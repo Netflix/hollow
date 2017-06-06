@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -35,11 +38,14 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     
     private PublishWorkflowContext ctx;
     
-    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+    public HollowFastlanePublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this.ctx = new TransformerPublishWorkflowContext(ctx,
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 uploadStatus,
                 fileStore,
+                publisher,
+                null,
+                announcer,
                 vip);
         
         this.scheduler = new PublicationJobScheduler();
@@ -52,50 +58,35 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
-        final Map<RegionEnum, List<PublicationJob>> regionalPublishJobs = addPublishJobsAllRegions(inputDataVersion, previousVersion, newVersion);
+        List<PublicationJob> allPublishJobs = addPublishJobs(inputDataVersion, previousVersion, newVersion);
 
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            createAnnounceJobForRegion(region, previousVersion, newVersion, regionalPublishJobs.get(region));
+            createAnnounceJobForRegion(region, previousVersion, newVersion, allPublishJobs);
         }
 
-        final List<PublicationJob> allPublishJobs = new ArrayList<>();
-        for(final List<PublicationJob> list: regionalPublishJobs.values()){
-            allPublishJobs.addAll(list);
-        }
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
         
         return CycleStatusFuture.UNCHECKED_STATUS;
     }
 
-    private Map<RegionEnum, List<PublicationJob>> addPublishJobsAllRegions(long inputDataVersion, long previousVersion, long newVersion){
-        Map<RegionEnum, List<PublicationJob>> publishJobsByRegion = new HashMap<>(RegionEnum.values().length);
-        for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            List<PublicationJob> allPublishJobs = new ArrayList<>();
-            List<PublicationJob> publishJobs = addPublishJobs(region, inputDataVersion, previousVersion, newVersion);
-            allPublishJobs.addAll(publishJobs);
-            publishJobsByRegion.put(region, allPublishJobs);
-        }
-        return publishJobsByRegion;
-    }
-
-    private List<PublicationJob> addPublishJobs(RegionEnum region, long inputDataVersion, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(long inputDataVersion, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if(snapshotFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, region, snapshotFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.SNAPSHOT, snapshotFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(deltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.DELTA, region, deltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.DELTA, deltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(reverseDeltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, region, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, reverseDeltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

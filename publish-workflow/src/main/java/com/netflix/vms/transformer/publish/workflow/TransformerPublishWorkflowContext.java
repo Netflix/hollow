@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
@@ -12,9 +14,7 @@ import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.poison.CassandraBasedPoisonedStateMarker;
 import com.netflix.vms.transformer.publish.poison.PoisonedStateMarker;
 import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
-
 import java.util.function.Supplier;
-
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public class TransformerPublishWorkflowContext implements PublishWorkflowContext {
@@ -27,17 +27,20 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final TaggingLogger logger;
     private final Supplier<ServerUploadStatus> uploadStatus;
     private final FileStore fileStore;
+    private final Publisher publisher;
+    private final Publisher nostreamsPublisher;
+    private final Announcer announcer;
     private final PublishWorkflowStatusIndicator statusIndicator;
 
     /* fields */
     private final String vip;
     private final long nowMillis;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, String vip) {
-        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, String vip) {
+        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, publisher, nostreamsPublisher, announcer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, String vip, PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
@@ -45,6 +48,9 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.poisonStateMarker = poisonStateMarker;
         this.uploadStatus = uploadStatus;
         this.fileStore = fileStore;
+        this.publisher = publisher;
+        this.nostreamsPublisher = nostreamsPublisher;
+        this.announcer = announcer;
         this.statusIndicator = statusIndicator;
         this.logger = ctx.getLogger();
         this.nowMillis = ctx.getNowMillis();
@@ -52,7 +58,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, publisher, nostreamsPublisher, announcer, vip, poisonStateMarker);
     }
 
     @Override
@@ -83,6 +89,21 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     @Override
     public FileStore getFileStore() {
         return fileStore;
+    }
+    
+    @Override
+    public Publisher getBlobPublisher() {
+        return publisher;
+    }
+    
+    @Override
+    public Publisher getNostreamsBlobPublisher() {
+        return nostreamsPublisher;
+    }
+
+    @Override
+    public Announcer getStateAnnouncer() {
+        return announcer;
     }
 
     @Override
