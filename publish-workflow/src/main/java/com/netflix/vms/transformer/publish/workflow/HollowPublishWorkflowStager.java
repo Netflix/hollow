@@ -50,12 +50,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private final String vip;
     private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, publisher, nostreamsPublisher, announcer, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 

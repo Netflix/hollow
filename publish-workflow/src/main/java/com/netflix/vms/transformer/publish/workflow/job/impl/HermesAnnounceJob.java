@@ -27,6 +27,13 @@ public class HermesAnnounceJob extends AnnounceJob {
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
         logResult(success);
+        
+        if(region == RegionEnum.EU_WEST_1) {///TODO: Announce per-region via Gutenberg.
+            ctx.getStateAnnouncer().announce(getCycleVersion());
+            ctx.getNostreamsStateAnnouncer().announce(getCycleVersion());
+        }
+        
+        
         return success;
     }
 
