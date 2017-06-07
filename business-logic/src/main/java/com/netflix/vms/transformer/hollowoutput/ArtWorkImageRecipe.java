@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.Arrays;
 
+@HollowPrimaryKey(fields="recipeNameStr")
 public class ArtWorkImageRecipe implements Cloneable {
 
     public char[] recipeNameStr = null;
@@ -50,5 +52,5 @@ public class ArtWorkImageRecipe implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

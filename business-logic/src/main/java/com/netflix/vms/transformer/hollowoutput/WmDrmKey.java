@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
+@HollowPrimaryKey(fields="downloadableId")
 public class WmDrmKey implements Cloneable {
 
     public DownloadableId downloadableId = null;
@@ -51,5 +53,5 @@ public class WmDrmKey implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

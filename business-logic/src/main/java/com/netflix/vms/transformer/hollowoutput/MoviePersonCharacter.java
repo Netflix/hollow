@@ -49,7 +49,7 @@ public class MoviePersonCharacter implements Cloneable, Comparable<MoviePersonCh
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 
     @Override
     public int compareTo(MoviePersonCharacter o) {
