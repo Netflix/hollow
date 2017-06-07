@@ -391,7 +391,7 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             readPointer += 1;
             break;
         case FLOAT:
-            int intValue = readIntBits(data, readPointer);
+            long intValue = readIntBits(data, readPointer) & 0xFFFFFFFFL;
             fixedLengthLongArray.setElementValue(fieldBitOffset, 32, intValue);
             readPointer += 4;
             break;
