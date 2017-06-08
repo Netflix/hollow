@@ -25,7 +25,6 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     public OutputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);
 
-        this.pinTitleFileStore = fileStore;
         this.outputDataClient = new VMSOutputDataClient(fileStore, vip);
     }
 

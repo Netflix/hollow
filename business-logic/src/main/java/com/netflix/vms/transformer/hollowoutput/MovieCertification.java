@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class MovieCertification implements Cloneable {
 
-    public Video videoId = null;
     public int certificationSystemId = java.lang.Integer.MIN_VALUE;
     public int ratingId = java.lang.Integer.MIN_VALUE;
     public int maturityLevel = java.lang.Integer.MIN_VALUE;
@@ -15,9 +14,6 @@ public class MovieCertification implements Cloneable {
             return false;
 
         MovieCertification o = (MovieCertification) other;
-        if(o.videoId == null) {
-            if(videoId != null) return false;
-        } else if(!o.videoId.equals(videoId)) return false;
         if(o.certificationSystemId != certificationSystemId) return false;
         if(o.ratingId != ratingId) return false;
         if(o.maturityLevel != maturityLevel) return false;
@@ -29,7 +25,6 @@ public class MovieCertification implements Cloneable {
 
     public int hashCode() {
         int hashCode = 1;
-        hashCode = hashCode * 31 + (videoId == null ? 1237 : videoId.hashCode());
         hashCode = hashCode * 31 + certificationSystemId;
         hashCode = hashCode * 31 + ratingId;
         hashCode = hashCode * 31 + maturityLevel;
@@ -39,7 +34,6 @@ public class MovieCertification implements Cloneable {
 
     public String toString() {
         StringBuilder builder = new StringBuilder("MovieCertification{");
-        builder.append("videoId=").append(videoId);
         builder.append(",certificationSystemId=").append(certificationSystemId);
         builder.append(",ratingId=").append(ratingId);
         builder.append(",maturityLevel=").append(maturityLevel);
@@ -57,5 +51,5 @@ public class MovieCertification implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

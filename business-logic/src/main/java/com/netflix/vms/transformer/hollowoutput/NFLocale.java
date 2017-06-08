@@ -47,7 +47,7 @@ public class NFLocale implements Cloneable, Comparable<NFLocale> {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 
     @Override
     public int compareTo(NFLocale o) {

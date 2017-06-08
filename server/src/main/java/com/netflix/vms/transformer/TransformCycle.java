@@ -14,7 +14,9 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
-
+import java.io.InputStream;
+import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.servo.monitor.Monitors;
 import com.google.gson.Gson;
 import com.netflix.aws.file.FileStore;
@@ -93,9 +95,9 @@ public class TransformCycle {
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
-    public void restore(VMSOutputDataClient restoreFrom) {
+    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
         outputStateEngine.restoreFrom(restoreFrom.getStateEngine());
-        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine());
+        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
         previousCycleNumber = restoreFrom.getCurrentVersionId();
     }
 
@@ -261,6 +263,9 @@ public class TransformCycle {
                 writer.writeSnapshot(snapshotOutputStream);
                 ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file {}", snapshotFileName);
             }
+            
+            String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
+            createNostreamsFilteredFile(snapshotFileName, nostreamsSnapshotFileName, true);
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
@@ -268,12 +273,18 @@ public class TransformCycle {
                     writer.writeDelta(deltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Delta to local file {}", deltaFileName);
                 }
+                
+                String nostreamsDeltaFileName = fileNamer.getNostreamsDeltaFileName(previousCycleNumber, currentCycleNumber);
+                createNostreamsFilteredFile(deltaFileName, nostreamsDeltaFileName, false);
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file {}", reverseDeltaFileName);
                 }
+                
+                String nostreamsReverseDeltaFileName = fileNamer.getNostreamsReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
+                createNostreamsFilteredFile(reverseDeltaFileName, nostreamsReverseDeltaFileName, false);
             }
         } catch(IOException e) {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
@@ -283,6 +294,31 @@ public class TransformCycle {
         long endTime = System.currentTimeMillis();
 
         ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, endTime - startTime);
+    }
+    
+    private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
+        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "SetOfDownloadableId", "FileEncodingData",
+                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "DownloadableId", "ChunkDurationsString", "StreamDataDescriptor",
+                "StreamAdditionalData", "ListOfDownloadableId", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
+                "WmDrmKey", "DrmInfo", "StreamMostlyConstantData", "ImageSubtitleIndexByteRange", "DrmInfoData", "QoEInfo",
+                "DeploymentIntent", "CodecPrivateDataString");
+        
+        FilteredHollowBlobWriter writer = new FilteredHollowBlobWriter(filterConfig);
+        
+        try(InputStream is = ctx.files().newBlobInputStream(new File(unfilteredFilename));
+            OutputStream os = ctx.files().newBlobOutputStream(new File(filteredFilename))) {
+            writer.filter(!isSnapshot, is, os);
+        }
+    }
+    
+    private HollowFilterConfig getStreamsFilter(String... streamTypes) {
+        HollowFilterConfig filterConfig = new HollowFilterConfig(true);
+        
+        for(String type : streamTypes) {
+            filterConfig.addType(type);
+        }
+        
+        return filterConfig;
     }
 
     private boolean isUnchangedFastlaneState() {
@@ -328,7 +364,8 @@ public class TransformCycle {
         return false;
       }
       
-      private String resolveConverterVip(TransformerContext ctx, String converterVip) {
+    @SuppressWarnings("unchecked")
+    private String resolveConverterVip(TransformerContext ctx, String converterVip) {
         
         // get the map of converterVip vs keybase
         String json = this.ctx.getConfig().getConverterVipToKeybaseMap();

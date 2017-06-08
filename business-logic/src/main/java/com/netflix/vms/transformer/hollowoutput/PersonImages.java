@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.List;
 import java.util.Map;
 
+@HollowPrimaryKey(fields="id")
 public class PersonImages implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
@@ -45,5 +47,5 @@ public class PersonImages implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

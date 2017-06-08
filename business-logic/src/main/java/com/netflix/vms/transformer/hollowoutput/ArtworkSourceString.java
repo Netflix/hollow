@@ -1,8 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
+
 import java.util.Arrays;
 
-public class ArtworkSourceString implements Cloneable {
+@HollowShardLargeType(numShards=32)
+public class ArtworkSourceString implements Cloneable, Comparable<ArtworkSourceString> {
 
     public char[] value = null;
 
@@ -48,5 +51,25 @@ public class ArtworkSourceString implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
+
+    @Override
+    public int compareTo(ArtworkSourceString o) {
+        int len1 = value.length;
+        int len2 = o.value.length;
+        int lim = Math.min(len1, len2);
+        char v1[] = value;
+        char v2[] = o.value;
+
+        int k = 0;
+        while (k < lim) {
+            char c1 = v1[k];
+            char c2 = v2[k];
+            if (c1 != c2) {
+                return c1 - c2;
+            }
+            k++;
+        }
+        return len1 - len2;
+    }
 }

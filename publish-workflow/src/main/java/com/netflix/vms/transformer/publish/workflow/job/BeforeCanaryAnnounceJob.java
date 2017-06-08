@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Map;
-
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
@@ -14,47 +15,55 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
 
     protected final String vip;
     protected final RegionEnum region;
-    private final HollowBlobPublishJob snapshotPublishJob;
-    private final HollowBlobPublishJob deltaPublishJob;
-    private final CanaryValidationJob previousCanaryValidationJob;
+    private final List<HollowBlobPublishJob> snapshotPublishJobs;
+    private final List<HollowBlobPublishJob> deltaPublishJobs;
+    private final List<HollowBlobPublishJob> reverseDeltaPublishJobs;
     private final CircuitBreakerJob circuitBreakerJob;
-    private final CanaryRollbackJob previousCanaryRollbackJob;
 
 
-	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
-			CanaryValidationJob previousCycleValidationJob, List<PublicationJob> newPublishJobs, CanaryRollbackJob previousCanaryRollBackJob) {
+	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> newPublishJobs) {
 		super(ctx, "Before-canary-annouce-"+region, newVersion);
         this.vip = vip;
         this.region = region;
-        this.previousCanaryValidationJob = previousCycleValidationJob;
         this.circuitBreakerJob = circuitBreakerJob;
-        this.snapshotPublishJob = findJob(newPublishJobs, PublishType.SNAPSHOT);
-        this.deltaPublishJob = findJob(newPublishJobs, PublishType.DELTA);
-        this.previousCanaryRollbackJob = previousCanaryRollBackJob;
+        this.snapshotPublishJobs = findJob(newPublishJobs, PublishType.SNAPSHOT);
+        this.deltaPublishJobs = findJob(newPublishJobs, PublishType.DELTA);
+        this.reverseDeltaPublishJobs = findJob(newPublishJobs, PublishType.REVERSEDELTA);
 	}
 
-    private HollowBlobPublishJob findJob(List<PublicationJob> jobs, PublishType type) {
+    private List<HollowBlobPublishJob> findJob(List<PublicationJob> jobs, PublishType type) {
+        List<HollowBlobPublishJob> foundJobs = new ArrayList<>();
+        
         HollowBlobPublishJob job;
         for(final PublicationJob j : jobs) {
             job = (HollowBlobPublishJob) j;
             if(job.getPublishType() == type)
-                return job;
+                foundJobs.add(job);
         }
-        return null;
+        
+        return foundJobs;
     }
 
     @Override
     public boolean isEligible() {
-        if(previousCanaryValidationJobFinished()) {
-            if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
-                if(jobExistsAndCompletedSuccessfully(snapshotPublishJob))
-                    return true;
-                if(jobExistsAndCompletedSuccessfully(deltaPublishJob))
-                    if(jobExistsAndCompletedSuccessfully(previousCanaryValidationJob))
-                        return true;
-                    else if(previousCanaryValidationJob != null && previousCanaryValidationJob.hasJobFailed()
-                            && jobExistsAndCompletedSuccessfully(previousCanaryRollbackJob))
-                        return true;
+        if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
+            if(!deltaPublishJobs.isEmpty()) {
+                for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(deltaPublishJob))
+                        return false;
+                }
+                
+                for(HollowBlobPublishJob reverseDeltaPublishJob : reverseDeltaPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(reverseDeltaPublishJob))
+                        return false;
+                }
+                return true;
+            } else if(!snapshotPublishJobs.isEmpty()){
+                for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs) {
+                    if(!jobExistsAndCompletedSuccessfully(snapshotPublishJob))
+                        return false;
+                }
+                return true;
             }
         }
         return false;
@@ -62,23 +71,21 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
 
     @Override
     protected boolean isFailedBasedOnDependencies() {
-        if(previousCanaryValidationJobFinished()) {
-            if(jobDoesNotExistOrFailed(circuitBreakerJob))
-                return true;
+        if(jobDoesNotExistOrFailed(circuitBreakerJob))
+            return true;
 
-            if(deltaPublishJob == null && snapshotPublishJob == null)
-                return true;
+        if(deltaPublishJobs.isEmpty() && snapshotPublishJobs.isEmpty())
+            return true;
 
-            if(jobDoesNotExistOrFailed(snapshotPublishJob) &&
-                    (jobDoesNotExistOrFailed(deltaPublishJob) || jobDoesNotExistOrFailed(previousCanaryValidationJob)))
-                return true;
+        if(!deltaPublishJobs.isEmpty()) {
+            for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs)
+                if(deltaPublishJob.hasJobFailed()) return true;
+        } else {
+            for(HollowBlobPublishJob snapshotPublishJob : snapshotPublishJobs)
+                if(snapshotPublishJob.hasJobFailed()) return true;
         }
 
         return false;
-    }
-
-    private boolean previousCanaryValidationJobFinished() {
-        return previousCanaryValidationJob == null || previousCanaryValidationJob.isComplete() || previousCanaryValidationJob.hasJobFailed();
     }
 
     /**

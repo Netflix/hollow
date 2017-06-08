@@ -18,7 +18,6 @@ import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData
 import com.netflix.vms.transformer.hollowoutput.MovieCertification;
 import com.netflix.vms.transformer.hollowoutput.MovieRatingReason;
 import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import java.util.ArrayList;
@@ -106,8 +105,6 @@ public class CertificationListsModule {
                                 }
                             }
                         }
-
-                        cert.movieCert.videoId = new Video(videoId.intValue());
 
                         int certSystemRatingOrdinal = certSystemRatingIdx.getMatchingOrdinal((long)cert.movieCert.ratingId);
                         if(certSystemRatingOrdinal != -1) {

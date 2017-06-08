@@ -21,17 +21,11 @@ import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.combine.HollowCombinerExcludePrimaryKeysCopyDirector;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
-import com.netflix.vms.generated.notemplate.EpisodeHollow;
-import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfEpisodeHollow;
-import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfVPersonHollow;
 import com.netflix.vms.generated.notemplate.MapOfStringsToSetOfVideoHollow;
 import com.netflix.vms.generated.notemplate.NamedCollectionHolderHollow;
-import com.netflix.vms.generated.notemplate.SetOfEpisodeHollow;
-import com.netflix.vms.generated.notemplate.SetOfVPersonHollow;
 import com.netflix.vms.generated.notemplate.SetOfVideoHollow;
 import com.netflix.vms.generated.notemplate.StringsHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.generated.notemplate.VPersonHollow;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
@@ -74,8 +68,6 @@ public class PinTitleHollowCombiner {
 
     // NamedList combined results
     protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedVideoLists;
-    protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedPersonLists;
-    protected final ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedEpisodeLists;
 
     public PinTitleHollowCombiner(TransformerContext ctx, HollowWriteStateEngine output, HollowWriteStateEngine fastlaneOutput, List<HollowReadStateEngine> pinnedTitleInputs) throws Exception {
         this(ctx, output, roundTrip(fastlaneOutput), pinnedTitleInputs);
@@ -89,8 +81,6 @@ public class PinTitleHollowCombiner {
         this.combiner = initCombiner(this.output, fastlaneInput, pinnedTitleInputs, inputs);
 
         this.combinedVideoLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
-        this.combinedPersonLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
-        this.combinedEpisodeLists = new ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String,Set<Integer>>>();
     }
 
 
@@ -282,39 +272,6 @@ public class PinTitleHollowCombiner {
                 }
             }
         });
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                ConcurrentHashMap<String, Set<Integer>> countryMap = getCountryMap(combinedEpisodeLists, countryId);
-                MapOfStringsToSetOfEpisodeHollow episodeListMaps = holder._getEpisodeListMap();
-                for (Map.Entry<StringsHollow, SetOfEpisodeHollow> entry : episodeListMaps.entrySet()) {
-                    Set<Integer> namedSet = getNamedSet(countryMap, entry.getKey()._getValue());
-                    synchronized (namedSet) {
-                        for (EpisodeHollow ep : entry.getValue()) {
-                            namedSet.add(ep._getIdBoxed());
-                        }
-                    }
-                }
-            }
-        });
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                ConcurrentHashMap<String, Set<Integer>> countryMap = getCountryMap(combinedPersonLists, countryId);
-                MapOfStringsToSetOfVPersonHollow personListMaps = holder._getPersonListMap();
-                for (Map.Entry<StringsHollow, SetOfVPersonHollow> entry : personListMaps.entrySet()) {
-                    Set<Integer> namedSet = getNamedSet(countryMap, entry.getKey()._getValue());
-                    synchronized (namedSet) {
-                        for (VPersonHollow person : entry.getValue()) {
-                            namedSet.add(person._getIdBoxed());
-                        }
-                    }
-                }
-            }
-        });
-
     }
 
     private ConcurrentHashMap<String, Set<Integer>> getCountryMap(ConcurrentHashMap<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> combinedMaps, String countryId) {
@@ -347,8 +304,6 @@ public class PinTitleHollowCombiner {
     private void writeNamedListsToOutput(HollowWriteStateEngine output) throws Exception {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
-        final int emptyResourceIdMapOrdinal = writeEmptyResourceIdMapToOutput(output);
-
         for(final Entry<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> entry : combinedVideoLists.entrySet()) {
             final ISOCountry country = entry.getKey();
 
@@ -356,26 +311,17 @@ public class PinTitleHollowCombiner {
                 @Override
                 public void run() {
                     ConcurrentHashMap<String, Set<Integer>> videoLists = entry.getValue();
-                    ConcurrentHashMap<String, Set<Integer>> personLists = combinedPersonLists.get(country);
-                    ConcurrentHashMap<String, Set<Integer>> episodeLists = combinedEpisodeLists.get(country);
 
                     HollowObjectWriteRecord holderRec = new HollowObjectWriteRecord((HollowObjectSchema) output.getSchema("NamedCollectionHolder"));
                     HollowObjectWriteRecord countryRec = new HollowObjectWriteRecord((HollowObjectSchema) output.getSchema("ISOCountry"));
                     countryRec.setString("id", country.getId());
 
                     HollowObjectWriteRecord videoRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("Video"));
-                    HollowObjectWriteRecord personRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("VPerson"));
-                    HollowObjectWriteRecord episodeRec = new HollowObjectWriteRecord((HollowObjectSchema)output.getSchema("Episode"));
 
                     int videoMapOrdinal = writeToOutput(videoLists, videoRec, "Video", "value", output);
-                    int episodeMapOrdinal = writeToOutput(episodeLists, episodeRec, "Episode", "id", output);
-                    int personMapOrdinal = writeToOutput(personLists, personRec, "VPerson", "id", output);
                     int countryOrdinal = output.add("ISOCountry", countryRec);
 
                     holderRec.setReference("videoListMap", videoMapOrdinal);
-                    holderRec.setReference("episodeListMap", episodeMapOrdinal);
-                    holderRec.setReference("personListMap", personMapOrdinal);
-                    holderRec.setReference("resourceIdListMap", emptyResourceIdMapOrdinal);
                     holderRec.setReference("country", countryOrdinal);
 
                     output.add("NamedCollectionHolder", holderRec);
@@ -385,12 +331,6 @@ public class PinTitleHollowCombiner {
 
         executor.awaitSuccessfulCompletion();
     }
-
-    // @TODO: Needs to be removed once client code is cleaned up
-    private int writeEmptyResourceIdMapToOutput(HollowWriteStateEngine output) {
-        return output.add("MapOfStringsToSetOfNFResourceID", new HollowMapWriteRecord());
-    }
-
 
     private int writeToOutput(Map<String, Set<Integer>> itemLists, HollowObjectWriteRecord itemRec, String typeName, String itemIdFieldName, HollowWriteStateEngine output) {
         String setName = SET_OF_PREFIX + typeName;

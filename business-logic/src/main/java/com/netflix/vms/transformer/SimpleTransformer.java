@@ -19,9 +19,9 @@ import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideo;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
+import com.netflix.vms.transformer.hollowoutput.CompleteVideoData;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoFacetData;
 import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
-import com.netflix.vms.transformer.hollowoutput.GlobalPerson;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MoviePersonCharacter;
@@ -38,7 +38,6 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
-import com.netflix.vms.transformer.misc.VideoEpisodeCountryDecoratorModule;
 import com.netflix.vms.transformer.modules.TransformModule;
 import com.netflix.vms.transformer.modules.artwork.CharacterImagesModule;
 import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
@@ -59,7 +58,6 @@ import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
-import com.netflix.vms.transformer.modules.passthrough.beehive.RolloutCharacterModule;
 import com.netflix.vms.transformer.modules.passthrough.mpl.EncodingProfileGroupModule;
 import com.netflix.vms.transformer.modules.person.GlobalPersonModule;
 import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
@@ -140,7 +138,6 @@ public class SimpleTransformer {
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, objectMapper, cycleConstants, indexer);
-                VideoEpisodeCountryDecoratorModule countryDecoratorModule = new VideoEpisodeCountryDecoratorModule(api, cycleConstants, objectMapper);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
@@ -163,13 +160,8 @@ public class SimpleTransformer {
                             Map<String, Map<Integer, CompleteVideoCountrySpecificData>> countrySpecificByCountry = 
                             						countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData, imagesDataByCountry);
 
-                            if (vcdByCountry != null) {
+                            if (vcdByCountry != null)
                                 writeJustTheCurrentData(vcdByCountry, vmdByCountry, miscData, mediaDataByCountry, imagesDataByCountry, countrySpecificByCountry, objectMapper);
-
-                                for (String country : vcdByCountry.keySet()) {
-                                    countryDecoratorModule.decorateVideoEpisodes(country, vcdByCountry.get(country));
-                                }
-                            }
                         }
                     } catch (Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup), th);
@@ -200,10 +192,10 @@ public class SimpleTransformer {
                 new L10NMiscResourcesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new LanguageRightsModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new TopNVideoDataModule(api, ctx, cycleConstants, objectMapper),
-                new RolloutCharacterModule(api, ctx, cycleConstants, objectMapper),
                 new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer)
+                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
+                new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer)
                 );
 
         // @formatter:on
@@ -215,21 +207,14 @@ public class SimpleTransformer {
             ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", m.getName(), tDuration);
         }
 
-        /// GlobalPersonModule is pulled out separately here because we will use the result in the NamedListCompletionModule
-        GlobalPersonModule globalPersonModule = new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer);
-        long tStart = System.currentTimeMillis();
-        List<GlobalPerson> allGlobalPersonRecords = globalPersonModule.transformPersons();
-        long tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", globalPersonModule.getName(), tDuration);
-
         executor.awaitSuccessfulCompletion();
 
         //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
         //// to the NamedLists, and we can build the POJOs using those.
-        tStart = System.currentTimeMillis();
-        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, allGlobalPersonRecords, cycleConstants, objectMapper);
+        long tStart = System.currentTimeMillis();
+        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
         namedListCompleter.transform();
-        tDuration = System.currentTimeMillis() - tStart;
+        long tDuration = System.currentTimeMillis() - tStart;
         ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
 
         ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
@@ -280,7 +265,7 @@ public class SimpleTransformer {
                 namedListPopulator.addCompleteVideo(topNode, true); // TODO: timt: refactor away duplicate calls (see globalVideoMap)
 
                 // Process Show children
-                if(topNode.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
+                if(topNode.data.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
                     int sequenceNumber = 0;
                     // Process Seasons
                     for(Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
@@ -325,8 +310,8 @@ public class SimpleTransformer {
                     representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
                     availableCountries.add(country);
 
-                    if (completeVideo.facetData.videoMetaData.aliases != null) {
-                        aliases.addAll(completeVideo.facetData.videoMetaData.aliases);
+                    if (completeVideo.data.facetData.videoMetaData.aliases != null) {
+                        aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
                     }
                 }
             }
@@ -337,7 +322,7 @@ public class SimpleTransformer {
             gVideo.completeVideo = representativeVideo;
             gVideo.aliases = aliases;
             gVideo.availableCountries = availableCountries;
-            gVideo.isSupplementalVideo = (representativeVideo.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
+            gVideo.isSupplementalVideo = (representativeVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SUPPLEMENTAL);
             gVideo.personCharacters = getPersonCharacters(primaryKeyIndex, representativeVideo);
             
             objectMapper.addObject(gVideo);
@@ -384,7 +369,7 @@ public class SimpleTransformer {
     private CompleteVideo preferredCompleteVideo(CompleteVideo current, CompleteVideo candidate) {
         if (current == null
                 || isGoLive(candidate)
-                || current.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
+                || current.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED)) {
             return candidate;
         }
 
@@ -403,15 +388,16 @@ public class SimpleTransformer {
         CompleteVideo completeVideo = new CompleteVideo();
         completeVideo.id = video;
         completeVideo.country = country;
-        completeVideo.facetData = new CompleteVideoFacetData();
-        completeVideo.facetData.videoCollectionsData = videoCollectionsData;
-        completeVideo.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
-        completeVideo.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
-        completeVideo.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
+        completeVideo.data = new CompleteVideoData();
+        completeVideo.data.facetData = new CompleteVideoFacetData();
+        completeVideo.data.facetData.videoCollectionsData = videoCollectionsData;
+        completeVideo.data.facetData.videoMetaData = vmdByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.data.facetData.videoMediaData = mediaDataByCountry.get(countryId).get(completeVideo.id.value);
+        completeVideo.data.facetData.videoImages = getVideoImages(countryId, completeVideo.id.value, imagesDataByCountry);
         
         if(!isExtended(completeVideo))  /// "Extended" videos have VideoMiscData excluded.
-            completeVideo.facetData.videoMiscData = miscData.get(completeVideo.id.value);
-        completeVideo.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
+            completeVideo.data.facetData.videoMiscData = miscData.get(completeVideo.id.value);
+        completeVideo.data.countrySpecificData = countrySpecificByCountry.get(countryId).get(completeVideo.id.value);
         objectMapper.addObject(completeVideo);
 
         // keep track of created completeVideo for GlobalVideo creation
@@ -454,11 +440,11 @@ public class SimpleTransformer {
     private static final VideoSetType VIDEO_SET_TYPE_EXTENDED = new VideoSetType("Extended");
 
     private static boolean isExtended(CompleteVideo completeVideo) {
-        return completeVideo.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
+        return completeVideo.data.facetData.videoMetaData.videoSetTypes.contains(VIDEO_SET_TYPE_EXTENDED);
     }
 
     private static boolean isGoLive(CompleteVideo completeVideo) {
-        return completeVideo.facetData != null && completeVideo.facetData.videoMediaData != null && completeVideo.facetData.videoMediaData.isGoLive;
+        return completeVideo.data.facetData != null && completeVideo.data.facetData.videoMediaData != null && completeVideo.data.facetData.videoMediaData.isGoLive;
     }
 
     private static Comparator<ISOCountry> countryComparator = new ISOCountryComparator();

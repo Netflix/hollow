@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
+@HollowPrimaryKey(fields={"keyId", "videoId"})
 public class DrmKey implements Cloneable {
 
     public long keyId = java.lang.Long.MIN_VALUE;
@@ -53,5 +55,5 @@ public class DrmKey implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

@@ -342,7 +342,7 @@ public class VideoImagesDataModuleTest {
 
         // Process list of derivatives
         artworkWithRolloutTrue.derivatives = new ArtworkDerivatives();
-        artworkWithRolloutTrue.sourceFileId = new Strings(sourceFileId);
+        artworkWithRolloutTrue.sourceFileId = new ArtworkSourceString(sourceFileId);
         artworkWithRolloutTrue.basic_passthrough = new ArtworkBasicPassthrough();
         artworkWithRolloutTrue.seqNum = 2;
         artworkWithRolloutTrue.ordinalPriority = 3;

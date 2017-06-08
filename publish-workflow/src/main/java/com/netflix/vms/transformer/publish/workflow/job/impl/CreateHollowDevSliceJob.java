@@ -3,17 +3,15 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.DEV_SLICE_TOPNODE_IDS;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
 
-import com.netflix.hollow.core.util.IntList;
-
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.io.LZ4VMSOutputStream;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -27,6 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 
 @SuppressWarnings("deprecation")
 public class CreateHollowDevSliceJob extends CreateDevSliceJob {
@@ -76,9 +75,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         
         HollowBlobWriter writer = new HollowBlobWriter(sliceOutputBlob);
         
-        ///TODO: This is the only place where we require the vmstransformer-io project.  When this
-        /// changes to an LZ4BlockOutputStream, remove the dependency on vmstransformer-io.
-        try (OutputStream os = new LZ4VMSOutputStream(new FileOutputStream(sliceSnapshotFile))) {
+        try (OutputStream os = new LZ4BlockOutputStream(new FileOutputStream(sliceSnapshotFile))) {
             writer.writeSnapshot(os);
         }
         return sliceSnapshotFile;

@@ -19,28 +19,28 @@ public class CertificationSystemCircuitBreaker extends HollowPerCountryCompleteV
 
     @Override
     public String getRuleName() {
-        if(maxMaturityRating == Integer.MAX_VALUE)
+        if (maxMaturityRating == Integer.MAX_VALUE)
             return "CertificationSystemCheck";
-        return "CertificationSystemCheckMax"+maxMaturityRating;
+        return "CertificationSystemCheckMax" + maxMaturityRating;
     }
 
     @Override
     protected int getVideoScore(CompleteVideoHollow cv) {
-        ListOfCertificationHollow certList = cv._getCountrySpecificData()._getCertificationList();
+        ListOfCertificationHollow certList = cv._getData()._getCountrySpecificData()._getCertificationList();
 
-        if(certList == null)
+        if (certList == null)
             return 0;
 
         /// If we're just counting ratings, let's count all of them.
-        if(maxMaturityRating == Integer.MAX_VALUE)
+        if (maxMaturityRating == Integer.MAX_VALUE)
             return certList.size();
 
         /// Otherwise, per: https://confluence.netflix.com/display/MERCHINF/Puneet%27s+writeups+on+maturity+level
         /// Only the first maturity rating in the certification list for a movie determines filtering logic
         /// so let's count the movies in which the first rating is not filtered out by this maturity rating.
-        if(certList.size() > 0) {
+        if (certList.size() > 0) {
             int maturityLevel = certList.get(0)._getMovieCert()._getMaturityLevel();
-            if(maturityLevel <= maxMaturityRating)
+            if (maturityLevel <= maxMaturityRating)
                 return 1;
         }
 

@@ -26,7 +26,6 @@ import com.netflix.vms.transformer.hollowoutput.PersonImages;
 import com.netflix.vms.transformer.hollowoutput.RolloutCharacter;
 import com.netflix.vms.transformer.hollowoutput.RolloutVideo;
 import com.netflix.vms.transformer.hollowoutput.TopNVideoData;
-import com.netflix.vms.transformer.hollowoutput.VideoEpisode_CountryList;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
@@ -35,6 +34,7 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
 
     public VMSTransformerWriteStateEngine() {
         super(new VMSTransformerHashCodeFinder());
+        setTargetMaxTypeShardSize(16 * 1024 * 1024);
         initializeTopLevelTypeStates();
     }
 
@@ -46,7 +46,6 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
         
         initializeTypeStates(mapper,
                 CompleteVideo.class,
-                VideoEpisode_CountryList.class,
                 VideoPackageData.class,
                 NamedCollectionHolder.class,
                 EncodingProfile.class,

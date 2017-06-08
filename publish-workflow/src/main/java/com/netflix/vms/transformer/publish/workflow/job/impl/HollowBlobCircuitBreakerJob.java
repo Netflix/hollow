@@ -33,8 +33,8 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
 
     private final boolean circuitBreakersDisabled;
 
-    public HollowBlobCircuitBreakerJob(PublishWorkflowContext ctx, long cycleVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, HollowBlobDataProvider hollowBlobDataProvider) {
-        super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile);
+    public HollowBlobCircuitBreakerJob(PublishWorkflowContext ctx, long cycleVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile, HollowBlobDataProvider hollowBlobDataProvider) {
+        super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
         this.circuitBreakerRules = createCircuitBreakerRules(ctx, cycleVersion, snapshotFile.length());
@@ -67,7 +67,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
     protected boolean executeJob() {
         try {
             // @TODO Need to move this to separate job - CBs and PBM depends on this updateData
-            hollowBlobDataProvider.updateData(snapshotFile, deltaFile, reverseDeltaFile);
+            hollowBlobDataProvider.updateData(snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
 
             if (circuitBreakersDisabled) {
                 ctx.getLogger().warn(CircuitBreaker, "Hollow/Master Circuit Breaker is disabled!");

@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.rollout;
 
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
+
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -187,8 +189,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
     private void initialize(Phase phase) {
         phase.projectedLaunchDates = new HashMap<ISOCountry, Date>();
         phase.windowsMap = new HashMap<ISOCountry, AvailabilityWindow>();
-        phase.artWorkImageIds = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
-        phase.sourceFileIds = new HashSet<Strings>();
+        phase.sourceFileIds = new HashSet<ArtworkSourceString>();
         phase.trailers = new ArrayList<RolloutTrailer>();
         phase.casts = new ArrayList<RolloutCast>();
         phase.roles = new ArrayList<RolloutRole>();
@@ -214,7 +215,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
         // add artwork source fields
         RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork()._getSourceFileIds();
         for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
-            phase.sourceFileIds.add(new Strings(sourceFieldHollow._getValue()._getValue()));
+            phase.sourceFileIds.add(new ArtworkSourceString(sourceFieldHollow._getValue()._getValue()));
         }
     }
 

@@ -36,16 +36,16 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = true;
-    private static final boolean isPerformDiff = true;
+    private static final boolean isProd = false;
+    private static final boolean isPerformDiff = false;
     private static final boolean isPublishPinnedData = false;
     private static final boolean isUseRemotePinTitleSlicer = true;
 
-    private static final String VIP_NAME = "newnoevent";
-    private static final String CONVERTER_VIP_NAME = "noevent";
+    private static final String VIP_NAME = "feather";
+    private static final String CONVERTER_VIP_NAME = "muon";
     private static final String WORKING_DIR = "/space/transformer-data/fast";
     private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
-    private static final String REMOTE_SLICER_URL = "http://go/pintitleslicer";
+    private static final String REMOTE_SLICER_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmstransformer-" + VIP_NAME + "_override-" + CONVERTER_VIP_NAME + ":7101/REST/vms/pintitleslicer";
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
     private FileStore pinTitleFileStore;
@@ -59,8 +59,8 @@ public class ShowMeTheFastProgress {
     @Test
     public void start() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170413151148932L;
-        int[] topNodes = { 70220028 };
+        long transformerVersion = 20170516184232009L;
+        int[] topNodes = { 70084180 };
 
         long start = System.currentTimeMillis();
         setup();

@@ -5,7 +5,7 @@ import java.util.List;
 public class EncodeSummaryDescriptor implements Cloneable {
 
     public boolean fromMuxedOnlyStreams = false;
-    public List<Long> downloadableIds = null;
+    public List<DownloadableId> downloadableIds = null;
     public EncodeSummaryDescriptorData descriptorData = null;
 
     public boolean equals(Object other) {
@@ -50,5 +50,5 @@ public class EncodeSummaryDescriptor implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

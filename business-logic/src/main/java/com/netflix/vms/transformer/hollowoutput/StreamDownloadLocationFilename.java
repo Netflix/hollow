@@ -2,26 +2,26 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class NFResourceID implements Cloneable {
+public class StreamDownloadLocationFilename implements Cloneable {
 
     public char[] value = null;
 
-    public NFResourceID() { }
+    public StreamDownloadLocationFilename() { }
 
-    public NFResourceID(char[] value) {
+    public StreamDownloadLocationFilename(char[] value) {
         this.value = value;
     }
 
-    public NFResourceID(String value) {
+    public StreamDownloadLocationFilename(String value) {
         this.value = value.toCharArray();
     }
 
     public boolean equals(Object other) {
         if(other == this)  return true;
-        if(!(other instanceof NFResourceID))
+        if(!(other instanceof StreamDownloadLocationFilename))
             return false;
 
-        NFResourceID o = (NFResourceID) other;
+        StreamDownloadLocationFilename o = (StreamDownloadLocationFilename) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
     }
@@ -33,20 +33,20 @@ public class NFResourceID implements Cloneable {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder("NFResourceID{");
+        StringBuilder builder = new StringBuilder("Strings{");
         builder.append("value=").append(value);
         builder.append("}");
         return builder.toString();
     }
 
-    public NFResourceID clone() {
+    public StreamDownloadLocationFilename clone() {
         try {
-            NFResourceID clone = (NFResourceID)super.clone();
+            StreamDownloadLocationFilename clone = (StreamDownloadLocationFilename)super.clone();
             clone.__assigned_ordinal = -1;
             return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

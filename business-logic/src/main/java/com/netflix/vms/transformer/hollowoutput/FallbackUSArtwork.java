@@ -1,9 +1,11 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@HollowPrimaryKey(fields="id")
 public class FallbackUSArtwork implements Cloneable {
 
     public Video id = null;
@@ -54,5 +56,5 @@ public class FallbackUSArtwork implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

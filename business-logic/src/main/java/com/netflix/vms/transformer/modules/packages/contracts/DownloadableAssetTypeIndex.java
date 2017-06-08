@@ -3,13 +3,14 @@ package com.netflix.vms.transformer.modules.packages.contracts;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
 
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import com.netflix.vms.transformer.contract.ContractAsset;
 
 public class DownloadableAssetTypeIndex {
@@ -47,7 +48,7 @@ public class DownloadableAssetTypeIndex {
         }
     }
 
-    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked(Viewing viewing) {
+    public Set<DownloadableId> getAllUnmarked(Viewing viewing) {
         switch (viewing) {
         case STREAM:
             return getAllUnmarked();
@@ -58,8 +59,8 @@ public class DownloadableAssetTypeIndex {
         }
     }
 
-    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarked() {
-        Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+    public Set<DownloadableId> getAllUnmarked() {
+        Set<DownloadableId> set = new HashSet<com.netflix.vms.transformer.hollowoutput.DownloadableId>();
 
         for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
             if(!entry.getValue().isMarked(STREAM))
@@ -69,8 +70,8 @@ public class DownloadableAssetTypeIndex {
         return set;
     }
 
-    public Set<com.netflix.vms.transformer.hollowoutput.Long> getAllUnmarkedForDownloadAndMarkedForStreaming() {
-        Set<com.netflix.vms.transformer.hollowoutput.Long> set = new HashSet<com.netflix.vms.transformer.hollowoutput.Long>();
+    public Set<com.netflix.vms.transformer.hollowoutput.DownloadableId> getAllUnmarkedForDownloadAndMarkedForStreaming() {
+        Set<com.netflix.vms.transformer.hollowoutput.DownloadableId> set = new HashSet<com.netflix.vms.transformer.hollowoutput.DownloadableId>();
 
         for(Map.Entry<ContractAsset, DownloadableIdList> entry : downloadableIdsByContract.entrySet()) {
             if(!entry.getValue().isMarked(DOWNLOAD) && entry.getValue().isMarked(STREAM))
@@ -87,7 +88,7 @@ public class DownloadableAssetTypeIndex {
 
     private static class DownloadableIdList {
 
-        private final List<com.netflix.vms.transformer.hollowoutput.Long> list;
+        private final List<com.netflix.vms.transformer.hollowoutput.DownloadableId> list;
         private boolean marked;
         private boolean markedForDownload;
 
@@ -96,7 +97,7 @@ public class DownloadableAssetTypeIndex {
         }
 
         public void addDownloadableId(long downloadableId) {
-            list.add(new com.netflix.vms.transformer.hollowoutput.Long(downloadableId));
+            list.add(new com.netflix.vms.transformer.hollowoutput.DownloadableId(downloadableId));
         }
 
         public void mark(Viewing viewing) {
@@ -128,7 +129,7 @@ public class DownloadableAssetTypeIndex {
             }
         }
         
-        public List<com.netflix.vms.transformer.hollowoutput.Long> getList() {
+        public List<com.netflix.vms.transformer.hollowoutput.DownloadableId> getList() {
             return list;
         }
     }

@@ -26,7 +26,6 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
@@ -94,8 +93,7 @@ public class VMSAvailabilityWindowModule {
         
         List<VMSAvailabilityWindow> windows = calculateWindowData(videoId, country, null, videoRights, rollup, isGoLive);
 
-        data.mediaAvailabilityWindows = windows;
-        data.imagesAvailabilityWindows = windows;
+        data.availabilityWindows = windows;
         
         return windows;
     }
@@ -364,8 +362,6 @@ public class VMSAvailabilityWindowModule {
             boolean hasRollingEpisodes = false;
             boolean isAvailableForDownload = false;
             LinkedHashSetOfStrings cupTokens = null;
-            Map<Strings, List<VideoImage>> stillImagesByTypeMap = null;
-            Map<Strings, List<VideoImage>> stillImagesByTypeMapForShowLevelExtraction = null;
 
             for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
                 VideoPackageInfo videoPackageInfo  = entry.getValue().videoPackageInfo;
@@ -384,10 +380,6 @@ public class VMSAvailabilityWindowModule {
                     hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
                     isAvailableForDownload = entry.getValue().videoContractInfo.isAvailableForDownload;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
-                    if(isGoLive && isInWindow)
-                        stillImagesByTypeMap = entry.getValue().videoPackageInfo.stillImagesMap;
-                    else
-                        stillImagesByTypeMapForShowLevelExtraction = entry.getValue().videoPackageInfo.stillImagesMap;
                 }
             }
 
@@ -403,11 +395,6 @@ public class VMSAvailabilityWindowModule {
                 rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
                 rollup.newCupTokens(cupTokens);
             }
-
-            if(stillImagesByTypeMap != null)
-                rollup.newEpisodeStillImagesByTypeMap(stillImagesByTypeMap);
-            else if (stillImagesByTypeMapForShowLevelExtraction != null)
-                rollup.newEpisodeStillImagesByTypeMapForShowLevelExtraction(stillImagesByTypeMapForShowLevelExtraction);
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
             
@@ -512,9 +499,7 @@ public class VMSAvailabilityWindowModule {
                     outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
                 }
     
-                if(isGoLive && isInWindow)
-                    outputContractInfo.videoPackageInfo.stillImagesMap = rollup.getVideoImageMap();
-                else
+                if(!(isGoLive && isInWindow))
                     outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
     
                 int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));

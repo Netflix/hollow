@@ -4,7 +4,6 @@ import com.netflix.vms.transformer.hollowoutput.DateWindow;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.util.RollUpOrDownValues;
 
 import java.util.ArrayList;
@@ -34,11 +33,6 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
     private LinkedHashSetOfStrings showCupTokensFromFirstStreamableEpisode = null;
     private LinkedHashSetOfStrings seasonCupTokensFromFirstStreamableEpisode = null;
-
-    private Map<Strings, List<VideoImage>> showFirstEpisodeVideoImagesMap = Collections.emptyMap();
-    private Map<Strings, List<VideoImage>> seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
-    private Map<Strings, List<VideoImage>> showLevelTaggedVideoImagesRollup = new HashMap<>();
-    private Map<Strings, List<VideoImage>> seasonLevelTaggedVideoImagesRollup = new HashMap<>();
 
     private int seasonSequenceNumber = 0;
     private Map<DateWindow, BitSet> seasonSequenceNumberMap = new HashMap<>();
@@ -86,8 +80,6 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonHasRollingEpisodes = false;
         seasonIsAvailableForDownload = false;
         seasonCupTokensFromFirstStreamableEpisode = null;
-        seasonFirstEpisodeVideoImagesMap = Collections.emptyMap();
-        seasonLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         seasonBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
         seasonFoundLocalAudio = false;
@@ -103,8 +95,6 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showHasRollingEpisodes = false;
         showIsAvailableForDownload = false;
         showCupTokensFromFirstStreamableEpisode = null;
-        showFirstEpisodeVideoImagesMap = Collections.emptyMap();
-        showLevelTaggedVideoImagesRollup = new HashMap<Strings, List<VideoImage>>();
         seasonSequenceNumberMap = new HashMap<>();
         showBundledAssetFromFirstAvailableEpisode = Integer.MIN_VALUE;
         showBundledAssetFromFirstUnavailableEpisode = Integer.MIN_VALUE;
@@ -196,45 +186,6 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
             seasonCupTokensFromFirstStreamableEpisode = cupTokens;
     }
 
-    public void newEpisodeStillImagesByTypeMap(Map<Strings, List<VideoImage>> map) {
-        if (showFirstEpisodeVideoImagesMap.isEmpty())
-            showFirstEpisodeVideoImagesMap = map;
-        if (seasonFirstEpisodeVideoImagesMap.isEmpty())
-            seasonFirstEpisodeVideoImagesMap = map;
-
-        newEpisodeStillImagesByTypeMapForShowLevelExtraction(map);
-    }
-
-    public void newEpisodeStillImagesByTypeMapForShowLevelExtraction(Map<Strings, List<VideoImage>> map) {
-        for (Map.Entry<Strings, List<VideoImage>> entry : map.entrySet()) {
-            for (VideoImage img : entry.getValue()) {
-                for (Strings momentTag : img.videoMoment.momentTags) {
-                    if (new String(momentTag.value).equals("show_level")) {
-                        newTagBasedShowLevelVideoImage(entry.getKey(), img);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    private void newTagBasedShowLevelVideoImage(Strings type, VideoImage img) {
-        List<VideoImage> list = showLevelTaggedVideoImagesRollup.get(type);
-        if (list == null) {
-            list = new ArrayList<VideoImage>();
-            showLevelTaggedVideoImagesRollup.put(type, list);
-        }
-
-        list.add(img);
-
-        list = seasonLevelTaggedVideoImagesRollup.get(type);
-        if (list == null) {
-            list = new ArrayList<VideoImage>();
-            seasonLevelTaggedVideoImagesRollup.put(type, list);
-        }
-        list.add(img);
-    }
-
     public void newSeasonWindow(long startDate, long endDate, boolean onHold, int sequenceNumber) {
         DateWindow dateWindow = new DateWindow();
         dateWindow.startDateTimestamp = startDate;
@@ -311,19 +262,6 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         if (doSeason())
             return seasonCupTokensFromFirstStreamableEpisode;
         return showCupTokensFromFirstStreamableEpisode;
-    }
-
-    public Map<Strings, List<VideoImage>> getVideoImageMap() {
-        if (doSeason()) {
-            if (seasonLevelTaggedVideoImagesRollup.isEmpty())
-                return seasonFirstEpisodeVideoImagesMap;
-            return seasonLevelTaggedVideoImagesRollup;
-        }
-
-        if (showLevelTaggedVideoImagesRollup.isEmpty())
-            return showFirstEpisodeVideoImagesMap;
-        return showLevelTaggedVideoImagesRollup;
-
     }
 
     public Map<DateWindow, List<com.netflix.vms.transformer.hollowoutput.Integer>> getDateWindowWiseSeasonSequenceNumbers() {

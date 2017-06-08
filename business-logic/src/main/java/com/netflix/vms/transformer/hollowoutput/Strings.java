@@ -48,7 +48,7 @@ public class Strings implements Cloneable, Comparable<Strings> {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 
     @Override
     public int compareTo(Strings o) {
