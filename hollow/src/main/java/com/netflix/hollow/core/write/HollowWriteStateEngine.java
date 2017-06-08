@@ -389,7 +389,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         Random rand = new Random();
         
         long newTag = rand.nextLong();
-        while((newTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK) == (previousStateRandomizedTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK))
+        while((newTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK) == 0 ||
+              (newTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK) == HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK ||
+              (newTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK) == (previousStateRandomizedTag & HollowTypeMapper.ASSIGNED_ORDINAL_CYCLE_MASK))
             newTag = rand.nextLong();
         
         return newTag;
