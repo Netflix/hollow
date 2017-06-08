@@ -110,7 +110,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -270,10 +270,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -551,7 +551,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -711,10 +711,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -992,7 +992,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -1152,10 +1152,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1433,7 +1433,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -1593,10 +1593,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1764,8 +1764,8 @@
         }
     },
     "findbugs": {
-        "com.google.code.findbugs:annotations": {
-            "locked": "3.0.0",
+        "com.apple:AppleJavaExtensions": {
+            "locked": "1.4",
             "transitive": [
                 "com.google.code.findbugs:findbugs"
             ]
@@ -1777,10 +1777,16 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.0"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
-            "locked": "3.0.0",
+            "locked": "2.0.1",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "com.google.code.findbugs:jsr305": {
+            "locked": "2.0.1",
             "transitive": [
                 "com.google.code.findbugs:findbugs"
             ]
@@ -1803,10 +1809,34 @@
                 "com.google.code.findbugs:findbugs"
             ]
         },
+        "net.jcip:jcip-annotations": {
+            "locked": "1.0",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "org.ow2.asm:asm": {
+            "locked": "5.0.2",
+            "transitive": [
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.2",
+            "transitive": [
+                "com.google.code.findbugs:findbugs"
+            ]
+        },
         "org.ow2.asm:asm-debug-all": {
             "locked": "5.0.2",
             "transitive": [
                 "com.google.code.findbugs:findbugs"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.2",
+            "transitive": [
+                "org.ow2.asm:asm-commons"
             ]
         },
         "xml-apis:xml-apis": {
@@ -1818,34 +1848,34 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.1.201405082137"
+            "locked": "0.7.6.201602180812"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.1.201405082137",
+            "locked": "0.7.6.201602180812",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.7.1.201405082137"
+            "locked": "0.7.6.201602180812"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.7.1.201405082137",
+            "locked": "0.7.6.201602180812",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.7.1.201405082137",
+            "locked": "0.7.6.201602180812",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.ow2.asm:asm-debug-all": {
-            "locked": "5.0.1",
+            "locked": "5.0.4",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
                 "org.jacoco:org.jacoco.report"
@@ -1854,7 +1884,7 @@
     },
     "nebulaRecommenderBom": {
         "netflix:runtime-platform-recommendations": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "requested": "latest.release"
         }
     },
@@ -1979,7 +2009,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -2139,10 +2169,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2420,7 +2450,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -2580,10 +2610,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2870,7 +2900,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -3030,10 +3060,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3320,7 +3350,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -3480,10 +3510,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3770,7 +3800,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "requested": "2.+"
         },
         "com.netflix.servo:servo-core": {
@@ -3930,10 +3960,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.3.5"
+            "locked": "4.4.0"
         },
         "netflix:server-context": {
-            "locked": "4.3.5",
+            "locked": "4.4.0",
             "transitive": [
                 "netflix:netflix-config"
             ]
