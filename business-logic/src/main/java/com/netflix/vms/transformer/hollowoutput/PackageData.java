@@ -20,6 +20,7 @@ public class PackageData implements Cloneable {
     public Set<EncodeSummaryDescriptor> textStreamSummary = null;
     public Set<EncodeSummaryDescriptor> muxAudioStreamSummary = null;
     public Set<ISOCountry> allDeployableCountries = null;
+    public int runtimeInSeconds = 0;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -28,6 +29,7 @@ public class PackageData implements Cloneable {
 
         PackageData o = (PackageData) other;
         if(o.id != id) return false;
+        if(o.runtimeInSeconds != runtimeInSeconds) return false;
         if(o.video == null) {
             if(video != null) return false;
         } else if(!o.video.equals(video)) return false;
@@ -63,6 +65,7 @@ public class PackageData implements Cloneable {
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + id;
+        hashCode = hashCode * 31 + runtimeInSeconds;
         hashCode = hashCode * 31 + (video == null ? 1237 : video.hashCode());
         hashCode = hashCode * 31 + (contractRestrictions == null ? 1237 : contractRestrictions.hashCode());
         hashCode = hashCode * 31 + (streams == null ? 1237 : streams.hashCode());
@@ -80,6 +83,7 @@ public class PackageData implements Cloneable {
         StringBuilder builder = new StringBuilder("PackageData{");
         builder.append("id=").append(id);
         builder.append(",video=").append(video);
+        builder.append(",runtimeInSeconds=").append(runtimeInSeconds);
         builder.append(",contractRestrictions=").append(contractRestrictions);
         builder.append(",streams=").append(streams);
         builder.append(",isPrimaryPackage=").append(isPrimaryPackage);

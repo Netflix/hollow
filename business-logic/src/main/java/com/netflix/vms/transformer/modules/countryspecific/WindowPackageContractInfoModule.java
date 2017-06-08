@@ -169,6 +169,7 @@ public class WindowPackageContractInfoModule {
         }
 
         info.videoPackageInfo.runtimeInSeconds = (int) longestRuntimeInSeconds;
+        packageData.runtimeInSeconds = info.videoPackageInfo.runtimeInSeconds;
 
         return info;
     }
