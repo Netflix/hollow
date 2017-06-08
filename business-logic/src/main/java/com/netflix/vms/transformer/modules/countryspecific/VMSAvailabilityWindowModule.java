@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
-
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -36,7 +34,9 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.RightsWindowContract;
 import com.netflix.vms.transformer.util.OutputUtil;
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -449,20 +449,17 @@ public class VMSAvailabilityWindowModule {
 
     // Return AvailabilityWindow from MediaData
     private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMulticatalogRollup) {
-        List<RightsWindowHollow> windows = new ArrayList<RightsWindowHollow>(rights._getWindows());
 
-        boolean windowsEmpty = windows.isEmpty();
-        
-        if(!windowsEmpty) {
+        List<RightsWindowHollow> rightsWindowHollows = new ArrayList<>(rights._getWindows());
+        if(!rightsWindowHollows.isEmpty()) {
+
             boolean isInWindow = false;
-
             int maxContractId = Integer.MIN_VALUE;
             
-            Collections.sort(windows, RIGHTS_WINDOW_COMPARATOR);
-            
-            List<VMSAvailabilityWindow> windowList = new ArrayList<VMSAvailabilityWindow>(windows.size());
+            Collections.sort(rightsWindowHollows, RIGHTS_WINDOW_COMPARATOR);
+            List<VMSAvailabilityWindow> windowList = new ArrayList<>(rightsWindowHollows.size());
 
-            for (RightsWindowHollow window : windows) {
+            for (RightsWindowHollow window : rightsWindowHollows) {
                 long startDate = window._getStartDate();
                 long endDate = window._getEndDate();
                 boolean isOnHold = window._getOnHold();
@@ -498,7 +495,7 @@ public class VMSAvailabilityWindowModule {
                 WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
     
     
-                outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
+                outputWindow.windowInfosByPackageId = new HashMap<>();
                 outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
     
                 outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
@@ -609,14 +606,10 @@ public class VMSAvailabilityWindowModule {
         this.transformedPackageData = null;
         this.windowPackageContractInfoModule.reset();
     }
-    
-    private static final Comparator<RightsWindowHollow> RIGHTS_WINDOW_COMPARATOR = new Comparator<RightsWindowHollow>() {
-        @Override
-        public int compare(RightsWindowHollow o1, RightsWindowHollow o2) {
-            long o1StartDate = o1._getOnHold() ? o1._getStartDate() + ONE_THOUSAND_YEARS : o1._getStartDate();
-            long o2StartDate = o2._getOnHold() ? o2._getStartDate() + ONE_THOUSAND_YEARS : o2._getStartDate();
-            
-            return Long.compare(o1StartDate, o2StartDate);
-        }
+
+    private static final Comparator<RightsWindowHollow> RIGHTS_WINDOW_COMPARATOR = (o1, o2) -> {
+        long t1 = o1._getOnHold() ? o1._getStartDate() + ONE_THOUSAND_YEARS : o1._getStartDate();
+        long t2 = o2._getOnHold() ? o2._getStartDate() + ONE_THOUSAND_YEARS : o2._getStartDate();
+        return t1 < t2 ? -1 : (t1 == t2 ? 0 : 1);
     };
 }

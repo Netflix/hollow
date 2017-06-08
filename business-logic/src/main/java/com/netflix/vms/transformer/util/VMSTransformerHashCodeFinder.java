@@ -67,7 +67,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         case Long:
             return Long.hashCode(((com.netflix.vms.transformer.hollowoutput.Long)objectToHash).val);
         case NFLocale:
-            return stringHashCode(((NFLocale)objectToHash).value);
+            return ((NFLocale)objectToHash).value.hashCode();
         case Strings:
             return stringHashCode(((Strings)objectToHash).value);
         case SupplementalInfoType:

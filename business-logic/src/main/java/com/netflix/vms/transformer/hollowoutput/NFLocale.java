@@ -1,19 +1,20 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.Arrays;
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
 
-public class NFLocale implements Cloneable {
+public class NFLocale implements Cloneable, Comparable<NFLocale> {
 
-    public char[] value = null;
+    @HollowInline
+    public String value;
 
     public NFLocale() { }
 
     public NFLocale(char[] value) {
-        this.value = value;
+        this.value = new String(value);
     }
 
     public NFLocale(String value) {
-        this.value = value.toCharArray();
+        this.value = value;
     }
 
     public boolean equals(Object other) {
@@ -22,14 +23,12 @@ public class NFLocale implements Cloneable {
             return false;
 
         NFLocale o = (NFLocale) other;
-        if(!Arrays.equals(o.value, value)) return false;
+        if(!o.value.equals(value)) return false;
         return true;
     }
 
     public int hashCode() {
-        int hashCode = 1;
-        hashCode = hashCode * 31 + Arrays.hashCode(value);
-        return hashCode;
+       return this.value.hashCode();
     }
 
     public String toString() {
@@ -49,4 +48,9 @@ public class NFLocale implements Cloneable {
 
     @SuppressWarnings("unused")
     private int __assigned_ordinal = -1;
+
+    @Override
+    public int compareTo(NFLocale o) {
+        return this.value.compareTo(o.value);
+    }
 }
