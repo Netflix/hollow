@@ -4,6 +4,7 @@
 
 [![Build Status](https://travis-ci.org/Netflix/hollow.svg?branch=master)](https://travis-ci.org/Netflix/hollow)
 [![Join the chat at https://gitter.im/Netflix/hollow](https://badges.gitter.im/Netflix/hollow.svg)](https://gitter.im/Netflix/hollow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/hollow.svg)](#)
 
 Hollow is a java library and toolset for disseminating in-memory datasets from a single producer to many consumers for high performance read-only access. [Read more](http://techblog.netflix.com/2016/12/netflixoss-announcing-hollow.html).
 
