@@ -2,26 +2,26 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 
-public class CodecPrivateDataString implements Cloneable {
+public class TrickPlayDownloadableFilename implements Cloneable {
 
     public char[] value = null;
 
-    public CodecPrivateDataString() { }
+    public TrickPlayDownloadableFilename() { }
 
-    public CodecPrivateDataString(char[] value) {
+    public TrickPlayDownloadableFilename(char[] value) {
         this.value = value;
     }
 
-    public CodecPrivateDataString(String value) {
+    public TrickPlayDownloadableFilename(String value) {
         this.value = value.toCharArray();
     }
 
     public boolean equals(Object other) {
         if(other == this)  return true;
-        if(!(other instanceof CodecPrivateDataString))
+        if(!(other instanceof TrickPlayDownloadableFilename))
             return false;
 
-        CodecPrivateDataString o = (CodecPrivateDataString) other;
+        TrickPlayDownloadableFilename o = (TrickPlayDownloadableFilename) other;
         if(!Arrays.equals(o.value, value)) return false;
         return true;
     }
@@ -33,15 +33,15 @@ public class CodecPrivateDataString implements Cloneable {
     }
 
     public String toString() {
-        StringBuilder builder = new StringBuilder("CodecPrivateDataString{");
+        StringBuilder builder = new StringBuilder("Strings{");
         builder.append("value=").append(value);
         builder.append("}");
         return builder.toString();
     }
 
-    public CodecPrivateDataString clone() {
+    public TrickPlayDownloadableFilename clone() {
         try {
-            CodecPrivateDataString clone = (CodecPrivateDataString)super.clone();
+            TrickPlayDownloadableFilename clone = (TrickPlayDownloadableFilename)super.clone();
             clone.__assigned_ordinal = -1;
             return clone;
         } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }

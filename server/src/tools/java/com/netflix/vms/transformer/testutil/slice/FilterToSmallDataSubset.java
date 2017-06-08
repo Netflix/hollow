@@ -6,7 +6,6 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.io.LZ4VMSInputStream;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -78,7 +77,7 @@ public class FilterToSmallDataSubset {
     private final HollowReadStateEngine readOutputStateEngine() throws IOException {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
-        try (LZ4VMSInputStream is = new LZ4VMSInputStream(new FileInputStream(ORIGINAL_OUTPUT_BLOB_LOCATION))) {
+        try (LZ4BlockInputStream is = new LZ4BlockInputStream(new FileInputStream(ORIGINAL_OUTPUT_BLOB_LOCATION))) {
             reader.readSnapshot(is);
             return stateEngine;
         }

@@ -2,7 +2,6 @@ package com.netflix.vms.transformer;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +13,7 @@ public class VMSTransformerWriteStateEngineTest {
 
     private VMSTransformerWriteStateEngine stateEngine;
 
+    
     @Before
     public void setup() {
         stateEngine = new VMSTransformerWriteStateEngine();

@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.modules.artwork;
 
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import java.util.Comparator;
 import java.util.List;
@@ -9,20 +8,15 @@ public class ArtworkDerivativesListMerger {
     
     private final List<ArtworkDerivative> sortedList1;
     private final List<ArtworkDerivative> sortedList2;
-    private final List<ArtworkCdn> cdnList1;
-    private final List<ArtworkCdn> cdnList2;
     
     private int idx1 = -1;
     private int idx2;
     private int which = 0;
     
-    public ArtworkDerivativesListMerger(List<ArtworkDerivative> sortedList1, List<ArtworkDerivative> sortedList2,
-                                        List<ArtworkCdn> cdnList1,           List<ArtworkCdn> cdnList2) {
+    public ArtworkDerivativesListMerger(List<ArtworkDerivative> sortedList1, List<ArtworkDerivative> sortedList2) {
         
         this.sortedList1 = sortedList1;
         this.sortedList2 = sortedList2;
-        this.cdnList1 = cdnList1;
-        this.cdnList2 = cdnList2;
         
         //this.which = findWhich();
     }
@@ -64,12 +58,6 @@ public class ArtworkDerivativesListMerger {
         if(which == 0)
             return sortedList1.get(idx1);
         return sortedList2.get(idx2);
-    }
-    
-    public ArtworkCdn getNextArtworkCdn() {
-        if(which == 0)
-            return cdnList1.get(idx1);
-        return cdnList2.get(idx2);
     }
     
     public static final Comparator<ArtworkDerivative> DERIVATIVE_COMPARATOR = new Comparator<ArtworkDerivative>() {

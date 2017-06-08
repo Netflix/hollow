@@ -51,6 +51,6 @@ public class StreamCropParams implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
     
 }

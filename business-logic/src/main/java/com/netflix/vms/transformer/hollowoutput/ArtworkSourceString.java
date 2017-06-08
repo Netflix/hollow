@@ -1,7 +1,10 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
+
 import java.util.Arrays;
 
+@HollowShardLargeType(numShards=32)
 public class ArtworkSourceString implements Cloneable {
 
     public char[] value = null;
@@ -48,5 +51,5 @@ public class ArtworkSourceString implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

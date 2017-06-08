@@ -27,6 +27,13 @@ public class HermesAnnounceJob extends AnnounceJob {
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
         logResult(success);
+        
+        if(region == RegionEnum.EU_WEST_1) {///TODO: Announce per-region via Gutenberg.
+            ctx.getStateAnnouncer().announce(getCycleVersion());
+            ctx.getNostreamsStateAnnouncer().announce(getCycleVersion());
+        }
+        
+        
         return success;
     }
 
@@ -34,6 +41,9 @@ public class HermesAnnounceJob extends AnnounceJob {
         if(success) {
             ctx.getLogger().info(AnnouncementSuccess, "Hollow data announce success: for version " + getCycleVersion() + " for vip "+vip+" region " + region);
             ctx.getMetricRecorder().incrementCounter(Metric.AnnounceSuccess, 1, "destination.region", region.toString());
+            
+            if(region == RegionEnum.EU_WEST_1) ///TODO: Announce per-region via Gutenberg.
+                ctx.getStateAnnouncer().announce(getCycleVersion());
         } else {
             ctx.getLogger().error(AnnouncementFailure, "Hollow data announce failure: for version " + getCycleVersion() + " for vip "+vip+" region "+region);
         }

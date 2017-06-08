@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.Arrays;
 import java.util.Set;
 
+@HollowPrimaryKey(fields="id")
 public class EncodingProfile implements Cloneable {
 
     public int id = java.lang.Integer.MIN_VALUE;
@@ -91,5 +93,5 @@ public class EncodingProfile implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

@@ -294,8 +294,7 @@ public class CountrySpecificDataModule {
         populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data);
 
         if(data.firstDisplayDateByLocale == null) data.firstDisplayDateByLocale = Collections.emptyMap();
-        if(data.imagesAvailabilityWindows == null) data.imagesAvailabilityWindows = Collections.emptyList();
-        if(data.mediaAvailabilityWindows == null) data.mediaAvailabilityWindows = Collections.emptyList();
+        if(data.availabilityWindows == null) data.availabilityWindows = Collections.emptyList();
     }
 
     // Return firstDisplayDate as long

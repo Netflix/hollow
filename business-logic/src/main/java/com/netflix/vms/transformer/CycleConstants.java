@@ -3,7 +3,6 @@ package com.netflix.vms.transformer;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;
-import com.netflix.vms.transformer.hollowoutput.ArtworkCdn;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivatives;
 import com.netflix.vms.transformer.hollowoutput.Date;
@@ -56,7 +55,6 @@ public class CycleConstants {
     
     public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
     public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
-    public final InputOrdinalResultCache<List<ArtworkCdn>> cdnListCache;
     public final InputOrdinalResultCache<Boolean> isNewEpisodeOverlayTypes;
     
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
@@ -68,7 +66,6 @@ public class CycleConstants {
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("IPLArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
-        this.cdnListCache = new InputOrdinalResultCache<List<ArtworkCdn>>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
         this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }

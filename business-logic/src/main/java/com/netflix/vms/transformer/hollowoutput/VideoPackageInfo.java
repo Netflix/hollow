@@ -13,12 +13,9 @@ public class VideoPackageInfo implements Cloneable {
     public int runtimeInSeconds = java.lang.Integer.MIN_VALUE;
     public List<Strings> soundTypes = null;
     public List<Strings> screenFormats = null;
-    public List<VideoMoment> phoneSnacks = null;
-    public Map<Strings, List<VideoImage>> stillImagesMap = null;
-    public Map<Strings, List<VideoClip>> videoClipMap = null;
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
-    public long startMomentOffsetInSeconds = -1;
-    public long endMomentOffsetInSeconds = -1;
+    public long startMomentOffsetInMillis = -1;
+    public long endMomentOffsetInMillis = -1;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -38,20 +35,11 @@ public class VideoPackageInfo implements Cloneable {
         if(o.screenFormats == null) {
             if(screenFormats != null) return false;
         } else if(!o.screenFormats.equals(screenFormats)) return false;
-        if(o.phoneSnacks == null) {
-            if(phoneSnacks != null) return false;
-        } else if(!o.phoneSnacks.equals(phoneSnacks)) return false;
-        if(o.stillImagesMap == null) {
-            if(stillImagesMap != null) return false;
-        } else if(!o.stillImagesMap.equals(stillImagesMap)) return false;
-        if(o.videoClipMap == null) {
-            if(videoClipMap != null) return false;
-        } else if(!o.videoClipMap.equals(videoClipMap)) return false;
         if(o.trickPlayMap == null) {
             if(trickPlayMap != null) return false;
         } else if(!o.trickPlayMap.equals(trickPlayMap)) return false;
-        if (o.startMomentOffsetInSeconds!=this.startMomentOffsetInSeconds) return false;
-        if (o.endMomentOffsetInSeconds!=endMomentOffsetInSeconds) return false;
+        if (o.startMomentOffsetInMillis!=this.startMomentOffsetInMillis) return false;
+        if (o.endMomentOffsetInMillis!=endMomentOffsetInMillis) return false;
         if (o.isDefaultPackage!=this.isDefaultPackage) return false;
         return true;
     }
@@ -64,9 +52,6 @@ public class VideoPackageInfo implements Cloneable {
         hashCode = hashCode * 31 + runtimeInSeconds;
         hashCode = hashCode * 31 + (soundTypes == null ? 1237 : soundTypes.hashCode());
         hashCode = hashCode * 31 + (screenFormats == null ? 1237 : screenFormats.hashCode());
-        hashCode = hashCode * 31 + (phoneSnacks == null ? 1237 : phoneSnacks.hashCode());
-        hashCode = hashCode * 31 + (stillImagesMap == null ? 1237 : stillImagesMap.hashCode());
-        hashCode = hashCode * 31 + (videoClipMap == null ? 1237 : videoClipMap.hashCode());
         hashCode = hashCode * 31 + (trickPlayMap == null ? 1237 : trickPlayMap.hashCode());
         hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
@@ -81,12 +66,9 @@ public class VideoPackageInfo implements Cloneable {
         builder.append(",runtimeInSeconds=").append(runtimeInSeconds);
         builder.append(",soundTypes=").append(soundTypes);
         builder.append(",screenFormats=").append(screenFormats);
-        builder.append(",phoneSnacks=").append(phoneSnacks);
-        builder.append(",stillImagesMap=").append(stillImagesMap);
-        builder.append(",videoClipMap=").append(videoClipMap);
         builder.append(",trickPlayMap=").append(trickPlayMap);
-        builder.append(",startOffsetInSeconds=").append(startMomentOffsetInSeconds);
-        builder.append(",endOffsetInSeconds=").append(endMomentOffsetInSeconds);
+        builder.append(",startOffsetInMillis=").append(startMomentOffsetInMillis);
+        builder.append(",endOffsetInMillis=").append(endMomentOffsetInMillis);
         builder.append("}");
         return builder.toString();
     }
@@ -100,5 +82,5 @@ public class VideoPackageInfo implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

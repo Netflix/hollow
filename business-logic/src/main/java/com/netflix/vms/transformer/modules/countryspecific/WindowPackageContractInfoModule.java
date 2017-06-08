@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.PixelAspect;
@@ -21,13 +22,11 @@ import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoImage;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +60,7 @@ public class WindowPackageContractInfoModule {
         this.ctx = ctx;
         this.cycleConstants = cycleConstants;
 
-        this.packageMomentDataModule = new PackageMomentDataModule(api, cycleConstants, indexer);
+        this.packageMomentDataModule = new PackageMomentDataModule(api, indexer);
 
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
@@ -95,49 +94,49 @@ public class WindowPackageContractInfoModule {
 
         int deployablePackageOrdinal = deployablePackageIdx.getMatchingOrdinal((long) packageData.id);
         DeployablePackagesHollow deployablePackage = deployablePackageOrdinal == -1 ? null : api.getDeployablePackagesHollow(deployablePackageOrdinal);
-        if (deployablePackage != null) {
+        if(deployablePackage != null) {
             info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
         }
-        Set<com.netflix.vms.transformer.hollowoutput.Long> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
+        Set<DownloadableId> excludedDownloadables = findRelevantExcludedDownloadables(packageData, country);
 
         Set<Integer> soundTypesAudioChannels = new TreeSet<Integer>();
         Set<String> screenFormats = new TreeSet<String>();
 
         long longestRuntimeInSeconds = 0;
 
-        for (StreamData streamData : packageData.streams) {
+        for(StreamData streamData : packageData.streams) {
             int encodingProfileId = streamData.downloadDescriptor.encodingProfileId;
             int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) encodingProfileId);  /// TODO: Map of encodingProfileID to encoding profile data.
             StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
             String streamProfileType = profile._getProfileType()._getValue();
 
-            if (hdrProfileIds.contains(encodingProfileId)) {
+            if(hdrProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.HDR);
             }
-            if (fourKProfileIds.contains(encodingProfileId)) {
+            if(fourKProfileIds.contains(encodingProfileId)) {
                 info.videoPackageInfo.formats.add(cycleConstants.FOUR_K);
             }
             if(atmosStreamProfileIds.contains(encodingProfileId)) {
             	info.videoPackageInfo.formats.add(cycleConstants.ATMOS);
             }
 
-            if ("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
+            if("VIDEO".equals(streamProfileType) || "MUXED".equals(streamProfileType)) {
                 /// TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
-                if ("VIDEO".equals(streamProfileType)) {
+                if("VIDEO".equals(streamProfileType)) {
                     /// add the videoFormatDescriptor
                     VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
-                    if (descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4) {  // Only interested in HD or better
+                    if(descriptor.id == 1 || descriptor.id == 3 || descriptor.id == 4) {  // Only interested in HD or better
                         info.videoPackageInfo.formats.add(descriptor);
                     }
                 }
 
-                if (streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
+                if(streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds && "VIDEO".equals(streamProfileType))
                     longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
 
                 PixelAspect pixelAspect = streamData.streamDataDescriptor.pixelAspect;
                 VideoResolution videoResolution = streamData.streamDataDescriptor.videoResolution;
 
-                if (pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
+                if(pixelAspect != null && videoResolution != null && videoResolution.height != 0 && videoResolution.width != 0) {
                     int parHeight = Math.max(pixelAspect.height, 1);
                     int parWidth = Math.max(pixelAspect.width, 1);
 
@@ -145,29 +144,27 @@ public class WindowPackageContractInfoModule {
                     screenFormats.add(getScreenFormat(screenFormat));
                 }
 
-            } else if ("AUDIO".equals(streamProfileType)) {
-                if (excludedDownloadables != null && !excludedDownloadables.contains(new com.netflix.vms.transformer.hollowoutput.Long(streamData.downloadableId)))
-                    soundTypesAudioChannels.add(Integer.valueOf((int) profile._getAudioChannelCount()));
+            } else if("AUDIO".equals(streamProfileType)) {
+                if(excludedDownloadables != null && !excludedDownloadables.contains(streamData.downloadableId))
+                    soundTypesAudioChannels.add(Integer.valueOf((int)profile._getAudioChannelCount()));
             }
         }
 
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
 
-        info.videoPackageInfo.stillImagesMap = packageMomentData.stillImagesMap;
-        info.videoPackageInfo.phoneSnacks = packageMomentData.phoneSnackMoments;
         info.videoPackageInfo.trickPlayMap = packageMomentData.trickPlayItemMap;
-        info.videoPackageInfo.startMomentOffsetInSeconds = packageMomentData.startMomentOffsetInSeconds;
-        info.videoPackageInfo.endMomentOffsetInSeconds = packageMomentData.endMomentOffsetInSeconds;
+        info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
+        info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
 
         info.videoPackageInfo.screenFormats = new ArrayList<Strings>(screenFormats.size());
-        for (String screenFormat : screenFormats) {
+        for(String screenFormat : screenFormats) {
             info.videoPackageInfo.screenFormats.add(new Strings(screenFormat));
         }
 
         info.videoPackageInfo.soundTypes = new ArrayList<Strings>(soundTypesAudioChannels.size());
-        for (Integer soundType : soundTypesAudioChannels) {
-            Strings soundTypeStr = soundTypesMap.get(soundType);
-            if (soundTypeStr != null)
+        for(Integer soundType : soundTypesAudioChannels) {
+            Strings soundTypeStr= soundTypesMap.get(soundType);
+            if(soundTypeStr != null)
                 info.videoPackageInfo.soundTypes.add(soundTypeStr);
         }
 
@@ -187,27 +184,27 @@ public class WindowPackageContractInfoModule {
     private void populateEncodingProfileIdSets(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
 
         int ordinal = primaryKeyIndex.getMatchingOrdinal("HDR");
-        if (ordinal != -1) {
+        if(ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
-            List<StreamProfileIdHollow> idList = group._getStreamProfileIds();
-            for (StreamProfileIdHollow id : idList) {
-                hdrProfileIds.add(Integer.valueOf((int) id._getValue()));
+            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
+            for(StreamProfileIdHollow id : idList) {
+                hdrProfileIds.add(Integer.valueOf((int)id._getValue()));
             }
         }
 
         ordinal = primaryKeyIndex.getMatchingOrdinal("4K");
-        if (ordinal != -1) {
+        if(ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
-            List<StreamProfileIdHollow> idList = group._getStreamProfileIds();
-            for (StreamProfileIdHollow id : idList) {
-                fourKProfileIds.add(Integer.valueOf((int) id._getValue()));
+            List<StreamProfileIdHollow>idList = group._getStreamProfileIds();
+            for(StreamProfileIdHollow id : idList) {
+                fourKProfileIds.add(Integer.valueOf((int)id._getValue()));
             }
         }
     }
 
     private String getScreenFormat(Float screenFormat) {
         String formatStr = screenFormatCache.get(screenFormat);
-        if (formatStr == null) {
+        if(formatStr == null) {
             formatStr = String.format("%.2f:1", screenFormat);
             screenFormatCache.put(screenFormat, formatStr);
         }
@@ -262,22 +259,22 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    private Set<com.netflix.vms.transformer.hollowoutput.Long> findRelevantExcludedDownloadables(PackageData packageData, String country) {
+    private Set<DownloadableId> findRelevantExcludedDownloadables(PackageData packageData, String country) {
         Set<ContractRestriction> countryContractRestrictions = packageData.contractRestrictions.get(cycleConstants.getISOCountry(country));
 
-        if (countryContractRestrictions == null)
+        if(countryContractRestrictions == null)
             return null;
 
         long now = ctx.getNowMillis();
 
-        Set<com.netflix.vms.transformer.hollowoutput.Long> nextExcludedDownloadables = Collections.emptySet();
+        Set<DownloadableId> nextExcludedDownloadables = Collections.emptySet();
         long nextStartDate = Long.MAX_VALUE;
 
-        for (ContractRestriction restriction : countryContractRestrictions) {
-            if (now > restriction.availabilityWindow.startDate.val && now < restriction.availabilityWindow.endDate.val) {
+        for(ContractRestriction restriction : countryContractRestrictions) {
+            if(now > restriction.availabilityWindow.startDate.val && now < restriction.availabilityWindow.endDate.val) {
                 return restriction.excludedDownloadables;
-            } else if (now < restriction.availabilityWindow.startDate.val) {
-                if (nextStartDate > restriction.availabilityWindow.startDate.val) {
+            } else if(now < restriction.availabilityWindow.startDate.val) {
+                if(nextStartDate > restriction.availabilityWindow.startDate.val) {
                     nextStartDate = restriction.availabilityWindow.startDate.val;
                     nextExcludedDownloadables = restriction.excludedDownloadables;
                 }
@@ -317,9 +314,6 @@ public class WindowPackageContractInfoModule {
         info.runtimeInSeconds = 0;
         info.soundTypes = Collections.emptyList();
         info.screenFormats = Collections.emptyList();
-        info.phoneSnacks = Collections.emptyList();
-        info.stillImagesMap = Collections.emptyMap();
-        info.videoClipMap = Collections.emptyMap();
         info.trickPlayMap = Collections.emptyMap();
         info.formats = Collections.emptySet();
         return info;

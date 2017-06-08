@@ -9,6 +9,10 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNex
 import com.google.inject.Inject;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
+import com.netflix.internal.hollow.factory.HollowAnnouncerFactory;
+import com.netflix.internal.hollow.factory.HollowPublisherFactory;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -41,6 +45,8 @@ public class TransformerCycleKickoff {
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
+            HollowPublisherFactory publisherFactory,
+            HollowAnnouncerFactory announcerFactory,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
             Config config,
@@ -50,9 +56,14 @@ public class TransformerCycleKickoff {
             TransformerServerHealthIndicator healthIndicator) {
 
         FileStore.useMultipartUploadWhenApplicable(true);
+        
+        Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
+        Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
+        Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
+        Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
         TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
@@ -151,12 +162,12 @@ public class TransformerCycleKickoff {
                 });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if(isFastlane(ctx.getConfig()))
-            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
@@ -166,11 +177,13 @@ public class TransformerCycleKickoff {
 
             if(restoreVersion != Long.MIN_VALUE) {
                 VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
+                VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
                 outputClient.triggerRefreshTo(restoreVersion);
+                nostreamsOutputClient.triggerRefreshTo(restoreVersion);
 
-                if(outputClient.getCurrentVersionId() != restoreVersion)
+                if(outputClient.getCurrentVersionId() != restoreVersion || nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
                     throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
-                cycle.restore(outputClient);
+                cycle.restore(outputClient, nostreamsOutputClient);
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");

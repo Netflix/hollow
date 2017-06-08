@@ -30,6 +30,7 @@ import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocation;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocationSet;
+import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
@@ -41,8 +42,8 @@ import com.netflix.vms.transformer.hollowoutput.QoEInfo;
 import com.netflix.vms.transformer.hollowoutput.StreamAdditionalData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.StreamDataDescriptor;
+import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
 import com.netflix.vms.transformer.hollowoutput.StreamDrmData;
-import com.netflix.vms.transformer.hollowoutput.StreamHashData;
 import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
@@ -98,7 +99,7 @@ public class StreamDataModule {
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;
 
-        EMPTY_DOWNLOAD_LOCATIONS.filename = new Strings("");
+        EMPTY_DOWNLOAD_LOCATIONS.filename = new StreamDownloadLocationFilename("");
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
     }
 
@@ -124,16 +125,15 @@ public class StreamDataModule {
 
         StreamData outputStream = new StreamData();
 
-        outputStream.downloadableId = inputStream._getDownloadableId();
+        outputStream.downloadableId = new DownloadableId(inputStream._getDownloadableId());
         outputStream.packageId = (int)packages._getPackageId();
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
         outputStream.creationTimeStampInSeconds = inputStreamIdentity._getCreatedTimeSeconds();
-        outputStream.hashData = new StreamHashData();
-        outputStream.hashData.cRC32Hash = inputStreamIdentity._getCrc32();
-        outputStream.hashData.sha1_1 = inputStreamIdentity._getSha1_1();
-        outputStream.hashData.sha1_2 = inputStreamIdentity._getSha1_2();
-        outputStream.hashData.sha1_3 = inputStreamIdentity._getSha1_3();
+        outputStream.cRC32Hash = inputStreamIdentity._getCrc32();
+        outputStream.sha1_1 = inputStreamIdentity._getSha1_1();
+        outputStream.sha1_2 = inputStreamIdentity._getSha1_2();
+        outputStream.sha1_3 = inputStreamIdentity._getSha1_3();
 
         outputStream.drmData = EMPTY_DRM_DATA;
         outputStream.additionalData = new StreamAdditionalData();
@@ -202,7 +202,7 @@ public class StreamDataModule {
             if(cdnDeployments != null) {
                 if(cdnDeployments.size() > 0) {
                     outputStream.additionalData.downloadLocations = new DownloadLocationSet();
-                    outputStream.additionalData.downloadLocations.filename = new Strings(inputStreamIdentity._getFilename());
+                    outputStream.additionalData.downloadLocations.filename = new StreamDownloadLocationFilename(inputStreamIdentity._getFilename());
                     outputStream.additionalData.downloadLocations.locations = new ArrayList<DownloadLocation>();
 
                     for(CdnDeploymentHollow cdnDeployment : cdnDeployments) {
@@ -283,8 +283,6 @@ public class StreamDataModule {
                 outputStream.streamDataDescriptor.targetDimensions.widthInPixels = targetWidth;
             }
 
-
-            ////TODO: There is a discrepancy here -- some package-level DrmKeys are NOT available at the streams level
             Integer drmKeyGroup = Integer.valueOf((int)streamProfile._getDrmKeyGroup());
             Object drmKey = drmKeysByGroupId.get(drmKeyGroup);
             if(drmKey != null) {
@@ -306,7 +304,7 @@ public class StreamDataModule {
 
                 DrmInfo drmInfo = drmInfoByGroupId.get(drmKeyGroup);
                 if(drmInfo != null) {
-                    drmInfoData.downloadableIdToDrmInfoMap.put(new com.netflix.vms.transformer.hollowoutput.Long(outputStream.downloadableId), drmInfo);
+                    drmInfoData.downloadableIdToDrmInfoMap.put(outputStream.downloadableId, drmInfo);
                 }
             }
 

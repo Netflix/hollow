@@ -1,11 +1,14 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+
 import java.util.Map;
 
+@HollowPrimaryKey(fields="packageId")
 public class DrmInfoData implements Cloneable {
 
     public int packageId = java.lang.Integer.MIN_VALUE;
-    public Map<Long, DrmInfo> downloadableIdToDrmInfoMap = null;
+    public Map<DownloadableId, DrmInfo> downloadableIdToDrmInfoMap = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -44,5 +47,5 @@ public class DrmInfoData implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

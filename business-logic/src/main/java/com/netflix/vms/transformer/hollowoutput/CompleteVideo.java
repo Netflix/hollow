@@ -1,12 +1,13 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
+@HollowPrimaryKey(fields={"id", "country"})
 public class CompleteVideo implements Cloneable {
 
     public Video id = null;
     public ISOCountry country = null;
-    public CompleteVideoFacetData facetData = null;
-    public CompleteVideoCountrySpecificData countrySpecificData = null;
+    public CompleteVideoData data = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -20,12 +21,9 @@ public class CompleteVideo implements Cloneable {
         if(o.country == null) {
             if(country != null) return false;
         } else if(!o.country.equals(country)) return false;
-        if(o.facetData == null) {
-            if(facetData != null) return false;
-        } else if(!o.facetData.equals(facetData)) return false;
-        if(o.countrySpecificData == null) {
-            if(countrySpecificData != null) return false;
-        } else if(!o.countrySpecificData.equals(countrySpecificData)) return false;
+        if(o.data == null) {
+            if(data != null) return false;
+        } else if(!o.data.equals(data)) return false;
         return true;
     }
 
@@ -33,8 +31,7 @@ public class CompleteVideo implements Cloneable {
         int hashCode = 1;
         hashCode = hashCode * 31 + (id == null ? 1237 : id.hashCode());
         hashCode = hashCode * 31 + (country == null ? 1237 : country.hashCode());
-        hashCode = hashCode * 31 + (facetData == null ? 1237 : facetData.hashCode());
-        hashCode = hashCode * 31 + (countrySpecificData == null ? 1237 : countrySpecificData.hashCode());
+        hashCode = hashCode * 31 + (data == null ? 1237 : data.hashCode());
         return hashCode;
     }
 
@@ -42,8 +39,7 @@ public class CompleteVideo implements Cloneable {
         StringBuilder builder = new StringBuilder("CompleteVideo{");
         builder.append("id=").append(id);
         builder.append(",country=").append(country);
-        builder.append(",facetData=").append(facetData);
-        builder.append(",countrySpecificData=").append(countrySpecificData);
+        builder.append(",data=").append(data);
         builder.append("}");
         return builder.toString();
     }
@@ -57,5 +53,5 @@ public class CompleteVideo implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

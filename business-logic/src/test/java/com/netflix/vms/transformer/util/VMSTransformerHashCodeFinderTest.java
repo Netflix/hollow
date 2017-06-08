@@ -3,12 +3,8 @@ package com.netflix.vms.transformer.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
-import com.netflix.vms.transformer.hollowoutput.Episode;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.SupplementalInfoType;
@@ -18,6 +14,8 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder.RecordType;
+import org.junit.Before;
+import org.junit.Test;
 
 public class VMSTransformerHashCodeFinderTest {
 
@@ -45,15 +43,6 @@ public class VMSTransformerHashCodeFinderTest {
     }
 
     @Test
-    public void episodeHashesToId() {
-        int id = 42;
-        Episode ep = new Episode(id);
-
-        assertThat(subject.hashCode(RecordType.Episode.name(), anyOrdinal(), ep))
-            .isEqualTo(id);
-    }
-
-    @Test
     public void hollowIntegerHashesToValue() {
         int value = 17;
         com.netflix.vms.transformer.hollowoutput.Integer i =
@@ -64,12 +53,12 @@ public class VMSTransformerHashCodeFinderTest {
     }
 
     @Test
-    public void hollowLongHashesToLongValueHashCode() {
+    public void hollowDownloadableIdHashesToLongValueHashCode() {
         Long value = 19L;
-        com.netflix.vms.transformer.hollowoutput.Long l =
-                new com.netflix.vms.transformer.hollowoutput.Long(value);
+        com.netflix.vms.transformer.hollowoutput.DownloadableId l =
+                new com.netflix.vms.transformer.hollowoutput.DownloadableId(value);
 
-        assertThat(subject.hashCode(RecordType.Long.name(), anyOrdinal(), l))
+        assertThat(subject.hashCode(RecordType.DownloadableId.name(), anyOrdinal(), l))
             .isEqualTo(value.hashCode());
     }
 

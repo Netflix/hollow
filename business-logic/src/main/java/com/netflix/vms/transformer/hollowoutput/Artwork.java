@@ -1,17 +1,16 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.List;
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 
+@HollowShardLargeType(numShards=32)
 public class Artwork implements Cloneable {
 
-    public Strings sourceFileId = null;
+    public ArtworkSourceString sourceFileId = null;
     public long effectiveDate = java.lang.Long.MIN_VALUE;
     public NFLocale locale = null;
     public int seqNum = java.lang.Integer.MIN_VALUE;
     public int ordinalPriority = java.lang.Integer.MIN_VALUE;
     public ArtworkDerivatives derivatives = null;
-    public List<ArtworkCdn> cdns = null;
-    public List<DeprecatedImageId> deprecatedImageIds = null;
     public PassthroughVideo source_movie_id = null;
     public ArtworkSourcePassthrough source = null;
     public ArtworkBasicPassthrough basic_passthrough = null;
@@ -31,8 +30,6 @@ public class Artwork implements Cloneable {
         builder.append(",seqNum=").append(seqNum);
         builder.append(",ordinalPriority=").append(ordinalPriority);
         builder.append(",derivatives=").append(derivatives);
-        builder.append(",cdns=").append(cdns);
-        builder.append(",deprecatedImageIds=").append(deprecatedImageIds);
         builder.append(",source_movie_id=").append(source_movie_id);
         builder.append(",source=").append(source);
         builder.append(",basic_passthrough=").append(basic_passthrough);
@@ -56,5 +53,5 @@ public class Artwork implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }

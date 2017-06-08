@@ -7,7 +7,8 @@ public class ArtworkDerivative implements Cloneable {
     public ArtWorkImageTypeEntry type = null;
     public ArtWorkImageRecipe recipe = null;
     public Strings recipeDesc = null;
-    public transient int cdnId;
+    public int cdnId = java.lang.Integer.MIN_VALUE;
+    public Strings cdnDirectory = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -27,6 +28,11 @@ public class ArtworkDerivative implements Cloneable {
         if(o.recipeDesc == null) {
             if(recipeDesc != null) return false;
         } else if(!o.recipeDesc.equals(recipeDesc)) return false;
+        if(o.cdnId != cdnId) return false;
+        if(o.cdnDirectory == null) {
+            if(cdnDirectory != null) return false;
+        } else if(!o.cdnDirectory.equals(cdnDirectory)) return false;
+
         return true;
     }
 
@@ -36,6 +42,8 @@ public class ArtworkDerivative implements Cloneable {
         hashCode = hashCode * 31 + (type == null ? 1237 : type.hashCode());
         hashCode = hashCode * 31 + (recipe == null ? 1237 : recipe.hashCode());
         hashCode = hashCode * 31 + (recipeDesc == null ? 1237 : recipeDesc.hashCode());
+        hashCode = hashCode * 31 + cdnId;
+        hashCode = hashCode * 31 + (cdnDirectory == null ? 1237 : cdnDirectory.hashCode());
         return hashCode;
     }
 
@@ -45,6 +53,8 @@ public class ArtworkDerivative implements Cloneable {
         builder.append(",type=").append(type);
         builder.append(",recipe=").append(recipe);
         builder.append(",recipeDesc=").append(recipeDesc);
+        builder.append(",cdnId=").append(cdnId);
+        builder.append(",cdnDirectory=").append(cdnDirectory);
         builder.append("}");
         return builder.toString();
     }
@@ -58,5 +68,5 @@ public class ArtworkDerivative implements Cloneable {
     }
 
     @SuppressWarnings("unused")
-    private int __assigned_ordinal = -1;
+    private long __assigned_ordinal = -1;
 }
