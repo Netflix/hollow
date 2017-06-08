@@ -41,7 +41,7 @@ public class ArtWorkComparator implements Comparator<Artwork> {
                 ComparisonChain.start()
                 .compare(o1.locale, o2.locale)
                 .compare(o1.seqNum, o2.seqNum)
-                .compare(o1.sourceFileId.toString(), o2.sourceFileId.toString());
+                .compare(o1.sourceFileId, o2.sourceFileId);
         int result = chain.result();
         return result;
     }
