@@ -22,6 +22,8 @@ public interface VideoStreamInfoDelegate extends HollowObjectDelegate {
 
     public Long getDashMediaStartByteOffsetBoxed(int ordinal);
 
+    public int getDashStreamHeaderDataOrdinal(int ordinal);
+
     public long getVmafScore(int ordinal);
 
     public Long getVmafScoreBoxed(int ordinal);

@@ -1,6 +1,9 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
+
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import java.util.Set;
 
 @HollowPrimaryKey(fields="downloadableId")
 public class FileEncodingData implements Cloneable {
@@ -10,6 +13,9 @@ public class FileEncodingData implements Cloneable {
     public ChunkDurationsString chunkDurations = null;
     public long dashHeaderSize = java.lang.Long.MIN_VALUE;
     public long dashMediaStartByteOffset = java.lang.Long.MIN_VALUE;
+    
+    @HollowHashKey(fields="key")
+    public Set<DashStreamBoxInfo> dashStreamBoxInfo = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
