@@ -20,6 +20,7 @@ import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
+import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
@@ -34,10 +35,13 @@ import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
+import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
+import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -57,7 +61,7 @@ public class PackageDataModule {
     private final VMSHollowInputAPI api;
     private final HollowObjectMapper mapper;
     private final CycleConstants cycleConstants;
-
+    private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowHashIndex packagesByVideoIdx;
     private final HollowPrimaryKeyIndex deployablePackagesIdx;
 
@@ -76,6 +80,7 @@ public class PackageDataModule {
         this.cycleConstants = cycleConstants;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
         this.deployablePackagesIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
+        this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
         this.drmKeysByGroupId = new HashMap<Integer, Object>();
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
@@ -194,6 +199,7 @@ public class PackageDataModule {
 
             addFileEncodingDataForStream(inputStream);
         }
+        calculateRuntimeInSeconds(pkg);
 
         //////////// DEPLOYABLE PACKAGES //////////////
         pkg.tags = new ArrayList<Strings>();
@@ -222,6 +228,24 @@ public class PackageDataModule {
         mapper.addObject(drmInfoData);
 
         return pkg;
+    }
+
+    
+    private void calculateRuntimeInSeconds(PackageData packageData) {
+        long longestRuntimeInSeconds = 0;
+
+        for(StreamData streamData : packageData.streams) {
+            int encodingProfileId = streamData.downloadDescriptor.encodingProfileId;
+            int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal((long) encodingProfileId);
+            StreamProfilesHollow profile = api.getStreamProfilesHollow(streamProfileOrdinal);
+            String streamProfileType = profile._getProfileType()._getValue();
+
+            if("VIDEO".equals(streamProfileType) && streamData.streamDataDescriptor.runTimeInSeconds > longestRuntimeInSeconds ) {
+                longestRuntimeInSeconds = streamData.streamDataDescriptor.runTimeInSeconds;
+            }
+        }
+
+        packageData.runtimeInSeconds = (int) longestRuntimeInSeconds;
     }
 
     private void addFileEncodingDataForStream(PackageStreamHollow inputStream) {

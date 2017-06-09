@@ -59,8 +59,8 @@ public class ShowMeTheFastProgress {
     @Test
     public void start() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170516184232009L;
-        int[] topNodes = { 70084180 };
+        long transformerVersion = 20170609181813261L; // getLatestTransformerVersion(VIP_NAME);
+        int[] topNodes = { 80151644 };
 
         long start = System.currentTimeMillis();
         setup();
