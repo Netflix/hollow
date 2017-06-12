@@ -2867,7 +2867,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2927,7 +2927,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -6434,7 +6434,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6494,7 +6494,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -10001,7 +10001,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10061,7 +10061,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -13561,7 +13561,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13621,7 +13621,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -17209,7 +17209,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17269,7 +17269,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -18875,7 +18875,7 @@
             "requested": "1.2.4"
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.akhikhl.gretty:gretty-core"
             ]
@@ -21873,7 +21873,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21933,7 +21933,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -25444,7 +25444,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25504,7 +25504,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -29059,7 +29059,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -29119,7 +29119,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -32739,7 +32739,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32799,7 +32799,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -36419,7 +36419,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -36479,7 +36479,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -40099,7 +40099,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40159,7 +40159,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -43779,7 +43779,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -43839,7 +43839,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -47459,7 +47459,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47519,7 +47519,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -51139,7 +51139,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51199,7 +51199,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
@@ -54819,7 +54819,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "59.261",
+            "locked": "59.263",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -54879,7 +54879,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
