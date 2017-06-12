@@ -136,7 +136,7 @@ public class VideoCollectionsModule {
     }
 
     private static final Comparator<SupplementalVideo> SUPPLEMENTAL_VIDEO_COMPARATOR = (o1, o2) -> {
-        int x = o1.seasonNumber;
+        int x = o1.sequenceNumber;
         int y = o2.sequenceNumber;
         return (x < y) ? -1 : ((x == y) ? 0 : 1);
     };

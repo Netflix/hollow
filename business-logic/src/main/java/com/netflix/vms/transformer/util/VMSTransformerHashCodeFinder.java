@@ -111,7 +111,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         throw new UnsupportedOperationException();
     }
     
-    private static int stringHashCode(char[] str) {
+    public static int stringHashCode(char[] str) {
         int h = 0;
         for(int i=0;i<str.length;i++)
             h = 31*h + str[i];
