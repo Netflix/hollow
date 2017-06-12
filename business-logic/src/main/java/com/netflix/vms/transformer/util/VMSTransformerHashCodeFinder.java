@@ -67,7 +67,7 @@ public class VMSTransformerHashCodeFinder implements HollowObjectHashCodeFinder 
         case DownloadableId:
             return Long.hashCode(((DownloadableId)objectToHash).val);
         case NFLocale:
-            return stringHashCode(((NFLocale)objectToHash).value);
+            return ((NFLocale)objectToHash).value.hashCode();
         case Strings:
             return stringHashCode(((Strings)objectToHash).value);
         case ArtworkSourceString:

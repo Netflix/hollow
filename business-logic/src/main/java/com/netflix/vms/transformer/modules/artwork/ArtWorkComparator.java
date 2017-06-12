@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.artwork;
 
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Ordering;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
 
@@ -40,27 +39,26 @@ public class ArtWorkComparator implements Comparator<Artwork> {
         // The rest
         final ComparisonChain chain =
                 ComparisonChain.start()
-                .compare(o1.locale, o2.locale, Ordering.usingToString())
+                .compare(o1.locale, o2.locale)
                 .compare(o1.seqNum, o2.seqNum)
-                .compare(o1.sourceFileId.toString(), o2.sourceFileId.toString());
+                .compare(o1.sourceFileId, o2.sourceFileId);
         int result = chain.result();
         return result;
     }
 
     private int compateArtWorkOrdinalPriority(final Artwork o1, Artwork o2) {
-        final Integer t1 = Integer.valueOf(o1.ordinalPriority);
-        final Integer t2 = Integer.valueOf(o2.ordinalPriority);
-        return t1.compareTo(t2);
+        int t1 = o1.ordinalPriority;
+        int t2 = o2.ordinalPriority;
+        return t1 < t2 ? -1 : (t1 == t2 ? 0 : 1);
     }
 
     private int compareArtWorkEffectiveDate(final Artwork o1, Artwork o2) {
         // Current artwork with most recent effective date should be on the top.
-        //        final Long now = VMSDataClock.getInstance().currentTimeMillis();
-        final Long now = Long.valueOf(ctx.getNowMillis());
+        long now = ctx.getNowMillis();
 
-        final Long t1 = Long.valueOf(o1.effectiveDate);
-        final Long t2 = Long.valueOf(o2.effectiveDate);
+        long t1 = o1.effectiveDate;
+        long t2 = o2.effectiveDate;
 
-        return (t1 < now && t2 < now) ? t2.compareTo(t1) : t1.compareTo(t2);
+        return (t1 < now && t2 < now) ? (t2 < t1 ? -1 : (t2 == t1 ? 0 : 1)) : t1 < t2 ? -1 : (t1 == t2 ? 0 : 1);
     }
 }
