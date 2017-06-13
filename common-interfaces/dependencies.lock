@@ -270,10 +270,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -311,7 +311,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -711,10 +711,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -752,7 +752,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -1152,10 +1152,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1193,7 +1193,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -1593,10 +1593,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -1634,7 +1634,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -1884,7 +1884,7 @@
     },
     "nebulaRecommenderBom": {
         "netflix:runtime-platform-recommendations": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "requested": "latest.release"
         }
     },
@@ -2169,10 +2169,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2210,7 +2210,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -2610,10 +2610,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -2651,7 +2651,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3060,10 +3060,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3101,7 +3101,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3510,10 +3510,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -3551,7 +3551,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",
@@ -3960,10 +3960,10 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.4.0"
+            "locked": "4.4.1"
         },
         "netflix:server-context": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:netflix-config"
             ]
@@ -4001,7 +4001,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.5",
+            "locked": "3.6",
             "transitive": [
                 "org.apache.cassandra:cassandra-all",
                 "org.apache.cassandra:cassandra-thrift",

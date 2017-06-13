@@ -134,10 +134,10 @@ public class VideoCollectionsModule {
 
         return supplementalVideos;
     }
-    
-    private static final Comparator<SupplementalVideo> SUPPLEMENTAL_VIDEO_COMPARATOR = new Comparator<SupplementalVideo>() {
-        public int compare(SupplementalVideo o1, SupplementalVideo o2) {
-            return Integer.compare(o1.sequenceNumber, o2.sequenceNumber);
-        }
+
+    private static final Comparator<SupplementalVideo> SUPPLEMENTAL_VIDEO_COMPARATOR = (o1, o2) -> {
+        int x = o1.sequenceNumber;
+        int y = o2.sequenceNumber;
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     };
 }
