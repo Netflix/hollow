@@ -177,13 +177,21 @@ public class TransformerCycleKickoff {
 
             if(restoreVersion != Long.MIN_VALUE) {
                 VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
                 outputClient.triggerRefreshTo(restoreVersion);
-                nostreamsOutputClient.triggerRefreshTo(restoreVersion);
+                if(outputClient.getCurrentVersionId() != restoreVersion)
+                    throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
 
-                if(outputClient.getCurrentVersionId() != restoreVersion || nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
-                    throw new IllegalStateException("Failed to restore from state: " + restoreVersion);
-                cycle.restore(outputClient, nostreamsOutputClient);
+                if(isFastlane(cfg)) {
+                    cycle.restore(outputClient, null, true);
+                } else {
+                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
+                    nostreamsOutputClient.triggerRefreshTo(restoreVersion);
+                    if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
+                        throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+                    
+                    cycle.restore(outputClient, nostreamsOutputClient, false);
+                }
+                
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
