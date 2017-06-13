@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishedBlob;
-
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -137,20 +136,33 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private Blob fakeProducerBlob(File file) {
         Blob.Type blobType = null;
+        long fromVersion;
+        long toVersion;
         
         switch(jobType) {
         case SNAPSHOT:
             blobType = Blob.Type.SNAPSHOT;
+            fromVersion = Long.MIN_VALUE;
+            toVersion = getCycleVersion();
             break;
         case DELTA:
             blobType = Blob.Type.DELTA;
+            fromVersion = previousVersion;
+            toVersion = getCycleVersion();
             break;
         case REVERSEDELTA:
             blobType = Blob.Type.REVERSE_DELTA;
+            fromVersion = getCycleVersion();
+            toVersion = previousVersion;
             break;
+        default:
+            throw new IllegalStateException("Publish job type undefined!");
         }
         
-        Blob blob = new Blob(previousVersion, getCycleVersion(), blobType) {
+         
+                
+        
+        Blob blob = new Blob(fromVersion, toVersion, blobType) {
             @Override public File getFile() {
                 return file;
             }
