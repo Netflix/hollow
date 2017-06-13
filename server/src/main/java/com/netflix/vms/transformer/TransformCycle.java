@@ -95,9 +95,10 @@ public class TransformCycle {
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
-    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
+    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isFastlane) {
         outputStateEngine.restoreFrom(restoreFrom.getStateEngine());
-        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
+        if(!isFastlane)
+            publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
         previousCycleNumber = restoreFrom.getCurrentVersionId();
     }
 
