@@ -224,6 +224,7 @@
 <h1 id="insight-tools">Insight Tools</h1>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
+<h3 id="explorer-setup">Explorer Setup</h3>
 <p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
 <pre><code class="java">HollowConsumer consumer = /// or your HollowReadStateEngine
 
@@ -251,6 +252,7 @@ server.join();
 <p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency: </p>
 <p><code>compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'</code></p>
 </div>
+<h3 id="explorer-usage">Explorer Usage</h3>
 <p>Upon opening your browser, you should see something like this:</p>
 <p><img alt="Explorer Home" src="../img/explorer-home.png" /></p>
 <p>Click on a column header to sort by that column.  This view shows details about how many records exist for each type, and the approximate heap footprint of each type.</p>
@@ -268,7 +270,8 @@ server.join();
 <p>Search queries remain active in the browser session until cleared, and can be augmented to find the intersection of matches over multiple fields by entering multiple query parameters without clearing the existing ones in the session.  For example, if we want to find movies in which <em>both</em> Carrie-Anne Moss and the Actor with ID <code>1001</code> starred, we can go back to the search page, and enter the appropriate criteria to augment our session's query.  The results will contain only records which match <em>both</em> of these criteria:</p>
 <p><img alt="Explorer Augment Query" src="../img/explorer-augmentsearchresult.png" /></p>
 <h2 id="history-tool">History tool</h2>
-<p>Hollow ships with a UI which can be used to browse and search changes in a dataset over time.</p>
+<p>Hollow ships with a UI which can be used to browse and search changes in a dataset over time.  The history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
+<h3 id="history-setup">History Setup</h3>
 <p>The <code>HollowHistoryUI</code> class in the <em>hollow-diff-ui</em> project can be instantiated using a <code>HollowConsumer</code> and a base URL path:</p>
 <pre><code class="java">HollowConsumer consumer = /// or your HollowReadStateEngine
 
@@ -293,7 +296,7 @@ server.join();
 </code></pre>
 
 <p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore the history.</p>
-<p>The history tool provides the ability to get a bird’s eye view of all of the changes a dataset goes through over time, while simultaneously allowing for specific queries to see exactly how individual records change as the dataset transitions between states.  The history tool has proven to be enormously beneficial when investigating data issues in production scenarios.  When something looks incorrect, it’s easy to pinpoint exactly what changed when, which can vastly expedite data corrections and eliminate hours of potential detective work.</p>
+<h3 id="history-usage">History Usage</h3>
 <p>Upon opening your browser, you will see something like this:</p>
 <p><img alt="History Home" src="../img/history-home.png" /></p>
 <p>The history UI will track changes in types for which you have defined primary keys.  In this view, we're looking at the number of records which changed between <em>data states</em>.  The changes in each state are broken down here into <em>modifications</em>, <em>additions</em>, and <em>removals</em>.  Clicking on a state will show us a further breakdown of these changes by each top-level type:</p>
