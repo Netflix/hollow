@@ -362,11 +362,7 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 <p>When consumers initialize, they will use the most recent <em>snapshot</em> to initialize their data store.  After initialization, consumers will keep up to date using <em>deltas</em>.</p>
 <div class="admonition note">
 <p class="admonition-title">Producer Cycles</p>
-<p>We call what the producer does to create a data state a <em>cycle</em>.  During each <em>cycle</em>, we </p>
-<ol>
-<li>add all of the records from our dataset into the state engine, then </li>
-<li>write blobs (usually each of a <em>snapshot</em>, a <em>delta</em>, and a <em>reverse delta</em> blob) to our blob file store.</li>
-</ol>
+<p>We call what the producer does to create a data state a <em>cycle</em>.  During each <em>cycle</em>, you’ll want to add <em>every record</em> from your source of truth.  Hollow will handle the details of publishing a delta for all of your established consumer instances, and a snapshot to initialize any consumer instances which start up before your next cycle.</p>
 </div>
 <h1 id="consuming-a-delta">Consuming a Delta</h1>
 <p>No manual intervention is necessary to consume the delta you produced.  The <code>HollowConsumer</code> will automatically stay up-to-date.  </p>
@@ -396,7 +392,7 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 
 consumer.triggerRefresh();
 
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIdx(consumer, &quot;id&quot;);
+MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, &quot;id&quot;);
 </code></pre>
 
 <p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:</p>
