@@ -2645,7 +2645,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -5905,7 +5905,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9165,7 +9165,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12425,7 +12425,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -15820,7 +15820,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19124,7 +19124,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -22440,7 +22440,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -25756,7 +25756,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -29072,7 +29072,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.5",
+            "locked": "60.7",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
