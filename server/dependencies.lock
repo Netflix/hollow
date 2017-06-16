@@ -616,7 +616,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -629,7 +629,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -637,13 +637,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -660,7 +660,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -668,7 +668,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -4183,7 +4183,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -4196,7 +4196,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -4204,13 +4204,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -4227,7 +4227,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -4235,7 +4235,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -7750,7 +7750,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -7763,7 +7763,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -7771,13 +7771,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -7794,7 +7794,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -7802,7 +7802,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -11317,7 +11317,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -11330,7 +11330,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -11338,13 +11338,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -11361,7 +11361,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -11369,7 +11369,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -14957,7 +14957,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -14984,7 +14984,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -19622,7 +19622,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -19635,7 +19635,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -19643,13 +19643,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -19666,7 +19666,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -19674,7 +19674,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -23193,7 +23193,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -23220,7 +23220,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -26770,7 +26770,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -26783,7 +26783,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -26791,13 +26791,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -26814,7 +26814,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -26822,7 +26822,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -30450,7 +30450,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -30463,7 +30463,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -30471,13 +30471,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -30494,7 +30494,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -30502,7 +30502,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -34130,7 +34130,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -34143,7 +34143,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -34151,13 +34151,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -34174,7 +34174,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -34182,7 +34182,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -37810,7 +37810,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -37823,7 +37823,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -37831,13 +37831,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -37854,7 +37854,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -37862,7 +37862,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -41490,7 +41490,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -41503,7 +41503,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -41511,13 +41511,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -41534,7 +41534,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -41542,7 +41542,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -45170,7 +45170,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -45183,7 +45183,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -45191,13 +45191,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -45214,7 +45214,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -45222,7 +45222,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -48850,7 +48850,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -48863,7 +48863,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -48871,13 +48871,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -48894,7 +48894,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -48902,7 +48902,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
@@ -52530,7 +52530,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -52543,7 +52543,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -52551,13 +52551,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -52574,7 +52574,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.runtime:health-guice",
@@ -52582,7 +52582,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.1.12",
+            "locked": "2.1.13",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
