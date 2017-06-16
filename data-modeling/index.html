@@ -225,7 +225,7 @@
             <div class="section">
               
                 <h1 id="schemas">Schemas</h1>
-<p>A Hollow data model is a set of schemas, which are usually defined by the POJOs which are used on the producer to <a href="../getting-started/#producing-a-data-snapshot">populate the data</a>.  This section will use POJOs as examples, but there are other ways to define schemas -- for example you could ingest a text file and using the <a href="../advanced-topics/#schema-parser">schema parser</a>.</p>
+<p>A Hollow data model is a set of schemas, which are usually defined by the POJOs used on the producer to <a href="../getting-started/#producing-a-data-snapshot">populate the data</a>.  This section will use POJOs as examples, but there are other ways to define schemas -- for example you could ingest a text file and use the <a href="../advanced-topics/#schema-parser">schema parser</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Schemas Define the Data Model</p>
 <p>A hollow dataset is comprised of one or more data <em>types</em>.  The <em>data model</em> for a dataset is defined by the schemas describing those types.</p>
@@ -256,7 +256,7 @@
 <p>Notice that since the reference type is <strong>defined by the schema</strong>, data models must be strongly typed.  Each reference in your data model must point to a specific concrete implementation.  References to interfaces, abstract classes, or <code>java.lang.Object</code> are not supported.</p>
 <h2 id="primary-keys">Primary Keys</h2>
 <p><code>Object</code> schemas may specify a primary key.  This is accomplished by using the <code>@HollowPrimaryKey</code> annotation and specifying the fields.</p>
-<pre><code class="java">@HollowPrimaryKey(fields={&quot;id&quot;})
+<pre><code class="java">@HollowPrimaryKey(fields={&quot;movieId&quot;})
 public class Movie {
     int movieId;
     String title;
