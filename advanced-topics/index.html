@@ -233,23 +233,24 @@
             <div class="section">
               
                 <h1 id="schema-parser">Schema Parser</h1>
-<p>Hollow schemas can be serialized as Java Strings.  Calling <code>toString()</code> on a <code>HollowSchema</code> will produce a human-readable representation of the schema.  The following shows the String representations of all of the schemas from our <code>Movie</code>/<code>Actor</code> example data model:</p>
-<pre><code>Movie {
+<p>Hollow schemas can be serialized as Java Strings.  Calling <code>toString()</code> on a <code>HollowSchema</code> will produce a human-readable representation of the schema.  The following shows the String representations of all of the schemas from a <code>Movie</code>/<code>Actor</code> example data model:</p>
+<pre><code>Movie @PrimaryKey(id) {
     long id;
     int releaseYear;
-    String title;
-    ListOfActor actors;
+    string title;
+    SetOfActor actors;
 }
 
-ListOfActor List&lt;Actor&gt;;
+SetOfActor Set&lt;Actor&gt; @HashKey(firstname, surname);
 
 Actor {
     long id;
-    String actorName;
+    String firstname;
+    String surname;
 }
 
 String {
-    string id;
+    string value;
 }
 </code></pre>
 
@@ -268,7 +269,7 @@ HollowWriteStateEngine initializedWriteEngine =
 <p>For a generic data ingestion mechanism, loading the schemas from a text representation comes in handy.  For example, the <a href="../data-ingestion/#json-to-hollow-adapter">JSON to Hollow adapter</a> requires a <code>HollowWriteStateEngine</code> which is preinitialized with a data model.  The data model can be configured in a text file, and loaded with the <code>HollowSchemaParser</code>.</p>
 </div>
 <p>Object schema definitions take the following form:</p>
-<pre><code>ObjectTypeName {
+<pre><code>ObjectTypeName @PrimaryKey(fieldName1, fieldNameN) {
    FieldType1 fieldName1;
    FieldType2 fieldName2;
    ...
@@ -276,6 +277,7 @@ HollowWriteStateEngine initializedWriteEngine =
 }
 </code></pre>
 
+<p>The primary key definition is optional and should be omitted if no primary key should be defined for a type.</p>
 <p>Object schemas may define any of the following field types: <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>boolean</code>, <code>string</code>, <code>bytes</code>.  If a field has a type other than these, the field will be interpreted as a <code>REFERENCE</code> to another type of that name.</p>
 <div class="admonition warning">
 <p class="admonition-title">Lowercase Field Type Declarations</p>
@@ -284,9 +286,10 @@ HollowWriteStateEngine initializedWriteEngine =
 <p><code>List</code>, <code>Set</code>, and <code>Map</code> types use the following notation:</p>
 <ul>
 <li><code>ListTypeName List&lt;ElementTypeName&gt;;</code></li>
-<li><code>SetTypeName Set&lt;ElementTypeName&gt;;</code></li>
-<li><code>MapTypeName Map&lt;KeyTypeName, ValueTypeName&gt;</code></li>
+<li><code>SetTypeName Set&lt;ElementTypeName&gt; @HashKey(elementFieldOne, elementFieldTwo);</code></li>
+<li><code>MapTypeName Map&lt;KeyTypeName, ValueTypeName&gt; @HashKey(keyFieldOne, keyFieldTwo);</code></li>
 </ul>
+<p><code>Set</code> and <code>Map</code> types may optionally define a <a href="../indexing-querying/#hash-keys">hash key</a>.  The hash key definition should be omitted if no hash key should be defined for a type.</p>
 <p>Elements, keys, and values in collection record types cannot be inlined.  Whitespace is unimportant when parsing schema definitions.</p>
 <h1 id="low-level-input-api">Low Level Input API</h1>
 <p>Although Hollow includes a few ready-made data ingestion utilities, other data ingestion utilities can be created.  Adding data into Hollow starts with a <code>HollowWriteStateEngine</code>.  We need to initialize a type state for each schema in our data model:</p>

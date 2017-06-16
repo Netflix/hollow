@@ -94,36 +94,37 @@
         
             <ul>
             
-                <li class="toctree-l3"><a href="#schema-types">Schema Types</a></li>
+                <li class="toctree-l3"><a href="#schemas">Schemas</a></li>
                 
-                    <li><a class="toctree-l4" href="#object-schemas">Object Schemas</a></li>
+            
+                <li class="toctree-l3"><a href="#object-schemas">Object Schemas</a></li>
                 
-                    <li><a class="toctree-l4" href="#list-schemas">List Schemas</a></li>
+                    <li><a class="toctree-l4" href="#primary-keys">Primary Keys</a></li>
                 
-                    <li><a class="toctree-l4" href="#set-schemas">Set Schemas</a></li>
+                    <li><a class="toctree-l4" href="#inlined-vs-referenced-fields">Inlined vs Referenced Fields</a></li>
                 
-                    <li><a class="toctree-l4" href="#map-schemas">Map Schemas</a></li>
+                    <li><a class="toctree-l4" href="#namespaced-record-type-names">Namespaced Record Type Names</a></li>
+                
+                    <li><a class="toctree-l4" href="#grouping-associated-fields">Grouping Associated Fields</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#list-schemas">List Schemas</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#set-schemas">Set Schemas</a></li>
+                
+            
+                <li class="toctree-l3"><a href="#map-schemas">Map Schemas</a></li>
                 
             
                 <li class="toctree-l3"><a href="#hash-keys">Hash Keys</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#circular-references">Circular References</a></li>
+                    <li><a class="toctree-l4" href="#circular-references">Circular References</a></li>
                 
-            
-                <li class="toctree-l3"><a href="#inlined-vs-referenced-fields">Inlined vs Referenced Fields</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#namespaced-record-type-names">Namespaced Record Type Names</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#grouping-associated-fields">Grouping Associated Fields</a></li>
+                    <li><a class="toctree-l4" href="#object-memory-layout">Object Memory Layout</a></li>
                 
             
                 <li class="toctree-l3"><a href="#maintaining-backwards-compatibility">Maintaining Backwards Compatibility</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#movieactor-example">Movie/Actor Example</a></li>
                 
             
             </ul>
@@ -223,99 +224,109 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="schema-types">Schema Types</h1>
-<p>Hollow records are strongly typed.  The structure of each type is defined by a schema.  A schema will be one of the following:</p>
-<ul>
-<li><code>Object</code>: A fixed set of strongly typed fields.</li>
-<li><code>List</code>: An ordered collection of references to records of a specific type.</li>
-<li><code>Set</code>: An unordered collection of references to records of a specific type.  </li>
-<li><code>Map</code>: A key/value mapping between references to records of a specific key type and records of a specific value type.</li>
-</ul>
+                <h1 id="schemas">Schemas</h1>
+<p>A Hollow data model is a set of schemas, which are usually defined by the POJOs which are used on the producer to <a href="../getting-started/#producing-a-data-snapshot">populate the data</a>.  This section will use POJOs as examples, but there are other ways to define schemas -- for example you could ingest a text file and using the <a href="../advanced-topics/#schema-parser">schema parser</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Schemas Define the Data Model</p>
 <p>A hollow dataset is comprised of one or more data <em>types</em>.  The <em>data model</em> for a dataset is defined by the schemas describing those types.</p>
 </div>
-<h3 id="object-schemas">Object Schemas</h3>
-<p><code>Object</code> schemas have one or more fields.  Each field is one of the following types:</p>
+<h1 id="object-schemas">Object Schemas</h1>
+<p>Each POJO class you define will result in an <code>Object</code> schema, which is a fixed set of strongly typed fields.  The fields will be based on the member variables in the class.  For example, the class <code>Movie</code> will define an <code>Object</code> schema with three fields:</p>
+<pre><code class="java">public class Movie {
+    int movieId;
+    String title;
+    Set&lt;Actor&gt; actors;
+}
+
+</code></pre>
+
+<p>Each schema has a <em>type name</em>.  The name of the type will default to the simple name of your POJO -- in this case <code>Movie</code>.  </p>
+<p>Each schema field has a <em>field name</em>, which will default to the same name as the field in the POJO -- in this case <code>movieId</code>, <code>title</code>, and <code>actors</code>.  Each field also has a <em>field type</em>, which is in this case <code>INT</code>, <code>REFERENCE</code>, and <code>REFERENCE</code>, respectively.  Each <code>REFERENCE</code> field also indicates the <em>referenced type</em>, which for our reference fields above default to <code>String</code> and <code>SetOfActor</code>.</p>
+<p>The possible field types are:</p>
 <ul>
-<li><code>INT</code>: An integer value up to 32-bits.</li>
+<li><code>INT</code>: An integer value up to 32-bits</li>
 <li><code>LONG</code>: An integer value up to 64-bits</li>
 <li><code>FLOAT</code>: A 32-bit floating-point value</li>
 <li><code>DOUBLE</code>: A 64-bit floating-point value</li>
 <li><code>BOOLEAN</code>: <code>true</code> or <code>false</code></li>
-<li><code>STRING</code>: An array of characters.  </li>
-<li><code>BYTES</code>: An array of bytes.  </li>
+<li><code>STRING</code>: An array of characters</li>
+<li><code>BYTES</code>: An array of bytes</li>
 <li><code>REFERENCE</code>: A reference to another specific type.  The referenced type must be defined by the schema.</li>
 </ul>
-<p>Additionally, an <code>Object</code> schema may optionally specify a primary key, which can be used as a default indexing mechanism in many of the tools provided with Hollow.</p>
-<p>On consumers, <code>INT</code> and <code>LONG</code> fields are each represented by a number of bits exactly sufficient to represent the maximum value for the field across all records.  <code>FLOAT</code>, <code>DOUBLE</code>, and <code>BOOLEAN</code> fields are represented by 32, 64, and 2 bits, respectively.  <code>STRING</code> and <code>BYTES</code> fields use a variable number of bytes for each record.  <code>REFERENCE</code> fields encode the <em>ordinal</em> of referenced records, and are represented by a number of bits exactly sufficient to encode the maximum ordinal of the referenced type.</p>
-<div class="admonition hint">
-<p class="admonition-title">Designing for Efficiency</p>
-<p>Try to model your data such that there aren't any outlier values for <code>INT</code> and <code>LONG</code> fields.  Also, avoid <code>FLOAT</code> and <code>DOUBLE</code> fields where possible, since these field types are relatively expensive.</p>
-</div>
-<h3 id="list-schemas">List Schemas</h3>
-<p>A <code>List</code> schema indicates a record type which is an ordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references.  The referenced type must be defined by the schema, and all references in all records will encode only the <em>ordinals</em> of the referenced records as the values for these references.</p>
-<h3 id="set-schemas">Set Schemas</h3>
-<p>A <code>Set</code> schema indicates a record type which is an unordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references, and the referenced type must be defined by the schema.  Within a single set record, each reference must be unique.  </p>
-<p>References in <code>Set</code> records can be hashed by some specific element fields for O(1) retrieval.  In order to enable this feature, a <code>Set</code> schema will define an optional <em>hash key</em>, which defines how its elements are hashed/indexed.</p>
-<h3 id="map-schemas">Map Schemas</h3>
-<p>A <code>Map</code> schema indicates a record type which is an unordered collection of pairs of <code>REFERENCE</code> fields, used to represent a key/value mapping.  Each record will have a variable number of key/value pairs.  Both the key reference type and the value reference type must be defined by the schema.  The key reference type does not have to be the same as the value reference type.  Within a single map record, each key reference must be unique.  </p>
-<p>Entries in <code>Map</code> records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a <code>Map</code> schema will define an optional <em>hash key</em>, which defines how its entries are hashed/indexed.</p>
-<h1 id="hash-keys">Hash Keys</h1>
-<p>Each <code>Map</code> and <code>Set</code> schema may optionally define a <em>hash key</em>.  A <em>hash key</em> specifies one or more user-defined fields used to hash entries into the collection.  When a hash key is defined on a <code>Set</code>, each set record becomes like a primary key index; records in the set can be efficiently retrieved by matching the specified <em>hash key</em> fields.  Similarly, when a hash key is defined on a <code>Map</code>, each map record becomes like an index over the keys in the key/value pairs contained in the map record.</p>
-<p>See <a href="../indexing-querying/#hash-keys">Hash Keys</a> for a detailed discussion of hash keys.</p>
-<h1 id="circular-references">Circular References</h1>
-<p>Circular references are not allowed in Hollow.  A type may not reference itself, either directly or transitively.</p>
-<h1 id="inlined-vs-referenced-fields">Inlined vs Referenced Fields</h1>
-<p>While modeling data, a choice sometimes must be made whether to define an Object field as a non-reference type (e.g. <code>STRING</code>), or as a <code>REFERENCE</code> to a separate type which has a single <code>STRING</code> field.  Consider the following type:</p>
-<pre><code>Award {
+<p>Notice that since the reference type is <strong>defined by the schema</strong>, data models must be strongly typed.  Each reference in your data model must point to a specific concrete implementation.  References to interfaces, abstract classes, or <code>java.lang.Object</code> are not supported.</p>
+<h2 id="primary-keys">Primary Keys</h2>
+<p><code>Object</code> schemas may specify a primary key.  This is accomplished by using the <code>@HollowPrimaryKey</code> annotation and specifying the fields.</p>
+<pre><code class="java">@HollowPrimaryKey(fields={&quot;id&quot;})
+public class Movie {
+    int movieId;
+    String title;
+    Set&lt;Actor&gt; actors;
+}
+</code></pre>
+
+<p>When defined in the schema, primary keys are a part of your data model and drive useful functionality and default configuration in the <a href="../tooling/#hollow-explorer">hollow explorer</a>, <a href="../tooling/#history-tool">hollow history</a>, and <a href="../tooling/#diff-tool">diff ui</a>.  They also provide a shortcut when creating a <a href="../indexing-querying/#default-primary-keys">primary key index</a>.</p>
+<p>Primary keys defined in the schema follow the same convention as primary keys defined for indexes.  They consist of one or more <a href="../indexing-querying/#field-paths">field paths</a>, which will auto-expand if they terminate in a <code>REFERENCE</code> field.</p>
+<h2 id="inlined-vs-referenced-fields">Inlined vs Referenced Fields</h2>
+<p>We can <em>inline</em> some fields in our POJOs so that they are no longer <code>REFERENCE</code> fields, but instead encode their data directly in each record:</p>
+<pre><code class="java">public class Movie {
+    int movieId;
+    @HollowInline String title;
+    Set&lt;Actor&gt; actors;
+}
+</code></pre>
+
+<p>In the above example, our fields are now of type <code>INT</code>, <code>STRING</code>, and <code>REFERENCE</code>.</p>
+<p>While modeling data, we choose whether or not to inline a field for efficiency.  Consider the following type:</p>
+<pre><code>public class Award {
     String awardName;
     long movieId;
     long actorId;
 }
 </code></pre>
 
-<p>In this case, imagine <code>awardName</code> is something like “Best Supporting Actress”.  Over the years, many such awards will be given, so we’ll have a lot of records which share that value.  If we use a <code>STRING</code> field, then that character string will be repeated for every such award record.  However, if we reference a separate record type, all such awards will reference the same record with that value.  If the <code>awardName</code> values have a lot of repetition, then this can result in a significant savings.</p>
+<p>In this case, imagine <code>awardName</code> is something like “Best Supporting Actress”.  Over the years, many such awards will be given, so we’ll have a lot of records which share that value.  If we use an <em>inlined</em> <code>STRING</code> field, then the value "Best Supporting Actress" will be repeated for every such award record.  However, if we reference a separate record type, all such awards will reference the same child record with that value.  If the <code>awardName</code> values have a lot of repetition, then this can result in a significant savings.</p>
 <div class="admonition hint">
 <p class="admonition-title">Deduplication</p>
 <p>Record deduplication happens automatically at the <em>record</em> granularity in Hollow.  Try to model your data such that when there is a lot of repetition in records, the repetitive fields are encapsulated into their own types.</p>
 </div>
-<p>To consider the opposite case, let’s examine the <code>Actor</code> type:</p>
-<pre><code>Actor {
+<p>To consider the opposite case, let’s examine the following <code>Actor</code> type:</p>
+<pre><code>public class Actor {
     long id;
-    String actorName;
+    @HollowInline String actorName;
 }
 </code></pre>
 
-<p>The <code>actorName</code> is unlikely to be repeated often.  In this case, if we reference a separate record type, we have to retain roughly the same number of character strings, plus, we need to retain references to those records.  In this case, we end up saving space by using a <code>STRING</code> field instead of a reference to a separate type.</p>
+<p>The <code>actorName</code> is unlikely to be repeated often.  In this case, if we reference a separate record type, we have to retain roughly the same number of unique character strings <strong>plus</strong> we need to retain references to those records.  In this case, we end up saving space by using an inlined <code>STRING</code> field instead of a reference to a separate type.</p>
 <div class="admonition warning">
 <p class="admonition-title">Reference Costs</p>
 <p>A <code>REFERENCE</code> field isn't free, and therefore we shouldn't necessarily try to encapsulate fields inside their own record types where we won't benefit from deduplication.  These fields should instead be <em>inlined</em>.</p>
 </div>
 <p>We refer to fields which are defined with native Hollow types as <em>inlined</em> fields, and fields which are defined as references to types with a single field as <em>referenced</em> fields.</p>
-<h1 id="namespaced-record-type-names">Namespaced Record Type Names</h1>
-<p>In order to be very efficient, referenced types sometimes need to be <em>namespaced</em> so that fields with like values may reference the same record type, but reference fields of the same primitive type elsewhere in the data model use different record types.  For example, consider our <code>Award</code> type again, but this time, we’ll reference a type called <code>AwardName</code>, instead of <code>String</code>:</p>
-<pre><code>Award {
-    AwardName awardName;
+<h2 id="namespaced-record-type-names">Namespaced Record Type Names</h2>
+<p>In order to be very efficient, referenced types sometimes should be <em>namespaced</em> so that fields with like values may reference the same <em>record type</em>, but reference fields of the same <em>primitive type</em> elsewhere in the data model use different <em>record types</em>.  For example, consider our <code>Award</code> type again, but this time, we’ll reference a type called <code>AwardName</code>, instead of <code>String</code>.  We can explicitly name the <em>type</em> of a field with the <code>@HollowTypeName</code> annotation:</p>
+<pre><code>public class Award {
+    @HollowTypeName(name=&quot;AwardName&quot;)
+    String awardName;
     long movieId;
     long actorId;
 }
 
-
-AwardName {
-    string value;
-}
 </code></pre>
 
 <p>Other types in our data model which reference award names can reuse the <code>AwardName</code> type.  Other referenced string fields in our data model, which are unrelated to award names, should use different types corresponding to the semantics of their values.  </p>
-<p>Namespacing fields appropriately saves space because references to types with a lower cardinality use fewer bits than references to types with a higher cardinality.  The reason for this can be gleaned from the <a href="../advanced-topics/#in-memory-data-layout">In-Memory Data Layout</a> topic underneath the <a href="../advanced-topics/">Advanced Topics</a> section.</p>
+<p>Namespacing fields saves space because references to types with a lower cardinality use fewer bits than references to types with a higher cardinality.  The reason for this can be gleaned from the <a href="../advanced-topics/#in-memory-data-layout">In-Memory Data Layout</a> topic underneath the <a href="../advanced-topics/">Advanced Topics</a> section.</p>
+<p>Namespacing fields is also useful if some consumers don't need the contents of a specific referenced field.  If a type is namespaced, it can be selectively <a href="../tooling/#filtering">filtered</a>, whereas if it is grouped with other fields which <em>are</em> needed by all consumers, then it cannot be selected for filtering.</p>
 <div class="admonition note">
 <p class="admonition-title">Namespacing Reduces Reference Costs</p>
-<p>Using an appropriately <em>namespaced</em> type reduces the heap footprint of <code>REFERENCE</code> fields.</p>
+<p>Using an appropriately <em>namespaced</em> type reduces the heap footprint cost of <code>REFERENCE</code> fields.</p>
 </div>
-<h1 id="grouping-associated-fields">Grouping Associated Fields</h1>
-<p>Referencing fields can save space because the same field values do not have to be repeated for every record in which they occur.  Similarly, we can group fields which have covarying values, and pull these out from larger objects as their own types.  For example, imagine we started with a <code>Movie</code> record which included the following fields:</p>
-<pre><code>Movie {
+<div class="admonition hint">
+<p class="admonition-title">Changing default <em>type names</em></p>
+<p>The <code>@HollowTypeName</code> annotation can also be used at the class level to select a default type name for a class other than its simple name.</p>
+</div>
+<h2 id="grouping-associated-fields">Grouping Associated Fields</h2>
+<p>Referencing fields can save space because the same field values do not have to be repeated for every record in which they occur.  Similarly, we can <em>group</em> fields which have covarying values, and pull these out from larger objects as their own types.  For example, imagine we started with a <code>Movie</code> type which included the following fields:</p>
+<pre><code>public class Movie {
     long id;
     String title;
     String maturityRating;
@@ -323,20 +334,51 @@ AwardName {
 }
 </code></pre>
 
-<p>We might notice that the <code>maturityRating</code> and <code>advisories</code> fields vary together, and are often the repeated across many Movies.  We can pull out a separate type for these fields:</p>
-<pre><code>Movie {
+<p>We might notice that the <code>maturityRating</code> and <code>advisories</code> fields vary together, and are often the repeated across many <code>Movie</code> records.  We can pull out a separate type for these fields:</p>
+<pre><code>public class Movie {
     long id;
     String title;
     MaturityRating maturityRating;
 }
 
-MaturityRating {
+public class MaturityRating {
     string rating;
     string advisories;
 }
 </code></pre>
 
 <p>We could have referenced these fields separately.  If we had done so, each <code>Movie</code> record, of which there are probably many, would have had to contain two separate references for these fields.  Instead, by recognizing that these fields were associated and pulling them together, space is saved because each <code>Movie</code> record now only contains one reference for this data.</p>
+<h1 id="list-schemas">List Schemas</h1>
+<p>You can define <code>List</code> schemas by adding a member variable of type <code>List</code> in your data model.  For example:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    String title;
+    List&lt;Award&gt; awardsReceived;
+}
+
+</code></pre>
+
+<p>The <code>List</code> must explicitly define its parameterized element type.  The default <em>type name</em> of the above <code>List</code> schema will be <code>ListOfAward</code>.  </p>
+<p>A <code>List</code> schema indicates a record type which is an ordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references.  The referenced type must be defined by the schema, and all references in all records will encode only the <em>ordinals</em> of the referenced records as the values for these references.</p>
+<h1 id="set-schemas">Set Schemas</h1>
+<p>You can define <code>Set</code> schemas by adding a member variable of type <code>Set</code> in your data model.  The <code>Set</code> must explicitly define its parameterized element type.</p>
+<p>A <code>Set</code> schema indicates a record type which is an unordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references, and the referenced type must be defined by the schema.  Within a single set record, each reference must be unique.  </p>
+<p>References in <code>Set</code> records can be hashed by some specific element fields for O(1) retrieval.  In order to enable this feature, a <code>Set</code> schema will define an optional <em>hash key</em>, which defines how its elements are hashed/indexed.</p>
+<h1 id="map-schemas">Map Schemas</h1>
+<p>You can define <code>Map</code> schemas by adding a member variable of type <code>Map</code> in your data model.  The <code>Map</code> must explicitly define it parameterized key and values types.  </p>
+<p>A <code>Map</code> schema indicates a record type which is an unordered collection of pairs of <code>REFERENCE</code> fields, used to represent a key/value mapping.  Each record will have a variable number of key/value pairs.  Both the key reference type and the value reference type must be defined by the schema.  The key reference type does not have to be the same as the value reference type.  Within a single map record, each key reference must be unique.  </p>
+<p>Entries in <code>Map</code> records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a <code>Map</code> schema will define an optional <em>hash key</em>, which defines how its entries are hashed/indexed.</p>
+<h1 id="hash-keys">Hash Keys</h1>
+<p>Each <code>Map</code> and <code>Set</code> schema may optionally define a <em>hash key</em>.  A <em>hash key</em> specifies one or more user-defined fields used to hash entries into the collection.  When a hash key is defined on a <code>Set</code>, each set record becomes like a primary key index; records in the set can be efficiently retrieved by matching the specified <em>hash key</em> fields.  Similarly, when a hash key is defined on a <code>Map</code>, each map record becomes like an index over the keys in the key/value pairs contained in the map record.</p>
+<p>See <a href="../indexing-querying/#hash-keys">Hash Keys</a> for a detailed discussion of hash keys.</p>
+<h3 id="circular-references">Circular References</h3>
+<p>Circular references are not allowed in Hollow.  A type may not reference itself, either directly or transitively.</p>
+<h3 id="object-memory-layout">Object Memory Layout</h3>
+<p>On consumers, <code>INT</code> and <code>LONG</code> fields are each represented by a number of bits exactly sufficient to represent the maximum value for the field across all records.  <code>FLOAT</code>, <code>DOUBLE</code>, and <code>BOOLEAN</code> fields are represented by 32, 64, and 2 bits, respectively.  <code>STRING</code> and <code>BYTES</code> fields use a variable number of bytes for each record.  <code>REFERENCE</code> fields encode the <em>ordinal</em> of referenced records, and are represented by a number of bits exactly sufficient to encode the maximum ordinal of the referenced type.  See <a href="../advanced-topics/#in-memory-data-layout">In-memory Data Layout</a> for more details.</p>
+<div class="admonition hint">
+<p class="admonition-title">Avoid Outlier Values</p>
+<p>Try to model your data such that there aren't any outlier values for <code>INT</code> and <code>LONG</code> fields.  Also, avoid <code>FLOAT</code> and <code>DOUBLE</code> fields where possible, since these field types are relatively expensive.</p>
+</div>
 <h1 id="maintaining-backwards-compatibility">Maintaining Backwards Compatibility</h1>
 <p>A data model will evolve over time.  The following operations will not impact the interoperability between existing clients and new data:</p>
 <ul>
@@ -347,43 +389,11 @@ MaturityRating {
 </ul>
 <p>When adding new fields or types, existing generated client APIs will ignore the new fields, and all of the fields which existed at the time of API generation will still be visible using the same methods.  When removing fields, existing generated client APIs will see null values if the methods corresponding to the removed fields are called.  When removing types, existing generated client APIs will see removed types as having no records.</p>
 <p>It is not backwards compatible to change the type of an existing field.  The client behavior when calling a method corresponding to a field with a changed type is undefined.</p>
-<p>Backwards compatibility often has a lot to do with the use case and semantics of the data. Hollow will always behave in the stated way for evolving data models, but it’s possible that consumers require a field which starts returning null once it gets removed.  For this reason, additional caution should be exercised when removing types and fields.</p>
+<p>It is not backwards compatible to change the primary key or hash key for any type.</p>
+<p>Beyond the specification of Hollow itself, backwards compatibility often has a lot to do with the use case and semantics of the data. Hollow will always behave in the stated way for evolving data models, but it’s possible that consumers require a field which starts returning null once it gets removed.  For this reason, additional caution should be exercised when removing types and fields.</p>
 <div class="admonition hint">
 <p class="admonition-title">Backwards-incompatible data remodeling</p>
 <p>Every so often, it may be required or desirable to make changes to the data model which are incompatible with prior versions.  In this case, an older producer, which produces the older data model, should run in parallel with the newer producer, producing the newer incompatible data model.  Each producer should write its blobs to a different <a href="../producer-consumer/#blob-namespaces">namespace</a>, so that older consumers can read from the old data model, and newer consumers can read from the newer data model.  Once all consumers are upgraded and reading from the newer data model, the older producer can be decommissioned.</p>
-</div>
-<h1 id="movieactor-example">Movie/Actor Example</h1>
-<p>Let's examine the <code>Movie</code> / <code>Actor</code> data model from our Getting Started Guide:</p>
-<pre><code class="java">public class Movie {
-    long id;
-    String title;
-    int releaseYear;
-    List&lt;Actor&gt; actors;
-
-    public Movie(long id, String title, int year, List&lt;Actor&gt; actors) {
-        this.id = id;
-        this.title = title;
-        this.releaseYear = year;
-        this.actors = actors;
-    }
-}
-
-public class Actor {
-    long actorId;
-    String actorName;
-
-    public Actor(long actorId, String actorName) {
-        this.actorId = actorId;
-        this.actorName = actorName;
-    }
-}
-</code></pre>
-
-<p>There are four type schemas in this data model:  <code>Movie</code>, <code>ListOfActor</code>, <code>Actor</code>, and <code>String</code>.</p>
-<p>Upon observing the <code>Movie</code> and <code>Actor</code> classes, the <code>HollowObjectMapper</code> will add a type for each into its <code>HollowWriteStateEngine</code>, each with an <code>Object</code> schema type.  Each of these references a <code>String</code> field.  Just as in Java, a <code>String</code> references a separate <code>Object</code>, and the <code>HollowObjectMapper</code> will add an <code>Object</code> schema for a type named <code>String</code> to assign to these references.</p>
-<div class="admonition note">
-<p class="admonition-title">Inlined Strings in the HollowObjectMapper</p>
-<p>To define an inlined String with the <code>HollowObjectMapper</code>, annotate a String field in your POJO with <code>@HollowInline</code>.</p>
 </div>
               
             </div>
