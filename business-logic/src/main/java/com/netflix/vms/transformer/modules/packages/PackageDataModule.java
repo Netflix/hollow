@@ -263,12 +263,11 @@ public class PackageDataModule {
                         }
                     }
                 }
-                
-                
-                
             }
 
-            if(encodingData.codecPrivateData != null || encodingData.chunkDurations != null)
+            if(encodingData.codecPrivateData != null || encodingData.chunkDurations != null
+                    || encodingData.dashHeaderSize != 0L || encodingData.dashMediaStartByteOffset != 0L
+                    || encodingData.dashStreamBoxInfo != null)
                 mapper.add(encodingData);
         }
     }
