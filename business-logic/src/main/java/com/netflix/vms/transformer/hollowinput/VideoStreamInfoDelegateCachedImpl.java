@@ -13,6 +13,7 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Integer videoPeakBitrateKBPS;
     private final Long dashHeaderSize;
     private final Long dashMediaStartByteOffset;
+    private final int dashStreamHeaderDataOrdinal;
     private final Long vmafScore;
     private final Integer vmafAlgoVersionExp;
     private final Integer vmafAlgoVersionLts;
@@ -32,6 +33,7 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
         this.videoPeakBitrateKBPS = typeAPI.getVideoPeakBitrateKBPSBoxed(ordinal);
         this.dashHeaderSize = typeAPI.getDashHeaderSizeBoxed(ordinal);
         this.dashMediaStartByteOffset = typeAPI.getDashMediaStartByteOffsetBoxed(ordinal);
+        this.dashStreamHeaderDataOrdinal = typeAPI.getDashStreamHeaderDataOrdinal(ordinal);
         this.vmafScore = typeAPI.getVmafScoreBoxed(ordinal);
         this.vmafAlgoVersionExp = typeAPI.getVmafAlgoVersionExpBoxed(ordinal);
         this.vmafAlgoVersionLts = typeAPI.getVmafAlgoVersionLtsBoxed(ordinal);
@@ -77,6 +79,10 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     public Long getDashMediaStartByteOffsetBoxed(int ordinal) {
         return dashMediaStartByteOffset;
+    }
+
+    public int getDashStreamHeaderDataOrdinal(int ordinal) {
+        return dashStreamHeaderDataOrdinal;
     }
 
     public long getVmafScore(int ordinal) {

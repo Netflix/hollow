@@ -42,6 +42,13 @@ public class VideoStreamInfoHollow extends HollowObject {
         return delegate().getDashMediaStartByteOffsetBoxed(ordinal);
     }
 
+    public DashStreamHeaderDataHollow _getDashStreamHeaderData() {
+        int refOrdinal = delegate().getDashStreamHeaderDataOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getDashStreamHeaderDataHollow(refOrdinal);
+    }
+
     public long _getVmafScore() {
         return delegate().getVmafScore(ordinal);
     }

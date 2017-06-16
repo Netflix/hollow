@@ -1,5 +1,10 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.hollowoutput.DashStreamBoxInfo;
+
+import com.netflix.vms.transformer.hollowinput.StreamBoxInfoHollow;
+import com.netflix.vms.transformer.hollowinput.SetOfStreamBoxInfoHollow;
+import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -121,7 +126,7 @@ public class PackageDataModule {
 
                 transformedPackages.put(videoId, videoPackageData);
 
-                mapper.addObject(videoPackageData);
+                mapper.add(videoPackageData);
             }
         }
 
@@ -225,7 +230,7 @@ public class PackageDataModule {
 
         encodeSummaryModule.summarize(pkg);
 
-        mapper.addObject(drmInfoData);
+        mapper.add(drmInfoData);
 
         return pkg;
     }
@@ -265,10 +270,29 @@ public class PackageDataModule {
             if(videoInfo != null) {
                 encodingData.dashHeaderSize = videoInfo._getDashHeaderSize();
                 encodingData.dashMediaStartByteOffset = videoInfo._getDashMediaStartByteOffset();
+                DashStreamHeaderDataHollow dashHeaderData = videoInfo._getDashStreamHeaderData();
+                if(dashHeaderData != null) {
+                    SetOfStreamBoxInfoHollow setOfBoxInfos = dashHeaderData._getBoxInfo();
+                    if(setOfBoxInfos != null) {
+                        encodingData.dashStreamBoxInfo = new HashSet<>();
+                        
+                        for(StreamBoxInfoHollow boxInfo : setOfBoxInfos) {
+                            if(boxInfo._getKey() != null) {
+                                DashStreamBoxInfo dashStreamBoxInfo = new DashStreamBoxInfo();
+                                dashStreamBoxInfo.key = boxInfo._getKey()._getValue();
+                                dashStreamBoxInfo.offset = boxInfo._getBoxOffset();
+                                dashStreamBoxInfo.size = boxInfo._getBoxSize();
+                                encodingData.dashStreamBoxInfo.add(dashStreamBoxInfo);
+                            }
+                        }
+                    }
+                }
             }
 
-            if(encodingData.codecPrivateData != null || encodingData.chunkDurations != null)
-                mapper.addObject(encodingData);
+            if(encodingData.codecPrivateData != null || encodingData.chunkDurations != null
+                    || encodingData.dashHeaderSize != Long.MIN_VALUE || encodingData.dashMediaStartByteOffset != Long.MIN_VALUE
+                    || (encodingData.dashStreamBoxInfo != null && !encodingData.dashStreamBoxInfo.isEmpty()))
+                mapper.add(encodingData);
         }
     }
 

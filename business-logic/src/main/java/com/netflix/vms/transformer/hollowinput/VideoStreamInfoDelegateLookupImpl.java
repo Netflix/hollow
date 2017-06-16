@@ -45,6 +45,10 @@ public class VideoStreamInfoDelegateLookupImpl extends HollowObjectAbstractDeleg
         return typeAPI.getDashMediaStartByteOffsetBoxed(ordinal);
     }
 
+    public int getDashStreamHeaderDataOrdinal(int ordinal) {
+        return typeAPI.getDashStreamHeaderDataOrdinal(ordinal);
+    }
+
     public long getVmafScore(int ordinal) {
         return typeAPI.getVmafScore(ordinal);
     }

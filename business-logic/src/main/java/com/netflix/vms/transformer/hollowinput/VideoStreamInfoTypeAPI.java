@@ -15,6 +15,7 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
             "videoPeakBitrateKBPS",
             "dashHeaderSize",
             "dashMediaStartByteOffset",
+            "dashStreamHeaderData",
             "vmafScore",
             "vmafAlgoVersionExp",
             "vmafAlgoVersionLts",
@@ -115,19 +116,29 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getVmafScore(int ordinal) {
+    public int getDashStreamHeaderDataOrdinal(int ordinal) {
         if(fieldIndex[4] == -1)
+            return missingDataHandler().handleReferencedOrdinal("VideoStreamInfo", ordinal, "dashStreamHeaderData");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+    }
+
+    public DashStreamHeaderDataTypeAPI getDashStreamHeaderDataTypeAPI() {
+        return getAPI().getDashStreamHeaderDataTypeAPI();
+    }
+
+    public long getVmafScore(int ordinal) {
+        if(fieldIndex[5] == -1)
             return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
     }
 
     public Long getVmafScoreBoxed(int ordinal) {
         long l;
-        if(fieldIndex[4] == -1) {
+        if(fieldIndex[5] == -1) {
             l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "vmafScore");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[4]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[4]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[5]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[5]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -137,36 +148,15 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
     public int getVmafAlgoVersionExp(int ordinal) {
-        if(fieldIndex[5] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionExp");
-        return getTypeDataAccess().readInt(ordinal, fieldIndex[5]);
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[6]);
     }
 
     public Integer getVmafAlgoVersionExpBoxed(int ordinal) {
         int i;
-        if(fieldIndex[5] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionExp");
-        } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[5]);
-            i = getTypeDataAccess().readInt(ordinal, fieldIndex[5]);
-        }
-        if(i == Integer.MIN_VALUE)
-            return null;
-        return Integer.valueOf(i);
-    }
-
-
-
-    public int getVmafAlgoVersionLts(int ordinal) {
-        if(fieldIndex[6] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionLts");
-        return getTypeDataAccess().readInt(ordinal, fieldIndex[6]);
-    }
-
-    public Integer getVmafAlgoVersionLtsBoxed(int ordinal) {
-        int i;
         if(fieldIndex[6] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionLts");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionExp");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[6]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[6]);
@@ -178,16 +168,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafScoreExp(int ordinal) {
+    public int getVmafAlgoVersionLts(int ordinal) {
         if(fieldIndex[7] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreExp");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionLts");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[7]);
     }
 
-    public Integer getVmafScoreExpBoxed(int ordinal) {
+    public Integer getVmafAlgoVersionLtsBoxed(int ordinal) {
         int i;
         if(fieldIndex[7] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreExp");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafAlgoVersionLts");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[7]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[7]);
@@ -199,16 +189,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafScoreLts(int ordinal) {
+    public int getVmafScoreExp(int ordinal) {
         if(fieldIndex[8] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreLts");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreExp");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[8]);
     }
 
-    public Integer getVmafScoreLtsBoxed(int ordinal) {
+    public Integer getVmafScoreExpBoxed(int ordinal) {
         int i;
         if(fieldIndex[8] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreLts");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreExp");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[8]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[8]);
@@ -220,16 +210,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafplusScoreExp(int ordinal) {
+    public int getVmafScoreLts(int ordinal) {
         if(fieldIndex[9] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreExp");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreLts");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[9]);
     }
 
-    public Integer getVmafplusScoreExpBoxed(int ordinal) {
+    public Integer getVmafScoreLtsBoxed(int ordinal) {
         int i;
         if(fieldIndex[9] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreExp");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafScoreLts");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[9]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[9]);
@@ -241,16 +231,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafplusScoreLts(int ordinal) {
+    public int getVmafplusScoreExp(int ordinal) {
         if(fieldIndex[10] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreLts");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreExp");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[10]);
     }
 
-    public Integer getVmafplusScoreLtsBoxed(int ordinal) {
+    public Integer getVmafplusScoreExpBoxed(int ordinal) {
         int i;
         if(fieldIndex[10] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreLts");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreExp");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[10]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[10]);
@@ -262,16 +252,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafplusPhoneScoreExp(int ordinal) {
+    public int getVmafplusScoreLts(int ordinal) {
         if(fieldIndex[11] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreExp");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreLts");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[11]);
     }
 
-    public Integer getVmafplusPhoneScoreExpBoxed(int ordinal) {
+    public Integer getVmafplusScoreLtsBoxed(int ordinal) {
         int i;
         if(fieldIndex[11] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreExp");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusScoreLts");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[11]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[11]);
@@ -283,16 +273,16 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getVmafplusPhoneScoreLts(int ordinal) {
+    public int getVmafplusPhoneScoreExp(int ordinal) {
         if(fieldIndex[12] == -1)
-            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreLts");
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreExp");
         return getTypeDataAccess().readInt(ordinal, fieldIndex[12]);
     }
 
-    public Integer getVmafplusPhoneScoreLtsBoxed(int ordinal) {
+    public Integer getVmafplusPhoneScoreExpBoxed(int ordinal) {
         int i;
         if(fieldIndex[12] == -1) {
-            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreLts");
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreExp");
         } else {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[12]);
             i = getTypeDataAccess().readInt(ordinal, fieldIndex[12]);
@@ -304,19 +294,40 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public long getScaledPsnrTimesHundred(int ordinal) {
+    public int getVmafplusPhoneScoreLts(int ordinal) {
         if(fieldIndex[13] == -1)
+            return missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreLts");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[13]);
+    }
+
+    public Integer getVmafplusPhoneScoreLtsBoxed(int ordinal) {
+        int i;
+        if(fieldIndex[13] == -1) {
+            i = missingDataHandler().handleInt("VideoStreamInfo", ordinal, "vmafplusPhoneScoreLts");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[13]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[13]);
+        }
+        if(i == Integer.MIN_VALUE)
+            return null;
+        return Integer.valueOf(i);
+    }
+
+
+
+    public long getScaledPsnrTimesHundred(int ordinal) {
+        if(fieldIndex[14] == -1)
             return missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
-        return getTypeDataAccess().readLong(ordinal, fieldIndex[13]);
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[14]);
     }
 
     public Long getScaledPsnrTimesHundredBoxed(int ordinal) {
         long l;
-        if(fieldIndex[13] == -1) {
+        if(fieldIndex[14] == -1) {
             l = missingDataHandler().handleLong("VideoStreamInfo", ordinal, "scaledPsnrTimesHundred");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[13]);
-            l = getTypeDataAccess().readLong(ordinal, fieldIndex[13]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[14]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[14]);
         }
         if(l == Long.MIN_VALUE)
             return null;
@@ -326,27 +337,27 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
 
     public float getFps(int ordinal) {
-        if(fieldIndex[14] == -1)
+        if(fieldIndex[15] == -1)
             return missingDataHandler().handleFloat("VideoStreamInfo", ordinal, "fps");
-        return getTypeDataAccess().readFloat(ordinal, fieldIndex[14]);
+        return getTypeDataAccess().readFloat(ordinal, fieldIndex[15]);
     }
 
     public Float getFpsBoxed(int ordinal) {
         float f;
-        if(fieldIndex[14] == -1) {
+        if(fieldIndex[15] == -1) {
             f = missingDataHandler().handleFloat("VideoStreamInfo", ordinal, "fps");
         } else {
-            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[14]);
-            f = getTypeDataAccess().readFloat(ordinal, fieldIndex[14]);
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[15]);
+            f = getTypeDataAccess().readFloat(ordinal, fieldIndex[15]);
         }        return Float.isNaN(f) ? null : Float.valueOf(f);
     }
 
 
 
     public int getCropParamsOrdinal(int ordinal) {
-        if(fieldIndex[15] == -1)
+        if(fieldIndex[16] == -1)
             return missingDataHandler().handleReferencedOrdinal("VideoStreamInfo", ordinal, "cropParams");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[15]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[16]);
     }
 
     public VideoStreamCropParamsTypeAPI getCropParamsTypeAPI() {

@@ -1365,6 +1365,130 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
+    public Iterable<StreamBoxInfoKeyHollow> findStreamBoxInfoKeyMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<StreamBoxInfoKeyHollow>() {
+            public Iterator<StreamBoxInfoKeyHollow> iterator() {
+                return new Iterator<StreamBoxInfoKeyHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public StreamBoxInfoKeyHollow next() {
+                        StreamBoxInfoKeyHollow obj = api.getStreamBoxInfoKeyHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<StreamBoxInfoHollow> findStreamBoxInfoMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<StreamBoxInfoHollow>() {
+            public Iterator<StreamBoxInfoHollow> iterator() {
+                return new Iterator<StreamBoxInfoHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public StreamBoxInfoHollow next() {
+                        StreamBoxInfoHollow obj = api.getStreamBoxInfoHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<SetOfStreamBoxInfoHollow> findSetOfStreamBoxInfoMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<SetOfStreamBoxInfoHollow>() {
+            public Iterator<SetOfStreamBoxInfoHollow> iterator() {
+                return new Iterator<SetOfStreamBoxInfoHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public SetOfStreamBoxInfoHollow next() {
+                        SetOfStreamBoxInfoHollow obj = api.getSetOfStreamBoxInfoHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<DashStreamHeaderDataHollow> findDashStreamHeaderDataMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<DashStreamHeaderDataHollow>() {
+            public Iterator<DashStreamHeaderDataHollow> iterator() {
+                return new Iterator<DashStreamHeaderDataHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public DashStreamHeaderDataHollow next() {
+                        DashStreamHeaderDataHollow obj = api.getDashStreamHeaderDataHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
     public Iterable<StreamDimensionsHollow> findStreamDimensionsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
