@@ -15,6 +15,8 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.VideoCountryData;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,11 +42,11 @@ public class VideoCollectionsModule {
         this.cycleConstants = constants;
     }
 
-    public Map<String, Set<VideoCollectionsDataHierarchy>> buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
 
         Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<VideoHierarchy, VideoCollectionsDataHierarchy>();
 
-        Map<String, Set<VideoCollectionsDataHierarchy>> countryHierarchies = new HashMap<String, Set<VideoCollectionsDataHierarchy>>();
+//        Map<String, Set<VideoCollectionsDataHierarchy>> countryHierarchies = new HashMap<String, Set<VideoCollectionsDataHierarchy>>();
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
@@ -77,10 +79,12 @@ public class VideoCollectionsModule {
                 uniqueHierarchies.put(showHierarchy, hierarchy);
             }
 
-            countryHierarchies.put(countryCode, vcdHierarchies);
+//            countryHierarchies.put(countryCode, vcdHierarchies);
+            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            videoCountryDataMap.get(countryCode).addVideoCollectionsDataHierarchy(vcdHierarchies);
         }
 
-        return countryHierarchies;
+//        return countryHierarchies;
     }
     
     private List<SupplementalVideo> getSupplementalVideos(VideoHierarchy hierarchy, long videoId) {

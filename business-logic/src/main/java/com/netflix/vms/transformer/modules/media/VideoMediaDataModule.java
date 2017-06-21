@@ -1,10 +1,5 @@
 package com.netflix.vms.transformer.modules.media;
 
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
-
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -19,10 +14,15 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.VideoCountryData;
 import com.netflix.vms.transformer.util.VideoDateUtil;
+
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -50,37 +50,37 @@ public class VideoMediaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
     }
 
-    public Map<String, Map<Integer, VideoMediaData>> buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
-        Map<String, Map<Integer, VideoMediaData>> allVideoMediaDataMap = new HashMap<String, Map<Integer, VideoMediaData>>();
+    public void buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
+//        Map<String, Map<Integer, VideoMediaData>> allVideoMediaDataMap = new HashMap<String, Map<Integer, VideoMediaData>>();
 
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            Map<Integer, VideoMediaData> countryMap = new HashMap<Integer, VideoMediaData>();
-            allVideoMediaDataMap.put(countryCode, countryMap);
+            videoCountryDataMap.computeIfAbsent(entry.getKey(), f -> new VideoCountryData());
+            VideoCountryData videoCountryData = videoCountryDataMap.get(entry.getKey());
 
-            for(VideoHierarchy hierarchy: entry.getValue()) {
-                addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, countryMap);
+            for (VideoHierarchy hierarchy : entry.getValue()) {
+                addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, videoCountryData);
 
                 for (int iSeason = 0; iSeason < hierarchy.getSeasonIds().length; iSeason++) {
                     int seasonId = hierarchy.getSeasonIds()[iSeason];
-                    addToResult(seasonId, countryCode, hierarchy, HierarchyLeveL.SEASON, countryMap);
+                    addToResult(seasonId, countryCode, hierarchy, HierarchyLeveL.SEASON, videoCountryData);
 
                     for (int j = 0; j < hierarchy.getEpisodeIds()[iSeason].length; j++) {
                         Integer episodeId = hierarchy.getEpisodeIds()[iSeason][j];
-                        addToResult(episodeId, countryCode, hierarchy, HierarchyLeveL.EPISODE, countryMap);
+                        addToResult(episodeId, countryCode, hierarchy, HierarchyLeveL.EPISODE, videoCountryData);
                     }
                 }
 
                 for (int i = 0; i < hierarchy.getSupplementalIds().length; i++) {
-                    addToResult(hierarchy.getSupplementalIds()[i], countryCode, hierarchy, HierarchyLeveL.SUPPLEMENTAL, countryMap);
+                    addToResult(hierarchy.getSupplementalIds()[i], countryCode, hierarchy, HierarchyLeveL.SUPPLEMENTAL, videoCountryData);
                 }
             }
         }
 
-        return allVideoMediaDataMap;
+//        return allVideoMediaDataMap;
     }
 
-    private void addToResult(Integer videoId, String countryCode, VideoHierarchy hierarchy, HierarchyLeveL level, Map<Integer, VideoMediaData> result) {
+    private void addToResult(Integer videoId, String countryCode, VideoHierarchy hierarchy, HierarchyLeveL level, VideoCountryData videoCountryData) {
         // Integer showId = hierarchy.getTopNodeId();
         VideoMediaData vmd = getVideoMediaDataInstance();
 
@@ -91,7 +91,8 @@ public class VideoMediaDataModule {
                 vmd.isGoLive = vmd.isGoLive && showData.isGoLive;
             }
 
-            result.put(videoId, vmd);
+            videoCountryData.addVideoMediaData(videoId, vmd);
+//            result.put(videoId, vmd);
         }
 
         populateGeneral(videoId, vmd);
@@ -131,16 +132,16 @@ public class VideoMediaDataModule {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             vmd.approximateRuntimeInSeconds = (int) general._getRuntime();
             SetOfStringHollow inputRegAdvisories = general._getRegulatoryAdvisories();
-            if(inputRegAdvisories != null) {
+            if (inputRegAdvisories != null) {
                 Set<Strings> outputRegAdv = new HashSet<>();
-                for(StringHollow regAdv : inputRegAdvisories) {
+                for (StringHollow regAdv : inputRegAdvisories) {
                     outputRegAdv.add(new Strings(regAdv._getValue()));
                 }
                 vmd.regulatoryAdvisories = outputRegAdv;
             }
         }
 
-        if(vmd.regulatoryAdvisories == null)  vmd.regulatoryAdvisories = Collections.emptySet();
+        if (vmd.regulatoryAdvisories == null) vmd.regulatoryAdvisories = Collections.emptySet();
     }
 
     private boolean populateDate(Integer videoId, String countryCode, VideoMediaData vmd) {

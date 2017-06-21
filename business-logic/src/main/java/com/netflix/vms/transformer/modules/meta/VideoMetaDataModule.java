@@ -8,6 +8,7 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import com.netflix.vms.transformer.modules.VideoCountryData;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -107,7 +108,7 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
@@ -115,8 +116,12 @@ public class VideoMetaDataModule {
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
-            allVideoMetaDataMap.put(entry.getKey(), countryMap);
+            videoCountryDataMap.computeIfAbsent(entry.getKey(), f -> new VideoCountryData());
+            VideoCountryData videoCountryData = videoCountryDataMap.get(entry.getKey());
+
+
+//            Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
+//            allVideoMetaDataMap.put(entry.getKey(), countryMap);
 
             for(VideoHierarchy hierarchy : entry.getValue()) {
                 VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
@@ -130,26 +135,26 @@ public class VideoMetaDataModule {
                     for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
-                        convert(hierarchy.getEpisodeIds()[i][j], countryCode, countryMap, rollup, rolldown);
+                        convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoCountryData, rollup, rolldown);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
 
                     rollup.setDoSeason(true);
                     rolldown.setDoSeason(true);
-                    convert(hierarchy.getSeasonIds()[i], countryCode, countryMap, rollup, rolldown);
+                    convert(hierarchy.getSeasonIds()[i], countryCode, videoCountryData, rollup, rolldown);
                     rollup.setDoSeason(false);
                     rolldown.setDoSeason(false);
                 }
 
                 rollup.setDoShow(true);
                 rolldown.setDoShow(true);
-                convert(hierarchy.getTopNodeId(), countryCode, countryMap, rollup, rolldown);
+                convert(hierarchy.getTopNodeId(), countryCode, videoCountryData, rollup, rolldown);
                 rollup.setDoShow(false);
                 rolldown.setDoShow(false);
 
                 for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                    convert(hierarchy.getSupplementalIds()[i], countryCode, countryMap, rollup, rolldown);
+                    convert(hierarchy.getSupplementalIds()[i], countryCode, videoCountryData, rollup, rolldown);
                 }
             }
         }
@@ -158,7 +163,7 @@ public class VideoMetaDataModule {
     }
 
     /// Here is a good pattern for processing country-specific data
-    private void convert(Integer videoId, String countryCode, Map<Integer, VideoMetaData> countryMap, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
+    private void convert(Integer videoId, String countryCode, VideoCountryData videoCountryData, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
         /// first create the country specific key
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = createCountrySpecificKey(videoId, countryCode, rollup, rolldown);
 
@@ -171,7 +176,8 @@ public class VideoMetaDataModule {
 
         VideoMetaData countrySpecificClone = countrySpecificMap.get(countrySpecificKey);
         if(countrySpecificClone != null) {
-            countryMap.put(videoId, countrySpecificClone);
+            videoCountryData.addVideoMetaData(videoId, countrySpecificClone);
+//            countryMap.put(videoId, countrySpecificClone);
             return;
         }
 
@@ -198,7 +204,7 @@ public class VideoMetaDataModule {
         /// return the country specific clone
         countrySpecificMap.put(countrySpecificKey, countrySpecificClone);
 
-        countryMap.put(videoId, countrySpecificClone);
+        videoCountryData.addVideoMetaData(videoId, countrySpecificClone);
     }
 
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {

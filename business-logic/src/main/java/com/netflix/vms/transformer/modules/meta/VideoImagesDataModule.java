@@ -1,11 +1,5 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -16,6 +10,10 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -47,8 +45,11 @@ import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.VideoCountryData;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -105,7 +106,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         this.videoStatusIdx = null;
     }*/
 
-    public Map<String, Map<Integer, VideoImages>> buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    public void buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
         Set<Integer> ids = new HashSet<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             for (VideoHierarchy hierarchy : entry.getValue()) {
@@ -129,10 +130,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 int videoArtworkOrdinal = iter.next();
                 while (videoArtworkOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                     VideoArtworkSourceHollow artworkHollowInput = api.getVideoArtworkSourceHollow(videoArtworkOrdinal);
-                    if(!artworkHollowInput._getIsFallback()) {
+                    if (!artworkHollowInput._getIsFallback()) {
                         Set<ArtworkLocaleHollow> localTerritories = getLocalTerritories(artworkHollowInput._getLocales());
                         ArtworkProcessResult processResult = processArtworkWithFallback(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, localTerritories);
-                        if(processResult != null && processResult.isMerchStillRollup) {
+                        if (processResult != null && processResult.isMerchStillRollup) {
                             rollupMerchstillVideoIds.add(videoId);
                             rollupSourceFieldIds.add(processResult.sourceFileId);
                         }
@@ -146,13 +147,16 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         rollupMerchstillsDescOrder(rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap, this, MIN_ROLLUP_SIZE);
 
         // Create VideoImages
-        Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
+//        Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
         for (Map.Entry<String, Map<Integer, Set<Artwork>>> countryEntry : countryArtworkMap.entrySet()) {
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
 
-            Map<Integer, VideoImages> imagesMap = new HashMap<>();
-            countryImagesMap.put(countryCode, imagesMap);
+            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
+
+//            Map<Integer, VideoImages> imagesMap = new HashMap<>();
+//            countryImagesMap.put(countryCode, imagesMap);
 
             for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
                 VideoImages images = new VideoImages();
@@ -162,10 +166,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 images.artworks = createArtworkByTypeMap(artworkSet);
                 images.artworkFormatsByType = createFormatByTypeMap(artworkSet);
 
-                imagesMap.put(id, images);
+                videoCountryData.addVideoImages(id, images);
             }
         }
-        
+
         /**
          * Iterate over what is left in countrySchedulePhaseMap. 
          * Iterating over countryArtworkMap and  countrySchedulePhaseMap is done separately to handle cases where some videos might not have
@@ -174,20 +178,25 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         for (Map.Entry<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseEntry : countrySchedulePhaseMap.entrySet()) {
             String countryCode = countrySchedulePhaseEntry.getKey();
             Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseEntry.getValue();
-            Map<Integer, VideoImages> videoImagesMap = countryImagesMap.get(countryCode);
-            for(Entry<Integer, Set<SchedulePhaseInfo>> entry: videoSchedulePhaseMap.entrySet()){
-            	Integer id = entry.getKey();
+
+//            Map<Integer, VideoImages> videoImagesMap = countryImagesMap.get(countryCode);
+            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
+
+            for (Entry<Integer, Set<SchedulePhaseInfo>> entry : videoSchedulePhaseMap.entrySet()) {
+                Integer id = entry.getKey();
                 // get schedule phase for artworks for the given video Id above
                 if (videoSchedulePhaseMap != null) {
-                	VideoImages images = videoImagesMap.get(id);
-                	if(images == null){
-                		images = new VideoImages();
-                		// VMS client side code assumes that if VideoImages object exists, then artworkFormatsByType and artworks not to be null. 
-                		// For this reason initialize them with empty maps. 
-                		images.artworkFormatsByType = Collections.emptyMap();
-                		images.artworks = Collections.emptyMap();
-                		videoImagesMap.put(id, images);
-                	}
+                    VideoImages images = videoCountryData.getVideoImages(id);
+//                	VideoImages images = videoImagesMap.get(id);
+                    if (images == null) {
+                        images = new VideoImages();
+                        // VMS client side code assumes that if VideoImages object exists, then artworkFormatsByType and artworks not to be null.
+                        // For this reason initialize them with empty maps.
+                        images.artworkFormatsByType = Collections.emptyMap();
+                        images.artworks = Collections.emptyMap();
+                        videoCountryData.addVideoImages(id, images);
+                    }
                     Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
                     if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
                 }
@@ -195,7 +204,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
         }
 
-        return countryImagesMap;
+//        return countryImagesMap;
     }
 
     private Map<String, Set<String>> getRolloutImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
@@ -439,22 +448,22 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     public void transform() {
         throw new UnsupportedOperationException("Use buildVideoImagesByCountry");
     }
-    
+
     private ArtworkProcessResult processArtworkWithFallback(Set<String> countrySet, VideoArtworkSourceHollow artworkHollowInput,
                                                             Map<String, Map<Integer, Set<Artwork>>> countryArtworkMap,
                                                             Map<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseMap,
                                                             Set<String> merchstillSourceFieldIds,
                                                             Map<String, Set<String>> rolloutImagesByCountry, Map<String, Set<VideoHierarchy>> showHierarchiesByCountry,
                                                             Set<ArtworkLocaleHollow> originalNonFallbackLocaleSet) {
-    
+
         ArtworkProcessResult result = processArtwork(showHierarchiesByCountry.keySet(), artworkHollowInput, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
         if (result != null) {
             return result;
         } else {
             StringHollow fallbackSourceId = artworkHollowInput._getFallbackSourceFileId();
-            if(fallbackSourceId != null) {
+            if (fallbackSourceId != null) {
                 int fallbackOrdinal = videoArtworkBySourceFileIdIndex.getMatchingOrdinal(fallbackSourceId._getValue());
-                if(fallbackOrdinal != -1) {
+                if (fallbackOrdinal != -1) {
                     VideoArtworkSourceHollow fallback = api.getVideoArtworkSourceHollow(fallbackOrdinal);
                     return processArtworkWithFallback(countrySet, fallback, countryArtworkMap, countrySchedulePhaseMap, merchstillSourceFieldIds, rolloutImagesByCountry, showHierarchiesByCountry, originalNonFallbackLocaleSet);
                 } else {
@@ -479,7 +488,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
             return null;
         }
-        
+
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
         int seqNum = (int) artworkHollowInput._getSeqNum();
@@ -526,8 +535,8 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
         // Process list of derivatives
         HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
-        
-        if(derivativeSetMatches != null) {
+
+        if (derivativeSetMatches != null) {
             processCombinedDerivativesAndCdnList(entityId, sourceFileId, derivativeSetMatches, artwork);
         } else {
             return null;
@@ -630,11 +639,11 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
         return new ArtworkProcessResult(isMerchstillRollup, sourceFileId);
     }
-    
+
     private class ArtworkProcessResult {
         private boolean isMerchStillRollup;
         private String sourceFileId;
-        
+
         public ArtworkProcessResult(boolean isMerchStillRollup, String sourceFileId) {
             this.isMerchStillRollup = isMerchStillRollup;
             this.sourceFileId = sourceFileId;
