@@ -116,7 +116,7 @@ public class VideoMetaDataModule {
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoCountryDataMap.computeIfAbsent(entry.getKey(), f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(entry.getKey(), new VideoCountryData());
             VideoCountryData videoCountryData = videoCountryDataMap.get(entry.getKey());
 
 

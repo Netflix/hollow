@@ -6,9 +6,10 @@ import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * POJO to encapsulate data for each video.
@@ -19,7 +20,8 @@ public class VideoCountryData {
     private Set<VideoCollectionsDataHierarchy> videoCollectionsDataHierarchies;
 
     public VideoCountryData() {
-        this.videoIdDataMap = new ConcurrentHashMap<>();
+        this.videoIdDataMap = new HashMap<>();
+        this.videoCollectionsDataHierarchies = new HashSet<>();
     }
 
     private void checkNull(Object obj, String name) {

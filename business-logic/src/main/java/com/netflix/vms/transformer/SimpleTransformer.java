@@ -287,14 +287,16 @@ public class SimpleTransformer {
         // Process Global Video
         processGlobalVideo(globalVideoMap, objectMapper);
         // Process FallbackUSArtwork
-        processUSFallbackArtworks(videoCountryDataMap.get("US"), objectMapper);
+        VideoCountryData usData = videoCountryDataMap.get("US");
+        if (usData != null)
+            processUSFallbackArtworks(usData, objectMapper);
     }
 
     private void processCompleteVideo(HollowObjectMapper mapper, VideoNamedListPopulator namedListPopulator, CompleteVideo completeVideo, boolean isTopNode, ISOCountry country, Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap) {
         mapper.addObject(completeVideo);
         namedListPopulator.addCompleteVideo(completeVideo, isTopNode);
         Video video = completeVideo.id;
-        globalVideoMap.computeIfAbsent(video, f -> new TreeMap<>(countryComparator));
+        globalVideoMap.putIfAbsent(video, new TreeMap<>(countryComparator));
         globalVideoMap.get(video).put(country, completeVideo);
     }
 

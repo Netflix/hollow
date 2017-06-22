@@ -152,7 +152,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
 
-            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
             VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
 
 //            Map<Integer, VideoImages> imagesMap = new HashMap<>();
@@ -179,8 +179,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             String countryCode = countrySchedulePhaseEntry.getKey();
             Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseEntry.getValue();
 
-//            Map<Integer, VideoImages> videoImagesMap = countryImagesMap.get(countryCode);
-            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
             VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
 
             for (Entry<Integer, Set<SchedulePhaseInfo>> entry : videoSchedulePhaseMap.entrySet()) {
@@ -188,7 +187,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 // get schedule phase for artworks for the given video Id above
                 if (videoSchedulePhaseMap != null) {
                     VideoImages images = videoCountryData.getVideoImages(id);
-//                	VideoImages images = videoImagesMap.get(id);
                     if (images == null) {
                         images = new VideoImages();
                         // VMS client side code assumes that if VideoImages object exists, then artworkFormatsByType and artworks not to be null.
@@ -203,8 +201,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             }
 
         }
-
-//        return countryImagesMap;
     }
 
     private Map<String, Set<String>> getRolloutImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {

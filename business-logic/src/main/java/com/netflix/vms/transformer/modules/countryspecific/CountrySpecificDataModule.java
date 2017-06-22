@@ -101,16 +101,11 @@ public class CountrySpecificDataModule {
 
     public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData, Map<String, VideoCountryData> videoCountryDataMap) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
-
-//        Map<String, Map<Integer, CompleteVideoCountrySpecificData>> allCountrySpecificDataMap = new HashMap<String, Map<Integer,CompleteVideoCountrySpecificData>>();
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-
-//            Map<Integer, CompleteVideoCountrySpecificData> countryMap = new HashMap<Integer, CompleteVideoCountrySpecificData>();
-//            allCountrySpecificDataMap.put(countryCode, countryMap);
-            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
             this.videoCountryData = videoCountryDataMap.get(countryCode);
 
             processCountrySpecificData(rollup, entry.getValue(), countryCode, videoCountryData);
@@ -123,8 +118,6 @@ public class CountrySpecificDataModule {
 
         certificationListsModule.reset();
         availabilityWindowModule.reset();
-
-//        return allCountrySpecificDataMap;
     }
 
     private void processCountrySpecificData(CountrySpecificRollupValues rollup, Set<VideoHierarchy> hierarchies, String countryCode, VideoCountryData videoCountryData) {

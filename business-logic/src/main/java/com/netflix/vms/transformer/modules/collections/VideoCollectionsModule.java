@@ -44,89 +44,82 @@ public class VideoCollectionsModule {
 
     public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
 
-        Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<VideoHierarchy, VideoCollectionsDataHierarchy>();
-
-//        Map<String, Set<VideoCollectionsDataHierarchy>> countryHierarchies = new HashMap<String, Set<VideoCollectionsDataHierarchy>>();
-
-        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<>();
+        for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            
+
             Set<VideoCollectionsDataHierarchy> vcdHierarchies = new HashSet<>();
-            
-            for(VideoHierarchy showHierarchy : entry.getValue()) {
+
+            for (VideoHierarchy showHierarchy : entry.getValue()) {
                 int topNodeId = showHierarchy.getTopNodeId();
-    
+
                 VideoCollectionsDataHierarchy alreadyBuiltHierarchy = uniqueHierarchies.get(showHierarchy);
-                if(alreadyBuiltHierarchy != null) {
+                if (alreadyBuiltHierarchy != null) {
                     vcdHierarchies.add(alreadyBuiltHierarchy);
                     continue;
                 }
-    
+
                 VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
-                for(int i=0;i<showHierarchy.getSeasonIds().length;i++) {
+                for (int i = 0; i < showHierarchy.getSeasonIds().length; i++) {
                     int seasonId = showHierarchy.getSeasonIds()[i];
                     int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
                     hierarchy.addSeason(seasonId, seasonSequenceNumber, getSupplementalVideos(showHierarchy, seasonId));
-    
-                    for(int j=0;j<showHierarchy.getEpisodeIds()[i].length;j++) {
+
+                    for (int j = 0; j < showHierarchy.getEpisodeIds()[i].length; j++) {
                         int episodeId = showHierarchy.getEpisodeIds()[i][j];
                         int episodeSequenceNumber = showHierarchy.getEpisodeSequenceNumbers()[i][j];
                         hierarchy.addEpisode(episodeId, episodeSequenceNumber, getSupplementalVideos(showHierarchy, episodeId));
                     }
                 }
-                
+
                 vcdHierarchies.add(hierarchy);
                 uniqueHierarchies.put(showHierarchy, hierarchy);
             }
-
-//            countryHierarchies.put(countryCode, vcdHierarchies);
-            videoCountryDataMap.computeIfAbsent(countryCode, f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
             videoCountryDataMap.get(countryCode).addVideoCollectionsDataHierarchy(vcdHierarchies);
         }
-
-//        return countryHierarchies;
     }
-    
+
     private List<SupplementalVideo> getSupplementalVideos(VideoHierarchy hierarchy, long videoId) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
 
-        if(supplementalsOrdinal == -1)
+        if (supplementalsOrdinal == -1)
             return new ArrayList<SupplementalVideo>();
 
         List<SupplementalVideo> supplementalVideos = new ArrayList<SupplementalVideo>();
 
         SupplementalsHollow supplementals = videoAPI.getSupplementalsHollow(supplementalsOrdinal);
         for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
-            int supplementalId = (int)supplemental._getMovieId();
-            if(hierarchy.includesSupplementalId(supplementalId)) {
+            int supplementalId = (int) supplemental._getMovieId();
+            if (hierarchy.includesSupplementalId(supplementalId)) {
 
                 SupplementalVideo supp = new SupplementalVideo();
                 supp.id = new Video(supplementalId);
                 supp.parent = new Video((int) videoId);
-                supp.sequenceNumber = (int)supplemental._getSequenceNumber();
+                supp.sequenceNumber = (int) supplemental._getSequenceNumber();
                 //supp.seasonNumber = seasonNumber;
                 supp.attributes = new HashMap<Strings, Strings>();
                 supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
 
                 PassthroughDataHollow passthrough = supplemental._getPassthrough();
 
-                for(Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
+                for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
                     List<Strings> valueList = new ArrayList<Strings>();
-                    for(StringHollow str : entry.getValue()) {
+                    for (StringHollow str : entry.getValue()) {
                         valueList.add(new Strings(str._getValue()));
                     }
 
                     supp.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), valueList);
                 }
 
-                for(Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
+                for (Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
                     supp.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
                 }
 
                 supp.attributes.put(TYPE, TRAILER);
 
                 ////TODO: This should just be a passthrough.
-                if(supplemental._getIdentifier() != null) {
+                if (supplemental._getIdentifier() != null) {
                     supp.attributes.put(IDENTIFIER, new Strings(supplemental._getIdentifier()._getValue()));
                 }
 

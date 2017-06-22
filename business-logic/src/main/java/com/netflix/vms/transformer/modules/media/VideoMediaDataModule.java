@@ -51,11 +51,9 @@ public class VideoMediaDataModule {
     }
 
     public void buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
-//        Map<String, Map<Integer, VideoMediaData>> allVideoMediaDataMap = new HashMap<String, Map<Integer, VideoMediaData>>();
-
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoCountryDataMap.computeIfAbsent(entry.getKey(), f -> new VideoCountryData());
+            videoCountryDataMap.putIfAbsent(entry.getKey(), new VideoCountryData());
             VideoCountryData videoCountryData = videoCountryDataMap.get(entry.getKey());
 
             for (VideoHierarchy hierarchy : entry.getValue()) {
@@ -76,8 +74,6 @@ public class VideoMediaDataModule {
                 }
             }
         }
-
-//        return allVideoMediaDataMap;
     }
 
     private void addToResult(Integer videoId, String countryCode, VideoHierarchy hierarchy, HierarchyLeveL level, VideoCountryData videoCountryData) {
