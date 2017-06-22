@@ -30,13 +30,13 @@ import com.netflix.vms.transformer.hollowoutput.SortedMapOfDateWindowToListOfInt
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.VideoCountryData;
+import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -99,7 +99,7 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = null;
     }
 
-    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, VideoPackageData> transformedPackageData, Map<String, VideoCountryData> videoCountryDataMap) {
+    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, Set<PackageDataCollection>> transformedPackageData, Map<String, VideoCountryData> videoCountryDataMap) {
         this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 

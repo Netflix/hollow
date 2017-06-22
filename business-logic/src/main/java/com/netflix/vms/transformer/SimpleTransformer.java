@@ -51,6 +51,7 @@ import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
 import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
+import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
@@ -147,7 +148,7 @@ public class SimpleTransformer {
                         // so need to keep track of them and allow those use cases to be in parity
                         Set<Integer> droppedVideoIds = new HashSet<>();
                         Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedVideoIds);
-                        Map<Integer, VideoPackageData> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds);
+                        Map<Integer, Set<PackageDataCollection>> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds);
                         l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
 
                         if (showHierarchiesByCountry != null) {
