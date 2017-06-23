@@ -246,6 +246,9 @@ public class SimpleTransformer {
             ISOCountry country = cycleConstants.getISOCountry(countryId);
             VideoDataCollection videoDataCollection = countryHierarchyEntry.getValue();
 
+            // if no videos in video collection hierarchies then continue to next.
+            if (videoDataCollection.getVideoCollectionsDataHierarchies() == null) continue;
+
             for (VideoCollectionsDataHierarchy hierarchy : videoDataCollection.getVideoCollectionsDataHierarchies()) {
 
                 int topNodeVideoId = hierarchy.getTopNodeId().value;
@@ -260,10 +263,10 @@ public class SimpleTransformer {
                 if (topNodeCompleteVideo.data.facetData.videoCollectionsData.nodeType == cycleConstants.SHOW) {
                     int sequenceNumber = 0;
                     // Process Seasons
-                    for (Map.Entry<Integer, VideoCollectionsData> showEntry : hierarchy.getOrderedSeasons().entrySet()) {
+                    for (Map.Entry<Integer, VideoCollectionsData> seasonEntry : hierarchy.getOrderedSeasons().entrySet()) {
 
-                        int seasonId = showEntry.getKey().intValue();
-                        CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, showEntry.getValue(), miscData.get(seasonId));
+                        int seasonId = seasonEntry.getKey().intValue();
+                        CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, seasonEntry.getValue(), miscData.get(seasonId));
                         processCompleteVideo(objectMapper, namedListPopulator, season, false, country, globalVideoMap);
 
                         // Process Episodes
