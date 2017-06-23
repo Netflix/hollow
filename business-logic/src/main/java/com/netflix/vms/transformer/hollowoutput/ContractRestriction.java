@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +9,7 @@ import java.util.Set;
 public class ContractRestriction implements Cloneable {
 
     public Set<DownloadableId> excludedDownloadables = null;
+    @HollowHashKey(fields={"contractAssetType", "locale"})
     public Set<ContractAsset> availableAssets;
     public AvailabilityWindow availabilityWindow = null;
     public List<CupKey> cupKeys = null;

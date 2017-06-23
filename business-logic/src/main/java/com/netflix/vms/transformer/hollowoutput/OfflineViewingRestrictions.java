@@ -1,11 +1,13 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class OfflineViewingRestrictions implements Cloneable {
     public Set<DownloadableId> streamOnlyDownloadables = null;
+    @HollowHashKey(fields={"contractAssetType", "locale"})
     public Set<ContractAsset> downloadableAssets = null;
     public List<CupKey> downloadOnlyCupKeys = null;
     public Map<Strings, LanguageRestrictions> downloadLanguageBcp47RestrictionsMap = null;
