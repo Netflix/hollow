@@ -6,8 +6,7 @@ public class ContractAsset implements Cloneable {
 
     @HollowTypeName(name="ContractAssetType")
     public String contractAssetType;
-    @HollowTypeName(name="Strings")
-    public String locale;
+    public Strings locale;
 
     @Override
     public int hashCode() {
