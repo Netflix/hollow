@@ -8,7 +8,9 @@ public class EncodeSummaryDescriptorData implements Cloneable {
     public Strings audioLanguage = null;
     public Strings textLanguage = null;
     public boolean isNative = false;
+    @Deprecated
     public int encodingProfileId = java.lang.Integer.MIN_VALUE;
+    public AudioChannelsDescriptor audioChannels;
     public boolean isSubtitleBurnedIn = false;
     public AssetMetaData assetMetaData = null;
 
@@ -36,6 +38,9 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         if(o.assetMetaData == null) {
             if(assetMetaData != null) return false;
         } else if(!o.assetMetaData.equals(assetMetaData)) return false;
+        if(o.audioChannels == null) {
+            if(audioChannels != null) return false;
+        } else if(!o.audioChannels.equals(audioChannels)) return false;
         return true;
     }
 
@@ -49,6 +54,7 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         hashCode = hashCode * 31 + encodingProfileId;
         hashCode = hashCode * 31 + (isSubtitleBurnedIn? 1231 : 1237);
         hashCode = hashCode * 31 + (assetMetaData == null ? 1237 : assetMetaData.hashCode());
+        hashCode = hashCode * 31 + (audioChannels == null ? 1237 : audioChannels.hashCode());
         return hashCode;
     }
 
@@ -60,6 +66,7 @@ public class EncodeSummaryDescriptorData implements Cloneable {
         builder.append(",textLanguage=").append(textLanguage);
         builder.append(",isNative=").append(isNative);
         builder.append(",encodingProfileId=").append(encodingProfileId);
+        builder.append(",audioChannels=").append(audioChannels);
         builder.append(",isSubtitleBurnedIn=").append(isSubtitleBurnedIn);
         builder.append(",assetMetaData=").append(assetMetaData);
         builder.append("}");

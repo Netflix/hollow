@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.vms.transformer.modules.mpl.AudioChannelsDescriptorCache;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -26,6 +28,9 @@ public class EncodeSummaryDescriptorModule {
     private static final int DEPLOYMENT_LABELS_TO_EXCLUDE_FROM_SUMMARY = 0x11;
 
     private final TimedTextTypeDescriptor SUBTITLES = new TimedTextTypeDescriptor("Subtitles");
+    
+    private final AudioChannelsDescriptorCache audioChannelsDescriptorCache = new AudioChannelsDescriptorCache();
+
 
     private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -59,6 +64,8 @@ public class EncodeSummaryDescriptorModule {
 
             if(language == null)
                 continue;
+            
+            int numAudioChannels = (int)profile._getAudioChannelCount();
 
             EncodeSummaryDescriptorData data = new EncodeSummaryDescriptorData();
             data.assetType = stream.downloadDescriptor.assetTypeDescriptor;
@@ -67,6 +74,7 @@ public class EncodeSummaryDescriptorModule {
             data.audioLanguage = stream.downloadDescriptor.audioLanguageBcp47code;
             data.textLanguage = stream.downloadDescriptor.textLanguageBcp47code;
             data.encodingProfileId = stream.downloadDescriptor.encodingProfileId;
+            data.audioChannels = audioChannelsDescriptorCache.getAudioChannels(numAudioChannels);
 
 
             data.isNative = language != null && language.equals(getNativeLanguage(packageData.video.value));
@@ -81,7 +89,7 @@ public class EncodeSummaryDescriptorModule {
                     audioData.isSubtitleBurnedIn = false;
                 }
 
-                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(audioData, (int)profile._getAudioChannelCount(), SummaryType.AUDIO);
+                EncodeSummaryDescriptorDataKey key = new EncodeSummaryDescriptorDataKey(audioData, numAudioChannels, SummaryType.AUDIO);
                 addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
 
