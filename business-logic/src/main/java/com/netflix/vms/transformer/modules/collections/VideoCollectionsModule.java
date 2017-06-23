@@ -15,7 +15,7 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoCountryData;
+import com.netflix.vms.transformer.modules.VideoDataCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class VideoCollectionsModule {
         this.cycleConstants = constants;
     }
 
-    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
+    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
 
         Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
@@ -75,8 +75,8 @@ public class VideoCollectionsModule {
                 vcdHierarchies.add(hierarchy);
                 uniqueHierarchies.put(showHierarchy, hierarchy);
             }
-            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
-            videoCountryDataMap.get(countryCode).addVideoCollectionsDataHierarchy(vcdHierarchies);
+            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
+            videoDataCollectionMap.get(countryCode).setVideoCollectionsDataHierarchy(vcdHierarchies);
         }
     }
 

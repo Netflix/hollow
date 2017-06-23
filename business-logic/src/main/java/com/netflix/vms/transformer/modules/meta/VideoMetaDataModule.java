@@ -1,19 +1,10 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
-import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
-import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
-import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
-import com.netflix.vms.transformer.modules.VideoCountryData;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -45,10 +36,20 @@ import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.IndexSpec;
+import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
+import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
+import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.VideoDataCollection;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -77,11 +78,11 @@ public class VideoMetaDataModule {
     private final HollowHashIndex showCountryLabelIdx;
     private final HollowPrimaryKeyIndex videoStatusIdx;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
-    
+
     private final int newContentFlagDuration;
 
     Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<Integer, VideoMetaData>();
-    Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<Integer, Map<VideoMetaDataCountrySpecificDataKey,VideoMetaData>>();
+    Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>>();
 
     private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
 
@@ -98,7 +99,7 @@ public class VideoMetaDataModule {
         this.videoStatusIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(L10N_STORIES_SYNOPSES);
-        
+
         this.newContentFlagDuration = ctx.getConfig().getNewContentFlagDuration();
 
         hookTypeMap.put("TV Ratings Hook", new HookType("TV_RATINGS"));
@@ -108,53 +109,49 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
-        Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<String, Map<Integer,VideoMetaData>>();
+        Map<String, Map<Integer, VideoMetaData>> allVideoMetaDataMap = new HashMap<>();
 
-        for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
+        for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoCountryDataMap.putIfAbsent(entry.getKey(), new VideoCountryData());
-            VideoCountryData videoCountryData = videoCountryDataMap.get(entry.getKey());
+            videoDataCollectionMap.putIfAbsent(entry.getKey(), new VideoDataCollection());
+            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(entry.getKey());
 
-
-//            Map<Integer, VideoMetaData> countryMap = new HashMap<Integer, VideoMetaData>();
-//            allVideoMetaDataMap.put(entry.getKey(), countryMap);
-
-            for(VideoHierarchy hierarchy : entry.getValue()) {
+            for (VideoHierarchy hierarchy : entry.getValue()) {
                 VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();
                 int topNodeId = hierarchy.getTopNodeId();
                 VideoMetaDataRolldownValues rolldown = new VideoMetaDataRolldownValues(topNodeId);
                 rolldown.setShowMemberTypeId(getShowMemberTypeId(topNodeId, countryCode));
 
-                for(int i=0;i<hierarchy.getSeasonIds().length;i++) {
+                for (int i = 0; i < hierarchy.getSeasonIds().length; i++) {
                     rollup.newSeason();
 
-                    for(int j=0;j<hierarchy.getEpisodeIds()[i].length;j++) {
+                    for (int j = 0; j < hierarchy.getEpisodeIds()[i].length; j++) {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
-                        convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoCountryData, rollup, rolldown);
+                        convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoDataCollection, rollup, rolldown);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
 
                     rollup.setDoSeason(true);
                     rolldown.setDoSeason(true);
-                    convert(hierarchy.getSeasonIds()[i], countryCode, videoCountryData, rollup, rolldown);
+                    convert(hierarchy.getSeasonIds()[i], countryCode, videoDataCollection, rollup, rolldown);
                     rollup.setDoSeason(false);
                     rolldown.setDoSeason(false);
                 }
 
                 rollup.setDoShow(true);
                 rolldown.setDoShow(true);
-                convert(hierarchy.getTopNodeId(), countryCode, videoCountryData, rollup, rolldown);
+                convert(hierarchy.getTopNodeId(), countryCode, videoDataCollection, rollup, rolldown);
                 rollup.setDoShow(false);
                 rolldown.setDoShow(false);
 
-                for(int i=0;i<hierarchy.getSupplementalIds().length;i++) {
-                    convert(hierarchy.getSupplementalIds()[i], countryCode, videoCountryData, rollup, rolldown);
+                for (int i = 0; i < hierarchy.getSupplementalIds().length; i++) {
+                    convert(hierarchy.getSupplementalIds()[i], countryCode, videoDataCollection, rollup, rolldown);
                 }
             }
         }
@@ -163,27 +160,22 @@ public class VideoMetaDataModule {
     }
 
     /// Here is a good pattern for processing country-specific data
-    private void convert(Integer videoId, String countryCode, VideoCountryData videoCountryData, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
-        /// first create the country specific key
+    private void convert(Integer videoId, String countryCode, VideoDataCollection videoDataCollection, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
+        // first create the country specific key
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = createCountrySpecificKey(videoId, countryCode, rollup, rolldown);
-
-        /// then try to get the country specific clone, return it if it exists
+        // then try to get the country specific clone, return it if it exists
         Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData> countrySpecificMap = this.countrySpecificMap.get(videoId);
-        if(countrySpecificMap == null) {
-            countrySpecificMap = new HashMap<VideoMetaDataCountrySpecificDataKey, VideoMetaData>();
+        if (countrySpecificMap == null) {
+            countrySpecificMap = new HashMap<>();
             this.countrySpecificMap.put(videoId, countrySpecificMap);
         }
-
         VideoMetaData countrySpecificClone = countrySpecificMap.get(countrySpecificKey);
-        if(countrySpecificClone != null) {
-            videoCountryData.addVideoMetaData(videoId, countrySpecificClone);
-//            countryMap.put(videoId, countrySpecificClone);
+        if (countrySpecificClone != null) {
+            videoDataCollection.addVideoMetaData(videoId, countrySpecificClone);
             return;
         }
-
         /// get the country agnostic data
         VideoMetaData countryAgnosticVMD = getCountryAgnosticClone(videoId);
-
         /// clone the country agnostic data
         countrySpecificClone = countryAgnosticVMD.clone();
 
@@ -203,8 +195,7 @@ public class VideoMetaDataModule {
 
         /// return the country specific clone
         countrySpecificMap.put(countrySpecificKey, countrySpecificClone);
-
-        videoCountryData.addVideoMetaData(videoId, countrySpecificClone);
+        videoDataCollection.addVideoMetaData(videoId, countrySpecificClone);
     }
 
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
@@ -227,10 +218,10 @@ public class VideoMetaDataModule {
 
         if (status != null) {
             FlagsHollow flags = status._getFlags();
-            if(flags != null) {
+            if (flags != null) {
                 isGoLive = flags._getGoLive();
                 DateHollow firstDisplayDate = flags._getFirstDisplayDate();
-                if(firstDisplayDate != null) {
+                if (firstDisplayDate != null) {
                     firstDisplayTimestamp = firstDisplayDate._getValue();
                     hasFirstDisplayDate = true;
                 }
@@ -241,11 +232,11 @@ public class VideoMetaDataModule {
             for (RightsWindowHollow window : windows) {
                 long startDate = window._getStartDate();
                 long endDate = window._getEndDate();
-                if(window._getOnHold()) {
+                if (window._getOnHold()) {
                     startDate += ONE_THOUSAND_YEARS;
                     endDate += ONE_THOUSAND_YEARS;
                 }
-                
+
                 if (startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis()) {
                     isInWindow = true;
                     break;
@@ -253,18 +244,18 @@ public class VideoMetaDataModule {
             }
         }
 
-        if(isGoLive && hasFirstDisplayDate)
+        if (isGoLive && hasFirstDisplayDate)
             rollup.newPotentiallyEarliestFirstDisplayDate(firstDisplayTimestamp);
-        if(isGoLive && isInWindow && hasFirstDisplayDate)
+        if (isGoLive && isInWindow && hasFirstDisplayDate)
             rollup.newPotentiallyLatestFirstDisplayDate(firstDisplayTimestamp);
-        if(hasFirstDisplayDate || (isGoLive && isInWindow))
+        if (hasFirstDisplayDate || (isGoLive && isInWindow))
             rollup.newLatestYear(countrySpecificKey.latestYear);
 
-        if(rollup.doSeason()) {
-            if(rollup.getSeasonLatestYear() != 0)
+        if (rollup.doSeason()) {
+            if (rollup.getSeasonLatestYear() != 0)
                 countrySpecificKey.latestYear = rollup.getSeasonLatestYear();
-        } else if(rollup.doShow()) {
-            if(rollup.getShowLatestYear() != 0)
+        } else if (rollup.doShow()) {
+            if (rollup.getShowLatestYear() != 0)
                 countrySpecificKey.latestYear = rollup.getShowLatestYear();
         }
 
@@ -282,7 +273,7 @@ public class VideoMetaDataModule {
 
     private VideoMetaData getCountryAgnosticClone(Integer videoId) {
         VideoMetaData vmd = countryAgnosticMap.get(videoId);
-        if(vmd != null)
+        if (vmd != null)
             return vmd;
 
         vmd = new VideoMetaData();
@@ -325,29 +316,29 @@ public class VideoMetaDataModule {
         vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer);
 
         StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
-        if(copyright != null) {
+        if (copyright != null) {
             vmd.copyright = new Strings(copyright._getValue());
         }
     }
 
     private void populateGeneral(Integer videoId, VideoMetaData vmd) {
-        int ordinal = videoGeneralIdx.getMatchingOrdinal((long)videoId);
-        if(ordinal != -1) {
+        int ordinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
+        if (ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
 
             StringHollow origCountry = general._getOriginCountryCode();
-            if(origCountry != null)
+            if (origCountry != null)
                 vmd.countryOfOrigin = constants.getISOCountry(origCountry._getValue());
             vmd.countryOfOriginNameLocale = new NFLocale(general._getOriginalTitleBcpCode()._getValue().replace('-', '_'));
             StringHollow origLang = general._getOriginalLanguageBcpCode();
-            if(origLang != null)
+            if (origLang != null)
                 vmd.originalLanguageBcp47code = new Strings(origLang._getValue());
 
             List<VideoGeneralAliasHollow> inputAliases = general._getAliases();
 
-            if(inputAliases != null) {
+            if (inputAliases != null) {
                 Set<Strings> aliasList = new HashSet<>();
-                for(VideoGeneralAliasHollow alias : inputAliases) {
+                for (VideoGeneralAliasHollow alias : inputAliases) {
                     aliasList.add(new Strings(alias._getValue()._getValue()));
                 }
                 vmd.aliases = aliasList;
@@ -355,9 +346,9 @@ public class VideoMetaDataModule {
 
             List<VideoGeneralTitleTypeHollow> inputTitleTypes = general._getTestTitleTypes();
 
-            if(inputTitleTypes != null) {
+            if (inputTitleTypes != null) {
                 Set<Strings> titleTypes = new HashSet<>();
-                for(VideoGeneralTitleTypeHollow titleType : inputTitleTypes) {
+                for (VideoGeneralTitleTypeHollow titleType : inputTitleTypes) {
                     titleTypes.add(new Strings(titleType._getValue()._getValue()));
                 }
 
@@ -366,9 +357,9 @@ public class VideoMetaDataModule {
 
             List<VideoGeneralEpisodeTypeHollow> inputEpisodeTypes = general._getEpisodeTypes();
 
-            if(inputEpisodeTypes != null) {
+            if (inputEpisodeTypes != null) {
                 Set<Strings> epTypes = new HashSet<>();
-                for(VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
+                for (VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
                     epTypes.add(new Strings(epType._getValue()._getValue()));
                 }
 
@@ -379,14 +370,14 @@ public class VideoMetaDataModule {
             vmd.metadataReleaseDays = OutputUtil.getNullableInteger(general._getMetadataReleaseDays());
         }
 
-        if(vmd.titleTypes == null)    vmd.titleTypes = Collections.emptySet();
-        if(vmd.episodeTypes == null)  vmd.episodeTypes = Collections.emptySet();
-        if(vmd.aliases == null)       vmd.aliases = Collections.emptySet();
+        if (vmd.titleTypes == null) vmd.titleTypes = Collections.emptySet();
+        if (vmd.episodeTypes == null) vmd.episodeTypes = Collections.emptySet();
+        if (vmd.aliases == null) vmd.aliases = Collections.emptySet();
     }
 
     private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, StatusHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
-        HollowHashIndexResult dateResult = videoDateIdx.findMatches((long)videoId, countryCode);
-        if(dateResult != null) {
+        HollowHashIndexResult dateResult = videoDateIdx.findMatches((long) videoId, countryCode);
+        if (dateResult != null) {
             int ordinal = dateResult.iterator().next();
             VideoDateWindowHollow dateWindow = api.getVideoDateWindowHollow(ordinal);
 
@@ -394,22 +385,22 @@ public class VideoMetaDataModule {
             if (releaseDates != null) {
                 for (ReleaseDateHollow releaseDate : releaseDates) {
                     String releaseDateType = releaseDate._getReleaseDateType()._getValue();
-                    if(releaseDateType.equals(VideoDateUtil.ReleaseDateType.Theatrical.toString())) {
+                    if (releaseDateType.equals(VideoDateUtil.ReleaseDateType.Theatrical.toString())) {
                         vmd.isTheatricalRelease = true;
                         vmd.theatricalReleaseDate = VideoDateUtil.convertToHollowOutputDate(releaseDate);
-                    } else if(releaseDateType.equals(VideoDateUtil.ReleaseDateType.Broadcast.toString())) {
+                    } else if (releaseDateType.equals(VideoDateUtil.ReleaseDateType.Broadcast.toString())) {
                         vmd.broadcastYear = releaseDate._getYear();
                         vmd.broadcastReleaseDate = VideoDateUtil.convertToHollowOutputDate(releaseDate);
                         StringHollow distributorName = releaseDate._getDistributorName();
-                        if(distributorName != null)
+                        if (distributorName != null)
                             vmd.broadcastDistributorName = new Strings(distributorName._getValue());
                     }
                 }
             }
         }
 
-        int ordinal = videoGeneralIdx.getMatchingOrdinal((long)videoId);
-        if(ordinal != -1) {
+        int ordinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
+        if (ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             vmd.year = (int) general._getFirstReleaseYear();
             vmd.latestYear = vmd.year;
@@ -419,11 +410,11 @@ public class VideoMetaDataModule {
     private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
         Map<VRole, List<SequencedVPerson>> roles = new HashMap<>();
         HollowHashIndexResult personMatches = personVideoIdx.findMatches((long) videoId);
-        if(personMatches != null) {
+        if (personMatches != null) {
             HollowOrdinalIterator iter = personMatches.iterator();
 
             int personOrdinal = iter.next();
-            while(personOrdinal != NO_MORE_ORDINALS) {
+            while (personOrdinal != NO_MORE_ORDINALS) {
                 PersonVideoHollow person = api.getPersonVideoHollow(personOrdinal);
 
                 long personId = person._getPersonId();
@@ -432,7 +423,7 @@ public class VideoMetaDataModule {
                 HollowOrdinalIterator roleIter = roleMatches.iterator();
 
                 int roleOrdinal = roleIter.next();
-                while(roleOrdinal != NO_MORE_ORDINALS) {
+                while (roleOrdinal != NO_MORE_ORDINALS) {
                     PersonVideoRoleHollow role = api.getPersonVideoRoleHollow(roleOrdinal);
 
                     VRole vRole = new VRole(role._getRoleTypeId());
@@ -456,38 +447,38 @@ public class VideoMetaDataModule {
         vmd.directorList = getRoles(DIRECTOR_ROLE_ID, vmd.roles);
         vmd.creatorList = getRoles(CREATOR_ROLE_ID, vmd.roles);
     }
-    
+
     private static class SequencedVPerson implements Comparable<SequencedVPerson> {
         private final VPerson person;
         private final int sequenceNumber;
-        
+
         public SequencedVPerson(VPerson person, int sequenceNumber) {
             this.person = person;
             this.sequenceNumber = sequenceNumber;
         }
-        
+
         public VPerson getPerson() {
             return person;
         }
-        
+
         @Override
         public int compareTo(SequencedVPerson other) {
             return Integer.compare(sequenceNumber, other.sequenceNumber);
         }
     }
-    
+
     private Map<VRole, List<VPerson>> getSortedRoleMap(Map<VRole, List<SequencedVPerson>> sequencedMap) {
         Map<VRole, List<VPerson>> map = new HashMap<>();
-        
-        for(Map.Entry<VRole, List<SequencedVPerson>>entry : sequencedMap.entrySet()) {
+
+        for (Map.Entry<VRole, List<SequencedVPerson>> entry : sequencedMap.entrySet()) {
             Collections.sort(entry.getValue());
             List<VPerson> personList = new ArrayList<>();
-            for(SequencedVPerson person : entry.getValue()) {
+            for (SequencedVPerson person : entry.getValue()) {
                 personList.add(person.getPerson());
             }
             map.put(entry.getKey(), personList);
         }
-        
+
         return map;
     }
 
@@ -500,14 +491,14 @@ public class VideoMetaDataModule {
     }
 
     private void populateHooks(Integer videoId, VideoMetaData vmd) {
-        int storiesSynopsesOrdinal = storiesSynopsesIdx.getMatchingOrdinal((long)videoId);
+        int storiesSynopsesOrdinal = storiesSynopsesIdx.getMatchingOrdinal((long) videoId);
 
-        if(storiesSynopsesOrdinal != -1) {
+        if (storiesSynopsesOrdinal != -1) {
             StoriesSynopsesHollow synopses = api.getStoriesSynopsesHollow(storiesSynopsesOrdinal);
 
             List<Hook> hooks = new ArrayList<Hook>();
 
-            for(StoriesSynopsesHookHollow hook : synopses._getHooks()) {
+            for (StoriesSynopsesHookHollow hook : synopses._getHooks()) {
                 String type = hook._getType()._getValue();
                 int rank = Integer.parseInt(hook._getRank()._getValue());
 
@@ -526,8 +517,8 @@ public class VideoMetaDataModule {
     }
 
     public boolean hasNewContent(VideoMetaDataRollupValues rollup) {
-        if(rollup.doShow()) {
-            if(daysAgo(rollup.getEarliestFirstDisplayDate()) > newContentFlagDuration && daysAgo(rollup.getLatestLiveFirstDisplayDate()) <= newContentFlagDuration)
+        if (rollup.doShow()) {
+            if (daysAgo(rollup.getEarliestFirstDisplayDate()) > newContentFlagDuration && daysAgo(rollup.getLatestLiveFirstDisplayDate()) <= newContentFlagDuration)
                 return true;
         }
 
@@ -535,9 +526,8 @@ public class VideoMetaDataModule {
     }
 
     private int daysAgo(long timestamp) {
-        return (int)((ctx.getNowMillis() - timestamp) / (24 * 60 * 60 * 1000));
+        return (int) ((ctx.getNowMillis() - timestamp) / (24 * 60 * 60 * 1000));
     }
-
 
 
 }

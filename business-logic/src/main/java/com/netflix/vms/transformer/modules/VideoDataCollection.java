@@ -12,54 +12,49 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * POJO to encapsulate data for each video.
+ * This class encapsulates data for a group of videos in collections hierarchies. Ideally to be used as a Map of country to VideoDataCollection.
  */
-public class VideoCountryData {
+public class VideoDataCollection {
 
     private Map<Integer, VideoData> videoIdDataMap;
     private Set<VideoCollectionsDataHierarchy> videoCollectionsDataHierarchies;
 
-    public VideoCountryData() {
+    public VideoDataCollection() {
         this.videoIdDataMap = new HashMap<>();
         this.videoCollectionsDataHierarchies = new HashSet<>();
     }
 
-    private void checkNull(Object obj, String name) {
+    private VideoData checkAndFetch(Object obj, String name, int videoId) {
         if (obj == null)
             throw new IllegalArgumentException(name + " cannot be null");
+        videoIdDataMap.computeIfAbsent(videoId, f -> new VideoData());
+        return videoIdDataMap.get(videoId);
     }
 
     public Set<VideoCollectionsDataHierarchy> getVideoCollectionsDataHierarchies() {
         return videoCollectionsDataHierarchies;
     }
 
-    public void addVideoCollectionsDataHierarchy(Set<VideoCollectionsDataHierarchy> collectionsDataHierarchies) {
-        checkNull(collectionsDataHierarchies, "Collection data hierarchy");
+    public void setVideoCollectionsDataHierarchy(Set<VideoCollectionsDataHierarchy> collectionsDataHierarchies) {
+        if (collectionsDataHierarchies == null)
+            throw new IllegalArgumentException("Collection hierarchies cannot be null");
         this.videoCollectionsDataHierarchies = collectionsDataHierarchies;
     }
 
     public void addVideoImages(Integer videoId, VideoImages videoImages) {
-        checkNull(videoImages, "Video Images");
-        videoIdDataMap.computeIfAbsent(videoId, f -> new VideoData());
-        videoIdDataMap.get(videoId).setVideoImages(videoImages);
+        checkAndFetch(videoImages, "Video Images", videoId).setVideoImages(videoImages);
     }
 
     public void addVideoMetaData(Integer videoId, VideoMetaData videoMetaData) {
-        checkNull(videoMetaData, "Video Meta Data");
-        videoIdDataMap.computeIfAbsent(videoId, f -> new VideoData());
-        videoIdDataMap.get(videoId).setVideoMetaData(videoMetaData);
+        checkAndFetch(videoMetaData, "Video Meta Data", videoId).setVideoMetaData(videoMetaData);
     }
 
     public void addVideoMediaData(Integer videoId, VideoMediaData videoMediaData) {
-        checkNull(videoMediaData, "Video Media Data");
-        videoIdDataMap.computeIfAbsent(videoId, f -> new VideoData());
-        videoIdDataMap.get(videoId).setVideoMediaData(videoMediaData);
+        checkAndFetch(videoMediaData, "Video Media Data", videoId).setVideoMediaData(videoMediaData);
     }
 
-    public void addCompleteVideoCountrySpecificData(Integer id, CompleteVideoCountrySpecificData completeVideoCountrySpecificData) {
-        checkNull(completeVideoCountrySpecificData, "Country Specific Data");
-        videoIdDataMap.computeIfAbsent(id, f -> new VideoData());
-        videoIdDataMap.get(id).setCompleteVideoCountrySpecificData(completeVideoCountrySpecificData);
+    public void addCompleteVideoCountrySpecificData(Integer videoId, CompleteVideoCountrySpecificData completeVideoCountrySpecificData) {
+        checkAndFetch(completeVideoCountrySpecificData, "Country Specific Data", videoId).setCompleteVideoCountrySpecificData(completeVideoCountrySpecificData);
     }
 
     public VideoMetaData getVideoMetaData(Integer videoId) {
@@ -101,35 +96,35 @@ public class VideoCountryData {
         private VideoImages videoImages;
         private CompleteVideoCountrySpecificData completeVideoCountrySpecificData;
 
-        public VideoMediaData getVideoMediaData() {
+        private VideoMediaData getVideoMediaData() {
             return videoMediaData;
         }
 
-        public void setVideoMediaData(VideoMediaData videoMediaData) {
+        private void setVideoMediaData(VideoMediaData videoMediaData) {
             this.videoMediaData = videoMediaData;
         }
 
-        public VideoMetaData getVideoMetaData() {
+        private VideoMetaData getVideoMetaData() {
             return videoMetaData;
         }
 
-        public void setVideoMetaData(VideoMetaData videoMetaData) {
+        private void setVideoMetaData(VideoMetaData videoMetaData) {
             this.videoMetaData = videoMetaData;
         }
 
-        public VideoImages getVideoImages() {
+        private VideoImages getVideoImages() {
             return videoImages;
         }
 
-        public void setVideoImages(VideoImages videoImages) {
+        private void setVideoImages(VideoImages videoImages) {
             this.videoImages = videoImages;
         }
 
-        public CompleteVideoCountrySpecificData getCompleteVideoCountrySpecificData() {
+        private CompleteVideoCountrySpecificData getCompleteVideoCountrySpecificData() {
             return completeVideoCountrySpecificData;
         }
 
-        public void setCompleteVideoCountrySpecificData(CompleteVideoCountrySpecificData completeVideoCountrySpecificData) {
+        private void setCompleteVideoCountrySpecificData(CompleteVideoCountrySpecificData completeVideoCountrySpecificData) {
             this.completeVideoCountrySpecificData = completeVideoCountrySpecificData;
         }
     }

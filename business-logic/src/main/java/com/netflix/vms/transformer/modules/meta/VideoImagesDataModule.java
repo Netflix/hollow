@@ -45,7 +45,7 @@ import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoCountryData;
+import com.netflix.vms.transformer.modules.VideoDataCollection;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
@@ -106,7 +106,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         this.videoStatusIdx = null;
     }*/
 
-    public void buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoCountryData> videoCountryDataMap) {
+    public void buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
         Set<Integer> ids = new HashSet<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             for (VideoHierarchy hierarchy : entry.getValue()) {
@@ -143,20 +143,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             }
         }
 
-
         rollupMerchstillsDescOrder(rollupSourceFieldIds, showHierarchiesByCountry, merchstillSourceFieldIds, countryArtworkMap, this, MIN_ROLLUP_SIZE);
-
-        // Create VideoImages
-//        Map<String, Map<Integer, VideoImages>> countryImagesMap = new HashMap<>();
         for (Map.Entry<String, Map<Integer, Set<Artwork>>> countryEntry : countryArtworkMap.entrySet()) {
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
 
-            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
-            VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
-
-//            Map<Integer, VideoImages> imagesMap = new HashMap<>();
-//            countryImagesMap.put(countryCode, imagesMap);
+            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
+            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(countryCode);
 
             for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
                 VideoImages images = new VideoImages();
@@ -166,7 +159,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 images.artworks = createArtworkByTypeMap(artworkSet);
                 images.artworkFormatsByType = createFormatByTypeMap(artworkSet);
 
-                videoCountryData.addVideoImages(id, images);
+                videoDataCollection.addVideoImages(id, images);
             }
         }
 
@@ -179,21 +172,21 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
             String countryCode = countrySchedulePhaseEntry.getKey();
             Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseEntry.getValue();
 
-            videoCountryDataMap.putIfAbsent(countryCode, new VideoCountryData());
-            VideoCountryData videoCountryData = videoCountryDataMap.get(countryCode);
+            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
+            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(countryCode);
 
             for (Entry<Integer, Set<SchedulePhaseInfo>> entry : videoSchedulePhaseMap.entrySet()) {
                 Integer id = entry.getKey();
                 // get schedule phase for artworks for the given video Id above
                 if (videoSchedulePhaseMap != null) {
-                    VideoImages images = videoCountryData.getVideoImages(id);
+                    VideoImages images = videoDataCollection.getVideoImages(id);
                     if (images == null) {
                         images = new VideoImages();
                         // VMS client side code assumes that if VideoImages object exists, then artworkFormatsByType and artworks not to be null.
                         // For this reason initialize them with empty maps.
                         images.artworkFormatsByType = Collections.emptyMap();
                         images.artworks = Collections.emptyMap();
-                        videoCountryData.addVideoImages(id, images);
+                        videoDataCollection.addVideoImages(id, images);
                     }
                     Set<SchedulePhaseInfo> schedulePhaseInfoList = videoSchedulePhaseMap.get(id);
                     if (schedulePhaseInfoList != null) images.imageAvailabilityWindows = schedulePhaseInfoList;
