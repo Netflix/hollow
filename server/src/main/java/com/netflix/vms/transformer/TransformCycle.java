@@ -298,9 +298,9 @@ public class TransformCycle {
     }
     
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
-        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "SetOfDownloadableId", "FileEncodingData",
-                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "DownloadableId", "ChunkDurationsString", "StreamDataDescriptor",
-                "StreamAdditionalData", "ListOfDownloadableId", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
+        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "FileEncodingData",
+                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "ChunkDurationsString", "StreamDataDescriptor",
+                "StreamAdditionalData", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
                 "WmDrmKey", "DrmInfo", "StreamMostlyConstantData", "ImageSubtitleIndexByteRange", "DrmInfoData", "QoEInfo",
                 "DeploymentIntent", "CodecPrivateDataString");
         

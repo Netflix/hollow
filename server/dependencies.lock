@@ -303,6 +303,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -325,19 +331,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -358,12 +369,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -387,6 +405,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -398,6 +419,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -499,13 +521,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -521,9 +561,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -576,7 +615,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -923,19 +962,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -1847,6 +1886,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -1956,6 +2029,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -2051,9 +2125,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -2257,7 +2330,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2320,21 +2393,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -2358,9 +2431,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -2428,7 +2514,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -2867,7 +2953,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3479,6 +3565,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -3870,6 +3958,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -3892,19 +3986,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -3925,12 +4024,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -3954,6 +4060,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -3965,6 +4074,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -4066,13 +4176,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -4088,9 +4216,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -4143,7 +4270,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -4490,19 +4617,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -5414,6 +5541,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -5523,6 +5684,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -5618,9 +5780,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -5824,7 +5985,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5887,21 +6048,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -5925,9 +6086,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -5995,7 +6169,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -6434,7 +6608,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7046,6 +7220,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -7437,6 +7613,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -7459,19 +7641,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -7492,12 +7679,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -7521,6 +7715,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -7532,6 +7729,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -7633,13 +7831,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -7655,9 +7871,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -7710,7 +7925,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -8057,19 +8272,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -8981,6 +9196,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -9090,6 +9339,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -9185,9 +9435,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -9391,7 +9640,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9454,21 +9703,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -9492,9 +9741,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -9562,7 +9824,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -10001,7 +10263,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10613,6 +10875,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -11004,6 +11268,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -11026,19 +11296,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -11059,12 +11334,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -11088,6 +11370,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -11099,6 +11384,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -11200,13 +11486,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -11222,9 +11526,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -11277,7 +11580,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -11624,19 +11927,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -12548,6 +12851,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -12657,6 +12994,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -12745,9 +13083,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -12951,7 +13288,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -13014,21 +13351,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -13052,9 +13389,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -13122,7 +13472,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -13561,7 +13911,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14166,6 +14516,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -14479,7 +14831,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.7",
+            "locked": "2.8.9",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -14643,6 +14995,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -14665,20 +15023,25 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.governator:governator-archaius",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -14699,12 +15062,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -14728,6 +15098,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -14739,6 +15112,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -14840,13 +15214,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -14862,9 +15254,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -14917,7 +15308,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -15264,19 +15655,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -16188,6 +16579,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -16298,6 +16723,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -16393,9 +16819,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -16599,7 +17024,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16662,21 +17087,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -16700,9 +17125,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -16770,7 +17208,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -17209,7 +17647,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17826,6 +18264,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -19309,6 +19749,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -19331,19 +19777,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -19364,12 +19815,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -19393,6 +19851,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -19404,6 +19865,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -19505,13 +19967,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -19527,9 +20007,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -19582,7 +20061,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -19929,19 +20408,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -20853,6 +21332,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -20962,6 +21475,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -21057,9 +21571,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -21263,7 +21776,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -21326,21 +21839,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -21364,9 +21877,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -21434,7 +21960,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -21873,7 +22399,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22485,6 +23011,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -22715,7 +23243,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.7",
+            "locked": "2.8.9",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -22879,6 +23407,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -22901,20 +23435,25 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.governator:governator-archaius",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -22935,12 +23474,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -22964,6 +23510,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -22975,6 +23524,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -23076,13 +23626,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -23098,9 +23666,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all"
             ]
         },
@@ -23153,7 +23720,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -23500,19 +24067,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.6.2",
+            "locked": "2.6.3",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -24424,6 +24991,40 @@
                 "com.netflix.aeneas:aeneas-core"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -24534,6 +25135,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -24628,9 +25230,8 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.10",
+            "locked": "4.8.1",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server"
             ]
         },
@@ -24834,7 +25435,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -24897,21 +25498,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -24935,9 +25536,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -25005,7 +25619,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -25444,7 +26058,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26028,6 +26642,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -26440,6 +27056,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -26462,19 +27084,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -26495,12 +27122,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -26524,6 +27158,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -26535,6 +27172,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -26636,13 +27274,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -26659,9 +27315,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -26716,7 +27371,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -26724,13 +27379,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28018,6 +28673,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -28135,6 +28824,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -28234,7 +28924,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -28448,7 +29137,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -28511,21 +29200,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -28549,9 +29238,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -28619,7 +29321,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -29059,7 +29761,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -29704,6 +30406,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -30120,6 +30824,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -30142,19 +30852,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -30175,12 +30890,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -30204,6 +30926,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -30215,6 +30940,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -30316,13 +31042,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -30339,9 +31083,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -30396,7 +31139,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -30404,13 +31147,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -31698,6 +32441,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -31815,6 +32592,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -31914,7 +32692,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -32128,7 +32905,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -32191,21 +32968,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -32229,9 +33006,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -32299,7 +33089,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -32739,7 +33529,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33384,6 +34174,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -33800,6 +34592,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -33822,19 +34620,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -33855,12 +34658,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -33884,6 +34694,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -33895,6 +34708,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -33996,13 +34810,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -34019,9 +34851,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -34076,7 +34907,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -34084,13 +34915,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35378,6 +36209,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -35495,6 +36360,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -35594,7 +36460,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -35808,7 +36673,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -35871,21 +36736,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -35909,9 +36774,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -35979,7 +36857,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -36419,7 +37297,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37064,6 +37942,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -37480,6 +38360,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -37502,19 +38388,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -37535,12 +38426,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -37564,6 +38462,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -37575,6 +38476,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -37676,13 +38578,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -37699,9 +38619,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -37756,7 +38675,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -37764,13 +38683,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -39058,6 +39977,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -39175,6 +40128,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -39274,7 +40228,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -39488,7 +40441,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -39551,21 +40504,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -39589,9 +40542,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -39659,7 +40625,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -40099,7 +41065,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40744,6 +41710,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -41160,6 +42128,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -41182,19 +42156,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -41215,12 +42194,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -41244,6 +42230,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -41255,6 +42244,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -41356,13 +42346,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -41379,9 +42387,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -41436,7 +42443,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -41444,13 +42451,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -42738,6 +43745,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -42855,6 +43896,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -42954,7 +43996,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -43168,7 +44209,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -43231,21 +44272,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -43269,9 +44310,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -43339,7 +44393,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -43779,7 +44833,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44424,6 +45478,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -44840,6 +45896,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -44862,19 +45924,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -44895,12 +45962,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -44924,6 +45998,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -44935,6 +46012,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -45036,13 +46114,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -45059,9 +46155,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -45116,7 +46211,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -45124,13 +46219,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -46418,6 +47513,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -46535,6 +47664,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -46634,7 +47764,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -46848,7 +47977,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -46911,21 +48040,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -46949,9 +48078,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -47019,7 +48161,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -47459,7 +48601,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48104,6 +49246,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -48520,6 +49664,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -48542,19 +49692,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -48575,12 +49730,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -48604,6 +49766,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -48615,6 +49780,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -48716,13 +49882,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -48739,9 +49923,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -48796,7 +49979,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -48804,13 +49987,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -50098,6 +51281,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -50215,6 +51432,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -50314,7 +51532,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -50528,7 +51745,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -50591,21 +51808,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -50629,9 +51846,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -50699,7 +51929,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -51139,7 +52369,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51784,6 +53014,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
@@ -52200,6 +53432,12 @@
                 "org.apache.cassandra:cassandra-all"
             ]
         },
+        "com.google.api.grpc:grpc-google-common-protos": {
+            "locked": "0.1.6",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
         "com.google.code.findbugs:annotations": {
             "locked": "3.0.1",
             "transitive": [
@@ -52222,19 +53460,24 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.instrumentation:instrumentation-api",
                 "com.netflix.archaius:archaius-core",
-                "com.netflix.netflix-commons:netflix-infix"
+                "com.netflix.netflix-commons:netflix-infix",
+                "io.grpc:grpc-core"
             ]
         },
         "com.google.code.gson:gson": {
             "locked": "2.8.0",
             "transitive": [
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.karyon:karyon2-admin-web",
                 "com.netflix.netflix-commons:netflix-infix",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
@@ -52255,12 +53498,19 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.0.19",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
         "com.google.guava:guava": {
             "locked": "20.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -52284,6 +53534,9 @@
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "io.grpc:grpc-core",
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
                 "netflix:akmsclient",
                 "netflix:atlas-plugin",
                 "netflix:base-server",
@@ -52295,6 +53548,7 @@
                 "netflix:epic-plugin",
                 "netflix:jarversions",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
                 "netflix:mutation-stream-client",
                 "netflix:nf-eventbus",
                 "netflix:nflibrary",
@@ -52396,13 +53650,31 @@
                 "netflix:whitecastle_v2"
             ]
         },
-        "com.google.protobuf:protobuf-java": {
-            "locked": "3.0.2",
+        "com.google.instrumentation:instrumentation-api": {
+            "locked": "0.3.0",
             "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "com.google.protobuf:protobuf-java": {
+            "locked": "3.2.0",
+            "transitive": [
+                "com.google.api.grpc:grpc-google-common-protos",
+                "com.google.protobuf:protobuf-java-util",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.google.protobuf:protobuf-java-util": {
+            "locked": "3.2.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "netflix:metatron-decrypt"
             ]
         },
         "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru": {
@@ -52419,9 +53691,8 @@
             ]
         },
         "com.googlecode.json-simple:json-simple": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "org.apache.cassandra:cassandra-all",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -52476,7 +53747,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -52484,13 +53755,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.28",
+            "locked": "1.29",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.39",
+            "locked": "1.40",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -53778,6 +55049,40 @@
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
+        "io.grpc:grpc-context": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-core"
+            ]
+        },
+        "io.grpc:grpc-core": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf",
+                "io.grpc:grpc-protobuf-lite",
+                "io.grpc:grpc-stub",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "io.grpc:grpc-protobuf": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
+        "io.grpc:grpc-protobuf-lite": {
+            "locked": "1.3.0",
+            "transitive": [
+                "io.grpc:grpc-protobuf"
+            ]
+        },
+        "io.grpc:grpc-stub": {
+            "locked": "1.3.0",
+            "transitive": [
+                "netflix:metatron-common"
+            ]
+        },
         "io.netty:netty": {
             "locked": "3.10.5.Final",
             "transitive": [
@@ -53895,6 +55200,7 @@
                 "com.netflix.vms.logging:vmslogging-core",
                 "com.netflix.vms.logging:vmslogging-slf4j",
                 "com.sun.jersey.contribs:jersey-guice",
+                "netflix:metatron-decrypt",
                 "netflix:nf-eventbus-core",
                 "netflix:request-expiry",
                 "netflix:request-expiry-impl",
@@ -53994,7 +55300,6 @@
             "locked": "4.11",
             "requested": "4.11",
             "transitive": [
-                "com.googlecode.json-simple:json-simple",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -54208,7 +55513,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "30.36",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -54271,21 +55576,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.190",
+            "locked": "1.197",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.191",
+            "locked": "1.198",
             "transitive": [
                 "netflix:hermes",
                 "netflix:netflix-internal-hollow"
@@ -54309,9 +55614,22 @@
                 "netflix:cryptexclient-standalone"
             ]
         },
-        "netflix:metatron-ipc-common": {
-            "locked": "1.93.0",
+        "netflix:metatron-common": {
+            "locked": "1.97.0",
             "transitive": [
+                "netflix:metatron-decrypt"
+            ]
+        },
+        "netflix:metatron-decrypt": {
+            "locked": "1.97.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-core"
+            ]
+        },
+        "netflix:metatron-ipc-common": {
+            "locked": "1.97.0",
+            "transitive": [
+                "netflix:metatron-decrypt",
                 "netflix:nsac-client"
             ]
         },
@@ -54379,7 +55697,7 @@
             ]
         },
         "netflix:netflix-internal-hollow": {
-            "locked": "1.16",
+            "locked": "1.17",
             "requested": "1.+"
         },
         "netflix:nf-admin-plugins": {
@@ -54819,7 +56137,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.13",
+            "locked": "60.17",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -55464,6 +56782,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:crypto-common-util",
                 "netflix:luna-safetynet",
+                "netflix:metatron-common",
+                "netflix:metatron-decrypt",
                 "netflix:metatron-ipc-common",
                 "netflix:nf-archaius2",
                 "netflix:nf-archaius2-platform-bridge",
