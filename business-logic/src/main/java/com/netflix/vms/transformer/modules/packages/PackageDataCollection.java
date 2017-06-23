@@ -52,9 +52,7 @@ public class PackageDataCollection {
     private long longestRuntimeInSeconds;
     private Set<Strings> screenFormats;
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap;
-
-    private Set<Strings> soundTypes;
-    private Map<ISOCountry, Set<Strings>> excludedSoundTypesByCountry;
+    private Map<ISOCountry, Set<Strings>> soundTypesByCountry;
 
     private Map<Float, Strings> screenFormatCache;
     private Set<Integer> fourKProfileIds;
@@ -67,13 +65,12 @@ public class PackageDataCollection {
         this.packageData = new PackageData();
         this.videoFormatDescriptors = new HashSet<>();
         this.longestRuntimeInSeconds = 0;
-        this.soundTypes = new TreeSet<>();
+        this.soundTypesByCountry = new HashMap<>();
         this.screenFormats = new TreeSet<>();
         this.trickPlayItemMap = new HashMap<>();
 
-        this.excludedSoundTypesByCountry = new HashMap<>();
-        this.screenFormatCache = new HashMap<>();
 
+        this.screenFormatCache = new HashMap<>();
         this.fourKProfileIds = fourKProfileIds;
         this.hdrProfileIds = hdrProfileIds;
         this.atmosStreamProfileIds = atmosStreamProfileIds;
@@ -90,12 +87,9 @@ public class PackageDataCollection {
     }
 
     public List<Strings> getSoundTypes(String country) {
-        // check if there are excluded sound types for the given country
-        if (excludedSoundTypesByCountry != null && excludedSoundTypesByCountry.containsKey(cycleConstants.getISOCountry(country))) {
-            Set<Strings> excludedSoundTypes = excludedSoundTypesByCountry.get(cycleConstants.getISOCountry(country));
-            return soundTypes.stream().filter(type -> !excludedSoundTypes.contains(type)).map(type -> new Strings(type.value)).collect(Collectors.toList());
-        }
-        return new ArrayList<>(soundTypes);
+        if (soundTypesByCountry.containsKey(cycleConstants.getISOCountry(country)))
+            return new ArrayList<>(soundTypesByCountry.get(cycleConstants.getISOCountry(country)));
+        return new ArrayList<>();
     }
 
     public Set<VideoFormatDescriptor> getVideoDescriptorFormats() {
@@ -200,32 +194,18 @@ public class PackageDataCollection {
 
     private void collectSoundTypes(StreamData streamData, String profileType, StreamProfilesHollow profilesHollow, Map<ISOCountry, Set<DownloadableId>> excludedDownloadables) {
         if (profileType.equals(AUDIO)) {
-
             // get sound type using audio channel
             int audioChannel = (int) profilesHollow._getAudioChannelCount();
-            if (soundTypesMap.containsKey(audioChannel))
-                soundTypes.add(soundTypesMap.get(audioChannel));
-            Strings soundType = soundTypesMap.get(audioChannel);
-            // add all the sound types
-            soundTypes.add(soundType);
-
-            // keep track of sound types to exclude by country.
-            if (excludedDownloadables != null && !excludedDownloadables.isEmpty()) {
+            if (soundTypesMap.containsKey(audioChannel)) {
                 Set<ISOCountry> countries = excludedDownloadables.keySet();
                 for (ISOCountry country : countries) {
                     Set<DownloadableId> excluded = excludedDownloadables.get(country);
-                    excludedSoundTypesByCountry.putIfAbsent(country, new HashSet<>());
-                    Set<Strings> excludedSoundTypes = excludedSoundTypesByCountry.get(country);
-                    // if downloadable id is to be excluded, then add given sound type to excluded sound type for that country.
-                    if (excluded != null && excluded.contains(streamData.downloadableId)) {
-                        excludedSoundTypes.add(soundType);
-                    } else {
-                        // if sound type was added before by previous DownloadableId that was in excluded, and current one is not, remove sound type from that set.
-                        excludedSoundTypes.remove(soundType);
+                    if (excluded != null && !excluded.contains(streamData.downloadableId)) {
+                        soundTypesByCountry.putIfAbsent(country, new TreeSet<>());
+                        soundTypesByCountry.get(country).add(soundTypesMap.get(audioChannel));
                     }
                 }
             }
-
         }
     }
 }
