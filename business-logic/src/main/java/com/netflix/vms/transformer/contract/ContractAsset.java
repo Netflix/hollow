@@ -70,4 +70,17 @@ public class ContractAsset {
         return "ContractAsset [type=" + type + ", locale=" + locale + "]";
     }
     
+    private com.netflix.vms.transformer.hollowoutput.ContractAsset outputPOJO = null;
+    
+    public com.netflix.vms.transformer.hollowoutput.ContractAsset toOutputPOJO() {
+        if(this.outputPOJO == null) {
+            com.netflix.vms.transformer.hollowoutput.ContractAsset outputPOJO = new com.netflix.vms.transformer.hollowoutput.ContractAsset();
+            outputPOJO.contractAssetType = type.name();
+            outputPOJO.locale = locale;
+            this.outputPOJO = outputPOJO;
+        }
+        
+        return this.outputPOJO;
+    }
+    
 }

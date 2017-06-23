@@ -6,6 +6,7 @@ import java.util.Set;
 
 public class OfflineViewingRestrictions implements Cloneable {
     public Set<DownloadableId> streamOnlyDownloadables = null;
+    public Set<ContractAsset> downloadableAssets = null;
     public List<CupKey> downloadOnlyCupKeys = null;
     public Map<Strings, LanguageRestrictions> downloadLanguageBcp47RestrictionsMap = null;
 
@@ -25,6 +26,10 @@ public class OfflineViewingRestrictions implements Cloneable {
                 * result
                 + ((streamOnlyDownloadables == null) ? 0
                         : streamOnlyDownloadables.hashCode());
+        result = prime
+                * result
+                + ((downloadableAssets == null) ? 0
+                        : downloadableAssets.hashCode());
         return result;
     }
     @Override
@@ -53,17 +58,26 @@ public class OfflineViewingRestrictions implements Cloneable {
         } else if (!streamOnlyDownloadables
                 .equals(other.streamOnlyDownloadables))
             return false;
+        if (downloadableAssets == null) {
+            if (other.downloadableAssets != null)
+                return false;
+        } else if (!downloadableAssets
+                .equals(other.downloadableAssets))
+            return false;
         return true;
     }
+
+
     @Override
     public String toString() {
         return "OfflineViewingRestrictions [streamOnlyDownloadables="
-                + streamOnlyDownloadables + ", downloadOnlyCupKeys="
+                + streamOnlyDownloadables + ", downloadableAssets="
+                + downloadableAssets + ", downloadOnlyCupKeys="
                 + downloadOnlyCupKeys
                 + ", downloadLanguageBcp47RestrictionsMap="
                 + downloadLanguageBcp47RestrictionsMap + "]";
     }
-
+    
     @Override
     public OfflineViewingRestrictions clone() {
         try {
