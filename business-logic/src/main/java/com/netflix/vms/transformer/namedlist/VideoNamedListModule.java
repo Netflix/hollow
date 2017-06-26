@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.namedlist;
 
+import com.netflix.encodingtools.videoresolutiontypelibrary.VideoResolutionType;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -98,7 +99,7 @@ public class VideoNamedListModule {
                 ConcurrentHashMap<VideoNamedListType, ThreadSafeBitSet> existingListMap = videoListsByCountryAndName.putIfAbsent(country, listsByName);
                 if(existingListMap != null) {
                     listsByName = existingListMap;
-                } 
+                }
             }
 
             episodeList = episodeListByCountry.get(country);
@@ -173,9 +174,9 @@ public class VideoNamedListModule {
 
             if(isAvailableForED && isAvailableInHDR && isViewable)
                 addToList(VideoNamedListType.ED_HDR_VIDEOS);
-            
+
             if(isAvailableForED && isAvailableInAtmos && isViewable)
-            	addToList(VideoNamedListType.ED_ATMOS_VIDEOS);
+                addToList(VideoNamedListType.ED_ATMOS_VIDEOS);
 
             for(VideoSetType setType : video.data.facetData.videoMetaData.videoSetTypes) {
                 if(setType == constants.PRESENT || setType == constants.PAST || setType == constants.FUTURE) {
@@ -343,8 +344,10 @@ public class VideoNamedListModule {
 
     private boolean isUltraHD(Set<VideoFormatDescriptor> formats, final LinkedHashSetOfStrings cupTokens, final String deviceCategory) {
         if (formats.contains(constants.ULTRA_HD)) {
-            int maxHeightForCupTokens = ctx.getCupLibrary().getMaximumVideoHeight(newSet(cupTokens), deviceCategory);
-            return constants.ULTRA_HD_MIN_HEIGHT <= maxHeightForCupTokens;
+            VideoResolutionType uHDType = ctx.getCupLibrary().getResolutionType(VideoResolutionType.ID_QHD);
+            VideoResolutionType cupType = ctx.getCupLibrary().getCupMaxVideoResolutionType(newSet(cupTokens), deviceCategory);
+
+            return cupType.compareTo(uHDType) >= 0;
         }
         return false;
     }
