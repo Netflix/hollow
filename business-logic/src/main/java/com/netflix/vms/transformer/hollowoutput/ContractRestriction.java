@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,6 +9,8 @@ import java.util.Set;
 public class ContractRestriction implements Cloneable {
 
     public Set<DownloadableId> excludedDownloadables = null;
+    @HollowHashKey(fields={"contractAssetType", "locale"})
+    public Set<ContractAsset> availableAssets;
     public AvailabilityWindow availabilityWindow = null;
     public List<CupKey> cupKeys = null;
     public int prePromotionDays = java.lang.Integer.MIN_VALUE;
@@ -25,6 +29,9 @@ public class ContractRestriction implements Cloneable {
         if(o.excludedDownloadables == null) {
             if(excludedDownloadables != null) return false;
         } else if(!o.excludedDownloadables.equals(excludedDownloadables)) return false;
+        if(o.availableAssets == null) {
+            if(availableAssets != null) return false;
+        } else if(!o.availableAssets.equals(availableAssets)) return false;
         if(o.availabilityWindow == null) {
             if(availabilityWindow != null) return false;
         } else if(!o.availabilityWindow.equals(availabilityWindow)) return false;
@@ -43,6 +50,7 @@ public class ContractRestriction implements Cloneable {
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + (excludedDownloadables == null ? 1237 : excludedDownloadables.hashCode());
+        hashCode = hashCode * 31 + (availableAssets == null ? 1237 : availableAssets.hashCode());
         hashCode = hashCode * 31 + (availabilityWindow == null ? 1237 : availabilityWindow.hashCode());
         hashCode = hashCode * 31 + (cupKeys == null ? 1237 : cupKeys.hashCode());
         hashCode = hashCode * 31 + prePromotionDays;
@@ -55,6 +63,7 @@ public class ContractRestriction implements Cloneable {
     public String toString() {
         StringBuilder builder = new StringBuilder("ContractRestriction{");
         builder.append("excludedDownloadables=").append(excludedDownloadables);
+        builder.append(",availableAssets=").append(availableAssets);
         builder.append(",availabilityWindow=").append(availabilityWindow);
         builder.append(",cupKeys=").append(cupKeys);
         builder.append(",prePromotionDays=").append(prePromotionDays);

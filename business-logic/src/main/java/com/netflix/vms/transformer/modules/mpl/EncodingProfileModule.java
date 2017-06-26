@@ -8,7 +8,6 @@ import com.netflix.vms.transformer.hollowinput.ProtectionTypesHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.hollowoutput.AudioChannelsDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodingProfile;
 import com.netflix.vms.transformer.hollowoutput.ProfileTypeDescriptor;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -22,10 +21,11 @@ import java.util.Map;
 
 public class EncodingProfileModule extends AbstractTransformModule {
 
-    private ThreadLocal<Map<String, ProfileTypeDescriptor>> profileTypeMapRef = new ThreadLocal<>();
-    private ThreadLocal<Map<Integer, AudioChannelsDescriptor>> audioChannelsMapRef = new ThreadLocal<>();
-    private ThreadLocal<Map<Integer, VideoDimensionsDescriptor>> videoDimensionsMapRef = new ThreadLocal<>();
-    private ThreadLocal<Map<String, Strings>> stringsMapRef = new ThreadLocal<>();
+    private final ThreadLocal<Map<String, ProfileTypeDescriptor>> profileTypeMapRef = new ThreadLocal<>();
+    private final ThreadLocal<Map<Integer, VideoDimensionsDescriptor>> videoDimensionsMapRef = new ThreadLocal<>();
+    private final ThreadLocal<Map<String, Strings>> stringsMapRef = new ThreadLocal<>();
+    
+    private final AudioChannelsDescriptorCache audioChannelsDescriptorCache = new AudioChannelsDescriptorCache();
 
     private final HollowPrimaryKeyIndex protectionTypeIndex;
 
@@ -46,7 +46,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
             output.drmKeyGroup = (int)input._getDrmKeyGroup();
 
             output.profileTypeDescriptor = getProfileType(input._getProfileType()._getValue());
-            output.audioChannelsDescriptor = getAudioChannels((int) input._getAudioChannelCount());
+            output.audioChannelsDescriptor = audioChannelsDescriptorCache.getAudioChannels((int) input._getAudioChannelCount());
 
             long drmType = input._getDrmType();
             int protectionTypeOrdinal = protectionTypeIndex.getMatchingOrdinal(drmType);
@@ -60,7 +60,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
             output.isAdaptiveSwitching = input._getIsAdaptiveSwitching();
             output.videoDimensionsDescriptor = input._getIs3D() ? getVideoDimensions(3) : getVideoDimensions(2);
 
-            mapper.addObject(output);
+            mapper.add(output);
         }
     }
 
@@ -107,43 +107,6 @@ public class EncodingProfileModule extends AbstractTransformModule {
     private static ProfileTypeDescriptor newProfileTypeDescriptor(final int id, final String name, final String description) {
         ProfileTypeDescriptor result = new ProfileTypeDescriptor();
         result.id = id;
-        result.name = name == null ? null : new Strings(name);
-        result.description = description == null ? null : new Strings(description);
-        return result;
-    }
-
-    private AudioChannelsDescriptor getAudioChannels(final int channels) {
-        Map<Integer, AudioChannelsDescriptor> audioChannelsMap = getMap(audioChannelsMapRef);
-        AudioChannelsDescriptor result = audioChannelsMap.get(channels);
-        if (result != null) return result;
-
-        switch(channels) {
-            case 0:
-                result = newAudioChannelsDescriptor(0, "", "");
-                break;
-            case 1:
-                result = newAudioChannelsDescriptor(1, "1.0", "Mono");
-                break;
-            case 2:
-                result = newAudioChannelsDescriptor(2, "2.0", "Stereo");
-                break;
-            case 6:
-                result = newAudioChannelsDescriptor(6, "5.1", "Dolby Digital Plus");
-                break;
-            case 8:
-                result = newAudioChannelsDescriptor(8, "7.1", "Dolby Digital Plus");
-                break;
-            default:
-                result = newAudioChannelsDescriptor(-1, "UNKNOWN", "");
-                break;
-        }
-
-        audioChannelsMap.put(channels, result);
-        return result;
-    }
-    private static AudioChannelsDescriptor newAudioChannelsDescriptor(final int numberOfChannels, final String name, final String description) {
-        AudioChannelsDescriptor result = new AudioChannelsDescriptor();
-        result.numberOfChannels = numberOfChannels;
         result.name = name == null ? null : new Strings(name);
         result.description = description == null ? null : new Strings(description);
         return result;

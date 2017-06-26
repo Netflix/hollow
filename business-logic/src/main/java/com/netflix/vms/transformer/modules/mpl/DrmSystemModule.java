@@ -31,7 +31,7 @@ public class DrmSystemModule extends AbstractTransformModule {
             system.attributes = new HashMap<DrmKeyString, DrmKeyString>();
             system.attributes.put(HEADER_DATA_AVAILABLE, drmSystemIdentifier._getHeaderDataAvailable() ? TRUE : FALSE);
 
-            mapper.addObject(system);
+            mapper.add(system);
         }
     }
 }
