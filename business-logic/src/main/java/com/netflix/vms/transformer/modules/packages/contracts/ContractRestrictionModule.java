@@ -486,10 +486,12 @@ public class ContractRestrictionModule {
             restriction.prePromotionDays = (int) selectedContract._getPrePromotionDays();
 
         restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
+        restriction.availableAssets = assetTypeIdx.getAllMarkedForStreamingAssets();
 
         // Offline viewing rights
         if(restriction.offlineViewingRestrictions != null){
             restriction.offlineViewingRestrictions.streamOnlyDownloadables = assetTypeIdx.getAllUnmarkedForDownloadAndMarkedForStreaming();
+            restriction.offlineViewingRestrictions.downloadableAssets = assetTypeIdx.getAllMarkedForDownloadAssets();
             if(isNoExtraOfflineViewingRestrictions(restriction)) restriction.offlineViewingRestrictions = null;
         }
     }

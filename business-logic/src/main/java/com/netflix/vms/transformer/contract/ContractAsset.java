@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.contract;
 
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 
 public class ContractAsset {
     
@@ -68,6 +69,19 @@ public class ContractAsset {
     @Override
     public String toString() {
         return "ContractAsset [type=" + type + ", locale=" + locale + "]";
+    }
+    
+    private com.netflix.vms.transformer.hollowoutput.ContractAsset outputPOJO = null;
+    
+    public com.netflix.vms.transformer.hollowoutput.ContractAsset toOutputPOJO() {
+        if(this.outputPOJO == null) {
+            com.netflix.vms.transformer.hollowoutput.ContractAsset outputPOJO = new com.netflix.vms.transformer.hollowoutput.ContractAsset();
+            outputPOJO.contractAssetType = type.name();
+            outputPOJO.locale = new Strings(locale);
+            this.outputPOJO = outputPOJO;
+        }
+        
+        return this.outputPOJO;
     }
     
 }

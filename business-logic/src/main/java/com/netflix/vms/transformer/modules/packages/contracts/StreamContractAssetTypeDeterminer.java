@@ -30,15 +30,13 @@ public class StreamContractAssetTypeDeterminer {
             if("MERCHSTILL".equals(profileType))
                 return null;
 
-            if(profileType.equals("MUXED")){
-                return ContractAssetType.AUDIO;
-            } else if(profileType.equals("VIDEO")) {
+            if(profileType.equals("VIDEO")) {
                 TextStreamInfoHollow textInfo = stream._getNonImageInfo()._getTextInfo();
                 if(textInfo != null && textInfo._getTextLanguageCode() != null) {
                     return ContractAssetType.SUBTITLES;
                 }
                 return null;
-            } else if(profileType.equals("AUDIO")) {
+            } else if(profileType.equals("AUDIO") || profileType.equals("MUXED")) {
                 StreamAssetTypeHollow assetType = stream._getAssetType();
                 if(assetType != null) {
                     StringHollow assetTypeStringHollow = assetType._getAssetType();

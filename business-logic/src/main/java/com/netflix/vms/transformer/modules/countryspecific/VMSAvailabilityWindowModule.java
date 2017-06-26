@@ -26,12 +26,12 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.RightsWindowContract;
+import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class VMSAvailabilityWindowModule {
-    
+
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
 
     private final VMSHollowInputAPI api;
@@ -62,7 +62,7 @@ public class VMSAvailabilityWindowModule {
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
-    private Map<Integer, VideoPackageData> transformedPackageData;
+    private Map<Integer, Set<PackageDataCollection>> transformedPackageData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
@@ -73,7 +73,7 @@ public class VMSAvailabilityWindowModule {
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, ctx, cycleConstants, indexer);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
@@ -84,34 +84,34 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-    public void setTransformedPackageData(Map<Integer, VideoPackageData> data) {
+    public void setTransformedPackageData(Map<Integer, Set<PackageDataCollection>> data) {
         this.transformedPackageData = data;
     }
 
     public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
-        
+
         List<VMSAvailabilityWindow> windows = calculateWindowData(videoId, country, null, videoRights, rollup, isGoLive);
 
         data.availabilityWindows = windows;
-        
+
         return windows;
     }
 
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
-        
+
         RightsHollow rights = videoRights._getRights();
-        if((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
+        if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
             windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null);
-            if(locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
+            if (locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
                 windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null);
         }
         return windows;
     }
-    
+
     private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup) {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<VMSAvailabilityWindow>();
 
@@ -128,7 +128,7 @@ public class VMSAvailabilityWindowModule {
 
         List<RightsWindowHollow> sortedWindows = new ArrayList<RightsWindowHollow>(rights._getWindows());
         Collections.sort(sortedWindows, RIGHTS_WINDOW_COMPARATOR);
-        
+
         ///TODO: simplify this logic.
         for (RightsWindowHollow window : sortedWindows) {
             boolean includedWindowPackageData = false;
@@ -140,12 +140,12 @@ public class VMSAvailabilityWindowModule {
             VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
             outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
             outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
-            if(window._getOnHold()) {
+            if (window._getOnHold()) {
                 outputWindow.startDate.val += ONE_THOUSAND_YEARS;
                 outputWindow.endDate.val += ONE_THOUSAND_YEARS;
                 outputWindow.onHold = true;
             }
-            
+
             outputWindow.windowInfosByPackageId = new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo>();
 
             LinkedHashMap<Long, RightsWindowContract> rightsContractMap = getRightsContractMap(rights, window);
@@ -157,66 +157,69 @@ public class VMSAvailabilityWindowModule {
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
                 boolean isAvailableForDownload = entry.getValue().isAvailableForDownload;
 
-                if(rightsContract != null) {
+                if (rightsContract != null) {
                     long contractAvailability = locale == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, rightsContract);
-                    
+
                     ListOfRightsContractPackageHollow packageIdList = rightsContract._getPackages();
 
-                    if(packageIdList != null && !packageIdList.isEmpty()) {
+                    if (packageIdList != null && !packageIdList.isEmpty()) {
 
                         for (RightsContractPackageHollow pkg : packageIdList) {
-                            com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int)pkg._getPackageId());
+                            com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int) pkg._getPackageId());
 
+                            PackageDataCollection packageDataCollection = null;
                             PackageData packageData = null;
-                            if(locale != null) {
-                                packageData = getPackageData(videoId, pkg._getPackageId());
+                            if (locale != null) {
+
+                                packageDataCollection = getPackageDataCollection(videoId, pkg._getPackageId());
+                                if (packageDataCollection != null) packageData = packageDataCollection.getPackageData();
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAvailability);
 
-                                if(packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
+                                if (packageAvailability == 0) //// multicatalog processing -- make sure contract gives access to some existing asset understandable in this language
                                     continue;
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
-                                if(!considerPackageForLang && packageIdList.size() == 1) {
+                                if (!considerPackageForLang && packageIdList.size() == 1) {
                                     considerPackageForLang = true;
                                 }
 
-                                if(considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
-                                    if(currentOrFirstFutureWindow == outputWindow)
+                                    if (currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalAudio = true;
                                 }
-                                if(considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
                                     thisWindowFoundLocalText = true; //rollup.foundLocalText();
-                                    if(currentOrFirstFutureWindow == outputWindow)
+                                    if (currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalText = true;
                                 }
                             }
-                            
+
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
-                            if(windowPackageContractInfo != null) {
+                            if (windowPackageContractInfo != null) {
                                 // MERGE MULTIPLE CONTRACTS
 
-                                if(shouldFilterOutWindowInfo) {
-                                    if(contractId > windowPackageContractInfo.videoContractInfo.contractId) {
-                                        windowPackageContractInfo.videoContractInfo.contractId = (int)contractId;
-                                        if(packageId.val == maxPackageId)
-                                            bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
-                                        if(packageId.val == thisWindowMaxPackageId)
-                                            thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                if (shouldFilterOutWindowInfo) {
+                                    if (contractId > windowPackageContractInfo.videoContractInfo.contractId) {
+                                        windowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
+                                        if (packageId.val == maxPackageId)
+                                            bundledAssetsGroupId = Math.max((int) contractId, bundledAssetsGroupId);
+                                        if (packageId.val == thisWindowMaxPackageId)
+                                            thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                     }
 
                                 } else {
                                     ///merge cup tokens
                                     List<Strings> cupTokens = new ArrayList<>();
                                     Strings contractCupToken = contract == null ? DEFAULT_CUP_TOKEN : new Strings(contract._getCupToken()._getValue());
-                                    if(windowPackageContractInfo.videoContractInfo.contractId > contractId) {
+                                    if (windowPackageContractInfo.videoContractInfo.contractId > contractId) {
                                         cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
-                                        if(!cupTokens.contains(contractCupToken))
+                                        if (!cupTokens.contains(contractCupToken))
                                             cupTokens.add(contractCupToken);
                                     } else {
                                         cupTokens.add(contractCupToken);
-                                        for(Strings cupToken : windowPackageContractInfo.videoContractInfo.cupTokens.ordinals) {
-                                            if(!cupToken.equals(contractCupToken))
+                                        for (Strings cupToken : windowPackageContractInfo.videoContractInfo.cupTokens.ordinals) {
+                                            if (!cupToken.equals(contractCupToken))
                                                 cupTokens.add(cupToken);
                                         }
                                     }
@@ -231,78 +234,81 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
                                     windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
                                     windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
-                                    windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int)contractId);
+                                    windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int) contractId);
                                     windowPackageContractInfo.videoContractInfo.isAvailableForDownload = windowPackageContractInfo.videoContractInfo.isAvailableForDownload || isAvailableForDownload;
                                     windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, rightsContract._getPackageId());
 
                                     outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
-                                    if(packageId.val == maxPackageId)
-                                        bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
-                                    if(packageId.val == thisWindowMaxPackageId)
-                                        thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
+                                    if (packageId.val == maxPackageId)
+                                        bundledAssetsGroupId = Math.max((int) contractId, bundledAssetsGroupId);
+                                    if (packageId.val == thisWindowMaxPackageId)
+                                        thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                 }
                             } else {
-                                if(shouldFilterOutWindowInfo) {
+                                if (shouldFilterOutWindowInfo) {
                                     WindowPackageContractInfo alreadyFilteredWindowPackageContractInfo = outputWindow.windowInfosByPackageId.get(ZERO);
-                                    if(alreadyFilteredWindowPackageContractInfo != null) {
-                                        if(alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId < (int)contractId)
-                                            alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId = (int)contractId;
+                                    if (alreadyFilteredWindowPackageContractInfo != null) {
+                                        if (alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId < (int) contractId)
+                                            alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
                                     } else {
                                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
                                     }
 
-                                    if(maxPackageId == 0)
-                                        bundledAssetsGroupId = Math.max(bundledAssetsGroupId, (int)contractId);
+                                    if (maxPackageId == 0)
+                                        bundledAssetsGroupId = Math.max(bundledAssetsGroupId, (int) contractId);
 
-                                    if(thisWindowMaxPackageId == 0)
-                                        thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int)contractId);
+                                    if (thisWindowMaxPackageId == 0)
+                                        thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int) contractId);
                                 } else {
                                     includedWindowPackageData = true;
 
-                                    if(packageData == null)
-                                        packageData = getPackageData(videoId, pkg._getPackageId());
-                                    
-                                    if(packageData != null) {
+                                    if (packageData == null) {
+                                        packageDataCollection = getPackageDataCollection(videoId, pkg._getPackageId());
+                                        if (packageDataCollection != null) packageData = packageDataCollection.getPackageData();
+                                    }
+
+                                    if (packageData != null) {
                                         /// package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, rightsContract, contract, country, isAvailableForDownload, packageDataCollection);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = rightsContract._getPackages() == null ? true : packageData.isDefaultPackage;
-                                        if(!considerForPackageSelection) {
-                                            if(rightsContract._getPackages().size() == 1) considerForPackageSelection = true;
+                                        if (!considerForPackageSelection) {
+                                            if (rightsContract._getPackages().size() == 1)
+                                                considerForPackageSelection = true;
                                         }
-                                        if(considerForPackageSelection) {
+                                        if (considerForPackageSelection) {
 
-                                            if(packageData.id > maxPackageId) {
+                                            if (packageData.id > maxPackageId) {
                                                 maxPackageId = packageData.id;
-                                                bundledAssetsGroupId = (int)contractId;
+                                                bundledAssetsGroupId = (int) contractId;
                                             }
-    
-                                            if(packageData.id > thisWindowMaxPackageId) {
+
+                                            if (packageData.id > thisWindowMaxPackageId) {
                                                 thisWindowMaxPackageId = packageData.id;
-                                                thisWindowBundledAssetsGroupId = (int)contractId;
+                                                thisWindowBundledAssetsGroupId = (int) contractId;
                                             }
                                         }
 
                                     } else {
                                         /// packagedata not available -- use the contract only
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, rightsContract, contract, country, videoId);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, rightsContract, contract, videoId);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
-                                        if(thisWindowMaxPackageId == 0)
-                                            thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
-                                        if(maxPackageId == 0)
-                                            bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
+                                        if (thisWindowMaxPackageId == 0)
+                                            thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+                                        if (maxPackageId == 0)
+                                            bundledAssetsGroupId = Math.max((int) contractId, bundledAssetsGroupId);
                                     }
                                 }
 
                                 long windowEndDate = window._getEndDate();
                                 long windowStartDate = window._getStartDate();
-                                if(isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
+                                if (isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
                                     rollup.newInWindowAvailabilityDate(windowStartDate);
                                     isInWindow = true;
                                 }
-                                
+
                                 if (windowEndDate > ctx.getNowMillis() && windowStartDate < minWindowStartDate) {
                                     minWindowStartDate = windowStartDate;
                                     currentOrFirstFutureWindow = outputWindow;
@@ -314,23 +320,23 @@ public class VMSAvailabilityWindowModule {
                         }
 
                     } else {
-                        if(locale == null) {
+                        if (locale == null) {
                             /// packageIdList was empty -- packagedata not available -- use the contract only
-                            WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, rightsContract, contract, country, videoId);
+                            WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, rightsContract, contract, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
-    
-                            if(thisWindowMaxPackageId == 0)
-                                thisWindowBundledAssetsGroupId = Math.max((int)contractId, thisWindowBundledAssetsGroupId);
-                            if(maxPackageId == 0)
-                                bundledAssetsGroupId = Math.max((int)contractId, bundledAssetsGroupId);
+
+                            if (thisWindowMaxPackageId == 0)
+                                thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+                            if (maxPackageId == 0)
+                                bundledAssetsGroupId = Math.max((int) contractId, bundledAssetsGroupId);
                         }
                     }
                 } else {
-                    if(locale == null) {
+                    if (locale == null) {
                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
-    
-                        if(maxPackageId == 0) {
-                            bundledAssetsGroupId = (int)contractId;
+
+                        if (maxPackageId == 0) {
+                            bundledAssetsGroupId = (int) contractId;
                             thisWindowBundledAssetsGroupId = (int) contractId;
                         }
                     }
@@ -339,22 +345,22 @@ public class VMSAvailabilityWindowModule {
 
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            if(locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
+            if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
                 availabilityWindows.add(outputWindow);
-                if(rollup.doEpisode()) {
-                    if(isMulticatalogRollup)
+                if (rollup.doEpisode()) {
+                    if (isMulticatalogRollup)
                         rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
-                    if(isGoLive)
+                    if (isGoLive)
                         rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup.getSeasonSequenceNumber());
                 }
             }
 
-            if(includedWindowPackageData)
+            if (includedWindowPackageData)
                 includedPackageDataCount++;
         }
 
 
-        if(currentOrFirstFutureWindow != null) {
+        if (currentOrFirstFutureWindow != null) {
             maxPackageId = Integer.MIN_VALUE;
             Set<Strings> assetBcp47CodesFromMaxPackageId = null;
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
@@ -363,16 +369,16 @@ public class VMSAvailabilityWindowModule {
             boolean isAvailableForDownload = false;
             LinkedHashSetOfStrings cupTokens = null;
 
-            for(Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
-                VideoPackageInfo videoPackageInfo  = entry.getValue().videoPackageInfo;
+            for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
+                VideoPackageInfo videoPackageInfo = entry.getValue().videoPackageInfo;
                 boolean considerForPackageSelection = videoPackageInfo == null ? true : videoPackageInfo.isDefaultPackage;
 
-                if(!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() ==1) {
+                if (!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() == 1) {
                     considerForPackageSelection = true;
                     ctx.getLogger().warn(TransformerLogTag.InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
                 }
 
-                if(considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
+                if (considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
                     maxPackageId = entry.getKey().val;
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
@@ -386,28 +392,28 @@ public class VMSAvailabilityWindowModule {
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
 
-            if(hasRollingEpisodes)
+            if (hasRollingEpisodes)
                 rollup.foundRollingEpisodes();
-            if(isAvailableForDownload)
+            if (isAvailableForDownload)
                 rollup.foundAvailableForDownload();
 
-            if(isGoLive && isInWindow) {
+            if (isGoLive && isInWindow) {
                 rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
                 rollup.newCupTokens(cupTokens);
             }
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
-            
-            if(locale != null) {
-                if(currentOrFirstFutureWindowFoundLocalAudio)
+
+            if (locale != null) {
+                if (currentOrFirstFutureWindowFoundLocalAudio)
                     rollup.foundLocalAudio();
-                if(currentOrFirstFutureWindowFoundLocalText)
+                if (currentOrFirstFutureWindowFoundLocalText)
                     rollup.foundLocalText();
             }
-            
-        } else if(locale == null) {
+
+        } else if (locale == null) {
             rollup.newEpisodeData(isGoLive, bundledAssetsGroupId);
-            if(rollup.doEpisode())
+            if (rollup.doEpisode())
                 rollup.newPrePromoDays(0);
         }
 
@@ -415,6 +421,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     private final LinkedHashMap<Long, RightsWindowContract> theRightsContractMap = new LinkedHashMap<>();
+
     private LinkedHashMap<Long, RightsWindowContract> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
         theRightsContractMap.clear();
         for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
@@ -438,11 +445,11 @@ public class VMSAvailabilityWindowModule {
     private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues rollup, RightsHollow rights, boolean isGoLive, boolean isMulticatalogRollup) {
 
         List<RightsWindowHollow> rightsWindowHollows = new ArrayList<>(rights._getWindows());
-        if(!rightsWindowHollows.isEmpty()) {
+        if (!rightsWindowHollows.isEmpty()) {
 
             boolean isInWindow = false;
             int maxContractId = Integer.MIN_VALUE;
-            
+
             Collections.sort(rightsWindowHollows, RIGHTS_WINDOW_COMPARATOR);
             List<VMSAvailabilityWindow> windowList = new ArrayList<>(rightsWindowHollows.size());
 
@@ -450,41 +457,41 @@ public class VMSAvailabilityWindowModule {
                 long startDate = window._getStartDate();
                 long endDate = window._getEndDate();
                 boolean isOnHold = window._getOnHold();
-                
-                if(window._getOnHold()) {
+
+                if (window._getOnHold()) {
                     startDate += ONE_THOUSAND_YEARS;
                     endDate += ONE_THOUSAND_YEARS;
                 }
-                
-                if(startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
+
+                if (startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
 
                 for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                    if((int)rightsWindowContract._getContractId() > maxContractId)
-                        maxContractId = (int)rightsWindowContract._getContractId();
+                    if ((int) rightsWindowContract._getContractId() > maxContractId)
+                        maxContractId = (int) rightsWindowContract._getContractId();
                 }
 
-                if(isMulticatalogRollup) {
+                if (isMulticatalogRollup) {
                     DateWindow windowWithEpisodes = rollup.doShow() ? rollup.getValidShowWindow(startDate, endDate) : rollup.getValidSeasonWindow(startDate, endDate);
-                    
-                    if(windowWithEpisodes != null) {
+
+                    if (windowWithEpisodes != null) {
                         startDate = windowWithEpisodes.startDateTimestamp;
                         endDate = windowWithEpisodes.endDateTimestamp;
                     } else continue;
                 }
-                
+
                 VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
                 outputWindow.startDate = OutputUtil.getRoundedDate(startDate);
                 outputWindow.endDate = OutputUtil.getRoundedDate(endDate);
                 outputWindow.onHold = isOnHold;
                 outputWindow.bundledAssetsGroupId = maxContractId; //rollup.getFirstEpisodeBundledAssetId();
-    
+
                 WindowPackageContractInfo outputContractInfo = createEmptyContractInfoForRollup(outputWindow);
-    
-    
+
+
                 outputWindow.windowInfosByPackageId = new HashMap<>();
                 outputWindow.windowInfosByPackageId.put(ZERO, outputContractInfo);
-    
+
                 outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
                 outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
                 outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
@@ -493,29 +500,29 @@ public class VMSAvailabilityWindowModule {
                 outputContractInfo.videoContractInfo.postPromotionDays = 0;
                 outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
                 outputContractInfo.videoPackageInfo.formats = rollup.getVideoFormatDescriptors();
-    
-                if(rollup.getFirstEpisodeBundledAssetId() != 0) {
+
+                if (rollup.getFirstEpisodeBundledAssetId() != 0) {
                     outputWindow.bundledAssetsGroupId = rollup.getFirstEpisodeBundledAssetId();
                     outputContractInfo.videoContractInfo.contractId = rollup.getFirstEpisodeBundledAssetId();
                 }
-    
-                if(!(isGoLive && isInWindow))
+
+                if (!(isGoLive && isInWindow))
                     outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
-    
+
                 int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
-                if(videoGeneralOrdinal != -1) {
+                if (videoGeneralOrdinal != -1) {
                     VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
                     long runtime = general._getRuntime();
-                    if(runtime != Long.MIN_VALUE)
-                        outputContractInfo.videoPackageInfo.runtimeInSeconds = (int)runtime;
+                    if (runtime != Long.MIN_VALUE)
+                        outputContractInfo.videoPackageInfo.runtimeInSeconds = (int) runtime;
                 }
-    
+
                 windowList.add(outputWindow);
             }
-            
+
             return windowList;
         }
-        
+
         return Collections.emptyList();
     }
 
@@ -531,46 +538,40 @@ public class VMSAvailabilityWindowModule {
         return contractInfo;
     }
 
+    private PackageDataCollection getPackageDataCollection(Integer videoId, long packageId) {
+        Set<PackageDataCollection> packageDataCollections = transformedPackageData.get(videoId);
+        if (packageDataCollections == null) return null;
 
-    private PackageData getPackageData(Integer videoId, long packageId) {
-        VideoPackageData vpData = transformedPackageData.get(videoId);
-        if (vpData == null) return null;
-
-        Set<PackageData> set = vpData.packages;
-        if(set == null)
-            return null;
-
-        for(PackageData packageData : set) {
-            if(packageData.id == packageId)
-                return packageData;
+        for (PackageDataCollection packageDataCollection : packageDataCollections) {
+            if (packageDataCollection.getPackageData().id == packageId)
+                return packageDataCollection;
         }
-
         return null;
     }
 
     private static final long FUTURE_CUTOFF_IN_MILLIS = 360L * 24L * 60L * 60L * 1000L;
 
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
-        if(endDate < ctx.getNowMillis())
+        if (endDate < ctx.getNowMillis())
             return true;
 
-        if(!isGoLive) {
+        if (!isGoLive) {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                if(contract != null && (contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                if (contract != null && (contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
                     isWindowDataNeeded = true;
                 }
             }
 
-            if(!isWindowDataNeeded)
+            if (!isWindowDataNeeded)
                 return true;
         }
 
-        if(unfilteredCount < 3 && endDate > ctx.getNowMillis())
+        if (unfilteredCount < 3 && endDate > ctx.getNowMillis())
             return false;
 
-        if(startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
+        if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
             return true;
 
         return false;
@@ -581,7 +582,7 @@ public class VMSAvailabilityWindowModule {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getGoLive();
     }
-    
+
     boolean isLanguageOverride(StatusHollow status) {
         FlagsHollow flags = status._getFlags();
         return flags != null && flags._getLanguageOverride();

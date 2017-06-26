@@ -2095,7 +2095,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2524,7 +2524,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -5355,7 +5355,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5784,7 +5784,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -8615,7 +8615,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9044,7 +9044,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -11875,7 +11875,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12304,7 +12304,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -15270,7 +15270,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -15699,7 +15699,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -18557,7 +18557,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -18991,7 +18991,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21873,7 +21873,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -22307,7 +22307,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -25189,7 +25189,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -25623,7 +25623,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -28505,7 +28505,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "31.32",
+            "locked": "32.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -28939,7 +28939,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.61",
+            "locked": "2.62",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
