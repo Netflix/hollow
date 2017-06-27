@@ -39,13 +39,15 @@ public class HollowPrimaryKeyIndexGenerator implements HollowJavaFileGenerator {
     private final String classname;
     private final String apiClassname;
     private final String classPostfix;
+    private final boolean useAggressiveSubstitutions;
     private final HollowObjectSchema schema;
     
-    public HollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, HollowObjectSchema schema) {
+    public HollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
         this.classname = schema.getName() + "PrimaryKeyIndex";
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.classPostfix = classPostfix;
+        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.schema = schema;
     }
     
@@ -90,11 +92,11 @@ public class HollowPrimaryKeyIndexGenerator implements HollowJavaFileGenerator {
         builder.append("        }\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix) + " findMatch(Object... keys) {\n");
+        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(Object... keys) {\n");
         builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
-        builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix) + "(ordinal);\n");
+        builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
         builder.append("    }\n\n");
         
         builder.append("    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {\n");

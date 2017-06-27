@@ -51,14 +51,14 @@ public class HollowMapJavaGenerator implements HollowJavaFileGenerator {
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix) {
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
         this.dataset = dataset;
-        this.className = hollowImplClassname(schema.getName(), classPostfix);
-        this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix);
-        this.valueClassName = hollowImplClassname(schema.getValueType(), classPostfix);
+        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
+        this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix, useAggressiveSubstitutions);
+        this.valueClassName = hollowImplClassname(schema.getValueType(), classPostfix, useAggressiveSubstitutions);
         this.parameterizeKey = parameterizeClassNames || parameterizedTypes.contains(schema.getKeyType());
         this.parameterizeValue = parameterizeClassNames || parameterizedTypes.contains(schema.getValueType());
     }

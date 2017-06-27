@@ -40,123 +40,134 @@ import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
  */
 public class HollowCodeGenerationUtils {
     
-    private static final Map<String,String> CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
+    private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
+    private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
     
     static {
-        CLASS_NAME_SUBSTITUTIONS.put("AbstractMethodError", "HAbstractMethodError");
-        CLASS_NAME_SUBSTITUTIONS.put("Appendable", "HAppendable");
-        CLASS_NAME_SUBSTITUTIONS.put("ArithmeticException", "HArithmeticException");
-        CLASS_NAME_SUBSTITUTIONS.put("ArrayIndexOutOfBoundsException", "HArrayIndexOutOfBoundsException");
-        CLASS_NAME_SUBSTITUTIONS.put("ArrayStoreException", "HArrayStoreException");
-        CLASS_NAME_SUBSTITUTIONS.put("AssertionError", "HAssertionError");
-        CLASS_NAME_SUBSTITUTIONS.put("AutoCloseable", "HAutoCloseable");
-        CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
-        CLASS_NAME_SUBSTITUTIONS.put("BootstrapMethodError", "HBootstrapMethodError");
-        CLASS_NAME_SUBSTITUTIONS.put("Byte", "HByte");
-        CLASS_NAME_SUBSTITUTIONS.put("CharSequence", "HCharSequence");
-        CLASS_NAME_SUBSTITUTIONS.put("Character", "HCharacter");
-        CLASS_NAME_SUBSTITUTIONS.put("Class", "HClass");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassCastException", "HClassCastException");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassCircularityError", "HClassCircularityError");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassFormatError", "HClassFormatError");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassLoader", "HClassLoader");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassNotFoundException", "HClassNotFoundException");
-        CLASS_NAME_SUBSTITUTIONS.put("ClassValue", "HClassValue");
-        CLASS_NAME_SUBSTITUTIONS.put("CloneNotSupportedException", "HCloneNotSupportedException");
-        CLASS_NAME_SUBSTITUTIONS.put("Cloneable", "HCloneable");
-        CLASS_NAME_SUBSTITUTIONS.put("Comparable", "HComparable");
-        CLASS_NAME_SUBSTITUTIONS.put("Compiler", "HCompiler");
-        CLASS_NAME_SUBSTITUTIONS.put("Deprecated", "HDeprecated");
-        CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
-        CLASS_NAME_SUBSTITUTIONS.put("Enum", "HEnum");
-        CLASS_NAME_SUBSTITUTIONS.put("EnumConstantNotPresentException", "HEnumConstantNotPresentException");
-        CLASS_NAME_SUBSTITUTIONS.put("Error", "HError");
-        CLASS_NAME_SUBSTITUTIONS.put("Exception", "HException");
-        CLASS_NAME_SUBSTITUTIONS.put("ExceptionInInitializerError", "HExceptionInInitializerError");
-        CLASS_NAME_SUBSTITUTIONS.put("Float", "HFloat");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalAccessError", "HIllegalAccessError");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalAccessException", "HIllegalAccessException");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalArgumentException", "HIllegalArgumentException");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalMonitorStateException", "HIllegalMonitorStateException");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalStateException", "HIllegalStateException");
-        CLASS_NAME_SUBSTITUTIONS.put("IllegalThreadStateException", "HIllegalThreadStateException");
-        CLASS_NAME_SUBSTITUTIONS.put("IncompatibleClassChangeError", "HIncompatibleClassChangeError");
-        CLASS_NAME_SUBSTITUTIONS.put("IndexOutOfBoundsException", "HIndexOutOfBoundsException");
-        CLASS_NAME_SUBSTITUTIONS.put("InheritableThreadLocal", "HInheritableThreadLocal");
-        CLASS_NAME_SUBSTITUTIONS.put("InstantiationError", "HInstantiationError");
-        CLASS_NAME_SUBSTITUTIONS.put("InstantiationException", "HInstantiationException");
-        CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
-        CLASS_NAME_SUBSTITUTIONS.put("InternalError", "HInternalError");
-        CLASS_NAME_SUBSTITUTIONS.put("InterruptedException", "HInterruptedException");
-        CLASS_NAME_SUBSTITUTIONS.put("Iterable", "HIterable");
-        CLASS_NAME_SUBSTITUTIONS.put("LinkageError", "HLinkageError");
-        CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
-        CLASS_NAME_SUBSTITUTIONS.put("Math", "HMath");
-        CLASS_NAME_SUBSTITUTIONS.put("NegativeArraySizeException", "HNegativeArraySizeException");
-        CLASS_NAME_SUBSTITUTIONS.put("NoClassDefFoundError", "HNoClassDefFoundError");
-        CLASS_NAME_SUBSTITUTIONS.put("NoSuchFieldError", "HNoSuchFieldError");
-        CLASS_NAME_SUBSTITUTIONS.put("NoSuchFieldException", "HNoSuchFieldException");
-        CLASS_NAME_SUBSTITUTIONS.put("NoSuchMethodError", "HNoSuchMethodError");
-        CLASS_NAME_SUBSTITUTIONS.put("NoSuchMethodException", "HNoSuchMethodException");
-        CLASS_NAME_SUBSTITUTIONS.put("NullPointerException", "HNullPointerException");
-        CLASS_NAME_SUBSTITUTIONS.put("Number", "HNumber");
-        CLASS_NAME_SUBSTITUTIONS.put("NumberFormatException", "HNumberFormatException");
-        CLASS_NAME_SUBSTITUTIONS.put("Object", "HObject");
-        CLASS_NAME_SUBSTITUTIONS.put("OutOfMemoryError", "HOutOfMemoryError");
-        CLASS_NAME_SUBSTITUTIONS.put("Override", "HOverride");
-        CLASS_NAME_SUBSTITUTIONS.put("Package", "HPackage");
-        CLASS_NAME_SUBSTITUTIONS.put("Process", "HProcess");
-        CLASS_NAME_SUBSTITUTIONS.put("ProcessBuilder", "HProcessBuilder");
-        CLASS_NAME_SUBSTITUTIONS.put("Readable", "HReadable");
-        CLASS_NAME_SUBSTITUTIONS.put("ReflectiveOperationException", "HReflectiveOperationException");
-        CLASS_NAME_SUBSTITUTIONS.put("Runnable", "HRunnable");
-        CLASS_NAME_SUBSTITUTIONS.put("Runtime", "HRuntime");
-        CLASS_NAME_SUBSTITUTIONS.put("RuntimeException", "HRuntimeException");
-        CLASS_NAME_SUBSTITUTIONS.put("RuntimePermission", "HRuntimePermission");
-        CLASS_NAME_SUBSTITUTIONS.put("SafeVarargs", "HSafeVarargs");
-        CLASS_NAME_SUBSTITUTIONS.put("SecurityException", "HSecurityException");
-        CLASS_NAME_SUBSTITUTIONS.put("SecurityManager", "HSecurityManager");
-        CLASS_NAME_SUBSTITUTIONS.put("Short", "HShort");
-        CLASS_NAME_SUBSTITUTIONS.put("StackOverflowError", "HStackOverflowError");
-        CLASS_NAME_SUBSTITUTIONS.put("StackTraceElement", "HStackTraceElement");
-        CLASS_NAME_SUBSTITUTIONS.put("StrictMath", "HStrictMath");
-        CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
-        CLASS_NAME_SUBSTITUTIONS.put("StringBuffer", "HStringBuffer");
-        CLASS_NAME_SUBSTITUTIONS.put("StringBuilder", "HStringBuilder");
-        CLASS_NAME_SUBSTITUTIONS.put("StringIndexOutOfBoundsException", "HStringIndexOutOfBoundsException");
-        CLASS_NAME_SUBSTITUTIONS.put("SuppressWarnings", "HSuppressWarnings");
-        CLASS_NAME_SUBSTITUTIONS.put("System", "HSystem");
-        CLASS_NAME_SUBSTITUTIONS.put("Thread", "HThread");
-        CLASS_NAME_SUBSTITUTIONS.put("ThreadDeath", "HThreadDeath");
-        CLASS_NAME_SUBSTITUTIONS.put("ThreadGroup", "HThreadGroup");
-        CLASS_NAME_SUBSTITUTIONS.put("ThreadLocal", "HThreadLocal");
-        CLASS_NAME_SUBSTITUTIONS.put("Throwable", "HThrowable");
-        CLASS_NAME_SUBSTITUTIONS.put("TypeNotPresentException", "HTypeNotPresentException");
-        CLASS_NAME_SUBSTITUTIONS.put("UnknownError", "HUnknownError");
-        CLASS_NAME_SUBSTITUTIONS.put("UnsatisfiedLinkError", "HUnsatisfiedLinkError");
-        CLASS_NAME_SUBSTITUTIONS.put("UnsupportedClassVersionError", "HUnsupportedClassVersionError");
-        CLASS_NAME_SUBSTITUTIONS.put("UnsupportedOperationException", "HUnsupportedOperationException");
-        CLASS_NAME_SUBSTITUTIONS.put("VerifyError", "HVerifyError");
-        CLASS_NAME_SUBSTITUTIONS.put("VirtualMachineError", "HVirtualMachineError");
-        CLASS_NAME_SUBSTITUTIONS.put("Void", "HVoid");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Float", "HFloat");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Object", "HObject");
+        
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("AbstractMethodError", "HAbstractMethodError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Appendable", "HAppendable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ArithmeticException", "HArithmeticException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ArrayIndexOutOfBoundsException", "HArrayIndexOutOfBoundsException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ArrayStoreException", "HArrayStoreException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("AssertionError", "HAssertionError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("AutoCloseable", "HAutoCloseable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("BootstrapMethodError", "HBootstrapMethodError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Byte", "HByte");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("CharSequence", "HCharSequence");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Character", "HCharacter");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Class", "HClass");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassCastException", "HClassCastException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassCircularityError", "HClassCircularityError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassFormatError", "HClassFormatError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassLoader", "HClassLoader");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassNotFoundException", "HClassNotFoundException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ClassValue", "HClassValue");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("CloneNotSupportedException", "HCloneNotSupportedException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Cloneable", "HCloneable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Comparable", "HComparable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Compiler", "HCompiler");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Deprecated", "HDeprecated");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Enum", "HEnum");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("EnumConstantNotPresentException", "HEnumConstantNotPresentException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Error", "HError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Exception", "HException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ExceptionInInitializerError", "HExceptionInInitializerError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Float", "HFloat");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalAccessError", "HIllegalAccessError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalAccessException", "HIllegalAccessException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalArgumentException", "HIllegalArgumentException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalMonitorStateException", "HIllegalMonitorStateException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalStateException", "HIllegalStateException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IllegalThreadStateException", "HIllegalThreadStateException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IncompatibleClassChangeError", "HIncompatibleClassChangeError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("IndexOutOfBoundsException", "HIndexOutOfBoundsException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("InheritableThreadLocal", "HInheritableThreadLocal");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("InstantiationError", "HInstantiationError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("InstantiationException", "HInstantiationException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("InternalError", "HInternalError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("InterruptedException", "HInterruptedException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Iterable", "HIterable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("LinkageError", "HLinkageError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Math", "HMath");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NegativeArraySizeException", "HNegativeArraySizeException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NoClassDefFoundError", "HNoClassDefFoundError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NoSuchFieldError", "HNoSuchFieldError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NoSuchFieldException", "HNoSuchFieldException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NoSuchMethodError", "HNoSuchMethodError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NoSuchMethodException", "HNoSuchMethodException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NullPointerException", "HNullPointerException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Number", "HNumber");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("NumberFormatException", "HNumberFormatException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Object", "HObject");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("OutOfMemoryError", "HOutOfMemoryError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Override", "HOverride");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Package", "HPackage");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Process", "HProcess");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ProcessBuilder", "HProcessBuilder");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Readable", "HReadable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ReflectiveOperationException", "HReflectiveOperationException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Runnable", "HRunnable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Runtime", "HRuntime");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("RuntimeException", "HRuntimeException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("RuntimePermission", "HRuntimePermission");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("SafeVarargs", "HSafeVarargs");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("SecurityException", "HSecurityException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("SecurityManager", "HSecurityManager");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Short", "HShort");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StackOverflowError", "HStackOverflowError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StackTraceElement", "HStackTraceElement");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StrictMath", "HStrictMath");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StringBuffer", "HStringBuffer");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StringBuilder", "HStringBuilder");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("StringIndexOutOfBoundsException", "HStringIndexOutOfBoundsException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("SuppressWarnings", "HSuppressWarnings");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("System", "HSystem");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Thread", "HThread");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ThreadDeath", "HThreadDeath");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ThreadGroup", "HThreadGroup");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ThreadLocal", "HThreadLocal");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Throwable", "HThrowable");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("TypeNotPresentException", "HTypeNotPresentException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("UnknownError", "HUnknownError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("UnsatisfiedLinkError", "HUnsatisfiedLinkError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("UnsupportedClassVersionError", "HUnsupportedClassVersionError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("UnsupportedOperationException", "HUnsupportedOperationException");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("VerifyError", "HVerifyError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("VirtualMachineError", "HVirtualMachineError");
+        AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Void", "HVoid");
     }
-
+    
     public static String typeAPIClassname(String typeName) {
         return uppercase(typeName) + "TypeAPI";
     }
 
     public static String hollowFactoryClassname(String typeName) {
-        return hollowImplClassname(typeName, "Hollow") + "Factory";
+        return hollowImplClassname(typeName, "Hollow", false) + "Factory";
     }
 
     public static String hollowObjectProviderName(String typeName) {
         return substituteInvalidChars(lowercase(typeName)) + "Provider";
     }
 
-    public static String hollowImplClassname(String typeName, String classPostfix) {
+    public static String hollowImplClassname(String typeName, String classPostfix, boolean useAggressiveSubstitutions) {
         String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
         
-        String sub = CLASS_NAME_SUBSTITUTIONS.get(classname);
+        String sub = useAggressiveSubstitutions ? 
+                                  AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) : 
+                                  DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
         if(sub != null)
             return sub;
         

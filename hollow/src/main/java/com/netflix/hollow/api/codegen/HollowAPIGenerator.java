@@ -61,6 +61,7 @@ public class HollowAPIGenerator {
     
     private String classPostfix = "Hollow";
     private String getterPrefix = "_";
+    private boolean useAggressiveSubstitutions = false;
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -115,6 +116,15 @@ public class HollowAPIGenerator {
     public void setGetterPrefix(String getterPrefix) {
         this.getterPrefix = getterPrefix;
     }
+    
+    /**
+     * Use this method to override generated classnames for type names corresponding to any class in the java.lang package.
+     * 
+     * Defaults to false, which overrides only type names corresponding to a few select classes in java.lang.
+     */
+    public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
+        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+    }
 
     
     public void generateFiles(String directory) throws IOException {
@@ -124,9 +134,9 @@ public class HollowAPIGenerator {
     public void generateFiles(File directory) throws IOException {
         directory.mkdirs();
         
-        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix);
+        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
-        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, dataset);
+        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, dataset);
 
         generateFile(directory, apiClassGenerator);
         generateFile(directory, apiFactoryGenerator);
@@ -145,7 +155,7 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema));
-                generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, (HollowObjectSchema)schema));
+                generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
             }
         }
     }
@@ -172,20 +182,20 @@ public class HollowAPIGenerator {
 
     private HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions);
         } else if(schema instanceof HollowListSchema) {
-            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix);
+            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         } else if(schema instanceof HollowSetSchema) {
-            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix);
+            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         } else if(schema instanceof HollowMapSchema) {
-            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, classPostfix);
+            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         }
 
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
     private HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
-        return new HollowFactoryJavaGenerator(packageName, schema, classPostfix);
+        return new HollowFactoryJavaGenerator(packageName, schema, classPostfix, useAggressiveSubstitutions);
     }
     
     public static class Builder {
@@ -196,6 +206,7 @@ public class HollowAPIGenerator {
         private boolean parameterizeAllClassnames = false;
         private String classPostfix = "";
         private String getterPrefix = "";
+        private boolean useAggressiveSubstitutions = false;
         
         public Builder withAPIClassname(String apiClassname) {
             this.apiClassname = apiClassname;
@@ -232,6 +243,11 @@ public class HollowAPIGenerator {
             return this;
         }
         
+        public Builder withAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
+            this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+            return this;
+        }
+        
         public HollowAPIGenerator build() {
             if(apiClassname == null)
                 throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
@@ -243,6 +259,7 @@ public class HollowAPIGenerator {
             HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames);
             generator.setClassPostfix(classPostfix);
             generator.setGetterPrefix(getterPrefix);
+            generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
             return generator;
         }
         

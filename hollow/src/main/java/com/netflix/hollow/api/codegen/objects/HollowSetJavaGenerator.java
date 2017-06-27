@@ -45,12 +45,12 @@ public class HollowSetJavaGenerator implements HollowJavaFileGenerator {
     private final String elementClassName;
     private final boolean parameterize;
 
-    public HollowSetJavaGenerator(String packageName, String apiClassname, HollowSetSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix) {
+    public HollowSetJavaGenerator(String packageName, String apiClassname, HollowSetSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
-        this.className = hollowImplClassname(schema.getName(), classPostfix);
-        this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix);
+        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
+        this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix, useAggressiveSubstitutions);
         this.parameterize = parameterizeClassNames || parameterizedTypes.contains(schema.getElementType());
     }
 

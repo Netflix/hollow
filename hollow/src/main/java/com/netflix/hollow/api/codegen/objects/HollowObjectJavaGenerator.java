@@ -47,16 +47,18 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     private final boolean parameterizeClassNames;
     private final String classPostfix;
     private final String getterPrefix;
+    private final boolean useAggressiveSubstitutions;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix) {
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
-        this.className = hollowImplClassname(schema.getName(), classPostfix);
+        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.parameterizedTypes = parameterizedTypes;
         this.parameterizeClassNames = parameterizeClassNames;
         this.classPostfix = classPostfix;
         this.getterPrefix = getterPrefix;
+        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
     }
 
     @Override
@@ -168,12 +170,12 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
         if(parameterize)
             builder.append("    public <T> T ").append(getterPrefix).append("get"+ uppercase(fieldName) + "() {\n");
         else
-            builder.append("    public ").append(hollowImplClassname(referencedType, classPostfix)).append(" ").append(getterPrefix).append("get"+ uppercase(fieldName) + "() {\n");
+            builder.append("    public ").append(hollowImplClassname(referencedType, classPostfix, useAggressiveSubstitutions)).append(" ").append(getterPrefix).append("get"+ uppercase(fieldName) + "() {\n");
 
         builder.append("        int refOrdinal = delegate().get" + uppercase(fieldName) + "Ordinal(ordinal);\n");
         builder.append("        if(refOrdinal == -1)\n");
         builder.append("            return null;\n");
-        builder.append("        return ").append(parameterize ? "(T)" : "").append(" api().get" + hollowImplClassname(referencedType, classPostfix) + "(refOrdinal);\n");
+        builder.append("        return ").append(parameterize ? "(T)" : "").append(" api().get" + hollowImplClassname(referencedType, classPostfix, useAggressiveSubstitutions) + "(refOrdinal);\n");
         builder.append("    }");
 
         return builder.toString();

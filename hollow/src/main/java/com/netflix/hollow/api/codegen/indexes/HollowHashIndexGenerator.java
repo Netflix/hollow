@@ -47,13 +47,15 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
     private final String classname;
     private final String apiClassname;
     private final String classPostfix;
+    private final boolean useAggressiveSubstitutions;
     private final HollowDataset dataset;
     
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, HollowDataset dataset) {
+    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset) {
         this.classname = apiClassname + "HashIndex";
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.classPostfix = classPostfix;
+        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.dataset = dataset;
     }
 
@@ -105,20 +107,20 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
         builder.append("    }\n\n");
         
         for(HollowSchema schema : schemaList) {
-            builder.append("    public Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
+            builder.append("    public Iterable<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
             builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
             builder.append("        if(matches == null)\n");
             builder.append("            return Collections.emptySet();\n\n");
             builder.append("        final HollowOrdinalIterator iter = matches.iterator();\n\n");
-            builder.append("        return new Iterable<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n");
-            builder.append("            public Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + "> iterator() {\n");
-            builder.append("                return new Iterator<" + hollowImplClassname(schema.getName(), classPostfix) + ">() {\n\n");
+            builder.append("        return new Iterable<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + ">() {\n");
+            builder.append("            public Iterator<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "> iterator() {\n");
+            builder.append("                return new Iterator<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + ">() {\n\n");
             builder.append("                    private int next = iter.next();\n\n");
             builder.append("                    public boolean hasNext() {\n");
             builder.append("                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;\n");
             builder.append("                    }\n\n");
-            builder.append("                    public " + hollowImplClassname(schema.getName(), classPostfix) + " next() {\n");
-            builder.append("                        " + hollowImplClassname(schema.getName(), classPostfix) + " obj = api.get" + hollowImplClassname(schema.getName(), classPostfix) + "(next);\n");
+            builder.append("                    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " next() {\n");
+            builder.append("                        " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " obj = api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(next);\n");
             builder.append("                        next = iter.next();\n");
             builder.append("                        return obj;\n");
             builder.append("                    }\n\n");

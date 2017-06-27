@@ -63,14 +63,16 @@ public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
     private final HollowDataset dataset;
     private final boolean parameterizeClassNames;
     private final String classPostfix;
+    private final boolean useAggressiveSubstitutions;
 
 
-    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix) {
+    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
         this.packageName = packageName;
         this.className = apiClassname;
         this.dataset = dataset;
         this.parameterizeClassNames = parameterizeClassNames;
         this.classPostfix = classPostfix;
+        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
     }
 
     @Override
@@ -196,20 +198,20 @@ public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
         for(int i=0;i<schemaList.size();i++) {
             HollowSchema schema = schemaList.get(i);
             if(parameterizeClassNames) {
-                builder.append("    public <T> Collection<T> getAll").append(hollowImplClassname(schema.getName(), classPostfix)).append("() {\n");
+                builder.append("    public <T> Collection<T> getAll").append(hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions)).append("() {\n");
                 builder.append("        return new AllHollowRecordCollection<T>(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\").getTypeState()) {\n");
                 builder.append("            protected T getForOrdinal(int ordinal) {\n");
-                builder.append("                return get").append(hollowImplClassname(schema.getName(), classPostfix)).append("(ordinal);\n");
+                builder.append("                return get").append(hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions)).append("(ordinal);\n");
                 builder.append("            }\n");
                 builder.append("        };\n");
                 builder.append("    }\n");
                 
-                builder.append("    public <T> T get").append(hollowImplClassname(schema.getName(), classPostfix)).append("(int ordinal) {\n");
+                builder.append("    public <T> T get").append(hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions)).append("(int ordinal) {\n");
                 builder.append("        objectCreationSampler.recordCreation(").append(i).append(");\n");
                 builder.append("        return (T) ").append(hollowObjectProviderName(schema.getName())).append(".getHollowObject(ordinal);\n");
                 builder.append("    }\n");
             } else {
-                String hollowImplClassname = hollowImplClassname(schema.getName(), classPostfix);
+                String hollowImplClassname = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
                 
                 builder.append("    public Collection<"+hollowImplClassname+"> getAll").append(hollowImplClassname).append("() {\n");
                 builder.append("        return new AllHollowRecordCollection<"+hollowImplClassname+">(getDataAccess().getTypeDataAccess(\"").append(schema.getName()).append("\").getTypeState()) {\n");
