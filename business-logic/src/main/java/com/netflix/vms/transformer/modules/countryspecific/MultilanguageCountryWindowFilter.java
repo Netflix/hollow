@@ -13,10 +13,6 @@ import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class MultilanguageCountryWindowFilter {
 
@@ -58,21 +54,6 @@ public class MultilanguageCountryWindowFilter {
 
         return availability;
     }
-
-    /**
-     * Merch a title for a language
-     * if override present for that language in that country
-     * OR
-     *
-     * if language is required audio language and has audio (dubs)
-     * AND
-     * if synopsis are present in language for the title
-     * AND
-     * if subtitles or audio are present for that language
-     * AND
-     * title has audio in original language
-     *
-     */
 
     /**
      * Determines if the language is available for the given package.
