@@ -25,6 +25,10 @@ public class ArtworkLocaleDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getEffectiveDateOrdinal(ordinal);
     }
 
+    public int getAttributesOrdinal(int ordinal) {
+        return typeAPI.getAttributesOrdinal(ordinal);
+    }
+
     public ArtworkLocaleTypeAPI getTypeAPI() {
         return typeAPI;
     }

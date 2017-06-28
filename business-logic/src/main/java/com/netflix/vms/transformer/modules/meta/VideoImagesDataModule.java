@@ -23,6 +23,7 @@ import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
+import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
@@ -579,6 +580,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
                 Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
                 localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
+                
+                /// locale-specific file sequences.
+                Integer localeFileSequence = extractLocaleSpecificFileSequence(localeHollow);
+                if(localeFileSequence != null) {
+                    localeArtworkIsRolloutAsInput.file_seq = localeFileSequence.intValue();
+                    localeArtworkIsRolloutOppositeToInput.file_seq = localeFileSequence.intValue();
+                }
 
                 for (String countryCode : getCountryCodes(localeHollow)) {
                     Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
@@ -629,6 +637,24 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         return new ArtworkProcessResult(isMerchstillRollup, sourceFileId);
     }
 
+    private Integer extractLocaleSpecificFileSequence(ArtworkLocaleHollow localeHollow) {
+        Integer localeFileSequence = null;
+        
+        ArtworkAttributesHollow localeAttributes = localeHollow._getAttributes();
+        if(localeAttributes != null) {
+            PassthroughDataHollow passthrough = localeAttributes._getPassthrough();
+            if(passthrough != null) {
+                try {
+                    StringHollow str = passthrough._getSingleValues().findValue("file_seq");
+                    localeFileSequence = Integer.parseInt(str._getValue());
+                } catch(NumberFormatException unexpected) {
+                    ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse locale-overridden file_seq attribute", unexpected);
+                }
+            }
+        }
+        return localeFileSequence;
+    }
+    
     private class ArtworkProcessResult {
         private boolean isMerchStillRollup;
         private String sourceFileId;
