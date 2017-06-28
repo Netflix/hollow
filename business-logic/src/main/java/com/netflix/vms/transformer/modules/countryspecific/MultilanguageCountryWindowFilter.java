@@ -1,10 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.contract.ContractAssetType;
-
-import com.netflix.vms.transformer.contract.ContractAsset;
-import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.contract.ContractAsset;
+import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
@@ -12,175 +10,263 @@ import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
+import com.netflix.vms.transformer.util.InputOrdinalResultCache;
+
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MultilanguageCountryWindowFilter {
-    
+
     private final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     private final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner;
-    
-    
+
+
     public MultilanguageCountryWindowFilter(CycleConstants cycleConstants) {
         this.rightsContractAssetCache = cycleConstants.rightsContractAssetCache;
         this.dialectOrdinalAssigner = cycleConstants.dialectOrdinalAssigner;
     }
-    
+
     /**
-     * Returns an integer describing the asset type rights available for the specified language. 
-     * 
+     * Returns an integer describing the asset type rights available for the specified language.
+     * AUDIO - 1 (001), SUBTITLES - 2(010), DESCRIPTIVE_AUDIO - 4 (100), AUDIO + SUBTITLES - 3 (011),
+     * AUDIO + DESCRIPTIVE_AUDIO - (101), AUDIO + SUBTITLES + DESCRIPTIVE_AUDIO - (111) and so on..
+     *
      * @param language
      * @param contract
      * @return
      */
     public long contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
         long availability = 0;
-        
-        for(RightsContractAssetHollow assetInput : contract._getAssets()) {
+
+        for (RightsContractAssetHollow assetInput : contract._getAssets()) {
             ContractAsset asset = rightsContractAssetCache.getResult(assetInput.getOrdinal());
-            if(asset == null) {
+            if (asset == null) {
                 asset = new ContractAsset(assetInput);
                 rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
             }
-            
-            if(language.equals(asset.getLanguage())) {
-                int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale());
+
+            if (language.equals(asset.getLanguage())) {
+                // effectively always 0, above check ensures lengths are same so method languageDialectOffset will return 0.
+                int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, asset.getLocale()); //-> not needed.
+
                 availability |= asset.getType().getBitIdentifier() << localeBitOffset;
             }
         }
-        
+
         return availability;
     }
-    
+
     /**
-     * Determines if the language is available for the given package, assuming the specified asset type rights 
-     * 
+     * Merch a title for a language
+     * if override present for that language in that country
+     * OR
+     *
+     * if language is required audio language and has audio (dubs)
+     * AND
+     * if synopsis are present in language for the title
+     * AND
+     * if subtitles or audio are present for that language
+     * AND
+     * title has audio in original language
+     *
+     */
+
+    /**
+     * Determines if the language is available for the given package.
+     * 001 - AUDIO assets only
+     * 010 - SUBTITLES only
+     * 011 - AUDIO & SUBTITLES
+     *
      * @param language
      * @param pkg
      * @param languageAvailability The asset type rights as returned from contractAvailabilityForLangauge()
      * @return
      */
     public long packageIsAvailableForLanguage(String language, PackageData pkg, long languageAvailability) {
-        if(pkg == null)
-            return 0;
-        
+        if (pkg == null) return 0;
         long packageAvailability = 0;
-        
         boolean anyLanguageDiscovered = false;
-        
-        for(EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
+
+        // find AUDIO AND SUBTITLES availability in list of [TEXT or VIDEO] stream profile types.
+        for (EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
+
             packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, true);
-            if(packageAvailability == (ContractAssetType.AUDIO.getBitIdentifier() | ContractAssetType.SUBTITLES.getBitIdentifier()))
+
+            // if both assets are found in any of the streams then return.
+            if (packageAvailability == (ContractAssetType.AUDIO.getBitIdentifier() | ContractAssetType.SUBTITLES.getBitIdentifier())) {
                 return packageAvailability;
-            
-            if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, true))
+            }
+
+            if (!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, true))
                 anyLanguageDiscovered = true;
         }
-        
-        if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) == 0) {
-            for(EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
+
+        // if AUDIO asset is not found
+        if ((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) == 0) {
+            // check list of [AUDIO or MUXED] stream profile types.
+            for (EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
+
+                // check language availability only for audio.
                 packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, false);
-                if((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                if ((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
                     break;
-                
-                if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, false))
+
+                if (!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, true, false))
                     anyLanguageDiscovered = true;
             }
         }
-        
-        if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) == 0) {
-            for(EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
+
+        // if SUBTITLES asset is not found
+        if ((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) == 0) {
+            // check list of [TEXT or VIDEO] stream profiles
+            for (EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
+
+                // check language availability only for text
                 packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, false, true);
-                if((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                if ((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
                     break;
-                
-                if(!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, false, true))
+
+                if (!anyLanguageDiscovered && !noLanguageIsAvailable(descriptor, false, true))
                     anyLanguageDiscovered = true;
             }
         }
-        
-        if(packageAvailability == 0 && !anyLanguageDiscovered)
+
+        if (packageAvailability == 0 && !anyLanguageDiscovered)
             return Long.MIN_VALUE;
         return packageAvailability;
     }
-    
+
     private static final char[] FORCED_CHARS = "Forced".toCharArray();
-    
-    private long languageIsAvailable(String language, EncodeSummaryDescriptor descriptor,  long contractAvailability, boolean checkAudio, boolean checkText) {
+
+    /**
+     *
+     * This method returns a number.
+     *
+     * For language that equals audioLanguage (descriptor). It returns a number that represents
+     *
+     * @param language
+     * @param descriptor
+     * @param contractAvailability AUDIO - 1 (001), SUBTITLES - 2(010), DESCRIPTIVE_AUDIO - 4 (100), AUDIO + SUBTITLES - 3 (011),
+     *                             AUDIO + DESCRIPTIVE_AUDIO - (101), AUDIO + SUBTITLES + DESCRIPTIVE_AUDIO - (111) and so on.. see method contractAvailability
+     *                             It is basically a number describing assets available for the language parameter in a contract.
+     * @param checkAudio
+     * @param checkText
+     * @return
+     */
+    private long languageIsAvailable(String language, EncodeSummaryDescriptor descriptor, long contractAvailability, boolean checkAudio, boolean checkText) {
         EncodeSummaryDescriptorData descriptorData = descriptor.descriptorData;
-        
+
         long languageAvailability = 0;
-        
-        if(checkAudio && languageMatches(language, descriptorData.audioLanguage)) {
+
+        if (checkAudio && languageMatches(language, descriptorData.audioLanguage)) {
+
+            // localeBitOffset will be non-zero if language is a prefix of descriptor.audioLanguage
             int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.audioLanguage);
-            
-            if(descriptorData.assetType.id == 2) {
-                if((contractAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
-                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier();
+
+            // what is this condition?
+            if (descriptorData.assetType.id == 2) {
+                // since contract availability is always first 3 bits, result of this condition will always be false for localeBitOffset > 0 (<< has higher precedence than &)
+                if ((contractAvailability & ContractAssetType.DESCRIPTIVE_AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
+
+                    // valid only if localeBitOffset is 0.
+                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier(); // value: 001
+
                 }
             } else {
-                if((contractAvailability & ContractAssetType.AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
-                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier();
+                if ((contractAvailability & ContractAssetType.AUDIO.getBitIdentifier() << localeBitOffset) != 0) {
+
+                    // valid only of localeBitOffset is 0
+                    languageAvailability |= ContractAssetType.AUDIO.getBitIdentifier(); // value: 001
                 }
-                
+
             }
         }
-        
-        if(checkText) {
+
+        if (checkText) {
             TimedTextTypeDescriptor textType = descriptorData.timedTextType;
-            
-            if(textType != null && !Arrays.equals(FORCED_CHARS, textType.nameStr)) {
-                if(languageMatches(language, descriptorData.textLanguage)) {
+
+            if (textType != null && !Arrays.equals(FORCED_CHARS, textType.nameStr)) {
+                if (languageMatches(language, descriptorData.textLanguage)) {
                     int localeBitOffset = ContractAssetType.values().length * languageDialectOffset(language, descriptorData.textLanguage);
-                    
-                    if((contractAvailability & ContractAssetType.SUBTITLES.getBitIdentifier() << localeBitOffset) != 0) {
-                        languageAvailability |= ContractAssetType.SUBTITLES.getBitIdentifier();
+
+                    if ((contractAvailability & ContractAssetType.SUBTITLES.getBitIdentifier() << localeBitOffset) != 0) {
+
+                        // valid only if localeBitOffset is 0
+                        languageAvailability |= ContractAssetType.SUBTITLES.getBitIdentifier(); // value: 010 for only SUBTITLES, or 011 for AUDIO & SUBTITLES
                     }
                 }
             }
         }
-        
+
+        // returns int 1 (AUDIO ONLY), 2 (SUBTITLES ONLY) or 3 (AUDIO AND SUBTITLES)
         return languageAvailability;
     }
-    
+
+    /**
+     * If descriptor language (audio or text) matches "zxx".
+     *
+     * @param descriptor
+     * @param checkAudio
+     * @param checkText
+     * @return
+     */
     private boolean noLanguageIsAvailable(EncodeSummaryDescriptor descriptor, boolean checkAudio, boolean checkText) {
         EncodeSummaryDescriptorData descriptorData = descriptor.descriptorData;
-        
-        if(checkAudio && !languageMatches("zxx", descriptorData.audioLanguage))
-            return false;
-        
-        if(checkText) {
-            return !languageMatches("zxx", descriptorData.textLanguage);
+
+        if (checkAudio && !languageMatches("zxx", descriptorData.audioLanguage))
+            return false;// does not match "zxx"
+
+        if (checkText) {
+            return !languageMatches("zxx", descriptorData.textLanguage);// return false, if does not match "zxx"
         }
-        
-        return true;
-    }    
-    
-    private boolean languageMatches(String language, Strings locale) {
-        if(locale == null)
-            return false;
-        
-        if(locale.value.length < language.length())
-            return false;
-        
-        for(int i=0;i<language.length();i++) {
-            if(language.charAt(i) != locale.value[i])
-                return false;
-        }
-        
+
         return true;
     }
-    
+
+    /**
+     * Check if given language is a prefix or equals audioOrTextLanguage
+     *
+     * @param language
+     * @param audioOrTextLanguage language of EncodingSummaryDescriptor
+     * @return true if language prefix or equals audio
+     */
+    private boolean languageMatches(String language, Strings audioOrTextLanguage) {
+        if (audioOrTextLanguage == null)
+            return false;
+
+        // if audioOrTextLanguage is en and language is zh-Hant. languages do not match return false.
+        if (audioOrTextLanguage.value.length < language.length())
+            return false;
+
+        // cases where language is es and audioOrTextLanguage is en (same length)
+        // cases where language is fr and audioOrTextLanguage is zh-Hant
+
+        // this loop checks language is a prefix of audioOrTextLanguage.
+        for (int i = 0; i < language.length(); i++) {
+            if (language.charAt(i) != audioOrTextLanguage.value[i])
+                return false;
+        }
+
+        // return true if language is a prefix of audioOrTextLanguage or equals each other.
+        // examples language: pt audioOrTextLanguage: pt-BR -> (prefix of audioOrTextLanguage) do we have such a use case?
+        // language: language en audioOrTextLanguage: en -> or they equal.
+        return true;
+    }
+
     private int languageDialectOffset(String language, Strings locale) {
-        if(locale.value.length == language.length())
+        if (locale.value.length == language.length())
             return 0;
-        
+
         return dialectOrdinalAssigner.getDialectOrdinal(language, String.valueOf(locale.value));
     }
 
     private int languageDialectOffset(String language, String locale) {
-        if(locale.length() == language.length())
+        if (locale.length() == language.length())
             return 0;
-        
+
         return dialectOrdinalAssigner.getDialectOrdinal(language, locale);
     }
 
