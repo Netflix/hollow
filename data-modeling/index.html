@@ -361,11 +361,29 @@ public class MaturityRating {
 <p>The <code>List</code> must explicitly define its parameterized element type.  The default <em>type name</em> of the above <code>List</code> schema will be <code>ListOfAward</code>.  </p>
 <p>A <code>List</code> schema indicates a record type which is an ordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references.  The referenced type must be defined by the schema, and all references in all records will encode only the <em>ordinals</em> of the referenced records as the values for these references.</p>
 <h1 id="set-schemas">Set Schemas</h1>
-<p>You can define <code>Set</code> schemas by adding a member variable of type <code>Set</code> in your data model.  The <code>Set</code> must explicitly define its parameterized element type.</p>
+<p>You can define <code>Set</code> schemas by adding a member variable of type <code>Set</code> in your data model.  The <code>Set</code> must explicitly define its parameterized element type.  For example:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    String title;
+
+    @HollowHashKey(fields={&quot;firstName&quot;, &quot;lastName&quot;}) /// hash key is optional
+    Set&lt;Actor&gt; cast;
+}
+</code></pre>
+
 <p>A <code>Set</code> schema indicates a record type which is an unordered collection of <code>REFERENCE</code> fields.  Each record will have a variable number of references, and the referenced type must be defined by the schema.  Within a single set record, each reference must be unique.  </p>
 <p>References in <code>Set</code> records can be hashed by some specific element fields for O(1) retrieval.  In order to enable this feature, a <code>Set</code> schema will define an optional <em>hash key</em>, which defines how its elements are hashed/indexed.</p>
 <h1 id="map-schemas">Map Schemas</h1>
-<p>You can define <code>Map</code> schemas by adding a member variable of type <code>Map</code> in your data model.  The <code>Map</code> must explicitly define it parameterized key and values types.  </p>
+<p>You can define <code>Map</code> schemas by adding a member variable of type <code>Map</code> in your data model.  The <code>Map</code> must explicitly define it parameterized key and values types.  For example:</p>
+<pre><code class="java">public class Movie {
+    long id;
+    String title;
+
+    @HollowHashKey(fields=&quot;actorId&quot;) /// hash key is optional
+    Map&lt;Actor, Role&gt; cast;
+}
+</code></pre>
+
 <p>A <code>Map</code> schema indicates a record type which is an unordered collection of pairs of <code>REFERENCE</code> fields, used to represent a key/value mapping.  Each record will have a variable number of key/value pairs.  Both the key reference type and the value reference type must be defined by the schema.  The key reference type does not have to be the same as the value reference type.  Within a single map record, each key reference must be unique.  </p>
 <p>Entries in <code>Map</code> records can be hashed by some specific key fields for O(1) retrieval of the keys, values, and/or entries.  In order to enable this feature, a <code>Map</code> schema will define an optional <em>hash key</em>, which defines how its entries are hashed/indexed.</p>
 <h1 id="hash-keys">Hash Keys</h1>
