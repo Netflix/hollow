@@ -63,10 +63,10 @@ public class MultilanguageCountryWindowFilter {
      *
      * @param language
      * @param pkg
-     * @param languageAvailability The asset type rights as returned from contractAvailabilityForLangauge()
+     * @param assetTypeRightsAvailability The asset type rights as returned from contractAvailabilityForLangauge()
      * @return
      */
-    public long packageIsAvailableForLanguage(String language, PackageData pkg, long languageAvailability) {
+    public long packageIsAvailableForLanguage(String language, PackageData pkg, long assetTypeRightsAvailability) {
         if (pkg == null) return 0;
         long packageAvailability = 0;
         boolean anyLanguageDiscovered = false;
@@ -74,7 +74,7 @@ public class MultilanguageCountryWindowFilter {
         // find AUDIO AND SUBTITLES availability in list of [TEXT or VIDEO] stream profile types.
         for (EncodeSummaryDescriptor descriptor : pkg.muxAudioStreamSummary) {
 
-            packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, true);
+            packageAvailability |= languageIsAvailable(language, descriptor, assetTypeRightsAvailability, true, true);
 
             // if both assets are found in any of the streams then return.
             if (packageAvailability == (ContractAssetType.AUDIO.getBitIdentifier() | ContractAssetType.SUBTITLES.getBitIdentifier())) {
@@ -91,7 +91,7 @@ public class MultilanguageCountryWindowFilter {
             for (EncodeSummaryDescriptor descriptor : pkg.audioStreamSummary) {
 
                 // check language availability only for audio.
-                packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, true, false);
+                packageAvailability |= languageIsAvailable(language, descriptor, assetTypeRightsAvailability, true, false);
                 if ((packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
                     break;
 
@@ -106,7 +106,7 @@ public class MultilanguageCountryWindowFilter {
             for (EncodeSummaryDescriptor descriptor : pkg.textStreamSummary) {
 
                 // check language availability only for text
-                packageAvailability |= languageIsAvailable(language, descriptor, languageAvailability, false, true);
+                packageAvailability |= languageIsAvailable(language, descriptor, assetTypeRightsAvailability, false, true);
                 if ((packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
                     break;
 
