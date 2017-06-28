@@ -21,6 +21,11 @@ public class CupLibraryImpl implements CupLibrary {
     }
 
     @Override
+    public int getMaximumVideoHeight(Set<String> cupTokens, String deviceCategory) {
+        return cupFactory.getCupMaximumVideoHeight(cupTokens, deviceCategory);
+    }
+
+    @Override
     public VideoResolutionType getCupMaxVideoResolutionType(Set<String> cupTokens, String cupDeviceCategory) {
         return cupFactory.getCupVideoResolutionTypeForVMS(cupTokens, cupDeviceCategory);
     }

@@ -5,6 +5,11 @@ import com.netflix.vms.transformer.common.cup.CupLibrary;
 import java.util.Set;
 
 public class SimpleCupLibrary implements CupLibrary {
+    @Override
+    public int getMaximumVideoHeight(Set<String> cupTokens, String deviceCategory) {
+        return Integer.MAX_VALUE;
+    }
+
     public static final VideoResolutionType DYMMY_VIDEO_RESOLUTION_TYPE = new VideoResolutionType() {
 
         @Override

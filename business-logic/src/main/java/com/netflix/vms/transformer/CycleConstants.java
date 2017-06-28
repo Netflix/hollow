@@ -47,6 +47,7 @@ public class CycleConstants {
     public final VideoFormatDescriptor FOUR_K = videoFormatDescriptor(5, "4K", "4K For Search");
     public final VideoFormatDescriptor HDR = videoFormatDescriptor(6, "HDR", "HDR For Search");
     public final VideoFormatDescriptor ATMOS = videoFormatDescriptor(7, "ATMOS", "Dolby Atmos For Search");
+    @Deprecated public final int ULTRA_HD_MIN_HEIGHT = 1081;
 
     public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages();
     public final SortedMapOfDateWindowToListOfInteger EMPTY_DATE_WINDOW_SEASON_SEQ_MAP = new SortedMapOfDateWindowToListOfInteger(Collections.emptyMap());

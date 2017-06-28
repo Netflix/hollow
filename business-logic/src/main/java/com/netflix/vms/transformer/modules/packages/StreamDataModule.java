@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.VideoStreamCropParamsHollow;
-
-import com.netflix.vms.transformer.hollowoutput.StreamCropParams;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -24,6 +23,7 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoStreamCropParamsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.AssetMetaData;
 import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
@@ -40,6 +40,7 @@ import com.netflix.vms.transformer.hollowoutput.ImageSubtitleIndexByteRange;
 import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.QoEInfo;
 import com.netflix.vms.transformer.hollowoutput.StreamAdditionalData;
+import com.netflix.vms.transformer.hollowoutput.StreamCropParams;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.StreamDataDescriptor;
 import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
@@ -48,6 +49,7 @@ import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
+import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -73,17 +75,15 @@ public class StreamDataModule {
     private final Map<Integer, DrmInfo> drmInfoByGroupId;
 
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
-
     private final HollowPrimaryKeyIndex streamProfileIdx;
-
     private final VMSHollowInputAPI api;
-
+    private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
-
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
+    public StreamDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
+        this.ctx = ctx;
         this.cycleConstants = cycleConstants;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
@@ -94,7 +94,7 @@ public class StreamDataModule {
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
-        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, cycleConstants, indexer);
+        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, ctx, cycleConstants, indexer);
 
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;
@@ -155,7 +155,7 @@ public class StreamDataModule {
         outputStream.additionalData.qoeInfo.vmafplusScoreLts = inputVideoStreamInfo._getVmafplusScoreLts();
         outputStream.additionalData.qoeInfo.vmafplusPhoneScoreExp = inputVideoStreamInfo._getVmafplusPhoneScoreExp();
         outputStream.additionalData.qoeInfo.vmafplusPhoneScoreLts = inputVideoStreamInfo._getVmafplusPhoneScoreLts();
-        
+
         VideoStreamCropParamsHollow inputCropParams = inputVideoStreamInfo._getCropParams();
         if(inputCropParams != null) {
             outputStream.additionalData.cropParams = new StreamCropParams();
@@ -164,7 +164,7 @@ public class StreamDataModule {
             outputStream.additionalData.cropParams.width = inputCropParams._getWidth();
             outputStream.additionalData.cropParams.height = inputCropParams._getHeight();
         }
-        
+
         Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
         int deploymentLabelBits = 0;
         if(deploymentLabels != null) {
@@ -215,12 +215,12 @@ public class StreamDataModule {
                 }
             }
         }
-        
+
         StringHollow conformingGroupId = inputStreamDeployment._getS3PathComponent();
         if(conformingGroupId != null) {
             outputStream.additionalData.mostlyConstantData.conformingGroupId = Integer.parseInt(conformingGroupId._getValue());
         }
-        
+
         StringHollow s3FullPath = inputStreamDeployment._getS3FullPath();
         if(s3FullPath != null) {
             outputStream.additionalData.mostlyConstantData.s3FullPath = s3FullPath._getValue().toCharArray();
@@ -248,7 +248,7 @@ public class StreamDataModule {
         } else {
             outputStream.downloadDescriptor.assetTypeDescriptor = assetTypeDescriptorMap.get("primary");
         }
-        
+
         StreamAssetMetadataHollow assetMetadataId = inputStream._getMetadataId();
         if(assetMetadataId != null) {
             String id = assetMetadataId._getId();
@@ -256,7 +256,7 @@ public class StreamDataModule {
                 outputStream.downloadDescriptor.assetMetaData = new AssetMetaData(new Strings(id));
             }
         }
-        
+
 
 
         if(inputNonImageInfo != null) {
@@ -273,9 +273,30 @@ public class StreamDataModule {
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
             int peakBitrate = inputVideoStreamInfo._getVideoPeakBitrateKBPS();
 
-            outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+            if (ctx.getConfig().useVideoResolutionType()) {
+                outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+            } else {
+                outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+            }
             outputStream.streamDataDescriptor.bitrate = bitrate;
             outputStream.streamDataDescriptor.peakBitrate = peakBitrate;
+
+            { // DEBUGGING
+                VideoFormatDescriptor selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+                VideoFormatDescriptor selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+                if (selectVideoFormatDescriptorOld.id != selectVideoFormatDescriptorNew.id) {
+                    ctx.getLogger().error(TransformerLogTag.UnexpectedError, "VideoFormat mismatch: new={}, old={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
+                            selectVideoFormatDescriptorNew.name,
+                            selectVideoFormatDescriptorOld.name,
+                            inputStream._getDownloadableId(),
+                            encodingProfileId,
+                            height,
+                            width,
+                            targetHeight,
+                            targetWidth
+                            );
+                }
+            }
 
             if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
                 outputStream.streamDataDescriptor.targetDimensions = new TargetDimensions();

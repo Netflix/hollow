@@ -344,10 +344,15 @@ public class VideoNamedListModule {
 
     private boolean isUltraHD(Set<VideoFormatDescriptor> formats, final LinkedHashSetOfStrings cupTokens, final String deviceCategory) {
         if (formats.contains(constants.ULTRA_HD)) {
-            VideoResolutionType uHDType = ctx.getCupLibrary().getResolutionType(VideoResolutionType.ID_QHD);
-            VideoResolutionType cupType = ctx.getCupLibrary().getCupMaxVideoResolutionType(newSet(cupTokens), deviceCategory);
+            if (ctx.getConfig().useVideoResolutionType()) {
+                VideoResolutionType uHDType = ctx.getCupLibrary().getResolutionType(VideoResolutionType.ID_QHD);
+                VideoResolutionType cupType = ctx.getCupLibrary().getCupMaxVideoResolutionType(newSet(cupTokens), deviceCategory);
 
-            return cupType.compareTo(uHDType) >= 0;
+                return cupType.compareTo(uHDType) >= 0;
+            } else {
+                int maxHeightForCupTokens = ctx.getCupLibrary().getMaximumVideoHeight(newSet(cupTokens), deviceCategory);
+                return constants.ULTRA_HD_MIN_HEIGHT <= maxHeightForCupTokens;
+            }
         }
         return false;
     }
