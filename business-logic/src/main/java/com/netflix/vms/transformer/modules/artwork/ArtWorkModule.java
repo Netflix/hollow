@@ -325,12 +325,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return map;
     }
 
-    protected void fillPassThroughData(Artwork desc, ArtworkAttributesHollow attributes) {
-        SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
-        HashMap<String, String> keyValues = new HashMap<>();
-        for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
-            keyValues.put(entry.getKey()._getValue(), entry.getValue()._getValue());
-        }
+    protected void fillPassThroughData(Artwork artwork, ArtworkAttributesHollow attributes) {
+        HashMap<String, String> keyValues = getSingleKeyValuesMap(attributes);
 
         HashMap<String, List<__passthrough_string>> keyListValues = new HashMap<>();
         MultiValuePassthroughMapHollow multiValuePassthrough = attributes._getPassthrough()._getMultiValues();
@@ -346,56 +342,81 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             keyListValues.put(key, values);
         }
 
-        ArtworkBasicPassthrough passThrough = new ArtworkBasicPassthrough();
         PassthroughString passThroughString = getPassThroughString("APPROVAL_SOURCE", keyValues);
-        boolean setBasicPassThrough = false;
         if(passThroughString != null) {
-            passThrough.approval_source = passThroughString;
-            setBasicPassThrough = true;
-        }
-        String approvalState = keyValues.get("APPROVAL_STATE");
-        if(approvalState != null) {
-            // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
-            passThrough.approval_state = java.lang.Boolean.valueOf(approvalState) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).approval_source = passThroughString;
         }
         passThroughString = getPassThroughString("designAttribute", keyValues);
         if(passThroughString != null) {
-            passThrough.design_attribute = passThroughString;
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).design_attribute = passThroughString;
         }
         
         passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
         if(passThroughString != null) {
-            passThrough.focal_point = passThroughString;
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).focal_point = passThroughString;
         }            // Sort descriptor necessary for client artwork resolver
 
         passThroughString = getPassThroughString("TONE", keyValues);
         if(passThroughString != null) {
-            passThrough.tone = passThroughString;
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).tone = passThroughString;
         }
         passThroughString = getPassThroughString("GROUP_ID", keyValues);
         if(passThroughString != null) {
-            passThrough.group_id = passThroughString;
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).group_id = passThroughString;
         }
         if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
-            passThrough.awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
         }
         if (keyListValues.containsKey("themes")) {
-            passThrough.themes = keyListValues.get("themes");
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).themes = keyListValues.get("themes");
         }
         if (keyListValues.containsKey("IDENTIFIERS")) {
-            passThrough.identifiers = keyListValues.get("IDENTIFIERS");
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).identifiers = keyListValues.get("IDENTIFIERS");
         }
         if (keyListValues.containsKey("PERSON_IDS")) {
-            passThrough.personIdStrs = keyListValues.get("PERSON_IDS");
-            setBasicPassThrough = true;
+            getBasicPassthrough(artwork).personIdStrs = keyListValues.get("PERSON_IDS");
+        }
+        applyLocaleOverridableAttributes(artwork, keyValues);
+        
+        String startX = keyValues.get("SCREENSAVER_START_X");
+        String endX = keyValues.get("SCREENSAVER_END_X");
+        String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
+        if(startX != null || endX != null || offsetY != null) {
+            ArtworkScreensaverPassthrough screensaverPassthrough = new ArtworkScreensaverPassthrough();
+            try {
+                if(startX != null)  screensaverPassthrough.startX = java.lang.Integer.parseInt(startX);
+                if(endX != null)    screensaverPassthrough.endX = java.lang.Integer.parseInt(endX);
+                if(offsetY != null) screensaverPassthrough.offsetY = java.lang.Integer.parseInt(offsetY);
+                getBasicPassthrough(artwork).screensaverPassthrough = screensaverPassthrough;
+            } catch(NumberFormatException unexpected) { 
+                ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse artwork SCREENSAVER attributes", unexpected);
+            }
+        }
+
+        ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
+        sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
+        sourcePassThrough.original_source_file_id = getArtworkSourceString("original_source_file_id", keyValues);
+        if (sourcePassThrough.original_source_file_id == null) sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
+
+        artwork.source = sourcePassThrough;
+        artwork.source_movie_id = getPassThroughVideo("SOURCE_MOVIE_ID", keyValues);
+        artwork.acquisitionSource = getAcquisitionSource("ACQUISITION_SOURCE", keyValues);
+    }
+
+    protected HashMap<String, String> getSingleKeyValuesMap(ArtworkAttributesHollow attributes) {
+        SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
+        HashMap<String, String> keyValues = new HashMap<>();
+        for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
+            keyValues.put(entry.getKey()._getValue(), entry.getValue()._getValue());
+        }
+        return keyValues;
+    }
+
+    protected void applyLocaleOverridableAttributes(Artwork artwork, HashMap<String, String> keyValues) {
+        String approvalState = keyValues.get("APPROVAL_STATE");
+        if(approvalState != null) {
+            // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
+            getBasicPassthrough(artwork).approval_state = java.lang.Boolean.valueOf(approvalState) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
         }
         if (keyValues.containsKey("REEXPLORE_TIME") && keyValues.get("REEXPLORE_TIME") != null) {
             long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
@@ -407,37 +428,17 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 // this log statement is only for warning purposes. Ideally this should not warn. If it does with high number, then revisit the window span or contact upstream team.
                 ctx.getLogger().warn(ReexploreTags, "Found re-explore timestamp={} that is older than 38 days timestamp={}, This is stale (dead) data", timestamp, timestamp38DaysBack);
             }
-            setBasicPassThrough = true;
-            passThrough.reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
+            getBasicPassthrough(artwork).reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
         }
         
-        String startX = keyValues.get("SCREENSAVER_START_X");
-        String endX = keyValues.get("SCREENSAVER_END_X");
-        String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
-        if(startX != null || endX != null || offsetY != null) {
-            passThrough.screensaverPassthrough = new ArtworkScreensaverPassthrough();
-            try {
-                if(startX != null)  passThrough.screensaverPassthrough.startX = java.lang.Integer.parseInt(startX);
-                if(endX != null)    passThrough.screensaverPassthrough.endX = java.lang.Integer.parseInt(endX);
-                if(offsetY != null) passThrough.screensaverPassthrough.offsetY = java.lang.Integer.parseInt(offsetY);
-                setBasicPassThrough = true;
-            } catch(NumberFormatException unexpected) { 
-                ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse artwork SCREENSAVER attributes", unexpected);
-            }
-        }
-
-        ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
-        sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
-        sourcePassThrough.original_source_file_id = getArtworkSourceString("original_source_file_id", keyValues);
-        if (sourcePassThrough.original_source_file_id == null) sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
-
-        if(setBasicPassThrough) {
-            desc.basic_passthrough = passThrough;
-        }
-        desc.source = sourcePassThrough;
-        desc.file_seq = java.lang.Integer.valueOf(keyValues.get("file_seq"));
-        desc.source_movie_id = getPassThroughVideo("SOURCE_MOVIE_ID", keyValues);
-        desc.acquisitionSource = getAcquisitionSource("ACQUISITION_SOURCE", keyValues);
+        if(keyValues.containsKey("file_seq") && keyValues.get("file_seq") != null)
+            artwork.file_seq = java.lang.Integer.valueOf(keyValues.get("file_seq"));
+    }
+    
+    private ArtworkBasicPassthrough getBasicPassthrough(Artwork artwork) {
+        if(artwork.basic_passthrough == null)
+            artwork.basic_passthrough = new ArtworkBasicPassthrough();
+        return artwork.basic_passthrough;
     }
 
     private PassthroughVideo getPassThroughVideo(String key, HashMap<String, String> keyValues) {

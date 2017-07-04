@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -10,10 +16,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -23,7 +25,6 @@ import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
@@ -48,9 +49,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.VideoDataCollection;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -578,15 +577,12 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 localeArtworkIsRolloutAsInput.locale = NFLocaleUtil.createNFLocale(localeHollow._getBcp47Code()._getValue());
                 localeArtworkIsRolloutAsInput.effectiveDate = localeHollow._getEffectiveDate()._getValue();
 
+                ArtworkAttributesHollow localeSpecificAttributes = localeHollow._getAttributes();
+                if(localeSpecificAttributes != null)
+                    applyLocaleOverridableAttributes(localeArtworkIsRolloutAsInput, getSingleKeyValuesMap(localeSpecificAttributes));
+                
                 Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
                 localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
-                
-                /// locale-specific file sequences.
-                Integer localeFileSequence = extractLocaleSpecificFileSequence(localeHollow);
-                if(localeFileSequence != null) {
-                    localeArtworkIsRolloutAsInput.file_seq = localeFileSequence.intValue();
-                    localeArtworkIsRolloutOppositeToInput.file_seq = localeFileSequence.intValue();
-                }
 
                 for (String countryCode : getCountryCodes(localeHollow)) {
                     Map<Integer, Set<Artwork>> artMap = getArtworkMap(countryCode, countryArtworkMap);
@@ -635,24 +631,6 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         }
 
         return new ArtworkProcessResult(isMerchstillRollup, sourceFileId);
-    }
-
-    private Integer extractLocaleSpecificFileSequence(ArtworkLocaleHollow localeHollow) {
-        Integer localeFileSequence = null;
-        
-        ArtworkAttributesHollow localeAttributes = localeHollow._getAttributes();
-        if(localeAttributes != null) {
-            PassthroughDataHollow passthrough = localeAttributes._getPassthrough();
-            if(passthrough != null) {
-                try {
-                    StringHollow str = passthrough._getSingleValues().findValue("file_seq");
-                    localeFileSequence = Integer.parseInt(str._getValue());
-                } catch(NumberFormatException unexpected) {
-                    ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse locale-overridden file_seq attribute", unexpected);
-                }
-            }
-        }
-        return localeFileSequence;
     }
     
     private class ArtworkProcessResult {
