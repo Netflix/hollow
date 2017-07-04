@@ -29,6 +29,7 @@ import com.netflix.vms.transformer.hollowinput.ListOfDerivativeTagHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
+import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -326,7 +327,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     }
 
     protected void fillPassThroughData(Artwork artwork, ArtworkAttributesHollow attributes) {
-        HashMap<String, String> keyValues = getSingleKeyValuesMap(attributes);
+        Map<String, String> keyValues = getSingleKeyValuesMap(attributes);
 
         HashMap<String, List<__passthrough_string>> keyListValues = new HashMap<>();
         MultiValuePassthroughMapHollow multiValuePassthrough = attributes._getPassthrough()._getMultiValues();
@@ -403,8 +404,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         artwork.acquisitionSource = getAcquisitionSource("ACQUISITION_SOURCE", keyValues);
     }
 
-    protected HashMap<String, String> getSingleKeyValuesMap(ArtworkAttributesHollow attributes) {
-        SingleValuePassthroughMapHollow singleValuePassThrough = attributes._getPassthrough()._getSingleValues();
+    protected Map<String, String> getSingleKeyValuesMap(ArtworkAttributesHollow attributes) {
+        PassthroughDataHollow passthrough = attributes._getPassthrough();
+        if(passthrough == null)
+            return Collections.emptyMap();
+        SingleValuePassthroughMapHollow singleValuePassThrough = passthrough._getSingleValues();
         HashMap<String, String> keyValues = new HashMap<>();
         for(Entry<MapKeyHollow, StringHollow> entry : singleValuePassThrough.entrySet()) {
             keyValues.put(entry.getKey()._getValue(), entry.getValue()._getValue());
@@ -412,7 +416,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return keyValues;
     }
 
-    protected void applyLocaleOverridableAttributes(Artwork artwork, HashMap<String, String> keyValues) {
+    protected void applyLocaleOverridableAttributes(Artwork artwork, Map<String, String> keyValues) {
         String approvalState = keyValues.get("APPROVAL_STATE");
         if(approvalState != null) {
             // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
@@ -441,7 +445,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artwork.basic_passthrough;
     }
 
-    private PassthroughVideo getPassThroughVideo(String key, HashMap<String, String> keyValues) {
+    private PassthroughVideo getPassThroughVideo(String key, Map<String, String> keyValues) {
         PassthroughString passThroughString = getPassThroughString(key, keyValues);
         if (passThroughString == null) return null;
 
@@ -449,7 +453,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return new PassthroughVideo(java.lang.Integer.parseInt(videoStr));
     }
 
-    private PassthroughString getPassThroughString(String key, HashMap<String, String> keyValues) {
+    private PassthroughString getPassThroughString(String key, Map<String, String> keyValues) {
         String value = keyValues.get(key);
         if(value != null) {
             return new PassthroughString(value);
@@ -457,7 +461,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return null;
     }
 
-    private AcquisitionSource getAcquisitionSource(String key, HashMap<String, String> keyValues) {
+    private AcquisitionSource getAcquisitionSource(String key, Map<String, String> keyValues) {
         String value = keyValues.get(key);
         if (value != null) {
             return new AcquisitionSource(value);
@@ -465,7 +469,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return null;
     }
 
-    private ArtworkSourceString getArtworkSourceString(String key, HashMap<String, String> keyValues) {
+    private ArtworkSourceString getArtworkSourceString(String key, Map<String, String> keyValues) {
         String value = keyValues.get(key);
         if(value != null) {
             return new ArtworkSourceString(value);

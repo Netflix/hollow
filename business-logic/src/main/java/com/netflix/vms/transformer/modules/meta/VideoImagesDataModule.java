@@ -580,7 +580,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 ArtworkAttributesHollow localeSpecificAttributes = localeHollow._getAttributes();
                 if(localeSpecificAttributes != null)
                     applyLocaleOverridableAttributes(localeArtworkIsRolloutAsInput, getSingleKeyValuesMap(localeSpecificAttributes));
-                
+
                 Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
                 localeArtworkIsRolloutOppositeToInput.isRolloutExclusive = !localeArtworkIsRolloutAsInput.isRolloutExclusive;
 
