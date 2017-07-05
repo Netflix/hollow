@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.modules.collections;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
@@ -15,7 +17,6 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,12 +43,13 @@ public class VideoCollectionsModule {
         this.cycleConstants = constants;
     }
 
-    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
+    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
 
         Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
-            String countryCode = entry.getKey();
 
+            String countryCode = entry.getKey();
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
             Set<VideoCollectionsDataHierarchy> vcdHierarchies = new HashSet<>();
 
             for (VideoHierarchy showHierarchy : entry.getValue()) {
@@ -75,8 +77,8 @@ public class VideoCollectionsModule {
                 vcdHierarchies.add(hierarchy);
                 uniqueHierarchies.put(showHierarchy, hierarchy);
             }
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            videoDataCollectionMap.get(countryCode).setVideoCollectionsDataHierarchy(vcdHierarchies);
+
+            videoDataCollection.setVideoCollectionsDataHierarchy(vcdHierarchies);
         }
     }
 

@@ -1,11 +1,5 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -14,8 +8,14 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -47,9 +47,10 @@ import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -92,21 +93,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
     }
 
-    // constructor only for test purposes
-    /*VideoImagesDataModule(TransformerContext context, HollowHashIndex overrideIndex, HollowHashIndex masterIndex,
-                          HollowHashIndex absoluteIndex, VMSHollowInputAPI api, HollowObjectMapper mapper, CycleConstants cycleConstants,
-                          VMSTransformerIndexer indexer) {
-        super("Video", api, context, mapper, cycleConstants, indexer);
-        this.overrideScheduleIndex = overrideIndex;
-        this.masterScheduleIndex = masterIndex;
-        this.absoluteScheduleIndex = absoluteIndex;
-
-        this.videoArtworkIndex = null;
-        this.damMerchStillsIdx = null;
-        this.videoStatusIdx = null;
-    }*/
-
-    public void buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
+    public void buildVideoImagesByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
         Set<Integer> ids = new HashSet<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             for (VideoHierarchy hierarchy : entry.getValue()) {
@@ -147,9 +134,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
         for (Map.Entry<String, Map<Integer, Set<Artwork>>> countryEntry : countryArtworkMap.entrySet()) {
             String countryCode = countryEntry.getKey();
             Map<Integer, Set<Artwork>> artMap = countryEntry.getValue();
-
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(countryCode);
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
 
             for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
                 VideoImages images = new VideoImages();
@@ -169,11 +154,10 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
          * images but still have schedule phase info. Ex: child nodes like season. The schedule phase windows including ones at child level are used by Asset Validator.
          */
         for (Map.Entry<String, Map<Integer, Set<SchedulePhaseInfo>>> countrySchedulePhaseEntry : countrySchedulePhaseMap.entrySet()) {
+
             String countryCode = countrySchedulePhaseEntry.getKey();
             Map<Integer, Set<SchedulePhaseInfo>> videoSchedulePhaseMap = countrySchedulePhaseEntry.getValue();
-
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(countryCode);
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
 
             for (Entry<Integer, Set<SchedulePhaseInfo>> entry : videoSchedulePhaseMap.entrySet()) {
                 Integer id = entry.getKey();
@@ -578,7 +562,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
                 localeArtworkIsRolloutAsInput.effectiveDate = localeHollow._getEffectiveDate()._getValue();
 
                 ArtworkAttributesHollow localeSpecificAttributes = localeHollow._getAttributes();
-                if(localeSpecificAttributes != null)
+                if (localeSpecificAttributes != null)
                     applyLocaleOverridableAttributes(localeArtworkIsRolloutAsInput, getSingleKeyValuesMap(localeSpecificAttributes));
 
                 Artwork localeArtworkIsRolloutOppositeToInput = localeArtworkIsRolloutAsInput.clone();
@@ -632,7 +616,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
 
         return new ArtworkProcessResult(isMerchstillRollup, sourceFileId);
     }
-    
+
     private class ArtworkProcessResult {
         private boolean isMerchStillRollup;
         private String sourceFileId;
