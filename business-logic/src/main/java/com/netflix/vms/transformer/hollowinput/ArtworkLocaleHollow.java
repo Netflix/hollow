@@ -31,6 +31,13 @@ public class ArtworkLocaleHollow extends HollowObject {
         return  api().getDateHollow(refOrdinal);
     }
 
+    public ArtworkAttributesHollow _getAttributes() {
+        int refOrdinal = delegate().getAttributesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getArtworkAttributesHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

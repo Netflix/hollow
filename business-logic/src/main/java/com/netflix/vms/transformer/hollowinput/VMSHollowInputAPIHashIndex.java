@@ -2791,68 +2791,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<ArtworkLocaleHollow> findArtworkLocaleMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkLocaleHollow>() {
-            public Iterator<ArtworkLocaleHollow> iterator() {
-                return new Iterator<ArtworkLocaleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkLocaleHollow next() {
-                        ArtworkLocaleHollow obj = api.getArtworkLocaleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<ArtworkLocaleListHollow> findArtworkLocaleListMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkLocaleListHollow>() {
-            public Iterator<ArtworkLocaleListHollow> iterator() {
-                return new Iterator<ArtworkLocaleListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkLocaleListHollow next() {
-                        ArtworkLocaleListHollow obj = api.getArtworkLocaleListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
     public Iterable<MasterScheduleHollow> findMasterScheduleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
@@ -3864,6 +3802,68 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
 
                     public ArtworkAttributesHollow next() {
                         ArtworkAttributesHollow obj = api.getArtworkAttributesHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<ArtworkLocaleHollow> findArtworkLocaleMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<ArtworkLocaleHollow>() {
+            public Iterator<ArtworkLocaleHollow> iterator() {
+                return new Iterator<ArtworkLocaleHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public ArtworkLocaleHollow next() {
+                        ArtworkLocaleHollow obj = api.getArtworkLocaleHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<ArtworkLocaleListHollow> findArtworkLocaleListMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<ArtworkLocaleListHollow>() {
+            public Iterator<ArtworkLocaleListHollow> iterator() {
+                return new Iterator<ArtworkLocaleListHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public ArtworkLocaleListHollow next() {
+                        ArtworkLocaleListHollow obj = api.getArtworkLocaleListHollow(next);
                         next = iter.next();
                         return obj;
                     }
