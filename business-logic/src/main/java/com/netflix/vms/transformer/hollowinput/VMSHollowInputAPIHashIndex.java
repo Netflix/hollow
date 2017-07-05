@@ -4403,6 +4403,99 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
+    public Iterable<TimecodedMomentAnnotationHollow> findTimecodedMomentAnnotationMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<TimecodedMomentAnnotationHollow>() {
+            public Iterator<TimecodedMomentAnnotationHollow> iterator() {
+                return new Iterator<TimecodedMomentAnnotationHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public TimecodedMomentAnnotationHollow next() {
+                        TimecodedMomentAnnotationHollow obj = api.getTimecodedMomentAnnotationHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<TimecodeAnnotationsListHollow> findTimecodeAnnotationsListMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<TimecodeAnnotationsListHollow>() {
+            public Iterator<TimecodeAnnotationsListHollow> iterator() {
+                return new Iterator<TimecodeAnnotationsListHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public TimecodeAnnotationsListHollow next() {
+                        TimecodeAnnotationsListHollow obj = api.getTimecodeAnnotationsListHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<TimecodeAnnotationHollow> findTimecodeAnnotationMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<TimecodeAnnotationHollow>() {
+            public Iterator<TimecodeAnnotationHollow> iterator() {
+                return new Iterator<TimecodeAnnotationHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public TimecodeAnnotationHollow next() {
+                        TimecodeAnnotationHollow obj = api.getTimecodeAnnotationHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
     public Iterable<TopNAttributeHollow> findTopNAttributeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
