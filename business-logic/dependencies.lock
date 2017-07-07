@@ -177,7 +177,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -185,7 +185,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -1103,7 +1103,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -1111,7 +1111,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -2029,7 +2029,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2037,7 +2037,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -2955,7 +2955,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2963,7 +2963,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -4010,7 +4010,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4018,7 +4018,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -4938,7 +4938,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -4946,7 +4946,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -5894,7 +5894,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5902,7 +5902,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -6850,7 +6850,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -6858,7 +6858,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
@@ -7806,7 +7806,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -7814,7 +7814,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.1.13",
+            "locked": "2.2.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2"
