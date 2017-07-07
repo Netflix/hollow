@@ -2025,7 +2025,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -2524,7 +2524,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -5211,7 +5211,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -5710,7 +5710,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -8397,7 +8397,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -8896,7 +8896,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -11583,7 +11583,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -12082,7 +12082,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -14898,7 +14898,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -15397,7 +15397,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -18085,7 +18085,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -18584,7 +18584,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -21276,7 +21276,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -21775,7 +21775,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -24467,7 +24467,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -24966,7 +24966,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -27658,7 +27658,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.35",
+            "locked": "4.36",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -28157,7 +28157,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.31",
+            "locked": "100.0.32",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
