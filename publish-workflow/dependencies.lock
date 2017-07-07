@@ -2189,7 +2189,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5651,7 +5651,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9113,7 +9113,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12575,7 +12575,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16172,7 +16172,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19634,7 +19634,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23100,7 +23100,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26566,7 +26566,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30032,7 +30032,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]

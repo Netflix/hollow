@@ -2025,7 +2025,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -5211,7 +5211,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -8397,7 +8397,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -11583,7 +11583,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -14898,7 +14898,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -18085,7 +18085,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -21276,7 +21276,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -24467,7 +24467,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -27658,7 +27658,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.34",
+            "locked": "4.35",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
