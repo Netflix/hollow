@@ -374,8 +374,8 @@ public class CountrySpecificDataModule {
             // Only offsets from images associated to current video should count for earliest offset.
             // In some cases (topNodes) image windows from child video are rolled up. In that case,
             // source video will be child video which should be ignored.
-            if (info.sourceVideoId != intVideoId)
-                continue;
+            //if (info.sourceVideoId != intVideoId)
+            //    continue;
 
             // If phase has offset and availability date is null, cannot calculate a date.
             // So needs to be ignored.
