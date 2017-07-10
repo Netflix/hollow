@@ -2189,7 +2189,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2256,21 +2256,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -2784,7 +2784,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -2794,7 +2794,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -5651,7 +5651,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5718,21 +5718,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -6246,7 +6246,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -6256,7 +6256,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9113,7 +9113,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9180,21 +9180,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -9708,7 +9708,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -9718,7 +9718,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12575,7 +12575,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12642,21 +12642,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -13170,7 +13170,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -13180,7 +13180,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16172,7 +16172,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16239,21 +16239,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -16767,7 +16767,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -16777,7 +16777,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19634,7 +19634,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19701,21 +19701,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -20230,7 +20230,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -20240,7 +20240,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -23100,7 +23100,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23167,21 +23167,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -23696,7 +23696,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -23706,7 +23706,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -26566,7 +26566,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26633,21 +26633,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -27162,7 +27162,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -27172,7 +27172,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -30032,7 +30032,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.36",
+            "locked": "4.37",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30099,21 +30099,21 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.202",
+            "locked": "1.203",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
@@ -30628,7 +30628,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.32",
+            "locked": "100.0.36",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -30638,7 +30638,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.19",
+            "locked": "60.21",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
