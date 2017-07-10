@@ -297,7 +297,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -306,7 +307,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -881,7 +884,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -1137,6 +1141,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -1426,6 +1436,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -1701,6 +1717,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -2172,7 +2189,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2248,13 +2265,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -2350,7 +2369,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -2359,7 +2379,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -2463,7 +2484,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -2759,6 +2781,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -3177,6 +3205,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -3310,6 +3344,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -3362,6 +3397,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -3723,7 +3759,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -3732,7 +3769,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -4307,7 +4346,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -4563,6 +4603,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -4852,6 +4898,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -5127,6 +5179,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -5598,7 +5651,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5674,13 +5727,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -5776,7 +5831,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -5785,7 +5841,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -5889,7 +5946,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -6185,6 +6243,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -6603,6 +6667,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -6736,6 +6806,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -6788,6 +6859,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -7149,7 +7221,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -7158,7 +7231,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -7733,7 +7808,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -7989,6 +8065,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -8278,6 +8360,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -8553,6 +8641,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -9024,7 +9113,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9100,13 +9189,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -9202,7 +9293,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -9211,7 +9303,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -9315,7 +9408,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -9611,6 +9705,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -10029,6 +10129,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -10162,6 +10268,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -10214,6 +10321,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -10575,7 +10683,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -10584,7 +10693,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -11159,7 +11270,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -11415,6 +11527,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -11704,6 +11822,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -11979,6 +12103,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -12450,7 +12575,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12526,13 +12651,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -12628,7 +12755,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -12637,7 +12765,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -12741,7 +12870,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -13037,6 +13167,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -13455,6 +13591,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -13588,6 +13730,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -13640,6 +13783,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -14136,7 +14280,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -14145,7 +14290,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -14720,7 +14867,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -14976,6 +15124,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -15265,6 +15419,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -15540,6 +15700,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -16011,7 +16172,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16087,13 +16248,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -16189,7 +16352,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -16198,7 +16362,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -16302,7 +16467,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -16598,6 +16764,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -17016,6 +17188,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -17149,6 +17327,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -17201,6 +17380,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -17562,7 +17742,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -17571,7 +17752,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -18146,7 +18329,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -18402,6 +18586,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -18691,6 +18881,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -18966,6 +19162,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -19437,7 +19634,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19513,13 +19710,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -19615,7 +19814,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -19624,7 +19824,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -19729,7 +19930,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -20025,6 +20227,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -20446,6 +20654,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -20579,6 +20793,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -20631,6 +20846,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -20992,7 +21208,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -21001,7 +21218,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -21576,7 +21795,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -21832,6 +22052,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -22121,6 +22347,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -22396,6 +22628,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -22867,7 +23100,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -22943,13 +23176,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -23045,7 +23280,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -23054,7 +23290,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -23159,7 +23396,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -23455,6 +23693,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -23876,6 +24120,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -24009,6 +24259,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -24061,6 +24312,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -24422,7 +24674,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -24431,7 +24684,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -25006,7 +25261,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -25262,6 +25518,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -25551,6 +25813,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -25826,6 +26094,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -26297,7 +26566,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26373,13 +26642,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -26475,7 +26746,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -26484,7 +26756,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -26589,7 +26862,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -26885,6 +27159,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -27306,6 +27586,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -27439,6 +27725,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -27491,6 +27778,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
@@ -27852,7 +28140,8 @@
                 "netflix:simone-client",
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
-                "netflix:streaming-utilities-testing"
+                "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -27861,7 +28150,9 @@
                 "com.google.code.findbugs:annotations",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
-                "netflix:streaming-ruuls"
+                "com.netflix.photon:Photon",
+                "netflix:streaming-ruuls",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.gson:gson": {
@@ -28436,7 +28727,8 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
-                "netflix:nf-archaius2"
+                "netflix:nf-archaius2",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.governator:governator-test": {
@@ -28692,6 +28984,12 @@
             "locked": "0.1.1",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+            ]
+        },
+        "com.netflix.photon:Photon": {
+            "locked": "3.0.1",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.netflix.pytheas:pytheas-api": {
@@ -28981,6 +29279,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "com.sandflow:regxmllib": {
+            "locked": "1.0.0",
+            "transitive": [
+                "com.netflix.photon:Photon"
+            ]
+        },
         "com.spatial4j:spatial4j": {
             "locked": "0.5",
             "transitive": [
@@ -29256,6 +29560,7 @@
                 "netflix:streaming-legacy",
                 "netflix:streaming-server",
                 "netflix:streaming-utilities-testing",
+                "netflix:videoresolutiontypelibrary",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
             ]
@@ -29727,7 +30032,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.31",
+            "locked": "4.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -29803,13 +30108,15 @@
         "netflix:gutenberg-consumer-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:gutenberg-publishing-library": {
             "locked": "1.202",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:hermes": {
@@ -29905,7 +30212,8 @@
             "locked": "1.31",
             "transitive": [
                 "netflix:cryptexclient-standalone",
-                "netflix:nf-archaius2-platform-bridge"
+                "netflix:nf-archaius2-platform-bridge",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
@@ -29914,7 +30222,8 @@
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
-                "netflix:platform-management"
+                "netflix:platform-management",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-build": {
@@ -30019,7 +30328,8 @@
         "netflix:nfzookeeper": {
             "locked": "1.53.0",
             "transitive": [
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nimble-int-java": {
@@ -30315,6 +30625,12 @@
             "locked": "1.12.0",
             "transitive": [
                 "netflix:nflibrary-junit-util"
+            ]
+        },
+        "netflix:videoresolutiontypelibrary": {
+            "locked": "100.0.32",
+            "transitive": [
+                "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-hollow-generated-notemplate": {
@@ -30736,6 +31052,12 @@
                 "org.elasticsearch:elasticsearch"
             ]
         },
+        "org.hibernate.javax.persistence:hibernate-jpa-2.1-api": {
+            "locked": "1.0.0.Final",
+            "transitive": [
+                "netflix:videoresolutiontypelibrary"
+            ]
+        },
         "org.hibernate:hibernate-validator": {
             "locked": "4.3.0.Final",
             "transitive": [
@@ -30869,6 +31191,7 @@
                 "com.netflix.netflix-commons:netflix-eventbus-bridge",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.netflix-commons:netflix-statistics",
+                "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
@@ -30921,6 +31244,7 @@
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
                 "com.netflix.dyno:dyno-jedis",
+                "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
                 "netflix:base-server-plugins",
                 "netflix:platform-core"
