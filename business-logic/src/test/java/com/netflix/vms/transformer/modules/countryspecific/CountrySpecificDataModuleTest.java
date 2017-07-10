@@ -106,12 +106,11 @@ public class CountrySpecificDataModuleTest {
                 availabilityDate);
         Assert.assertEquals((Long)(availabilityDate+Minus90DaysInMilliS), earliestSchedulePhaseOffset);
 
-        // Windows with other source video are ignored. So -90 days is earliest window but with different source video id. This will be ignored
-        // -60 days window will be returned instead.
+        // Windows with other source video are no longer ignored. So -90 days is earliest window.
         images = videoImagesByVideoMap.get(videoWithEarliestWindowFromAnotherSourceVideo);
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithEarliestWindowFromAnotherSourceVideo,
                 images, availabilityDate);
-        Assert.assertEquals((Long)(availabilityDate+Minus60DaysInMilliS), earliestSchedulePhaseOffset);
+        Assert.assertEquals((Long)(availabilityDate+Minus90DaysInMilliS), earliestSchedulePhaseOffset);
     }
     
     @Test
