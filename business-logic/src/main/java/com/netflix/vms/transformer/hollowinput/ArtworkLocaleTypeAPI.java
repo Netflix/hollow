@@ -12,7 +12,8 @@ public class ArtworkLocaleTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "territoryCodes",
             "bcp47Code",
-            "effectiveDate"
+            "effectiveDate",
+            "attributes"
         });
         this.delegateLookupImpl = new ArtworkLocaleDelegateLookupImpl(this);
     }
@@ -45,6 +46,16 @@ public class ArtworkLocaleTypeAPI extends HollowObjectTypeAPI {
 
     public DateTypeAPI getEffectiveDateTypeAPI() {
         return getAPI().getDateTypeAPI();
+    }
+
+    public int getAttributesOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("ArtworkLocale", ordinal, "attributes");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public ArtworkAttributesTypeAPI getAttributesTypeAPI() {
+        return getAPI().getArtworkAttributesTypeAPI();
     }
 
     public ArtworkLocaleDelegateLookupImpl getDelegateLookupImpl() {

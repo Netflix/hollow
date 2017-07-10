@@ -37,7 +37,7 @@ public class PlaybackMonkeyTester {
 
     private static final String PBM_REST_CLIENT_NAME = "vms-pbm-client";
     
-	private static final FastProperty.BooleanProperty passDownloadFlag = new FastProperty.BooleanProperty("playback.monkey.passDownloadFlag", false);
+	private static final FastProperty.BooleanProperty passDownloadFlag = new FastProperty.BooleanProperty("playback.monkey.passDownloadFlag", true);
 
     private final RestClient pbmRestClient;
 

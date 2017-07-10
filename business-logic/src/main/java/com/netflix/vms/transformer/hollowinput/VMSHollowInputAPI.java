@@ -118,8 +118,6 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final ListOfStringTypeAPI listOfStringTypeAPI;
     private final LocaleTerritoryCodeTypeAPI localeTerritoryCodeTypeAPI;
     private final LocaleTerritoryCodeListTypeAPI localeTerritoryCodeListTypeAPI;
-    private final ArtworkLocaleTypeAPI artworkLocaleTypeAPI;
-    private final ArtworkLocaleListTypeAPI artworkLocaleListTypeAPI;
     private final MasterScheduleTypeAPI masterScheduleTypeAPI;
     private final MultiValuePassthroughMapTypeAPI multiValuePassthroughMapTypeAPI;
     private final OriginServerTypeAPI originServerTypeAPI;
@@ -153,6 +151,8 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final SingleValuePassthroughMapTypeAPI singleValuePassthroughMapTypeAPI;
     private final PassthroughDataTypeAPI passthroughDataTypeAPI;
     private final ArtworkAttributesTypeAPI artworkAttributesTypeAPI;
+    private final ArtworkLocaleTypeAPI artworkLocaleTypeAPI;
+    private final ArtworkLocaleListTypeAPI artworkLocaleListTypeAPI;
     private final CharacterArtworkSourceTypeAPI characterArtworkSourceTypeAPI;
     private final IndividualSupplementalTypeAPI individualSupplementalTypeAPI;
     private final PersonArtworkSourceTypeAPI personArtworkSourceTypeAPI;
@@ -337,8 +337,6 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final HollowObjectProvider listOfStringProvider;
     private final HollowObjectProvider localeTerritoryCodeProvider;
     private final HollowObjectProvider localeTerritoryCodeListProvider;
-    private final HollowObjectProvider artworkLocaleProvider;
-    private final HollowObjectProvider artworkLocaleListProvider;
     private final HollowObjectProvider masterScheduleProvider;
     private final HollowObjectProvider multiValuePassthroughMapProvider;
     private final HollowObjectProvider originServerProvider;
@@ -372,6 +370,8 @@ public class VMSHollowInputAPI extends HollowAPI {
     private final HollowObjectProvider singleValuePassthroughMapProvider;
     private final HollowObjectProvider passthroughDataProvider;
     private final HollowObjectProvider artworkAttributesProvider;
+    private final HollowObjectProvider artworkLocaleProvider;
+    private final HollowObjectProvider artworkLocaleListProvider;
     private final HollowObjectProvider characterArtworkSourceProvider;
     private final HollowObjectProvider individualSupplementalProvider;
     private final HollowObjectProvider personArtworkSourceProvider;
@@ -484,7 +484,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;
 
-        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","Date","DerivativeTag","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","ListOfDerivativeTag","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonCharacter","CharacterList","MovieCharacterPerson","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsAssetSetId","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamBoxInfoKey","StreamBoxInfo","SetOfStreamBoxInfo","DashStreamHeaderData","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","AbsoluteSchedule","ArtWorkImageType","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DamMerchStillsMoment","DamMerchStills","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","IPLArtworkDerivative","IPLDerivativeSet","IPLDerivativeGroup","IPLDerivativeGroupSet","IPLArtworkDerivativeSet","ImageStreamInfo","ListOfContract","Contracts","ListOfPackageTags","DeployablePackages","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","ArtworkLocale","ArtworkLocaleList","MasterSchedule","MultiValuePassthroughMap","OriginServer","OverrideSchedule","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","PhaseTag","PhaseTagList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsAsset","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfRightsAsset","RightsAssets","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","CharacterArtworkSource","IndividualSupplemental","PersonArtworkSource","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesSet","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","PersonCharacterResource","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtworkSource","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamCropParams","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorSet","VideoType");
+        objectCreationSampler = new HollowObjectCreationSampler("CharacterQuote","CharacterQuoteList","ChunkDurationsString","CodecPrivateDataString","Date","DerivativeTag","DownloadableId","DownloadableIdList","DrmInfoString","Episode","EpisodeList","ExplicitDate","ISOCountry","ISOCountryList","ISOCountrySet","ListOfDerivativeTag","MapKey","MapOfFlagsFirstDisplayDates","Flags","PersonCharacter","CharacterList","MovieCharacterPerson","PersonVideoAliasId","PersonVideoAliasIdsList","PersonVideoRole","PersonVideoRolesList","PersonVideo","RightsAssetSetId","RightsContractPackage","ListOfRightsContractPackage","RightsWindowContract","ListOfRightsWindowContract","RightsWindow","ListOfRightsWindow","RolloutPhaseWindow","RolloutPhaseWindowMap","Season","SeasonList","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","ShowSeasonEpisode","StreamAssetMetadata","StreamBoxInfoKey","StreamBoxInfo","SetOfStreamBoxInfo","DashStreamHeaderData","StreamDimensions","StreamFileIdentification","StreamProfileId","StreamProfileIdList","String","AbsoluteSchedule","ArtWorkImageType","ArtworkRecipe","AudioStreamInfo","CSMReview","CacheDeploymentIntent","Cdn","CdnDeployment","CdnDeploymentSet","CertificationSystemRating","CertificationSystemRatingList","CertificationSystem","CharacterElements","Character","DamMerchStillsMoment","DamMerchStills","DisallowedSubtitleLangCode","DisallowedSubtitleLangCodesList","DisallowedAssetBundle","DisallowedAssetBundlesList","Contract","DrmHeaderInfo","DrmHeaderInfoList","DrmSystemIdentifiers","IPLArtworkDerivative","IPLDerivativeSet","IPLDerivativeGroup","IPLDerivativeGroupSet","IPLArtworkDerivativeSet","ImageStreamInfo","ListOfContract","Contracts","ListOfPackageTags","DeployablePackages","ListOfString","LocaleTerritoryCode","LocaleTerritoryCodeList","MasterSchedule","MultiValuePassthroughMap","OriginServer","OverrideSchedule","PackageDrmInfo","PackageDrmInfoList","PackageMoment","PackageMomentList","PhaseTag","PhaseTagList","ProtectionTypes","ReleaseDate","ListOfReleaseDates","RightsAsset","RightsContractAsset","ListOfRightsContractAsset","RightsContract","ListOfRightsContract","Rights","RolloutPhaseArtworkSourceFileId","RolloutPhaseArtworkSourceFileIdList","RolloutPhaseArtwork","RolloutPhaseLocalizedMetadata","RolloutPhaseElements","RolloutPhase","RolloutPhaseList","Rollout","SetOfRightsAsset","RightsAssets","SetOfString","SingleValuePassthroughMap","PassthroughData","ArtworkAttributes","ArtworkLocale","ArtworkLocaleList","CharacterArtworkSource","IndividualSupplemental","PersonArtworkSource","Status","StorageGroups","StreamAssetType","StreamDeploymentInfo","StreamDeploymentLabel","StreamDeploymentLabelSet","StreamDeployment","StreamDrmInfo","StreamProfileGroups","StreamProfiles","SupplementalsList","Supplementals","TerritoryCountries","TextStreamInfo","TopNAttribute","TopNAttributesSet","TopN","TranslatedTextValue","MapOfTranslatedText","AltGenresAlternateNames","AltGenresAlternateNamesList","LocalizedCharacter","LocalizedMetadata","StoriesSynopsesHook","StoriesSynopsesHookList","TranslatedText","AltGenres","AssetMetaDatas","Awards","Categories","CategoryGroups","Certifications","Characters","ConsolidatedCertSystemRating","ConsolidatedCertSystemRatingList","ConsolidatedCertificationSystems","Episodes","Festivals","Languages","MovieRatings","Movies","PersonAliases","PersonCharacterResource","Persons","Ratings","ShowMemberTypes","StoriesSynopses","TurboCollections","VMSAward","VideoArtworkSource","VideoAwardMapping","VideoAwardList","VideoAward","VideoDateWindow","VideoDateWindowList","VideoDate","VideoGeneralAlias","VideoGeneralAliasList","VideoGeneralEpisodeType","VideoGeneralEpisodeTypeList","VideoGeneralTitleType","VideoGeneralTitleTypeList","VideoGeneral","VideoId","ListOfVideoIds","PersonBio","VideoRatingAdvisoryId","VideoRatingAdvisoryIdList","VideoRatingAdvisories","ConsolidatedVideoCountryRating","ConsolidatedVideoCountryRatingList","ConsolidatedVideoRating","ConsolidatedVideoRatingList","ConsolidatedVideoRatings","VideoRatingRatingReasonIds","VideoRatingRatingReasonArrayOfIds","VideoRatingRatingReason","VideoRatingRating","VideoRatingArrayOfRating","VideoRating","VideoStreamCropParams","VideoStreamInfo","StreamNonImageInfo","PackageStream","PackageStreamSet","Package","VideoTypeMedia","VideoTypeMediaList","VideoTypeDescriptor","VideoTypeDescriptorSet","VideoType");
 
         typeDataAccess = dataAccess.getTypeDataAccess("CharacterQuote");
         if(typeDataAccess != null) {
@@ -2177,44 +2177,6 @@ public class VMSHollowInputAPI extends HollowAPI {
             localeTerritoryCodeListProvider = new HollowObjectFactoryProvider(typeDataAccess, localeTerritoryCodeListTypeAPI, factory);
         }
 
-        typeDataAccess = dataAccess.getTypeDataAccess("ArtworkLocale");
-        if(typeDataAccess != null) {
-            artworkLocaleTypeAPI = new ArtworkLocaleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
-        } else {
-            artworkLocaleTypeAPI = new ArtworkLocaleTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "ArtworkLocale"));
-        }
-        addTypeAPI(artworkLocaleTypeAPI);
-        factory = factoryOverrides.get("ArtworkLocale");
-        if(factory == null)
-            factory = new ArtworkLocaleHollowFactory();
-        if(cachedTypes.contains("ArtworkLocale")) {
-            HollowObjectCacheProvider previousCacheProvider = null;
-            if(previousCycleAPI != null && (previousCycleAPI.artworkLocaleProvider instanceof HollowObjectCacheProvider))
-                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.artworkLocaleProvider;
-            artworkLocaleProvider = new HollowObjectCacheProvider(typeDataAccess, artworkLocaleTypeAPI, factory, previousCacheProvider);
-        } else {
-            artworkLocaleProvider = new HollowObjectFactoryProvider(typeDataAccess, artworkLocaleTypeAPI, factory);
-        }
-
-        typeDataAccess = dataAccess.getTypeDataAccess("ArtworkLocaleList");
-        if(typeDataAccess != null) {
-            artworkLocaleListTypeAPI = new ArtworkLocaleListTypeAPI(this, (HollowListTypeDataAccess)typeDataAccess);
-        } else {
-            artworkLocaleListTypeAPI = new ArtworkLocaleListTypeAPI(this, new HollowListMissingDataAccess(dataAccess, "ArtworkLocaleList"));
-        }
-        addTypeAPI(artworkLocaleListTypeAPI);
-        factory = factoryOverrides.get("ArtworkLocaleList");
-        if(factory == null)
-            factory = new ArtworkLocaleListHollowFactory();
-        if(cachedTypes.contains("ArtworkLocaleList")) {
-            HollowObjectCacheProvider previousCacheProvider = null;
-            if(previousCycleAPI != null && (previousCycleAPI.artworkLocaleListProvider instanceof HollowObjectCacheProvider))
-                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.artworkLocaleListProvider;
-            artworkLocaleListProvider = new HollowObjectCacheProvider(typeDataAccess, artworkLocaleListTypeAPI, factory, previousCacheProvider);
-        } else {
-            artworkLocaleListProvider = new HollowObjectFactoryProvider(typeDataAccess, artworkLocaleListTypeAPI, factory);
-        }
-
         typeDataAccess = dataAccess.getTypeDataAccess("MasterSchedule");
         if(typeDataAccess != null) {
             masterScheduleTypeAPI = new MasterScheduleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
@@ -2840,6 +2802,44 @@ public class VMSHollowInputAPI extends HollowAPI {
             artworkAttributesProvider = new HollowObjectCacheProvider(typeDataAccess, artworkAttributesTypeAPI, factory, previousCacheProvider);
         } else {
             artworkAttributesProvider = new HollowObjectFactoryProvider(typeDataAccess, artworkAttributesTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ArtworkLocale");
+        if(typeDataAccess != null) {
+            artworkLocaleTypeAPI = new ArtworkLocaleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            artworkLocaleTypeAPI = new ArtworkLocaleTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "ArtworkLocale"));
+        }
+        addTypeAPI(artworkLocaleTypeAPI);
+        factory = factoryOverrides.get("ArtworkLocale");
+        if(factory == null)
+            factory = new ArtworkLocaleHollowFactory();
+        if(cachedTypes.contains("ArtworkLocale")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.artworkLocaleProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.artworkLocaleProvider;
+            artworkLocaleProvider = new HollowObjectCacheProvider(typeDataAccess, artworkLocaleTypeAPI, factory, previousCacheProvider);
+        } else {
+            artworkLocaleProvider = new HollowObjectFactoryProvider(typeDataAccess, artworkLocaleTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ArtworkLocaleList");
+        if(typeDataAccess != null) {
+            artworkLocaleListTypeAPI = new ArtworkLocaleListTypeAPI(this, (HollowListTypeDataAccess)typeDataAccess);
+        } else {
+            artworkLocaleListTypeAPI = new ArtworkLocaleListTypeAPI(this, new HollowListMissingDataAccess(dataAccess, "ArtworkLocaleList"));
+        }
+        addTypeAPI(artworkLocaleListTypeAPI);
+        factory = factoryOverrides.get("ArtworkLocaleList");
+        if(factory == null)
+            factory = new ArtworkLocaleListHollowFactory();
+        if(cachedTypes.contains("ArtworkLocaleList")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.artworkLocaleListProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.artworkLocaleListProvider;
+            artworkLocaleListProvider = new HollowObjectCacheProvider(typeDataAccess, artworkLocaleListTypeAPI, factory, previousCacheProvider);
+        } else {
+            artworkLocaleListProvider = new HollowObjectFactoryProvider(typeDataAccess, artworkLocaleListTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("CharacterArtworkSource");
@@ -4809,10 +4809,6 @@ public class VMSHollowInputAPI extends HollowAPI {
             ((HollowObjectCacheProvider)localeTerritoryCodeProvider).detach();
         if(localeTerritoryCodeListProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)localeTerritoryCodeListProvider).detach();
-        if(artworkLocaleProvider instanceof HollowObjectCacheProvider)
-            ((HollowObjectCacheProvider)artworkLocaleProvider).detach();
-        if(artworkLocaleListProvider instanceof HollowObjectCacheProvider)
-            ((HollowObjectCacheProvider)artworkLocaleListProvider).detach();
         if(masterScheduleProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)masterScheduleProvider).detach();
         if(multiValuePassthroughMapProvider instanceof HollowObjectCacheProvider)
@@ -4879,6 +4875,10 @@ public class VMSHollowInputAPI extends HollowAPI {
             ((HollowObjectCacheProvider)passthroughDataProvider).detach();
         if(artworkAttributesProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)artworkAttributesProvider).detach();
+        if(artworkLocaleProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)artworkLocaleProvider).detach();
+        if(artworkLocaleListProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)artworkLocaleListProvider).detach();
         if(characterArtworkSourceProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)characterArtworkSourceProvider).detach();
         if(individualSupplementalProvider instanceof HollowObjectCacheProvider)
@@ -5336,12 +5336,6 @@ public class VMSHollowInputAPI extends HollowAPI {
     public LocaleTerritoryCodeListTypeAPI getLocaleTerritoryCodeListTypeAPI() {
         return localeTerritoryCodeListTypeAPI;
     }
-    public ArtworkLocaleTypeAPI getArtworkLocaleTypeAPI() {
-        return artworkLocaleTypeAPI;
-    }
-    public ArtworkLocaleListTypeAPI getArtworkLocaleListTypeAPI() {
-        return artworkLocaleListTypeAPI;
-    }
     public MasterScheduleTypeAPI getMasterScheduleTypeAPI() {
         return masterScheduleTypeAPI;
     }
@@ -5440,6 +5434,12 @@ public class VMSHollowInputAPI extends HollowAPI {
     }
     public ArtworkAttributesTypeAPI getArtworkAttributesTypeAPI() {
         return artworkAttributesTypeAPI;
+    }
+    public ArtworkLocaleTypeAPI getArtworkLocaleTypeAPI() {
+        return artworkLocaleTypeAPI;
+    }
+    public ArtworkLocaleListTypeAPI getArtworkLocaleListTypeAPI() {
+        return artworkLocaleListTypeAPI;
     }
     public CharacterArtworkSourceTypeAPI getCharacterArtworkSourceTypeAPI() {
         return characterArtworkSourceTypeAPI;
@@ -6702,28 +6702,6 @@ public class VMSHollowInputAPI extends HollowAPI {
         objectCreationSampler.recordCreation(88);
         return (LocaleTerritoryCodeListHollow)localeTerritoryCodeListProvider.getHollowObject(ordinal);
     }
-    public Collection<ArtworkLocaleHollow> getAllArtworkLocaleHollow() {
-        return new AllHollowRecordCollection<ArtworkLocaleHollow>(getDataAccess().getTypeDataAccess("ArtworkLocale").getTypeState()) {
-            protected ArtworkLocaleHollow getForOrdinal(int ordinal) {
-                return getArtworkLocaleHollow(ordinal);
-            }
-        };
-    }
-    public ArtworkLocaleHollow getArtworkLocaleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(89);
-        return (ArtworkLocaleHollow)artworkLocaleProvider.getHollowObject(ordinal);
-    }
-    public Collection<ArtworkLocaleListHollow> getAllArtworkLocaleListHollow() {
-        return new AllHollowRecordCollection<ArtworkLocaleListHollow>(getDataAccess().getTypeDataAccess("ArtworkLocaleList").getTypeState()) {
-            protected ArtworkLocaleListHollow getForOrdinal(int ordinal) {
-                return getArtworkLocaleListHollow(ordinal);
-            }
-        };
-    }
-    public ArtworkLocaleListHollow getArtworkLocaleListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(90);
-        return (ArtworkLocaleListHollow)artworkLocaleListProvider.getHollowObject(ordinal);
-    }
     public Collection<MasterScheduleHollow> getAllMasterScheduleHollow() {
         return new AllHollowRecordCollection<MasterScheduleHollow>(getDataAccess().getTypeDataAccess("MasterSchedule").getTypeState()) {
             protected MasterScheduleHollow getForOrdinal(int ordinal) {
@@ -6732,7 +6710,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MasterScheduleHollow getMasterScheduleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(91);
+        objectCreationSampler.recordCreation(89);
         return (MasterScheduleHollow)masterScheduleProvider.getHollowObject(ordinal);
     }
     public Collection<MultiValuePassthroughMapHollow> getAllMultiValuePassthroughMapHollow() {
@@ -6743,7 +6721,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public MultiValuePassthroughMapHollow getMultiValuePassthroughMapHollow(int ordinal) {
-        objectCreationSampler.recordCreation(92);
+        objectCreationSampler.recordCreation(90);
         return (MultiValuePassthroughMapHollow)multiValuePassthroughMapProvider.getHollowObject(ordinal);
     }
     public Collection<OriginServerHollow> getAllOriginServerHollow() {
@@ -6754,7 +6732,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public OriginServerHollow getOriginServerHollow(int ordinal) {
-        objectCreationSampler.recordCreation(93);
+        objectCreationSampler.recordCreation(91);
         return (OriginServerHollow)originServerProvider.getHollowObject(ordinal);
     }
     public Collection<OverrideScheduleHollow> getAllOverrideScheduleHollow() {
@@ -6765,7 +6743,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public OverrideScheduleHollow getOverrideScheduleHollow(int ordinal) {
-        objectCreationSampler.recordCreation(94);
+        objectCreationSampler.recordCreation(92);
         return (OverrideScheduleHollow)overrideScheduleProvider.getHollowObject(ordinal);
     }
     public Collection<PackageDrmInfoHollow> getAllPackageDrmInfoHollow() {
@@ -6776,7 +6754,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageDrmInfoHollow getPackageDrmInfoHollow(int ordinal) {
-        objectCreationSampler.recordCreation(95);
+        objectCreationSampler.recordCreation(93);
         return (PackageDrmInfoHollow)packageDrmInfoProvider.getHollowObject(ordinal);
     }
     public Collection<PackageDrmInfoListHollow> getAllPackageDrmInfoListHollow() {
@@ -6787,7 +6765,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageDrmInfoListHollow getPackageDrmInfoListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(96);
+        objectCreationSampler.recordCreation(94);
         return (PackageDrmInfoListHollow)packageDrmInfoListProvider.getHollowObject(ordinal);
     }
     public Collection<PackageMomentHollow> getAllPackageMomentHollow() {
@@ -6798,7 +6776,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageMomentHollow getPackageMomentHollow(int ordinal) {
-        objectCreationSampler.recordCreation(97);
+        objectCreationSampler.recordCreation(95);
         return (PackageMomentHollow)packageMomentProvider.getHollowObject(ordinal);
     }
     public Collection<PackageMomentListHollow> getAllPackageMomentListHollow() {
@@ -6809,7 +6787,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PackageMomentListHollow getPackageMomentListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(98);
+        objectCreationSampler.recordCreation(96);
         return (PackageMomentListHollow)packageMomentListProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseTagHollow> getAllPhaseTagHollow() {
@@ -6820,7 +6798,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PhaseTagHollow getPhaseTagHollow(int ordinal) {
-        objectCreationSampler.recordCreation(99);
+        objectCreationSampler.recordCreation(97);
         return (PhaseTagHollow)phaseTagProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseTagListHollow> getAllPhaseTagListHollow() {
@@ -6831,7 +6809,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PhaseTagListHollow getPhaseTagListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(100);
+        objectCreationSampler.recordCreation(98);
         return (PhaseTagListHollow)phaseTagListProvider.getHollowObject(ordinal);
     }
     public Collection<ProtectionTypesHollow> getAllProtectionTypesHollow() {
@@ -6842,7 +6820,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ProtectionTypesHollow getProtectionTypesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(101);
+        objectCreationSampler.recordCreation(99);
         return (ProtectionTypesHollow)protectionTypesProvider.getHollowObject(ordinal);
     }
     public Collection<ReleaseDateHollow> getAllReleaseDateHollow() {
@@ -6853,7 +6831,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ReleaseDateHollow getReleaseDateHollow(int ordinal) {
-        objectCreationSampler.recordCreation(102);
+        objectCreationSampler.recordCreation(100);
         return (ReleaseDateHollow)releaseDateProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfReleaseDatesHollow> getAllListOfReleaseDatesHollow() {
@@ -6864,7 +6842,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfReleaseDatesHollow getListOfReleaseDatesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(103);
+        objectCreationSampler.recordCreation(101);
         return (ListOfReleaseDatesHollow)listOfReleaseDatesProvider.getHollowObject(ordinal);
     }
     public Collection<RightsAssetHollow> getAllRightsAssetHollow() {
@@ -6875,7 +6853,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsAssetHollow getRightsAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(104);
+        objectCreationSampler.recordCreation(102);
         return (RightsAssetHollow)rightsAssetProvider.getHollowObject(ordinal);
     }
     public Collection<RightsContractAssetHollow> getAllRightsContractAssetHollow() {
@@ -6886,7 +6864,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsContractAssetHollow getRightsContractAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(105);
+        objectCreationSampler.recordCreation(103);
         return (RightsContractAssetHollow)rightsContractAssetProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsContractAssetHollow> getAllListOfRightsContractAssetHollow() {
@@ -6897,7 +6875,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsContractAssetHollow getListOfRightsContractAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(106);
+        objectCreationSampler.recordCreation(104);
         return (ListOfRightsContractAssetHollow)listOfRightsContractAssetProvider.getHollowObject(ordinal);
     }
     public Collection<RightsContractHollow> getAllRightsContractHollow() {
@@ -6908,7 +6886,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsContractHollow getRightsContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(107);
+        objectCreationSampler.recordCreation(105);
         return (RightsContractHollow)rightsContractProvider.getHollowObject(ordinal);
     }
     public Collection<ListOfRightsContractHollow> getAllListOfRightsContractHollow() {
@@ -6919,7 +6897,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ListOfRightsContractHollow getListOfRightsContractHollow(int ordinal) {
-        objectCreationSampler.recordCreation(108);
+        objectCreationSampler.recordCreation(106);
         return (ListOfRightsContractHollow)listOfRightsContractProvider.getHollowObject(ordinal);
     }
     public Collection<RightsHollow> getAllRightsHollow() {
@@ -6930,7 +6908,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsHollow getRightsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(109);
+        objectCreationSampler.recordCreation(107);
         return (RightsHollow)rightsProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkSourceFileIdHollow> getAllRolloutPhaseArtworkSourceFileIdHollow() {
@@ -6941,7 +6919,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkSourceFileIdHollow getRolloutPhaseArtworkSourceFileIdHollow(int ordinal) {
-        objectCreationSampler.recordCreation(110);
+        objectCreationSampler.recordCreation(108);
         return (RolloutPhaseArtworkSourceFileIdHollow)rolloutPhaseArtworkSourceFileIdProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkSourceFileIdListHollow> getAllRolloutPhaseArtworkSourceFileIdListHollow() {
@@ -6952,7 +6930,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkSourceFileIdListHollow getRolloutPhaseArtworkSourceFileIdListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(111);
+        objectCreationSampler.recordCreation(109);
         return (RolloutPhaseArtworkSourceFileIdListHollow)rolloutPhaseArtworkSourceFileIdListProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseArtworkHollow> getAllRolloutPhaseArtworkHollow() {
@@ -6963,7 +6941,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseArtworkHollow getRolloutPhaseArtworkHollow(int ordinal) {
-        objectCreationSampler.recordCreation(112);
+        objectCreationSampler.recordCreation(110);
         return (RolloutPhaseArtworkHollow)rolloutPhaseArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseLocalizedMetadataHollow> getAllRolloutPhaseLocalizedMetadataHollow() {
@@ -6974,7 +6952,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseLocalizedMetadataHollow getRolloutPhaseLocalizedMetadataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(113);
+        objectCreationSampler.recordCreation(111);
         return (RolloutPhaseLocalizedMetadataHollow)rolloutPhaseLocalizedMetadataProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseElementsHollow> getAllRolloutPhaseElementsHollow() {
@@ -6985,7 +6963,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseElementsHollow getRolloutPhaseElementsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(114);
+        objectCreationSampler.recordCreation(112);
         return (RolloutPhaseElementsHollow)rolloutPhaseElementsProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseHollow> getAllRolloutPhaseHollow() {
@@ -6996,7 +6974,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseHollow getRolloutPhaseHollow(int ordinal) {
-        objectCreationSampler.recordCreation(115);
+        objectCreationSampler.recordCreation(113);
         return (RolloutPhaseHollow)rolloutPhaseProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhaseListHollow> getAllRolloutPhaseListHollow() {
@@ -7007,7 +6985,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutPhaseListHollow getRolloutPhaseListHollow(int ordinal) {
-        objectCreationSampler.recordCreation(116);
+        objectCreationSampler.recordCreation(114);
         return (RolloutPhaseListHollow)rolloutPhaseListProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutHollow> getAllRolloutHollow() {
@@ -7018,7 +6996,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RolloutHollow getRolloutHollow(int ordinal) {
-        objectCreationSampler.recordCreation(117);
+        objectCreationSampler.recordCreation(115);
         return (RolloutHollow)rolloutProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfRightsAssetHollow> getAllSetOfRightsAssetHollow() {
@@ -7029,7 +7007,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SetOfRightsAssetHollow getSetOfRightsAssetHollow(int ordinal) {
-        objectCreationSampler.recordCreation(118);
+        objectCreationSampler.recordCreation(116);
         return (SetOfRightsAssetHollow)setOfRightsAssetProvider.getHollowObject(ordinal);
     }
     public Collection<RightsAssetsHollow> getAllRightsAssetsHollow() {
@@ -7040,7 +7018,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public RightsAssetsHollow getRightsAssetsHollow(int ordinal) {
-        objectCreationSampler.recordCreation(119);
+        objectCreationSampler.recordCreation(117);
         return (RightsAssetsHollow)rightsAssetsProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfStringHollow> getAllSetOfStringHollow() {
@@ -7051,7 +7029,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SetOfStringHollow getSetOfStringHollow(int ordinal) {
-        objectCreationSampler.recordCreation(120);
+        objectCreationSampler.recordCreation(118);
         return (SetOfStringHollow)setOfStringProvider.getHollowObject(ordinal);
     }
     public Collection<SingleValuePassthroughMapHollow> getAllSingleValuePassthroughMapHollow() {
@@ -7062,7 +7040,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public SingleValuePassthroughMapHollow getSingleValuePassthroughMapHollow(int ordinal) {
-        objectCreationSampler.recordCreation(121);
+        objectCreationSampler.recordCreation(119);
         return (SingleValuePassthroughMapHollow)singleValuePassthroughMapProvider.getHollowObject(ordinal);
     }
     public Collection<PassthroughDataHollow> getAllPassthroughDataHollow() {
@@ -7073,7 +7051,7 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public PassthroughDataHollow getPassthroughDataHollow(int ordinal) {
-        objectCreationSampler.recordCreation(122);
+        objectCreationSampler.recordCreation(120);
         return (PassthroughDataHollow)passthroughDataProvider.getHollowObject(ordinal);
     }
     public Collection<ArtworkAttributesHollow> getAllArtworkAttributesHollow() {
@@ -7084,8 +7062,30 @@ public class VMSHollowInputAPI extends HollowAPI {
         };
     }
     public ArtworkAttributesHollow getArtworkAttributesHollow(int ordinal) {
-        objectCreationSampler.recordCreation(123);
+        objectCreationSampler.recordCreation(121);
         return (ArtworkAttributesHollow)artworkAttributesProvider.getHollowObject(ordinal);
+    }
+    public Collection<ArtworkLocaleHollow> getAllArtworkLocaleHollow() {
+        return new AllHollowRecordCollection<ArtworkLocaleHollow>(getDataAccess().getTypeDataAccess("ArtworkLocale").getTypeState()) {
+            protected ArtworkLocaleHollow getForOrdinal(int ordinal) {
+                return getArtworkLocaleHollow(ordinal);
+            }
+        };
+    }
+    public ArtworkLocaleHollow getArtworkLocaleHollow(int ordinal) {
+        objectCreationSampler.recordCreation(122);
+        return (ArtworkLocaleHollow)artworkLocaleProvider.getHollowObject(ordinal);
+    }
+    public Collection<ArtworkLocaleListHollow> getAllArtworkLocaleListHollow() {
+        return new AllHollowRecordCollection<ArtworkLocaleListHollow>(getDataAccess().getTypeDataAccess("ArtworkLocaleList").getTypeState()) {
+            protected ArtworkLocaleListHollow getForOrdinal(int ordinal) {
+                return getArtworkLocaleListHollow(ordinal);
+            }
+        };
+    }
+    public ArtworkLocaleListHollow getArtworkLocaleListHollow(int ordinal) {
+        objectCreationSampler.recordCreation(123);
+        return (ArtworkLocaleListHollow)artworkLocaleListProvider.getHollowObject(ordinal);
     }
     public Collection<CharacterArtworkSourceHollow> getAllCharacterArtworkSourceHollow() {
         return new AllHollowRecordCollection<CharacterArtworkSourceHollow>(getDataAccess().getTypeDataAccess("CharacterArtworkSource").getTypeState()) {

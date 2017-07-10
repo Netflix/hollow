@@ -12,6 +12,8 @@ public interface ArtworkLocaleDelegate extends HollowObjectDelegate {
 
     public int getEffectiveDateOrdinal(int ordinal);
 
+    public int getAttributesOrdinal(int ordinal);
+
     public ArtworkLocaleTypeAPI getTypeAPI();
 
 }

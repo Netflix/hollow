@@ -22,6 +22,10 @@ public class MultiValuePassthroughMapHollow extends HollowMap<MapKeyHollow, List
         return (ListOfStringHollow) api().getListOfStringHollow(ordinal);
     }
 
+    public ListOfStringHollow get(String k0) {
+        return findValue(k0);
+    }
+
     @Override
     public boolean equalsKey(int keyOrdinal, Object testObject) {
         return GenericHollowRecordHelper.equalObject(getSchema().getKeyType(), keyOrdinal, testObject);

@@ -22,6 +22,10 @@ public class SingleValuePassthroughMapHollow extends HollowMap<MapKeyHollow, Str
         return (StringHollow) api().getStringHollow(ordinal);
     }
 
+    public StringHollow get(String k0) {
+        return findValue(k0);
+    }
+
     @Override
     public boolean equalsKey(int keyOrdinal, Object testObject) {
         return GenericHollowRecordHelper.equalObject(getSchema().getKeyType(), keyOrdinal, testObject);
