@@ -16,7 +16,7 @@ configurations {
   all*.exclude group: 'netflix', module: 'platform'
   all*.exclude group: 'netflix', module: 'platform-core'
   all*.exclude group: 'netflix', module: 'nflibrary'
-  //all*.exclude group: 'netflix', module: 'hermes'
+  all*.exclude group: 'netflix', module: 'hermes'
   all*.exclude group: 'netflix', module: 'nfastyanax'
 }
 

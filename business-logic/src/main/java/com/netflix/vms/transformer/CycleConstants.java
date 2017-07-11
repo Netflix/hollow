@@ -39,12 +39,13 @@ public class CycleConstants {
     public final Date HOLD_BACK_INDEFINITELY_DATE = null;
     public final Date EXEMPT_HOLD_BACK_DATE = new Date((new DateTime(1997, 1, 1, 0, 0, 0, 0, DateTimeZone.UTC)).getMillis());
 
+    // @TODO: VideoFormat should exclude video resolution in the future
     public final VideoFormatDescriptor VIDEOFORMAT_UNKNOWN = videoFormatDescriptor(-1, "unknown", "unknown");
-    public final VideoFormatDescriptor SD = videoFormatDescriptor(2, "SD", "Standard Definition");
-    public final VideoFormatDescriptor HD = videoFormatDescriptor(1, "HD", "HiDefinition");
-    public final VideoFormatDescriptor SUPER_HD = videoFormatDescriptor(3, "Super_HD", "Super HiDefinition");
-    public final VideoFormatDescriptor ULTRA_HD = videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition");
-    public final VideoFormatDescriptor FOUR_K = videoFormatDescriptor(5, "4K", "4K For Search");
+    @Deprecated public final VideoFormatDescriptor SD = videoFormatDescriptor(2, "SD", "Standard Definition");
+    @Deprecated public final VideoFormatDescriptor HD = videoFormatDescriptor(1, "HD", "HiDefinition");
+    @Deprecated public final VideoFormatDescriptor SUPER_HD = videoFormatDescriptor(3, "Super_HD", "Super HiDefinition");
+    @Deprecated public final VideoFormatDescriptor ULTRA_HD = videoFormatDescriptor(4, "Ultra_HD", "Ultra HiDefinition");
+    @Deprecated public final VideoFormatDescriptor FOUR_K = videoFormatDescriptor(5, "4K", "4K For Search");
     public final VideoFormatDescriptor HDR = videoFormatDescriptor(6, "HDR", "HDR For Search");
     public final VideoFormatDescriptor ATMOS = videoFormatDescriptor(7, "ATMOS", "Dolby Atmos For Search");
     @Deprecated public final int ULTRA_HD_MIN_HEIGHT = 1081;
@@ -52,40 +53,40 @@ public class CycleConstants {
     public final VideoImages EMPTY_VIDEO_IMAGES = emptyVideoImages();
     public final SortedMapOfDateWindowToListOfInteger EMPTY_DATE_WINDOW_SEASON_SEQ_MAP = new SortedMapOfDateWindowToListOfInteger(Collections.emptyMap());
     public final SortedMapOfIntegerToListOfVideoEpisode EMPTY_EPISODE_SEQUENCE_NUMBER_MAP = new SortedMapOfIntegerToListOfVideoEpisode(Collections.<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>emptyMap());
-    
+
     public final InputOrdinalResultCache<ArtworkDerivative> artworkDerivativeCache;
     public final InputOrdinalResultCache<ArtworkDerivatives> artworkDerivativesCache;
     public final InputOrdinalResultCache<Boolean> isNewEpisodeOverlayTypes;
-    
+
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
-    
+
     private final ConcurrentHashMap<String, ISOCountry> isoCountryMap = new ConcurrentHashMap<String, ISOCountry>();
-    
-    
+
+
     public CycleConstants(HollowReadStateEngine inputStateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("IPLArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
         this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }
-    
+
     public ISOCountry getISOCountry(String countryId) {
         ISOCountry country = isoCountryMap.get(countryId);
         if(country == null) {
             String uppercaseCountry = countryId.toUpperCase();
-            
+
             if(countryId.length() != 2 || uppercaseCountry.charAt(0) < 'A' || uppercaseCountry.charAt(0) > 'Z' ||
                     uppercaseCountry.charAt(1) < 'A' || uppercaseCountry.charAt(1) > 'Z')
                 throw new IllegalArgumentException("The country code \"" + countryId + "\" is invalid.");
-                
-            
+
+
             country = new ISOCountry(uppercaseCountry);
             ISOCountry existingCountry = isoCountryMap.putIfAbsent(countryId, country);
             if(existingCountry != null)
                 country = existingCountry;
         }
-        
+
         return country;
     }
 

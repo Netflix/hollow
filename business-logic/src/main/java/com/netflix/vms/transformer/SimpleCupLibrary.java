@@ -41,11 +41,6 @@ public class SimpleCupLibrary implements CupLibrary {
         public long getMaxPixelsPerFrame() {
             return Long.MAX_VALUE;
         }
-
-        @Override
-        public boolean isHigherResolutionThan(VideoResolutionType resolutionType) {
-            return this.compareTo(resolutionType) > 0;
-        }
     };
 
     public static CupLibrary INSTANCE = new SimpleCupLibrary();
