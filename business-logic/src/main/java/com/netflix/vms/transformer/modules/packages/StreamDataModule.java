@@ -285,7 +285,7 @@ public class StreamDataModule {
                 VideoFormatDescriptor selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
                 VideoFormatDescriptor selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
                 if (selectVideoFormatDescriptorOld.id != selectVideoFormatDescriptorNew.id) {
-                    ctx.getLogger().error(TransformerLogTag.UnexpectedError, "VideoFormat mismatch: new={}, old={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
+                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch, "VideoFormat mismatch: new={}, old={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
                             selectVideoFormatDescriptorNew.name,
                             selectVideoFormatDescriptorOld.name,
                             inputStream._getDownloadableId(),
