@@ -273,21 +273,26 @@ public class StreamDataModule {
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
             int peakBitrate = inputVideoStreamInfo._getVideoPeakBitrateKBPS();
 
+            VideoFormatDescriptor selectVideoFormatDescriptorNew = null;
+            VideoFormatDescriptor selectVideoFormatDescriptorOld = null;
             if (ctx.getConfig().useVideoResolutionType()) {
                 outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+                selectVideoFormatDescriptorNew = outputStream.downloadDescriptor.videoFormatDescriptor;
             } else {
                 outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+                selectVideoFormatDescriptorOld = outputStream.downloadDescriptor.videoFormatDescriptor;
             }
             outputStream.streamDataDescriptor.bitrate = bitrate;
             outputStream.streamDataDescriptor.peakBitrate = peakBitrate;
 
             { // DEBUGGING
-                VideoFormatDescriptor selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
-                VideoFormatDescriptor selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+                if (selectVideoFormatDescriptorNew == null) selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+                if (selectVideoFormatDescriptorOld == null) selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
                 if (selectVideoFormatDescriptorOld.id != selectVideoFormatDescriptorNew.id) {
-                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch, "VideoFormat mismatch: new={}, old={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
+                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch, "VideoFormat mismatch: new={}, old={}, videoId={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
                             selectVideoFormatDescriptorNew.name,
                             selectVideoFormatDescriptorOld.name,
+                            packages._getMovieId(),
                             inputStream._getDownloadableId(),
                             encodingProfileId,
                             height,
