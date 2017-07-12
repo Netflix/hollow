@@ -1,6 +1,7 @@
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -38,24 +39,18 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @param field           field to use as keys in prefix index. field must of type String.
      */
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String field) {
-        this.prefixTree = new Tst();// todo if using FixedElementArray then read the type state to find the size of max ordinal and pass that in initialization of the tst.
         this.readStateEngine = readStateEngine;
         this.type = type;
         this.field = field;
-        build();
+        this.prefixTree = build();
     }
 
     private int getFieldPosition() {
-        HollowTypeDataAccess typeDataAccess = readStateEngine.getTypeDataAccess(type);
-        HollowObjectSchema objectSchema = (HollowObjectSchema) typeDataAccess.getSchema();
-        int position = objectSchema.getPosition(field);
-        if (position < 0)
-            throw new IllegalArgumentException("Cannot find the field:" + field + " in the given type:" + type);
-        return position;
+        HollowObjectSchema objectSchema = (HollowObjectSchema) readStateEngine.getTypeState(type).getSchema();
+        return objectSchema.getPosition(field);
     }
 
-
-    private void build() {
+    private Tst build() {
         // check if the given type is a HollowObject.
         HollowSchema schema = readStateEngine.getSchema(type);
         if (!(schema instanceof HollowObjectSchema))
@@ -91,18 +86,21 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         // get the populated bit set from type read state
         BitSet ordinals = readStateForValue.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        int maxOrdinalValue = readStateForValue.maxOrdinal();
+        Tst prefixIndex = new Tst(maxOrdinalValue, ordinals.cardinality(), readStateForKey.getPopulatedOrdinals().cardinality());
 
         // iterate through the populated bitset to build the tree
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
 
             // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
-            updateIndex(ordinal, true);
+            addOrdinal(ordinal, prefixIndex);
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
+        return prefixIndex;
     }
 
-    private void updateIndex(int ordinal, boolean toAdd) {
+    private void addOrdinal(int ordinal, Tst tst) {
         // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
         String key;
         if (isKeyReferenceType) {
@@ -111,8 +109,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         } else {
             key = readStateForValue.readString(ordinal, fieldPositionInKeyObject);
         }
-        if (toAdd) prefixTree.insert(key, ordinal);
-        else prefixTree.remove(key, ordinal);
+        tst.insert(key, ordinal);
     }
 
     /**
@@ -133,13 +130,11 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     @Override
     public void addedOrdinal(int ordinal) {
         // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
-        updateIndex(ordinal, true);
     }
 
     @Override
     public void removedOrdinal(int ordinal) {
         // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
-        updateIndex(ordinal, false);
     }
 
     @Override
@@ -147,39 +142,122 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         // after delta is applied -> no action to be taken
     }
 
-    // data structure to match keys (prefix) with values. TST is very space efficient compared to a trie, with minute trade-off in cost to perform look-ups.
-    private class Tst {
+    // data structure to match keys (prefix) with ordinalSet.
+    // TST is very space efficient compared to a trie, with minute trade-off in cost to perform look-ups.
+    // TST plus FixedLengthElementArray is super duper compact.
+    private static class Tst {
 
-        // class to represent a node in the ternary search tree.
-        private class Node {
-
-            private char key;
-            private Node left, middle, right; // todo need reference to parent, if delete operation involves removing the node from the tree.
-            private Set<Integer> ordinals;// todo replace with compact FixedLengthElementArray
-
-            protected Node(char key) {
-                this.key = key;
-                this.ordinals = new HashSet<>();
-            }
-
+        enum NodeType {
+            Left, Right, Middle
         }
 
-        private Node root;  // root of the tree
-        private int size;   // size of the tree -> needed?
-        private Object lock;
+        // each node segment can be thought of as 16 bit key, bits to hold index of its children, bits to get size of ordinal set, and finally bits to point to ordinal set.
+        private int bitsPerNode;
+        private int bitsPerKey;
+        private int bitsForChildPointer;
+        private int bitsForOrdinalSetPointer;
+        private int bitsForOrdinalSetSize;
 
-        // private constructor
-        protected Tst() {
-            this.size = 0;
-            this.root = null;
-            this.lock = new Object();
-        }
+        // helper offsets
+        private int leftChildOffset;
+        private int middleChildOffset;
+        private int rightChildOffset;
+        private int ordinalSetPointerOffset;
+        private int ordinalSetSizeOffset;
+
+        // bits for ordinal sets
+        private int bitsPerOrdinal;
+        private int bitsPerOrdinalSet;
+
+        private int maxNodes;
+        private FixedLengthElementArray nodes, ordinalSet;
+        private int indexTracker;// where to create new node
 
         /**
-         * get total number of keys inserted in the tree.
+         * Create new prefix index. Represents a ternary search tree.
+         *
+         * @param maxOrdinalValue   max ordinal value for value type stored.
+         * @param cardinalityValues total cardinality of the values
+         * @param cardinalityKeys   total cardinality of the keys
          */
-        private int getSize() {
-            return size;
+        protected Tst(int maxOrdinalValue, int cardinalityValues, int cardinalityKeys) {
+
+            // if there are 100 keys to be indexed, assuming each key has 256 chars.
+            maxNodes = cardinalityKeys * 256;
+
+            // bits needed to hold a value ordinal
+            bitsPerOrdinal = 32 - Integer.numberOfLeadingZeros(maxOrdinalValue);
+            // total bits to hold all ordinals for a given key
+            bitsPerOrdinalSet = cardinalityValues * bitsPerOrdinal;
+
+            // bits for pointers in a single node:
+            bitsPerKey = 16;// key
+            bitsForChildPointer = 32 - Integer.numberOfLeadingZeros(maxNodes);// a child pointer
+            bitsForOrdinalSetPointer = 32 - Integer.numberOfLeadingZeros(maxNodes);// ordinal set pointer
+            bitsForOrdinalSetSize = 32 - Integer.numberOfLeadingZeros(bitsPerOrdinalSet);// ordinal set size pointer
+
+            // bits to represent one node
+            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + bitsForOrdinalSetSize + bitsForOrdinalSetPointer;
+
+            nodes = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, bitsPerNode * maxNodes);
+            ordinalSet = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, bitsPerOrdinalSet * maxNodes);
+            indexTracker = 0;
+
+            // initialize offsets
+            leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
+            middleChildOffset = leftChildOffset + bitsForChildPointer;
+            rightChildOffset = middleChildOffset + bitsForChildPointer;
+            ordinalSetPointerOffset = bitsPerKey + (3 * bitsForChildPointer);
+            ordinalSetSizeOffset = ordinalSetPointerOffset + bitsForOrdinalSetPointer;
+        }
+
+        private int getChildOffset(NodeType nodeType) {
+            int offset;
+            if (nodeType.equals(NodeType.Left)) offset = leftChildOffset;
+            else if (nodeType.equals(NodeType.Middle)) offset = middleChildOffset;
+            else offset = rightChildOffset;
+            return offset;
+        }
+
+        // get child index of the given node
+        private int getIndex(long currentNode, NodeType nodeType) {
+            int offset = getChildOffset(nodeType);
+            return (int) nodes.getElementValue((currentNode * bitsPerNode) + offset, bitsForChildPointer);
+        }
+
+        // create new node at the given index and given key
+        private void setDataForNewNode(int index, char ch) {
+            // set the key for new node
+            nodes.setElementValue(index * bitsPerNode, bitsPerKey, ch);
+            // set the ordinal set pointer to use the same index as node index
+            nodes.setElementValue((index * bitsPerNode) + ordinalSetPointerOffset, bitsForOrdinalSetPointer, index);
+        }
+
+        // returns the index of new child node created for the current node index
+        int createNode(long currentNode, NodeType nodeType, char ch) {
+            int indexForNode = indexTracker;
+
+            // set data for new node at above index
+            setDataForNewNode(indexForNode, ch);
+
+            // set child index in current node
+            int offset = getChildOffset(nodeType);
+            nodes.setElementValue((currentNode * bitsPerNode) + offset, bitsForChildPointer, indexForNode);
+
+            // increment tracker for next node index.
+            indexTracker++;
+            return indexForNode;
+        }
+
+        // get key for the child of given node index
+        private long getKey(int nodeIndex, NodeType type) {
+            int childIndex = getIndex(nodeIndex, type);
+            return (char) getKey(childIndex);
+        }
+
+        // get key for the given node index
+        private long getKey(int nodeIndex) {
+            return nodes.getElementValue(nodeIndex * bitsPerNode, bitsPerKey);
         }
 
         /**
@@ -188,41 +266,53 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param key
          * @param ordinal
          */
-        private synchronized void insert(String key, int ordinal) {
+        private void insert(String key, int ordinal) {
             if (key == null) throw new IllegalArgumentException("Null key cannot be indexed");
-            synchronized (lock) {
-                Node current = root;
-                for (char ch : key.toLowerCase().toCharArray()) {
-                    if (current != null) {
-                        // pick the correct child by traversing the tree and creating new nodes along with path
-                        while (current.key != ch) {
-                            Node child;
-                            if (ch < current.key) {
-                                if (current.left == null) current.left = new Node(ch);
-                                child = current.left;
-                            } else if (ch > current.key) {
-                                if (current.right == null) current.right = new Node(ch);
-                                child = current.right;
-                            } else {
-                                if (current.middle == null) current.middle = new Node(ch);
-                                child = current.middle;
-                            }
-                            current = child;
+            int currentIndex = 0;
+            for (char ch : key.toLowerCase().toCharArray()) {
+                long currentValue = getKey(currentIndex);
+                if (currentValue != 0) {
+                    // pick the correct child by traversing the tree and creating new nodes along the path
+                    while (currentValue != ch) {
+                        int childIndex;// checking child index is 0, is equivalent if checking if current.child == null in pojo world
+                        if (ch < currentValue) {
+                            int leftIndex = getIndex(currentIndex, NodeType.Left);
+                            if (leftIndex == 0) leftIndex = createNode(currentIndex, NodeType.Left, ch);
+                            childIndex = leftIndex;
+                        } else if (ch > currentValue) {
+                            int rightIndex = getIndex(currentIndex, NodeType.Right);
+                            if (rightIndex == 0) rightIndex = createNode(currentIndex, NodeType.Right, ch);
+                            childIndex = rightIndex;
+                        } else {
+                            int middleIndex = getIndex(currentIndex, NodeType.Middle);
+                            if (middleIndex == 0) middleIndex = createNode(currentIndex, NodeType.Middle, ch);
+                            childIndex = middleIndex;
                         }
-                        // add the ordinal to every prefix of the key.
-                        current.ordinals.add(ordinal);
-                    } else {
-                        // this part is entered only if root is not initialized.
-                        if (this.root == null) {
-                            this.root = new Node(ch);
-                        }
-                        current = this.root;
-                        current.ordinals.add(ordinal);
+                        currentIndex = childIndex;
+                        currentValue = getKey(currentIndex);
                     }
+                    // save ordinal
+                    addOrdinal(currentIndex, ordinal);
+
+                } else {
+                    // this part is entered only if root is not initialized.
+                    setDataForNewNode(currentIndex, ch);
+                    indexTracker++;
+                    addOrdinal(currentIndex, ordinal);
                 }
-                // increment the size once key is inserted in the tree.
-                size++;
             }
+        }
+
+        private void addOrdinal(long nodeIndex, long ordinal) {
+            // find index of ordinal set that current node points to
+            long ordinalSetIndex = nodes.getElementValue((nodeIndex * bitsPerNode) + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
+            int ordinalSetSize = (int) nodes.getElementValue((nodeIndex * bitsPerNode) + ordinalSetSizeOffset, bitsForOrdinalSetSize);
+
+            // add ordinal
+            ordinalSet.setElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (ordinalSetSize * bitsPerOrdinal), bitsPerOrdinal, ordinal);
+
+            // increment set size and re-add for the node
+            nodes.setElementValue((nodeIndex * bitsPerNode) + ordinalSetSizeOffset, bitsForOrdinalSetSize, (ordinalSetSize + 1));
         }
 
         /**
@@ -233,41 +323,31 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          */
         private Set<Integer> query(String prefix) {
             if (prefix == null) throw new IllegalArgumentException("Cannot query null prefix");
-            Node current = this.root;
             Set<Integer> ordinals = new HashSet<>();
+            int current = 0;
             for (char ch : prefix.toLowerCase().toCharArray()) {
-                while (current != null && current.key != ch) {
-                    if (ch < current.key) current = current.left;
-                    else if (ch > current.key) current = current.right;
-                    else current = current.middle;
+                long currentValue = getKey(current);
+                while (currentValue != 0 && currentValue != ch) {
+                    if (ch < currentValue) current = getIndex(current, NodeType.Left);
+                    else if (ch > currentValue) current = getIndex(current, NodeType.Right);
+                    else current = getIndex(current, NodeType.Middle);
+                    currentValue = getKey(current);// update value
                 }
             }
-            if (current != null) {
-                ordinals = current.ordinals;
+            if (getKey(current) != 0) {
+
+                long ordinalSetIndex = nodes.getElementValue(current * bitsPerNode + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
+                int ordinalSetSize = (int) nodes.getElementValue(current * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
+                if (ordinalSetSize == 0) return ordinals;
+
+                int i = 0;
+                do {
+                    int ordinal = (int) ordinalSet.getElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (i * bitsPerOrdinal), bitsPerOrdinal);
+                    ordinals.add(ordinal);
+                    i++;
+                } while (i < (ordinalSetSize - 1));
             }
             return ordinals;
-        }
-
-        /**
-         * for the given prefix, remove all the references of the ordinal in the tree.
-         *
-         * @param prefix
-         * @param ordinal
-         */
-        private synchronized void remove(String prefix, int ordinal) {
-            if (prefix == null) throw new IllegalArgumentException("Cannot remove null prefix from the tree");
-            synchronized (lock) {
-                Node current = this.root;
-                for (char ch : prefix.toLowerCase().toCharArray()) {
-                    while (current != null && current.key != ch) {
-                        if (ch < current.key) current = current.left;
-                        else if (ch > current.key) current = current.right;
-                        else current = current.middle;
-                    }
-                    if (current.key == ch)
-                        current.ordinals.remove(ordinal);//todo remove the node from the tree if the set of ordinals is empty.
-                }
-            }
         }
     }
 }

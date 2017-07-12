@@ -28,6 +28,18 @@ public class HollowPrefixIndexTest extends AbstractStateEngineTest {
         Set<Integer> ordinals = prefixIndex.query("R");
         Assert.assertEquals(ordinals.size(), 2);
 
+        ordinals = prefixIndex.query("R");
+        Assert.assertEquals(ordinals.size(), 2);
+
+        ordinals = prefixIndex.query("th");
+        Assert.assertEquals(ordinals.size(), 1);
+
+        ordinals = prefixIndex.query("the");
+        Assert.assertEquals(ordinals.size(), 1);
+
+        ordinals = prefixIndex.query("blOO");
+        Assert.assertEquals(ordinals.size(), 1);
+
     }
 
     private static class Movie {
@@ -47,6 +59,17 @@ public class HollowPrefixIndexTest extends AbstractStateEngineTest {
                     new Movie(2, "Blood Diamond", 2006),
                     new Movie(3, "Rush", 2013),
                     new Movie(4, "Rocky", 1976));
+        }
+    }
+
+    private void printResults(Set<Integer> ordinals) {
+        HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("Movie");
+        HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
+        int nameField = movieReadState.getSchema().getPosition("name");
+        int valueField = nameReadState.getSchema().getPosition("value");
+        for (int ordinal : ordinals) {
+            int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
+            System.out.println(nameReadState.readString(nameOrdinal, valueField));
         }
     }
 
