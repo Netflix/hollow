@@ -19,7 +19,6 @@ import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * Class to encapsulate data collection when iterating through streams data.
@@ -147,7 +145,7 @@ public class PackageDataCollection {
     }
 
     private void collectVideoDescriptorFormats(StreamData streamData, String profileType, int encodingProfileId) {
-        /// TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
+        // @TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
         if ("VIDEO".equals(profileType)) {
             VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
             // Only interested in HD or better
@@ -157,6 +155,7 @@ public class PackageDataCollection {
         }
         if (hdrProfileIds.contains(encodingProfileId))
             videoFormatDescriptors.add(cycleConstants.HDR);
+        // @TODO: should FOUR_K be computed from video resolution?  - Perhaps VideoFormat should just exclude video resolutions instead
         if (fourKProfileIds.contains(encodingProfileId))
             videoFormatDescriptors.add(cycleConstants.FOUR_K);
         if (atmosStreamProfileIds.contains(encodingProfileId))
