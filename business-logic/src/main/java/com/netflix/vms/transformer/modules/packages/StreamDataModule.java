@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -63,6 +64,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class StreamDataModule {
+    private final DebugLogConfig debugLogConfig = new DebugLogConfig();
 
     private final StreamDrmData EMPTY_DRM_DATA = new StreamDrmData();
     private final DownloadLocationSet EMPTY_DOWNLOAD_LOCATIONS = new DownloadLocationSet();
@@ -285,20 +287,18 @@ public class StreamDataModule {
             outputStream.streamDataDescriptor.bitrate = bitrate;
             outputStream.streamDataDescriptor.peakBitrate = peakBitrate;
 
-            { // DEBUGGING
+            if (!debugLogConfig.isExcludeEncodingProfileId(encodingProfileId)) { // DEBUGGING
                 if (selectVideoFormatDescriptorNew == null) selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
                 if (selectVideoFormatDescriptorOld == null) selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
                 if (selectVideoFormatDescriptorOld.id != selectVideoFormatDescriptorNew.id) {
-                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch, "VideoFormat mismatch: new={}, old={}, videoId={}, downloadableId={}, encodingProfileId={}, height={}, width={}, targetHeight={}, targetWidth={}",
-                            selectVideoFormatDescriptorNew.name,
-                            selectVideoFormatDescriptorOld.name,
+                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch, "videoId={}: new={}, old={}, downloadableId={}, encodingProfileId={}, height={}, width={}",
                             packages._getMovieId(),
+                            new String(selectVideoFormatDescriptorNew.name.value),
+                            new String(selectVideoFormatDescriptorOld.name.value),
                             inputStream._getDownloadableId(),
                             encodingProfileId,
                             height,
-                            width,
-                            targetHeight,
-                            targetWidth
+                            width
                             );
                 }
             }
@@ -429,4 +429,34 @@ public class StreamDataModule {
         return map;
     }
 
+    @Deprecated // should be removed once new video resolution code is enabled
+    private static class DebugLogConfig {
+        private Set<Integer> idSet = Collections.emptySet();
+        private static final FastProperty.StringProperty EXCLUDE_ENCPROF_IDS_FROM_LOG = new FastProperty.StringProperty("com.netflix.vms.server.exclude.encprof_ids.inlogs", "");
+
+        public DebugLogConfig() {
+            EXCLUDE_ENCPROF_IDS_FROM_LOG.addCallback(() -> {
+                updateIdSet();
+            });
+            updateIdSet();
+        }
+
+        private void updateIdSet() {
+            String value = EXCLUDE_ENCPROF_IDS_FROM_LOG.getValue();
+            if (value == null || value.trim().isEmpty()) {
+                idSet = Collections.emptySet();
+            } else {
+                Set<Integer> newSet = new HashSet<>();
+                for (String id : value.split(",")) {
+                    if (id.trim().isEmpty()) continue;
+                    newSet.add(Integer.parseInt(id.trim()));
+                }
+                idSet = newSet;
+            }
+        }
+
+        public boolean isExcludeEncodingProfileId(int encodingProfileId) {
+            return idSet.contains(encodingProfileId);
+        }
+    }
 }
