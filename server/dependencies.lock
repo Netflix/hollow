@@ -627,6 +627,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -658,6 +659,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -1434,7 +1436,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -4377,6 +4379,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -4408,6 +4411,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -5184,7 +5188,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -8127,6 +8131,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -8158,6 +8163,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -8934,7 +8940,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -11877,6 +11883,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -11908,6 +11915,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -12684,7 +12692,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -15700,6 +15708,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -15731,6 +15740,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -16507,7 +16517,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -20548,6 +20558,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -20579,6 +20590,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -21355,7 +21367,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -24302,6 +24314,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -24333,6 +24346,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -25109,7 +25123,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -28062,6 +28076,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -28093,6 +28108,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -28879,7 +28895,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -31924,6 +31940,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -31955,6 +31972,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -32741,7 +32759,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -35786,6 +35804,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -35817,6 +35836,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -36603,7 +36623,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -39648,6 +39668,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -39679,6 +39700,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -40465,7 +40487,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -43510,6 +43532,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -43541,6 +43564,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -44327,7 +44351,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -47372,6 +47396,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -47403,6 +47428,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -48189,7 +48215,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -51234,6 +51260,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -51265,6 +51292,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -52051,7 +52079,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -55096,6 +55124,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:nimble-int-java"
             ]
@@ -55127,6 +55156,7 @@
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
                 "com.netflix.servo:servo-atlas",
+                "com.netflix.suro:suro-core",
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client"
@@ -55913,7 +55943,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.17-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
