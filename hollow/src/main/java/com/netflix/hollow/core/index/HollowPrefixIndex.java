@@ -4,7 +4,6 @@ import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
-import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -20,96 +19,123 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     private HollowReadStateEngine readStateEngine;
 
-    HollowObjectTypeReadState readStateForValue;
-    HollowObjectTypeReadState readStateForKey;
-
-    private int fieldPositionInValueObject;
-    private int fieldPositionInKeyObject;
-    private boolean isKeyReferenceType;
-
     private String type;
-    private String field;
-    private Tst prefixTree;
+    private String fieldPath;
+    private Tst prefixIndex;
+
+    private String[] fields;
+    private int[] fieldPositions;
+    private HollowObjectSchema.FieldType[] fieldTypes;
 
     /**
-     * Constructor to create a prefix index with the given parameters.
+     * Constructor to create a prefix index for a type using the key defined in one of the fields in that type.
+     * The fieldPath could be a reference to another type and path ultimately leads to a string type fieldPath.
+     * <p>
+     * Example: class "Movie" with a fieldPath String name or class "Movie" with a reference fieldPath of type "Name" which has a string fieldPath "movieName".
+     * The former example should provide type as "Movie" and fieldPath path as "name.value".
+     * The latter example should provide type as "Movie" and fieldPath path as "name.movieName.value".
+     * Note if using HollowInline annotation appending .value to field path is not needed.
      *
      * @param readStateEngine state engine to read data from
-     * @param type            type in the read state engine from which the prefix needs to be built. Schema of the type must be HollowObjectSchema
-     * @param field           field to use as keys in prefix index. field must of type String.
+     * @param type            type in the read state engine. Ordinals for this type will be returned when queried for a prefix.
+     * @param fieldPath       fieldPath should ultimately lead to a string fieldPath, which will be the keys to build the prefix index.
      */
-    public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String field) {
+    public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
         this.readStateEngine = readStateEngine;
         this.type = type;
-        this.field = field;
-        this.prefixTree = build();
+        this.fieldPath = fieldPath;
+        initialize();
+        build();
     }
 
-    private int getFieldPosition() {
-        HollowObjectSchema objectSchema = (HollowObjectSchema) readStateEngine.getTypeState(type).getSchema();
-        return objectSchema.getPosition(field);
-    }
+    // initialize field positions and field paths.
+    private void initialize() {
+        // split the field path with "." char
+        fields = fieldPath.split("\\.");
 
-    private Tst build() {
-        // check if the given type is a HollowObject.
-        HollowSchema schema = readStateEngine.getSchema(type);
-        if (!(schema instanceof HollowObjectSchema))
-            throw new IllegalArgumentException("Prefix index can only be built for Object type schema. Given type :" + type + " is " + schema.getClass().toString());
+        // arrays to save data for field path
+        fieldPositions = new int[fields.length];
+        fieldTypes = new HollowObjectSchema.FieldType[fields.length];
 
-        // check the field type
-        HollowObjectSchema.FieldType fieldType = ((HollowObjectSchema) schema).getFieldType(field);
-        if (!(fieldType.equals(HollowObjectSchema.FieldType.STRING) || fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)))
-            throw new IllegalArgumentException("Prefix index can only be built on field of type String or a reference to String. Given field: " + field + " type is :" + fieldType.toString());
+        // traverse through the field path to save field position and types.
+        Set<String> typeSeen = new HashSet<>();
+        String tempType = type;
+        HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
+        for (int i = 0; i < fields.length; i++) {
+            typeSeen.add(tempType);
+            HollowSchema schema = readStateEngine.getSchema(tempType);
 
-        // get the read state for the given field, two types Reference and inline string.
-        if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
-            // get reference type
-            String fieldReferenceType = ((HollowObjectSchema) schema).getReferencedType(field);
-            readStateForKey = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(fieldReferenceType);
-            fieldPositionInKeyObject = ((HollowObjectSchema) (readStateEngine.getSchema(fieldReferenceType))).getPosition("value");
-            if (fieldPositionInKeyObject < 0) {
-                throw new IllegalArgumentException("Could not find the field: value in reference type :" + field);
+            if (schema == null) throw new IllegalArgumentException("Null schema found for type " + tempType);
+            if (!schema.getSchemaType().equals(HollowSchema.SchemaType.OBJECT))
+                throw new IllegalArgumentException("Field path should be defined in type Objects only, " +
+                        "found field " + fields[i] + " in path defined in schema " + schema.getSchemaType().toString());
+
+            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
+            int position = objectSchema.getPosition(fields[i]);
+            if (position < 0)
+                throw new IllegalArgumentException("Invalid field position for field " + fields[i] + " in type " + tempType);
+
+            HollowObjectSchema.FieldType fieldType = objectSchema.getFieldType(fields[i]);
+            if (!(fieldType.equals(HollowObjectSchema.FieldType.REFERENCE) || fieldType.equals(HollowObjectSchema.FieldType.STRING)))
+                throw new IllegalArgumentException("Invalid field type for the field " + fields[i]);
+
+            fieldPositions[i] = position;
+            fieldTypes[i] = fieldType;
+            if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
+                tempType = objectSchema.getReferencedType(fields[i]);
+                if (typeSeen.contains(tempType)) throw new IllegalStateException("Circular reference found in fieldPath for type " + tempType);
             }
-
-            isKeyReferenceType = true;
-        } else {
-            // inline string, use the same dataAccess state as for value
-            readStateForKey = readStateForValue;
-            fieldPositionInKeyObject = ((HollowObjectSchema) schema).getPosition(field);
+            readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
         }
 
-        // get HollowObjectTypeRead state for the given type
-        readStateForValue = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
+        int cardinalityOfKeyField = readState.getPopulatedOrdinals().cardinality();
 
-        // get the field fieldPositionInValueObject in type read state
-        fieldPositionInValueObject = getFieldPosition();
+        HollowObjectTypeReadState valueState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
+        int cardinalityOfType = valueState.getPopulatedOrdinals().cardinality();
+        int maxOrdinalOfType = valueState.maxOrdinal();
 
-        // get the populated bit set from type read state
-        BitSet ordinals = readStateForValue.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
-        int maxOrdinalValue = readStateForValue.maxOrdinal();
-        Tst prefixIndex = new Tst(maxOrdinalValue, ordinals.cardinality(), readStateForKey.getPopulatedOrdinals().cardinality());
+        // initialize the prefix index.
+        this.prefixIndex = new Tst(maxOrdinalOfType, cardinalityOfType, cardinalityOfKeyField);
+    }
 
-        // iterate through the populated bitset to build the tree
+    private String getKey(int ordinal) {
+
+        HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
+        int refOrdinal = ordinal;
+        int position = 0;
+        String tempType = type;
+
+        for (int i = 0; i < fields.length; i++) {
+            position = fieldPositions[i];
+            readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
+
+            if (fieldTypes[i].equals(HollowObjectSchema.FieldType.REFERENCE)) {
+                tempType = readState.getSchema().getReferencedType(fields[i]);
+                refOrdinal = readState.readOrdinal(refOrdinal, position);
+            }
+        }
+
+        return readState.readString(refOrdinal, position);
+    }
+
+    private void build() {
+        BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
-
-            // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
-            addOrdinal(ordinal, prefixIndex);
+            String key = getKey(ordinal);
+            put(key, ordinal);
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
-        return prefixIndex;
     }
 
-    private void addOrdinal(int ordinal, Tst tst) {
-        // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
-        String key;
-        if (isKeyReferenceType) {
-            int referenceOrdinal = readStateForValue.readOrdinal(ordinal, fieldPositionInValueObject);
-            key = readStateForKey.readString(referenceOrdinal, fieldPositionInKeyObject);
-        } else {
-            key = readStateForValue.readString(ordinal, fieldPositionInKeyObject);
-        }
-        tst.insert(key, ordinal);
+    /**
+     * Add the given key to the prefix index. To have a custom tokens of the key, override this method.
+     *
+     * @param key
+     * @param ordinal
+     */
+    protected void put(String key, int ordinal) {
+        prefixIndex.insert(key, ordinal);
     }
 
     /**
@@ -119,7 +145,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @return ordinals of the parent object.
      */
     public Set<Integer> query(String prefix) {
-        return prefixTree.query(prefix);
+        return prefixIndex.query(prefix);
     }
 
     @Override
@@ -129,12 +155,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     @Override
     public void addedOrdinal(int ordinal) {
-        // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
+        // for each ordinal and fieldPath fieldPositionInValueObject -> get key and ordinal of the object
     }
 
     @Override
     public void removedOrdinal(int ordinal) {
-        // for each ordinal and field fieldPositionInValueObject -> get key and ordinal of the object
+        // for each ordinal and fieldPath fieldPositionInValueObject -> get key and ordinal of the object
     }
 
     @Override
@@ -180,7 +206,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param cardinalityValues total cardinality of the values
          * @param cardinalityKeys   total cardinality of the keys
          */
-        protected Tst(int maxOrdinalValue, int cardinalityValues, int cardinalityKeys) {
+        private Tst(int maxOrdinalValue, int cardinalityValues, int cardinalityKeys) {
 
             // if there are 100 keys to be indexed, assuming each key has 256 chars.
             maxNodes = cardinalityKeys * 256;
@@ -234,7 +260,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         }
 
         // returns the index of new child node created for the current node index
-        int createNode(long currentNode, NodeType nodeType, char ch) {
+        private int createNode(long currentNode, NodeType nodeType, char ch) {
             int indexForNode = indexTracker;
 
             // set data for new node at above index
@@ -247,12 +273,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             // increment tracker for next node index.
             indexTracker++;
             return indexForNode;
-        }
-
-        // get key for the child of given node index
-        private long getKey(int nodeIndex, NodeType type) {
-            int childIndex = getIndex(nodeIndex, type);
-            return (char) getKey(childIndex);
         }
 
         // get key for the given node index
