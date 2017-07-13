@@ -491,7 +491,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -2178,7 +2178,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2416,11 +2416,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -2765,8 +2766,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -3934,7 +3936,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -5621,7 +5623,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5859,11 +5861,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -6208,8 +6211,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -7377,7 +7381,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -9064,7 +9068,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9302,11 +9306,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -9651,8 +9656,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -10820,7 +10826,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -12507,7 +12513,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12745,11 +12751,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -13094,8 +13101,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -14398,7 +14406,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -16085,7 +16093,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16323,11 +16331,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -16672,8 +16681,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -17841,7 +17851,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -19528,7 +19538,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19766,11 +19776,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -20116,8 +20127,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -21288,7 +21300,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -22975,7 +22987,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23213,11 +23225,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -23563,8 +23576,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -24735,7 +24749,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -26422,7 +26436,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26660,11 +26674,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -27010,8 +27025,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -28182,7 +28198,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -29869,7 +29885,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30107,11 +30123,12 @@
             "transitive": [
                 "netflix:awsutils",
                 "netflix:gutenberg-common",
-                "netflix:hermes"
+                "netflix:hermes",
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -30457,8 +30474,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },

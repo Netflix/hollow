@@ -125,7 +125,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -140,7 +140,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -165,7 +165,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -191,14 +191,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -206,13 +206,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -220,13 +220,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -446,7 +446,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -1992,7 +1992,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -2178,7 +2178,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -2466,8 +2466,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -3252,7 +3253,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -3267,7 +3268,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -3292,7 +3293,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -3318,14 +3319,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -3333,13 +3334,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -3347,13 +3348,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -3573,7 +3574,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -5119,7 +5120,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -5305,7 +5306,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -5593,8 +5594,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -6379,7 +6381,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -6394,7 +6396,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -6419,7 +6421,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -6445,14 +6447,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -6460,13 +6462,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -6474,13 +6476,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -6700,7 +6702,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -8246,7 +8248,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -8432,7 +8434,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -8720,8 +8722,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -9506,7 +9509,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -9521,7 +9524,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -9546,7 +9549,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -9572,14 +9575,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -9587,13 +9590,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -9601,13 +9604,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -9827,7 +9830,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -11373,7 +11376,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -11559,7 +11562,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -11847,8 +11850,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -12762,7 +12766,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -12777,7 +12781,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -12802,7 +12806,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -12828,14 +12832,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -12843,13 +12847,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -12857,13 +12861,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -13083,7 +13087,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -14629,7 +14633,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -14815,7 +14819,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -15103,8 +15107,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -15889,7 +15894,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -15904,7 +15909,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -15929,7 +15934,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -15955,14 +15960,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -15970,13 +15975,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -15984,13 +15989,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -16210,7 +16215,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -17757,7 +17762,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -17943,7 +17948,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -18231,8 +18236,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -19021,7 +19027,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -19036,7 +19042,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -19061,7 +19067,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -19087,14 +19093,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -19102,13 +19108,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -19116,13 +19122,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -19342,7 +19348,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -20889,7 +20895,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -21075,7 +21081,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -21363,8 +21369,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -22153,7 +22160,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -22168,7 +22175,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -22193,7 +22200,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -22219,14 +22226,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -22234,13 +22241,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -22248,13 +22255,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -22474,7 +22481,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -24021,7 +24028,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -24207,7 +24214,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -24495,8 +24502,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
@@ -25285,7 +25293,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -25300,7 +25308,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-core": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor",
@@ -25325,7 +25333,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-databind": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.amazonaws:jmespath-java",
@@ -25351,14 +25359,14 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-smile": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.servo:servo-atlas",
                 "netflix:atlas-plugin",
@@ -25366,13 +25374,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "org.elasticsearch:elasticsearch"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -25380,13 +25388,13 @@
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jaxb-annotations": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.fasterxml.jackson.module:jackson-module-jsonSchema": {
-            "locked": "2.8.9",
+            "locked": "2.8.7",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -25606,7 +25614,7 @@
             ]
         },
         "com.ibm.icu:icu4j": {
-            "locked": "59.1",
+            "locked": "54.1.1",
             "transitive": [
                 "netflix:nf-filter",
                 "netflix:nfi18n-core"
@@ -27153,7 +27161,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "33.7",
+            "locked": "30.36",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -27339,7 +27347,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.77",
+            "locked": "2.75",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -27627,8 +27635,9 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.42",
+            "locked": "100.0.43",
             "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
