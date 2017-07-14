@@ -71,6 +71,17 @@ public class CycleConstants {
         this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }
 
+    private CycleConstants() {
+        this.artworkDerivativeCache = null;
+        this.artworkDerivativesCache = null;
+        this.rightsContractAssetCache = null;
+        this.isNewEpisodeOverlayTypes = null;
+    }
+
+    public static CycleConstants getInstanceForTesting() {
+        return new CycleConstants();
+    }
+
     public ISOCountry getISOCountry(String countryId) {
         ISOCountry country = isoCountryMap.get(countryId);
         if(country == null) {
