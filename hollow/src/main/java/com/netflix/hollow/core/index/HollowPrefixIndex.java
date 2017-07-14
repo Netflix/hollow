@@ -1,7 +1,8 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -18,14 +19,20 @@ import java.util.Set;
 public class HollowPrefixIndex implements HollowTypeStateListener {
 
     private HollowReadStateEngine readStateEngine;
-
     private String type;
     private String fieldPath;
+
     private Tst prefixIndex;
+    private volatile Tst prefixIndexVolatile;
+    private RecyclingRecycler memoryRecycle;
 
     private String[] fields;
     private int[] fieldPositions;
     private HollowObjectSchema.FieldType[] fieldTypes;
+
+    private int cardinalityOfType;
+    private int cardinalityOfKeyField;
+    private int maxOrdinalOfType;
 
     /**
      * Constructor to create a prefix index for a type using the key defined in one of the fields in that type.
@@ -44,8 +51,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         this.readStateEngine = readStateEngine;
         this.type = type;
         this.fieldPath = fieldPath;
+
+        // create memory recycle for using shared memory pools.
+        memoryRecycle = new RecyclingRecycler();
         initialize();
-        build();
     }
 
     // initialize field positions and field paths.
@@ -83,22 +92,56 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             fieldTypes[i] = fieldType;
             if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
                 tempType = objectSchema.getReferencedType(fields[i]);
-                if (typeSeen.contains(tempType)) throw new IllegalStateException("Circular reference found in fieldPath for type " + tempType);
+                if (typeSeen.contains(tempType))
+                    throw new IllegalStateException("Circular reference found in fieldPath for type " + tempType);
             }
             readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
         }
 
-        int cardinalityOfKeyField = readState.getPopulatedOrdinals().cardinality();
-
+        // get all cardinality to estimate size of array bits needed.
+        cardinalityOfKeyField = readState.getPopulatedOrdinals().cardinality();
         HollowObjectTypeReadState valueState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
-        int cardinalityOfType = valueState.getPopulatedOrdinals().cardinality();
-        int maxOrdinalOfType = valueState.maxOrdinal();
+        cardinalityOfType = valueState.getPopulatedOrdinals().cardinality();
+        maxOrdinalOfType = valueState.maxOrdinal();
 
         // initialize the prefix index.
-        this.prefixIndex = new Tst(maxOrdinalOfType, cardinalityOfType, cardinalityOfKeyField);
+        build();
     }
 
-    private String getKey(int ordinal) {
+    private void build() {
+
+        // tell memory recycler to use current tst's long arrays next time when long array is requested.
+        // note reuse only happens once swap is called and bits are reset
+        if (prefixIndex != null) prefixIndex.recycleMemory(memoryRecycle);
+
+        Tst tst = new Tst(maxOrdinalOfType, cardinalityOfType, cardinalityOfKeyField, memoryRecycle);
+        BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
+        int ordinal = ordinals.nextSetBit(0);
+        while (ordinal != -1) {
+            String[] keys = getKey(ordinal);
+            for (String key : keys)
+                tst.insert(key, ordinal);
+            ordinal = ordinals.nextSetBit(ordinal + 1);
+        }
+
+        prefixIndex = tst;
+        prefixIndexVolatile = tst;
+        // safe to return previous long arrays on next request for long array.
+        memoryRecycle.swap();
+    }
+
+    /**
+     * Return the key to index in prefix index. Override this method to support tokens for the key. By default keys are indexed as lower case characters.
+     * <pre><code>
+     *     String[] keys = super.getKey(ordinal);
+     *     String[] tokens = keys[0].split(" ")
+     *     return tokens;
+     * </pre></code>
+     *
+     * @param ordinal
+     * @return keys to index.
+     */
+    protected String[] getKey(int ordinal) {
 
         HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
         int refOrdinal = ordinal;
@@ -115,27 +158,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             }
         }
 
-        return readState.readString(refOrdinal, position);
-    }
-
-    private void build() {
-        BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
-        int ordinal = ordinals.nextSetBit(0);
-        while (ordinal != -1) {
-            String key = getKey(ordinal);
-            put(key, ordinal);
-            ordinal = ordinals.nextSetBit(ordinal + 1);
-        }
-    }
-
-    /**
-     * Add the given key to the prefix index. To have a custom tokens of the key, override this method.
-     *
-     * @param key
-     * @param ordinal
-     */
-    protected void put(String key, int ordinal) {
-        prefixIndex.insert(key, ordinal);
+        String key = readState.readString(refOrdinal, position).toLowerCase();
+        return new String[]{key};
     }
 
     /**
@@ -145,7 +169,28 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @return ordinals of the parent object.
      */
     public Set<Integer> query(String prefix) {
-        return prefixIndex.query(prefix);
+        Tst current = this.prefixIndex;
+        Set<Integer> ordinals;
+        do {
+            ordinals = current.query(prefix);
+        } while (current != this.prefixIndexVolatile);
+        return ordinals;
+    }
+
+    /**
+     * Use this method to keep the index updated with delta changes on the read state engine.
+     * Remember to call stopDeltaUpdates to stop the delta changes.
+     * NOTE: Each delta updates creates a new prefix index and swaps the new with current.
+     */
+    public void listenForDeltaUpdates() {
+        readStateEngine.getTypeState(type).addListener(this);
+    }
+
+    /**
+     * Stop delta updates for this index.
+     */
+    public void stopDeltaUpdates() {
+        readStateEngine.getTypeState(type).removeListener(this);
     }
 
     @Override
@@ -165,15 +210,18 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     @Override
     public void endUpdate() {
-        // after delta is applied -> no action to be taken
+        // pass 1 for delta support - rebuild the tree and swap the new tree with the one that is serving the queries.
+        initialize();
+        // pass 2 fast creation by re-using index built
+        // pass 3 support remove method and dynamic size creation.
     }
 
     // data structure to match keys (prefix) with ordinalSet.
-    // TST is very space efficient compared to a trie, with minute trade-off in cost to perform look-ups.
+    // TST is very space efficient compared to a trie, with small trade-off in cost to perform look-ups (specially for misses).
     // TST plus FixedLengthElementArray is super duper compact.
     private static class Tst {
 
-        enum NodeType {
+        private enum NodeType {
             Left, Right, Middle
         }
 
@@ -206,9 +254,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param cardinalityValues total cardinality of the values
          * @param cardinalityKeys   total cardinality of the keys
          */
-        private Tst(int maxOrdinalValue, int cardinalityValues, int cardinalityKeys) {
+        private Tst(int maxOrdinalValue, int cardinalityValues, int cardinalityKeys, ArraySegmentRecycler memoryRecycler) {
 
-            // if there are 100 keys to be indexed, assuming each key has 256 chars.
+            // if there are 100 keys to be indexed, assuming each key has 256 chars - worst case estimation for number of nodes
             maxNodes = cardinalityKeys * 256;
 
             // bits needed to hold a value ordinal
@@ -225,8 +273,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             // bits to represent one node
             bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + bitsForOrdinalSetSize + bitsForOrdinalSetPointer;
 
-            nodes = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, bitsPerNode * maxNodes);
-            ordinalSet = new FixedLengthElementArray(WastefulRecycler.DEFAULT_INSTANCE, bitsPerOrdinalSet * maxNodes);
+            nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
+            ordinalSet = new FixedLengthElementArray(memoryRecycler, bitsPerOrdinalSet * maxNodes);
             indexTracker = 0;
 
             // initialize offsets
@@ -235,6 +283,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             rightChildOffset = middleChildOffset + bitsForChildPointer;
             ordinalSetPointerOffset = bitsPerKey + (3 * bitsForChildPointer);
             ordinalSetSizeOffset = ordinalSetPointerOffset + bitsForOrdinalSetPointer;
+        }
+
+        // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
+        private void recycleMemory(ArraySegmentRecycler memoryRecycler) {
+            nodes.destroy(memoryRecycler);
+            ordinalSet.destroy(memoryRecycler);
         }
 
         private int getChildOffset(NodeType nodeType) {
@@ -290,8 +344,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             if (key == null) throw new IllegalArgumentException("Null key cannot be indexed");
             int currentIndex = 0;
             for (char ch : key.toLowerCase().toCharArray()) {
-                long currentValue = getKey(currentIndex);
-                if (currentValue != 0) {
+                if (indexTracker != 0) {
+                    long currentValue = getKey(currentIndex);
                     // pick the correct child by traversing the tree and creating new nodes along the path
                     while (currentValue != ch) {
                         int childIndex;// checking child index is 0, is equivalent if checking if current.child == null in pojo world
@@ -344,20 +398,22 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private Set<Integer> query(String prefix) {
             if (prefix == null) throw new IllegalArgumentException("Cannot query null prefix");
             Set<Integer> ordinals = new HashSet<>();
-            int current = 0;
+            int currentIndex = 0;
+            boolean atRoot = true;
             for (char ch : prefix.toLowerCase().toCharArray()) {
-                long currentValue = getKey(current);
-                while (currentValue != 0 && currentValue != ch) {
-                    if (ch < currentValue) current = getIndex(current, NodeType.Left);
-                    else if (ch > currentValue) current = getIndex(current, NodeType.Right);
-                    else current = getIndex(current, NodeType.Middle);
-                    currentValue = getKey(current);// update value
+                long currentValue = getKey(currentIndex);
+                while ((currentIndex != 0 || atRoot) && currentValue != ch) {
+                    if (ch < currentValue) currentIndex = getIndex(currentIndex, NodeType.Left);
+                    else if (ch > currentValue) currentIndex = getIndex(currentIndex, NodeType.Right);
+                    else currentIndex = getIndex(currentIndex, NodeType.Middle);
+                    currentValue = getKey(currentIndex);// update value
+                    atRoot = false;
                 }
             }
-            if (getKey(current) != 0) {
+            if (currentIndex != 0 || atRoot) {
 
-                long ordinalSetIndex = nodes.getElementValue(current * bitsPerNode + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
-                int ordinalSetSize = (int) nodes.getElementValue(current * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
+                long ordinalSetIndex = nodes.getElementValue(currentIndex * bitsPerNode + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
+                int ordinalSetSize = (int) nodes.getElementValue(currentIndex * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
                 if (ordinalSetSize == 0) return ordinals;
 
                 int i = 0;

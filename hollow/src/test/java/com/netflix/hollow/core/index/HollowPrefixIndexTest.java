@@ -50,6 +50,57 @@ public class HollowPrefixIndexTest {
         test(getReferenceToInlineList(), "MovieWithReferenceToInlineName", "name.n");
     }
 
+    @Test
+    public void testDeltaChange() throws Exception {
+        List<Movie> movies = getSimpleList();
+        ((SimpleMovie) movies.get(0)).updateName("007 James Bond");// test numbers
+        ((SimpleMovie) movies.get(1)).updateName("龍爭虎鬥");// "Enter The Dragon"
+        for (Movie movie : movies) {
+            objectMapper.add(movie);
+        }
+
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+        prefixIndex.listenForDeltaUpdates();
+
+        Set<Integer> ordinals = prefixIndex.query("龍");
+        Assert.assertTrue(ordinals.size() == 1);
+        printResults(ordinals, "SimpleMovie", "name");
+
+        ordinals = prefixIndex.query("00");
+        Assert.assertEquals(ordinals.size(), 1);
+        printResults(ordinals, "SimpleMovie", "name");
+
+        // update one movie
+        ((SimpleMovie)(movies.get(3))).updateName("Rocky 2");
+        // add new movie
+        Movie m = new SimpleMovie(5, "As Good as It Gets", 1997);
+        movies.add(m);
+        m = new SimpleMovie(6, "0 dark thirty", 1997);
+        movies.add(m);
+        for (Movie movie : movies) {
+            objectMapper.add(movie);
+        }
+
+        StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
+        ordinals = prefixIndex.query("as");
+        Assert.assertTrue(ordinals.size() == 1);
+
+        ordinals = prefixIndex.query("R");
+        Assert.assertEquals(ordinals.size(), 2);
+        printResults(ordinals, "SimpleMovie", "name");
+
+        ordinals = prefixIndex.query("rocky 2");
+        Assert.assertTrue(ordinals.size() == 1);
+
+        ordinals = prefixIndex.query("0");
+        Assert.assertTrue(ordinals.size() == 2);
+        printResults(ordinals, "SimpleMovie", "name");
+
+        prefixIndex.stopDeltaUpdates();
+
+    }
+
     private void test(List<Movie> movies, String type, String fieldPath) throws Exception {
         for (Movie movie : movies) {
             objectMapper.add(movie);
@@ -125,6 +176,10 @@ public class HollowPrefixIndexTest {
             this.name = name;
             this.yearRelease = yearRelease;
         }
+
+        public void updateName(String n) {
+            this.name = n;
+        }
     }
 
     private static class MovieInlineName implements Movie {
@@ -181,10 +236,10 @@ public class HollowPrefixIndexTest {
         }
     }
 
-    private void printResults(Set<Integer> ordinals) {
-        HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("Movie");
+    private void printResults(Set<Integer> ordinals, String type, String field) {
+        HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
         HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
-        int nameField = movieReadState.getSchema().getPosition("name");
+        int nameField = movieReadState.getSchema().getPosition(field);
         int valueField = nameReadState.getSchema().getPosition("value");
         for (int ordinal : ordinals) {
             int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
