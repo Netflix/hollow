@@ -101,13 +101,13 @@ public class HollowPrefixIndexTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidType() throws Exception {
         for (Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        new HollowPrefixIndex(readStateEngine, "Movie", "id");
+        new HollowPrefixIndex(readStateEngine, "randomType", "id");
     }
 
     @Test(expected = IllegalArgumentException.class)

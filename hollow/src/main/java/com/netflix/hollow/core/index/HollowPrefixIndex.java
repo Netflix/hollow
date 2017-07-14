@@ -59,6 +59,11 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     // initialize field positions and field paths.
     private void initialize() {
+
+        //check arguments
+        if (readStateEngine == null || type == null || fieldPath == null)
+            throw new IllegalArgumentException("Null arguments received");
+
         // split the field path with "." char
         fields = fieldPath.split("\\.");
 
@@ -74,7 +79,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             typeSeen.add(tempType);
             HollowSchema schema = readStateEngine.getSchema(tempType);
 
-            if (schema == null) throw new NullPointerException("Null schema found for type " + tempType);
+            if (schema == null) throw new IllegalArgumentException("Null schema found for type " + tempType);
             if (!schema.getSchemaType().equals(HollowSchema.SchemaType.OBJECT))
                 throw new IllegalArgumentException("Field path should be defined in type Objects only, " +
                         "found field " + fields[i] + " in path defined in schema " + schema.getSchemaType().toString());
