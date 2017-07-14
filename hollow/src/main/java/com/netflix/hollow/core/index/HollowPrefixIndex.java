@@ -74,7 +74,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             typeSeen.add(tempType);
             HollowSchema schema = readStateEngine.getSchema(tempType);
 
-            if (schema == null) throw new IllegalArgumentException("Null schema found for type " + tempType);
+            if (schema == null) throw new NullPointerException("Null schema found for type " + tempType);
             if (!schema.getSchemaType().equals(HollowSchema.SchemaType.OBJECT))
                 throw new IllegalArgumentException("Field path should be defined in type Objects only, " +
                         "found field " + fields[i] + " in path defined in schema " + schema.getSchemaType().toString());
@@ -97,6 +97,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             }
             readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
         }
+
+        // field path should ultimately lead down to a String type
+        if (!fieldTypes[fields.length - 1].equals(HollowObjectSchema.FieldType.STRING))
+            throw new IllegalArgumentException("Field path should resolve to a String type");
 
         // get all cardinality to estimate size of array bits needed.
         cardinalityOfKeyField = readState.getPopulatedOrdinals().cardinality();
