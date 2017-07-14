@@ -33,20 +33,21 @@ public class VideoFormatDescriptorIdentifier {
     }
 
     public VideoFormatDescriptor selectVideoFormatDescriptor(int height, int width) {
+        return selectVideoFormatDescriptor(ctx.getCupLibrary(), cycleConstants, height, width);
+    }
+
+    protected static VideoFormatDescriptor selectVideoFormatDescriptor(CupLibrary cupLibrary, CycleConstants cycleConstants, int height, int width) {
         if (height == Integer.MIN_VALUE) return cycleConstants.VIDEOFORMAT_UNKNOWN;
 
-        CupLibrary cupLibrary = ctx.getCupLibrary();
         VideoResolutionType videoResType = cupLibrary.getResolutionType(width, height);
-
-        if (cupLibrary.getResolutionType(VideoResolutionType.ID_SD).compareTo(videoResType) >= 0) return cycleConstants.SD;
-        if (cupLibrary.getResolutionType(VideoResolutionType.ID_MIN_HD).compareTo(videoResType) >= 0) return cycleConstants.HD;
-        if (cupLibrary.getResolutionType(VideoResolutionType.ID_FULL_HD).compareTo(videoResType) >= 0) return cycleConstants.SUPER_HD;
-
         // NOTE: TO BE PARITY, the following is commented out for now
-        // if (cupLibrary.getResolutionType(VideoResolutionType.ID_QHD).compareTo(videoResType) >= 0) return cycleConstants.ULTRA_HD;
-        // if (cupLibrary.getResolutionType(VideoResolutionType.ID_UHD).compareTo(videoResType) >= 0) return cycleConstants.FOUR_K;
+        // if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_QHD)) > 0) return cycleConstants.FOUR_K;
 
-        return cycleConstants.ULTRA_HD;
+        if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_FULL_HD)) > 0) return cycleConstants.ULTRA_HD;
+        if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_FULL_HD)) == 0) return cycleConstants.SUPER_HD;
+        if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_MIN_HD)) >= 0) return cycleConstants.HD;
+
+        return cycleConstants.SD;
     }
 
     @Deprecated
@@ -132,5 +133,4 @@ public class VideoFormatDescriptorIdentifier {
 
         return set;
     }
-
 }
