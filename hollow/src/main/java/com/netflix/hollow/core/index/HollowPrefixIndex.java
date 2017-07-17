@@ -184,7 +184,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     /**
      * Use this method to keep the index updated with delta changes on the read state engine.
-     * Remember to call stopDeltaUpdates to stop the delta changes.
+     * Remember to call detachFromDeltaUpdates to stop the delta changes.
      * NOTE: Each delta updates creates a new prefix index and swaps the new with current.
      */
     public void listenForDeltaUpdates() {
@@ -194,7 +194,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     /**
      * Stop delta updates for this index.
      */
-    public void stopDeltaUpdates() {
+    public void detachFromDeltaUpdates() {
         readStateEngine.getTypeState(type).removeListener(this);
     }
 

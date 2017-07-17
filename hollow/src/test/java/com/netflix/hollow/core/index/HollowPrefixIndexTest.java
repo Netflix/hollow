@@ -117,7 +117,7 @@ public class HollowPrefixIndexTest {
         Assert.assertTrue(ordinals.size() == 2);
         printResults(ordinals, "SimpleMovie", "name");
 
-        prefixIndex.stopDeltaUpdates();
+        prefixIndex.detachFromDeltaUpdates();
 
     }
 
