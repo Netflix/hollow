@@ -51,6 +51,26 @@ public class HollowPrefixIndexTest {
     }
 
     @Test
+    public void testCustomPrefixIndex() throws Exception {
+
+        for (Movie movie: getSimpleList()) {
+            objectMapper.add(movie);
+        }
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+
+        Set<Integer> ordinals = tokenizedPrefixIndex.query("th");
+        Assert.assertTrue(ordinals.size() == 1);
+
+        ordinals = tokenizedPrefixIndex.query("matrix");
+        Assert.assertTrue(ordinals.size() == 1);
+
+        ordinals = tokenizedPrefixIndex.query("the ");// note the whitespace in query string.
+        // expected result ordinals size is 0, since entire movie is not indexed. movie name is split by whitespace.
+        Assert.assertTrue(ordinals.size() == 0);
+    }
+
+    @Test
     public void testDeltaChange() throws Exception {
         List<Movie> movies = getSimpleList();
         ((SimpleMovie) movies.get(0)).updateName("007 James Bond");// test numbers
@@ -283,6 +303,26 @@ public class HollowPrefixIndexTest {
 
         public NameInline(String n) {
             this.n = n;
+        }
+    }
+
+    private static class HollowTokenizedPrefixIndex extends HollowPrefixIndex {
+
+        public HollowTokenizedPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
+            super(readStateEngine, type, fieldPath);
+        }
+
+        @Override
+        public String[] getKey(int ordinal) {
+            // split the key by " ";
+            String[] keys = super.getKey(ordinal);
+            List<String> tokens = new ArrayList<>();
+            for (String key : keys) {
+                String[] splits = key.split(" ");
+                for (String split : splits)
+                    tokens.add(split.toLowerCase());
+            }
+            return tokens.toArray(new String[tokens.size()]);
         }
     }
 
