@@ -72,11 +72,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         fieldTypes = new HollowObjectSchema.FieldType[fields.length];
 
         // traverse through the field path to save field position and types.
-        Set<String> typeSeen = new HashSet<>();
         String tempType = type;
         HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
         for (int i = 0; i < fields.length; i++) {
-            typeSeen.add(tempType);
             HollowSchema schema = readStateEngine.getSchema(tempType);
 
             if (schema == null) throw new IllegalArgumentException("Null schema found for type " + tempType);
@@ -97,8 +95,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             fieldTypes[i] = fieldType;
             if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
                 tempType = objectSchema.getReferencedType(fields[i]);
-                if (typeSeen.contains(tempType))
-                    throw new IllegalStateException("Circular reference found in fieldPath for type " + tempType);
             }
             readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
         }
