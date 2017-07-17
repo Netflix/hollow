@@ -396,7 +396,7 @@ public class SimpleTransformer {
         completeVideo.data.facetData.videoCollectionsData = collectionsData;
         completeVideo.data.facetData.videoMetaData = videoDataCollection.getVideoMetaData(videoId);
         completeVideo.data.facetData.videoMediaData = videoDataCollection.getVideoMediaData(videoId);
-        completeVideo.data.facetData.videoImages = videoDataCollection.getVideoImages(videoId);
+        completeVideo.data.facetData.videoImages = videoDataCollection.getVideoImages(videoId) == null ? cycleConstants.EMPTY_VIDEO_IMAGES : videoDataCollection.getVideoImages(videoId);
         // CountrySpecificData
         completeVideo.data.countrySpecificData = videoDataCollection.getCompleteVideoCountrySpecificData(videoId);
 

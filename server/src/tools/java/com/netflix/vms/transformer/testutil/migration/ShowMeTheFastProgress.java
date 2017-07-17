@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
@@ -52,12 +53,18 @@ public class ShowMeTheFastProgress {
 
     @Test
     public void getLatestTransformerVersion() {
-        long version = getLatestTransformerVersion(VIP_NAME);
+        long version = getLatestVersion(new HollowBlobKeybaseBuilder(VIP_NAME).getSnapshotKeybase());
         System.out.println("getLatestTransformerVersion: " + version);
     }
 
     @Test
-    public void start() throws Throwable {
+    public void getLatestConverterVersion() {
+        long version = getLatestVersion(new VMSInputDataKeybaseBuilder(CONVERTER_VIP_NAME).getSnapshotKeybase());
+        System.out.println("getLatestConverterVersion: " + version);
+    }
+
+    @Test
+    public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
         long transformerVersion = 20170516184232009L;
         int[] topNodes = { 70084180 };
@@ -98,6 +105,33 @@ public class ShowMeTheFastProgress {
         }
     }
 
+    @Test
+    public void runFastLaneWithConverterData() throws Throwable {
+        // NOTE: the specified converterVersion must be valid or already in local HD; otherwise, run  getLatestConverterVersion();
+        int[] topNodes = { 80063535 };
+        long converterVersion = 20170629171458752L;
+
+        setup();
+
+        // Setup Context
+        SimpleTransformerContext ctx = new SimpleTransformerContext();
+        //ctx.overrideSupportedCountries("US");
+
+        // Load Transformer input based on converterBlobVersion
+        VMSHollowInputAPI inputAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterVersion, topNodes);
+
+        // Setup Fastlane context and Output State Engine
+        List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
+        ctx.setFastlaneIds(new HashSet<>(fastlaneIds));
+        VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
+
+        // Run Transformer
+        SimpleTransformer transformer = new SimpleTransformer(inputAPI, outputStateEngine, ctx);
+        transformer.transform();
+        HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
+        System.out.println(actualOutputReadStateEngine.getHeaderTags());
+    }
+
     public void setup() throws Exception {
         File workingDir = new File(WORKING_DIR);
         if (!workingDir.exists()) workingDir.mkdirs();
@@ -106,10 +140,6 @@ public class ShowMeTheFastProgress {
             LifecycleInjector lInjector = InjectorBuilder.fromModules(new RuntimeCoreModule()).createInjector();
             pinTitleFileStore = lInjector.getInstance(FileStore.class);
         }
-    }
-
-    public long getLatestTransformerVersion(String vip) {
-        return getLatestVersion(new HollowBlobKeybaseBuilder(vip).getSnapshotKeybase());
     }
 
     private static long getLatestVersion(String keybase) {

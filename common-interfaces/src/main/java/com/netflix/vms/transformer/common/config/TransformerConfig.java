@@ -57,6 +57,9 @@ public interface TransformerConfig {
     // The VIP of the output data to use when pinning title using output data
     String getOverridePinTitleOutputDataVip();
 
+    @DefaultValue("false")
+    boolean useVideoResolutionType();
+
     @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
 
@@ -183,19 +186,19 @@ public interface TransformerConfig {
 
     @DefaultValue("BE,CH,LU,TH,IL,GR,RO,CY,MD")
     String getMultilanguageCatalogCountries();
-    
+
     @DefaultValue("true")
     public boolean isRollupImagesForArtworkScheduling();
-    
+
     @DefaultValue("true")
     public boolean isFilterImagesForArtworkScheduling();
-    
+
     @DefaultValue("true")
     public boolean isUseSchedulePhasesInAvailabilityDateCalc();
-    
+
     @DefaultValue("TITLE_TREATMENT,LOGO_STACKED,LOGO_HORIZONTAL,NETFLIX_ORIGINAL,MOVIE_PERSON_STILL,BB2_OG_LOGO,BB2_OG_LOGO_STACKED,OriginalsPostPlayLogoPostPlay,OriginalsPostPlayLogoPostTrailer,OriginalsPostPlayLogoPrePlay,BB2_OG_LOGO_PLUS,VERTICAL_STORY_ART,MERCH_STILL,MERCH_STILL_4_3,NEW_CONTENT_BADGE,PORTRAIT,SCREENSAVER_BACKGROUND,SCREENSAVER_MIDGROUND,SCREENSAVER_FOREGROUND,NSRE_DATE_BADGE_CROPPED,NSRE_DATE_BADGE")
     public String getVariableImageTypes();
-    
+
     @DefaultValue("NEW_EPISODE,NEW_EPISODE_V2,NEW_EPISODE_GLOBAL")
     public String getNewEpisodeOverlayTypes();
 }
