@@ -2,7 +2,7 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
@@ -24,7 +24,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     private Tst prefixIndex;
     private volatile Tst prefixIndexVolatile;
-    private RecyclingRecycler memoryRecycle;
+    private ArraySegmentRecycler memoryRecycle;
 
     private String[] fields;
     private int[] fieldPositions;
@@ -53,7 +53,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         this.fieldPath = fieldPath;
 
         // create memory recycle for using shared memory pools.
-        memoryRecycle = new RecyclingRecycler();
+        memoryRecycle = WastefulRecycler.DEFAULT_INSTANCE;
         initialize();
     }
 
