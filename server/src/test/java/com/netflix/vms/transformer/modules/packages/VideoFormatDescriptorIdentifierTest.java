@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.cup.CupLibraryImpl;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import org.junit.Assert;
-import org.junit.Test;
 
 public class VideoFormatDescriptorIdentifierTest {
 
@@ -29,64 +28,71 @@ public class VideoFormatDescriptorIdentifierTest {
         {
             int height = 576;
             int width = 480;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, true);
             Assert.assertEquals(cycleConstants.SD, result);
         }
 
         {
             int height = 490;
             int width = 342;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, true);
             Assert.assertEquals(cycleConstants.SD, result);
         }
 
         {
             int height = 640;
             int width = 480;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, true);
             Assert.assertEquals(cycleConstants.HD, result);
         }
 
         {
             int height = 720;
             int width = 580;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.HD, result);
         }
 
         {
             int height = 768;
             int width = 432;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.SUPER_HD, result);
         }
 
         {
             int height = 1080;
             int width = 1920;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.SUPER_HD, result);
         }
 
         {
             int height = 1081;
             int width = 1920;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.ULTRA_HD, result);
         }
 
         {
             int height = 1440;
             int width = 2560;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.ULTRA_HD, result);
         }
 
         {
             int height = 2160;
             int width = 3840;
-            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width);
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, false);
             Assert.assertEquals(cycleConstants.ULTRA_HD, result);
+        }
+
+        {
+            int height = 2160;
+            int width = 3840;
+            VideoFormatDescriptor result = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(cupLibrary, cycleConstants, height, width, true);
+            Assert.assertEquals(cycleConstants.FOUR_K, result);
         }
     }
 

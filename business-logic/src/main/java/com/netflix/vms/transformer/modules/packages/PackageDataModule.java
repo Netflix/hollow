@@ -186,7 +186,7 @@ public class PackageDataModule {
         int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
 
-        PackageDataCollection packageDataCollection = new PackageDataCollection(fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
+        PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
         PackageData pkg = packageDataCollection.getPackageData();
 
         pkg.id = (int) packages._getPackageId();
