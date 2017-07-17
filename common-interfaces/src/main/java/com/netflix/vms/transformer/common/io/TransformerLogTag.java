@@ -27,6 +27,7 @@ public enum TransformerLogTag implements LogTag {
     DroppedTopNodeOnFloor,
     ArtworkFallbackMissing,
     VideoFormatMismatch,
+    VideoFormat4KMismatch,
 
 
     //// TRANSFORMATION ERRORS ////
