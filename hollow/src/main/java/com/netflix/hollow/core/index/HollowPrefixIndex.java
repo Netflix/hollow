@@ -6,11 +6,13 @@ import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -171,15 +173,15 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * Query the index to find all the ordinals that match the given prefix.
      *
      * @param prefix
-     * @return ordinals of the parent object.
+     * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given query.
      */
-    public Set<Integer> query(String prefix) {
+    public HollowOrdinalIterator query(String prefix) {
         Tst current = this.prefixIndex;
-        Set<Integer> ordinals;
+        HollowOrdinalIterator it;
         do {
-            ordinals = current.query(prefix);
+            it = current.query(prefix);
         } while (current != this.prefixIndexVolatile);
-        return ordinals;
+        return it;
     }
 
     /**
@@ -400,9 +402,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param prefix
          * @return
          */
-        private Set<Integer> query(String prefix) {
+        private HollowOrdinalIterator query(String prefix) {
             if (prefix == null) throw new IllegalArgumentException("Cannot query null prefix");
-            Set<Integer> ordinals = new HashSet<>();
+            final Set<Integer> ordinals = new HashSet<>();
             int currentIndex = 0;
             boolean atRoot = true;
             for (char ch : prefix.toLowerCase().toCharArray()) {
@@ -419,16 +421,28 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
                 long ordinalSetIndex = nodes.getElementValue(currentIndex * bitsPerNode + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
                 int ordinalSetSize = (int) nodes.getElementValue(currentIndex * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
-                if (ordinalSetSize == 0) return ordinals;
-
-                int i = 0;
-                do {
-                    int ordinal = (int) ordinalSet.getElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (i * bitsPerOrdinal), bitsPerOrdinal);
-                    ordinals.add(ordinal);
-                    i++;
-                } while (i < (ordinalSetSize - 1));
+                if (ordinalSetSize != 0) {
+                    int i = 0;
+                    do {
+                        int ordinal = (int) ordinalSet.getElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (i * bitsPerOrdinal), bitsPerOrdinal);
+                        ordinals.add(ordinal);
+                        i++;
+                    } while (i < (ordinalSetSize - 1));
+                }
             }
-            return ordinals;
+
+            HollowOrdinalIterator iterator = new HollowOrdinalIterator() {
+
+                private Iterator<Integer> it = ordinals.iterator();
+
+                @Override
+                public int next() {
+                    if (it.hasNext()) return it.next();
+                    return NO_MORE_ORDINALS;
+                }
+            };
+
+            return iterator;
         }
     }
 }
