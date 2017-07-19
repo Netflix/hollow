@@ -129,6 +129,8 @@ public class HollowPrefixIndexTest {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // random type which does not exists in read state engine.
         new HollowPrefixIndex(readStateEngine, "randomType", "id");
     }
 
@@ -138,6 +140,8 @@ public class HollowPrefixIndexTest {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        // test invalid field path, basically field path does not lead to a string value.
         new HollowPrefixIndex(readStateEngine, "SimpleMovie", "id");
     }
 
@@ -147,30 +151,23 @@ public class HollowPrefixIndexTest {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.value");
+
+        // test invalid field path, in this case reference type is referring toa field which is not present.
+        // PrimaryKey class helps in catching this.
+        new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.randomField");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidFieldPathReferenceField() throws Exception {
+    @Test
+    public void testAutoExpandFieldPath() throws Exception {
         for (Movie movie : getReferenceList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.movie");
-    }
+        HollowPrefixIndex index = new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.n");// no.value appended, it should work
+        Set<Integer> ordinals = toSet(index.query("the"));
+        Assert.assertTrue(ordinals.size() == 1);
+        printResults(ordinals, "MovieWithReferenceName", "name");
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidFieldPathIncomplete() throws Exception {
-        for (Movie movie : getReferenceList()) {
-            objectMapper.add(movie);
-        }
-        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        try {
-            new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.n");
-        } catch (Exception e) {
-            Assert.assertEquals(e.getMessage(), "Field path should resolve to a String type");
-            throw e;
-        }
     }
 
     private void test(List<Movie> movies, String type, String fieldPath) throws Exception {

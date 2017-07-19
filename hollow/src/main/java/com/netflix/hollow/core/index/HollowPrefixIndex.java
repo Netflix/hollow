@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.index;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -8,7 +9,6 @@ import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 
 import java.util.BitSet;
 import java.util.HashSet;
@@ -66,36 +66,18 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         if (readStateEngine == null || type == null || fieldPath == null)
             throw new IllegalArgumentException("Null arguments received");
 
-        // split the field path with "." char
-        fields = fieldPath.split("\\.");
-
-        // arrays to save data for field path
-        fieldPositions = new int[fields.length];
+        //PrimaryKey primaryKey = new PrimaryKey(type, new String[]{fieldPath});
+        fields = PrimaryKey.getCompleteFieldPathParts(readStateEngine, type, fieldPath);
+        fieldPositions = PrimaryKey.getFieldPathIndex(readStateEngine, type, fieldPath);
         fieldTypes = new HollowObjectSchema.FieldType[fields.length];
 
         // traverse through the field path to save field position and types.
         String tempType = type;
         HollowObjectTypeReadState readState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
         for (int i = 0; i < fields.length; i++) {
-            HollowSchema schema = readStateEngine.getSchema(tempType);
-
-            if (schema == null) throw new IllegalArgumentException("Null schema found for type " + tempType);
-            if (!schema.getSchemaType().equals(HollowSchema.SchemaType.OBJECT))
-                throw new IllegalArgumentException("Field path should be defined in type Objects only, " +
-                        "found field " + fields[i] + " in path defined in schema " + schema.getSchemaType().toString());
-
-            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-            int position = objectSchema.getPosition(fields[i]);
-            if (position < 0)
-                throw new IllegalArgumentException("Invalid field position for field " + fields[i] + " in type " + tempType);
-
-            HollowObjectSchema.FieldType fieldType = objectSchema.getFieldType(fields[i]);
-            if (!(fieldType.equals(HollowObjectSchema.FieldType.REFERENCE) || fieldType.equals(HollowObjectSchema.FieldType.STRING)))
-                throw new IllegalArgumentException("Invalid field type for the field " + fields[i]);
-
-            fieldPositions[i] = position;
-            fieldTypes[i] = fieldType;
-            if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
+            HollowObjectSchema objectSchema = (HollowObjectSchema) readStateEngine.getSchema(tempType);
+            fieldTypes[i] = objectSchema.getFieldType(fields[i]);
+            if (fieldTypes[i].equals(HollowObjectSchema.FieldType.REFERENCE)) {
                 tempType = objectSchema.getReferencedType(fields[i]);
             }
             readState = (HollowObjectTypeReadState) readStateEngine.getTypeState(tempType);
