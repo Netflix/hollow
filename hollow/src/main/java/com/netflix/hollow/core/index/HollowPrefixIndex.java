@@ -43,7 +43,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * Example: class "Movie" with a fieldPath String name or class "Movie" with a reference fieldPath of type "Name" which has a string fieldPath "movieName".
      * The former example should provide type as "Movie" and fieldPath path as "name.value".
      * The latter example should provide type as "Movie" and fieldPath path as "name.movieName.value".
-     * Note if using HollowInline annotation appending .value to field path is not needed.
+     * Note the .value is optional in field path.
      *
      * @param readStateEngine state engine to read data from
      * @param type            type in the read state engine. Ordinals for this type will be returned when queried for a prefix.
@@ -152,7 +152,14 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     }
 
     /**
-     * Query the index to find all the ordinals that match the given prefix.
+     * Query the index to find all the ordinals that match the given prefix. Example -
+     * <pre><code>
+     *     HollowOrdinalIterator iterator = index.query("a");
+     *     int ordinal = iterator.next();
+     *     while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL) {
+     *         // print the result using API
+     *     }
+     * </code></pre>
      *
      * @param prefix
      * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given query.

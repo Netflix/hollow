@@ -34,7 +34,7 @@ public class HollowPrefixIndexTest {
 
     @Test
     public void testSimple() throws Exception {
-        test(getSimpleList(), "SimpleMovie", "name.value");
+        test(getSimpleList(), "SimpleMovie", "name");// also tests, if field path auto expands to name.value.
     }
 
     @Test
