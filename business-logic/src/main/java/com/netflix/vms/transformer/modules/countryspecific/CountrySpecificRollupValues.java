@@ -58,6 +58,8 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     
     private long episodeLaunchDate = -1L;
     
+    private long seasonEarliestSchedulePhaseDate = Long.MAX_VALUE;
+    private long showEarliestSchedulePhaseDate = Long.MAX_VALUE;
     
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
@@ -85,6 +87,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         seasonFoundLocalAudio = false;
         seasonFoundLocalText = false;
         seasonWindowAggregator.reset();
+        seasonEarliestSchedulePhaseDate = Long.MAX_VALUE;
     }
 
     public void resetShow() {
@@ -102,6 +105,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showFoundLocalAudio = false;
         showFoundLocalText = false;
         showWindowAggregator.reset();
+        showEarliestSchedulePhaseDate = Long.MAX_VALUE;
     }
     
     public void resetViewable() {
@@ -350,6 +354,21 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
     public boolean isEpisodeFoundLocalText() {
         return viewableFoundLocalText;
+    }
+    
+    public void newEarliestScheduledPhaseDate(long date) {
+        if(date < seasonEarliestSchedulePhaseDate)
+            seasonEarliestSchedulePhaseDate = date;
+        if(date < showEarliestSchedulePhaseDate)
+            showEarliestSchedulePhaseDate = date;
+    }
+    
+    public long getRolledUpEarliestScheduledPhaseDate() {
+        if(doShow())
+            return showEarliestSchedulePhaseDate;
+        if(doSeason())
+            return seasonEarliestSchedulePhaseDate;
+        return Long.MAX_VALUE;
     }
 
 }

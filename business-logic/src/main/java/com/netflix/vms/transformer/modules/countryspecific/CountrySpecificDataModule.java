@@ -286,7 +286,7 @@ public class CountrySpecificDataModule {
         }
 
         // Use Status Data to populate MetaDataAvailabilityDate
-        populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data);
+        populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data, rollup);
 
         if (data.firstDisplayDateByLocale == null) data.firstDisplayDateByLocale = Collections.emptyMap();
         if (data.availabilityWindows == null) data.availabilityWindows = Collections.emptyList();
@@ -334,13 +334,13 @@ public class CountrySpecificDataModule {
         return null;
     }
 
-    private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data) {
+    private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
         VideoImages videoImages = videoDataCollection.getVideoImages((int) videoId);
-        Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, videoImages, availabilityDate);
+        Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, videoImages, availabilityDate, rollup);
 
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
@@ -353,7 +353,7 @@ public class CountrySpecificDataModule {
     }
 
     @VisibleForTesting
-    Long getEarliestSchedulePhaseDate(long videoId, VideoImages videoImages, Long availabilityDate) {
+    Long getEarliestSchedulePhaseDate(long videoId, VideoImages videoImages, Long availabilityDate, CountrySpecificRollupValues rollup) {
         Long earliestStart = null;
 
         // Check if the feature is turned on.
@@ -374,8 +374,8 @@ public class CountrySpecificDataModule {
             // Only offsets from images associated to current video should count for earliest offset.
             // In some cases (topNodes) image windows from child video are rolled up. In that case,
             // source video will be child video which should be ignored.
-            //if (info.sourceVideoId != intVideoId)
-            //    continue;
+            if (info.sourceVideoId != intVideoId)
+                continue;
 
             // If phase has offset and availability date is null, cannot calculate a date.
             // So needs to be ignored.
@@ -388,6 +388,13 @@ public class CountrySpecificDataModule {
             if (earliestStart == null || earliestStart > currentOffsetDate)
                 earliestStart = currentOffsetDate;
         }
+        
+        if(earliestStart != null)
+            rollup.newEarliestScheduledPhaseDate(earliestStart);
+        
+        if(rollup.getRolledUpEarliestScheduledPhaseDate() != Long.MAX_VALUE)
+            earliestStart = rollup.getRolledUpEarliestScheduledPhaseDate();
+        
         return earliestStart;
     }
 
