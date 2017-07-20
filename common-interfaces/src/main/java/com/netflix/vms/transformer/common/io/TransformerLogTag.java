@@ -26,7 +26,12 @@ public enum TransformerLogTag implements LogTag {
     HideCycleFromDashboard,
     DroppedTopNodeOnFloor,
     ArtworkFallbackMissing,
-    VideoFormatMismatch,
+    VideoFormatMismatch_downloadableIds,
+    VideoFormatMismatch_downloadableIds_total,
+    VideoFormatMismatch_4K,
+    VideoFormatMismatch_encodingProfileIds,
+    VideoFormatMismatch_videoIds,
+    VideoFormatMismatch_videoIds_missingFormat,
 
 
     //// TRANSFORMATION ERRORS ////

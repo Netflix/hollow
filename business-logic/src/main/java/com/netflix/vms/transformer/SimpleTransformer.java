@@ -1,5 +1,11 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -7,11 +13,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
 import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
@@ -52,6 +53,7 @@ import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
+import com.netflix.vms.transformer.modules.packages.StreamDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkImageRecipeModule;
 import com.netflix.vms.transformer.modules.passthrough.artwork.ArtworkTypeModule;
@@ -61,7 +63,6 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,6 +108,7 @@ public class SimpleTransformer {
     }
 
     public HollowWriteStateEngine transform() throws Throwable {
+        StreamDataModule.clearVideoFormatDiffs();
 
         // hierarchy initializer, HollowObjectMapper and namedListModule
         final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, ctx);
@@ -176,7 +178,6 @@ public class SimpleTransformer {
                     idx = processedCount.getAndIncrement();
                 }
             });
-
         }
 
         // @formatter:off
@@ -197,7 +198,7 @@ public class SimpleTransformer {
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer)
-        );
+                );
 
         // @formatter:on
         // Execute Transform Modules
@@ -209,6 +210,7 @@ public class SimpleTransformer {
         }
 
         executor.awaitSuccessfulCompletion();
+        StreamDataModule.logVideoFormatDiffs(ctx);
 
         //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
         //// to the NamedLists, and we can build the POJOs using those.

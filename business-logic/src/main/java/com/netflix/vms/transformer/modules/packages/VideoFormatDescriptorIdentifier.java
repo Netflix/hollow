@@ -33,15 +33,15 @@ public class VideoFormatDescriptorIdentifier {
     }
 
     public VideoFormatDescriptor selectVideoFormatDescriptor(int height, int width) {
-        return selectVideoFormatDescriptor(ctx.getCupLibrary(), cycleConstants, height, width);
+        boolean isInclude4K = false; // NOTE: TO BE PARITY, continue to exclude 4K for default code path - @TODO deprecate VideoFormat to encapsulate Video Resolution and introduce new mechanism to return VideoResolutionType
+        return selectVideoFormatDescriptor(ctx.getCupLibrary(), cycleConstants, height, width, isInclude4K);
     }
 
-    protected static VideoFormatDescriptor selectVideoFormatDescriptor(CupLibrary cupLibrary, CycleConstants cycleConstants, int height, int width) {
+    protected static VideoFormatDescriptor selectVideoFormatDescriptor(CupLibrary cupLibrary, CycleConstants cycleConstants, int height, int width, boolean isInclude4K) {
         if (height == Integer.MIN_VALUE) return cycleConstants.VIDEOFORMAT_UNKNOWN;
 
         VideoResolutionType videoResType = cupLibrary.getResolutionType(width, height);
-        // NOTE: TO BE PARITY, the following is commented out for now
-        // if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_QHD)) > 0) return cycleConstants.FOUR_K;
+        if (isInclude4K && videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_QHD)) > 0) return cycleConstants.FOUR_K;
 
         if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_FULL_HD)) > 0) return cycleConstants.ULTRA_HD;
         if (videoResType.compareTo(cupLibrary.getResolutionType(VideoResolutionType.ID_FULL_HD)) == 0) return cycleConstants.SUPER_HD;

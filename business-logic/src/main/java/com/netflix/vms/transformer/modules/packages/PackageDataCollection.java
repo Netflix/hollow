@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
@@ -52,6 +54,7 @@ public class PackageDataCollection {
     public Map<TrickPlayType, TrickPlayItem> trickPlayItemMap;
     private Map<ISOCountry, Set<Strings>> soundTypesByCountry;
 
+    private TransformerContext ctx;
     private Map<Float, Strings> screenFormatCache;
     private Set<Integer> fourKProfileIds;
     private Set<Integer> hdrProfileIds;
@@ -59,7 +62,9 @@ public class PackageDataCollection {
     private Map<Integer, Strings> soundTypesMap;
     private CycleConstants cycleConstants;
 
-    public PackageDataCollection(Set<Integer> fourKProfileIds, Set<Integer> hdrProfileIds, Set<Integer> atmosStreamProfileIds, Map<Integer, Strings> soundTypesMap, CycleConstants cycleConstants) {
+    public PackageDataCollection(TransformerContext ctx, Set<Integer> fourKProfileIds, Set<Integer> hdrProfileIds, Set<Integer> atmosStreamProfileIds, Map<Integer, Strings> soundTypesMap, CycleConstants cycleConstants) {
+        this.ctx = ctx;
+
         this.packageData = new PackageData();
         this.videoFormatDescriptors = new HashSet<>();
         this.longestRuntimeInSeconds = 0;
@@ -107,7 +112,7 @@ public class PackageDataCollection {
         String profileType = profilesHollow._getProfileType()._getValue();
 
         // collect video format descriptors
-        collectVideoDescriptorFormats(streamData, profileType, encodingProfileId);
+        collectVideoDescriptorFormats(videoId, streamData, profileType, encodingProfileId);
         checkLongestRuntime(streamData, profileType);
         collectScreenFormats(streamData, profileType);
         collectSoundTypes(streamData, profileType, profilesHollow, excludedDownloadables);
@@ -144,7 +149,7 @@ public class PackageDataCollection {
         }
     }
 
-    private void collectVideoDescriptorFormats(StreamData streamData, String profileType, int encodingProfileId) {
+    private void collectVideoDescriptorFormats(int videoId, StreamData streamData, String profileType, int encodingProfileId) {
         // @TODO: Why don't MUXED streams contribute to the package info's videoFormatDescriptors?
         if ("VIDEO".equals(profileType)) {
             VideoFormatDescriptor descriptor = streamData.downloadDescriptor.videoFormatDescriptor;
@@ -155,11 +160,32 @@ public class PackageDataCollection {
         }
         if (hdrProfileIds.contains(encodingProfileId))
             videoFormatDescriptors.add(cycleConstants.HDR);
-        // @TODO: should FOUR_K be computed from video resolution?  - Perhaps VideoFormat should just exclude video resolutions instead
-        if (fourKProfileIds.contains(encodingProfileId))
-            videoFormatDescriptors.add(cycleConstants.FOUR_K);
         if (atmosStreamProfileIds.contains(encodingProfileId))
             videoFormatDescriptors.add(cycleConstants.ATMOS);
+
+        // Use Video Resolution to compute 4K - to be backwards compatible StreamData.DownloadDescriptor.VideoFormatDescriptor does not include 4K
+        VideoResolution videoRes = streamData.streamDataDescriptor.videoResolution;
+        boolean old4K = fourKProfileIds.contains(encodingProfileId);
+        boolean new4K = isVideoResolution4K(videoRes);
+        if (old4K != new4K) {
+            String diffKey = String.format("encodingProfileId=%s, height=%s, width=%s", encodingProfileId, videoRes == null ? 0 : videoRes.height, videoRes == null ? 0 : videoRes.width);
+            String change = String.format("new4K=%s, old4K=%s", new4K, old4K);
+            StreamDataModule.debugVideoFormatMap.track(diffKey, change, videoId);
+            ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_4K, "videoId={}: new4K={}, old4K={}, downloadableId={}, {}", videoId, new4K, old4K, streamData.downloadableId.val, diffKey);
+        }
+        if (ctx.getConfig().useVideoResolutionType()) {
+            if (new4K) videoFormatDescriptors.add(cycleConstants.FOUR_K);
+        } else {
+            if (old4K) videoFormatDescriptors.add(cycleConstants.FOUR_K);
+        }
+    }
+
+    private boolean isVideoResolution4K(VideoResolution videoRes) {
+        if (videoRes != null) {
+            VideoFormatDescriptor vFormat = VideoFormatDescriptorIdentifier.selectVideoFormatDescriptor(ctx.getCupLibrary(), cycleConstants, videoRes.height, videoRes.width, true);
+            return (vFormat.id == cycleConstants.FOUR_K.id);
+        }
+        return false;
     }
 
     private void checkLongestRuntime(StreamData streamData, String profileType) {
