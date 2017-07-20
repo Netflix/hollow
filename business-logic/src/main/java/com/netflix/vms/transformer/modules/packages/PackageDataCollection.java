@@ -167,7 +167,12 @@ public class PackageDataCollection {
         VideoResolution videoRes = streamData.streamDataDescriptor.videoResolution;
         boolean old4K = fourKProfileIds.contains(encodingProfileId);
         boolean new4K = isVideoResolution4K(videoRes);
-        if (old4K != new4K) ctx.getLogger().warn(TransformerLogTag.VideoFormat4KMismatch, "videoId={}: new4K={}, old4K={}, downloadableId={}, encodingProfileId={}, height={}, width={}", videoId, new4K, old4K, streamData.downloadableId.val, encodingProfileId, videoRes == null ? 0 : videoRes.height, videoRes == null ? 0 : videoRes.width);
+        if (old4K != new4K) {
+            String diffKey = String.format("encodingProfileId=%s, height=%s, width=%s", encodingProfileId, videoRes == null ? 0 : videoRes.height, videoRes == null ? 0 : videoRes.width);
+            String change = String.format("new4K=%s, old4K=%s", new4K, old4K);
+            StreamDataModule.debugVideoFormatMap.track(diffKey, change, videoId);
+            ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_4K, "videoId={}: new4K={}, old4K={}, downloadableId={}, {}", videoId, new4K, old4K, streamData.downloadableId.val, diffKey);
+        }
         if (ctx.getConfig().useVideoResolutionType()) {
             if (new4K) videoFormatDescriptors.add(cycleConstants.FOUR_K);
         } else {
