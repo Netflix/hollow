@@ -369,8 +369,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private long bitsPerOrdinalSet;
 
         private long maxNodes;
-        private FixedLengthElementArray nodes, ordinalSet;
+        private FixedLengthElementArray nodes;
         private long indexTracker;// where to create new node
+
+        private FixedLengthElementArray[] ordinalSets;
+        private long nodeBucketSize = 1 << 10;
+        private int totalBuckets;
 
         /**
          * Create new prefix index. Represents a ternary search tree.
@@ -395,8 +399,13 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             bitsPerNode = bitsPerKey + (3 * bitsForChildPointer);
 
             nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
-            ordinalSet = new FixedLengthElementArray(memoryRecycler, bitsPerOrdinalSet * maxNodes);
             indexTracker = 0;
+
+            totalBuckets = (int) Math.ceil((double) maxNodes / (double) nodeBucketSize);
+            ordinalSets = new FixedLengthElementArray[totalBuckets];
+            for (int i = 0; i < totalBuckets; i++) {
+                ordinalSets[i] = new FixedLengthElementArray(memoryRecycler, nodeBucketSize * bitsPerOrdinalSet);
+            }
 
             // initialize offsets
             leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
@@ -407,7 +416,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
         private void recycleMemory(ArraySegmentRecycler memoryRecycler) {
             nodes.destroy(memoryRecycler);
-            ordinalSet.destroy(memoryRecycler);
+            for (int i = 0; i < totalBuckets; i++) {
+                ordinalSets[i].destroy(memoryRecycler);
+            }
         }
 
         private long getChildOffset(NodeType nodeType) {
@@ -484,9 +495,16 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         }
 
         private void addOrdinal(long nodeIndex, long ordinal) {
+
+            // find bucket
+            long bucket = nodeIndex / nodeBucketSize;
+            long offset = nodeIndex % nodeBucketSize;
+
+            FixedLengthElementArray ordinalSet = ordinalSets[(int) bucket];
+
             // if ordinal set size has reached max capacity then do not add.
             if (ordinal < bitsPerOrdinalSet) {
-                ordinalSet.setElementValue((nodeIndex * bitsPerOrdinalSet) + ordinal, 1, 1);
+                ordinalSet.setElementValue((offset * bitsPerOrdinalSet) + ordinal, 1, 1);
             }
         }
 
@@ -525,7 +543,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
             if (matchFound) {
 
-                long ordinalStartIndex = currentNodeIndex * bitsPerOrdinalSet;
+                long bucket = currentNodeIndex / nodeBucketSize;
+                long offset = currentNodeIndex % nodeBucketSize;
+                FixedLengthElementArray ordinalSet = ordinalSets[(int) bucket];
+                long ordinalStartIndex = offset * bitsPerOrdinalSet;
                 long ordinalEndIndex = ordinalStartIndex + bitsPerOrdinalSet - 1;
                 int ordinal = 0;
                 while (ordinalStartIndex <= ordinalEndIndex) {
