@@ -12,8 +12,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,7 +58,7 @@ public class HollowPrefixIndexTest {
     @Test
     public void testCustomPrefixIndex() throws Exception {
 
-        for (Movie movie: getSimpleList()) {
+        for (Movie movie : getSimpleList()) {
             objectMapper.add(movie);
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
@@ -82,7 +85,7 @@ public class HollowPrefixIndexTest {
         }
 
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "SimpleMovie", "name");
         prefixIndex.listenForDeltaUpdates();
 
         Set<Integer> ordinals = toSet(prefixIndex.query("龍"));
@@ -121,6 +124,68 @@ public class HollowPrefixIndexTest {
 
         prefixIndex.detachFromDeltaUpdates();
 
+    }
+
+    @Test
+    public void testListReference() throws Exception {
+        MovieListReference movieListReference = new MovieListReference(1, 1999, "The Matrix", Arrays.asList("Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"));
+        objectMapper.add(movieListReference);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieListReference", "actors.element.value");
+        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Assert.assertTrue(ordinals.size() == 1);
+    }
+
+    @Test
+    public void testSetReference() throws Exception {
+        MovieSetReference movieSetReference = new MovieSetReference(1, 1999, "The Matrix", new HashSet<String>(Arrays.asList("Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss")));
+        objectMapper.add(movieSetReference);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.value");
+        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Assert.assertTrue(ordinals.size() == 1);
+    }
+
+    @Test
+    public void testMovieActorReference() throws Exception {
+        List<Actor> actors = Arrays.asList(new Actor("Keanu Reeves"), new Actor("Laurence Fishburne"), new Actor("Carrie-Anne Moss"));
+        MovieActorReference movieSetReference = new MovieActorReference(1, 1999, "The Matrix", actors);
+        objectMapper.add(movieSetReference);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorReference", "actors.element");
+        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Assert.assertTrue(ordinals.size() == 1);
+    }
+
+    @Test
+    public void testMovieMapReference() throws Exception {
+        Map<Integer, String> idActorMap = new HashMap<>();
+        idActorMap.put(1, "Keanu Reeves");
+        idActorMap.put(2, "Laurence Fishburne");
+        idActorMap.put(3, "Carrie-Anne Moss");
+        MovieMapReference movieMapReference = new MovieMapReference(1, 1999, "The Matrix", idActorMap);
+        objectMapper.add(movieMapReference);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieMapReference", "idActorNameMap");
+        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Assert.assertTrue(ordinals.size() == 1);
+    }
+
+    @Test
+    public void testMovieActorMapReference() throws Exception {
+        Map<Integer, Actor> idActorMap = new HashMap<>();
+        idActorMap.put(1, new Actor("Keanu Reeves"));
+        idActorMap.put(2, new Actor("Laurence Fishburne"));
+        idActorMap.put(3, new Actor("Carrie-Anne Moss"));
+        MovieActorMapReference movieActorMapReference = new MovieActorMapReference(1, 1999, "The Matrix", idActorMap);
+        objectMapper.add(movieActorMapReference);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorMapReference", "idActorNameMap");
+        Set<Integer> ordinals = toSet(prefixIndex.query("carr"));
+        Assert.assertTrue(ordinals.size() == 1);
+        ordinals = toSet(prefixIndex.query("aaa"));
+        System.out.println(ordinals.toString());
+        Assert.assertTrue(ordinals.size() == 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -187,6 +252,9 @@ public class HollowPrefixIndexTest {
         ordinals = toSet(prefixIndex.query("th"));
         Assert.assertEquals(ordinals.size(), 1);
 
+        ordinals = toSet(prefixIndex.query("ttt"));
+        Assert.assertEquals(ordinals.size(), 0);
+
         ordinals = toSet(prefixIndex.query("the"));
         Assert.assertEquals(ordinals.size(), 1);
 
@@ -230,81 +298,30 @@ public class HollowPrefixIndexTest {
         return movies;
     }
 
-    private static interface Movie {
-
+    private Set<Integer> toSet(HollowOrdinalIterator iterator) {
+        Set<Integer> ordinals = new HashSet<>();
+        int ordinal = iterator.next();
+        while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            ordinals.add(ordinal);
+            ordinal = iterator.next();
+        }
+        return ordinals;
     }
 
-    private static class SimpleMovie implements Movie {
-
-        private int id;
-        private String name;
-        int yearRelease;
-
-        public SimpleMovie(int id, String name, int yearRelease) {
-            this.id = id;
-            this.name = name;
-            this.yearRelease = yearRelease;
-        }
-
-        public void updateName(String n) {
-            this.name = n;
-        }
-    }
-
-    private static class MovieInlineName implements Movie {
-        private int id;
-        @HollowInline
-        private String name;
-        int yearRelease;
-
-        public MovieInlineName(int id, String name, int yearRelease) {
-            this.id = id;
-            this.name = name;
-            this.yearRelease = yearRelease;
+    private void printResults(Set<Integer> ordinals, String type, String field) {
+        HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
+        HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
+        int nameField = movieReadState.getSchema().getPosition(field);
+        int valueField = nameReadState.getSchema().getPosition("value");
+        for (int ordinal : ordinals) {
+            int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
+            System.out.println(nameReadState.readString(nameOrdinal, valueField));
         }
     }
 
-    private static class MovieWithReferenceName implements Movie {
-        private int id;
-        private Name name;
-        int yearRelease;
-
-        public MovieWithReferenceName(int id, String name, int yearRelease) {
-            this.id = id;
-            this.name = new Name(name);
-            this.yearRelease = yearRelease;
-        }
-    }
-
-    private static class Name {
-        String n;
-
-        public Name(String n) {
-            this.n = n;
-        }
-    }
-
-    private static class MovieWithReferenceToInlineName implements Movie {
-        private int id;
-        private NameInline name;
-        int yearRelease;
-
-        public MovieWithReferenceToInlineName(int id, String name, int yearRelease) {
-            this.id = id;
-            this.name = new NameInline(name);
-            this.yearRelease = yearRelease;
-        }
-    }
-
-    private static class NameInline {
-        @HollowInline
-        String n;
-
-        public NameInline(String n) {
-            this.n = n;
-        }
-    }
-
+    /**
+     * Custom prefix index for splitting the key by white space.
+     */
     private static class HollowTokenizedPrefixIndex extends HollowPrefixIndex {
 
         public HollowTokenizedPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
@@ -325,24 +342,159 @@ public class HollowPrefixIndexTest {
         }
     }
 
-    private Set<Integer> toSet(HollowOrdinalIterator iterator) {
-        Set<Integer> ordinals = new HashSet<>();
-        int ordinal = iterator.next();
-        while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            ordinals.add(ordinal);
-            ordinal = iterator.next();
+
+    /**
+     * Abstract Movie class for testing purposes.
+     */
+    private static abstract class Movie {
+        private int id;
+        private int yearRelease;
+
+        public Movie(int id, int year) {
+            this.id = id;
+            this.yearRelease = year;
         }
-        return ordinals;
     }
 
-    private void printResults(Set<Integer> ordinals, String type, String field) {
-        HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
-        HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
-        int nameField = movieReadState.getSchema().getPosition(field);
-        int valueField = nameReadState.getSchema().getPosition("value");
-        for (int ordinal : ordinals) {
-            int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
-            System.out.println(nameReadState.readString(nameOrdinal, valueField));
+    /**
+     * Movie class with String reference for movie name.
+     */
+    private static class SimpleMovie extends Movie {
+        private String name;
+
+        public SimpleMovie(int id, String name, int yearRelease) {
+            super(id, yearRelease);
+            this.name = name;
+        }
+
+        public void updateName(String n) {
+            this.name = n;
+        }
+    }
+
+    /**
+     * Movie class with HollowInline attribute for movie name.
+     */
+    private static class MovieInlineName extends Movie {
+        @HollowInline
+        private String name;
+
+        public MovieInlineName(int id, String name, int yearRelease) {
+            super(id, yearRelease);
+            this.name = name;
+        }
+    }
+
+    /**
+     * Movie class with name attribute being reference to another class with String reference.
+     */
+    private static class MovieWithReferenceName extends Movie {
+        private Name name;
+
+        public MovieWithReferenceName(int id, String name, int yearRelease) {
+            super(id, yearRelease);
+            this.name = new Name(name);
+        }
+    }
+
+    private static class Name {
+        String n;
+
+        public Name(String n) {
+            this.n = n;
+        }
+    }
+
+    /**
+     * Movie class with name attribute being reference to another class with HollowInline string value
+     */
+    private static class MovieWithReferenceToInlineName extends Movie {
+        private NameInline name;
+
+        public MovieWithReferenceToInlineName(int id, String name, int yearRelease) {
+            super(id, yearRelease);
+            this.name = new NameInline(name);
+        }
+    }
+
+    private static class NameInline {
+        @HollowInline
+        String n;
+
+        public NameInline(String n) {
+            this.n = n;
+        }
+    }
+
+    /**
+     * Movie class with list of actors
+     */
+    private static class MovieListReference extends Movie {
+        List<String> actors;
+        String name;
+
+        public MovieListReference(int id, int yearRelease, String name, List<String> actors) {
+            super(id, yearRelease);
+            this.name = name;
+            this.actors = actors;
+        }
+    }
+
+    /**
+     * Movie class with set of actors
+     */
+    private static class MovieSetReference extends Movie {
+        Set<String> actors;
+        String name;
+
+        public MovieSetReference(int id, int yearRelease, String name, Set<String> actors) {
+            super(id, yearRelease);
+            this.name = name;
+            this.actors = actors;
+        }
+    }
+
+    /**
+     * Movie class with reference to List of Actor
+     */
+    private static class MovieActorReference extends Movie {
+        List<Actor> actors;
+        String name;
+
+        public MovieActorReference(int id, int yearRelease, String name, List<Actor> actors) {
+            super(id, yearRelease);
+            this.actors = actors;
+            this.name = name;
+        }
+    }
+
+    private static class Actor {
+        private String name;
+
+        public Actor(String name) {
+            this.name = name;
+        }
+    }
+
+    private static class MovieMapReference extends Movie {
+        private Map<Integer, String> idActorNameMap;
+        private String name;
+
+        public MovieMapReference(int id, int yearRelease, String name, Map<Integer, String> idActorMap) {
+            super(id, yearRelease);
+            this.name = name;
+            this.idActorNameMap = idActorMap;
+        }
+    }
+
+    private static class MovieActorMapReference extends Movie {
+        private Map<Integer, Actor> idActorNameMap;
+        private String name;
+
+        public MovieActorMapReference(int id, int yearRelease, String name, Map<Integer, Actor> idActorMap) {
+            super(id, yearRelease);
+            this.name = name;
+            this.idActorNameMap = idActorMap;
         }
     }
 }
