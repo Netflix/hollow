@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 
+ * Warning: This is a BETA API and is subject to breaking changes.
+ * 
+ */
 public class HollowIncrementalProducer {
     
     private static final Object DELETE_RECORD = new Object();
