@@ -83,8 +83,11 @@ public class HollowDeltaProcessor {
                 Map<String, BitSet> recordsToRemove = new HashMap<String, BitSet>();
                 for(RecordPrimaryKey key : mutations.keySet()) {
                     if(!recordsToRemove.containsKey(key.getType())) {
-                        BitSet bs = new BitSet(readState.getStateEngine().getTypeState(key.getType()).getPopulatedOrdinals().length());
-                        recordsToRemove.put(key.getType(), bs);
+                        HollowTypeReadState typeState = readState.getStateEngine().getTypeState(key.getType());
+                        if(typeState != null) {
+                            BitSet bs = new BitSet(typeState.getPopulatedOrdinals().length());
+                            recordsToRemove.put(key.getType(), bs);
+                        }
                     }
                 }
                 return recordsToRemove;
