@@ -42,7 +42,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     private int totalWords;
     private int averageWordLen;
-    private int totalValues;
     private int maxOrdinalOfType;
 
     /**
@@ -169,9 +168,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         averageWordLen = (int) Math.ceil(avg);
 
         HollowObjectTypeReadState valueState = (HollowObjectTypeReadState) readStateEngine.getTypeDataAccess(type);
-        totalValues = valueState.getPopulatedOrdinals().cardinality();
         maxOrdinalOfType = valueState.maxOrdinal();
-        if (maxOrdinalOfType == 0) maxOrdinalOfType++;// if only 1 record then max ordinal of type will be 0.
 
         // initialize the prefix index.
         build();
@@ -184,9 +181,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         if (prefixIndex != null) prefixIndex.recycleMemory(memoryRecycle);
 
         long estimatedNumberOfNodes = estimateNumNodes(totalWords, averageWordLen);
-        long estimatedTotalValues = estimateNumberOfValuesPerNode(totalValues);
-
-        Tst tst = new Tst(estimatedNumberOfNodes, estimatedTotalValues, maxOrdinalOfType, memoryRecycle);
+        Tst tst = new Tst(estimatedNumberOfNodes, maxOrdinalOfType, memoryRecycle);
         BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
@@ -215,14 +210,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         } else {
             return (long) Math.pow(2, 8) * (averageWordLen);
         }
-    }
-
-    // ordinal set size -> bitsPerOrdinal, maxNodes, total words per Ordinal
-    protected long estimateNumberOfValuesPerNode(long totalValues) {
-        if (totalValues > (int) Math.pow(2, 16)) {
-            return (long) Math.pow(2, 8);
-        }
-        return totalValues;
     }
 
     /**
@@ -368,21 +355,17 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             Left, Right, Middle
         }
 
-        // each node segment can be thought of as 16 bit key, bits to hold index of its children, bits to get size of ordinal set, and finally bits to point to ordinal set.
+        // each node segment can be thought of as 16 bit key and bits to hold index of its children
         private int bitsPerNode;
         private int bitsPerKey;
         private int bitsForChildPointer;
-        private int bitsForOrdinalSetSize;
 
         // helper offsets
         private long leftChildOffset;
         private long middleChildOffset;
         private long rightChildOffset;
-        private long ordinalSetPointerOffset;
-        private long ordinalSetSizeOffset;
 
-        // bits for ordinal sets
-        private int bitsPerOrdinal;
+        // bits for ordinal values, each bit itself represents the ordinal value.
         private long bitsPerOrdinalSet;
 
         private long maxNodes;
@@ -392,28 +375,24 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         /**
          * Create new prefix index. Represents a ternary search tree.
          *
-         * @param estimateNumNodes       estimate number of max nodes that will created.
-         * @param estimatedValuesPerNode estimate number of values per node
-         * @param maxOrdinalValue        max ordinal that can be referenced
-         * @param memoryRecycler         to reuse arrays from memory pool
+         * @param estimateNumNodes estimate number of max nodes that will created.
+         * @param maxOrdinalValue  max ordinal that can be referenced
+         * @param memoryRecycler   to reuse arrays from memory pool
          */
-        private Tst(long estimateNumNodes, long estimatedValuesPerNode, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
+        private Tst(long estimateNumNodes, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
 
             // best guess
             maxNodes = estimateNumNodes;
 
-            // bits needed to hold a value ordinal
-            bitsPerOrdinal = 64 - Long.numberOfLeadingZeros(maxOrdinalValue);
             // total bits to hold all ordinals for a given key
-            bitsPerOrdinalSet = estimatedValuesPerNode * bitsPerOrdinal;
+            bitsPerOrdinalSet = maxOrdinalValue + 1;
 
             // bits for pointers in a single node:
             bitsPerKey = 16;// key
             bitsForChildPointer = 64 - Long.numberOfLeadingZeros(maxNodes);// a child pointer
-            bitsForOrdinalSetSize = 64 - Long.numberOfLeadingZeros(bitsPerOrdinalSet);// ordinal set size pointer
 
             // bits to represent one node
-            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + bitsForOrdinalSetSize;
+            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer);
 
             nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
             ordinalSet = new FixedLengthElementArray(memoryRecycler, bitsPerOrdinalSet * maxNodes);
@@ -423,7 +402,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
             middleChildOffset = leftChildOffset + bitsForChildPointer;
             rightChildOffset = middleChildOffset + bitsForChildPointer;
-            ordinalSetSizeOffset = bitsPerKey + (3 * bitsForChildPointer);
         }
 
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
@@ -506,15 +484,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         }
 
         private void addOrdinal(long nodeIndex, long ordinal) {
-            // find index of ordinal set that current node points to
-            long ordinalSetIndex = nodeIndex;
-            long ordinalSetSize = nodes.getElementValue((nodeIndex * bitsPerNode) + ordinalSetSizeOffset, bitsForOrdinalSetSize);
-
             // if ordinal set size has reached max capacity then do not add.
-            if (ordinalSetSize < (bitsPerOrdinalSet / bitsPerOrdinal)) {
-                ordinalSet.setElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (ordinalSetSize * bitsPerOrdinal), bitsPerOrdinal, ordinal);
-                // increment set size and re-add for the node
-                nodes.setElementValue((nodeIndex * bitsPerNode) + ordinalSetSizeOffset, bitsForOrdinalSetSize, (ordinalSetSize + 1));
+            if (ordinal < bitsPerOrdinalSet) {
+                ordinalSet.setElementValue((nodeIndex * bitsPerOrdinalSet) + ordinal, 1, 1);
             }
         }
 
@@ -553,15 +525,13 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
             if (matchFound) {
 
-                long ordinalSetIndex = currentNodeIndex;
-                int ordinalSetSize = (int) nodes.getElementValue(currentNodeIndex * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
-                if (ordinalSetSize != 0) {
-                    int i = 0;
-                    do {
-                        int ordinal = (int) ordinalSet.getElementValue((ordinalSetIndex * bitsPerOrdinalSet) + (i * bitsPerOrdinal), bitsPerOrdinal);
-                        ordinals.add(ordinal);
-                        i++;
-                    } while (i < (ordinalSetSize - 1));
+                long ordinalStartIndex = currentNodeIndex * bitsPerOrdinalSet;
+                long ordinalEndIndex = ordinalStartIndex + bitsPerOrdinalSet - 1;
+                int ordinal = 0;
+                while (ordinalStartIndex <= ordinalEndIndex) {
+                    if (ordinalSet.getElementValue(ordinalStartIndex, 1) == 1) ordinals.add(ordinal);
+                    ordinal++;
+                    ordinalStartIndex++;
                 }
             }
 
