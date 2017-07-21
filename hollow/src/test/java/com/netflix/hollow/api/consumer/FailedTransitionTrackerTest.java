@@ -24,6 +24,7 @@ import com.netflix.hollow.api.client.HollowUpdatePlan;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import java.io.IOException;
 import java.io.InputStream;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +46,10 @@ public class FailedTransitionTrackerTest {
         tracker.markAllTransitionsAsFailed(plan);
     }
 
-
+    @After
+    public void tearDown() {
+        this.tracker.clear();
+    }
 
     @Test
     public void testNoFailedTransitions() {
