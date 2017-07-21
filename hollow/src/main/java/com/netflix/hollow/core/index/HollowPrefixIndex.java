@@ -372,7 +372,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private int bitsPerNode;
         private int bitsPerKey;
         private int bitsForChildPointer;
-        private int bitsForOrdinalSetPointer;
         private int bitsForOrdinalSetSize;
 
         // helper offsets
@@ -411,11 +410,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             // bits for pointers in a single node:
             bitsPerKey = 16;// key
             bitsForChildPointer = 64 - Long.numberOfLeadingZeros(maxNodes);// a child pointer
-            bitsForOrdinalSetPointer = 64 - Long.numberOfLeadingZeros(maxNodes);// ordinal set pointer
             bitsForOrdinalSetSize = 64 - Long.numberOfLeadingZeros(bitsPerOrdinalSet);// ordinal set size pointer
 
             // bits to represent one node
-            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + bitsForOrdinalSetSize + bitsForOrdinalSetPointer;
+            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + bitsForOrdinalSetSize;
 
             nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
             ordinalSet = new FixedLengthElementArray(memoryRecycler, bitsPerOrdinalSet * maxNodes);
@@ -425,8 +423,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
             middleChildOffset = leftChildOffset + bitsForChildPointer;
             rightChildOffset = middleChildOffset + bitsForChildPointer;
-            ordinalSetPointerOffset = bitsPerKey + (3 * bitsForChildPointer);
-            ordinalSetSizeOffset = ordinalSetPointerOffset + bitsForOrdinalSetPointer;
+            ordinalSetSizeOffset = bitsPerKey + (3 * bitsForChildPointer);
         }
 
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
@@ -453,8 +450,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private void setDataForNewNode(long index, char ch) {
             // set the key for new node
             nodes.setElementValue(index * bitsPerNode, bitsPerKey, ch);
-            // set the ordinal set pointer to use the same index as node index
-            nodes.setElementValue((index * bitsPerNode) + ordinalSetPointerOffset, bitsForOrdinalSetPointer, index);
         }
 
         private void setChildIndex(long currentNode, NodeType nodeType, long indexForNode) {
@@ -512,7 +507,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         private void addOrdinal(long nodeIndex, long ordinal) {
             // find index of ordinal set that current node points to
-            long ordinalSetIndex = nodes.getElementValue((nodeIndex * bitsPerNode) + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
+            long ordinalSetIndex = nodeIndex;
             long ordinalSetSize = nodes.getElementValue((nodeIndex * bitsPerNode) + ordinalSetSizeOffset, bitsForOrdinalSetSize);
 
             // if ordinal set size has reached max capacity then do not add.
@@ -558,7 +553,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
             if (matchFound) {
 
-                long ordinalSetIndex = nodes.getElementValue(currentNodeIndex * bitsPerNode + ordinalSetPointerOffset, bitsForOrdinalSetPointer);
+                long ordinalSetIndex = currentNodeIndex;
                 int ordinalSetSize = (int) nodes.getElementValue(currentNodeIndex * bitsPerNode + ordinalSetSizeOffset, bitsForOrdinalSetSize);
                 if (ordinalSetSize != 0) {
                     int i = 0;
