@@ -81,47 +81,73 @@ public class HollowWriteStateCreator {
         }
     }
     
+    /**
+     * Recreate a {@link HollowWriteStateEngine} which can be used to write a snapshot of or continue
+     * a delta chain from the supplied {@link HollowReadStateEngine}.
+     * <p>
+     * The returned state engine will be ready to write a snapshot which will exactly recreate the data in the supplied {@link HollowReadStateEngine}.
+     * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
+     * 
+     * @param readEngine
+     * @return
+     */
     public static HollowWriteStateEngine recreateAndPopulateUsingReadEngine(final HollowReadStateEngine readEngine) {
         final HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         
-        for(HollowTypeReadState readState : readEngine.getTypeStates()) {
-            HollowSchema schema = readState.getSchema();
-            switch(schema.getSchemaType()) {
-            case OBJECT:
-                writeEngine.addTypeState(new HollowObjectTypeWriteState((HollowObjectSchema)schema, readState.numShards()));
-                break;
-            case LIST:
-                writeEngine.addTypeState(new HollowListTypeWriteState((HollowListSchema)schema, readState.numShards()));
-                break;
-            case SET:
-                writeEngine.addTypeState(new HollowSetTypeWriteState((HollowSetSchema)schema, readState.numShards()));
-                break;
-            case MAP:
-                writeEngine.addTypeState(new HollowMapTypeWriteState((HollowMapSchema)schema, readState.numShards()));
-                break;
-            }
-        }
+        populateStateEngineWithTypeWriteStates(writeEngine, readEngine.getSchemas());
+        populateUsingReadEngine(writeEngine, readEngine);
         
+        return writeEngine;
+    }
+
+    /**
+     * Populate the supplied {@link HollowWriteStateEngine} with all of the records from the supplied {@link HollowReadStateEngine}.
+     * <p>
+     * <ul>
+     *   <li>If fields or types have been removed, then those are ignored when copying records.</li>
+     *   <li>If fields have been added to existing types, those fields will be null in the copied records.</li>
+     *   <li>If types have been added, those types will have no records.</li>
+     * </ul>
+     * <p>
+     * The supplied HollowWriteStateEngine must be newly created, initialized with a data model, and empty.  After this call, 
+     * the write engine will be ready to write a snapshot which will exactly recreate the data in the supplied {@link HollowReadStateEngine}, 
+     * except with the data model which was initialized.
+     * <p>
+     * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
+     * 
+     * @param readEngine
+     * @return
+     */
+    public static void populateUsingReadEngine(final HollowWriteStateEngine writeEngine, final HollowReadStateEngine readEngine) {
         SimultaneousExecutor executor = new SimultaneousExecutor();
+        
+        for(HollowTypeWriteState writeState : writeEngine.getOrderedTypeStates()) {
+            if(writeState.getPopulatedBitSet().cardinality() != 0 || writeState.getPreviousCyclePopulatedBitSet().cardinality() != 0)
+                throw new IllegalStateException("The supplied HollowWriteStateEngine is already populated!");
+        }
         
         for(final HollowTypeReadState readState : readEngine.getTypeStates()) {
             executor.execute(new Runnable() {
                 public void run() {
                     HollowTypeWriteState writeState = writeEngine.getTypeState(readState.getSchema().getName());
                     
-                    HollowRecordCopier copier = HollowRecordCopier.createCopier(readState);
-                    
-                    BitSet populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
-                    
-                    int ordinal = populatedOrdinals.nextSetBit(0);
-                    while(ordinal != -1) {
-                        HollowWriteRecord rec = copier.copy(ordinal);
-                        writeState.mapOrdinal(rec, ordinal, false, true);
+                    if(writeState != null) {
+                        writeState.setNumShards(readState.numShards());
                         
-                        ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+                        HollowRecordCopier copier = HollowRecordCopier.createCopier(readState, writeState.getSchema());
+                        
+                        BitSet populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+                        
+                        int ordinal = populatedOrdinals.nextSetBit(0);
+                        while(ordinal != -1) {
+                            HollowWriteRecord rec = copier.copy(ordinal);
+                            writeState.mapOrdinal(rec, ordinal, false, true);
+                            
+                            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+                        }
+                        
+                        writeState.recalculateFreeOrdinals();
                     }
-                    
-                    writeState.recalculateFreeOrdinals();
                 }
             });
         }
@@ -132,10 +158,9 @@ public class HollowWriteStateCreator {
             throw new RuntimeException(e);
         }
         
+        writeEngine.addHeaderTags(readEngine.getHeaderTags());
         writeEngine.overrideNextStateRandomizedTag(readEngine.getCurrentRandomizedTag());
         writeEngine.prepareForWrite();
-        
-        return writeEngine;
     }
 
 }

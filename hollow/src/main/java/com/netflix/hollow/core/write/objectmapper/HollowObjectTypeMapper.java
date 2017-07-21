@@ -50,6 +50,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final long assignedOrdinalFieldOffset;
 
     private final List<MappedField> mappedFields;
+    
+    private volatile int primaryKeyFieldPathIdx[][];
 
     public HollowObjectTypeMapper(HollowObjectMapper parentMapper, Class<?> clazz, String declaredTypeName, Set<Type> visited) {
         this.parentMapper = parentMapper;
@@ -188,7 +190,36 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return assignedOrdinal;
     }
 
-    public String[] getDefaultElementHashKey() {
+    Object[] extractPrimaryKey(Object obj) {
+        int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;
+        
+        if(primaryKeyFieldPathIdx == null) {
+            primaryKeyFieldPathIdx = calculatePrimaryKeyFieldPathIdx(primaryKeyFieldPathIdx);
+            this.primaryKeyFieldPathIdx = primaryKeyFieldPathIdx;
+        }
+        
+        Object key[] = new Object[primaryKeyFieldPathIdx.length];
+        
+        for(int i=0;i<key.length;i++) {
+            key[i] = retrieveFieldValue(obj, primaryKeyFieldPathIdx[i], 0);
+        }
+        
+        return key;
+    }
+
+    private int[][] calculatePrimaryKeyFieldPathIdx(int[][] primaryKeyFieldPathIdx) {
+        if(schema.getPrimaryKey() == null)
+            throw new IllegalArgumentException("Type " + typeName + " does not have a primary key defined");
+        
+        primaryKeyFieldPathIdx = new int[schema.getPrimaryKey().numFields()][];
+        
+        for(int i=0;i<primaryKeyFieldPathIdx.length;i++)
+            primaryKeyFieldPathIdx[i] = schema.getPrimaryKey().getFieldPathIndex(parentMapper.getStateEngine(), i);
+        
+        return primaryKeyFieldPathIdx;
+    }
+    
+    String[] getDefaultElementHashKey() {
         PrimaryKey pKey = schema.getPrimaryKey();
         if (pKey != null) return pKey.getFieldPaths();
 
@@ -208,6 +239,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     @Override
     protected HollowTypeWriteState getTypeWriteState() {
         return writeState;
+    }
+
+    private Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
+        return mappedFields.get(fieldPathIdx[idx]).retrieveFieldValue(obj, fieldPathIdx, idx);
     }
 
     private class MappedField {
@@ -435,6 +470,75 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
         
+        public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
+            Object fieldObject;
+
+            if(idx < fieldPathIdx.length - 1) {
+                if(fieldType != MappedFieldType.REFERENCE)
+                    throw new IllegalArgumentException("Expected REFERENCE mapped field type but found " + fieldType);
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                if(fieldObject == null)
+                    return null;
+                return ((HollowObjectTypeMapper)subTypeMapper).retrieveFieldValue(fieldObject, fieldPathIdx, idx+1);
+            }
+            
+
+            switch(fieldType) {
+            case BOOLEAN:
+                return unsafe.getBoolean(obj, fieldOffset);
+            case INT:
+                return Integer.valueOf(unsafe.getInt(obj, fieldOffset));
+            case SHORT:
+                return Integer.valueOf(unsafe.getShort(obj, fieldOffset));
+            case BYTE:
+                return Integer.valueOf(unsafe.getByte(obj, fieldOffset));
+            case CHAR:
+                return Integer.valueOf(unsafe.getChar(obj, fieldOffset));
+            case LONG:
+                return Long.valueOf(unsafe.getLong(obj, fieldOffset));
+            case DOUBLE:
+                double d = unsafe.getDouble(obj, fieldOffset);
+                if(Double.isNaN(d))
+                    return null;
+                return Double.valueOf(d);
+            case FLOAT:
+                float f = unsafe.getFloat(obj, fieldOffset);
+                if(Float.isNaN(f))
+                    return null;
+                return Float.valueOf(f);
+            case STRING:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : new String((char[])fieldObject);
+            case BYTES:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : (byte[])fieldObject;
+            case INLINED_BOOLEAN:
+            case INLINED_INT:
+            case INLINED_LONG:
+            case INLINED_DOUBLE:
+            case INLINED_FLOAT:
+            case INLINED_STRING:
+                return unsafe.getObject(obj, fieldOffset);
+            case INLINED_SHORT:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : Integer.valueOf((Short)fieldObject);
+            case INLINED_BYTE:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : Integer.valueOf((Byte)fieldObject);
+            case INLINED_CHAR:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : Integer.valueOf((Character)fieldObject);
+            case NULLABLE_PRIMITIVE_BOOLEAN:
+                fieldObject = unsafe.getObject(obj, fieldOffset);
+                return fieldObject == null ? null : Boolean.valueOf(((NullablePrimitiveBoolean)fieldObject).getBooleanValue());
+            case DATE_TIME:
+                return Long.valueOf(((Date)obj).getTime());
+            case ENUM_NAME:
+                return String.valueOf(((Enum<?>)obj).name());
+            default:
+                throw new IllegalArgumentException("Cannot extract POJO primary key from a " + fieldType + " mapped field type");
+            }
+        }
     }
     
     private static enum AssignedOrdinalType {
