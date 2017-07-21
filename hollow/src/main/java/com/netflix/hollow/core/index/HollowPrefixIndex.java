@@ -72,8 +72,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private void initialize() {
 
         //check arguments
-        if (readStateEngine == null || type == null || fieldPath == null)
-            throw new IllegalArgumentException("Null arguments received");
+        if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
+        if (type == null) throw new IllegalArgumentException("type cannot be null");
+        if (fieldPath == null || fieldPath.isEmpty())
+            throw new IllegalArgumentException("fieldPath cannot be null or empty");
 
         String[] fieldParts = fieldPath.split("\\.");
         List<String> fields = new ArrayList<String>();
