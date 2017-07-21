@@ -35,14 +35,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HollowDeltaProcessor {
+public class HollowIncrementalProducer {
     
     private static final Object DELETE_RECORD = new Object();
 
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     
-    public HollowDeltaProcessor(HollowProducer producer) {
+    public HollowIncrementalProducer(HollowProducer producer) {
         this.producer = producer;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
     }

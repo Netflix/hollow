@@ -31,7 +31,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HollowDeltaProcessorTest {
+public class HollowIncrementalProducerTest {
 
     private InMemoryBlobStore blobStore;
 
@@ -41,33 +41,117 @@ public class HollowDeltaProcessorTest {
     }
 
     @Test
-    public void continuesARestoredState() {
+    public void publishAndLoadASnapshot() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager()).build();
+                                                .withBlobStager(new HollowInMemoryBlobStager())
+                                                .build();
 
-        /// Initialize the data.
-        long originalVersion = producer.runCycle(new Populator() {
+        /// initialize the data -- classic producer creates the first state in the delta chain. 
+        producer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeA(1, "one", 1));
+                state.add(new TypeA(2, "two", 2));
+                state.add(new TypeA(3, "three", 3));
+                state.add(new TypeA(4, "four", 4));
+                state.add(new TypeA(5, "five", 5));
+
+                state.add(new TypeB(1, "1"));
+                state.add(new TypeB(2, "2"));
+                state.add(new TypeB(3, "3"));
+                state.add(new TypeB(4, "4"));
+            }
+        });
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.addOrModify(new TypeA(4, "five", 6));
+        incrementalProducer.delete(new TypeA(5, "five", 5));
+
+        incrementalProducer.delete(new TypeB(2, "3"));
+        incrementalProducer.addOrModify(new TypeB(5, "5"));
+        incrementalProducer.addOrModify(new TypeB(5, "6"));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        /// another new state with a single change
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 100L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 1, "1");
+        assertTypeB(idx, 2, null);
+        assertTypeB(idx, 3, null);
+        assertTypeB(idx, 4, "4");
+        assertTypeB(idx, 5, "6");
+
+        consumer.triggerRefreshTo(finalVersion);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1000L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+    }
+    
+    @Test
+    public void continuesARestoredState() {
+        HollowProducer genesisProducer = HollowProducer.withPublisher(blobStore)
+                                                       .withBlobStager(new HollowInMemoryBlobStager())
+                                                       .build();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain. 
+        long originalVersion = genesisProducer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeA(1, "one", 1));
             }
         });
         
-        HollowProducer newProducer = HollowProducer.withPublisher(blobStore)
+        /// now at some point in the future, we will start up and create a new classic producer 
+        /// to back the HollowIncrementalProducer.
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
                                                    .withBlobStager(new HollowInMemoryBlobStager())
                                                    .build();
         
-        /// adding a new type.
-        newProducer.initializeDataModel(TypeA.class, TypeB.class);
+        /// adding a new type this time (TypeB).
+        backingProducer.initializeDataModel(TypeA.class, TypeB.class);
          
-
-        HollowDeltaProcessor deltaProcessor = new HollowDeltaProcessor(newProducer);
-        deltaProcessor.restore(originalVersion, blobStore);
+        /// now create our HollowIncrementalProducer
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(backingProducer);
+        incrementalProducer.restore(originalVersion, blobStore);
         
-        deltaProcessor.addOrModify(new TypeA(1, "one", 2));
-        deltaProcessor.addOrModify(new TypeA(2, "two", 2));
-        deltaProcessor.addOrModify(new TypeB(3, "three"));
+        incrementalProducer.addOrModify(new TypeA(1, "one", 2));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeB(3, "three"));
         
-        long version = deltaProcessor.runCycle();
+        long version = incrementalProducer.runCycle();
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(originalVersion);
@@ -87,93 +171,6 @@ public class HollowDeltaProcessorTest {
         Assert.assertFalse(idx.containsDuplicates());
         
         assertTypeB(idx, 3, "three");
-    }
-
-    @Test
-    public void publishAndLoadASnapshot() {
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager()).build();
-
-        // / Initialize the data.
-        long originalVersion = producer.runCycle(new Populator() {
-            public void populate(WriteState state) throws Exception {
-                state.add(new TypeA(1, "one", 1));
-                state.add(new TypeA(2, "two", 2));
-                state.add(new TypeA(3, "three", 3));
-                state.add(new TypeA(4, "four", 4));
-                state.add(new TypeA(5, "five", 5));
-
-                state.add(new TypeB(1, "1"));
-                state.add(new TypeB(2, "2"));
-                state.add(new TypeB(3, "3"));
-                state.add(new TypeB(4, "4"));
-            }
-        });
-
-        /*
-         * HollowProducer newProducer = HollowProducer.withPublisher(blobStore)
-         * .withBlobStager(new HollowInMemoryBlobStager()) .build();
-         * 
-         * newProducer.initializeDataModel(TypeA.class, TypeB.class);
-         */
-
-        HollowDeltaProcessor deltaProcessor = new HollowDeltaProcessor(producer);
-        // deltaProcessor.restore(originalVersion, blobStore);
-
-        deltaProcessor.addOrModify(new TypeA(1, "one", 100));
-        deltaProcessor.addOrModify(new TypeA(2, "two", 2));
-        deltaProcessor.addOrModify(new TypeA(3, "three", 300));
-        deltaProcessor.addOrModify(new TypeA(3, "three", 3));
-        deltaProcessor.addOrModify(new TypeA(4, "five", 6));
-        deltaProcessor.delete(new TypeA(5, "five", 5));
-
-        deltaProcessor.delete(new TypeB(2, "3"));
-        deltaProcessor.addOrModify(new TypeB(5, "5"));
-        deltaProcessor.addOrModify(new TypeB(5, "6"));
-        deltaProcessor.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
-
-        long nextVersion = deltaProcessor.runCycle();
-
-        deltaProcessor.addOrModify(new TypeA(1, "one", 1000));
-
-        long finalVersion = deltaProcessor.runCycle();
-
-        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
-        consumer.triggerRefreshTo(originalVersion);
-        consumer.triggerRefreshTo(nextVersion);
-
-        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
-        Assert.assertFalse(idx.containsDuplicates());
-
-        assertTypeA(idx, 1, "one", 100L);
-        assertTypeA(idx, 2, "two", 2L);
-        assertTypeA(idx, 3, "three", 3L);
-        assertTypeA(idx, 4, "four", 4L);
-        assertTypeA(idx, 4, "five", 6L);
-        assertTypeA(idx, 5, "five", null);
-
-        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB",
-                "id");
-        Assert.assertFalse(idx.containsDuplicates());
-
-        assertTypeB(idx, 1, "1");
-        assertTypeB(idx, 2, null);
-        assertTypeB(idx, 3, null);
-        assertTypeB(idx, 4, "4");
-        assertTypeB(idx, 5, "6");
-
-        consumer.triggerRefreshTo(finalVersion);
-
-        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA",
-                "id1", "id2");
-        Assert.assertFalse(idx.containsDuplicates());
-
-        assertTypeA(idx, 1, "one", 1000L);
-        assertTypeA(idx, 2, "two", 2L);
-        assertTypeA(idx, 3, "three", 3L);
-        assertTypeA(idx, 4, "four", 4L);
-        assertTypeA(idx, 4, "five", 6L);
-        assertTypeA(idx, 5, "five", null);
     }
 
     private void assertTypeA(HollowPrimaryKeyIndex typeAIdx, int id1,
