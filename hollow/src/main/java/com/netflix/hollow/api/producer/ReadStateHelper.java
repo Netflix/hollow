@@ -81,6 +81,11 @@ final class ReadStateHelper {
         return new ReadStateHelper(this.pending, null);
     }
 
+    ReadStateHelper rollback() {
+        if(pending == null) throw new IllegalStateException();
+        return new ReadStateHelper(newReadState(current.getVersion(), pending.getStateEngine()), null);
+    }
+
     ReadState current() {
         return current;
     }

@@ -340,11 +340,20 @@ public class HollowProducer {
                 cycleStatus.version(candidate.pending());
                 candidate = checkIntegrity(candidate, artifacts);
 
-                validate(candidate.pending());
-
-                announce(candidate.pending());
-                readStates = candidate.commit();
-                cycleStatus.version(readStates.current()).success();
+                try {
+                    validate(candidate.pending());
+    
+                    announce(candidate.pending());
+    
+                    readStates = candidate.commit();
+                    cycleStatus.version(readStates.current()).success();
+                } catch(Throwable th) {
+                    if(artifacts.hasReverseDelta()) {
+                        applyDelta(artifacts.reverseDelta, candidate.pending().getStateEngine());
+                        readStates = candidate.rollback();
+                    }
+                    throw th;
+                }
             } else {
                 // 3b. Nothing to do; reset the effects of Step 2
                 writeEngine.resetToLastPrepareForNextCycle();
@@ -358,6 +367,8 @@ public class HollowProducer {
                 throw (RuntimeException)th;
             throw new RuntimeException(th);
         } finally {
+            
+            
             artifacts.cleanup();
         }
     }
@@ -497,15 +508,15 @@ public class HollowProducer {
                 log.info("         PND " + pendingChecksum);
 
                 if(artifacts.hasDelta()) {
-                    // FIXME: timt: future cycles will fail unless this delta validates *and* we have a reverse
-                    // delta *and* it also validates
+                    if(!artifacts.hasReverseDelta())
+                        throw new IllegalStateException("Both a delta and reverse delta are required");
+                    
+                    // FIXME: timt: future cycles will fail unless both deltas validate
                     applyDelta(artifacts.delta, current);
                     HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
                     //out.format("  CUR => PND %s\n", forwardChecksum);
                     if(!forwardChecksum.equals(pendingChecksum)) throw new ChecksumValidationException(Blob.Type.DELTA);
-                }
 
-                if(artifacts.hasReverseDelta()) {
                     applyDelta(artifacts.reverseDelta, pending);
                     HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
                     //out.format("  CUR <= PND %s\n", reverseChecksum);
