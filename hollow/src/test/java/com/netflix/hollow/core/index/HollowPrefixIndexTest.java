@@ -64,13 +64,13 @@ public class HollowPrefixIndexTest {
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowTokenizedPrefixIndex tokenizedPrefixIndex = new HollowTokenizedPrefixIndex(readStateEngine, "SimpleMovie", "name.value");
 
-        Set<Integer> ordinals = toSet(tokenizedPrefixIndex.query("th"));
+        Set<Integer> ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("th"));
         Assert.assertTrue(ordinals.size() == 1);
 
-        ordinals = toSet(tokenizedPrefixIndex.query("matrix"));
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("matrix"));
         Assert.assertTrue(ordinals.size() == 1);
 
-        ordinals = toSet(tokenizedPrefixIndex.query("the "));// note the whitespace in query string.
+        ordinals = toSet(tokenizedPrefixIndex.findKeysWithPrefix("the "));// note the whitespace in findKeysWithPrefix string.
         // expected result ordinals size is 0, since entire movie is not indexed. movie name is split by whitespace.
         Assert.assertTrue(ordinals.size() == 0);
     }
@@ -88,13 +88,16 @@ public class HollowPrefixIndexTest {
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "SimpleMovie", "name");
         prefixIndex.listenForDeltaUpdates();
 
-        Set<Integer> ordinals = toSet(prefixIndex.query("龍"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("龍"));
+        Set<String> movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
         Assert.assertTrue(ordinals.size() == 1);
-        printResults(ordinals, "SimpleMovie", "name");
+        Assert.assertTrue(movieNames.contains("龍爭虎鬥"));
 
-        ordinals = toSet(prefixIndex.query("00"));
-        Assert.assertEquals(ordinals.size(), 1);
-        printResults(ordinals, "SimpleMovie", "name");
+
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("00"));
+        movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
+        Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(movieNames.contains("007 James Bond"));
 
         // update one movie
         ((SimpleMovie) (movies.get(3))).updateName("Rocky 2");
@@ -108,19 +111,27 @@ public class HollowPrefixIndexTest {
         }
 
         StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
-        ordinals = toSet(prefixIndex.query("as"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("as"));
+        movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
         Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(movieNames.contains("As Good as It Gets"));
 
-        ordinals = toSet(prefixIndex.query("R"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("R"));
+        movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
         Assert.assertEquals(ordinals.size(), 2);
-        printResults(ordinals, "SimpleMovie", "name");
+        Assert.assertTrue(movieNames.contains("Rocky 2"));
+        Assert.assertTrue(movieNames.contains("Rush"));
 
-        ordinals = toSet(prefixIndex.query("rocky 2"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("rocky 2"));
+        movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
         Assert.assertTrue(ordinals.size() == 1);
+        Assert.assertTrue(movieNames.contains("Rocky 2"));
 
-        ordinals = toSet(prefixIndex.query("0"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("0"));
+        movieNames = getMovieNames(ordinals, "SimpleMovie", "name");
         Assert.assertTrue(ordinals.size() == 2);
-        printResults(ordinals, "SimpleMovie", "name");
+        Assert.assertTrue(movieNames.contains("007 James Bond"));
+        Assert.assertTrue(movieNames.contains("0 dark thirty"));
 
         prefixIndex.detachFromDeltaUpdates();
 
@@ -132,7 +143,7 @@ public class HollowPrefixIndexTest {
         objectMapper.add(movieListReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieListReference", "actors.element.value");
-        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
 
@@ -142,7 +153,7 @@ public class HollowPrefixIndexTest {
         objectMapper.add(movieSetReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.value");
-        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
 
@@ -153,7 +164,7 @@ public class HollowPrefixIndexTest {
         objectMapper.add(movieSetReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorReference", "actors.element");
-        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
 
@@ -167,7 +178,7 @@ public class HollowPrefixIndexTest {
         objectMapper.add(movieMapReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieMapReference", "idActorNameMap");
-        Set<Integer> ordinals = toSet(prefixIndex.query("kea"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
 
@@ -181,10 +192,9 @@ public class HollowPrefixIndexTest {
         objectMapper.add(movieActorMapReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorMapReference", "idActorNameMap");
-        Set<Integer> ordinals = toSet(prefixIndex.query("carr"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("carr"));
         Assert.assertTrue(ordinals.size() == 1);
-        ordinals = toSet(prefixIndex.query("aaa"));
-        System.out.println(ordinals.toString());
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("aaa"));
         Assert.assertTrue(ordinals.size() == 0);
     }
 
@@ -229,9 +239,8 @@ public class HollowPrefixIndexTest {
         }
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
         HollowPrefixIndex index = new HollowPrefixIndex(readStateEngine, "MovieWithReferenceName", "name.n");// no.value appended, it should work
-        Set<Integer> ordinals = toSet(index.query("the"));
+        Set<Integer> ordinals = toSet(index.findKeysWithPrefix("the"));
         Assert.assertTrue(ordinals.size() == 1);
-        printResults(ordinals, "MovieWithReferenceName", "name");
 
     }
 
@@ -243,22 +252,23 @@ public class HollowPrefixIndexTest {
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, type, fieldPath);
-        Set<Integer> ordinals = toSet(prefixIndex.query("R"));
+        Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("R"));
         Assert.assertEquals(ordinals.size(), 2);
 
-        ordinals = toSet(prefixIndex.query("R"));
+
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("R"));
         Assert.assertEquals(ordinals.size(), 2);
 
-        ordinals = toSet(prefixIndex.query("th"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("th"));
         Assert.assertEquals(ordinals.size(), 1);
 
-        ordinals = toSet(prefixIndex.query("ttt"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("ttt"));
         Assert.assertEquals(ordinals.size(), 0);
 
-        ordinals = toSet(prefixIndex.query("the"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("the"));
         Assert.assertEquals(ordinals.size(), 1);
 
-        ordinals = toSet(prefixIndex.query("blOO"));
+        ordinals = toSet(prefixIndex.findKeysWithPrefix("blOO"));
         Assert.assertEquals(ordinals.size(), 1);
     }
 
@@ -308,15 +318,17 @@ public class HollowPrefixIndexTest {
         return ordinals;
     }
 
-    private void printResults(Set<Integer> ordinals, String type, String field) {
+    private Set<String> getMovieNames(Set<Integer> ordinals, String type, String field) {
+        Set<String> movieNames = new HashSet<>();
         HollowObjectTypeReadState movieReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState(type);
         HollowObjectTypeReadState nameReadState = (HollowObjectTypeReadState) readStateEngine.getTypeState("String");
         int nameField = movieReadState.getSchema().getPosition(field);
         int valueField = nameReadState.getSchema().getPosition("value");
         for (int ordinal : ordinals) {
             int nameOrdinal = movieReadState.readOrdinal(ordinal, nameField);
-            System.out.println(nameReadState.readString(nameOrdinal, valueField));
+            movieNames.add(nameReadState.readString(nameOrdinal, valueField));
         }
+        return movieNames;
     }
 
     /**
@@ -329,9 +341,9 @@ public class HollowPrefixIndexTest {
         }
 
         @Override
-        public String[] getKey(int ordinal) {
+        public String[] getKeys(int ordinal) {
             // split the key by " ";
-            String[] keys = super.getKey(ordinal);
+            String[] keys = super.getKeys(ordinal);
             List<String> tokens = new ArrayList<>();
             for (String key : keys) {
                 String[] splits = key.split(" ");

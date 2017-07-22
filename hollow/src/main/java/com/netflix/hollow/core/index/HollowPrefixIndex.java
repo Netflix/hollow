@@ -16,11 +16,13 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -32,8 +34,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private String type;
     private String fieldPath;
 
-    private Tst prefixIndex;
-    private volatile Tst prefixIndexVolatile;
+    private TST prefixIndex;
+    private volatile TST prefixIndexVolatile;
     private ArraySegmentRecycler memoryRecycle;
 
     private String[] fields;
@@ -44,18 +46,16 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private int averageWordLen;
     private int maxOrdinalOfType;
 
+    private boolean buildIndexOnUpdate;
+
     /**
-     * Constructor to create a prefix index for a type using the key defined in one of the fields in that type.
-     * The fieldPath could be a reference to another type and path ultimately leads to a string type fieldPath.
-     * <p>
-     * Example: class "Movie" with a fieldPath String name or class "Movie" with a reference fieldPath of type "Name" which has a string fieldPath "movieName".
-     * The former example should provide type as "Movie" and fieldPath path as "name.value".
-     * The latter example should provide type as "Movie" and fieldPath path as "name.movieName.value".
-     * Note the .value is optional in field path.
+     * Initializes a new prefix index.
      *
      * @param readStateEngine state engine to read data from
      * @param type            type in the read state engine. Ordinals for this type will be returned when queried for a prefix.
-     * @param fieldPath       fieldPath should ultimately lead to a string fieldPath, which will be the keys to build the prefix index.
+     * @param fieldPath       fieldPath should ultimately lead to a string field.
+     *                        The fields in the path could reference another Object, List, Set or a Map.
+     *                        The fields should be separated by ".".
      */
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
         this.readStateEngine = readStateEngine;
@@ -64,6 +64,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         // create memory recycle for using shared memory pools.
         memoryRecycle = WastefulRecycler.DEFAULT_INSTANCE;
+        buildIndexOnUpdate = true;
         initialize();
     }
 
@@ -174,20 +175,23 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         build();
     }
 
-    private void build() {
+    private synchronized void build() {
 
+        if (!buildIndexOnUpdate) return;
         // tell memory recycler to use current tst's long arrays next time when long array is requested.
         // note reuse only happens once swap is called and bits are reset
         if (prefixIndex != null) prefixIndex.recycleMemory(memoryRecycle);
 
         long estimatedNumberOfNodes = estimateNumNodes(totalWords, averageWordLen);
-        Tst tst = new Tst(estimatedNumberOfNodes, maxOrdinalOfType, memoryRecycle);
+        TST tst = new TST(estimatedNumberOfNodes, maxOrdinalOfType, memoryRecycle);
         BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
-            String[] keys = getKey(ordinal);
-            for (String key : keys) {
-                tst.insert(key, ordinal);
+            String[] keys = getKeys(ordinal);
+            if (keys != null) {
+                for (String key : keys) {
+                    tst.insert(key, ordinal);
+                }
             }
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
@@ -195,21 +199,19 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         prefixIndexVolatile = tst;
         // safe to return previous long arrays on next request for long array.
         memoryRecycle.swap();
+        buildIndexOnUpdate = false;
     }
 
+    /**
+     * This method estimates the total number of nodes that will required to create the index.
+     * Override this method if lower/higher estimate is needed compared to the default implementation.
+     *
+     * @param totalWords
+     * @param averageWordLen
+     * @return
+     */
     protected long estimateNumNodes(long totalWords, long averageWordLen) {
-        long diff = totalWords - averageWordLen;
-        // total words more than average word len
-        if (diff > 0) {
-            // total symbols 2^16 - unicode is 16 bits. if total words are very large, then approximate
-            if (totalWords > (Math.pow(2, 16) * averageWordLen)) {
-                return (long) (Math.pow(2, 16) * averageWordLen);
-            }
-            return totalWords * averageWordLen;// good estimate
-
-        } else {
-            return (long) Math.pow(2, 8) * (averageWordLen);
-        }
+        return totalWords * averageWordLen;
     }
 
     /**
@@ -223,11 +225,11 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @param ordinal ordinal of the parent type.
      * @return keys to index.
      */
-    protected String[] getKey(int ordinal) {
+    protected String[] getKeys(int ordinal) {
         return findKeys(ordinal, type, 0);
     }
 
-
+    // recursively find all the keys to index using the field path starting from the given type and field
     private String[] findKeys(int ordinal, String type, int fieldIndex) {
 
         String[] keys;
@@ -288,23 +290,41 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     /**
      * Query the index to find all the ordinals that match the given prefix. Example -
      * <pre>{@code
-     *     HollowOrdinalIterator iterator = index.query("a");
+     *     HollowOrdinalIterator iterator = index.findKeysWithPrefix("a");
      *     int ordinal = iterator.next();
      *     while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL) {
      *         // print the result using API
      *     }
      * }</pre>
+     * <p>
+     * For larger data sets, querying smaller prefixes will be longer than querying for prefixes that are longer.
      *
-     * @param prefix query prefix.
-     * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given query.
+     * @param prefix findKeysWithPrefix prefix.
+     * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given findKeysWithPrefix.
      */
-    public HollowOrdinalIterator query(String prefix) {
-        Tst current = this.prefixIndex;
+    public HollowOrdinalIterator findKeysWithPrefix(String prefix) {
+        TST current = this.prefixIndex;
         HollowOrdinalIterator it;
         do {
-            it = current.query(prefix);
+            it = current.findKeysWithPrefix(prefix);
         } while (current != this.prefixIndexVolatile);
         return it;
+    }
+
+    /**
+     * Check if the given exists in the index.
+     *
+     * @param key
+     * @return boolean value indicating if the key exists in the index.
+     */
+    public boolean contains(String key) {
+        if (key == null) throw new IllegalArgumentException("key cannot be null");
+        TST current = this.prefixIndex;
+        boolean result;
+        do {
+            result = current.contains(key);
+        } while (current != this.prefixIndexVolatile);
+        return result;
     }
 
     /**
@@ -330,26 +350,22 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     @Override
     public void addedOrdinal(int ordinal) {
-        // for each ordinal and fieldPath fieldPositionInValueObject -> get key and ordinal of the object
+        buildIndexOnUpdate = true;
     }
 
     @Override
     public void removedOrdinal(int ordinal) {
-        // for each ordinal and fieldPath fieldPositionInValueObject -> get key and ordinal of the object
+        buildIndexOnUpdate = true;
     }
 
     @Override
     public void endUpdate() {
         // pass 1 for delta support - rebuild the tree and swap the new tree with the one that is serving the queries.
+        // next pass -  improve the index build time or add support for remove method.
         initialize();
-        // pass 2 fast creation by re-using index built
-        // pass 3 support remove method and dynamic size creation.
     }
 
-    // data structure to match keys (prefix) with ordinalSet.
-    // TST is very space efficient compared to a trie, with small trade-off in cost to perform look-ups (specially for misses).
-    // TST plus FixedLengthElementArray is super duper compact.
-    private static class Tst {
+    private static class TST {
 
         private enum NodeType {
             Left, Right, Middle
@@ -359,22 +375,20 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private int bitsPerNode;
         private int bitsPerKey;
         private int bitsForChildPointer;
+        private int bitsPerOrdinal;
 
         // helper offsets
         private long leftChildOffset;
         private long middleChildOffset;
         private long rightChildOffset;
-
-        // bits for ordinal values, each bit itself represents the ordinal value.
-        private long bitsPerOrdinalSet;
+        private long isLeafNodeFlagOffset;
 
         private long maxNodes;
         private FixedLengthElementArray nodes;
-        private long indexTracker;// where to create new node
+        private FixedLengthElementArray ordinalSet;
+        private long indexTracker;
 
-        private FixedLengthElementArray[] ordinalSets;
-        private long nodeBucketSize = 1 << 10;
-        private int totalBuckets;
+        private long size;
 
         /**
          * Create new prefix index. Represents a ternary search tree.
@@ -383,42 +397,34 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param maxOrdinalValue  max ordinal that can be referenced
          * @param memoryRecycler   to reuse arrays from memory pool
          */
-        private Tst(long estimateNumNodes, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
+        private TST(long estimateNumNodes, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
 
             // best guess
             maxNodes = estimateNumNodes;
 
-            // total bits to hold all ordinals for a given key
-            bitsPerOrdinalSet = maxOrdinalValue + 1;
-
             // bits for pointers in a single node:
             bitsPerKey = 16;// key
             bitsForChildPointer = 64 - Long.numberOfLeadingZeros(maxNodes);// a child pointer
+            bitsPerOrdinal = maxOrdinalValue == 0 ? 1 : 32 - Integer.numberOfLeadingZeros(maxOrdinalValue);
 
             // bits to represent one node
-            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer);
+            bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + 1;
 
             nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
+            ordinalSet = new FixedLengthElementArray(memoryRecycler, maxNodes * bitsPerOrdinal);
             indexTracker = 0;
-
-            totalBuckets = (int) Math.ceil((double) maxNodes / (double) nodeBucketSize);
-            ordinalSets = new FixedLengthElementArray[totalBuckets];
-            for (int i = 0; i < totalBuckets; i++) {
-                ordinalSets[i] = new FixedLengthElementArray(memoryRecycler, nodeBucketSize * bitsPerOrdinalSet);
-            }
 
             // initialize offsets
             leftChildOffset = bitsPerKey;// after first 16 bits in node is first left child offset.
             middleChildOffset = leftChildOffset + bitsForChildPointer;
             rightChildOffset = middleChildOffset + bitsForChildPointer;
+            isLeafNodeFlagOffset = rightChildOffset + bitsForChildPointer;
         }
 
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
         private void recycleMemory(ArraySegmentRecycler memoryRecycler) {
             nodes.destroy(memoryRecycler);
-            for (int i = 0; i < totalBuckets; i++) {
-                ordinalSets[i].destroy(memoryRecycler);
-            }
+            ordinalSet.destroy(memoryRecycler);
         }
 
         private long getChildOffset(NodeType nodeType) {
@@ -429,16 +435,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             return offset;
         }
 
-        // get child index of the given node, if not set then 0 is returned
-        private long getIndex(long currentNode, NodeType nodeType) {
+        private long getChildIndex(long currentNode, NodeType nodeType) {
             long offset = getChildOffset(nodeType);
             return nodes.getElementValue((currentNode * bitsPerNode) + offset, bitsForChildPointer);
-        }
-
-        // create new node at the given index and given key
-        private void setDataForNewNode(long index, char ch) {
-            // set the key for new node
-            nodes.setElementValue(index * bitsPerNode, bitsPerKey, ch);
         }
 
         private void setChildIndex(long currentNode, NodeType nodeType, long indexForNode) {
@@ -446,9 +445,33 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             nodes.setElementValue((currentNode * bitsPerNode) + offset, bitsForChildPointer, indexForNode);
         }
 
-        // get key for the given node index
+        private void setKey(long index, char ch) {
+            nodes.setElementValue(index * bitsPerNode, bitsPerKey, ch);
+        }
+
         private long getKey(long nodeIndex) {
             return nodes.getElementValue(nodeIndex * bitsPerNode, bitsPerKey);
+        }
+
+        private boolean isLeafNode(long nodeIndex) {
+            if (nodes.getElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1) == 1)
+                return true;
+            return false;
+        }
+
+        private void addOrdinal(long nodeIndex, long ordinal) {
+            long ordinalIndex = nodeIndex * bitsPerOrdinal;
+            ordinalSet.setElementValue(ordinalIndex, bitsPerOrdinal, ordinal);
+            nodes.setElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1, 1);
+        }
+
+        private int getOrdinal(long nodeIndex) {
+            long ordinalIndex = nodeIndex * bitsPerOrdinal;
+            return (int) ordinalSet.getElementValue(ordinalIndex, bitsPerOrdinal);
+        }
+
+        private long size() {
+            return size;
         }
 
         /**
@@ -466,7 +489,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
                 char ch = key.charAt(keyIndex);
                 if (getKey(currentNodeIndex) == 0) {
-                    setDataForNewNode(currentNodeIndex, ch);
+                    setKey(currentNodeIndex, ch);
                     indexTracker++;
                     if (indexTracker >= maxNodes)
                         throw new IllegalStateException("Index Tracker reached max capacity. Try with larger estimate of number of nodes");
@@ -474,38 +497,65 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
                 long keyAtCurrentNode = getKey(currentNodeIndex);
                 if (ch < keyAtCurrentNode) {
-                    long leftIndex = getIndex(currentNodeIndex, NodeType.Left);
+                    long leftIndex = getChildIndex(currentNodeIndex, NodeType.Left);
                     if (leftIndex == 0) leftIndex = indexTracker;
                     setChildIndex(currentNodeIndex, NodeType.Left, leftIndex);
                     currentNodeIndex = leftIndex;
                 } else if (ch > keyAtCurrentNode) {
-                    long rightIndex = getIndex(currentNodeIndex, NodeType.Right);
+                    long rightIndex = getChildIndex(currentNodeIndex, NodeType.Right);
                     if (rightIndex == 0) rightIndex = indexTracker;
                     setChildIndex(currentNodeIndex, NodeType.Right, rightIndex);
                     currentNodeIndex = rightIndex;
                 } else {
-                    addOrdinal(currentNodeIndex, ordinal);
-                    long midIndex = getIndex(currentNodeIndex, NodeType.Middle);
-                    if (midIndex == 0) midIndex = indexTracker;
-                    setChildIndex(currentNodeIndex, NodeType.Middle, midIndex);
-                    currentNodeIndex = midIndex;
                     keyIndex++;
+                    if (keyIndex < key.length()) {
+                        long midIndex = getChildIndex(currentNodeIndex, NodeType.Middle);
+                        if (midIndex == 0) midIndex = indexTracker;
+                        setChildIndex(currentNodeIndex, NodeType.Middle, midIndex);
+                        currentNodeIndex = midIndex;
+                    }
                 }
             }
+            addOrdinal(currentNodeIndex, ordinal);
+            size++;
         }
 
-        private void addOrdinal(long nodeIndex, long ordinal) {
+        /**
+         * This functions checks if the given key exists in the trie.
+         *
+         * @param key
+         * @return index of the node that findNodeWithKey the last character of the key, if not found then returns -1.
+         */
+        private long findNodeWithKey(String key) {
+            long index = -1;
 
-            // find bucket
-            long bucket = nodeIndex / nodeBucketSize;
-            long offset = nodeIndex % nodeBucketSize;
+            boolean atRoot = true;
+            long currentNodeIndex = 0;
+            int keyIndex = 0;
 
-            FixedLengthElementArray ordinalSet = ordinalSets[(int) bucket];
-
-            // if ordinal set size has reached max capacity then do not add.
-            if (ordinal < bitsPerOrdinalSet) {
-                ordinalSet.setElementValue((offset * bitsPerOrdinalSet) + ordinal, 1, 1);
+            while (true) {
+                if (currentNodeIndex == 0 && !atRoot) break;
+                long currentValue = getKey(currentNodeIndex);
+                char ch = key.charAt(keyIndex);
+                if (ch < currentValue) currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Left);
+                else if (ch > currentValue) currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Right);
+                else {
+                    if (keyIndex == (key.length() - 1)) {
+                        index = currentNodeIndex;
+                        break;
+                    }
+                    currentNodeIndex = getChildIndex(currentNodeIndex, NodeType.Middle);
+                    keyIndex++;
+                }
+                if (atRoot) atRoot = false;
             }
+            return index;
+        }
+
+        private boolean contains(String key) {
+            long nodeIndex = findNodeWithKey(key);
+            if (nodeIndex >= 0 && isLeafNode(nodeIndex)) return true;
+            return false;
         }
 
         /**
@@ -514,45 +564,34 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
          * @param prefix
          * @return
          */
-        private HollowOrdinalIterator query(String prefix) {
-            if (prefix == null) throw new IllegalArgumentException("Cannot query null prefix");
+        private HollowOrdinalIterator findKeysWithPrefix(String prefix) {
+            if (prefix == null) throw new IllegalArgumentException("Cannot findKeysWithPrefix null prefix");
             final Set<Integer> ordinals = new HashSet<>();
+            long currentNodeIndex = findNodeWithKey(prefix.toLowerCase());
 
-            prefix = prefix.toLowerCase();
-            boolean matchFound = false;
-            boolean atRoot = true;
-            long currentNodeIndex = 0;
-            int keyIndex = 0;
+            if (currentNodeIndex >= 0) {
 
-            while (true) {
-                if (currentNodeIndex == 0 && !atRoot) break;
-                long currentValue = getKey(currentNodeIndex);
-                char ch = prefix.charAt(keyIndex);
-                if (ch < currentValue) currentNodeIndex = getIndex(currentNodeIndex, NodeType.Left);
-                else if (ch > currentValue) currentNodeIndex = getIndex(currentNodeIndex, NodeType.Right);
-                else {
-                    if (keyIndex == (prefix.length() - 1)) {
-                        matchFound = true;
-                        break;
+                if (isLeafNode(currentNodeIndex))
+                    ordinals.add(getOrdinal(currentNodeIndex));
+
+                // go to all leaf nodes from current node mid pointer
+                long subTree = getChildIndex(currentNodeIndex, NodeType.Middle);
+                if (subTree != 0) {
+                    Queue<Long> queue = new ArrayDeque<>();
+                    queue.add(subTree);
+                    while (!queue.isEmpty()) {
+                        long nodeIndex = queue.remove();
+                        long left = getChildIndex(nodeIndex, NodeType.Left);
+                        long mid = getChildIndex(nodeIndex, NodeType.Middle);
+                        long right = getChildIndex(nodeIndex, NodeType.Right);
+
+                        if (left == 0 && mid == 0 && right == 0) {
+                            if (isLeafNode(nodeIndex)) ordinals.add(getOrdinal(nodeIndex));
+                        }
+                        if (left != 0) queue.add(left);
+                        if (mid != 0) queue.add(mid);
+                        if (right != 0) queue.add(right);
                     }
-                    currentNodeIndex = getIndex(currentNodeIndex, NodeType.Middle);
-                    keyIndex++;
-                }
-                if (atRoot) atRoot = false;// after first iteration, this should reset.
-            }
-
-            if (matchFound) {
-
-                long bucket = currentNodeIndex / nodeBucketSize;
-                long offset = currentNodeIndex % nodeBucketSize;
-                FixedLengthElementArray ordinalSet = ordinalSets[(int) bucket];
-                long ordinalStartIndex = offset * bitsPerOrdinalSet;
-                long ordinalEndIndex = ordinalStartIndex + bitsPerOrdinalSet - 1;
-                int ordinal = 0;
-                while (ordinalStartIndex <= ordinalEndIndex) {
-                    if (ordinalSet.getElementValue(ordinalStartIndex, 1) == 1) ordinals.add(ordinal);
-                    ordinal++;
-                    ordinalStartIndex++;
                 }
             }
 
