@@ -49,8 +49,6 @@ import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
-
-import javax.xml.bind.DatatypeConverter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,6 +56,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.xml.bind.DatatypeConverter;
 
 public class PackageDataModule {
 
@@ -95,7 +94,7 @@ public class PackageDataModule {
         this.drmKeysByGroupId = new HashMap<Integer, Object>();
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
-        this.streamDataModule = new StreamDataModule(api, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
+        this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
         this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
@@ -184,7 +183,7 @@ public class PackageDataModule {
         int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
 
-        PackageDataCollection packageDataCollection = new PackageDataCollection(fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
+        PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
         PackageData pkg = packageDataCollection.getPackageData();
 
         pkg.id = (int) packages._getPackageId();

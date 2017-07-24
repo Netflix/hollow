@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.modules.packages;
 
-import com.netflix.vms.transformer.hollowinput.VideoStreamCropParamsHollow;
-
-import com.netflix.vms.transformer.hollowoutput.StreamCropParams;
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -24,6 +24,7 @@ import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TextStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VideoStreamCropParamsHollow;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.AssetMetaData;
 import com.netflix.vms.transformer.hollowoutput.AssetTypeDescriptor;
@@ -40,6 +41,7 @@ import com.netflix.vms.transformer.hollowoutput.ImageSubtitleIndexByteRange;
 import com.netflix.vms.transformer.hollowoutput.PixelAspect;
 import com.netflix.vms.transformer.hollowoutput.QoEInfo;
 import com.netflix.vms.transformer.hollowoutput.StreamAdditionalData;
+import com.netflix.vms.transformer.hollowoutput.StreamCropParams;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.StreamDataDescriptor;
 import com.netflix.vms.transformer.hollowoutput.StreamDownloadLocationFilename;
@@ -48,6 +50,7 @@ import com.netflix.vms.transformer.hollowoutput.StreamMostlyConstantData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TargetDimensions;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
+import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -61,6 +64,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class StreamDataModule {
+    public static final VideoFormatDebugMap debugVideoFormatMap = new VideoFormatDebugMap();
+    public static final DebugLogConfig debugLogConfig = new DebugLogConfig();
 
     private final StreamDrmData EMPTY_DRM_DATA = new StreamDrmData();
     private final DownloadLocationSet EMPTY_DOWNLOAD_LOCATIONS = new DownloadLocationSet();
@@ -73,17 +78,15 @@ public class StreamDataModule {
     private final Map<Integer, DrmInfo> drmInfoByGroupId;
 
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
-
     private final HollowPrimaryKeyIndex streamProfileIdx;
-
     private final VMSHollowInputAPI api;
-
+    private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
-
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
+    public StreamDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
         this.api = api;
+        this.ctx = ctx;
         this.cycleConstants = cycleConstants;
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
@@ -94,7 +97,7 @@ public class StreamDataModule {
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
-        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, cycleConstants, indexer);
+        this.videoFormatIdentifier = new VideoFormatDescriptorIdentifier(api, ctx, cycleConstants, indexer);
 
         /// only necessary for rogue DrmKeys.
         this.objectMapper = objectMapper;
@@ -155,7 +158,7 @@ public class StreamDataModule {
         outputStream.additionalData.qoeInfo.vmafplusScoreLts = inputVideoStreamInfo._getVmafplusScoreLts();
         outputStream.additionalData.qoeInfo.vmafplusPhoneScoreExp = inputVideoStreamInfo._getVmafplusPhoneScoreExp();
         outputStream.additionalData.qoeInfo.vmafplusPhoneScoreLts = inputVideoStreamInfo._getVmafplusPhoneScoreLts();
-        
+
         VideoStreamCropParamsHollow inputCropParams = inputVideoStreamInfo._getCropParams();
         if(inputCropParams != null) {
             outputStream.additionalData.cropParams = new StreamCropParams();
@@ -164,7 +167,7 @@ public class StreamDataModule {
             outputStream.additionalData.cropParams.width = inputCropParams._getWidth();
             outputStream.additionalData.cropParams.height = inputCropParams._getHeight();
         }
-        
+
         Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
         int deploymentLabelBits = 0;
         if(deploymentLabels != null) {
@@ -215,12 +218,12 @@ public class StreamDataModule {
                 }
             }
         }
-        
+
         StringHollow conformingGroupId = inputStreamDeployment._getS3PathComponent();
         if(conformingGroupId != null) {
             outputStream.additionalData.mostlyConstantData.conformingGroupId = Integer.parseInt(conformingGroupId._getValue());
         }
-        
+
         StringHollow s3FullPath = inputStreamDeployment._getS3FullPath();
         if(s3FullPath != null) {
             outputStream.additionalData.mostlyConstantData.s3FullPath = s3FullPath._getValue().toCharArray();
@@ -248,7 +251,7 @@ public class StreamDataModule {
         } else {
             outputStream.downloadDescriptor.assetTypeDescriptor = assetTypeDescriptorMap.get("primary");
         }
-        
+
         StreamAssetMetadataHollow assetMetadataId = inputStream._getMetadataId();
         if(assetMetadataId != null) {
             String id = assetMetadataId._getId();
@@ -256,7 +259,7 @@ public class StreamDataModule {
                 outputStream.downloadDescriptor.assetMetaData = new AssetMetaData(new Strings(id));
             }
         }
-        
+
 
 
         if(inputNonImageInfo != null) {
@@ -273,9 +276,34 @@ public class StreamDataModule {
             int bitrate = inputVideoStreamInfo._getVideoBitrateKBPS();
             int peakBitrate = inputVideoStreamInfo._getVideoPeakBitrateKBPS();
 
-            outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+            VideoFormatDescriptor selectVideoFormatDescriptorNew = null;
+            VideoFormatDescriptor selectVideoFormatDescriptorOld = null;
+            if (ctx.getConfig().useVideoResolutionType()) {
+                outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+                selectVideoFormatDescriptorNew = outputStream.downloadDescriptor.videoFormatDescriptor;
+            } else {
+                outputStream.downloadDescriptor.videoFormatDescriptor = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+                selectVideoFormatDescriptorOld = outputStream.downloadDescriptor.videoFormatDescriptor;
+            }
             outputStream.streamDataDescriptor.bitrate = bitrate;
             outputStream.streamDataDescriptor.peakBitrate = peakBitrate;
+
+            { // DEBUGGING
+                if (selectVideoFormatDescriptorNew == null) selectVideoFormatDescriptorNew = videoFormatIdentifier.selectVideoFormatDescriptor(height, width);
+                if (selectVideoFormatDescriptorOld == null) selectVideoFormatDescriptorOld = videoFormatIdentifier.selectVideoFormatDescriptorOld(encodingProfileId, bitrate, height, width, targetHeight, targetWidth);
+
+                int videoId = (int) packages._getMovieId();
+                long downloadableId = inputStream._getDownloadableId();
+                String diffKey = String.format("encodingProfileId=%s, height=%s, width=%s", encodingProfileId, height, width);
+                String newFormat = new String(selectVideoFormatDescriptorNew.name.value);
+                String oldFormat = new String(selectVideoFormatDescriptorOld.name.value);
+                debugVideoFormatMap.track(diffKey, videoId, inputStream._getDownloadableId(), oldFormat, newFormat);
+
+                if (debugLogConfig.isLogDetails() && selectVideoFormatDescriptorOld.id != selectVideoFormatDescriptorNew.id) {
+                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_downloadableIds, "videoId={}: new={}, old={}, downloadableId={}, {}",
+                            videoId, newFormat, oldFormat, downloadableId, diffKey);
+                }
+            }
 
             if(targetHeight != Integer.MIN_VALUE && targetWidth != Integer.MIN_VALUE) {
                 outputStream.streamDataDescriptor.targetDimensions = new TargetDimensions();
@@ -403,4 +431,123 @@ public class StreamDataModule {
         return map;
     }
 
+    @Deprecated // should be removed once new video resolution code is enabled
+    private static class DebugLogConfig {
+        private Set<Integer> idSet = Collections.emptySet();
+        private static final FastProperty.StringProperty EXCLUDE_ENCPROF_IDS_FROM_LOG = new FastProperty.StringProperty("com.netflix.vms.server.exclude.encprof_ids.inlogs", "");
+        private static final FastProperty.BooleanProperty LOG_DETAILS_ENABLED = new FastProperty.BooleanProperty("com.netflix.vms.server.log.videoformatdiff_details.enabled", false);
+
+        public DebugLogConfig() {
+            EXCLUDE_ENCPROF_IDS_FROM_LOG.addCallback(() -> {
+                updateIdSet();
+            });
+            updateIdSet();
+        }
+
+        private void updateIdSet() {
+            String value = EXCLUDE_ENCPROF_IDS_FROM_LOG.getValue();
+            if (value == null || value.trim().isEmpty()) {
+                idSet = Collections.emptySet();
+            } else {
+                Set<Integer> newSet = new HashSet<>();
+                for (String id : value.split(",")) {
+                    if (id.trim().isEmpty()) continue;
+                    newSet.add(Integer.parseInt(id.trim()));
+                }
+                idSet = newSet;
+            }
+        }
+
+        public boolean isLogDetails() {
+            return LOG_DETAILS_ENABLED.get();
+        }
+
+        public boolean isExcludeEncodingProfileIdInDetailLog(int encodingProfileId) {
+            return idSet.contains(encodingProfileId);
+        }
+    }
+
+    @Deprecated
+    public static class VideoFormatDebugMap {
+        public static Map<String, Map<String, Set<Integer>>> diffMap = new HashMap<>();
+        public static Map<Integer, Set<String>> oldFormatMap = new HashMap<>();
+        public static Map<Integer, Set<String>> newFormatMap = new HashMap<>();
+        public static Set<Long> downloadableIdDiffsSet = new HashSet<>();
+
+        public void track(String key, Integer video, long downloadableId, String oldFormat, String newFormat) {
+            add(video, oldFormat, oldFormatMap);
+            add(video, newFormat, newFormatMap);
+
+            if (!oldFormat.equals(newFormat)) {
+                downloadableIdDiffsSet.add(downloadableId);
+                String change = String.format("new=%s, old=%s", newFormat, oldFormat);
+                track(key, change, video);
+            }
+        }
+
+        private void add(Integer video, String format, Map<Integer, Set<String>> map) {
+            Set<String> values = map.get(video);
+            if (values == null) {
+                values = new HashSet<>();
+                map.put(video, values);
+            }
+            values.add(format);
+        }
+
+        public void track(String key, String change, Integer video) {
+            Map<String, Set<Integer>> innerMap = diffMap.get(key);
+            if (innerMap == null) {
+                innerMap = new HashMap<>();
+                diffMap.put(key, innerMap);
+            }
+
+            Set<Integer> videos = innerMap.get(change);
+            if (videos == null) {
+                videos = new HashSet<>();
+                innerMap.put(change, videos);
+            }
+
+            videos.add(video);
+        }
+
+        public void reset() {
+            diffMap.clear();
+            oldFormatMap.clear();
+            newFormatMap.clear();
+            downloadableIdDiffsSet.clear();
+        }
+    }
+
+    @Deprecated
+    public static void clearVideoFormatDiffs() {
+        debugVideoFormatMap.reset();
+    }
+
+    @Deprecated
+    public static void logVideoFormatDiffs(TransformerContext ctx) {
+        ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_downloadableIds_total, "total downloadableId diffs={}", debugVideoFormatMap.downloadableIdDiffsSet.size());
+
+        Set<Integer> videoIds = new HashSet<>();
+        for (String encProKey : debugVideoFormatMap.diffMap.keySet()) {
+            Map<String, Set<Integer>> innerMap = debugVideoFormatMap.diffMap.get(encProKey);
+
+            for (Set<Integer> vSet : innerMap.values()) {
+                videoIds.addAll(vSet);
+            }
+
+            ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_encodingProfileIds, "{} : {}", encProKey, debugLogConfig.isLogDetails() ? innerMap : innerMap.keySet());
+        }
+
+        for (Integer vId : videoIds) {
+            Set<String> oldSet = debugVideoFormatMap.oldFormatMap.get(vId);
+            Set<String> newSet = debugVideoFormatMap.newFormatMap.get(vId);
+            if (!oldSet.equals(newSet)) {
+                ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds, "videoId={} : old={}, new={}", vId, oldSet, newSet);
+
+                if (!newSet.containsAll(oldSet)) {
+                    ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds_missingFormat, "videoId={} : old={}, new={}", vId, oldSet, newSet);
+                }
+            }
+        }
+    }
 }

@@ -19,7 +19,6 @@ import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
 import com.netflix.vms.transformer.octobersky.OctoberSkyDataImpl;
 import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
-
 import javax.inject.Singleton;
 
 

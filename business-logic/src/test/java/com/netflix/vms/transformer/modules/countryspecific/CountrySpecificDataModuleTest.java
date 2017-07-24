@@ -89,28 +89,28 @@ public class CountrySpecificDataModuleTest {
     public void testGetEarliestSchedulePhaseOffsetWithOffsetsOnly() {
 	    VideoImages images = videoImagesByVideoMap.get(videoWithMinus60EarliestWindow);
         Long earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithMinus60EarliestWindow, images,
-                availabilityDate);
+                availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals((Long)(availabilityDate+Minus60DaysInMilliS), earliestSchedulePhaseOffset);
 
         images = videoImagesByVideoMap.get(videoWithNoImages);
-        earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithNoImages, images, availabilityDate);
+        earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithNoImages, images, availabilityDate, new CountrySpecificRollupValues());
         Assert.assertNull(earliestSchedulePhaseOffset);
 
         images = videoImagesByVideoMap.get(videoWithLaunchEarliestWindow);
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithLaunchEarliestWindow, images,
-                availabilityDate);
+                availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals((Long)(availabilityDate+0l), earliestSchedulePhaseOffset);
 
         images = videoImagesByVideoMap.get(videoWith2WindowsBeforeLaunch);
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWith2WindowsBeforeLaunch, images,
-                availabilityDate);
+                availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals((Long)(availabilityDate+Minus90DaysInMilliS), earliestSchedulePhaseOffset);
 
         // Windows with other source video are ignored. So -90 days is earliest window but with different source video id. This will be ignored
         // -60 days window will be returned instead.
         images = videoImagesByVideoMap.get(videoWithEarliestWindowFromAnotherSourceVideo);
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithEarliestWindowFromAnotherSourceVideo,
-                images, availabilityDate);
+                images, availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals((Long)(availabilityDate+Minus60DaysInMilliS), earliestSchedulePhaseOffset);
     }
     
@@ -119,19 +119,19 @@ public class CountrySpecificDataModuleTest {
         // PR Date is earliest (15th Oct 2016) than offsets. PR Date wins
         VideoImages images = videoImagesByVideoMap.get(videoWithAbsoluteTagAndOffsets);
         Long earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithAbsoluteTagAndOffsets, images,
-                availabilityDate);
+                availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals(october15th2016, earliestSchedulePhaseOffset);
 
         images = videoImagesByVideoMap.get(videoWithAbsoluteTagAndOffsetsWherOffsetIsEarliest);
         // Earliest offset is earlier than PR Date (5th Jan 2017) and hence offset wins.
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithAbsoluteTagAndOffsetsWherOffsetIsEarliest, images,
-                availabilityDate);
+                availabilityDate, new CountrySpecificRollupValues());
         Assert.assertEquals((Long)(availabilityDate+Minus90DaysInMilliS), earliestSchedulePhaseOffset);
 
         images = videoImagesByVideoMap.get(videoWithAbsoluteTagAndOffsetsWherOffsetIsEarliest);
         // Null availability date, phase offsets will be ignored. Hence PR Date (5th Jan 2016) wins
         earliestSchedulePhaseOffset = dataModule.getEarliestSchedulePhaseDate(videoWithAbsoluteTagAndOffsetsWherOffsetIsEarliest, images,
-                null);
+                null, new CountrySpecificRollupValues());
         Assert.assertEquals(january5th2017, earliestSchedulePhaseOffset);
     }
     
