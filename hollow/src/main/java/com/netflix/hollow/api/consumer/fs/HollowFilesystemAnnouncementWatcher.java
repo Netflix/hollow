@@ -24,24 +24,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.nio.file.attribute.FileTime;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+import static java.nio.file.Files.getLastModifiedTime;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
@@ -53,10 +44,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private final List<HollowConsumer> subscribedConsumers;
     private final ScheduledExecutorService executor;
+    private final ScheduledFuture<?> watchFuture;
     private boolean ownedExecutor;
-
-    private WatchService watchService;
-    private ScheduledFuture<?> watchFuture;
 
     private long latestVersion;
 
@@ -82,10 +71,10 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         this.executor = executor;
 
         this.announceFile = this.publishDir.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
-        this.subscribedConsumers = new CopyOnWriteArrayList<HollowConsumer>();
+        this.subscribedConsumers = new CopyOnWriteArrayList<>();
         this.latestVersion = readLatestVersion();
 
-        setupWatch();
+        this.watchFuture = setupWatch();
     }
 
     @Override
@@ -98,51 +87,33 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         else {
             watchFuture.cancel(true);
         }
-
-        if (watchService != null) {
-            watchService.close();
-        }
     }
 
-    private void setupWatch() {
-        try {
-            watchService = FileSystems.getDefault().newWatchService();
-            publishDir.register(watchService, ENTRY_CREATE, ENTRY_MODIFY);
+    private ScheduledFuture setupWatch() {
+        return executor.scheduleWithFixedDelay(new Runnable() {
+            private FileTime previousFileTime = FileTime.from(0, TimeUnit.MILLISECONDS);
 
-            watchFuture = executor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        WatchKey watchKey;
-                        while ((watchKey = watchService.poll()) != null) {
-                            try {
-                                for (WatchEvent<?> watchEvent : watchKey.pollEvents()) {
-                                    Path changed = (Path) watchEvent.context();
-                                    if (changed.endsWith(announceFile.getFileName())) {
-                                        long currentVersion = readLatestVersion();
-                                        if (latestVersion != currentVersion) {
-                                            latestVersion = currentVersion;
-                                            for (HollowConsumer consumer : subscribedConsumers)
-                                                consumer.triggerAsyncRefresh();
-                                        }
-                                    }
-                                }
-                            } catch (Throwable th) {
-                                log.log(Level.WARNING, "Exception reading the current announced version", th);
-                            } finally {
-                                watchKey.reset();
-                            }
+            @Override
+            public void run() {
+                try {
+                    if (!Files.isReadable(announceFile)) return;
+
+                    FileTime lastModifiedTime = getLastModifiedTime(announceFile);
+                    if (lastModifiedTime.compareTo(previousFileTime) > 0) {
+                        previousFileTime = lastModifiedTime;
+
+                        long currentVersion = readLatestVersion();
+                        if (latestVersion != currentVersion) {
+                            latestVersion = currentVersion;
+                            for (HollowConsumer consumer : subscribedConsumers)
+                                consumer.triggerAsyncRefresh();
                         }
-                    } catch (ClosedWatchServiceException io) {
-                        // Ignore.  The finalizer must have run while we were running.
                     }
+                } catch (Throwable th) {
+                    log.log(Level.WARNING, "Exception reading the current announced version", th);
                 }
-            }, 1, 1, TimeUnit.SECONDS);
-        } catch (IOException io) {
-            String msg = "IOException creating watch service (" + io.getMessage() + ").";
-            log.log(Level.SEVERE, msg, io);
-            throw new RuntimeException(msg, io);
-        }
+            }
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
     @Override
