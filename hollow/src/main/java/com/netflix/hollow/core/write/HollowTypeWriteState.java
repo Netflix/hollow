@@ -225,6 +225,14 @@ public abstract class HollowTypeWriteState {
     int getNumShards() {
         return numShards;
     }
+    
+    public void setNumShards(int numShards) {
+        if(this.numShards == -1) {
+            this.numShards = numShards;
+        } else if(this.numShards != numShards) {
+            throw new IllegalStateException("The number of shards for type " + schema.getName() + " is already fixed to " + this.numShards + ".  Cannot reset to " + numShards + "."); 
+        }
+    }
 
     /**
      * Called to perform a state transition.<p>

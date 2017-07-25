@@ -19,7 +19,6 @@ package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
@@ -45,7 +44,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,6 +130,8 @@ public class HollowProducer {
     private final Executor snapshotPublishExecutor;
     private final int numStatesBetweenSnapshots;
     private int numStatesUntilNextSnapshot;
+    
+    private boolean isInitialized;
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
@@ -181,18 +181,42 @@ public class HollowProducer {
         for(Class<?> c : classes)
             objectMapper.initializeTypeState(c);
         listeners.fireProducerInit(currentTimeMillis() - start);
-    }
-    protected HollowWriteStateEngine getWriteEngine() {
-        return objectMapper.getStateEngine();
+        
+        isInitialized = true;
     }
 
     public void initializeDataModel(HollowSchema... schemas) {
         long start = currentTimeMillis();
         HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(getWriteEngine(), Arrays.asList(schemas));
         listeners.fireProducerInit(currentTimeMillis() - start);
+        
+        isInitialized = true;
     }
 
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+        return restore(versionDesired, blobRetriever, new RestoreAction() {
+            public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
+                restoreTo.restoreFrom(restoreFrom);
+            }
+        });
+    }
+    
+    HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+        return restore(versionDesired, blobRetriever, new RestoreAction() {
+            public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
+                HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom);
+            }
+        });
+    }
+    
+    private static interface RestoreAction {
+        void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo);
+    }
+    
+    private HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever, RestoreAction restoreAction) {
+        if(!isInitialized)
+            throw new IllegalStateException("You must initialize the data model of a HollowProducer with producer.initializeDataModel(...) prior to restoring");
+        
         long start = currentTimeMillis();
         RestoreStatus status = RestoreStatus.unknownFailure();
         ReadState readState = null;
@@ -203,21 +227,25 @@ public class HollowProducer {
 
                 HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
-                readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
-                if(readState.getVersion() == versionDesired) {
+                if(client.getCurrentVersionId() == versionDesired) {
+                    readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
                     readStates = ReadStateHelper.restored(readState);
 
                     // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
                     HollowObjectMapper newObjectMapper = createNewHollowObjectMapperFromExisting(objectMapper);
-                    newObjectMapper.getStateEngine().restoreFrom(readStates.current().getStateEngine());
+                    
+                    restoreAction.restore(readStates.current().getStateEngine(), newObjectMapper.getStateEngine());
+                    
                     status = RestoreStatus.success(versionDesired, readState.getVersion());
                     objectMapper = newObjectMapper; // Restore completed successfully so swap
                 } else {
-                    status = RestoreStatus.fail(versionDesired, readState.getVersion(), null);
+                    status = RestoreStatus.fail(versionDesired, client.getCurrentVersionId(), null);
+                    throw new IllegalStateException("Unable to reach requested version to restore from: " + versionDesired);
                 }
             }
         } catch(Throwable th) {
             status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
+            throw th;
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
         }
@@ -230,6 +258,14 @@ public class HollowProducer {
         return new HollowObjectMapper(writeEngine);
     }
 
+    protected HollowWriteStateEngine getWriteEngine() {
+        return objectMapper.getStateEngine();
+    }
+    
+    protected HollowObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+     
     /**
      * Each cycle produces a single data state.
      * 

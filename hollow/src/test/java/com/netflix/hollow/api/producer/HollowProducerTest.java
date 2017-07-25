@@ -110,18 +110,13 @@ public class HollowProducerTest {
         HollowProducer producer = createProducer(tmpFolder, schema);
         long fakeVersion = 101;
 
-        {
+        try {
             producer.restore(fakeVersion, blobRetriever);
-            Assert.assertNotNull(lastRestoreStatus);
-            Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
-        }
-
-        {
-            ReadState readState = producer.restore(fakeVersion, blobRetriever);
-            Assert.assertNull(readState);
-            Assert.assertNotNull(lastRestoreStatus);
-            Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
-        }
+            Assert.fail();
+        } catch(Exception expected) { }
+        
+        Assert.assertNotNull(lastRestoreStatus);
+        Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
     }
 
     @Test
@@ -257,8 +252,6 @@ public class HollowProducerTest {
 
     @After
     public void tearDown() {
-        System.out.println("tearDown");
-
         for (File file : blobFileMap.values()) {
             System.out.println("\t deleting: " + file);
             file.delete();

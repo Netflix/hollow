@@ -18,15 +18,14 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowObjectMapper {
 
@@ -69,6 +68,17 @@ public class HollowObjectMapper {
     public int add(Object o) {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
+    }
+    
+    /**
+     * Extracts the primary key from the specified POJO.
+     * 
+     * @param o
+     * @return
+     */
+    public RecordPrimaryKey extractPrimaryKey(Object o) {
+        HollowObjectTypeMapper typeMapper = (HollowObjectTypeMapper)getTypeMapper(o.getClass(), null, null);
+        return new RecordPrimaryKey(typeMapper.getTypeName(), typeMapper.extractPrimaryKey(o));
     }
 
     /**
