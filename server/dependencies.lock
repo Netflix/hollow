@@ -1321,7 +1321,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -5087,7 +5087,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -8853,7 +8853,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -12619,7 +12619,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -16458,7 +16458,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -21322,7 +21322,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -25092,7 +25092,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -28875,7 +28875,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -32753,7 +32753,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -36631,7 +36631,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -40509,7 +40509,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -44387,7 +44387,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -48265,7 +48265,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -52143,7 +52143,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -56021,7 +56021,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.34",
+            "locked": "1.35",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
