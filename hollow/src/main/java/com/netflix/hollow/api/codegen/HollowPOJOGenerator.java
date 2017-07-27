@@ -17,39 +17,41 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-
-import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * This class is used to generate java code which defines POJOs, which can in turn be used to populate a 
  * {@link HollowWriteStateEngine} via a {@link HollowObjectMapper}
  * 
  * The generated java code is based on a data model (defined by a set of {@link HollowSchema}).
- * 
- * @author dkoszewnik
  *
  */
 public class HollowPOJOGenerator {
 
     private final String packageName;
     private final String pojoClassNameSuffix;
-    private final HollowStateEngine stateEngine;
+    private final Collection<HollowSchema> schemas;
 
     public HollowPOJOGenerator(String packageName, HollowStateEngine stateEngine) {
         this(packageName, "POJO", stateEngine);
     }
 
     public HollowPOJOGenerator(String packageName, String pojoClassNameSuffix, HollowStateEngine stateEngine) {
+        this(packageName, pojoClassNameSuffix, stateEngine.getSchemas());
+    }
+    
+    public HollowPOJOGenerator(String packageName, String pojoClassNameSuffix, Collection<HollowSchema> schemas) {
         this.packageName = packageName;
         this.pojoClassNameSuffix = pojoClassNameSuffix;
-        this.stateEngine = stateEngine;
+        this.schemas = schemas;
     }
 
     public void generateFiles(String directory) throws IOException {
@@ -57,9 +59,9 @@ public class HollowPOJOGenerator {
     }
 
     public void generateFiles(File directory) throws IOException {
-        for(HollowSchema schema : stateEngine.getSchemas()) {
+        for(HollowSchema schema : schemas) {
             if(schema instanceof HollowObjectSchema) {
-                HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(stateEngine, (HollowObjectSchema) schema, packageName, pojoClassNameSuffix);
+                HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(schemas, (HollowObjectSchema) schema, packageName, pojoClassNameSuffix);
                 FileWriter writer = new FileWriter(new File(directory, generator.getClassName() + ".java"));
                 writer.write(generator.generate());
                 writer.close();

@@ -20,14 +20,13 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -38,11 +37,10 @@ import java.util.Set;
  * This class contains template logic for generating POJOs.  Not intended for external consumption.
  * 
  * @see HollowPOJOGenerator
- * 
- * @author dkoszewnik
  */
 public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
-    private final HollowStateEngine stateEngine;
+    
+    private final Collection<HollowSchema> allSchemas;
     private final HollowObjectSchema schema;
 
     private final String className;
@@ -51,17 +49,16 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
     private final boolean memoizeOrdinal;
     private final Set<Class<?>> importClasses;
 
-    public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName) {
-        this(stateEngine, schema, packageName, null);
+    public HollowPOJOClassGenerator(Collection<HollowSchema> allSchemas, HollowObjectSchema schema, String packageName) {
+        this(allSchemas, schema, packageName, null);
     }
 
-    public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName, String classNameSuffix) {
-        this(stateEngine, schema, packageName, classNameSuffix, false);
+    public HollowPOJOClassGenerator(Collection<HollowSchema> allSchemas, HollowObjectSchema schema, String packageName, String classNameSuffix) {
+        this(allSchemas, schema, packageName, classNameSuffix, false);
     }
     
-    public HollowPOJOClassGenerator(HollowStateEngine stateEngine, HollowObjectSchema schema, String packageName, 
-    		String classNameSuffix, boolean memoizeOrdinal) {
-        this.stateEngine = stateEngine;
+    public HollowPOJOClassGenerator(Collection<HollowSchema> allSchemas, HollowObjectSchema schema, String packageName, String classNameSuffix, boolean memoizeOrdinal) {
+        this.allSchemas = allSchemas;
         this.schema = schema;
         this.packageName = packageName;
         this.classNameSuffix = classNameSuffix;
@@ -332,7 +329,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
 
 
     private HollowSchema findSchema(String schemaName) {
-        for(HollowSchema schema : stateEngine.getSchemas()) {
+        for(HollowSchema schema : allSchemas) {
             if(schema.getName().equals(schemaName))
                 return schema;
         }
