@@ -245,6 +245,32 @@ public class HollowProducerConsumerTests {
     }
     
     @Test
+    public void producerCanContinueAfterValidationFailure() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                                                .withBlobStager(new HollowInMemoryBlobStager())
+                                                .withValidator(new Validator() {
+                                                    int counter=0;
+                                                    @Override public void validate(ReadState readState) {
+                                                        if(++counter == 2)
+                                                            throw new ValidationException("Expected to fail!");
+                                                    }
+                                                })
+                                                .build();
+        
+        runCycle(producer, 1);
+        
+        try {
+            runCycle(producer, 2);
+            Assert.fail();
+        } catch(ValidationException expected) {
+            Assert.assertEquals(1, expected.getIndividualFailures().size());
+            Assert.assertEquals("Expected to fail!", expected.getIndividualFailures().get(0).getMessage());
+        }
+        
+        runCycle(producer, 3);
+    }
+    
+    @Test
     public void producerCompacts() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                                                 .withBlobStager(new HollowInMemoryBlobStager())
