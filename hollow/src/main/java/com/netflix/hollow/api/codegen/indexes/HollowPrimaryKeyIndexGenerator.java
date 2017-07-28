@@ -106,8 +106,12 @@ public class HollowPrimaryKeyIndexGenerator implements HollowJavaFileGenerator {
         builder.append("        this.api = (" + apiClassname + ")api;\n");
         builder.append("    }\n\n");
         
+        builder.append("    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {\n");
+        builder.append("        this.api = (" + apiClassname + ")api;\n");
+        builder.append("    }\n\n");
+
+        
         builder.append("    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }\n");
-        builder.append("    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }\n");
         builder.append("    @Override public void blobLoaded(HollowConsumer.Blob transition) { }\n");
         builder.append("    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }\n");
         builder.append("    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }\n");
