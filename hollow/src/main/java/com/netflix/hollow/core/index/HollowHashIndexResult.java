@@ -27,14 +27,14 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
  */
 public class HollowHashIndexResult {
 
-    private final HollowHashIndex idx;
+    private final HollowHashIndex.HollowHashIndexState hashIndexState;
     private final long selectTableStartPointer;
     private final int selectTableSize;
     private final int selectTableBuckets;
     private final int selectBucketMask;
 
-    HollowHashIndexResult(HollowHashIndex idx, long selectTableStartPointer, int selectTableSize) {
-        this.idx = idx;
+    HollowHashIndexResult(HollowHashIndex.HollowHashIndexState hashIndexState, long selectTableStartPointer, int selectTableSize) {
+        this.hashIndexState = hashIndexState;
         this.selectTableStartPointer = selectTableStartPointer;
         this.selectTableSize = selectTableSize;
         this.selectTableBuckets = HashCodes.hashTableSize(selectTableSize);
@@ -55,13 +55,13 @@ public class HollowHashIndexResult {
         int hash = HashCodes.hashInt(value);
         int bucket = hash & selectBucketMask;
 
-        int selectOrdinal = (int)idx.selectHashArray.getElementValue((selectTableStartPointer + bucket) * idx.bitsPerSelectHashEntry, idx.bitsPerSelectHashEntry) - 1;
+        int selectOrdinal = (int) hashIndexState.getSelectHashArray().getElementValue((selectTableStartPointer + bucket) * hashIndexState.getBitsPerSelectHashEntry(), hashIndexState.getBitsPerSelectHashEntry()) - 1;
         while(selectOrdinal != -1) {
             if(selectOrdinal == value)
                 return true;
 
             bucket = (bucket + 1) & selectBucketMask;
-            selectOrdinal = (int)idx.selectHashArray.getElementValue((selectTableStartPointer + bucket) * idx.bitsPerSelectHashEntry, idx.bitsPerSelectHashEntry) - 1;
+            selectOrdinal = (int) hashIndexState.getSelectHashArray().getElementValue((selectTableStartPointer + bucket) * hashIndexState.getBitsPerSelectHashEntry(), hashIndexState.getBitsPerSelectHashEntry()) - 1;
         }
 
         return false;
@@ -79,7 +79,7 @@ public class HollowHashIndexResult {
             @Override
             public int next() {
                 while(currentBucket < endBucket) {
-                    int selectOrdinal = (int)idx.selectHashArray.getElementValue((currentBucket++) * idx.bitsPerSelectHashEntry, idx.bitsPerSelectHashEntry) - 1;
+                    int selectOrdinal = (int) hashIndexState.getSelectHashArray().getElementValue((currentBucket++) * hashIndexState.getBitsPerSelectHashEntry(), hashIndexState.getBitsPerSelectHashEntry()) - 1;
                     if(selectOrdinal != -1)
                         return selectOrdinal;
                 }
