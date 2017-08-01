@@ -73,7 +73,7 @@ public class VideoHierarchy {
 
                 int seasonSequenceNumber = (int) season._getSequenceNumber();
                 Set<Integer> addedSeasonSupplementals = initializer.addSupplementalVideos(seasonId, countryCode, supplementalIds, droppedIds);
-                addToSupplementalSeasonSeqNumMap(topNodeId, seasonId, seasonSequenceNumber, addedSeasonSupplementals);
+                addToSupplementalSeasonSeqNumMap(topNodeId, seasonId, null, seasonSequenceNumber, addedSeasonSupplementals);
 
                 seasonIds[seasonCounter] = seasonId;
                 seasonSequenceNumbers[seasonCounter] = seasonSequenceNumber;
@@ -102,7 +102,8 @@ public class VideoHierarchy {
                         continue;
                     }
 
-                    initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds, droppedIds);
+                    Set<Integer> addedEpisodeSupplementals = initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds, droppedIds);
+                    addToSupplementalSeasonSeqNumMap(topNodeId, seasonId, episodeId, seasonSequenceNumber, addedEpisodeSupplementals);
 
                     episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
                     episodeSequenceNumbers[seasonCounter][episodeCounter] = (int)episode._getSequenceNumber();
@@ -150,13 +151,13 @@ public class VideoHierarchy {
         addIds(this.supplementalIds);
     }
 
-    private void addToSupplementalSeasonSeqNumMap(int topNodeId, int seasonId, int seasonSeqNum, Set<Integer> supplementalIds) {
+    private void addToSupplementalSeasonSeqNumMap(int topNodeId, int seasonId, Integer episodeId, int seasonSeqNum, Set<Integer> supplementalIds) {
         if (supplementalIds == null) return;
 
         for (Integer supId : supplementalIds) {
             Integer prevSeasonSeqNum = supplementalSeasonSeqNumMap.get(supId);
             if (prevSeasonSeqNum != null) {
-                ctx.getLogger().error(TransformerLogTag.SupplementalSeasonSeqNumConflict, "SupplementalVideo={} for Season={}/Show={} already has previousSeasonSeqNum={} vs currentSeasonSeqNum={}", supId, seasonId, topNodeId, prevSeasonSeqNum, seasonSeqNum);
+                ctx.getLogger().error(TransformerLogTag.SupplementalSeasonSeqNumConflict, "SupplementalVideo={} for Episode={}/Season={}/Show={} already has previousSeasonSeqNum={} vs currentSeasonSeqNum={}", supId, episodeId == null ? "" : episodeId, seasonId, topNodeId, prevSeasonSeqNum, seasonSeqNum);
             }
             supplementalSeasonSeqNumMap.put(supId, seasonSeqNum);
         }
