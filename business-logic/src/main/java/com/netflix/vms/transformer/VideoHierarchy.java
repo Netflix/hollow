@@ -152,7 +152,7 @@ public class VideoHierarchy {
     }
 
     private void addToSupplementalSeasonSeqNumMap(int topNodeId, int seasonId, Integer episodeId, int seasonSeqNum, Set<Integer> supplementalIds) {
-        if (supplementalIds == null) return;
+        if (!ctx.getConfig().isSeasonNumberForChildrenEnabled() || supplementalIds == null) return;
 
         for (Integer supId : supplementalIds) {
             Integer prevSeasonSeqNum = supplementalSeasonSeqNumMap.get(supId);
