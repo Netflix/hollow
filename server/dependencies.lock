@@ -33,20 +33,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -65,25 +65,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -92,13 +92,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -106,13 +106,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -1321,7 +1321,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -2253,7 +2253,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -2266,7 +2266,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -2682,7 +2682,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -3799,20 +3799,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -3831,25 +3831,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -3858,13 +3858,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -3872,13 +3872,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -5087,7 +5087,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -6019,7 +6019,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -6032,7 +6032,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -6448,7 +6448,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -7565,20 +7565,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -7597,25 +7597,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -7624,13 +7624,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -7638,13 +7638,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -8853,7 +8853,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -9785,7 +9785,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -9798,7 +9798,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -10214,7 +10214,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -11331,20 +11331,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -11363,25 +11363,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -11390,13 +11390,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -11404,13 +11404,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -12619,7 +12619,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -13544,7 +13544,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -13557,7 +13557,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -13973,7 +13973,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -15172,14 +15172,14 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -15245,7 +15245,7 @@
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -15355,7 +15355,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.6.6",
+            "locked": "2.6.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
@@ -16458,7 +16458,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -17391,7 +17391,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -17404,7 +17404,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -17820,7 +17820,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -20034,20 +20034,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -20066,25 +20066,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -20093,13 +20093,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -20107,13 +20107,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -21322,7 +21322,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -22254,7 +22254,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -22267,7 +22267,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -22683,7 +22683,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -23806,14 +23806,14 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -23879,7 +23879,7 @@
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -23989,7 +23989,7 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.6.6",
+            "locked": "2.6.7",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "org.elasticsearch:elasticsearch"
@@ -25092,7 +25092,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -26024,7 +26024,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -26037,7 +26037,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -26453,7 +26453,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -27542,20 +27542,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -27574,25 +27574,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -27601,13 +27601,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -27615,13 +27615,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -28875,7 +28875,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -29837,7 +29837,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -29850,7 +29850,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -30267,7 +30267,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -31420,20 +31420,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -31452,25 +31452,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -31479,13 +31479,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -31493,13 +31493,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -32753,7 +32753,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -33715,7 +33715,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -33728,7 +33728,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -34145,7 +34145,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -35298,20 +35298,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -35330,25 +35330,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -35357,13 +35357,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -35371,13 +35371,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -36631,7 +36631,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -37593,7 +37593,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -37606,7 +37606,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -38023,7 +38023,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -39176,20 +39176,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -39208,25 +39208,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -39235,13 +39235,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -39249,13 +39249,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -40509,7 +40509,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -41471,7 +41471,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -41484,7 +41484,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -41901,7 +41901,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -43054,20 +43054,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -43086,25 +43086,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -43113,13 +43113,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -43127,13 +43127,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -44387,7 +44387,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -45349,7 +45349,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -45362,7 +45362,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -45779,7 +45779,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -46932,20 +46932,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -46964,25 +46964,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -46991,13 +46991,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -47005,13 +47005,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -48265,7 +48265,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -49227,7 +49227,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -49240,7 +49240,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -49657,7 +49657,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -50810,20 +50810,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -50842,25 +50842,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -50869,13 +50869,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -50883,13 +50883,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -52143,7 +52143,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -53105,7 +53105,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -53118,7 +53118,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -53535,7 +53535,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
@@ -54688,20 +54688,20 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-cloudwatch": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.servo:servo-aws",
                 "netflix:atlas-plugin"
             ]
         },
         "com.amazonaws:aws-java-sdk-core": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -54720,25 +54720,25 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -54747,13 +54747,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -54761,13 +54761,13 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "com.amazonaws:jmespath-java": {
-            "locked": "1.11.158",
+            "locked": "1.11.162",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-autoscaling",
                 "com.amazonaws:aws-java-sdk-cloudwatch",
@@ -56021,7 +56021,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.36",
+            "locked": "1.37",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -56983,7 +56983,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server",
@@ -56996,7 +56996,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.13.2",
+            "locked": "2.13.3",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:metrics-explorer",
@@ -57413,7 +57413,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.5.26",
+            "locked": "0.5.28",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:atlas-plugin",
