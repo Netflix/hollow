@@ -2,6 +2,8 @@ package com.netflix.vms.transformer;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.util.IntList;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
@@ -9,12 +11,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class VideoHierarchy {
 
+    private final TransformerContext ctx;
     private final int topNodeId;
     private final boolean isStandalone;
     private final int seasonIds[];
@@ -25,8 +30,10 @@ public class VideoHierarchy {
     private final int hashCode;
     private final Set<Integer> allIds = new HashSet<>();
     private final Set<Integer> droppedIds = new HashSet<>();
+    private final Map<Integer, Integer> supplementalSeasonSeqNumMap = new HashMap<>();
 
-    public VideoHierarchy(int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, VideoHierarchyInitializer initializer) {
+    public VideoHierarchy(TransformerContext ctx, int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, VideoHierarchyInitializer initializer) {
+        this.ctx = ctx;
         this.topNodeId = topNodeId;
         this.isStandalone = isStandalone;
         int hashCode = HashCodes.hashInt(topNodeId);
@@ -64,10 +71,12 @@ public class VideoHierarchy {
                     continue;
                 }
 
-                initializer.addSupplementalVideos(seasonId, countryCode, supplementalIds, droppedIds);
+                int seasonSequenceNumber = (int) season._getSequenceNumber();
+                Set<Integer> addedSeasonSupplementals = initializer.addSupplementalVideos(seasonId, countryCode, supplementalIds, droppedIds);
+                addToSupplementalSeasonSeqNumMap(topNodeId, seasonId, seasonSequenceNumber, addedSeasonSupplementals);
 
                 seasonIds[seasonCounter] = seasonId;
-                seasonSequenceNumbers[seasonCounter] = (int)season._getSequenceNumber();
+                seasonSequenceNumbers[seasonCounter] = seasonSequenceNumber;
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
 
@@ -139,7 +148,22 @@ public class VideoHierarchy {
             addIds(episodeIdsPerSeason);
         }
         addIds(this.supplementalIds);
+    }
 
+    private void addToSupplementalSeasonSeqNumMap(int topNodeId, int seasonId, int seasonSeqNum, Set<Integer> supplementalIds) {
+        if (supplementalIds == null) return;
+
+        for (Integer supId : supplementalIds) {
+            Integer prevSeasonSeqNum = supplementalSeasonSeqNumMap.get(supId);
+            if (prevSeasonSeqNum != null) {
+                ctx.getLogger().error(TransformerLogTag.SupplementalSeasonSeqNumConflict, "SupplementalVideo={} for Season={}/Show={} already has previousSeasonSeqNum={} vs currentSeasonSeqNum={}", supId, seasonId, topNodeId, prevSeasonSeqNum, seasonSeqNum);
+            }
+            supplementalSeasonSeqNumMap.put(supId, seasonSeqNum);
+        }
+    }
+
+    public Map<Integer, Integer> getSupplementalSeasonSeqNumMap() {
+        return supplementalSeasonSeqNumMap;
     }
 
     public Set<Integer> getDroppedIds() {

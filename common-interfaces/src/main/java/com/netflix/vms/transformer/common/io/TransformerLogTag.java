@@ -33,6 +33,8 @@ public enum TransformerLogTag implements LogTag {
     VideoFormatMismatch_videoIds,
     VideoFormatMismatch_videoIds_missingFormat,
 
+    SupplementalSeasonSeqNumConflict,
+
 
     //// TRANSFORMATION ERRORS ////
 
