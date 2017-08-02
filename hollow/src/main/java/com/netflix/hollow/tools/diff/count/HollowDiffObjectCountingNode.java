@@ -58,6 +58,9 @@ public class HollowDiffObjectCountingNode extends HollowDiffCountingNode {
         this.fromSchema = fromState == null ? emptySchema(toState.getSchema()) : fromState.getSchema();
         this.toSchema = toState == null ? emptySchema(fromState.getSchema()) : toState.getSchema();
 
+        if(!fromSchema.getName().equals(toSchema.getName()))
+            throw new IllegalArgumentException("Cannot diff between two schemas with different names: from '" + fromSchema.getName() + "' to '" + toSchema.getName() + "'");
+
         this.unionSchema = fromSchema.findUnionSchema(toSchema);
         this.fieldNodes = new HollowDiffCountingNode[unionSchema.numFields()];
         this.fromFieldMapping = createFieldMapping(unionSchema, fromSchema);
