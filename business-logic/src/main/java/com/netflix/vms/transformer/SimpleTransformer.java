@@ -134,7 +134,7 @@ public class SimpleTransformer {
 
                 // create new modules for each executor thread
                 PackageDataModule packageDataModule = new PackageDataModule(api, ctx, objectMapper, cycleConstants, indexer);
-                VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, cycleConstants, indexer);
+                VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, ctx, cycleConstants, indexer);
                 VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
