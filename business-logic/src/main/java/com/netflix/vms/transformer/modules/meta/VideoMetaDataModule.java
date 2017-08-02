@@ -7,6 +7,8 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
@@ -44,7 +46,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -81,10 +82,10 @@ public class VideoMetaDataModule {
 
     private final int newContentFlagDuration;
 
-    Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<Integer, VideoMetaData>();
-    Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>>();
+    Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<>();
+    Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<>();
 
-    private final Map<String, HookType> hookTypeMap = new HashMap<String, HookType>();
+    private final Map<String, HookType> hookTypeMap = new HashMap<>();
 
     public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -109,7 +110,7 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
     }
 
-    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
+    public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
         countryAgnosticMap.clear();
         countrySpecificMap.clear();
 
@@ -117,8 +118,7 @@ public class VideoMetaDataModule {
 
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoDataCollectionMap.putIfAbsent(entry.getKey(), new VideoDataCollection());
-            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(entry.getKey());
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
 
             for (VideoHierarchy hierarchy : entry.getValue()) {
                 VideoMetaDataRollupValues rollup = new VideoMetaDataRollupValues();

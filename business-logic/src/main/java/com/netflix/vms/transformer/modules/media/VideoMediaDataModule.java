@@ -4,6 +4,8 @@ import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
@@ -19,7 +21,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 
 import java.util.Collections;
@@ -50,11 +51,10 @@ public class VideoMediaDataModule {
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
     }
 
-    public void buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
+    public void buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoDataCollectionMap.putIfAbsent(entry.getKey(), new VideoDataCollection());
-            VideoDataCollection videoDataCollection = videoDataCollectionMap.get(entry.getKey());
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
 
             for (VideoHierarchy hierarchy : entry.getValue()) {
                 addToResult(hierarchy.getTopNodeId(), countryCode, hierarchy, HierarchyLeveL.SHOW, videoDataCollection);

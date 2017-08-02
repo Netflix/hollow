@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.contract.ContractAssetType;
@@ -31,7 +33,6 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.RightsWindowContract;
-import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
@@ -62,7 +63,7 @@ public class VMSAvailabilityWindowModule {
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
-    private Map<Integer, Set<PackageDataCollection>> transformedPackageData;
+    private TransformedVideoData transformedVideoData;
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
@@ -84,8 +85,8 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-    public void setTransformedPackageData(Map<Integer, Set<PackageDataCollection>> data) {
-        this.transformedPackageData = data;
+    public void setTransformedVideoData(TransformedVideoData transformedVideoData) {
+        this.transformedVideoData = transformedVideoData;
     }
 
     public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
@@ -539,14 +540,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     private PackageDataCollection getPackageDataCollection(Integer videoId, long packageId) {
-        Set<PackageDataCollection> packageDataCollections = transformedPackageData.get(videoId);
-        if (packageDataCollections == null) return null;
-
-        for (PackageDataCollection packageDataCollection : packageDataCollections) {
-            if (packageDataCollection.getPackageData().id == packageId)
-                return packageDataCollection;
-        }
-        return null;
+        return transformedVideoData.getTransformedPackageData(videoId).getPackageDataCollection((int) packageId);
     }
 
     private static final long FUTURE_CUTOFF_IN_MILLIS = 360L * 24L * 60L * 60L * 1000L;
@@ -589,7 +583,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     public void reset() {
-        this.transformedPackageData = null;
+        this.transformedVideoData = null;
         this.windowPackageContractInfoModule.reset();
     }
 

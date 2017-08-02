@@ -8,6 +8,8 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
@@ -35,8 +37,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
-import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -99,17 +99,14 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = null;
     }
 
-    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, Set<PackageDataCollection>> transformedPackageData, Map<String, VideoDataCollection> videoDataCollectionMap) {
-        this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
+    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
+        this.availabilityWindowModule.setTransformedVideoData(transformedVideoData);
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            this.videoDataCollection = videoDataCollectionMap.get(countryCode);
-
+            this.videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
             processCountrySpecificData(rollup, entry.getValue(), countryCode, videoDataCollection);
-
             Set<String> catalogLanguages = ctx.getOctoberSkyData().getCatalogLanguages(countryCode);
             if (catalogLanguages != null) {
                 processLocaleSpecificData(rollup, entry.getValue(), countryCode, catalogLanguages);

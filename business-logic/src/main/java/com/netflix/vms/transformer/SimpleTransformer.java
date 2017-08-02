@@ -12,6 +12,8 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
+import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
@@ -35,7 +37,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.modules.TransformModule;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 import com.netflix.vms.transformer.modules.artwork.CharacterImagesModule;
 import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
@@ -51,7 +52,6 @@ import com.netflix.vms.transformer.modules.meta.VideoMiscDataModule;
 import com.netflix.vms.transformer.modules.mpl.DrmSystemModule;
 import com.netflix.vms.transformer.modules.mpl.EncodingProfileModule;
 import com.netflix.vms.transformer.modules.mpl.OriginServerModule;
-import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.modules.packages.PackageDataModule;
 import com.netflix.vms.transformer.modules.packages.StreamDataModule;
 import com.netflix.vms.transformer.modules.packages.contracts.LanguageRightsModule;
@@ -131,6 +131,8 @@ public class SimpleTransformer {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         for (int i = 0; i < executor.getCorePoolSize(); i++) {
             executor.execute(() -> {
+
+                // create new modules for each executor thread
                 PackageDataModule packageDataModule = new PackageDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, ctx, cycleConstants, indexer);
                 VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
@@ -145,26 +147,28 @@ public class SimpleTransformer {
                     Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
                     try {
 
+                        TransformedVideoData transformedVideoData = new TransformedVideoData();
+
                         // NOTE: Legacy pipeline seems to propagate data for video that is not considered valid or not valid yet
                         // so need to keep track of them and allow those use cases to be in parity
                         Set<Integer> droppedVideoIds = new HashSet<>();
                         Map<String, Set<VideoHierarchy>> showHierarchiesByCountry = hierarchyInitializer.getShowHierarchiesByCountry(processGroup, droppedVideoIds);
-                        Map<Integer, Set<PackageDataCollection>> transformedPackageData = packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds);
+                        packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds, transformedVideoData);
                         l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
 
                         if (showHierarchiesByCountry != null) {
 
-                            Map<String, VideoDataCollection> videoDataCollectionMap = new HashMap<>();
+                            // get all transformed data for show hierarchies using all the modules.
+                            collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                            metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                            mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                            imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry, transformedVideoData);
+                            miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry, transformedVideoData);
+                            countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedVideoData);
 
-                            collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry, videoDataCollectionMap);
-                            metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry, videoDataCollectionMap);
-                            mediaDataModule.buildVideoMediaDataByCountry(showHierarchiesByCountry, videoDataCollectionMap);
-                            imagesDataModule.buildVideoImagesByCountry(showHierarchiesByCountry, videoDataCollectionMap);
-                            Map<Integer, VideoMiscData> miscData = miscDataModule.buildVideoMiscDataByCountry(showHierarchiesByCountry);
-                            countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedPackageData, videoDataCollectionMap);
-
-                            if (videoDataCollectionMap != null && !videoDataCollectionMap.isEmpty())
-                                processCurrentData(videoDataCollectionMap, miscData, objectMapper);
+                            // process the transformed video data
+                            if (transformedVideoData.getVideoDataCollectionMap() != null && !transformedVideoData.getVideoDataCollectionMap().isEmpty())
+                                processCurrentData(transformedVideoData, objectMapper);
                         }
                     } catch (Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup), th);
@@ -182,7 +186,7 @@ public class SimpleTransformer {
 
         // @formatter:off
         // Register Transform Modules
-        List<TransformModule> moduleList = Arrays.<TransformModule>asList(
+        List<TransformModule> moduleList = Arrays.asList(
                 new DrmSystemModule(api, ctx, cycleConstants, objectMapper),
                 new OriginServerModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new EncodingProfileModule(api, ctx, cycleConstants, objectMapper, indexer),
@@ -238,7 +242,8 @@ public class SimpleTransformer {
         return totalCount / 100;
     }
 
-    private void processCurrentData(Map<String, VideoDataCollection> videoCountryDataMap, Map<Integer, VideoMiscData> miscData, HollowObjectMapper objectMapper) {
+    private void processCurrentData(TransformedVideoData transformedVideoData, HollowObjectMapper objectMapper) {
+        Map<String, VideoDataCollection> videoCountryDataMap = transformedVideoData.getVideoDataCollectionMap();
         VideoNamedListPopulator namedListPopulator = videoNamedListModule.getPopulator();
         Map<Video, Map<ISOCountry, CompleteVideo>> globalVideoMap = new HashMap<>();
 
@@ -258,7 +263,8 @@ public class SimpleTransformer {
                 namedListPopulator.setCountry(countryId);
 
                 // Process TopNode
-                CompleteVideo topNodeCompleteVideo = getCompleteVideo(topNodeVideoId, country, videoDataCollection, videoCollectionsData, miscData.get(topNodeVideoId));
+                VideoMiscData miscData = transformedVideoData.getVideoData(topNodeVideoId).getVideoMiscData();
+                CompleteVideo topNodeCompleteVideo = getCompleteVideo(topNodeVideoId, country, videoDataCollection, videoCollectionsData, miscData);
                 processCompleteVideo(objectMapper, namedListPopulator, topNodeCompleteVideo, true, country, globalVideoMap);
 
                 // Process Show children
@@ -268,13 +274,15 @@ public class SimpleTransformer {
                     for (Map.Entry<Integer, VideoCollectionsData> seasonEntry : hierarchy.getOrderedSeasons().entrySet()) {
 
                         int seasonId = seasonEntry.getKey().intValue();
-                        CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, seasonEntry.getValue(), miscData.get(seasonId));
+                        miscData = transformedVideoData.getVideoData(seasonId).getVideoMiscData();
+                        CompleteVideo season = getCompleteVideo(seasonId, country, videoDataCollection, seasonEntry.getValue(), miscData);
                         processCompleteVideo(objectMapper, namedListPopulator, season, false, country, globalVideoMap);
 
                         // Process Episodes
                         for (Map.Entry<Integer, VideoCollectionsData> episodeEntry : hierarchy.getOrderedSeasonEpisodes(++sequenceNumber).entrySet()) {
                             int episodeId = episodeEntry.getKey().intValue();
-                            CompleteVideo episode = getCompleteVideo(episodeId, country, videoDataCollection, episodeEntry.getValue(), miscData.get(episodeId));
+                            miscData = transformedVideoData.getVideoData(episodeId).getVideoMiscData();
+                            CompleteVideo episode = getCompleteVideo(episodeId, country, videoDataCollection, episodeEntry.getValue(), miscData);
                             processCompleteVideo(objectMapper, namedListPopulator, episode, false, country, globalVideoMap);
                         }
                     }
@@ -283,7 +291,8 @@ public class SimpleTransformer {
                 // Process Supplemental
                 for (Map.Entry<Integer, VideoCollectionsData> supplementalEntry : hierarchy.getSupplementalVideosCollectionsData().entrySet()) {
                     int supplementalId = supplementalEntry.getKey().intValue();
-                    CompleteVideo supplemental = getCompleteVideo(supplementalId, country, videoDataCollection, supplementalEntry.getValue(), miscData.get(supplementalId));
+                    miscData = transformedVideoData.getVideoData(supplementalId).getVideoMiscData();
+                    CompleteVideo supplemental = getCompleteVideo(supplementalId, country, videoDataCollection, supplementalEntry.getValue(), miscData);
                     processCompleteVideo(objectMapper, namedListPopulator, supplemental, false, country, globalVideoMap);
                 }
             }
