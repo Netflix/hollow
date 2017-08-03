@@ -114,10 +114,7 @@ public class TransformerCycleKickoff {
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
-
-                if(msUntilNextCycle > 0) {
-                    ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
-                }
+                ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", msUntilNextCycle);
 
                 long sleepStart = System.currentTimeMillis();
                 while(msUntilNextCycle > 0) {
@@ -135,7 +132,7 @@ public class TransformerCycleKickoff {
                 long sleepDuration = sleepEnd - sleepStart;
 
                 ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, sleepDuration);
-                ctx.getLogger().info(WaitForNextCycle, "Waited {}ms until beginning next cycle", sleepDuration);
+                ctx.getLogger().info(WaitForNextCycle, "Waited {}ms", sleepDuration);
 
                 previousCycleStartTime = sleepEnd;
             }
