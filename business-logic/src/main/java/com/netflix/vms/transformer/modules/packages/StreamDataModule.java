@@ -61,6 +61,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class StreamDataModule {
@@ -541,10 +542,10 @@ public class StreamDataModule {
         for (Integer vId : videoIds) {
             Set<String> oldSet = debugVideoFormatMap.oldFormatMap.get(vId);
             Set<String> newSet = debugVideoFormatMap.newFormatMap.get(vId);
-            if (!oldSet.equals(newSet)) {
+            if (!Objects.equals(oldSet,  newSet)) {
                 ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds, "videoId={} : old={}, new={}", vId, oldSet, newSet);
 
-                if (!newSet.containsAll(oldSet)) {
+                if (newSet != null && !newSet.containsAll(oldSet)) {
                     ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds_missingFormat, "videoId={} : old={}, new={}", vId, oldSet, newSet);
                 }
             }
