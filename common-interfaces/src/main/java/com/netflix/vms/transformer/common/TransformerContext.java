@@ -6,7 +6,6 @@ import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
-
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -35,6 +34,8 @@ public interface TransformerContext {
     TransformerMetricRecorder getMetricRecorder();
 
     TransformerCassandraHelper getCassandraHelper();
+
+    TransformerCycleInterrupter getCycleInterrupter();
 
     TransformerFiles files();
 

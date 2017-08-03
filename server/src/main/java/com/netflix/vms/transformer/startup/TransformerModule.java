@@ -9,6 +9,8 @@ import com.netflix.cup.CupModule;
 // Server dependencies
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.SimpleTransformerCycleInterrupter;
+import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -44,6 +46,7 @@ public final class TransformerModule extends AbstractModule {
 
         bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
         bind(CupLibrary.class).to(CupLibraryImpl.class);
+        bind(TransformerCycleInterrupter.class).to(SimpleTransformerCycleInterrupter.class);
         bind(TransformerCassandraHelper.class).to(TransformerServerCassandraHelper.class);
         bind(TransformerCycleKickoff.class).asEagerSingleton();
         bind(VersionMinter.class).annotatedWith(Names.named("vipAnnounceID")).toInstance(new SequenceVersionMinter());

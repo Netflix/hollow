@@ -7,6 +7,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
@@ -16,6 +17,7 @@ import com.netflix.internal.hollow.factory.HollowPublisherFactory;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -38,10 +40,12 @@ import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
+@Singleton
 public class TransformerCycleKickoff {
 
     @Inject
     public TransformerCycleKickoff(
+            TransformerCycleInterrupter cycleInterrupter,
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
@@ -56,13 +60,13 @@ public class TransformerCycleKickoff {
             TransformerServerHealthIndicator healthIndicator) {
 
         FileStore.useMultipartUploadWhenApplicable(true);
-        
+
         Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
-        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
+        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -75,26 +79,30 @@ public class TransformerCycleKickoff {
         restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
-            private long previousCycleStartTime;
+            private long previousCycleStartTime = System.currentTimeMillis();
             private int consecutiveCycleFailures = 0;
 
             @Override
             public void run() {
                 while(true) {
                     try {
-                        waitForMinCycleTimeToPass();
                         if (isFastlane(ctx.getConfig()))
                             setUpFastlaneContext();
+
                         cycle.cycle();
                         markCycleSucessful();
+
                         if(shouldTryCompaction(ctx.getConfig())) {
                             cycle.tryCompaction();
                             markCycleSucessful();
                         }
+
+                        waitForMinCycleTimeToPass();
                     } catch(Throwable th) {
                         markCycleFailed(th);
                     } finally {
                         ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
+                        ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
                     }
                 }
             }
@@ -109,19 +117,27 @@ public class TransformerCycleKickoff {
 
                 if(msUntilNextCycle > 0) {
                     ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
-                    ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, msUntilNextCycle);
                 }
 
+                long sleepStart = System.currentTimeMillis();
                 while(msUntilNextCycle > 0) {
+                    if (ctx.getCycleInterrupter().isCycleInterrupted()) break;
+
                     try {
-                        Thread.sleep(msUntilNextCycle);
+                        long sleepInMS = Math.min(10000, msUntilNextCycle);
+                        Thread.sleep(sleepInMS);
                     } catch (InterruptedException ignore) { }
 
                     timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 }
+                long sleepEnd = System.currentTimeMillis();
+                long sleepDuration = sleepEnd - sleepStart;
 
-                previousCycleStartTime = System.currentTimeMillis();
+                ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, sleepDuration);
+                ctx.getLogger().info(WaitForNextCycle, "Waited {}ms until beginning next cycle", sleepDuration);
+
+                previousCycleStartTime = sleepEnd;
             }
 
             private void setUpFastlaneContext() {
@@ -148,8 +164,9 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private final TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
+                cycleInterrupter,
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
                 octoberSkyData,
@@ -188,10 +205,10 @@ public class TransformerCycleKickoff {
                     nostreamsOutputClient.triggerRefreshTo(restoreVersion);
                     if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
                         throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
-                    
+
                     cycle.restore(outputClient, nostreamsOutputClient, false);
                 }
-                
+
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");

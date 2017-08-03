@@ -8,6 +8,7 @@ import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
@@ -133,5 +134,10 @@ public class SimpleTransformerContext implements TransformerContext {
 
         Set<String> countrySet = new HashSet<>(Arrays.asList(country));
         SimpleOctoberSkyData.INSTANCE.overrideSupportedCountries(countrySet);
+    }
+
+    @Override
+    public TransformerCycleInterrupter getCycleInterrupter() {
+        return SimpleTransformerCycleInterrupter.INSTANCE;
     }
 }

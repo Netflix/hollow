@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
@@ -12,9 +13,9 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
-import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
 import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
@@ -146,7 +147,6 @@ public class SimpleTransformer {
                 while (idx < processGroups.size()) {
                     Set<VideoHierarchyGroup> processGroup = processGroups.get(idx);
                     try {
-
                         TransformedVideoData transformedVideoData = new TransformedVideoData();
 
                         // NOTE: Legacy pipeline seems to propagate data for video that is not considered valid or not valid yet
@@ -180,6 +180,12 @@ public class SimpleTransformer {
                     }
 
                     idx = processedCount.getAndIncrement();
+
+                    // Interrupt if needed
+                    if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                        ctx.getLogger().error(CycleInterrupted, "Interrupted while processing video : {} ", new ProgressMessage(idx, progressDivisor));
+                        break;
+                    }
                 }
             });
         }
@@ -207,6 +213,12 @@ public class SimpleTransformer {
         // @formatter:on
         // Execute Transform Modules
         for (TransformModule m : moduleList) {
+            // Interrupt if needed
+            if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                ctx.getLogger().error(CycleInterrupted, "Interrupted while processing module={} ", m.getName());
+                break;
+            }
+
             long tStart = System.currentTimeMillis();
             m.transform();
             long tDuration = System.currentTimeMillis() - tStart;
@@ -214,24 +226,32 @@ public class SimpleTransformer {
         }
 
         executor.awaitSuccessfulCompletion();
-        StreamDataModule.logVideoFormatDiffs(ctx);
+        if (!ctx.getCycleInterrupter().isCycleInterrupted()) {
+            //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
+            //// to the NamedLists, and we can build the POJOs using those.
+            long tStart = System.currentTimeMillis();
+            NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
+            namedListCompleter.transform();
+            long tDuration = System.currentTimeMillis() - tStart;
+            ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
 
-        //// NamedListCompletionModule happens after all hierarchies are already processed -- now we have built the ThreadSafeBitSets corresponding
-        //// to the NamedLists, and we can build the POJOs using those.
-        long tStart = System.currentTimeMillis();
-        NamedListCompletionModule namedListCompleter = new NamedListCompletionModule(videoNamedListModule, cycleConstants, objectMapper);
-        namedListCompleter.transform();
-        long tDuration = System.currentTimeMillis() - tStart;
-        ctx.getLogger().info(NonVideoSpecificTransformDuration, "Finished Transform for module={}, duration={}", namedListCompleter.getName(), tDuration);
+            StreamDataModule.logVideoFormatDiffs(ctx);
+            ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
+        }
 
-        ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
-
         if (failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
             throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
 
         long endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
+
+        // Check to determine whether to abort cycle due to interrupt
+        if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+            String msg = "Stopped at transform";
+            ctx.getLogger().error(CycleInterrupted, msg);
+            ctx.getCycleInterrupter().triggerInterrupt(ctx.getCurrentCycleId(), msg);
+        }
 
         return writeStateEngine;
     }
