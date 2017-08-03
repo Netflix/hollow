@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.Objects;
 
 import com.netflix.vms.logging.TaggingLogger;
 
@@ -18,7 +19,6 @@ public class VMSInputDataVersionLogger {
             if(entry.getKey().endsWith("_coldstart")) {
                 String mutationGroup = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));
                 String latestColdstartVersion = entry.getValue();
-                String latestEventId = inputBlobHeaders.get(mutationGroup + "_events");
                 String coldstartKeybase = inputBlobHeaders.get(mutationGroup + "_coldstartKeybase");
 
                 // coldstart filename
@@ -33,14 +33,31 @@ public class VMSInputDataVersionLogger {
                     formattedDate = dateFormat.format(publishDate);
                 }
 
-                logger.info(InputDataVersionIds,
-                        "mutationGroup=" + mutationGroup +
-                        " latestEventId=" + latestEventId +
-                        " coldstartVersionId=" + latestColdstartVersion +
-                        " coldstartKeybase=" + coldstartKeybase +
-                        " coldstartS3Filename=" + coldstartFilename +
-                        " isColdstartPinned=false" +
-                        " coldstartFilePublishDate=" + formattedDate);
+                StringBuilder sb = new StringBuilder();
+                sb.append("mutationGroup=");
+                sb.append(mutationGroup);
+                sb.append(" coldstartVersionId=");
+                sb.append(latestColdstartVersion);
+                sb.append(" coldstartS3Filename=");
+                sb.append(coldstartFilename);
+                sb.append(" isColdstartPinned=false"); // FIXME: timt: what's this?
+                sb.append(" coldstartFilePublishDate=");
+                sb.append(formattedDate.toString());
+                for(String k : new String[]{
+                    "coldstartFile",
+                    "coldstartFilePublishTime",
+                    "coldstartKeybase",
+                    "eventsBackend",
+                    "eventsCheckpoints",
+                    "eventsLatest"
+                  }) {
+                  String v = inputBlobHeaders.get(mutationGroup + "_" + k);
+                  sb.append(' ');
+                  sb.append(k);
+                  sb.append('=');
+                  sb.append(Objects.toString(v, ""));
+                }
+                logger.info(InputDataVersionIds, sb.toString());
             }
         }
     }
