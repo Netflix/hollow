@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.common;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public interface TransformerCycleInterrupter {
@@ -21,26 +23,28 @@ public interface TransformerCycleInterrupter {
 
     public static class CycleInterruptEntry {
         private final Long cycleId;
-        private String message;
+        private List<String> messages = new ArrayList<>();
         private boolean isTriggered;
         private boolean isReset;
 
         public CycleInterruptEntry(Long cycleId, String message) {
             super();
             this.cycleId = cycleId;
-            this.message = message;
+            this.messages.add(message);
         }
 
         public Long getCycleId() {
             return cycleId;
         }
 
-        public void updateMessage(String message) {
-            this.message = message;
+        public void appendMessage(String message) {
+            this.messages.add(message);
         }
 
         public String getMessage() {
-            return message;
+            if (messages.size() == 0) return messages.get(0);
+
+            return messages.toString();
         }
 
         public void triggered() {
@@ -64,12 +68,12 @@ public interface TransformerCycleInterrupter {
             StringBuilder builder = new StringBuilder();
             builder.append("CycleInterrupt [cycleId=");
             builder.append(cycleId);
-            builder.append(", message=");
-            builder.append(message);
             builder.append(", isTriggered=");
             builder.append(isTriggered);
             builder.append(", isReset=");
             builder.append(isReset);
+            builder.append(", message=");
+            builder.append(messages);
             builder.append("]");
             return builder.toString();
         }

@@ -33,11 +33,17 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
         isInterrupted = true;
         interruptMsg = msg;
 
-        historyMap.put(cycleId, new CycleInterruptEntry(cycleId, msg));
+        addEntry(cycleId, msg);
+    }
+
+    private synchronized CycleInterruptEntry addEntry(long cycleId, String msg) {
+        CycleInterruptEntry entry = new CycleInterruptEntry(cycleId, msg);
+        historyMap.put(cycleId, entry);
         if (historyMap.size() > HISTORY_LIMIT) {
             Long firstKey = historyMap.firstKey();
             historyMap.remove(firstKey);
         }
+        return entry;
     }
 
     @Override
@@ -63,14 +69,13 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
     public synchronized void triggerInterrupt(long cycleId, String message) throws CycleInterruptException {
         CycleInterruptEntry cycleInterruptEntry = historyMap.get(cycleId);
         if (cycleInterruptEntry == null) {
-            cycleInterruptEntry = new CycleInterruptEntry(cycleId, message);
-            historyMap.put(cycleId, cycleInterruptEntry);
+            cycleInterruptEntry = addEntry(cycleId, message);
         } else {
-            cycleInterruptEntry.updateMessage(message + " : " + interruptMsg);
+            cycleInterruptEntry.appendMessage(message);
         }
         cycleInterruptEntry.triggered();
 
-        throw new CycleInterruptException(message + " : " + interruptMsg);
+        throw new CycleInterruptException(cycleInterruptEntry.getMessage());
     }
 
     @Override
