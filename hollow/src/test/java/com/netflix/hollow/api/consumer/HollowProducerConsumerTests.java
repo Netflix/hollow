@@ -160,6 +160,29 @@ public class HollowProducerConsumerTests {
     }
     
     @Test
+    public void consumerFindsLatestPublishedVersionWithoutAnnouncementWatcher() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                                                .withAnnouncer(announcement)
+                                                .withBlobStager(new HollowInMemoryBlobStager())
+                                                .build();
+        
+        long v1 = runCycle(producer, 1);
+        
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        
+        consumer.triggerRefresh();
+        Assert.assertEquals(v1, consumer.getCurrentVersionId());
+        
+        consumer.triggerRefresh();
+        Assert.assertEquals(v1, consumer.getCurrentVersionId());
+        
+        long v2 = runCycle(producer, 2);
+        
+        consumer.triggerRefresh();
+        Assert.assertEquals(v2, consumer.getCurrentVersionId());
+    }
+
+    @Test
     public void producerRestoresAndProducesDelta() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                                                 .withBlobStager(new HollowInMemoryBlobStager())

@@ -76,10 +76,10 @@ public class HollowClientUpdater {
         try {
             HollowUpdatePlan updatePlan = planUpdate(version);
 
-            if(updatePlan.destinationVersion() == Long.MIN_VALUE)
+            if(updatePlan.destinationVersion() == Long.MIN_VALUE && version != Long.MAX_VALUE)
                 throw new Exception("Could not create an update plan for version " + version);
 
-            if(updatePlan.destinationVersion() == getCurrentVersionId())
+            if(updatePlan.destinationVersion(version) == getCurrentVersionId())
                 return true;
 
             if(updatePlan.isSnapshotPlan()) {
