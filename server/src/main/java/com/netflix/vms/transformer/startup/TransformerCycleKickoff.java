@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.startup;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
@@ -123,18 +123,22 @@ public class TransformerCycleKickoff {
                 while(msUntilNextCycle > 0) {
                     if (ctx.getCycleInterrupter().isCycleInterrupted()) break;
 
-                    try {
+                    try { // Sleep in small intervals to give it a chance to react to cycle interrupt
                         long sleepInMS = Math.min(10000, msUntilNextCycle);
                         Thread.sleep(sleepInMS);
                     } catch (InterruptedException ignore) { }
 
-                    timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
+                    long now = System.currentTimeMillis();
+                    timeSinceLastCycle = now - previousCycleStartTime;
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
+
+                    long currSleepTime = now - sleepStart;
+                    ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, currSleepTime);
                 }
                 long sleepEnd = System.currentTimeMillis();
                 long sleepDuration = sleepEnd - sleepStart;
 
-                ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, sleepDuration);
+                ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, sleepDuration);
                 ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
 
                 previousCycleStartTime = sleepEnd;

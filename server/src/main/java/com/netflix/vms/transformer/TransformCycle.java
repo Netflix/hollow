@@ -1,10 +1,10 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForPublishWorkflowDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P1_ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P5_WaitForNextCycleDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P3_WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
@@ -156,11 +156,11 @@ public class TransformCycle {
         ctx.getOctoberSkyData().refresh();
 
         // Reset Metric
-        ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(ProcessDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(WaitForPublishWorkflowDuration, 0);
-        ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, 0);
+        ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, 0);
+        ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, 0);
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
@@ -179,40 +179,42 @@ public class TransformCycle {
     private void updateTheInput() {
         long startTime = System.currentTimeMillis();
 
-        FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+        try {
+            FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
 
-        /// load the input data
-        Long pinnedInputVersion = ctx.getConfig().getPinInputVersion();
-        if(pinnedInputVersion == null && followVipPin != null)
-            pinnedInputVersion = followVipPin.getInputVersionId();
+            /// load the input data
+            Long pinnedInputVersion = ctx.getConfig().getPinInputVersion();
+            if(pinnedInputVersion == null && followVipPin != null)
+                pinnedInputVersion = followVipPin.getInputVersionId();
 
-        // If the converter vip has changed we need to re-initialize the client
-        if(hasConverterVipChanged()) {
-            inputClient = new VMSInputDataClient(filestore, resolveConverterVip(ctx, converterVip));
-            this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
-            previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
+            // If the converter vip has changed we need to re-initialize the client
+            if(hasConverterVipChanged()) {
+                inputClient = new VMSInputDataClient(filestore, resolveConverterVip(ctx, converterVip));
+                this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
+                previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
+            }
+
+            if(pinnedInputVersion == null)
+                inputClient.triggerRefresh();
+            else
+                inputClient.triggerRefreshTo(pinnedInputVersion);
+
+            //// set the now millis
+            Long nowMillis = ctx.getConfig().getNowMillis();
+            if(nowMillis == null && followVipPin != null)
+                nowMillis = followVipPin.getNowMillis();
+            if(nowMillis == null)
+                nowMillis = System.currentTimeMillis();
+            ctx.setNowMillis(nowMillis.longValue());
+
+            ctx.getLogger().info(InputDataConverterVersionId, inputClient.getCurrentVersionId());
+            ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
+
+            VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
+        } finally {
+            long endTime = System.currentTimeMillis();
+            ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, endTime - startTime);
         }
-
-        if(pinnedInputVersion == null)
-            inputClient.triggerRefresh();
-        else
-            inputClient.triggerRefreshTo(pinnedInputVersion);
-
-        //// set the now millis
-        Long nowMillis = ctx.getConfig().getNowMillis();
-        if(nowMillis == null && followVipPin != null)
-            nowMillis = followVipPin.getNowMillis();
-        if(nowMillis == null)
-            nowMillis = System.currentTimeMillis();
-        ctx.setNowMillis(nowMillis.longValue());
-
-        long endTime = System.currentTimeMillis();
-
-        ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, endTime - startTime);
-        ctx.getLogger().info(InputDataConverterVersionId, inputClient.getCurrentVersionId());
-        ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
-
-        VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
     }
 
     private boolean transformTheData() throws Throwable {
@@ -245,7 +247,7 @@ public class TransformCycle {
             throw th;
         } finally {
             long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(ProcessDataDuration, endTime - startTime);
+            ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, endTime - startTime);
         }
 
         return true;
@@ -260,13 +262,10 @@ public class TransformCycle {
     }
 
     private void writeTheBlobFiles() throws IOException {
-        headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
-
         long startTime = System.currentTimeMillis();
-
-        HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
-
         try {
+            headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
+            HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
@@ -300,11 +299,10 @@ public class TransformCycle {
         } catch(IOException e) {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
             throw e;
+        } finally {
+            long endTime = System.currentTimeMillis();
+            ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, endTime - startTime);
         }
-
-        long endTime = System.currentTimeMillis();
-
-        ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, endTime - startTime);
     }
 
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
@@ -339,7 +337,6 @@ public class TransformCycle {
     private boolean rollbackFastlaneStateEngine() {
         outputStateEngine.resetToLastPrepareForNextCycle();
         fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
-        ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
         ctx.getLogger().info(TransformerLogTag.HideCycleFromDashboard, "Fastlane data was unchanged -- rolling back and trying again");
         return true;
     }
@@ -353,7 +350,7 @@ public class TransformCycle {
                 throw new RuntimeException("Publish Workflow Failed!");
         } finally {
             long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(WaitForPublishWorkflowDuration, endTime - startTime);
+            ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, endTime - startTime);
         }
 
     }
