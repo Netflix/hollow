@@ -647,7 +647,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -2734,7 +2734,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -4821,7 +4821,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -6908,7 +6908,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -9130,7 +9130,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -11217,7 +11217,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -13313,7 +13313,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -15409,7 +15409,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -17505,7 +17505,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.8",
+            "locked": "2.6.9",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {

@@ -5,6 +5,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import java.util.Map;
+import java.util.Objects;
 
 public class TransformerOutputBlobHeaderPopulator {
     
@@ -36,7 +37,19 @@ public class TransformerOutputBlobHeaderPopulator {
 
                 outputStateEngine.addHeaderTag("input:" + mutationGroup + "_ColdStartManager", "version:" + latestColdstartVersion);
                 outputStateEngine.addHeaderTag("input:" + mutationGroup + "_MutationEventsFetcher", "version:" + latestEventId);
-                outputStateEngine.addHeaderTag(mutationGroup + ".lastReadMessageId", latestEventId);
+                outputStateEngine.addHeaderTag(mutationGroup + ".lastReadMessageId", Objects.toString(latestEventId, ""));
+
+                for(String k : new String[]{
+                    "coldstartFile",
+                    "coldstartFilePublishTime",
+                    "coldstartKeybase",
+                    "eventsBackend",
+                    "eventsCheckpoints",
+                    "eventsLatest"
+                  }) {
+                  String v = inputHeaderTags.get(mutationGroup + "_" + k);
+                  outputStateEngine.addHeaderTag("input:" + mutationGroup + "_" + k, Objects.toString(v, ""));
+                }
             }
         }
 
