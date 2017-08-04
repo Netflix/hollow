@@ -34,6 +34,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.util.function.Supplier;
@@ -102,6 +103,8 @@ public class TransformerCycleKickoff {
                         markCycleFailed(th);
                     } finally {
                         ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
+
+                        // Reset for next cycle
                         ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
                     }
                 }
@@ -132,7 +135,7 @@ public class TransformerCycleKickoff {
                 long sleepDuration = sleepEnd - sleepStart;
 
                 ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, sleepDuration);
-                ctx.getLogger().info(WaitForNextCycle, "Waited {}ms", sleepDuration);
+                ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
 
                 previousCycleStartTime = sleepEnd;
             }

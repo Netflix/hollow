@@ -2,6 +2,7 @@ package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
@@ -153,6 +154,13 @@ public class TransformCycle {
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
         ctx.getOctoberSkyData().refresh();
+
+        // Reset Metric
+        ctx.getMetricRecorder().recordMetric(ReadInputDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(ProcessDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(WriteOutputDataDuration, 0);
+        ctx.getMetricRecorder().recordMetric(WaitForPublishWorkflowDuration, 0);
+        ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, 0);
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
