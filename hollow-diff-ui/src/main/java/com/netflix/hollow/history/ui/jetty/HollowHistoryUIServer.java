@@ -45,16 +45,18 @@ public class HollowHistoryUIServer {
         this.ui = ui;
     }
 
-    public void start() throws Exception {
+    public HollowHistoryUIServer start() throws Exception {
         server.start();
+        return this;
     }
 
     public void stop() throws Exception {
         server.stop();
     }
 
-    public void join() throws InterruptedException {
+    public HollowHistoryUIServer join() throws InterruptedException {
         server.join();
+        return this;
     }
 
     public HollowHistoryUI getUI() {

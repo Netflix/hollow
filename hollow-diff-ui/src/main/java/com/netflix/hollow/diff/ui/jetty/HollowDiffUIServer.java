@@ -41,16 +41,18 @@ public class HollowDiffUIServer {
         return server.addDiff(diffPath, diff, fromBlobName, toBlobName);
     }
 
-    public void start() throws Exception {
+    public HollowDiffUIServer start() throws Exception {
         server.start();
+        return this;
     }
 
     public void stop() throws Exception {
         server.stop();
     }
 
-    public void join() throws InterruptedException {
+    public HollowDiffUIServer join() throws InterruptedException {
         server.join();
+        return this;
     }
 
     static interface UIServer {
