@@ -235,24 +235,28 @@ public class HollowCombiner {
                         for(PrimaryKey pk : selectedPrimaryKeys) {
                             if(pk.getType().equals(schema.getName())) {
                                 HollowPrimaryKeyIndex[] indexes = new HollowPrimaryKeyIndex[inputs.length];
-                                for(int i=0;i<indexes.length;i++)
-                                    indexes[i] = new HollowPrimaryKeyIndex(inputs[i], pk);
+                                for(int i=0;i<indexes.length;i++) {
+                                    if(inputs[i].getTypeState(pk.getType()) != null)
+                                        indexes[i] = new HollowPrimaryKeyIndex(inputs[i], pk);
+                                }
 
                                 for(int i=0;i<indexes.length;i++) {
                                     HollowTypeReadState typeState = inputs[i].getTypeState(pk.getType());
-                                    BitSet populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
-
-                                    int ordinal = populatedOrdinals.nextSetBit(0);
-                                    while(ordinal != -1) {
-                                        if(primaryKeyCopyDirector.shouldCopy(typeState, ordinal)) {
-                                            Object recordKey[] = indexes[i].getRecordKey(ordinal);
-
-                                            for(int j=i+1;j<indexes.length;j++) {
-                                                primaryKeyCopyDirector.excludeKey(indexes[j], recordKey);
+                                    if(typeState != null) {
+                                        BitSet populatedOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+    
+                                        int ordinal = populatedOrdinals.nextSetBit(0);
+                                        while(ordinal != -1) {
+                                            if(primaryKeyCopyDirector.shouldCopy(typeState, ordinal)) {
+                                                Object recordKey[] = indexes[i].getRecordKey(ordinal);
+    
+                                                for(int j=i+1;j<indexes.length;j++) {
+                                                    primaryKeyCopyDirector.excludeKey(indexes[j], recordKey);
+                                                }
                                             }
+    
+                                            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
                                         }
-
-                                        ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
                                     }
                                 }
 

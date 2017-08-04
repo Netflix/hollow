@@ -54,9 +54,11 @@ class HollowCombinerPrimaryKeyOrdinalRemapper implements OrdinalRemapper {
             
             for(int i=0;i<baseRemappers.length;i++) {
                 if(i != stateEngineIdx) {
-                    int matchOrdinal = typeKeyIndexes[i].getMatchingOrdinal(primaryKey);
-                    if(matchOrdinal != -1) {
-                        baseRemappers[i].remapOrdinal(type, matchOrdinal, mappedOrdinal);
+                    if(typeKeyIndexes[i] != null) {
+                        int matchOrdinal = typeKeyIndexes[i].getMatchingOrdinal(primaryKey);
+                        if(matchOrdinal != -1) {
+                            baseRemappers[i].remapOrdinal(type, matchOrdinal, mappedOrdinal);
+                        }
                     }
                 }
             }
