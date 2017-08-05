@@ -60,8 +60,8 @@ public class RecordCountVarianceValidator implements Validator {
 		float actualChangePercent = (float)(100*Math.abs(latestCardinality - previousCardinality))/previousCardinality;
 		if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
 			throw new ValidationException("RecordCountVarianceValidator for type " + typeName
-					+ " failed. Actual change percent: " + actualChangePercent + "; allowableVariancePercent: "
-					+ allowableVariancePercent + "; current cycle record count: " + latestCardinality
+					+ " failed. Actual variance: " + actualChangePercent + "%; Allowed variance: "
+					+ allowableVariancePercent + "%; current cycle record count: " + latestCardinality
 					+ "; previous cycle record count: " + previousCardinality);
 		}
 	}
