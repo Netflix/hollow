@@ -66,7 +66,7 @@ public class RecordCountVarianceValidatorTests {
 			Assert.fail();
 		} catch (ValidationException expected) {
 			Assert.assertEquals(1, expected.getIndividualFailures().size());
-			System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
+			//System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
 			Assert.assertTrue(expected.getIndividualFailures().get(0).getMessage()
 					.startsWith("RecordCountVarianceValidator for type TypeWithPrimaryKey failed."));
 		}
@@ -95,7 +95,7 @@ public class RecordCountVarianceValidatorTests {
 			});
 			Assert.fail();
 		} catch (ValidationException expected) {
-			System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
+			//System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
 			Assert.assertEquals(1, expected.getIndividualFailures().size());
 			Assert.assertTrue(expected.getIndividualFailures().get(0).getMessage()
 					.startsWith("RecordCountVarianceValidator for type TypeWithPrimaryKey failed."));
