@@ -61,8 +61,9 @@ public class RecordCountVarianceValidator implements Validator {
 		if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
 			throw new ValidationException("RecordCountVarianceValidator for type " + typeName
 					+ " failed. Actual variance: " + actualChangePercent + "%; Allowed variance: "
-					+ allowableVariancePercent + "%; current cycle record count: " + latestCardinality
-					+ "; previous cycle record count: " + previousCardinality);
+					+ allowableVariancePercent + "%;  previous cycle record count: " + previousCardinality
+							+ "; current cycle record count: " + latestCardinality);
+					
 		}
 	}
 }
