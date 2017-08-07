@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P1_ReadInputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P5_WaitForNextCycleDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P3_WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
@@ -154,13 +153,6 @@ public class TransformCycle {
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
         ctx.getOctoberSkyData().refresh();
-
-        // Reset Metric
-        ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, 0);
-        ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, 0);
-        ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, 0);
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());

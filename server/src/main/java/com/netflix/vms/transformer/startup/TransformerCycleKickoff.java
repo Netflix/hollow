@@ -1,6 +1,10 @@
 package com.netflix.vms.transformer.startup;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P1_ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P3_WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
@@ -85,10 +89,10 @@ public class TransformerCycleKickoff {
 
             @Override
             public void run() {
+                boolean isFastlane = isFastlane(ctx.getConfig());
                 while(true) {
                     try {
-                        if (isFastlane(ctx.getConfig()))
-                            setUpFastlaneContext();
+                        if (isFastlane) setUpFastlaneContext();
 
                         cycle.cycle();
                         markCycleSucessful();
@@ -106,6 +110,13 @@ public class TransformerCycleKickoff {
 
                         // Reset for next cycle
                         ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
+                        if (!isFastlane) { // Fastlane metrics are not reset; otherwise, the gauge is reset prior to being flushed
+                            ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, 0);
+                            ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, 0);
+                            ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, 0);
+                            ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, 0);
+                            ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, 0);
+                        }
                     }
                 }
             }
