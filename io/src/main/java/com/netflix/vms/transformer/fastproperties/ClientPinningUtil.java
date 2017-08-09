@@ -10,7 +10,9 @@ import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -54,15 +56,18 @@ public class ClientPinningUtil {
 
     public static void unpinClients(String vipName, RegionEnum region) throws IOException {
 
-        // Figure out the key of the property
-        String key = propertyNameSuffix + "." + vipName;
-        PersistedPropertiesUtil.deleteFastProperty(key,
-                null,                                         // no appId
-                NetflixConfiguration.getEnvironmentEnum(),
-                region,
-                null,                                         // no serverId
-                null,                                         // no stack
-                null);                                        // no countries
+    	List<String> keys = new ArrayList<>();
+    	keys.add(propertyNameSuffix);
+    	keys.add(propertyNameSuffix + ".berlin");
+    	for(String key : keys) {
+        	PersistedPropertiesUtil.deleteFastProperty(key,
+                    null,                                         // no appId
+                    NetflixConfiguration.getEnvironmentEnum(),
+                    region,
+                    null,                                         // no serverId
+                    null,                                         // no stack
+                    null);                                        // no countries    		
+    	}
     }
 
     /**
@@ -74,27 +79,35 @@ public class ClientPinningUtil {
      */
     public static void pinClients(String vipName, String blobVersion, RegionEnum region) throws IOException {
 
-        // Determine if the key already exists
-        String key = propertyNameSuffix + "." + vipName;
+    	List<String> keys = new ArrayList<>();
+    	keys.add(propertyNameSuffix);
+    	keys.add(propertyNameSuffix + ".berlin");
         EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-        boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
-        if(exists) {
-            // Update property
-            PersistedPropertiesUtil.updateFastProperty(key, blobVersion, null, env, region, null, null, null);
-        } else {
-            // create property
-            PersistedPropertiesUtil.createFastProperty(key, blobVersion, null, env, region, null, null, null);
+        for(String key : keys) {
+            boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
+            if(exists) {
+                // Update property
+                PersistedPropertiesUtil.updateFastProperty(key, blobVersion, null, env, region, null, null, null);
+            } else {
+                // create property
+                PersistedPropertiesUtil.createFastProperty(key, blobVersion, null, env, region, null, null, null);
+            }        	
         }
 
     }
 
 
     public static String getPinnedVersion(String vipName, RegionEnum region) throws IOException {
-        String key = propertyNameSuffix + "." + vipName;
         EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-        if(!PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null))
-            return null;
-        return PersistedPropertiesUtil.getFastPropertyValue(key, null, env, region, null, null, null);
+
+    	String key = propertyNameSuffix + "." + vipName;
+        if(PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null)) {
+        	return PersistedPropertiesUtil.getFastPropertyValue(key, null, env, region, null, null, null);
+        } else if(PersistedPropertiesUtil.fastPropertyExists(propertyNameSuffix, null, env, region, null, null, null)){
+        	return PersistedPropertiesUtil.getFastPropertyValue(propertyNameSuffix, null, env, region, null, null, null);
+        }
+        
+        return null;
     }
 
 	private static Map<RegionEnum, String> consumeJson(String json) {

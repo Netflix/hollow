@@ -25,6 +25,7 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class VideoHierarchyInitializer {
                             continue;
                         }
 
-                        VideoHierarchy showHierarchy = new VideoHierarchy((int) topParentId, isStandalone, showSeasonEpisode, countryCode, this);
+                        VideoHierarchy showHierarchy = new VideoHierarchy(ctx, (int) topParentId, isStandalone, showSeasonEpisode, countryCode, this);
                         droppedIds.addAll(showHierarchy.getDroppedIds());
 
                         VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
@@ -129,7 +130,7 @@ public class VideoHierarchyInitializer {
                         continue;
                     }
 
-                    VideoHierarchy showHierarchy = new VideoHierarchy((int) topParentId, isStandalone, null, countryCode, this);
+                    VideoHierarchy showHierarchy = new VideoHierarchy(ctx, (int) topParentId, isStandalone, null, countryCode, this);
                     droppedIds.addAll(showHierarchy.getDroppedIds());
 
                     VideoHierarchy canonicalHierarchy = uniqueShowHierarchies.get(showHierarchy);
@@ -245,21 +246,24 @@ public class VideoHierarchyInitializer {
         return false;
     }
 
-    void addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> droppedIds) {
+    // return the added supplemental IDs
+    Set<Integer> addSupplementalVideos(long videoId, String countryCode, IntList toList, Set<Integer> droppedIds) {
         int supplementalsOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
-
         if(supplementalsOrdinal == -1)
-            return;
+            return Collections.emptySet();
 
+        Set<Integer> addedSupplementals = new HashSet<>();
         SupplementalsHollow supplementals = api.getSupplementalsHollow(supplementalsOrdinal);
         for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
             int supplementalId = (int)supplemental._getMovieId();
             if (isChildNodeIncluded(supplementalId, countryCode)) {
                 toList.add(supplementalId);
+                addedSupplementals.add(supplementalId);
             } else {
                 droppedIds.add(supplementalId);
             }
         }
+        return addedSupplementals;
     }
 
     void addShowAndAllChildren(ShowSeasonEpisodeHollow showSeasonEpisode, Set<Integer> toSet) {

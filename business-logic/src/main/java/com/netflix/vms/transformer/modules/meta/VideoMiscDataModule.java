@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
@@ -46,23 +47,23 @@ public class VideoMiscDataModule {
         this.csmReviewIdx = indexer.getPrimaryKeyIndex(CSM_REVIEW);
     }
 
-    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry) {
+    public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
         videoMiscMap.clear();
 
         for(Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             for(VideoHierarchy showHierarchy : entry.getValue()) {
-                addVideoMiscData(showHierarchy.getTopNodeId(), entry.getKey());
+                addVideoMiscData(showHierarchy.getTopNodeId(), transformedVideoData);
                 int[][] seasonEpisodesIds = showHierarchy.getEpisodeIds();
                 for(int seasonIdx = 0; seasonIdx < showHierarchy.getSeasonIds().length; seasonIdx++) {
-                    addVideoMiscData(showHierarchy.getSeasonIds()[seasonIdx], entry.getKey());
+                    addVideoMiscData(showHierarchy.getSeasonIds()[seasonIdx], transformedVideoData);
     
                     for(int episodeIdx = 0; episodeIdx < seasonEpisodesIds[seasonIdx].length; episodeIdx++) {
-                        addVideoMiscData(seasonEpisodesIds[seasonIdx][episodeIdx], entry.getKey());
+                        addVideoMiscData(seasonEpisodesIds[seasonIdx][episodeIdx], transformedVideoData);
                     }
                 }
     
                 for(int i=0;i<showHierarchy.getSupplementalIds().length;i++) {
-                    addVideoMiscData(showHierarchy.getSupplementalIds()[i], entry.getKey());
+                    addVideoMiscData(showHierarchy.getSupplementalIds()[i], transformedVideoData);
                 }
             }
         }
@@ -70,15 +71,16 @@ public class VideoMiscDataModule {
         return videoMiscMap;
     }
 
-    private void addVideoMiscData(int videoId, String countryCode) {
+    private void addVideoMiscData(int videoId, TransformedVideoData transformedVideoData) {
         VideoMiscData miscData = videoMiscMap.get(videoId);
         if(miscData == null) {
-            miscData = createMiscData(videoId, countryCode);
+            miscData = createMiscData(videoId);
             videoMiscMap.put(videoId, miscData);
+            transformedVideoData.getVideoData(videoId).setVideoMiscData(miscData);
         }
     }
 
-    private VideoMiscData createMiscData(int videoId, String countryCode) {
+    private VideoMiscData createMiscData(int videoId) {
         VideoMiscData miscData = new VideoMiscData();
         miscData.videoAwards = getAwards(videoId);
         miscData.cSMReview = getCSMReview(videoId);

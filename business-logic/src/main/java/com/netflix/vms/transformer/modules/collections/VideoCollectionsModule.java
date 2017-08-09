@@ -3,6 +3,9 @@ package com.netflix.vms.transformer.modules.collections;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
@@ -15,7 +18,6 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,21 +35,24 @@ public class VideoCollectionsModule {
     private final Strings IDENTIFIER = new Strings("identifier");
 
     private final VMSHollowInputAPI videoAPI;
+    private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex supplementalIndex;
     private final CycleConstants cycleConstants;
 
-    public VideoCollectionsModule(VMSHollowInputAPI videoAPI, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public VideoCollectionsModule(VMSHollowInputAPI videoAPI, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
         this.videoAPI = videoAPI;
+        this.ctx = ctx;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.cycleConstants = constants;
     }
 
-    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<String, VideoDataCollection> videoDataCollectionMap) {
+    public void buildVideoCollectionsDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
 
         Map<VideoHierarchy, VideoCollectionsDataHierarchy> uniqueHierarchies = new HashMap<>();
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
-            String countryCode = entry.getKey();
 
+            String countryCode = entry.getKey();
+            VideoDataCollection videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
             Set<VideoCollectionsDataHierarchy> vcdHierarchies = new HashSet<>();
 
             for (VideoHierarchy showHierarchy : entry.getValue()) {
@@ -59,7 +64,7 @@ public class VideoCollectionsModule {
                     continue;
                 }
 
-                VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
+                VideoCollectionsDataHierarchy hierarchy = new VideoCollectionsDataHierarchy(ctx, topNodeId, showHierarchy.isStandalone(), getSupplementalVideos(showHierarchy, topNodeId), cycleConstants);
                 for (int i = 0; i < showHierarchy.getSeasonIds().length; i++) {
                     int seasonId = showHierarchy.getSeasonIds()[i];
                     int seasonSequenceNumber = showHierarchy.getSeasonSequenceNumbers()[i];
@@ -75,8 +80,8 @@ public class VideoCollectionsModule {
                 vcdHierarchies.add(hierarchy);
                 uniqueHierarchies.put(showHierarchy, hierarchy);
             }
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            videoDataCollectionMap.get(countryCode).setVideoCollectionsDataHierarchy(vcdHierarchies);
+
+            videoDataCollection.setVideoCollectionsDataHierarchy(vcdHierarchies);
         }
     }
 
@@ -86,6 +91,7 @@ public class VideoCollectionsModule {
         if (supplementalsOrdinal == -1)
             return new ArrayList<SupplementalVideo>();
 
+        Map<Integer, Integer> supplementalSeasonSeqNumMap = hierarchy.getSupplementalSeasonSeqNumMap();
         List<SupplementalVideo> supplementalVideos = new ArrayList<SupplementalVideo>();
 
         SupplementalsHollow supplementals = videoAPI.getSupplementalsHollow(supplementalsOrdinal);
@@ -97,7 +103,9 @@ public class VideoCollectionsModule {
                 supp.id = new Video(supplementalId);
                 supp.parent = new Video((int) videoId);
                 supp.sequenceNumber = (int) supplemental._getSequenceNumber();
-                //supp.seasonNumber = seasonNumber;
+                if (supplementalSeasonSeqNumMap.containsKey(supplementalId)) {
+                    supp.seasonNumber = supplementalSeasonSeqNumMap.get(supplementalId);
+                }
                 supp.attributes = new HashMap<Strings, Strings>();
                 supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
 

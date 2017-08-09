@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules;
+package com.netflix.vms.transformer.data;
 
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
@@ -12,14 +12,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class encapsulates data for a group of videos in collections hierarchies. Ideally to be used as a Map of country to VideoDataCollection.
+ * This class encapsulates/holds media, meta, images & country specific video data by video id.
  */
 public class VideoDataCollection {
 
     private Map<Integer, VideoData> videoIdDataMap;
     private Set<VideoCollectionsDataHierarchy> videoCollectionsDataHierarchies;
 
-    public VideoDataCollection() {
+    protected VideoDataCollection() {
         this.videoIdDataMap = new HashMap<>();
         this.videoCollectionsDataHierarchies = new HashSet<>();
     }

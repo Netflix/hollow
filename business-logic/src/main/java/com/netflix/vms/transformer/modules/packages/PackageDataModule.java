@@ -7,6 +7,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
@@ -103,9 +104,7 @@ public class PackageDataModule {
         this.soundTypesMap = getSoundTypesMap();
     }
 
-    public Map<Integer, Set<PackageDataCollection>> transform(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds) {
-
-        Map<Integer, Set<PackageDataCollection>> transformedPackages = new HashMap<>();
+    public void transform(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Set<Integer> extraVideoIds, TransformedVideoData transformedVideoData) {
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry, extraVideoIds);
         for (Integer videoId : videoIds) {
@@ -134,11 +133,9 @@ public class PackageDataModule {
                 videoPackageData.packages = allPackageDataCollection.stream().map(c -> c.getPackageData()).collect(Collectors.toSet());
 
                 mapper.add(videoPackageData);
-                transformedPackages.put(videoId, allPackageDataCollection);
+                transformedVideoData.getTransformedPackageData(videoId).setPackageDataCollectionMap(allPackageDataCollection);
             }
         }
-
-        return transformedPackages;
     }
 
     private void populateDrmKeysByGroupId(PackageHollow packageInput, Integer videoId) {
@@ -186,7 +183,7 @@ public class PackageDataModule {
         int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
         if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
 
-        PackageDataCollection packageDataCollection = new PackageDataCollection(fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
+        PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
         PackageData pkg = packageDataCollection.getPackageData();
 
         pkg.id = (int) packages._getPackageId();

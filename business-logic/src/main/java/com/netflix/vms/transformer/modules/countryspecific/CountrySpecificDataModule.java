@@ -8,6 +8,8 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
+import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
@@ -35,8 +37,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.modules.VideoDataCollection;
-import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -99,17 +99,14 @@ public class CountrySpecificDataModule {
         this.availabilityWindowModule = null;
     }
 
-    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, Map<Integer, Set<PackageDataCollection>> transformedPackageData, Map<String, VideoDataCollection> videoDataCollectionMap) {
-        this.availabilityWindowModule.setTransformedPackageData(transformedPackageData);
+    public void buildCountrySpecificDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
+        this.availabilityWindowModule.setTransformedVideoData(transformedVideoData);
         CountrySpecificRollupValues rollup = new CountrySpecificRollupValues();
 
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchiesByCountry.entrySet()) {
             String countryCode = entry.getKey();
-            videoDataCollectionMap.putIfAbsent(countryCode, new VideoDataCollection());
-            this.videoDataCollection = videoDataCollectionMap.get(countryCode);
-
+            this.videoDataCollection = transformedVideoData.getVideoDataCollection(countryCode);
             processCountrySpecificData(rollup, entry.getValue(), countryCode, videoDataCollection);
-
             Set<String> catalogLanguages = ctx.getOctoberSkyData().getCatalogLanguages(countryCode);
             if (catalogLanguages != null) {
                 processLocaleSpecificData(rollup, entry.getValue(), countryCode, catalogLanguages);
@@ -286,7 +283,7 @@ public class CountrySpecificDataModule {
         }
 
         // Use Status Data to populate MetaDataAvailabilityDate
-        populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data);
+        populateMetaDataAvailabilityDate(videoId, countryCode, firstDisplayDate, availabilityWindowList, data, rollup);
 
         if (data.firstDisplayDateByLocale == null) data.firstDisplayDateByLocale = Collections.emptyMap();
         if (data.availabilityWindows == null) data.availabilityWindows = Collections.emptyList();
@@ -334,13 +331,13 @@ public class CountrySpecificDataModule {
         return null;
     }
 
-    private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data) {
+    private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
         Integer prePromoDays = packageContractInfo == null ? null : packageContractInfo.videoContractInfo.prePromotionDays;
         Long availabilityDate = firstWindow != null ? firstWindow.startDate.val : null;
         VideoImages videoImages = videoDataCollection.getVideoImages((int) videoId);
-        Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, videoImages, availabilityDate);
+        Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, videoImages, availabilityDate, rollup);
 
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
@@ -353,7 +350,7 @@ public class CountrySpecificDataModule {
     }
 
     @VisibleForTesting
-    Long getEarliestSchedulePhaseDate(long videoId, VideoImages videoImages, Long availabilityDate) {
+    Long getEarliestSchedulePhaseDate(long videoId, VideoImages videoImages, Long availabilityDate, CountrySpecificRollupValues rollup) {
         Long earliestStart = null;
 
         // Check if the feature is turned on.
@@ -388,6 +385,13 @@ public class CountrySpecificDataModule {
             if (earliestStart == null || earliestStart > currentOffsetDate)
                 earliestStart = currentOffsetDate;
         }
+        
+        if(earliestStart != null)
+            rollup.newEarliestScheduledPhaseDate(earliestStart);
+        
+        if(rollup.getRolledUpEarliestScheduledPhaseDate() != Long.MAX_VALUE)
+            earliestStart = rollup.getRolledUpEarliestScheduledPhaseDate();
+        
         return earliestStart;
     }
 

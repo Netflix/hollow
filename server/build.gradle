@@ -101,6 +101,19 @@ configurations.grettyRunnerTomcat8 {
     exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
 }
 
+configurations.all {
+  resolutionStrategy {
+    force 'com.netflix.archaius:archaius2-api:2.2.0'                                                                                                                      
+    force 'com.netflix.archaius:archaius2-archaius1-bridge:2.2.0'
+    force 'com.netflix.archaius:archaius2-commons-configuration:2.2.0'
+    force 'com.netflix.archaius:archaius2-core:2.2.0'
+    force 'com.netflix.archaius:archaius2-guice:2.2.0'
+    force 'com.netflix.archaius:archaius2-persisted2:2.2.0'
+    force 'com.netflix.archaius:archaius2-test:2.2.0'
+  }
+}
+
+
 war {
   into('WEB-INF/classes') {
     from 'src/main/java'
