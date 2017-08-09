@@ -240,6 +240,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -252,6 +258,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -676,7 +688,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -703,7 +715,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -1435,7 +1447,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -2481,7 +2493,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -3383,6 +3395,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -3395,6 +3413,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -3819,7 +3843,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -3846,7 +3870,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -4578,7 +4602,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -5624,7 +5648,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -6526,6 +6550,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -6538,6 +6568,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -6962,7 +6998,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -6989,7 +7025,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -7721,7 +7757,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -8767,7 +8803,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -9669,6 +9705,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -9681,6 +9723,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -10105,7 +10153,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -10132,7 +10180,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -10864,7 +10912,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -11910,7 +11958,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -12941,6 +12989,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -12953,6 +13007,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -13377,7 +13437,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -13404,7 +13464,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -14136,7 +14196,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -15182,7 +15242,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -16084,6 +16144,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -16096,6 +16162,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -16520,7 +16592,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -16547,7 +16619,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -17279,7 +17351,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -18326,7 +18398,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -19232,6 +19304,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -19244,6 +19322,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -19668,7 +19752,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -19695,7 +19779,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -20427,7 +20511,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -21474,7 +21558,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -22380,6 +22464,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -22392,6 +22482,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -22816,7 +22912,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -22843,7 +22939,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -23575,7 +23671,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -24622,7 +24718,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25528,6 +25624,12 @@
                 "netflix:simone-client"
             ]
         },
+        "com.github.andrewoma.dexx:dexx-collections": {
+            "locked": "0.2",
+            "transitive": [
+                "com.github.vlsi.compactmap:compactmap"
+            ]
+        },
         "com.github.stephenc.high-scale-lib:high-scale-lib": {
             "locked": "1.1.2",
             "transitive": [
@@ -25540,6 +25642,12 @@
             "locked": "0.2.5",
             "transitive": [
                 "org.apache.cassandra:cassandra-all"
+            ]
+        },
+        "com.github.vlsi.compactmap:compactmap": {
+            "locked": "1.2.1",
+            "transitive": [
+                "com.netflix.eureka:eureka-client"
             ]
         },
         "com.google.code.findbugs:annotations": {
@@ -25964,7 +26072,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
@@ -25991,7 +26099,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.7.0",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -26723,7 +26831,7 @@
             ]
         },
         "com.thoughtworks.xstream:xstream": {
-            "locked": "1.4.9",
+            "locked": "1.4.10",
             "transitive": [
                 "com.netflix.eureka:eureka-client",
                 "netflix:netflix-config",
@@ -27770,7 +27878,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.60",
+            "locked": "100.0.61",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
