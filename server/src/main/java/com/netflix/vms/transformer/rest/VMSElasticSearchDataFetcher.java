@@ -31,6 +31,56 @@ import com.google.gson.JsonParser;
  *
  */
 public class VMSElasticSearchDataFetcher {
+	
+	public static List<String> getCycles(String esHostName, String vipName) {
+		List<String> indices = getIndices(esHostName, vipName);
+		
+		// Now we will get cycles for each of these indices
+		List<String> cycles = new ArrayList<>();
+		for(String index : indices) {
+			List<String> indexCycles = getCyclesForIndex(esHostName, index);
+			cycles.addAll(indexCycles);
+		}
+		
+		return cycles;
+	}
+
+	private static List<String> getCyclesForIndex(String esHostName, String index) {
+		URI uri = null;
+		try {
+			uri = new URIBuilder()
+					.setScheme("http")
+					.setHost(esHostName)
+					.setPort(7104)
+					.setPath("/" + index + "/vmsserver/_search")
+					.addParameter("q", "eventInfo.tag:TransformCycleBegin")
+					.addParameter("size", "720")
+					.addParameter("sort", "eventInfo.timestamp:desc")
+					.addParameter("pretty", "true")
+					.build();
+		} catch(URISyntaxException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+		
+		String jsonResponse = executeHttpGet(uri);
+		List<String> cycles = extractCyclesFromJson(jsonResponse);
+		
+		return cycles;
+	}
+	
+	private static List<String> extractCyclesFromJson(String json) {
+		List<String> cycles = new ArrayList<>();
+		JsonObject jobj = new JsonParser().parse(json).getAsJsonObject();
+		JsonArray hits = jobj.get("hits").getAsJsonObject().get("hits").getAsJsonArray();
+		for(int i = 0; i < hits.size(); i++) {
+			JsonObject hit = hits.get(i).getAsJsonObject();
+			JsonObject eventInfo = hit.get("_source").getAsJsonObject().get("eventInfo").getAsJsonObject();
+			String cycleVersion = eventInfo.get("currentCycle").getAsString();
+			cycles.add(cycleVersion);
+		}
+		return cycles;
+	}
 
 	/**
 	 * Gets the last completed cycle for a particula vip

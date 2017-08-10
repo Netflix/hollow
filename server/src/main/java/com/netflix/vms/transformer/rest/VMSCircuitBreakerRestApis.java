@@ -53,6 +53,26 @@ public class VMSCircuitBreakerRestApis {
 	}
 	
 	@GET
+	@Path("/cycles")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getCycles(@QueryParam("vip") String vipName) {
+		// If vip name is null, use the default vip
+		if(vipName == null)
+			vipName = transformerConfig.getTransformerVip();
+		
+		// Get elastic search hostname for query
+		String esHostName = getElasticSearchHostname();
+		if(esHostName == null)
+			return "[]";
+		
+		// Get the list of cycles for this vip
+		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostName, vipName);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		
+		return gson.toJson(cycles);
+	}
+	
+	@GET
 	@Path("/status/{cbname}")
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getCircuitBreakerStatus(@PathParam("cbname") String circuitBreakerName, 
