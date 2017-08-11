@@ -143,6 +143,20 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     }
 
     /**
+     * Get total number of integers added to the set.
+     *
+     * @return
+     */
+    public int cardinality() {
+        SparseBitSet current = sparseBitSet;
+        int cardinality;
+        do {
+            cardinality = current.cardinality();
+        } while (current != sparseBitSetVolatile);
+        return cardinality;
+    }
+
+    /**
      * Use this method to keep the index updated with delta changes on the read state engine.
      * Remember to call detachFromDeltaUpdates to stop the delta changes.
      * NOTE: Each delta updates creates a new prefix index and swaps the new with current.
