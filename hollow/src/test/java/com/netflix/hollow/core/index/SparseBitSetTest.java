@@ -41,9 +41,13 @@ public class SparseBitSetTest {
         Set<Integer> intIndexed = new HashSet<>();
         for (int i = 0; i < 100000; i++) {
             int r = random.nextInt(maxValue);
+            while (intIndexed.contains(r)) r = random.nextInt(maxValue);
             sparseBitSet.set(r);
             intIndexed.add(r);
         }
+
+        Assert.assertEquals(100000, sparseBitSet.cardinality());
+        Assert.assertTrue(sparseBitSet.estimateBitsUsed() > 0);
 
         for (int i = 0; i < maxValue; i++) {
             if (intIndexed.contains(i))

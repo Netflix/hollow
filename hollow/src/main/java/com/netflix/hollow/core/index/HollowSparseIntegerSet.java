@@ -442,6 +442,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                     for (long value : longs)
                         cardinality += Long.bitCount(value);
                 }
+                index++;
             }
             return cardinality;
         }
@@ -456,6 +457,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 } else {
                     nullReferences++;
                 }
+                index++;
             }
 
             // total bits used
