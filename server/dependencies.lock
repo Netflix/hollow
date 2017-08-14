@@ -984,7 +984,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -4763,7 +4763,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -8542,7 +8542,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -12321,7 +12321,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -16173,7 +16173,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -21050,7 +21050,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -24833,7 +24833,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.6.11",
+            "locked": "2.7.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",

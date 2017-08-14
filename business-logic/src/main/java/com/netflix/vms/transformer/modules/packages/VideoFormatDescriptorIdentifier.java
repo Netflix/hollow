@@ -90,7 +90,7 @@ public class VideoFormatDescriptorIdentifier {
     private Set<Integer> getUltraHDEncodingProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex primaryKeyIndex) {
         Set<Integer> ultraHDEncodingProfiles = new HashSet<Integer>();
 
-        int ordinal = primaryKeyIndex.getMatchingOrdinal("CE4DASHVideo-4K");
+        int ordinal = primaryKeyIndex.getMatchingOrdinal("4K");
         if (ordinal != -1) {
             StreamProfileGroupsHollow group = api.getStreamProfileGroupsHollow(ordinal);
             List<StreamProfileIdHollow> idList = group._getStreamProfileIds();
