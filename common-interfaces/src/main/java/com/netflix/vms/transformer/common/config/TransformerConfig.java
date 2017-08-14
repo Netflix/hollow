@@ -84,7 +84,7 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean isMerchstillEpisodeLiveCheckEnabled();
 
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean isSeasonNumberForChildrenEnabled();
 
     //////////////// PUBLISH WORKFLOW ///////////////////
