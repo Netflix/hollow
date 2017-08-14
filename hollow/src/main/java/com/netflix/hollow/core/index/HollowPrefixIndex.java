@@ -16,28 +16,20 @@ package com.netflix.hollow.core.index;
 *     limitations under the License.
 *
 */
+
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
-import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -48,15 +40,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
     private HollowReadStateEngine readStateEngine;
     private String type;
-    private String fieldPath;
 
     private TST prefixIndex;
     private volatile TST prefixIndexVolatile;
     private ArraySegmentRecycler memoryRecycle;
 
-    private String[] fields;
-    private int[] fieldPositions;
-    private HollowObjectSchema.FieldType[] fieldTypes;
+    private FieldPath fieldPath;
 
     private int totalWords;
     private int averageWordLen;
@@ -74,9 +63,15 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      *                        The fields should be separated by ".".
      */
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
+
+        if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
+        if (type == null) throw new IllegalArgumentException("type cannot be null");
+        if (fieldPath == null || fieldPath.isEmpty())
+            throw new IllegalArgumentException("fieldPath cannot be null or empty");
+
         this.readStateEngine = readStateEngine;
         this.type = type;
-        this.fieldPath = fieldPath;
+        this.fieldPath = new FieldPath(readStateEngine, type, fieldPath, HollowObjectSchema.FieldType.STRING);
 
         // create memory recycle for using shared memory pools.
         memoryRecycle = WastefulRecycler.DEFAULT_INSTANCE;
@@ -87,89 +82,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     // initialize field positions and field paths.
     private void initialize() {
 
-        //check arguments
-        if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
-        if (type == null) throw new IllegalArgumentException("type cannot be null");
-        if (fieldPath == null || fieldPath.isEmpty())
-            throw new IllegalArgumentException("fieldPath cannot be null or empty");
-
-        String[] fieldParts = fieldPath.split("\\.");
-        List<String> fields = new ArrayList<String>();
-        List<Integer> fieldPositions = new ArrayList<Integer>();
-        List<HollowObjectSchema.FieldType> fieldTypes = new ArrayList<HollowObjectSchema.FieldType>();
-
-        // traverse through the field path to save field position and types.
-        String refType = type;
-        String lastRefType = type;
-        int i = 0;
-        while (i < fieldParts.length || refType != null) {
-
-            HollowSchema schema = readStateEngine.getSchema(refType);
-            if (schema == null)
-                throw new IllegalArgumentException("Null schema found for field : " + fieldParts[i]);
-            HollowSchema.SchemaType schemaType = readStateEngine.getSchema(refType).getSchemaType();
-
-            String fieldName = null;
-            int fieldPosition = 0;
-            HollowObjectSchema.FieldType fieldType = HollowObjectSchema.FieldType.REFERENCE;
-
-            if (schemaType.equals(HollowSchema.SchemaType.OBJECT)) {
-
-                HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-
-                // find field position, field name and field type
-                if (i >= fieldParts.length) {
-                    if (objectSchema.numFields() != 1)
-                        throw new IllegalArgumentException("Found a reference in field path with more than one field in schema for type :" + refType);
-                    fieldPosition = 0;
-                } else {
-                    fieldPosition = objectSchema.getPosition(fieldParts[i]);
-                    i++; // increment index for field part for next iteration.
-                }
-                if (fieldPosition < 0)
-                    throw new IllegalArgumentException("Could not find a valid field position in type " + refType);
-                fieldName = objectSchema.getFieldName(fieldPosition);
-                fieldType = objectSchema.getFieldType(fieldPosition);
-
-                // check field type.
-                if (fieldType.equals(HollowObjectSchema.FieldType.REFERENCE)) {
-                    refType = objectSchema.getReferencedType(fieldName);
-                } else if (fieldType.equals(HollowObjectSchema.FieldType.STRING)) {
-                    lastRefType = refType;
-                    refType = null;
-                } else {
-                    throw new IllegalArgumentException("field path should contain either a reference field or a string field. " +
-                            "Found field :" + fieldName + " with type :" + fieldType.toString());
-                }
-
-            } else if (schemaType.equals(HollowSchema.SchemaType.LIST) || schemaType.equals(HollowSchema.SchemaType.SET) || schemaType.equals(HollowSchema.SchemaType.MAP)) {
-
-                if (i >= fieldParts.length || (i < fieldParts.length && !fieldParts[i].equals("element"))) {
-                    fieldName = "element";
-                } else {
-                    fieldName = fieldParts[i];
-                    i++; // increment index for field part for next iteration.
-                }
-                // update ref type to element type.
-                if (schema instanceof HollowMapSchema) refType = ((HollowMapSchema) schema).getValueType();
-                else refType = ((HollowCollectionSchema) schema).getElementType();
-            }
-
-            // update lists
-            fields.add(fieldName);
-            fieldPositions.add(fieldPosition);
-            fieldTypes.add(fieldType);
-        }
-
-        this.fields = fields.toArray(new String[fields.size()]);
-        this.fieldPositions = new int[fieldPositions.size()];
-        for (i = 0; i < fieldPositions.size(); i++) this.fieldPositions[i] = fieldPositions.get(i);
-        this.fieldTypes = fieldTypes.toArray(new HollowObjectSchema.FieldType[fieldTypes.size()]);
-
-
-        // field path should ultimately lead down to a String type
-        if (!this.fieldTypes[this.fields.length - 1].equals(HollowObjectSchema.FieldType.STRING))
-            throw new IllegalArgumentException("Field path should resolve to a String type");
+        String lastRefType = this.fieldPath.getLastRefTypeInPath();
 
         // get all cardinality to estimate size of array bits needed.
         totalWords = readStateEngine.getTypeState(lastRefType).getPopulatedOrdinals().cardinality();
@@ -242,65 +155,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @return keys to index.
      */
     protected String[] getKeys(int ordinal) {
-        return findKeys(ordinal, type, 0);
-    }
-
-    // recursively find all the keys to index using the field path starting from the given type and field
-    private String[] findKeys(int ordinal, String type, int fieldIndex) {
-
-        String[] keys;
-        HollowTypeReadState typeReadState = readStateEngine.getTypeState(type);
-        HollowSchema.SchemaType schemaType = readStateEngine.getSchema(type).getSchemaType();
-        HollowSchema schema = readStateEngine.getSchema(type);
-
-        if (schemaType.equals(HollowSchema.SchemaType.LIST) || schemaType.equals(HollowSchema.SchemaType.SET)) {
-
-            HollowCollectionTypeReadState collectionTypeReadState = (HollowCollectionTypeReadState) typeReadState;
-            HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
-            String elementType = collectionSchema.getElementType();
-
-            HollowOrdinalIterator it = collectionTypeReadState.ordinalIterator(ordinal);
-            List<String> keyList = new ArrayList<>();
-            int refOrdinal = it.next();
-            while (refOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                String[] refKeys = findKeys(refOrdinal, elementType, fieldIndex + 1);
-                for (String refKey : refKeys)
-                    keyList.add(refKey);
-                refOrdinal = it.next();
-            }
-            keys = new String[keyList.size()];
-            keyList.toArray(keys);
-
-        } else if (schemaType.equals(HollowSchema.SchemaType.OBJECT)) {
-
-            HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-            HollowObjectTypeReadState objectTypeReadState = (HollowObjectTypeReadState) typeReadState;
-
-            if (fieldTypes[fieldIndex].equals(HollowObjectSchema.FieldType.REFERENCE)) {
-                int refOrdinal = objectTypeReadState.readOrdinal(ordinal, fieldPositions[fieldIndex]);
-                String refType = objectSchema.getReferencedType(fieldPositions[fieldIndex]);
-                return findKeys(refOrdinal, refType, fieldIndex + 1);
-            }
-
-            String key = objectTypeReadState.readString(ordinal, fieldPositions[fieldIndex]).toLowerCase();
-            keys = new String[]{key};
-        } else {
-            // Map type
-            HollowMapTypeReadState mapTypeReadState = (HollowMapTypeReadState) typeReadState;
-            HollowMapSchema mapSchema = (HollowMapSchema) schema;
-            String mapValueType = mapSchema.getValueType();
-
-            HollowMapEntryOrdinalIterator mapEntryIterator = mapTypeReadState.ordinalIterator(ordinal);
-            List<String> keyList = new ArrayList<>();
-            while (mapEntryIterator.next()) {
-                String[] refKeys = findKeys(mapEntryIterator.getValue(), mapValueType, fieldIndex + 1);
-                for (String refKey : refKeys)
-                    keyList.add(refKey);
-            }
-            keys = new String[keyList.size()];
-            keyList.toArray(keys);
+        Object[] values = fieldPath.findValuesFollowingPath(ordinal);
+        String[] stringValues = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            stringValues[i] = ((String) values[i]).toLowerCase();
         }
-        return keys;
+        return stringValues;
     }
 
     /**
