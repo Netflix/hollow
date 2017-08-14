@@ -8332,7 +8332,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.49.0",
+            "locked": "0.50.1",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {

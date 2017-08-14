@@ -2451,7 +2451,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3426,7 +3426,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -3439,7 +3439,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -6230,7 +6230,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7205,7 +7205,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -7218,7 +7218,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -10009,7 +10009,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10984,7 +10984,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -10997,7 +10997,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -13781,7 +13781,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17641,7 +17641,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20057,7 +20057,7 @@
     },
     "resolutionRules": {
         "com.netflix.nebula:gradle-resolution-rules": {
-            "locked": "0.49.0",
+            "locked": "0.50.1",
             "requested": "latest.release"
         },
         "netflix.nebula.resolutionrules:resolution-rules": {
@@ -22517,7 +22517,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23492,7 +23492,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -23505,7 +23505,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -26300,7 +26300,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30126,7 +30126,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31120,7 +31120,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -31134,7 +31134,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -34017,7 +34017,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35011,7 +35011,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -35025,7 +35025,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -37908,7 +37908,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38902,7 +38902,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -38916,7 +38916,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -41799,7 +41799,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42793,7 +42793,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -42807,7 +42807,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -45690,7 +45690,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46684,7 +46684,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -46698,7 +46698,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -49581,7 +49581,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -50575,7 +50575,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -50589,7 +50589,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -53472,7 +53472,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -54466,7 +54466,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -54480,7 +54480,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
@@ -57363,7 +57363,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.202.0",
+            "locked": "1.211.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -58357,7 +58357,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
@@ -58371,7 +58371,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.4.3.v20170317",
             "requested": "9.2.15.v20160210"
         },
         "org.eclipse.jetty:jetty-util": {
