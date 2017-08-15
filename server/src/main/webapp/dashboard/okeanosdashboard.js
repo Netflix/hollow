@@ -74,7 +74,10 @@ function Dashboard() {
         var hostName = "http://atlasui.prod.netflix.net";
         var path = "/dashboard/show/VMS%20Client%20Dashboard#url=http:%2F%2Fatlas-us.prod.netflix.net:7001%2Fapi%2Fv1%2Fgraph%3Fq&title=Refresh%20Duration%20%28max%29%20%28minutes%29&o=0&no_legend=1&e=now-5m&s=e-3h&w=517&h=310&refresh=23442969&tab=Client%20Refreshes%20grouped%20by%20app";
         var clientdash = new IFrameWidget("#id-vms-client-dashboard", "id-vms-client-dashboard-iframe", hostName, path);
-        var clientJars = new IFrameWidget("#id-vms-client-jarversions-atlas", "id-vms-client-jarversions-atlas-iframe", "http://go", "/vmsclientjars");
+
+        var target = dashboard.nflxEnvironment == "prod" ? "prod.us":"test.us";
+        var clientJars = new IFrameWidget("#id-vms-client-jarversions-atlas", "id-vms-client-jarversions-atlas-iframe", "http://go", "/vmsclientjars?target="+target);
+
         var vmssps = new IFrameWidget("#id-vms-sps-content", "id-vms-sps-content-iframe", "http://go", "/vmssps");
         var vmsusage = new IFrameWidget("#id-vms-usage-info", "id-vms-usage-content-iframe", "http://go", "/vmsusage");
         dashboard.vmsblobinfo = new IFrameWidget("#id-vms-blob-info", "id-vms-blob-info-iframe", "", "/dashboard/blobinfo");
