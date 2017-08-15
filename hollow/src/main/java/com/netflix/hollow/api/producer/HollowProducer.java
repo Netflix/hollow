@@ -174,6 +174,8 @@ public class HollowProducer {
         
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
+
+        this.isInitialized = false;
     }
 
     public void initializeDataModel(Class<?>...classes) {
