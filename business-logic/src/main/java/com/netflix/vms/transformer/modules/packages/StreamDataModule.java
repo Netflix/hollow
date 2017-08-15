@@ -542,10 +542,12 @@ public class StreamDataModule {
         for (Integer vId : videoIds) {
             Set<String> oldSet = debugVideoFormatMap.oldFormatMap.get(vId);
             Set<String> newSet = debugVideoFormatMap.newFormatMap.get(vId);
+            if (oldSet == null) oldSet = Collections.emptySet();
+            if (newSet == null) newSet = Collections.emptySet();
             if (!Objects.equals(oldSet,  newSet)) {
                 ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds, "videoId={} : old={}, new={}", vId, oldSet, newSet);
 
-                if (newSet != null && !newSet.containsAll(oldSet)) {
+                if (!newSet.containsAll(oldSet)) {
                     ctx.getLogger().warn(TransformerLogTag.VideoFormatMismatch_videoIds_missingFormat, "videoId={} : old={}, new={}", vId, oldSet, newSet);
                 }
             }
