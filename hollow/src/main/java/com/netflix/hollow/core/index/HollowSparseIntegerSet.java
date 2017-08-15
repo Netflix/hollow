@@ -40,8 +40,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     private final FieldPath fieldPath;
     private final IndexPredicate predicate;
 
-    private SparseBitSet sparseBitSet;
-    private volatile SparseBitSet sparseBitSetVolatile;
+    protected SparseBitSet sparseBitSet;
+    protected volatile SparseBitSet sparseBitSetVolatile;
 
     private Set<Integer> valuesToSet;
     private Set<Integer> valuesToClear;
@@ -95,7 +95,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         build();
     }
 
-    private synchronized void build() {
+    protected synchronized void build() {
 
         SparseBitSet set = new SparseBitSet(Integer.MAX_VALUE);
         BitSet typeBitSet = readStateEngine.getTypeState(type).getPopulatedOrdinals();
@@ -122,7 +122,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     }
 
     // although duplicates are not supported, adding a support to log and maintain a small map to handle rare cases.
-    private void handleDuplicate(int value) {
+    protected void handleDuplicate(int value) {
         if (duplicateValues == null) duplicateValues = new HashMap<>(16, 0.75f);
         if (!duplicateValues.containsKey(value)) duplicateValues.put(value, 0);
 
