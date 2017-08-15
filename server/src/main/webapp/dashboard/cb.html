@@ -29,8 +29,16 @@
           <option value="on" selected="true">On</option>
         </select>        
       </td>
-      <td>
-        <a href="#" id="reset-baseline-link">Reset Baselines</a>
+      <td style="width:10%">
+          <table><tr>
+              <td nowrap>
+                <a href="/REST/vms/interruptcycle?interrupt=true&message=cb_interryp_cycle" onclick="return confirm('Are you sure about proceeding to attempt to interrupt current cycle?')" target="_blank" id="interrupt-cycle-link">Interrupt Cycle</a>
+              </td>
+              <td nowrap> | </td>
+              <td nowrap>
+                <a href="#" id="reset-baseline-link">Reset Baselines</a>
+              </td>
+          </tr></table>
       </td>
     </tr>
   </table>
