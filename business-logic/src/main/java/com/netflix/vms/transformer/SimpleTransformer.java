@@ -247,12 +247,7 @@ public class SimpleTransformer {
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
 
         // Check to determine whether to abort cycle due to interrupt
-        if (ctx.getCycleInterrupter().isCycleInterrupted()) {
-            String msg = "Stopped at transform";
-            ctx.getLogger().error(CycleInterrupted, msg);
-            ctx.getCycleInterrupter().triggerInterrupt(ctx.getCurrentCycleId(), msg);
-        }
-
+        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at transform");
         return writeStateEngine;
     }
 

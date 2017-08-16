@@ -1,7 +1,10 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import java.util.Map;
 import java.util.TreeMap;
@@ -66,7 +69,9 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
     }
 
     @Override
-    public synchronized void triggerInterrupt(long cycleId, String message) throws CycleInterruptException {
+    public synchronized void triggerInterruptIfNeeded(long cycleId, TaggingLogger logger, String message) throws CycleInterruptException {
+        if (!isCycleInterrupted()) return;
+
         CycleInterruptEntry cycleInterruptEntry = historyMap.get(cycleId);
         if (cycleInterruptEntry == null) {
             cycleInterruptEntry = addEntry(cycleId, message);
@@ -75,6 +80,7 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
         }
         cycleInterruptEntry.triggered();
 
+        logger.error(CycleInterrupted, message);
         throw new CycleInterruptException(cycleInterruptEntry.getMessage());
     }
 

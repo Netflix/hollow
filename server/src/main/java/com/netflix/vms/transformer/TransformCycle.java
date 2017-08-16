@@ -331,6 +331,9 @@ public class TransformCycle {
     }
 
     public void submitToPublishWorkflow() {
+        // Check to determine whether to abort cycle due to interrupt
+        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at submitToPublishWorkflow");
+
         ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
             CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
@@ -339,7 +342,6 @@ public class TransformCycle {
         } finally {
             ctx.getMetricRecorder().stopTimer(P4_WaitForPublishWorkflowDuration);
         }
-
     }
 
     private void endCycleSuccessfully() {

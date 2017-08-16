@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.common;
 
+import com.netflix.vms.logging.TaggingLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,13 @@ public interface TransformerCycleInterrupter {
 
     String getCycleInterruptMsg();
 
-    void triggerInterrupt(long cycleId, String message) throws CycleInterruptException;
+    /**
+     * Throw CycleInterruptException if Cycle Interrupt was requested
+     *
+     * @see #interruptCycle(String)
+     * @see #isCycleInterrupted()
+     */
+    void triggerInterruptIfNeeded(long cycleId, TaggingLogger logger, String message) throws CycleInterruptException;
 
     Map<Long, CycleInterruptEntry> getHistory();
 

@@ -6,6 +6,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
@@ -131,7 +132,10 @@ public class TransformerCycleKickoff {
                 long sleepStart = System.currentTimeMillis();
                 ctx.getMetricRecorder().startTimer(P5_WaitForNextCycleDuration);
                 while(msUntilNextCycle > 0) {
-                    if (ctx.getCycleInterrupter().isCycleInterrupted()) break;
+                    if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                        ctx.getLogger().info(CycleInterrupted, "Interrupted while waiting for next Cycle ");
+                        break;
+                    }
 
                     try { // Sleep in small intervals to give it a chance to react to cycle interrupt
                         long sleepInMS = Math.min(10000, msUntilNextCycle);
