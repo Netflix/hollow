@@ -1479,7 +1479,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -3532,7 +3532,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -5585,7 +5585,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -7638,7 +7638,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -9820,7 +9820,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -11876,7 +11876,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -13954,7 +13954,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -16032,7 +16032,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
@@ -18110,7 +18110,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.85",
+            "locked": "2.87",
             "requested": "latest.release"
         },
         "netflix:nflibrary": {
