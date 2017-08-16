@@ -3,6 +3,12 @@ package com.netflix.vms.transformer.common;
 
 public interface TransformerMetricRecorder {
 
+    void startTimer(DurationMetric metric);
+
+    void stopTimer(DurationMetric metric);
+
+    void resetTimer(DurationMetric metric);
+
     void recordMetric(Metric name, double value);
 
     void recordMetric(Metric metric, double value, String... tagKeyValues);
@@ -11,13 +17,18 @@ public interface TransformerMetricRecorder {
 
     void incrementCounter(Metric name, long incrementBy, String... tagKeyValues);
 
-    public static enum Metric {
+    public static enum DurationMetric {
         P1_ReadInputDataDuration,
         P2_ProcessDataDuration,
         P3_WriteOutputDataDuration,
         P4_WaitForPublishWorkflowDuration,
-        P5_WaitForNextCycleDuration,
+        P5_WaitForNextCycleDuration;
 
+        private final String metricName = formatMetricName(name());
+        @Override public String toString() { return metricName; }
+    }
+
+    public static enum Metric {
         ConsecutiveCycleFailures,
         ConsecutivePublishFailures,
         FailedProcessingIndividualHierarchies,
@@ -31,17 +42,11 @@ public interface TransformerMetricRecorder {
 
         CycleSuccessCounter;
 
-        private final String metricName;
-
-        private Metric() {
-            this.metricName = "vms.transformer." + this.name();
-        }
-
-        @Override
-        public String toString() {
-            return metricName;
-        }
-
+        private final String metricName = formatMetricName(name());
+        @Override public String toString() { return metricName; }
     }
 
+    static String formatMetricName(String metric) {
+        return "vms.transformer." + metric;
+    }
 }

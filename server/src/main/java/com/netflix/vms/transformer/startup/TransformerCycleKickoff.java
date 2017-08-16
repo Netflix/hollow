@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.startup;
 
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P1_ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P1_ReadInputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P3_WriteOutputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
@@ -110,13 +110,11 @@ public class TransformerCycleKickoff {
 
                         // Reset for next cycle
                         ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
-                        if (!isFastlane) { // Fastlane metrics are not reset; otherwise, the gauge is reset prior to being flushed
-                            ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, 0);
-                            ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, 0);
-                            ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, 0);
-                            ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, 0);
-                            ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, 0);
-                        }
+                        ctx.getMetricRecorder().resetTimer(P1_ReadInputDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P2_ProcessDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P3_WriteOutputDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P4_WaitForPublishWorkflowDuration);
+                        ctx.getMetricRecorder().resetTimer(P5_WaitForNextCycleDuration);
                     }
                 }
             }
@@ -128,9 +126,10 @@ public class TransformerCycleKickoff {
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
-                ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", msUntilNextCycle);
+                ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", Math.max(msUntilNextCycle, 0));
 
                 long sleepStart = System.currentTimeMillis();
+                ctx.getMetricRecorder().startTimer(P5_WaitForNextCycleDuration);
                 while(msUntilNextCycle > 0) {
                     if (ctx.getCycleInterrupter().isCycleInterrupted()) break;
 
@@ -142,14 +141,11 @@ public class TransformerCycleKickoff {
                     long now = System.currentTimeMillis();
                     timeSinceLastCycle = now - previousCycleStartTime;
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
-
-                    long currSleepTime = now - sleepStart;
-                    ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, currSleepTime);
                 }
                 long sleepEnd = System.currentTimeMillis();
                 long sleepDuration = sleepEnd - sleepStart;
 
-                ctx.getMetricRecorder().recordMetric(P5_WaitForNextCycleDuration, sleepDuration);
+                ctx.getMetricRecorder().stopTimer(P5_WaitForNextCycleDuration);
                 ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
 
                 previousCycleStartTime = sleepEnd;

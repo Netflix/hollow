@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P1_ReadInputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P2_ProcessDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P3_WriteOutputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P1_ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
@@ -169,8 +169,7 @@ public class TransformCycle {
     }
 
     private void updateTheInput() {
-        long startTime = System.currentTimeMillis();
-
+        ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
         try {
             FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
 
@@ -204,14 +203,13 @@ public class TransformCycle {
 
             VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
         } finally {
-            long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(P1_ReadInputDataDuration, endTime - startTime);
+            ctx.getMetricRecorder().stopTimer(P1_ReadInputDataDuration);
         }
     }
 
     private boolean transformTheData() throws Throwable {
         long startTime = System.currentTimeMillis();
-
+        ctx.getMetricRecorder().startTimer(P2_ProcessDataDuration);
         try {
             if (isFastlane) {
                 // Kick off processing of Title Override/Pinning and use blobs that is ready
@@ -238,8 +236,7 @@ public class TransformCycle {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
             throw th;
         } finally {
-            long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(P2_ProcessDataDuration, endTime - startTime);
+            ctx.getMetricRecorder().stopTimer(P2_ProcessDataDuration);
         }
 
         return true;
@@ -254,7 +251,8 @@ public class TransformCycle {
     }
 
     private void writeTheBlobFiles() throws IOException {
-        long startTime = System.currentTimeMillis();
+        ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
+
         try {
             headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
@@ -292,8 +290,7 @@ public class TransformCycle {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
             throw e;
         } finally {
-            long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(P3_WriteOutputDataDuration, endTime - startTime);
+            ctx.getMetricRecorder().stopTimer(P3_WriteOutputDataDuration);
         }
     }
 
@@ -334,15 +331,13 @@ public class TransformCycle {
     }
 
     public void submitToPublishWorkflow() {
-        long startTime = System.currentTimeMillis();
-
+        ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
             CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
         } finally {
-            long endTime = System.currentTimeMillis();
-            ctx.getMetricRecorder().recordMetric(P4_WaitForPublishWorkflowDuration, endTime - startTime);
+            ctx.getMetricRecorder().stopTimer(P4_WaitForPublishWorkflowDuration);
         }
 
     }
