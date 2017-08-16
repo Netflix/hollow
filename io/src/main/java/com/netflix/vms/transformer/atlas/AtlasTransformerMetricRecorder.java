@@ -53,8 +53,7 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
     @Override
     public void resetTimer(DurationMetric metric) {
         DurationMeter meter = meterMap.get(metric);
-        if (meter == null) throw new RuntimeException("Metric=" + metric + " has not been started");
-        meter.reset();
+        if (meter != null) meter.reset();
     }
 
     @Override
@@ -128,7 +127,7 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
             this.metric = metric;
             this.gauge = gauge;
         }
-        
+
         public void start() { reset(); start = System.currentTimeMillis(); }
         public void stop() { stoppedDuration = System.currentTimeMillis() - start; }
 
