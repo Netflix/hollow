@@ -18,6 +18,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
@@ -95,27 +96,30 @@ public class HollowDataHolder {
     }
 
     private void applyInitialTransitions(HollowUpdatePlan updatePlan) throws Throwable {
-        for(HollowConsumer.Blob transition : updatePlan) {
-            InputStream is = transition.getInputStream();
-
-            try {
-                applyTransition(is, transition);
-            } catch(Throwable t) {
-                failedTransitionTracker.markFailedTransition(transition);
-                throw t;
-            } finally {
-                is.close();
-            }
-        }
 
         try {
-            if(objLongevityConfig.enableLongLivedObjectSupport()) {
-                HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
-                dataAccess.setDataAccess(stateEngine);
-                currentAPI = apiFactory.createAPI(dataAccess);
-            } else {
-                currentAPI = apiFactory.createAPI(stateEngine);
-            }
+	        for(HollowConsumer.Blob transition : updatePlan) {
+	            try(InputStream is = transition.getInputStream()) {
+	                applyTransition(is, transition);
+	
+	                for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
+	                	if (!(refreshListener instanceof TransitionAwareRefreshListener))
+	                		continue;
+	
+	                	TransitionAwareRefreshListener transitionRefreshListener = (TransitionAwareRefreshListener) refreshListener;
+	                    if(transition.isSnapshot()) {
+	                    	initializeAPI();
+	                    	transitionRefreshListener.snapshotApplied(currentAPI, stateEngine, transition.getToVersion());
+	                    } else if(transition.isDelta())
+	                    	transitionRefreshListener.deltaApplied(currentAPI, stateEngine, transition.getToVersion());
+	                }
+	            } catch(Throwable t) {
+	                failedTransitionTracker.markFailedTransition(transition);
+	                throw t;
+	            }
+	        }
+
+        	initializeAPI();
 
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
                 refreshListener.snapshotUpdateOccurred(currentAPI, stateEngine, updatePlan.destinationVersion());
@@ -129,9 +133,7 @@ public class HollowDataHolder {
 
     private void applySubsequentTransitions(HollowUpdatePlan updatePlan) throws Throwable {
         for(HollowConsumer.Blob blob : updatePlan) {
-            InputStream is = blob.getInputStream();
-
-            try {
+            try(InputStream is = blob.getInputStream()) {
                 applyTransition(is, blob);
 
                 if(objLongevityConfig.enableLongLivedObjectSupport()) {
@@ -141,8 +143,11 @@ public class HollowDataHolder {
                     newDataAccess.setDataAccess(stateEngine);
                     currentAPI = apiFactory.createAPI(newDataAccess, currentAPI);
 
-                    for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+                    for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
                         refreshListener.deltaUpdateOccurred(currentAPI, stateEngine, blob.getToVersion());
+	                	if (refreshListener instanceof TransitionAwareRefreshListener)
+	                		((TransitionAwareRefreshListener)refreshListener).deltaApplied(currentAPI, stateEngine, blob.getToVersion());
+                    }
 
                     if(previousDataAccess instanceof HollowProxyDataAccess)
                         ((HollowProxyDataAccess)previousDataAccess).setDataAccess(priorState);
@@ -152,8 +157,11 @@ public class HollowDataHolder {
                     if(currentAPI.getDataAccess() != stateEngine)
                         currentAPI = apiFactory.createAPI(stateEngine);
                     
-                    for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+                    for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
                         refreshListener.deltaUpdateOccurred(currentAPI, stateEngine, blob.getToVersion());
+	                	if (refreshListener instanceof TransitionAwareRefreshListener)
+	                		((TransitionAwareRefreshListener)refreshListener).deltaApplied(currentAPI, stateEngine, blob.getToVersion());
+                    }
 
                     priorHistoricalDataAccess = null;
                 }
@@ -164,9 +172,17 @@ public class HollowDataHolder {
             } catch(Throwable t) {
                 failedTransitionTracker.markFailedTransition(blob);
                 throw t;
-            } finally {
-                is.close();
             }
+        }
+    }
+
+    private void initializeAPI() {
+        if(objLongevityConfig.enableLongLivedObjectSupport()) {
+            HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
+            dataAccess.setDataAccess(stateEngine);
+            currentAPI = apiFactory.createAPI(dataAccess);
+        } else {
+        	currentAPI = apiFactory.createAPI(stateEngine);
         }
     }
 
