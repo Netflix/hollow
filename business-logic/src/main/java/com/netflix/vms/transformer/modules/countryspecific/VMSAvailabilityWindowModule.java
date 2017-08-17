@@ -74,7 +74,7 @@ public class VMSAvailabilityWindowModule {
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, ctx);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();

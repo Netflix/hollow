@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class WindowPackageContractInfoModule {
 
     private final VMSHollowInputAPI api;
+    private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
@@ -32,8 +34,9 @@ public class WindowPackageContractInfoModule {
     private final PackageMomentDataModule packageMomentDataModule;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
-    public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
+    public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.api = api;
+        this.ctx = ctx;
         this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
@@ -67,7 +70,7 @@ public class WindowPackageContractInfoModule {
         if (deployablePackage != null) info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
 
         // package moment data
-        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation);
+        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
 
