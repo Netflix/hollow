@@ -41,17 +41,16 @@ public class WindowPackageContractInfoModule {
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
-        this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
+        if(ctx.getConfig().isTimecodeAnnotationFeedEnabled())
+        	this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
+        else
+        	this.timecodeAnnotationIdx = null;
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
         
-        int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
-        TimecodeAnnotationHollow inputTimecodeAnnotation = null;
-        if(ordinal != -1)
-          inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));
         
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
@@ -70,6 +69,14 @@ public class WindowPackageContractInfoModule {
         if (deployablePackage != null) info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
 
         // package moment data
+        TimecodeAnnotationHollow inputTimecodeAnnotation = null;
+        // Extract the timecode annotation if it is enabled
+        if(this.ctx.getConfig().isTimecodeAnnotationFeedEnabled()) {
+            int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
+            if(ordinal != -1)
+              inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));        	
+        }
+        
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
