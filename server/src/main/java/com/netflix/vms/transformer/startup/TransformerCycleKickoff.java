@@ -1,12 +1,18 @@
 package com.netflix.vms.transformer.startup;
 
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P1_ReadInputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.WaitForNextCycleDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleSuccess;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WaitForNextCycle;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
@@ -16,6 +22,7 @@ import com.netflix.internal.hollow.factory.HollowPublisherFactory;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -32,16 +39,19 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
+import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
+@Singleton
 public class TransformerCycleKickoff {
 
     @Inject
     public TransformerCycleKickoff(
+            TransformerCycleInterrupter cycleInterrupter,
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
@@ -56,13 +66,13 @@ public class TransformerCycleKickoff {
             TransformerServerHealthIndicator healthIndicator) {
 
         FileStore.useMultipartUploadWhenApplicable(true);
-        
+
         Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
-        TransformerContext ctx = ctx(esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
+        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -75,26 +85,37 @@ public class TransformerCycleKickoff {
         restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
-            private long previousCycleStartTime;
+            private long previousCycleStartTime = System.currentTimeMillis();
             private int consecutiveCycleFailures = 0;
 
             @Override
             public void run() {
+                boolean isFastlane = isFastlane(ctx.getConfig());
                 while(true) {
                     try {
-                        waitForMinCycleTimeToPass();
-                        if (isFastlane(ctx.getConfig()))
-                            setUpFastlaneContext();
+                        if (isFastlane) setUpFastlaneContext();
+
                         cycle.cycle();
                         markCycleSucessful();
+
                         if(shouldTryCompaction(ctx.getConfig())) {
                             cycle.tryCompaction();
                             markCycleSucessful();
                         }
+
+                        waitForMinCycleTimeToPass();
                     } catch(Throwable th) {
                         markCycleFailed(th);
                     } finally {
                         ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
+
+                        // Reset for next cycle
+                        ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
+                        ctx.getMetricRecorder().resetTimer(P1_ReadInputDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P2_ProcessDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P3_WriteOutputDataDuration);
+                        ctx.getMetricRecorder().resetTimer(P4_WaitForPublishWorkflowDuration);
+                        ctx.getMetricRecorder().resetTimer(P5_WaitForNextCycleDuration);
                     }
                 }
             }
@@ -106,22 +127,32 @@ public class TransformerCycleKickoff {
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
                 long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
+                ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", Math.max(msUntilNextCycle, 0));
 
-                if(msUntilNextCycle > 0) {
-                    ctx.getLogger().info(WaitForNextCycle, "Waiting " + msUntilNextCycle + "ms until beginning next cycle");
-                    ctx.getMetricRecorder().recordMetric(WaitForNextCycleDuration, msUntilNextCycle);
-                }
-
+                long sleepStart = System.currentTimeMillis();
+                ctx.getMetricRecorder().startTimer(P5_WaitForNextCycleDuration);
                 while(msUntilNextCycle > 0) {
-                    try {
-                        Thread.sleep(msUntilNextCycle);
+                    if (ctx.getCycleInterrupter().isCycleInterrupted()) {
+                        ctx.getLogger().info(CycleInterrupted, "Interrupted while waiting for next Cycle ");
+                        break;
+                    }
+
+                    try { // Sleep in small intervals to give it a chance to react to cycle interrupt
+                        long sleepInMS = Math.min(10000, msUntilNextCycle);
+                        Thread.sleep(sleepInMS);
                     } catch (InterruptedException ignore) { }
 
-                    timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
+                    long now = System.currentTimeMillis();
+                    timeSinceLastCycle = now - previousCycleStartTime;
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 }
+                long sleepEnd = System.currentTimeMillis();
+                long sleepDuration = sleepEnd - sleepStart;
 
-                previousCycleStartTime = System.currentTimeMillis();
+                ctx.getMetricRecorder().stopTimer(P5_WaitForNextCycleDuration);
+                ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
+
+                previousCycleStartTime = sleepEnd;
             }
 
             private void setUpFastlaneContext() {
@@ -148,8 +179,9 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private final TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
+                cycleInterrupter,
                 new TransformerServerLogger(transformerConfig, esClient),
                 config,
                 octoberSkyData,
@@ -188,10 +220,10 @@ public class TransformerCycleKickoff {
                     nostreamsOutputClient.triggerRefreshTo(restoreVersion);
                     if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
                         throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
-                    
+
                     cycle.restore(outputClient, nostreamsOutputClient, false);
                 }
-                
+
             } else {
                 if(cfg.isFailIfRestoreNotAvailable())
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
