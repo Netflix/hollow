@@ -4,6 +4,7 @@ import com.netflix.archaius.api.Config;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.logging.TaggingLoggers;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerFiles;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
@@ -14,7 +15,6 @@ import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.config.FrozenTransformerConfigFactory;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
-
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 public class TransformerServerContext implements TransformerContext {
 
     /* dependencies */
+    private final TransformerCycleInterrupter cycleInterrupter;
     private final TransformerCassandraHelper cassandraHelper;
     private final TransformerFiles files;
     private final PublicationHistoryConsumer publicationHistoryConsumer;
@@ -44,6 +45,7 @@ public class TransformerServerContext implements TransformerContext {
     private Set<String> pinTitleSpecs;
 
     public TransformerServerContext(
+            TransformerCycleInterrupter cycleInterrupter,
             TransformerServerLogger logger,
             Config config,
             OctoberSkyData octoberSkyData,
@@ -52,6 +54,7 @@ public class TransformerServerContext implements TransformerContext {
             TransformerCassandraHelper cassandraHelper,
             TransformerFiles files,
             PublicationHistoryConsumer publicationHistoryConsumer) {
+        this.cycleInterrupter = cycleInterrupter;
         this.logger = logger;
         this.octoberSkyData = octoberSkyData;
         this.cupLibrary = cupLibrary;
@@ -144,5 +147,10 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public CupLibrary getCupLibrary() {
         return cupLibrary;
+    }
+
+    @Override
+    public TransformerCycleInterrupter getCycleInterrupter() {
+        return cycleInterrupter;
     }
 }
