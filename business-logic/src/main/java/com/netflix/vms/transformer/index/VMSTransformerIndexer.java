@@ -4,6 +4,8 @@ import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.vms.transformer.common.TransformerContext;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +17,10 @@ import java.util.concurrent.Future;
 public class VMSTransformerIndexer {
 
     private final Map<IndexSpec, Object> indexMap;
+    private final TransformerContext ctx;
 
-    public VMSTransformerIndexer(HollowReadStateEngine stateEngine) {
+    public VMSTransformerIndexer(HollowReadStateEngine stateEngine, TransformerContext ctx) {
+    	this.ctx = ctx;
         ExecutorService executor = new SimultaneousExecutor();
 
         try {
@@ -43,6 +47,8 @@ public class VMSTransformerIndexer {
 
     private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<IndexSpec, Object> indexMap) {
         for(IndexSpec spec : IndexSpec.values()) {
+        	if(!this.ctx.getConfig().isTimecodeAnnotationFeedEnabled() && spec == IndexSpec.TIMECODE_ANNOTATIONS)
+        		continue;
             switch(spec.getIndexType()) {
             case PRIMARY_KEY:
                 indexMap.put(spec, primaryKeyIdx(executor, stateEngine, spec));
