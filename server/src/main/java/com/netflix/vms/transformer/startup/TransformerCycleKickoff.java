@@ -85,13 +85,14 @@ public class TransformerCycleKickoff {
         restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
 
         Thread t = new Thread(new Runnable() {
-            private long previousCycleStartTime = System.currentTimeMillis();
+            private long cycleStartTime = 0;
             private int consecutiveCycleFailures = 0;
 
             @Override
             public void run() {
                 boolean isFastlane = isFastlane(ctx.getConfig());
                 while(true) {
+                    cycleStartTime = System.currentTimeMillis();
                     try {
                         if (isFastlane) setUpFastlaneContext();
 
@@ -125,7 +126,7 @@ public class TransformerCycleKickoff {
                     return;
 
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
-                long timeSinceLastCycle = System.currentTimeMillis() - previousCycleStartTime;
+                long timeSinceLastCycle = System.currentTimeMillis() - cycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", Math.max(msUntilNextCycle, 0));
 
@@ -142,17 +143,12 @@ public class TransformerCycleKickoff {
                         Thread.sleep(sleepInMS);
                     } catch (InterruptedException ignore) { }
 
-                    long now = System.currentTimeMillis();
-                    timeSinceLastCycle = now - previousCycleStartTime;
+                    timeSinceLastCycle = System.currentTimeMillis() - cycleStartTime;
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 }
-                long sleepEnd = System.currentTimeMillis();
-                long sleepDuration = sleepEnd - sleepStart;
-
+                long sleepDuration = System.currentTimeMillis() - sleepStart;
                 ctx.getMetricRecorder().stopTimer(P5_WaitForNextCycleDuration);
                 ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
-
-                previousCycleStartTime = sleepEnd;
             }
 
             private void setUpFastlaneContext() {
