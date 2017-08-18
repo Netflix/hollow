@@ -1,10 +1,27 @@
+/*
+ *
+ *  Copyright 2017 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.hollow.api.consumer;
-
-import com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevityConfig;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevityConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
@@ -126,6 +143,40 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(v0, listener.refreshSuccessBeforeVersion);
         Assert.assertEquals(v3, listener.refreshSuccessAfterVersion);
         Assert.assertEquals(v3, listener.refreshSuccessRequestedVersion);
+    }
+    
+    @Test
+    public void testObjectLongevityOnInitialUpdateCallbacks() {
+        runCycle(producer, 1);
+        runCycle(producer, 2);
+        runCycle(producer, 3);
+        runCycle(producer, 4);
+        long v5 = runCycle(producer, 5);
+        
+        final List<GenericHollowObject> snapshotOrdinal0Objects = new ArrayList<GenericHollowObject>();
+        final List<GenericHollowObject> deltaOrdinal0Objects = new ArrayList<GenericHollowObject>();
+        final List<GenericHollowObject> deltaOrdinal1Objects = new ArrayList<GenericHollowObject>();
+
+        AbstractRefreshListener longevityListener = new AbstractRefreshListener() {
+            public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+                snapshotOrdinal0Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 0));
+            }
+            
+            public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+                deltaOrdinal0Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 0));
+                deltaOrdinal1Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 1));
+            }
+        };
+        
+        consumer.addRefreshListener(longevityListener);
+        
+        consumer.triggerRefreshTo(v5);
+
+        Assert.assertEquals(1, snapshotOrdinal0Objects.get(0).getInt("value"));
+        Assert.assertEquals(2, deltaOrdinal1Objects.get(0).getInt("value"));
+        Assert.assertEquals(3, deltaOrdinal0Objects.get(1).getInt("value"));
+        Assert.assertEquals(4, deltaOrdinal1Objects.get(2).getInt("value"));
+        Assert.assertEquals(5, deltaOrdinal0Objects.get(3).getInt("value"));
     }
     
     private long runCycle(HollowProducer producer, final int cycleNumber) {
