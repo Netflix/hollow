@@ -1,10 +1,12 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
+import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
@@ -23,24 +25,33 @@ import java.util.stream.Collectors;
 public class WindowPackageContractInfoModule {
 
     private final VMSHollowInputAPI api;
+    private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
+    private final HollowPrimaryKeyIndex timecodeAnnotationIdx;
 
     private final PackageMomentDataModule packageMomentDataModule;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
-    public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
+    public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
         this.api = api;
+        this.ctx = ctx;
         this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
+        if(ctx.getConfig().isTimecodeAnnotationFeedEnabled())
+        	this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
+        else
+        	this.timecodeAnnotationIdx = null;
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
+        
+        
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
@@ -58,7 +69,15 @@ public class WindowPackageContractInfoModule {
         if (deployablePackage != null) info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
 
         // package moment data
-        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
+        TimecodeAnnotationHollow inputTimecodeAnnotation = null;
+        // Extract the timecode annotation if it is enabled
+        if(this.ctx.getConfig().isTimecodeAnnotationFeedEnabled()) {
+            int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
+            if(ordinal != -1)
+              inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));        	
+        }
+        
+        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
 

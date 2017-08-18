@@ -99,7 +99,7 @@ public class SimpleTransformer {
         HollowReadStateEngine inputStateEngine = (HollowReadStateEngine) inputAPI.getDataAccess();
         this.cycleConstants = new CycleConstants(inputStateEngine);
         long startTime = System.currentTimeMillis();
-        this.indexer = new VMSTransformerIndexer(inputStateEngine);
+        this.indexer = new VMSTransformerIndexer(inputStateEngine, ctx);
         long endTime = System.currentTimeMillis();
         System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
     }
