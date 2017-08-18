@@ -17,14 +17,6 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import java.util.Map;
-
-import java.util.HashMap;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
@@ -34,6 +26,14 @@ import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
@@ -250,5 +250,47 @@ public class HollowCodeGenerationUtils {
         str = str.replace(' ', '_');
         str = str.replace('.', '_');
         return str;
+    }
+    
+    public static String getJavaBoxedType(FieldType fieldType) {
+        switch(fieldType) {
+        case BOOLEAN:
+            return "Boolean";
+        case BYTES:
+            return "byte[]";
+        case DOUBLE:
+            return "Double";
+        case FLOAT:
+            return "Float";
+        case LONG:
+            return "Long";
+        case INT:
+        case REFERENCE:
+            return "Integer";
+        case STRING:
+            return "String";
+        }
+        throw new IllegalArgumentException("Java boxed type is not known for FieldType." + fieldType.toString());
+    }
+    
+    public static String getJavaScalarType(FieldType fieldType) {
+        switch(fieldType) {
+        case BOOLEAN:
+            return "boolean";
+        case BYTES:
+            return "byte[]";
+        case DOUBLE:
+            return "double";
+        case FLOAT:
+            return "float";
+        case LONG:
+            return "long";
+        case INT:
+        case REFERENCE:
+            return "int";
+        case STRING:
+            return "String";
+        }
+        throw new IllegalArgumentException("Java scalar type is not known for FieldType." + fieldType.toString());
     }
 }

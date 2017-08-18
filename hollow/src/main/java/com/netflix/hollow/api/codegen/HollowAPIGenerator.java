@@ -58,6 +58,7 @@ public class HollowAPIGenerator {
     private final HollowDataset dataset;
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
+    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
     
     private String classPostfix = "Hollow";
     private String getterPrefix = "_";
@@ -69,7 +70,7 @@ public class HollowAPIGenerator {
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset) {
-        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), false);
+        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), false, false);
     }
 
     /**
@@ -80,7 +81,7 @@ public class HollowAPIGenerator {
      *                               alternate implementations are desired for some types.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, boolean parameterizeAllClassNames) {
-        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), parameterizeAllClassNames);
+        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), parameterizeAllClassNames, false);
     }
 
     /**
@@ -91,16 +92,17 @@ public class HollowAPIGenerator {
      *                               alternate implementations are desired for some types.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizeSpecificTypeNames) {
-        this(apiClassname, packageName, dataset, parameterizeSpecificTypeNames, false);
+        this(apiClassname, packageName, dataset, parameterizeSpecificTypeNames, false, false);
     }
     
     
-    private HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames) {
+    private HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.dataset = dataset;
         this.parameterizedTypes = parameterizedTypes;
         this.parameterizeClassNames = parameterizeAllClassNames;
+        this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
     }
     
     /**
@@ -152,9 +154,9 @@ public class HollowAPIGenerator {
             generateFile(directory, getHollowFactoryGenerator(schema));
 
             if(schema.getSchemaType() == SchemaType.OBJECT) {
-                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema));
-                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema));
-                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema));
+                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
+                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
+                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
             }
         }
@@ -182,7 +184,7 @@ public class HollowAPIGenerator {
 
     private HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts);
         } else if(schema instanceof HollowListSchema) {
             return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         } else if(schema instanceof HollowSetSchema) {
@@ -207,6 +209,7 @@ public class HollowAPIGenerator {
         private String classPostfix = "";
         private String getterPrefix = "";
         private boolean useAggressiveSubstitutions = false;
+        private boolean useErgonomicShortcuts = false;
         
         public Builder withAPIClassname(String apiClassname) {
             this.apiClassname = apiClassname;
@@ -248,6 +251,11 @@ public class HollowAPIGenerator {
             return this;
         }
         
+        public Builder withErgonomicShortcuts() {
+            this.useErgonomicShortcuts = true;
+            return this;
+        }
+        
         public HollowAPIGenerator build() {
             if(apiClassname == null)
                 throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
@@ -256,7 +264,7 @@ public class HollowAPIGenerator {
             if(dataset == null)
                 throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
             
-            HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames);
+            HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts);
             generator.setClassPostfix(classPostfix);
             generator.setGetterPrefix(getterPrefix);
             generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
