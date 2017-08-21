@@ -51,7 +51,7 @@ public class HollowSchemaSorter {
         Map<String, HollowSchema> schemaMap = new HashMap<String, HollowSchema>();
         for(HollowSchema schema : schemas) {
             schemaMap.put(schema.getName(), schema);
-            idx.indexSchema(schema);
+            idx.indexSchema(schema, schemas);
         }
 
         List<HollowSchema> orderedSchemas = new ArrayList<HollowSchema>();
@@ -102,22 +102,22 @@ public class HollowSchemaSorter {
             return firstAvailableType;
         }
 
-        private void indexSchema(HollowSchema schema) {
+        private void indexSchema(HollowSchema schema, Collection<HollowSchema> allSchemas) {
             if(schema instanceof HollowCollectionSchema) {
                 String elementType = ((HollowCollectionSchema) schema).getElementType();
-                addDependency(schema.getName(), elementType);
+                addDependency(schema.getName(), elementType, allSchemas);
             } else if(schema instanceof HollowMapSchema) {
                 String keyType = ((HollowMapSchema)schema).getKeyType();
                 String valueType = ((HollowMapSchema)schema).getValueType();
 
-                addDependency(schema.getName(), keyType);
-                addDependency(schema.getName(), valueType);
+                addDependency(schema.getName(), keyType, allSchemas);
+                addDependency(schema.getName(), valueType, allSchemas);
             } else if(schema instanceof HollowObjectSchema) {
                 HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
                 for(int i=0;i<objectSchema.numFields();i++) {
                     if(objectSchema.getFieldType(i) == FieldType.REFERENCE) {
                         String refType = objectSchema.getReferencedType(i);
-                        addDependency(schema.getName(), refType);
+                        addDependency(schema.getName(), refType, allSchemas);
                     }
                 }
             }
@@ -135,11 +135,20 @@ public class HollowSchemaSorter {
             dependencyIndex.remove(type);
         }
 
-        private void addDependency(String dependent, String dependency) {
-            getList(dependent, dependencyIndex).add(dependency);
-            getList(dependency, reverseDependencyIndex).add(dependent);
+        private void addDependency(String dependent, String dependency, Collection<HollowSchema> allSchemas) {
+            if(schemaExists(dependency, allSchemas)) {
+                getList(dependent, dependencyIndex).add(dependency);
+                getList(dependency, reverseDependencyIndex).add(dependent);
+            }
         }
 
+        private boolean schemaExists(String schemaName, Collection<HollowSchema> allSchemas) {
+            for(HollowSchema schema : allSchemas) {
+                if(schema.getName().equals(schemaName))
+                    return true;
+            }
+            return false;
+        }
 
         private Set<String> getList(String key, Map<String, Set<String>> dependencyIndex2) {
             Set<String> list = dependencyIndex2.get(key);
@@ -160,6 +169,9 @@ public class HollowSchemaSorter {
         
         HollowSchema dependentTypeSchema = stateEngine.getSchema(dependentType);
         
+        if(dependentTypeSchema == null)
+            return false;
+            
         switch(dependentTypeSchema.getSchemaType()) {
         case OBJECT:
             HollowObjectSchema objectSchema = (HollowObjectSchema)dependentTypeSchema;

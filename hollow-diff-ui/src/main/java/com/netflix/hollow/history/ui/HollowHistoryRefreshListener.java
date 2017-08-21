@@ -17,14 +17,14 @@
  */
 package com.netflix.hollow.history.ui;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
-import com.netflix.hollow.api.consumer.HollowConsumer.RefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
-public class HollowHistoryRefreshListener implements RefreshListener {
-	
+public class HollowHistoryRefreshListener extends HollowConsumer.AbstractRefreshListener {
+
     private final HollowHistory history;
     
     public HollowHistoryRefreshListener(HollowHistory history) {

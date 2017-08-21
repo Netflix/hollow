@@ -508,27 +508,32 @@ public class HollowConsumer {
          * <li>one or more deltas</li>
          * <li>a snapshot load, plus zero or more deltas</li>
          * </ul> 
+         * @param currentVersion the current state version
+         * @param requestedVersion the version to which the refresh is progressing
          */
         public void refreshStarted(long currentVersion, long requestedVersion);
 
         /**
-         * This method is called when either data was initialized for the first time, <i>or</i> an update occurred across a 
+         * This method is called when either data was initialized for the first time, <i>or</i> an update occurred across a
          * discontinuous delta chain (double snapshot).
-         * 
-         * Implementations should initialize (or re-initialize) any indexing which is critical to keep in-sync with the data.
-         * 
-         * If this method is called, it means that the current refresh consists of a snapshot load, plus zero or more deltas.  
-         * 
-         * This method will be called a maximum of once per refresh, after the data has reached the final state of the refresh. 
          *
-         * @param stateEngine
-         * @throws Exception
+         * If this method is called, it means that the current refresh consists of a snapshot load, plus zero or more deltas.
+         *
+         * Implementations may initialize (or re-initialize) any indexing which is critical to keep in-sync with the data.
+         *
+         * This method will be called a maximum of once per refresh, after the data has reached the final state of the refresh.
+         *
+         * @param api the {@link HollowAPI} instance
+         * @param stateEngine the {@link HollowReadStateEngine}
+         * @param version the current state version
+         * @throws Exception thrown if an error occurs in processing
          */
         public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
-
         /**
-         * This method is called whenever a live state engine's data is updated with a delta.
+         * This method is called whenever a live state engine's data is updated with a delta.  This method is <i>not</i>
+         * called during first time initialization or when an update across a discontinuous delta chain (double snapshot)
+         * occurs.
          *
          * Implementations should incrementally update any indexing which is critical to keep in-sync with the data.
          * 
@@ -537,8 +542,10 @@ public class HollowConsumer {
          * 
          * This method may be called multiple times per refresh, once for each time a delta is applied.
          *
-         * @param stateEngine
-         * @throws Exception
+         * @param api the {@link HollowAPI} instance
+         * @param stateEngine the {@link HollowReadStateEngine}
+         * @param version the current state version
+         * @throws Exception thrown if an error occurs in processing
          */
         public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
@@ -570,7 +577,80 @@ public class HollowConsumer {
         public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
 
     }
-    
+
+    public interface TransitionAwareRefreshListener extends RefreshListener {
+
+        /**
+         * This method is called <i>whenever</i> a snapshot is processed.  In the case of first time initialization or an update
+         * across a discontinuous delta chain (double snapshot), this method will be called once (as the first transition).
+         *
+         * Implementations may initialize (or re-initialize) any indexing which is critical to keep in-sync with the data.
+         *
+         * @param api the {@link HollowAPI} instance
+         * @param stateEngine the {@link HollowReadStateEngine}
+         * @param version the current state version
+         * @throws Exception thrown if an error occurs in processing
+         */
+        public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+
+        /**
+         * This method is called <i>whenever</i> a delta is processed.  In the case of first time initialization or an update
+         * across a discontinuous delta chain (double snapshot), this method may be called one or more times before arriving
+         * at the final state (after which {@link #snapshotUpdateOccurred(HollowAPI, HollowReadStateEngine, long)} is called.
+         *
+         * Implementations may incrementally update any indexing which is critical to keep in-sync with the data.
+         *
+         * @param api the {@link HollowAPI} instance
+         * @param stateEngine the {@link HollowReadStateEngine}
+         * @param version the current state version
+         * @throws Exception thrown if an error occurs in processing
+         */
+        public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+    	
+    }
+
+    public static class AbstractRefreshListener implements TransitionAwareRefreshListener {
+        @Override
+        public void refreshStarted(long currentVersion, long requestedVersion) {
+            // no-op
+        }
+
+        @Override
+        public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            // no-op
+        }
+
+        @Override
+        public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            // no-op
+        }
+
+        @Override
+        public void blobLoaded(Blob transition) {
+            // no-op
+        }
+
+        @Override
+        public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+            // no-op
+        }
+
+        @Override
+        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+            // no-op
+        }
+
+        @Override
+        public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            // no-op
+        }
+
+        @Override
+        public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+            // no-op
+        }
+    }
+
     public static HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
         HollowConsumer.Builder builder = new Builder();
         return builder.withBlobRetriever(blobRetriever);
