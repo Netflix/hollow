@@ -20,16 +20,17 @@ package com.netflix.hollow.api.codegen.objects;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
-import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowMap;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
+import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Set;
 
 /**
@@ -182,23 +183,9 @@ public class HollowMapJavaGenerator implements HollowJavaFileGenerator {
                 idx++;
             }
             
-            switch(keySchema.getFieldType(keySchema.getPosition(fieldPathElements[idx]))) {
-            case BOOLEAN:
-                return "Boolean";
-            case BYTES:
-                return "byte[]";
-            case DOUBLE:
-                return "Double";
-            case FLOAT:
-                return "Float";
-            case LONG:
-                return "Long";
-            case INT:
-            case REFERENCE:
-                return "Integer";
-            case STRING:
-                return "String";
-            }
+            FieldType fieldType = keySchema.getFieldType(keySchema.getPosition(fieldPathElements[idx]));
+
+            return HollowCodeGenerationUtils.getJavaBoxedType(fieldType);
         } catch(Throwable th) { }
         throw new IllegalArgumentException("Field path '" + fieldPath + "' specified incorrectly for type: " + schema.getName());
     }
