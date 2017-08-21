@@ -451,10 +451,13 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         int findMaxValue() {
             // find the last index that is initialized
             int index = indices.length - 1;
-            while (index > 0) {
+            while (index >= 0) {
                 if (indices[index] != 0) break;
                 index--;
             }
+
+            // if no buckets are initialized, then return -1 ( meaning set is empty)
+            if (index < 0) return -1;
 
             // find the highest bit in indexAtLong to see which is last long init in bucket
             int highestBitSetInIndexAtLong = 63 - Long.numberOfLeadingZeros(Long.highestOneBit(indices[index]));
@@ -519,6 +522,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
          */
         static SparseBitSet compact(SparseBitSet sparseBitSet) {
             int maxValueAdded = sparseBitSet.findMaxValue();
+            // if the given set is empty then compact the sparseBitSet to have only 1 bucket i.e. 64 longs
+            if (maxValueAdded < 0) {
+                maxValueAdded = (1 << BUCKET_SHIFT) - 1;
+            }
             int indexForMaxValueAdded = getIndex(maxValueAdded);
             int newLength = indexForMaxValueAdded + 1;
             return cloneSparseBitSetWithNewLength(sparseBitSet, newLength, newLength, maxValueAdded);
