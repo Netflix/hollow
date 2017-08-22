@@ -185,6 +185,10 @@ public class FieldPath {
         return lastRefTypeInPath;
     }
 
+    public FieldType getLastFieldType() {
+        return fieldTypes[this.fields.length - 1];
+    }
+
     /**
      * Recursively find all the values following the field path.
      *
