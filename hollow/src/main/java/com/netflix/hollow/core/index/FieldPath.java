@@ -252,8 +252,10 @@ public class FieldPath {
             if (fieldTypes[fieldIndex].equals(FieldType.REFERENCE)) {
 
                 int refOrdinal = objectTypeReadState.readOrdinal(ordinal, fieldPositions[fieldIndex]);
-                String refType = objectSchema.getReferencedType(fieldPositions[fieldIndex]);
-                value = getValue(refOrdinal, refType, fieldIndex + 1);
+                if (refOrdinal >= 0) {
+                    String refType = objectSchema.getReferencedType(fieldPositions[fieldIndex]);
+                    value = getValue(refOrdinal, refType, fieldIndex + 1);
+                }
 
             } else {
                 value = readFromObject(objectTypeReadState, ordinal, fieldTypes[fieldIndex], fieldPositions[fieldIndex]);
@@ -315,8 +317,11 @@ public class FieldPath {
 
             if (fieldTypes[fieldIndex].equals(FieldType.REFERENCE)) {
                 int refOrdinal = objectTypeReadState.readOrdinal(ordinal, fieldPositions[fieldIndex]);
-                String refType = objectSchema.getReferencedType(fieldPositions[fieldIndex]);
-                return getAllValues(refOrdinal, refType, fieldIndex + 1);
+                if (refOrdinal >= 0) {
+                    String refType = objectSchema.getReferencedType(fieldPositions[fieldIndex]);
+                    return getAllValues(refOrdinal, refType, fieldIndex + 1);
+                }
+                return new Object[]{};
             } else {
                 return new Object[]{readFromObject(objectTypeReadState, ordinal, fieldTypes[fieldIndex], fieldPositions[fieldIndex])};
             }
