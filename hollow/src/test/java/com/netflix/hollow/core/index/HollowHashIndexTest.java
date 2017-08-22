@@ -56,6 +56,52 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
 
     }
 
+    @Test
+    public void testUpdateListener() throws Exception {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("twenty"), new TypeB("two hundred")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three"), new TypeB("thirty"), new TypeB("three hundred")));
+
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "a1", new String[] {"a1", "ab.element.b1.value"});
+        index.listenForDeltaUpdates();
+
+        HollowHashIndexResult result = index.findMatches(2, "twenty");
+        HollowOrdinalIterator iter = result.iterator();
+
+        int matchedOrdinal = iter.next();
+
+        while(matchedOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            System.out.println(matchedOrdinal);
+            matchedOrdinal = iter.next();
+        }
+
+        System.out.println(result.contains(2));
+
+        mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
+        mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
+        mapper.add(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("forty"), new TypeB("two hundred")));
+        mapper.add(new TypeA(3, 3.3d, new TypeB("three"), new TypeB("thirty"), new TypeB("three hundred")));
+        roundTripDelta();
+
+        HollowHashIndexResult result2 = index.findMatches(2, "forty");
+        HollowOrdinalIterator iter2 = result.iterator();
+
+        int matchedOrdinal2 = iter2.next();
+
+        while(matchedOrdinal2 != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            System.out.println(matchedOrdinal2);
+            matchedOrdinal2 = iter2.next();
+        }
+
+        System.out.println(result2.contains(4));
+
+    }
+
     @SuppressWarnings("unused")
     private static class TypeA {
         private final int a1;
