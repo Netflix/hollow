@@ -194,7 +194,7 @@ public class HollowPrefixIndexTest {
         MovieMapReference movieMapReference = new MovieMapReference(1, 1999, "The Matrix", idActorMap);
         objectMapper.add(movieMapReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieMapReference", "idActorNameMap");
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieMapReference", "idActorNameMap.value");
         Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
@@ -208,7 +208,7 @@ public class HollowPrefixIndexTest {
         MovieActorMapReference movieActorMapReference = new MovieActorMapReference(1, 1999, "The Matrix", idActorMap);
         objectMapper.add(movieActorMapReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorMapReference", "idActorNameMap");
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorMapReference", "idActorNameMap.value");
         Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("carr"));
         Assert.assertTrue(ordinals.size() == 1);
         ordinals = toSet(prefixIndex.findKeysWithPrefix("aaa"));
