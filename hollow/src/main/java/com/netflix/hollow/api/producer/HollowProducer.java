@@ -122,6 +122,7 @@ public class HollowProducer {
     private final BlobStager blobStager;
     private final Publisher publisher;
     private final List<Validator> validators;
+    private final ValidationConfig validationConfig;
     private final Announcer announcer;
     private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
@@ -135,19 +136,20 @@ public class HollowProducer {
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), ValidationConfig.ALL_ENABLED, Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), ValidationConfig.ALL_ENABLED, Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
     }
 
     protected HollowProducer(BlobStager blobStager,
                              Publisher publisher,
                              Announcer announcer,
                              List<Validator> validators,
+                             ValidationConfig validationConfig,
                              List<HollowProducerListener> listeners,
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
@@ -155,6 +157,7 @@ public class HollowProducer {
                              long targetMaxTypeShardSize) {
         this.publisher = publisher;
         this.validators = validators;
+        this.validationConfig = validationConfig;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
         this.blobStager = blobStager;
@@ -567,6 +570,10 @@ public class HollowProducer {
             
             for(Validator validator : validators) {
                 try {
+                    if(validator instanceof ConfigurableValidator) {
+                        if(!validationConfig.isValidationEnabled(((ConfigurableValidator) validator).getName()))
+                            continue;
+                    }
                     validator.validate(readState);
                 } catch(Throwable th) {
                     validationFailures.add(th);
@@ -795,6 +802,27 @@ public class HollowProducer {
         }
     }
 
+    public static abstract class ConfigurableValidator implements Validator {
+
+        private final String name;
+
+        public ConfigurableValidator(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+
+    public static interface ValidationConfig {
+        public boolean isValidationEnabled(String validationName);
+
+        public static ValidationConfig ALL_ENABLED = new ValidationConfig() {
+            public boolean isValidationEnabled(String validationName) { return true; }
+        };
+    }
+
     public static interface Announcer {
         public void announce(long stateVersion);
     }
@@ -855,6 +883,7 @@ public class HollowProducer {
         private File stagingDir;
         private Publisher publisher;
         private Announcer announcer;
+        private ValidationConfig validationConfig = ValidationConfig.ALL_ENABLED;
         private List<Validator> validators = new ArrayList<Validator>();
         private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
         private VersionMinter versionMinter = new VersionMinterWithCounter();
@@ -895,6 +924,11 @@ public class HollowProducer {
         public Builder withValidators(HollowProducer.Validator... validators) {
             for(Validator validator : validators)
                 this.validators.add(validator);
+            return this;
+        }
+        
+        public Builder withValidationConfig(ValidationConfig validationConfig) {
+            this.validationConfig = validationConfig;
             return this;
         }
         
@@ -942,7 +976,7 @@ public class HollowProducer {
                 stager = new HollowFilesystemBlobStager(stagingDir, compressor);
             }
             
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
+            return new HollowProducer(stager, publisher, announcer, validators, validationConfig, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
         }
     }
     
