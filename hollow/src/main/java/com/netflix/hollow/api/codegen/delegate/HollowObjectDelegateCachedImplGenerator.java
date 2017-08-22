@@ -191,6 +191,8 @@ public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGe
         switch(fieldType) {
         case BOOLEAN:
             builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return false;\n");
             builder.append("        return ").append(fieldName).append(".booleanValue();\n");
             builder.append("    }\n\n");
             builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
@@ -204,6 +206,8 @@ public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGe
             break;
         case DOUBLE:
             builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Double.NaN;\n");
             builder.append("        return ").append(fieldName).append(".doubleValue();\n");
             builder.append("    }\n\n");
             builder.append("    public Double get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
@@ -212,6 +216,8 @@ public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGe
             break;
         case FLOAT:
             builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Float.NaN;\n");
             builder.append("        return ").append(fieldName).append(".floatValue();\n");
             builder.append("    }\n\n");
             builder.append("    public Float get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
@@ -220,6 +226,8 @@ public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGe
             break;
         case INT:
             builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Integer.MIN_VALUE;\n");
             builder.append("        return ").append(fieldName).append(".intValue();\n");
             builder.append("    }\n\n");
             builder.append("    public Integer get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
@@ -228,6 +236,8 @@ public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGe
             break;
         case LONG:
             builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Long.MIN_VALUE;\n");
             builder.append("        return ").append(fieldName).append(".longValue();\n");
             builder.append("    }\n\n");
             builder.append("    public Long get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
