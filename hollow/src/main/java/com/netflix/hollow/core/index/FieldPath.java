@@ -19,16 +19,19 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class is used to represent a field path. A field path is a "." separated list of fields that are used for traversal when looking up values to build Hollow indexes.
- * While traversing, it checks for
- * <li>
- * <ul>valid types in the HollowReadStateEngine</ul>
- * <ul>auto-expands the path for collection hollow schema types,</ul>
- * <ul>and checks that the field path leads to one of the valid field types provided in the constructor.</ul>
- * </li>
+ * This class is used to represent a field path. A field path is a "." separated list of fields that are used for traversal when looking up values for a type and ordinal of that type.
+ * It is used to read field values for a given type and its ordinal. It is convenient, when the path is deeply nested.
  * <p>
- * This class also has a convenience method to find values following the fieldpath and given a start field position.
- * This class is meant as a utility class.
+ * Upon initializing a instance of this class with given parameters, it does the following checks
+ * <ul>
+ * <li>valid types in the HollowReadStateEngine</li>
+ * <li>auto-expands the path for collections (appending ".element" if missing), and a reference type (e.g String/Integer appending ".value" if missing) with single field. (except for Map schema)</li>
+ * <li>and checks that the field path leads to one of the valid field types provided in the constructor</li>
+ * <li>for map schema type, specify "key" to iterate over key types and "value" to iterate over value types.</li>
+ * </ul>
+ * <p>
+ * This class also has a convenience method to find values following the field path and given a start field position.
+ * This class is meant as a utility class to read deeply nested fields for a given type and its ordinal.
  */
 public class FieldPath {
 
@@ -42,23 +45,39 @@ public class FieldPath {
     private HollowObjectSchema.FieldType[] fieldTypes;
     private String lastRefTypeInPath;
 
+    private boolean autoExpand = true;
+
+    /**
+     * Create new FieldPath with auto-expand feature.
+     *
+     * @param readStateEngine read state engine
+     * @param type            parent type of the field path
+     * @param fieldPath       "." separated fields
+     * @param validFieldType  field path should end with one of the given field type.
+     */
+    protected FieldPath(HollowReadStateEngine readStateEngine, String type, String fieldPath, HollowObjectSchema.FieldType validFieldType) {
+        this(readStateEngine, type, fieldPath, new HashSet<>(Arrays.asList(validFieldType)), true);
+    }
+
     /**
      * Create new FieldPath.
      *
-     * @param readStateEngine
-     * @param type
-     * @param fieldPath
-     * @param validFieldType
+     * @param readStateEngine read state engine
+     * @param type            parent type of the field path
+     * @param fieldPath       "." separated fields
+     * @param validFieldType  field path should end with one of the given field type.
+     * @param autoExpand      if the field path should be auto-expand collections and references with one field.
      */
-    protected FieldPath(HollowReadStateEngine readStateEngine, String type, String fieldPath, HollowObjectSchema.FieldType validFieldType) {
-        this(readStateEngine, type, fieldPath, new HashSet<>(Arrays.asList(validFieldType)));
+    protected FieldPath(HollowReadStateEngine readStateEngine, String type, String fieldPath, HollowObjectSchema.FieldType validFieldType, boolean autoExpand) {
+        this(readStateEngine, type, fieldPath, new HashSet<>(Arrays.asList(validFieldType)), autoExpand);
     }
 
-    protected FieldPath(HollowReadStateEngine readStateEngine, String type, String fieldPath, Set<HollowObjectSchema.FieldType> validFieldTypes) {
+    private FieldPath(HollowReadStateEngine readStateEngine, String type, String fieldPath, Set<HollowObjectSchema.FieldType> validFieldTypes, boolean autoExpand) {
         this.fieldPath = fieldPath;
         this.readStateEngine = readStateEngine;
         this.type = type;
         this.validFieldTypes = validFieldTypes;
+        this.autoExpand = autoExpand;
         initialize();
     }
 
@@ -76,7 +95,7 @@ public class FieldPath {
 
             HollowSchema schema = readStateEngine.getSchema(refType);
             if (schema == null)
-                throw new IllegalArgumentException("Null schema found for field : " + fieldParts[i]);
+                throw new IllegalArgumentException("Schema not found for the type : " + refType);
             HollowSchema.SchemaType schemaType = readStateEngine.getSchema(refType).getSchemaType();
 
             String fieldName = null;
@@ -89,15 +108,16 @@ public class FieldPath {
 
                 // find field position, field name and field type
                 if (i >= fieldParts.length) {
-                    if (objectSchema.numFields() != 1)
-                        throw new IllegalArgumentException("Found a reference in field path with more than one field in schema for type :" + refType);
+                    if (!autoExpand || objectSchema.numFields() != 1)
+                        throw new IllegalArgumentException("Incomplete field path at type :" + refType + ". Please enter the field names in type to complete the path.");
                     fieldPosition = 0;
                 } else {
                     fieldPosition = objectSchema.getPosition(fieldParts[i]);
+                    if (fieldPosition < 0)
+                        throw new IllegalArgumentException("Could not find a valid field position for the field :" + fieldParts[i] + " in type :" + refType);
                     i++; // increment index for field part for next iteration.
                 }
-                if (fieldPosition < 0)
-                    throw new IllegalArgumentException("Could not find a valid field position in type " + refType);
+
                 fieldName = objectSchema.getFieldName(fieldPosition);
                 fieldType = objectSchema.getFieldType(fieldPosition);
 
@@ -108,21 +128,33 @@ public class FieldPath {
                     lastRefType = refType;
                     refType = null;
                 } else {
-                    throw new IllegalArgumentException("field path should contain either a reference field or a string field. " +
-                            "Found field :" + fieldName + " with type :" + fieldType.toString());
+                    throw new IllegalArgumentException("Field path should contain references and should lead to a field of type :" + Arrays.toString(validFieldTypes.toArray()));
                 }
 
-            } else if (schemaType.equals(HollowSchema.SchemaType.LIST) || schemaType.equals(HollowSchema.SchemaType.SET) || schemaType.equals(HollowSchema.SchemaType.MAP)) {
+            } else if (schemaType.equals(HollowSchema.SchemaType.LIST) || schemaType.equals(HollowSchema.SchemaType.SET)) {
 
-                if (i >= fieldParts.length || (i < fieldParts.length && !fieldParts[i].equals("element"))) {
+                if (autoExpand && (i >= fieldParts.length || (i < fieldParts.length && !fieldParts[i].equals("element")))) {
                     fieldName = "element";
                 } else {
                     fieldName = fieldParts[i];
                     i++; // increment index for field part for next iteration.
                 }
                 // update ref type to element type.
-                if (schema instanceof HollowMapSchema) refType = ((HollowMapSchema) schema).getValueType();
-                else refType = ((HollowCollectionSchema) schema).getElementType();
+                refType = ((HollowCollectionSchema) schema).getElementType();
+
+            } else if (schemaType.equals(HollowSchema.SchemaType.MAP)) {
+
+                if ((i >= fieldParts.length) || (!fieldParts[i].equals("value") && !fieldParts[i].equals("key")))
+                    throw new IllegalArgumentException("When using Map in field path, please specify key or value. Cannot auto-expand on Map type field");
+
+                // update field name and increment i to move to next field
+                fieldName = fieldParts[i];
+                i++;
+
+                // update ref type depending on key or value in field path for map.
+                if (fieldName.equals("value")) {
+                    refType = ((HollowMapSchema) schema).getValueType();
+                } else refType = ((HollowMapSchema) schema).getKeyType();
             }
 
             // update lists
@@ -187,12 +219,16 @@ public class FieldPath {
             // Map type
             HollowMapTypeReadState mapTypeReadState = (HollowMapTypeReadState) typeReadState;
             HollowMapSchema mapSchema = (HollowMapSchema) schema;
-            String mapValueType = mapSchema.getValueType();
+
+            // what to iterate on in map
+            boolean iterateThroughKeys = fields[fieldIndex].equals("key");
+            String keyOrValueType = iterateThroughKeys ? mapSchema.getKeyType() : mapSchema.getValueType();
 
             HollowMapEntryOrdinalIterator mapEntryIterator = mapTypeReadState.ordinalIterator(ordinal);
             List<Object> valueList = new ArrayList<>();
             while (mapEntryIterator.next()) {
-                Object[] refValues = findValuesFollowingPath(mapEntryIterator.getValue(), mapValueType, fieldIndex + 1);
+                int keyOrValueOrdinal = iterateThroughKeys ? mapEntryIterator.getKey() : mapEntryIterator.getValue();
+                Object[] refValues = findValuesFollowingPath(keyOrValueOrdinal, keyOrValueType, fieldIndex + 1);
                 for (Object value : refValues)
                     valueList.add(value);
             }
