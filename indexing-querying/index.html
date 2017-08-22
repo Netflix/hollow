@@ -88,6 +88,9 @@
                 <li class="toctree-l3"><a href="#hash-indexes">Hash Indexes</a></li>
                 
             
+                <li class="toctree-l3"><a href="#prefix-index">Prefix Index</a></li>
+                
+            
                 <li class="toctree-l3"><a href="#field-paths">Field Paths</a></li>
                 
             
@@ -294,7 +297,7 @@ ActorRole actorRoleInMovie = idx.findMatch(knownActorId, knownMovieId);
 String knownCharacterName = ...;
 
 for(Movie movie : idx.findMovieMatches(knownCharacterName)) {
-    System.out.println(&quot;The movie &quot; + movie.getTitle().getValue() + 
+    System.out.println(&quot;The movie &quot; + movie.getTitle().getValue() +
                        &quot; has a character named &quot; + knownCharacterName);
 }
 </code></pre>
@@ -311,7 +314,7 @@ for(Actor actor : idx.findActorMatches(knownMovieTitle)) {
 </code></pre>
 
 <p>We can also match at multiple places in a type hierarchy.  For example, if we want to find the <code>ActorRole</code> by actor id and movie title, we can use the following:</p>
-<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element&quot;, 
+<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element&quot;,
                                               &quot;cast.element.actor.actorId&quot;, &quot;title.value&quot;);
 
 String knownMovieTitle = ...;
@@ -319,14 +322,44 @@ int knownActorId = ...;
 
 for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
     System.out.println(&quot;The actor &quot; + role.getActor().getName().getValue() +
-                       &quot; starred in &quot; + knownMovieTitle + 
+                       &quot; starred in &quot; + knownMovieTitle +
                        &quot; as &quot; + role.getCharacterName().getValue());
 }
 
 </code></pre>
 
+<h1 id="prefix-index">Prefix Index</h1>
+<p>A prefix index is used for indexing string values to records containing them. Prefix index in hollow also supports partial matching of string values enabling quick development of features like auto-complete, spell-checkers and others. In order to create a new prefix index, use this class by providing the following arguments in the constructor:
+- An instance of <code>HollowReadStateEngine</code>
+- A type on which the index will record the ordinals
+- A field path that leads to a string value.</p>
+<p>For example, in order to build a prefix index of movie titles to retrieve <code>Movie</code> records, we can create the prefix index as follows:</p>
+<pre><code class="java">
+HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, &quot;Movie&quot;, &quot;title.value&quot;);
+HollowOrdinalIterator it = prefixIndex.findKeysWithPrefix(&quot;A&quot;);
+
+MovieAPI movieApi = (MovieAPI) consumer.getAPI();
+int ordinal = it.next();
+while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL)
+    MovieHollow movieHollow = movieApi.getMovieHollow(ordinal);
+    System.out.println(movieHollow.getTitle().getValue());
+    ordinal = it.next();
+}
+
+</code></pre>
+
+<p>The above code will print out all the movie titles that begin with the letter "A". Field path could be a reference to an <code>OBJECT</code>, <code>LIST</code>, or a <code>SET</code>, it has to ultimately lead to a String type.</p>
+<p>You can also keep this index updated when a new delta blob is received on the consumer. When a new delta is available, a new prefix is built completely from scratch. While a new prefix index is being built, the current index can continue to answer queries. The implementation of the index takes care of swapping the new updated index with old one. In order to keep your index updated with delta changes, use the following:</p>
+<pre><code class="java">// add the index object as listener for delta updates for type &quot;Movie&quot;.
+prefixIndex.listenForDeltaUpdates();
+
+// remove the index object as listener for delta updates for type &quot;Movie&quot;.
+prefixIndex.detachFromDeltaUpdates();
+
+</code></pre>
+
 <h1 id="field-paths">Field Paths</h1>
-<p>A field path indicates how to traverse through a type hierarchy. It contains multiple parts delimited by <code>.</code>, and we need one part per type through which we're traversing. Each part corresponding to an <code>OBJECT</code> type should be equal to the name of a field in that type. </p>
+<p>A field path indicates how to traverse through a type hierarchy. It contains multiple parts delimited by <code>.</code>, and we need one part per type through which we're traversing. Each part corresponding to an <code>OBJECT</code> type should be equal to the name of a field in that type.</p>
 <p>Primary key and hash key field paths may only span through <code>OBJECT</code> types.  These field paths will be automatically expanded if they end in a <code>REFERENCE</code> field which points to a type that has only a single field, or a type which has a primary key with only a single field defined.  If auto-expansion is not desired, the field path should terminate with a <code>!</code> character.  For example, in our data model example above, the following field paths for the type <code>Movie</code> are equivalent: <code>title</code>, <code>title.value</code>.  If we actually want the field path to terminate at the <code>REFERENCE</code> field <code>title</code>, we can specify the field path as <code>title!</code>.</p>
 <p>Hash <em>index</em> field paths may span through any type.  Each part corresponding to a <code>LIST</code> or <code>SET</code> type should be specified as <code>element</code>. Similarly, each part corresponding to a <code>MAP</code> type should be specified as either <code>key</code> or <code>value</code>.  Hash index field paths are never auto-expanded.</p>
 <h1 id="hash-keys">Hash Keys</h1>
@@ -348,7 +381,7 @@ ActorRole role = movie.getCast().findElement(knownActorId);
 <p>Hash keys may also be defined on <strong>map</strong> record types.  When defined on a <strong>map</strong> record, the field paths should be defined starting from the key type.  The methods <code>findKey()</code>, <code>findValue()</code>, and <code>findElement()</code> are available on <strong>map</strong> types in the generated API for consumers to look up records by hash key values.  </p>
 <p>If using the <code>HollowObjectMapper</code>, unspecified hash keys will be automatically selected if an element or key type contain a single non-reference field.  Addionally, if a <code>Set</code> or <code>Map</code> references <code>Object</code> elements with a defined <em>primary key</em>, then the <em>hash key</em> will default to the <em>primary key</em> of the element type.  Alternatively, <em>hash keys</em> can be explicitly defined using the <code>@HollowHashKey</code> annotation in POJOs for <code>Set</code> schemas by specifying one or more fields from the element type, or for <code>Map</code> schemas by specifying one or more fields from the key type.  See our <a href="#a-data-model">data model example</a> at the beginning of this section for an example.</p>
 <h1 id="field-match-scan-queries">Field Match Scan Queries</h1>
-<p>Each of the examples above pre-index your dataset to achieve O(1) lookup times.  These are very efficient, but require pre-knowledge of what you're searching for. Given that all of hollow datasets exist in memory, for some use cases it is reasonable to scan through the entire dataset looking for matches. </p>
+<p>Each of the examples above pre-index your dataset to achieve O(1) lookup times.  These are very efficient, but require pre-knowledge of what you're searching for. Given that all of hollow datasets exist in memory, for some use cases it is reasonable to scan through the entire dataset looking for matches.</p>
 <p>The <code>HollowFieldMatchQuery</code> can be used to accommodate these use cases.  The Hollow Explorer UI, for example, uses this mechanism to provide a powerful "search-for-anything" capability with reasonable response times for low-volume query traffic.</p>
 <h2 id="diving-deeper">Diving Deeper</h2>
 <p>Lower-level interfaces are available to index data in the absence of a generated API.  See <a href="../diving-deeper/#indexing-data-for-retrieval">Diving Deeper: Indexing Data for Retrieval</a> for a detailed look.</p>
