@@ -45,6 +45,26 @@ public class HollowSparseIntegerSetTest {
         objectMapper = new HollowObjectMapper(writeStateEngine);
     }
 
+    @Test
+    public void testEmptyAndDelta() throws Exception {
+        List<Movie> emptyMovies = new ArrayList<>();
+        objectMapper.initializeTypeState(Movie.class);
+        for (Movie movie : emptyMovies)
+            objectMapper.add(movie);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+
+        HollowSparseIntegerSet hollowIntSet = new HollowSparseIntegerSet(readStateEngine, "Movie", "id.value", getPredicate());
+        Assert.assertEquals(0, hollowIntSet.cardinality());
+
+        hollowIntSet.listenForDeltaUpdates();
+
+        for (Movie m : getMovies())
+            objectMapper.add(m);
+        objectMapper.add(new Movie(new Video(8192), "Random", 2009));
+        StateEngineRoundTripper.roundTripDelta(writeStateEngine, readStateEngine);
+
+        Assert.assertEquals(11, hollowIntSet.cardinality());// 11 movies released in 2009 as per predicate
+    }
 
 
     @Test
