@@ -2,7 +2,6 @@ package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Before;
