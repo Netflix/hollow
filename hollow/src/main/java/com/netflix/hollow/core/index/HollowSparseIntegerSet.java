@@ -281,7 +281,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * Each bit in long value in indices array, indicates if a long value is initialized. 64 bits would point to 64 long values ( 1 bucket ).
      * Each bucket could contain 1-64 longs, we only hold non-zero long values in bucket.
      */
-    protected static class SparseBitSet {
+    static class SparseBitSet {
 
         // shift used to determine which bucket and index
         private static final int BUCKET_SHIFT = 12;
@@ -292,7 +292,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         private final long[] indices;
         private final long[][] buckets;
 
-        protected SparseBitSet(int maxValue) {
+        SparseBitSet(int maxValue) {
             this.maxValue = maxValue;
 
             int totalBuckets = maxValue >>> BUCKET_SHIFT;
