@@ -310,7 +310,8 @@ public class HollowCodeGenerationUtils {
      *
      *      boolean isPrimary - isPrimary()
      *      boolean hasStreams - hasStreams()
-     *      boolean playable - isPlayable()
+     *      boolean playable - getPlayable()
+     *      boolean value - getValue()
      *
      * other field type: prepend "get" + upper case first char
      *
