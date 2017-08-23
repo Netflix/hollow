@@ -96,7 +96,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     protected synchronized void build() {
 
-        SparseBitSet set = new SparseBitSet(Integer.MAX_VALUE);
+        // initialize an instance of SparseBitSet
+        initSet(Integer.MAX_VALUE);
+
+        // iterate through all populated ordinals for the type to set the values based on predicate
         BitSet typeBitSet = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = typeBitSet.nextSetBit(0);
         while (ordinal != -1) {
@@ -106,26 +109,32 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Object[] values = fieldPath.findValues(ordinal);
                 if (values != null && values.length > 0) {
                     for (Object value : values) {
-                        set(set, (int) value);
+                        set((int) value);
                     }
 
                 }
             }
             ordinal = typeBitSet.nextSetBit(ordinal + 1);
         }
-        SparseBitSet compactedSet = compact(set);
 
-        sparseBitSet = compactedSet;
-        sparseBitSetVolatile = compactedSet;
+        // run compaction
+        compact();
     }
 
-    protected void set(SparseBitSet set, int value) {
-        if (!set.get(value)) set.set(value);
+    protected void initSet(int maxValue) {
+        sparseBitSet = new SparseBitSet(maxValue);
+        sparseBitSetVolatile = sparseBitSet;
+    }
+
+    protected void set(int value) {
+        if (!sparseBitSet.get(value)) sparseBitSet.set(value);
         else handleDuplicate(value);
     }
 
-    protected SparseBitSet compact(SparseBitSet set) {
-        return SparseBitSet.compact(set);
+    protected void compact() {
+        SparseBitSet compactedSet = SparseBitSet.compact(sparseBitSet);
+        sparseBitSet = compactedSet;
+        sparseBitSetVolatile = compactedSet;
     }
 
     // although duplicates are not supported, adding a support to log and maintain a small map to handle rare cases.
@@ -272,7 +281,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * Each bit in long value in indices array, indicates if a long value is initialized. 64 bits would point to 64 long values ( 1 bucket ).
      * Each bucket could contain 1-64 longs, we only hold non-zero long values in bucket.
      */
-    static class SparseBitSet {
+    protected static class SparseBitSet {
 
         // shift used to determine which bucket and index
         private static final int BUCKET_SHIFT = 12;
@@ -283,7 +292,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         private final long[] indices;
         private final long[][] buckets;
 
-        SparseBitSet(int maxValue) {
+        protected SparseBitSet(int maxValue) {
             this.maxValue = maxValue;
 
             int totalBuckets = maxValue >>> BUCKET_SHIFT;
