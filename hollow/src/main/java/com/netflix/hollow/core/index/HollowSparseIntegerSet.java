@@ -19,7 +19,6 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -107,18 +106,26 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Object[] values = fieldPath.findValues(ordinal);
                 if (values != null && values.length > 0) {
                     for (Object value : values) {
-                        if (!set.get((int) value)) set.set((int) value);
-                        else handleDuplicate((int) value);
+                        set(set, (int) value);
                     }
 
                 }
             }
             ordinal = typeBitSet.nextSetBit(ordinal + 1);
         }
-        SparseBitSet compactedSet = SparseBitSet.compact(set);
+        SparseBitSet compactedSet = compact(set);
 
         sparseBitSet = compactedSet;
         sparseBitSetVolatile = compactedSet;
+    }
+
+    protected void set(SparseBitSet set, int value) {
+        if (!set.get(value)) set.set(value);
+        else handleDuplicate(value);
+    }
+
+    protected SparseBitSet compact(SparseBitSet set) {
+        return SparseBitSet.compact(set);
     }
 
     // although duplicates are not supported, adding a support to log and maintain a small map to handle rare cases.
