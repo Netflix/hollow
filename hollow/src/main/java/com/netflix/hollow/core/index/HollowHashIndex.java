@@ -19,10 +19,10 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
 /**
@@ -30,54 +30,53 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
  * multiple records to a single key.
  * <p>
  * The field definitions in a hash key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
- * the field definition <i>actors.element.actorId</i> may be used to traverse a child <b>LIST</b> or <b>SET</b> type record referenced by the field 
- * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field. 
+ * the field definition <i>actors.element.actorId</i> may be used to traverse a child <b>LIST</b> or <b>SET</b> type record referenced by the field
+ * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field.
  * <p>
  */
-public class HollowHashIndex {
-    
-    private final FixedLengthElementArray matchHashTable;
-    final FixedLengthElementArray selectHashArray;
+public class HollowHashIndex implements HollowTypeStateListener {
 
-    private final HollowHashIndexField[] matchFields;
-    private final int matchHashMask;
-    private final int bitsPerMatchHashKey;
-    private final int bitsPerMatchHashEntry;
-    
-    private final int[] bitsPerTraverserField;
-    private final int[] offsetPerTraverserField;
-    private final int bitsPerSelectTableSize;
-    private final int bitsPerSelectTablePointer;
-    
-    final int bitsPerSelectHashEntry;
-    
+    protected HollowHashIndexState hashState;
+    private volatile HollowHashIndexState hashStateVolatile;
+
+    private final HollowReadStateEngine stateEngine;
+    private final HollowObjectTypeReadState typeState;
+    private final String type;
+    private final String selectField;
+    private final String[] matchFields;
+
     /**
-     * Define a {@link HollowHashIndex}. 
-     * 
+     * Define a {@link HollowHashIndex}.
+     *
      * @param stateEngine The state engine to index
      * @param type The query starts with the specified type
-     * @param selectField The query will select records at this field (specify "" to select the specified type).  
-     * The selectField may span collection elements and/or map keys or values, which can result in multiple matches per record of the specified start type. 
+     * @param selectField The query will select records at this field (specify "" to select the specified type).
+     * The selectField may span collection elements and/or map keys or values, which can result in multiple matches per record of the specified start type.
      * @param matchFields The query will match on the specified match fields.  The match fields may span collection elements and/or map keys or values.
      */
     public HollowHashIndex(HollowReadStateEngine stateEngine, String type, String selectField, String... matchFields) {
-        HollowHashIndexBuilder builder = new HollowHashIndexBuilder(stateEngine, type, selectField, matchFields);
+        this.stateEngine = stateEngine;
+        this.type = type;
+        this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(type);
+        this.selectField = selectField;
+        this.matchFields = matchFields;
         
-        builder.buildIndex();
-        
-        this.matchHashTable = builder.getFinalMatchHashTable();
-        this.selectHashArray = builder.getFinalSelectHashArray();
-        this.matchFields = builder.getMatchFields();
-        this.matchHashMask = (int)builder.getFinalMatchHashMask();
-        this.bitsPerMatchHashKey = builder.getBitsPerMatchHashKey();
-        this.bitsPerMatchHashEntry = builder.getFinalBitsPerMatchHashEntry();
-        this.bitsPerTraverserField = builder.getBitsPerTraverserField();
-        this.offsetPerTraverserField = builder.getOffsetPerTraverserField();
-        this.bitsPerSelectTableSize = builder.getFinalBitsPerSelectTableSize();
-        this.bitsPerSelectTablePointer = builder.getFinalBitsPerSelectTablePointer();
-        this.bitsPerSelectHashEntry = builder.getBitsPerSelectHashEntry();
-        
+        reindexHashIndex();
     }
+
+    /**
+     * Recreate the hash index entirely
+     */
+    private void reindexHashIndex() {
+        HollowHashIndexBuilder builder = new HollowHashIndexBuilder(stateEngine, type, selectField, matchFields);
+
+        builder.buildIndex();
+
+        HollowHashIndexState hollowHashIndexState = new HollowHashIndexState(builder);
+        this.hashState = hollowHashIndexState;
+        this.hashStateVolatile = hollowHashIndexState;
+    }
+
 
     /**
      * Query the index.  The returned {@link HollowHashIndexResult} will be null if no matches were found.  Otherwise, may be used
@@ -91,29 +90,33 @@ public class HollowHashIndex {
         }
 
         //System.out.println("QUERY HASH: " + hashCode);
+        HollowHashIndexResult result;
+        do {
+            result = null;
+            long bucket = hashCode & hashState.getMatchHashMask();
+            long hashBucketBit = bucket * hashState.getBitsPerMatchHashEntry();
+            boolean bucketIsEmpty = hashState.getMatchHashTable().getElementValue(hashBucketBit, hashState.getBitsPerTraverserField()[0]) == 0;
 
-        long bucket = hashCode & matchHashMask;
-        long hashBucketBit = bucket * bitsPerMatchHashEntry;
-        boolean bucketIsEmpty = matchHashTable.getElementValue(hashBucketBit, bitsPerTraverserField[0]) == 0;
+            while (!bucketIsEmpty) {
+                if (matchIsEqual(hashState.getMatchHashTable(), hashBucketBit, query)) {
+                    int selectSize = (int) hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey(), hashState.getBitsPerSelectTableSize());
+                    long selectBucketPointer = hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey() + hashState.getBitsPerSelectTableSize(), hashState.getBitsPerSelectTablePointer());
 
-        while(!bucketIsEmpty) {
-            if(matchIsEqual(matchHashTable, hashBucketBit, query)) {
-                int selectSize = (int) matchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey, bitsPerSelectTableSize);
-                long selectBucketPointer = matchHashTable.getElementValue(hashBucketBit + bitsPerMatchHashKey + bitsPerSelectTableSize, bitsPerSelectTablePointer);
+                    result = new HollowHashIndexResult(this.hashState, selectBucketPointer, selectSize);
+                    break;
+                }
 
-                return new HollowHashIndexResult(this, selectBucketPointer, selectSize);
+                bucket = (bucket + 1) & hashState.getMatchHashMask();
+                hashBucketBit = (long) bucket * hashState.getBitsPerMatchHashEntry();
+                bucketIsEmpty = hashState.getMatchHashTable().getElementValue(hashBucketBit, hashState.getBitsPerTraverserField()[0]) == 0;
             }
+        } while (hashState != hashStateVolatile);
 
-            bucket = (bucket + 1) & matchHashMask;
-            hashBucketBit = (long)bucket * bitsPerMatchHashEntry;
-            bucketIsEmpty = matchHashTable.getElementValue(hashBucketBit, bitsPerTraverserField[0]) == 0;
-        }
-
-        return null;
+        return result;
     }
 
     private int keyHashCode(Object key, int fieldIdx) {
-        switch(matchFields[fieldIdx].getFieldType()) {
+        switch(hashState.getMatchFields()[fieldIdx].getFieldType()) {
         case BOOLEAN:
             return HollowReadFieldUtils.booleanHashCode((Boolean)key);
         case DOUBLE:
@@ -132,13 +135,13 @@ public class HollowHashIndex {
             return HashCodes.hashCode((String)key);
         }
 
-        throw new IllegalArgumentException("I don't know how to hash a " + matchFields[fieldIdx].getFieldType());
+        throw new IllegalArgumentException("I don't know how to hash a " + hashState.getMatchFields()[fieldIdx].getFieldType());
     }
 
     private boolean matchIsEqual(FixedLengthElementArray matchHashTable, long hashBucketBit, Object[] query) {
-        for(int i=0;i<matchFields.length;i++) {
-            HollowHashIndexField field = matchFields[i];
-            int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
+        for(int i = 0; i< hashState.getMatchFields().length; i++) {
+            HollowHashIndexField field = hashState.getMatchFields()[i];
+            int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + hashState.getOffsetPerTraverserField()[field.getBaseIteratorFieldIdx()], hashState.getBitsPerTraverserField()[field.getBaseIteratorFieldIdx()]) - 1;
 
             HollowTypeReadState readState = field.getBaseDataAccess();
             int fieldPath[] = field.getSchemaFieldPositionPath();
@@ -161,5 +164,113 @@ public class HollowHashIndex {
         }
 
         return true;
+    }
+
+    /**
+     * Once called, this HollowHashIndex will be kept up-to-date when deltas are applied to the indexed state engine.
+     * <p>
+     * This method should be called <b>before</b> any subsequent deltas occur after the index is created.
+     * <p>
+     * In order to prevent memory leaks, if this method is called and the index is no longer needed, call detachFromDeltaUpdates() before
+     * discarding the index.
+     */
+    public void listenForDeltaUpdates() {
+        typeState.addListener(this);
+    }
+
+    /**
+     * Once called, this HollowHashIndex will no longer be kept up-to-date when deltas are applied to the indexed state engine.
+     * <p>
+     * Call this method before discarding indexes which are currently listening for delta updates.
+     */
+    public void detachFromDeltaUpdates() {
+        typeState.removeListener(this);
+    }
+
+    @Override
+    public void beginUpdate() { }
+
+    @Override
+    public void addedOrdinal(int ordinal) { }
+
+    @Override
+    public void removedOrdinal(int ordinal) { }
+
+    @Override
+    public void endUpdate() {
+       reindexHashIndex();
+    }
+
+    protected static class HollowHashIndexState {
+
+        final FixedLengthElementArray selectHashArray;
+        final int bitsPerSelectHashEntry;
+        private final FixedLengthElementArray matchHashTable;
+        private final HollowHashIndexField[] matchFields;
+        private final int matchHashMask;
+        private final int bitsPerMatchHashKey;
+        private final int bitsPerMatchHashEntry;
+        private final int[] bitsPerTraverserField;
+        private final int[] offsetPerTraverserField;
+        private final int bitsPerSelectTableSize;
+        private final int bitsPerSelectTablePointer;
+
+        public HollowHashIndexState(HollowHashIndexBuilder builder) {
+            matchHashTable = builder.getFinalMatchHashTable();
+            selectHashArray = builder.getFinalSelectHashArray();
+            matchFields = builder.getMatchFields();
+            matchHashMask = (int) builder.getFinalMatchHashMask();
+            bitsPerMatchHashKey = builder.getBitsPerMatchHashKey();
+            bitsPerMatchHashEntry = builder.getFinalBitsPerMatchHashEntry();
+            bitsPerTraverserField = builder.getBitsPerTraverserField();
+            offsetPerTraverserField = builder.getOffsetPerTraverserField();
+            bitsPerSelectTableSize = builder.getFinalBitsPerSelectTableSize();
+            bitsPerSelectTablePointer = builder.getFinalBitsPerSelectTablePointer();
+            bitsPerSelectHashEntry = builder.getBitsPerSelectHashEntry();
+        }
+
+        public FixedLengthElementArray getSelectHashArray() {
+            return selectHashArray;
+        }
+
+        public int getBitsPerSelectHashEntry() {
+            return bitsPerSelectHashEntry;
+        }
+
+        public FixedLengthElementArray getMatchHashTable() {
+            return matchHashTable;
+        }
+
+        public HollowHashIndexField[] getMatchFields() {
+            return matchFields;
+        }
+
+        public int getMatchHashMask() {
+            return matchHashMask;
+        }
+
+        public int getBitsPerMatchHashKey() {
+            return bitsPerMatchHashKey;
+        }
+
+        public int getBitsPerMatchHashEntry() {
+            return bitsPerMatchHashEntry;
+        }
+
+        public int[] getBitsPerTraverserField() {
+            return bitsPerTraverserField;
+        }
+
+        public int[] getOffsetPerTraverserField() {
+            return offsetPerTraverserField;
+        }
+
+        public int getBitsPerSelectTableSize() {
+            return bitsPerSelectTableSize;
+        }
+
+        public int getBitsPerSelectTablePointer() {
+            return bitsPerSelectTablePointer;
+        }
     }
 }
