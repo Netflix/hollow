@@ -88,7 +88,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
         this.readStateEngine = readStateEngine;
         this.type = type;
-        this.fieldPath = new FieldPath(readStateEngine, type, fieldPath, HollowObjectSchema.FieldType.INT);
+        this.fieldPath = new FieldPath(readStateEngine, type, fieldPath);
         this.predicate = predicate;
         this.valuesToSet = new HashSet<>();
         this.valuesToClear = new HashSet<>();
@@ -104,7 +104,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             // check predicate
             if (predicate.shouldIndex(ordinal)) {
                 // get integer values
-                Object[] values = fieldPath.findValuesFollowingPath(ordinal);
+                Object[] values = fieldPath.findValues(ordinal);
                 if (values != null && values.length > 0) {
                     for (Object value : values) {
                         if (!set.get((int) value)) set.set((int) value);
@@ -200,7 +200,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     @Override
     public void addedOrdinal(int ordinal) {
         if (predicate.shouldIndex(ordinal)) {
-            Object[] values = fieldPath.findValuesFollowingPath(ordinal);
+            Object[] values = fieldPath.findValues(ordinal);
             for (Object value : values) {
                 valuesToSet.add((int) value);
                 if (maxValueToSet < (int) value) maxValueToSet = (int) value;
@@ -210,7 +210,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     @Override
     public void removedOrdinal(int ordinal) {
-        Object[] values = fieldPath.findValuesFollowingPath(ordinal);
+        Object[] values = fieldPath.findValues(ordinal);
         for (Object value : values)
             valuesToClear.add((int) value);
     }

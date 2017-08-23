@@ -71,7 +71,9 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         this.readStateEngine = readStateEngine;
         this.type = type;
-        this.fieldPath = new FieldPath(readStateEngine, type, fieldPath, HollowObjectSchema.FieldType.STRING);
+        this.fieldPath = new FieldPath(readStateEngine, type, fieldPath);
+        if (!this.fieldPath.getLastFieldType().equals(HollowObjectSchema.FieldType.STRING))
+            throw new IllegalArgumentException("Field path should lead to a string type");
 
         // create memory recycle for using shared memory pools.
         memoryRecycle = WastefulRecycler.DEFAULT_INSTANCE;
@@ -155,7 +157,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @return keys to index.
      */
     protected String[] getKeys(int ordinal) {
-        Object[] values = fieldPath.findValuesFollowingPath(ordinal);
+        Object[] values = fieldPath.findValues(ordinal);
         String[] stringValues = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             stringValues[i] = ((String) values[i]).toLowerCase();
