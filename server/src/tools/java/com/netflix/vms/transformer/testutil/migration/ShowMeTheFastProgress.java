@@ -3,15 +3,24 @@ package com.netflix.vms.transformer.testutil.migration;
 import com.netflix.aws.file.FileStore;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.LifecycleInjector;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
+import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
@@ -32,6 +41,9 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -219,6 +231,77 @@ public class ShowMeTheFastProgress {
         } finally {
             trackDuration(start, "loadVMSHollowInputAPI: isUseInputSlicing=%s, version=%s, topNodes=%s", isUseInputSlicing, version, toString(topNodes));
         }
+    }
+
+    @Test
+    public void debugConverterData() {
+        String workingDir = "/space/converter-data";
+        String vipName = CONVERTER_VIP_NAME;
+        long version = 20170824034503068L;
+        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, workingDir, vipName);
+        inputClient.triggerRefreshTo(version);
+
+        Map<String, Set<Long>> map = new TreeMap<>();
+        VMSHollowInputAPI api = inputClient.getAPI();
+
+        boolean isScanStreams = false;
+        if (isScanStreams) {
+            for (PackageStreamHollow stream : api.getAllPackageStreamHollow()) {
+                StreamDeploymentHollow deployment = stream._getDeployment();
+                if (deployment==null) continue;
+
+                StringHollow s3PathComponent = deployment._getS3PathComponent();
+                if (s3PathComponent == null) continue;
+
+                String path = s3PathComponent._getValue();
+                Set<Long> ids = map.get(path);
+                if (ids==null) {
+                    ids = new HashSet<>();
+                    map.put(path, ids);
+                }
+                ids.add(stream._getDownloadableIdBoxed());
+            }
+
+            int i = 1;
+            for (Map.Entry<String, Set<Long>> entry : map.entrySet()) {
+                System.out.println(String.format("%d) %s = [%d] - %s", i++, entry.getKey(), entry.getValue().size(), entry.getValue()));
+            }
+            // FOUND: Celeste Holm (1961-1996) = [2] - [572674263, 572672107]
+        }
+    }
+
+    public void debug() {
+        long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
+
+        String workingDir = "/space/converter-data/new";
+        String vipName = CONVERTER_VIP_NAME;
+        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, workingDir, vipName);
+        for (long version : versions) {
+            inputClient.triggerRefreshTo(version);
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(inputClient.getStateEngine(), "PackageStream", "downloadableId");
+            int ordinal = index.getMatchingOrdinal(572674263L);
+
+            VMSHollowInputAPI api = inputClient.getAPI();
+            PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
+            if (stream._getDeployment()._getS3PathComponent() != null) {
+                System.out.println(String.format("version={}, dId={}, deployment=", version, stream._getDownloadableId(), new HollowRecordStringifier().stringify(stream._getDeployment())));
+            }
+        }
+    }
+
+    @Test
+    public void testConverter() throws Exception {
+        long version = 20170824030803390L;
+        long toVersion = 20170824034503068L;
+
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).build();
+        consumer.triggerRefreshTo(version);
+        HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
+        historyUI.start();
+        //consumer.triggerRefresh();
+        consumer.triggerRefreshTo(toVersion);
+        historyUI.join();
     }
 
     private HollowReadStateEngine roundTripOutputStateEngine(HollowWriteStateEngine stateEngine) throws IOException {
