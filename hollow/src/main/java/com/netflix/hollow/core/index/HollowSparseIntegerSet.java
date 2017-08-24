@@ -103,17 +103,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         BitSet typeBitSet = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = typeBitSet.nextSetBit(0);
         while (ordinal != -1) {
-            // check predicate
-            if (predicate.shouldIndex(ordinal)) {
-                // get integer values
-                Object[] values = fieldPath.findValues(ordinal);
-                if (values != null && values.length > 0) {
-                    for (Object value : values) {
-                        set((int) value);
-                    }
-
-                }
-            }
+            set(ordinal);
             ordinal = typeBitSet.nextSetBit(ordinal + 1);
         }
 
@@ -126,9 +116,17 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         sparseBitSetVolatile = sparseBitSet;
     }
 
-    protected void set(int value) {
-        if (!sparseBitSet.get(value)) sparseBitSet.set(value);
-        else handleDuplicate(value);
+    protected void set(int ordinal) {
+        if (predicate.shouldIndex(ordinal)) {
+            Object[] values = fieldPath.findValues(ordinal);
+            if (values != null && values.length > 0) {
+                for (Object value : values) {
+                    if (!sparseBitSet.get((int) value)) sparseBitSet.set((int) value);
+                    else handleDuplicate((int) value);
+                }
+            }
+
+        }
     }
 
     protected void compact() {
@@ -324,9 +322,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         }
 
         boolean get(int i) {
-            if (i > maxValue)
-                throw new IllegalArgumentException("Max value initialized is " + maxValue + " given value is " + i);
-            if (i < 0) return false;
+            if (i > maxValue || i < 0)
+                return false;
 
             int index = getIndex(i);
             long longAtIndex = indices[index];
