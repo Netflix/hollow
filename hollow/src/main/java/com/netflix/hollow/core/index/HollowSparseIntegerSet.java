@@ -21,19 +21,14 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.logging.Logger;
 
 /**
  * Create hollow integer set for sparse non-negative & unique integer values referenced by fieldPath in a type based on a predicate.
  */
 public class HollowSparseIntegerSet implements HollowTypeStateListener {
-
-    private final static Logger log = Logger.getLogger(HollowSparseIntegerSet.class.getName());
 
     private final HollowReadStateEngine readStateEngine;
     private final String type;
@@ -45,7 +40,6 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     private Set<Integer> valuesToSet;
     private Set<Integer> valuesToClear;
-    private Map<Integer, Integer> duplicateValues;
     private int maxValueToSet;
 
     public interface IndexPredicate {
@@ -122,11 +116,9 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             Object[] values = fieldPath.findValues(ordinal);
             if (values != null && values.length > 0) {
                 for (Object value : values) {
-                    if (!sparseBitSet.get((int) value)) sparseBitSet.set((int) value);
-                    else handleDuplicate((int) value);
+                    sparseBitSet.set((int) value);
                 }
             }
-
         }
     }
 
@@ -136,15 +128,6 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         sparseBitSetVolatile = compactedSet;
     }
 
-    // although duplicates are not supported, adding a support to log and maintain a small map to handle rare cases.
-    protected void handleDuplicate(int value) {
-        if (duplicateValues == null) duplicateValues = new HashMap<>(16, 0.75f);
-        if (!duplicateValues.containsKey(value)) duplicateValues.put(value, 0);
-
-        int count = duplicateValues.get(value);
-        duplicateValues.put(value, ++count);
-        log.warning("Found duplicate value :" + value + " with duplicate count : " + count + ". This index is best used with unique values.");
-    }
 
     /**
      * Check if the given value is contained in the set (or if the given value satisfies the predicate condition.)
@@ -242,23 +225,12 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
         // when applying delta, check for duplicates, increment counts if duplicate values are found else set them
         for (int value : valuesToSet) {
-            if (updated.get(value)) handleDuplicate(value);
-            else updated.set(value);
+            updated.set(value);
         }
 
         // first clear all the values that are meant to be cleared
         for (int value : valuesToClear) {
-            if (duplicateValues != null && duplicateValues.containsKey(value)) {
-                int count = duplicateValues.get(value);
-                count--;
-                if (count <= 1) {
-                    duplicateValues.remove(value);
-                    updated.clear(value);
-                }
-            } else {
-                updated.clear(value);
-            }
-
+            updated.clear(value);
         }
 
 
