@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HollowAPIGeneratorTest {
-    private String baseDir = "/tmp/HollowAPIGeneratorTest";
+    private String baseDir = System.getProperty("java.io.tmpdir");
 
     @Before
     public void setUp() throws IOException {}
@@ -23,6 +23,7 @@ public class HollowAPIGeneratorTest {
         // Setup Folders
         String packageName = "booleanfieldergo";
         String srcDir = String.format("%s/%s/src/", baseDir, packageName);
+        System.out.println("Generated Source under: " + srcDir);
         HollowCodeGenerationCompileUtil.cleanupFolder(new File(srcDir), null);
 
         // Init ObjectMapper 
@@ -47,6 +48,7 @@ public class HollowAPIGeneratorTest {
     static class Movie {
         int id;
         boolean playable;
+        boolean value;
         boolean isAction;
         Boolean hasSubtitles;
     }

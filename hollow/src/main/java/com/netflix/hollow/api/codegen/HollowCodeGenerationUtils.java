@@ -300,7 +300,7 @@ public class HollowCodeGenerationUtils {
 
     private static final Set<String> booleanMethodPrefixes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
             "is", "has", "do", "should", "was", "contains", "enable", "disable", "get")));
-    public static Set<String> getBooleanMethodPrefixes() { return Collections.unmodifiableSet(booleanMethodPrefixes); }
+    public static Set<String> getBooleanMethodPrefixes() { return booleanMethodPrefixes; }
 
     /**
      * Rules: prepend "get" / "is" + upper case first char of field name
