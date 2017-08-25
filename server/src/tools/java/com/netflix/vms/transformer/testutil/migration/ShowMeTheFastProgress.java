@@ -10,7 +10,7 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.explorer.ui.jetty.HollowExplorerUIServer;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
@@ -291,17 +291,55 @@ public class ShowMeTheFastProgress {
 
     @Test
     public void testConverter() throws Exception {
+        //        long version = 20170824030803390L;
+        //        long toVersion = 20170824034503068L;
+        long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
+
+        int ordinal = 54076780;
+
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+
+        for (long version : versions) {
+            System.out.println("Refreshing to version=" + version);
+            consumer.triggerRefreshTo(version);
+            VMSHollowInputAPI api = (VMSHollowInputAPI) consumer.getAPI();
+
+            StringHollow hStrAt0 = api.getStringHollow(0);
+            System.out.println("\t StringHollow @ ordinal==0 - " + (hStrAt0 == null ? null : hStrAt0._getValue()));
+            PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
+            StreamDeploymentHollow deployment = stream._getDeployment();
+            if (deployment._getS3FullPath() != null) {
+                StringHollow hStr = deployment._getS3FullPath();
+                System.out.println(String.format("\t s3FullPath=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
+            }
+
+            if (deployment._getS3PathComponent() != null) {
+                StringHollow hStr = deployment._getS3PathComponent();
+                System.out.println(String.format("\t s3PathComponent=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
+            }
+        }
+
+        //        HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
+        //        historyUI.start();
+        //        consumer.triggerRefresh();
+        //        consumer.triggerRefreshTo(toVersion);
+        //        historyUI.join();
+    }
+
+    @Test
+    public void testConverterWithExplorer() throws Exception {
         long version = 20170824030803390L;
         long toVersion = 20170824034503068L;
 
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).build();
         consumer.triggerRefreshTo(version);
-        HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
-        historyUI.start();
+        HollowExplorerUIServer uiServer = new HollowExplorerUIServer(consumer, 7777);
+        uiServer.start();
         //consumer.triggerRefresh();
         consumer.triggerRefreshTo(toVersion);
-        historyUI.join();
+        uiServer.join();
     }
 
     private HollowReadStateEngine roundTripOutputStateEngine(HollowWriteStateEngine stateEngine) throws IOException {
