@@ -1569,7 +1569,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -1886,7 +1886,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -1964,9 +1964,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -2654,7 +2660,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -3455,7 +3461,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -5043,7 +5048,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -5360,7 +5365,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -5438,9 +5443,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -6128,7 +6139,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -6929,7 +6940,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -8517,7 +8527,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -8834,7 +8844,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -8912,9 +8922,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -9602,7 +9618,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -10403,7 +10419,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -11991,7 +12006,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -12308,7 +12323,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -12386,9 +12401,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -13076,7 +13097,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -13877,7 +13898,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -15600,7 +15620,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -15917,7 +15937,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -15995,9 +16015,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -16685,7 +16711,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -17486,7 +17512,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -19074,7 +19099,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -19391,7 +19416,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -19469,9 +19494,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -20160,7 +20191,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -20964,7 +20995,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -22552,7 +22582,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -22869,7 +22899,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -22947,9 +22977,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -23638,7 +23674,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -24442,7 +24478,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -26030,7 +26065,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -26347,7 +26382,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -26425,9 +26460,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -27116,7 +27157,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -27920,7 +27961,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
@@ -29508,7 +29548,7 @@
             ]
         },
         "com.sun.xml.bind:jaxb-impl": {
-            "locked": "2.2.4",
+            "locked": "2.2.3-1",
             "transitive": [
                 "com.sun.jersey:jersey-json",
                 "netflix:playback-monkey-model"
@@ -29825,7 +29865,7 @@
             ]
         },
         "javax.activation:activation": {
-            "locked": "1.1.1",
+            "locked": "1.1",
             "transitive": [
                 "javax.xml.bind:jaxb-api"
             ]
@@ -29903,9 +29943,15 @@
             ]
         },
         "javax.xml.bind:jaxb-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.sun.xml.bind:jaxb-impl"
+            ]
+        },
+        "javax.xml.stream:stax-api": {
+            "locked": "1.0-2",
+            "transitive": [
+                "javax.xml.bind:jaxb-api"
             ]
         },
         "jdom:jdom": {
@@ -30594,7 +30640,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.69",
+            "locked": "2.70",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -31398,7 +31444,6 @@
         "stax:stax-api": {
             "locked": "1.0.1",
             "transitive": [
-                "javax.xml.bind:jaxb-api",
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
             ]
