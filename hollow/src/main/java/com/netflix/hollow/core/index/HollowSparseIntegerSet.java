@@ -19,21 +19,16 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * Create hollow integer set for sparse non-negative & unique integer values referenced by fieldPath in a type based on a predicate.
  */
 public class HollowSparseIntegerSet implements HollowTypeStateListener {
-
-    private final static Logger log = Logger.getLogger(HollowSparseIntegerSet.class.getName());
 
     private final HollowReadStateEngine readStateEngine;
     private final String type;
@@ -45,7 +40,6 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     private Set<Integer> valuesToSet;
     private Set<Integer> valuesToClear;
-    private Map<Integer, Integer> duplicateValues;
     private int maxValueToSet;
 
     public interface IndexPredicate {
@@ -97,39 +91,43 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     protected synchronized void build() {
 
-        SparseBitSet set = new SparseBitSet(Integer.MAX_VALUE);
+        // initialize an instance of SparseBitSet
+        initSet(Integer.MAX_VALUE);
+
+        // iterate through all populated ordinals for the type to set the values based on predicate
         BitSet typeBitSet = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = typeBitSet.nextSetBit(0);
         while (ordinal != -1) {
-            // check predicate
-            if (predicate.shouldIndex(ordinal)) {
-                // get integer values
-                Object[] values = fieldPath.findValues(ordinal);
-                if (values != null && values.length > 0) {
-                    for (Object value : values) {
-                        if (!set.get((int) value)) set.set((int) value);
-                        else handleDuplicate((int) value);
-                    }
-
-                }
-            }
+            set(ordinal);
             ordinal = typeBitSet.nextSetBit(ordinal + 1);
         }
-        SparseBitSet compactedSet = SparseBitSet.compact(set);
 
+        // run compaction
+        compact();
+    }
+
+    protected void initSet(int maxValue) {
+        sparseBitSet = new SparseBitSet(maxValue);
+        sparseBitSetVolatile = sparseBitSet;
+    }
+
+    protected void set(int ordinal) {
+        if (predicate.shouldIndex(ordinal)) {
+            Object[] values = fieldPath.findValues(ordinal);
+            if (values != null && values.length > 0) {
+                for (Object value : values) {
+                    sparseBitSet.set((int) value);
+                }
+            }
+        }
+    }
+
+    protected void compact() {
+        SparseBitSet compactedSet = SparseBitSet.compact(sparseBitSet);
         sparseBitSet = compactedSet;
         sparseBitSetVolatile = compactedSet;
     }
 
-    // although duplicates are not supported, adding a support to log and maintain a small map to handle rare cases.
-    protected void handleDuplicate(int value) {
-        if (duplicateValues == null) duplicateValues = new HashMap<>(16, 0.75f);
-        if (!duplicateValues.containsKey(value)) duplicateValues.put(value, 0);
-
-        int count = duplicateValues.get(value);
-        duplicateValues.put(value, ++count);
-        log.warning("Found duplicate value :" + value + " with duplicate count : " + count + ". This index is best used with unique values.");
-    }
 
     /**
      * Check if the given value is contained in the set (or if the given value satisfies the predicate condition.)
@@ -227,23 +225,12 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
         // when applying delta, check for duplicates, increment counts if duplicate values are found else set them
         for (int value : valuesToSet) {
-            if (updated.get(value)) handleDuplicate(value);
-            else updated.set(value);
+            updated.set(value);
         }
 
         // first clear all the values that are meant to be cleared
         for (int value : valuesToClear) {
-            if (duplicateValues != null && duplicateValues.containsKey(value)) {
-                int count = duplicateValues.get(value);
-                count--;
-                if (count <= 1) {
-                    duplicateValues.remove(value);
-                    updated.clear(value);
-                }
-            } else {
-                updated.clear(value);
-            }
-
+            updated.clear(value);
         }
 
 
@@ -260,33 +247,39 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * - smaller sizes of BitSet are not useful, since null references are themselves 64/32 bit references.
      * - larger sizes of BitSet for truly sparse integers, has overhead of too many zeroes in one BitSet.
      * <p>
-     * The idea is to only store longs in buckets that have non-zero values where bucket sizes are longs. Bucket size of 64 longs are convenient when using mod operations.
+     * The idea is to only store longs in bb that have non-zero values where bucket sizes are longs. Bucket size of 64 longs are convenient when using mod operations.
      * <p>
      * Each bit in long value in indices array, indicates if a long value is initialized. 64 bits would point to 64 long values ( 1 bucket ).
      * Each bucket could contain 1-64 longs, we only hold non-zero long values in bucket.
      */
     static class SparseBitSet {
 
-        // shift used to determine which bucket and index
+        // shift used to determine which bucket
         private static final int BUCKET_SHIFT = 12;
         // shift used to determine which Long value to use in bucket.
         private static final int LONG_SHIFT = 6;
 
         private final int maxValue;
-        private final long[] indices;
-        private final long[][] buckets;
+        private final AtomicReferenceArray<Bucket> buckets;
 
-        SparseBitSet(int maxValue) {
-            this.maxValue = maxValue;
+        private static class Bucket {
+            private long idx;
+            private long[] longs;
 
-            int totalBuckets = maxValue >>> BUCKET_SHIFT;
-            indices = new long[totalBuckets + 1];
-            buckets = new long[totalBuckets + 1][];
+            private Bucket(long idx, long[] longs) {
+                this.idx = idx;
+                this.longs = longs;
+            }
         }
 
-        private SparseBitSet(int maxValue, long[] indices, long[][] buckets) {
+        SparseBitSet(int maxValue) {
+            int totalBuckets = maxValue >>> BUCKET_SHIFT;
             this.maxValue = maxValue;
-            this.indices = indices;
+            this.buckets = new AtomicReferenceArray<Bucket>(totalBuckets + 1);
+        }
+
+        private SparseBitSet(int maxValue, AtomicReferenceArray<Bucket> buckets) {
+            this.maxValue = maxValue;
             this.buckets = buckets;
         }
 
@@ -295,164 +288,194 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             return i >>> BUCKET_SHIFT;
         }
 
-        // This method returns the number of Longs initialized from LSB to the given bitInIndex.
-        // example if longAtIndex (64 bits) 00...1001 and bitInIndex (3) 000...100
-        // this method will return 1 since only one bit is set in index bits from left side to bitInIndex.
+
+        /**
+         * This method returns the number of Longs initialized from LSB to the given bitInIndex.
+         * For example longAtIndex (64 bits) = 00...1001 and bitInIndex (3rd bit is set) 000...100
+         * then this method will return 1 since only one bit is set in longAtIndex to the right of bitInIndex
+         *
+         * @param longAtIndex
+         * @param bitInIndex
+         * @return
+         */
         private static int getOffset(long longAtIndex, long bitInIndex) {
-            // set all bits to one before
-            // example : 000... 100 will become 000...011
+            // set all bits to one before the bit that is set in bitInIndex
+            // example : 000...0100 will become 000...011
             long setAllOnesBeforeBitInIndex = bitInIndex - 1;
             long offset = (longAtIndex & setAllOnesBeforeBitInIndex);
-            // count of one's set in index to right of bitInIndex -> indicating which long to use in buckets
             return Long.bitCount(offset);
         }
 
         boolean get(int i) {
-            if (i > maxValue)
-                throw new IllegalArgumentException("Max value initialized is " + maxValue + " given value is " + i);
-            if (i < 0) return false;
+            if (i > maxValue || i < 0)
+                return false;
 
             int index = getIndex(i);
-            long longAtIndex = indices[index];
+            Bucket currentBucket = buckets.get(index);
+            if (currentBucket == null) return false;
 
-            // find which bit in index will point to the long in buckets
+            long currentLongAtIndex = currentBucket.idx;
+            long[] longs = currentBucket.longs;
+
+            // find which bit in index will point to the long in bb
             long whichLong = i >>> LONG_SHIFT;
             long bitInIndex = 1L << whichLong;// whichLong % 64
 
-            long isLongInitialized = (longAtIndex & bitInIndex);
+            long isLongInitialized = (currentLongAtIndex & bitInIndex);
             if (isLongInitialized == 0) return false;
 
-            int offset = getOffset(longAtIndex, bitInIndex);
-            long value = buckets[index][offset];
+            int offset = getOffset(currentLongAtIndex, bitInIndex);
+            long value = longs[offset];
             long whichBitInLong = 1L << i;
 
             return (value & whichBitInLong) != 0;
         }
 
+        // thread-safe
         void set(int i) {
 
             if (i > maxValue)
                 throw new IllegalArgumentException("Max value initialized is " + maxValue + " given value is " + i);
             if (i < 0) throw new IllegalArgumentException("Cannot index negative numbers");
 
+            // find which bucket
             int index = getIndex(i);
-            long longAtIndex = indices[index];
 
-            // find which bit in index will point to the long in buckets
+            // find which bit in index will point to the long in bb
             long whichLong = i >>> LONG_SHIFT;
             long bitInIndex = 1L << whichLong;// whichLong % 64
-
             long whichBitInLong = 1L << i;// i % 64
 
-            // if that bit in index is set, means a Long value is initialized to set the (i % 64)
-            boolean isLongInitialized = (longAtIndex & bitInIndex) != 0;
+            while (true) {
 
-            if (isLongInitialized) {
-                int offset = getOffset(longAtIndex, bitInIndex);
-                buckets[index][offset] |= whichBitInLong;// or preserves previous set operations in this long.
-            } else if (longAtIndex == 0) {
-                // first set that bit in index long, so that index will be > 0
-                indices[index] = bitInIndex;
-                buckets[index] = new long[]{whichBitInLong};
-            } else {
-                // update long value at index
-                indices[index] |= bitInIndex;
-                longAtIndex = indices[index];
+                long longAtIndex = 0;
+                long[] longs = null;
 
-                // find offset
-                int offset = getOffset(longAtIndex, bitInIndex);
-                int totalLongsInitialized = buckets[index].length;
-
-                final long[] oldLongs = buckets[index];
-                long[] newLongs = new long[totalLongsInitialized + 1];
-
-                // if offset is 2 means 3 longs are needed starting from 0
-                // if current longs length is 2 (0,1) then append third long at end
-                // if current longs length is greater than offset, then insert long 0 -> (offset - 1), new long, offset to (length -1)
-                if (offset >= totalLongsInitialized) {
-                    // append new long at end
-                    int it;
-                    for (it = 0; it < totalLongsInitialized; it++)
-                        newLongs[it] = oldLongs[it];
-                    newLongs[it] = whichBitInLong;
-                } else {
-                    // insert new long in between
-                    int it;
-                    for (it = 0; it < offset; it++)
-                        newLongs[it] = oldLongs[it];
-                    newLongs[offset] = whichBitInLong;
-                    for (it = offset; it < totalLongsInitialized; it++)
-                        newLongs[it + 1] = oldLongs[it];
+                Bucket currentBucket = buckets.get(index);
+                if (currentBucket != null) {
+                    longAtIndex = currentBucket.idx;
+                    longs = currentBucket.longs;
                 }
-                buckets[index] = newLongs;
+
+                boolean isLongInitialized = (longAtIndex & bitInIndex) != 0;
+                if (isLongInitialized) {
+
+                    // if a long value is set, the find the correct offset to determine which long in longs to use.
+                    int offset = getOffset(longAtIndex, bitInIndex);
+                    longs[offset] |= whichBitInLong;// or preserves previous set operations in this long.
+
+                } else if (longAtIndex == 0) {
+
+                    // first set that bit in idx for that bucket, and assign a new long[]
+                    longAtIndex = bitInIndex;
+                    longs = new long[]{whichBitInLong};
+
+                } else {
+
+                    // update long value at index
+                    longAtIndex |= bitInIndex;
+
+                    // find offset
+                    int offset = getOffset(longAtIndex, bitInIndex);
+
+                    int oldLongsLen = longs.length;
+                    long[] newLongs = new long[oldLongsLen + 1];
+
+                    // if offset is 2 means 3 longs are needed starting from 0
+                    // if current longs length is 2 (0,1) then append third long at end
+                    // if current longs length is greater than offset, then insert long 0 -> (offset - 1), new long, offset to (length -1)
+                    if (offset >= oldLongsLen) {
+                        // append new long at end
+                        int it;
+                        for (it = 0; it < oldLongsLen; it++)
+                            newLongs[it] = longs[it];
+                        newLongs[it] = whichBitInLong;
+                    } else {
+                        // insert new long in between
+                        int it;
+                        for (it = 0; it < offset; it++)
+                            newLongs[it] = longs[it];
+                        newLongs[offset] = whichBitInLong;
+                        for (it = offset; it < oldLongsLen; it++)
+                            newLongs[it + 1] = longs[it];
+                    }
+                    longs = newLongs;
+                }
+
+                Bucket newBucket = new Bucket(longAtIndex, longs);
+                if (buckets.compareAndSet(index, currentBucket, newBucket))
+                    break;
             }
         }
 
+        // thread-safe
         void clear(int i) {
-            if (i > maxValue)
-                throw new IllegalArgumentException("Max value initialized is " + maxValue + " given value is " + i);
-            if (i < 0) throw new IllegalArgumentException("Cannot index negative numbers");
+            if (i > maxValue || i < 0) return;
 
             int index = getIndex(i);
-            long longAtIndex = indices[index];
 
-            // find which bit in index will point to the long in buckets
-            long whichLong = i >>> LONG_SHIFT;
-            long bitInIndex = 1L << whichLong;// whichLong % 64
+            while (true) {
+                Bucket currentBucket = buckets.get(index);
+                if (currentBucket == null) return;
+                long longAtIndex = currentBucket.idx;
+                long[] longs = currentBucket.longs;
 
-            long whichBitInLong = 1L << i;// i % 64
+                // find which bit in index will point to the long in bb
+                long whichLong = i >>> LONG_SHIFT;
+                long bitInIndex = 1L << whichLong;// whichLong % 64
+                long whichBitInLong = 1L << i;// i % 64
 
-            long isLongInitialized = (longAtIndex & bitInIndex);
-            if (isLongInitialized == 0) return;
+                long isLongInitialized = (longAtIndex & bitInIndex);
+                if (isLongInitialized == 0) return;
 
-            int offset = getOffset(longAtIndex, bitInIndex);
-            long value = buckets[index][offset];
+                int offset = getOffset(longAtIndex, bitInIndex);
+                long value = longs[offset];
 
-            // unset whichBitInIndex in value
-            // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to get 00001
-            long updatedValue = value & ~whichBitInLong;
+                // unset whichBitInIndex in value
+                // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to get 00001
+                long updatedValue = value & ~whichBitInLong;
 
-            if (updatedValue != 0) {
-                buckets[index][offset] = updatedValue;
-
-            } else {
-
-                // if updatedValue is 0, then update the bucket removing that long
-
-                int totalLongsInitialized = buckets[index].length;
-                // if only one long was initialized in the bucket, then make the reference null, indexAtLong 0
-                if (totalLongsInitialized == 1) {
-                    buckets[index] = null;
-                    indices[index] = 0;
+                if (updatedValue != 0) {
+                    longs[offset] = updatedValue;
                 } else {
-                    // copy everything over, except the long at the given offset,
-                    final long[] oldLongs = buckets[index];
-                    long[] newLongs = new long[totalLongsInitialized - 1];
 
-                    int it;
-                    for (it = 0; it < offset; it++)
-                        newLongs[it] = oldLongs[it];
-                    it++;
-                    while (it < totalLongsInitialized) {
-                        newLongs[it - 1] = oldLongs[it];
+                    // if updatedValue is 0, then update the bucket removing that long
+                    int oldLongsLen = longs.length;
+                    // if only one long was initialized in the bucket, then make the reference null, indexAtLong 0
+                    if (oldLongsLen == 1) {
+                        longs = null;
+                        longAtIndex = 0;
+                    } else {
+                        // copy everything over, except the long at the given offset,
+
+                        long[] newLongs = new long[oldLongsLen - 1];
+
+                        int it;
+                        for (it = 0; it < offset; it++)
+                            newLongs[it] = longs[it];
                         it++;
+                        while (it < oldLongsLen) {
+                            newLongs[it - 1] = longs[it];
+                            it++;
+                        }
+
+                        longs = newLongs;
+                        longAtIndex &= ~bitInIndex;
                     }
-
-                    buckets[index] = newLongs;
-
-                    // and unset bit in indexAtLong to indicate that no long is initialized at that offset.
-                    longAtIndex &= ~bitInIndex;
-                    indices[index] = longAtIndex;
                 }
-            }
 
+                Bucket updatedBucket = new Bucket(longAtIndex, longs);
+                if (buckets.compareAndSet(index, currentBucket, updatedBucket))
+                    break;
+
+            }
         }
 
         int findMaxValue() {
             // find the last index that is initialized
-            int index = indices.length - 1;
+            int index = buckets.length() - 1;
             while (index >= 0) {
-                if (indices[index] != 0) break;
+                if (buckets.get(index) != null) break;
                 index--;
             }
 
@@ -460,9 +483,9 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             if (index < 0) return -1;
 
             // find the highest bit in indexAtLong to see which is last long init in bucket
-            int highestBitSetInIndexAtLong = 63 - Long.numberOfLeadingZeros(Long.highestOneBit(indices[index]));
+            int highestBitSetInIndexAtLong = 63 - Long.numberOfLeadingZeros(Long.highestOneBit(buckets.get(index).idx));
 
-            long[] longs = buckets[index];
+            long[] longs = buckets.get(index).longs;
             long value = longs[longs.length - 1];
             long highestBitSetInLong = 63 - Long.numberOfLeadingZeros(Long.highestOneBit(value));
 
@@ -472,9 +495,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         int cardinality() {
             int cardinality = 0;
             int index = 0;
-            while (index < indices.length) {
-                if (indices[index] != 0) {
-                    long[] longs = buckets[index];
+            while (index < buckets.length()) {
+
+                if (buckets.get(index) != null) {
+                    long[] longs = buckets.get(index).longs;
                     for (long value : longs)
                         cardinality += Long.bitCount(value);
                 }
@@ -484,34 +508,24 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         }
 
         long estimateBitsUsed() {
-            long bucketsUsed = 0;
-            long nullReferences = 0;
+            long longsUsed = 0;
+            long idxCounts = 0;
+
             int index = 0;
-            while (index < indices.length) {
-                if (indices[index] != 0) {
-                    bucketsUsed += buckets[index].length;
-                } else {
-                    nullReferences++;
+            while (index < buckets.length()) {
+                if (buckets.get(index) != null) {
+                    idxCounts++;
+                    longsUsed += buckets.get(index).longs.length;
                 }
                 index++;
             }
 
             // total bits used
-            // indices array
-            long bitsUsedByIndices = indices.length * 64;
-            long bitsUsedByBucketIndices = buckets.length * 64;
-            long bitsUsedByBuckets = bucketsUsed * 64;
-            long bitsUsedByNullReferences = nullReferences * 64;
+            long bitsUsedByArrayPointers = buckets.length() * 64;
+            long bitsUsedByIdx = idxCounts * 64;
+            long bitsUsedByLongs = longsUsed * 64;
 
-            return bitsUsedByIndices + bitsUsedByBucketIndices + bitsUsedByBuckets + bitsUsedByNullReferences;
-        }
-
-        private long[] getIndices() {
-            return indices;
-        }
-
-        private long[][] getBuckets() {
-            return buckets;
+            return bitsUsedByArrayPointers + bitsUsedByIdx + bitsUsedByLongs;
         }
 
         /**
@@ -528,26 +542,24 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             }
             int indexForMaxValueAdded = getIndex(maxValueAdded);
             int newLength = indexForMaxValueAdded + 1;
-            return cloneSparseBitSetWithNewLength(sparseBitSet, newLength, newLength, maxValueAdded);
+            return copyWithNewLength(sparseBitSet, newLength, newLength, maxValueAdded);
         }
 
         static SparseBitSet resize(SparseBitSet sparseBitSet, int newMaxValue) {
             if (sparseBitSet.findMaxValue() < newMaxValue) {
                 int indexForNewMaxValue = getIndex(newMaxValue);
                 int newLength = indexForNewMaxValue + 1;
-                return cloneSparseBitSetWithNewLength(sparseBitSet, newLength, sparseBitSet.getIndices().length, newMaxValue);
+                return copyWithNewLength(sparseBitSet, newLength, sparseBitSet.buckets.length(), newMaxValue);
             }
             return sparseBitSet;
         }
 
-        private static SparseBitSet cloneSparseBitSetWithNewLength(SparseBitSet sparseBitSet, int newLength, int lengthToClone, int newMaxValue) {
-            long[] compactIndices = new long[newLength];
-            System.arraycopy(sparseBitSet.getIndices(), 0, compactIndices, 0, lengthToClone);
-
-            long[][] compactBuckets = new long[newLength][];
-            System.arraycopy(sparseBitSet.getBuckets(), 0, compactBuckets, 0, lengthToClone);
-
-            return new SparseBitSet(newMaxValue, compactIndices, compactBuckets);
+        private static SparseBitSet copyWithNewLength(SparseBitSet sparseBitSet, int newLength, int lengthToClone, int newMaxValue) {
+            AtomicReferenceArray<Bucket> compactBuckets = new AtomicReferenceArray<Bucket>(newLength);
+            for (int i = 0; i < lengthToClone; i++) {
+                if (sparseBitSet.buckets.get(i) != null) compactBuckets.set(i, sparseBitSet.buckets.get(i));
+            }
+            return new SparseBitSet(newMaxValue, compactBuckets);
         }
 
     }
