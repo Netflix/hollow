@@ -497,7 +497,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -1629,6 +1629,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -2195,7 +2196,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -2660,7 +2661,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -3976,7 +3977,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -5108,6 +5109,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -5674,7 +5676,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -6139,7 +6141,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -7455,7 +7457,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -8587,6 +8589,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -9153,7 +9156,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -9618,7 +9621,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -10934,7 +10937,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -12066,6 +12069,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -12632,7 +12636,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -13097,7 +13101,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -14548,7 +14552,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -15680,6 +15684,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -16246,7 +16251,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -16711,7 +16716,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -18027,7 +18032,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -19159,6 +19164,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -19725,7 +19731,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -20191,7 +20197,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21510,7 +21516,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -22642,6 +22648,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -23208,7 +23215,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -23674,7 +23681,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -24993,7 +25000,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -26125,6 +26132,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -26691,7 +26699,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -27157,7 +27165,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -28476,7 +28484,7 @@
             ]
         },
         "com.googlecode.java-diff-utils:diffutils": {
-            "locked": "1.2.1",
+            "locked": "1.3.0",
             "transitive": [
                 "netflix:common-data-format"
             ]
@@ -29608,6 +29616,7 @@
         "commons-cli:commons-cli": {
             "locked": "1.3.1",
             "transitive": [
+                "netflix:common-data-format",
                 "netflix:nfastyanax",
                 "org.apache.cassandra:cassandra-all",
                 "org.elasticsearch:elasticsearch"
@@ -30174,7 +30183,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.1464",
+            "locked": "1.3080",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -30640,7 +30649,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.72",
+            "locked": "2.73",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
