@@ -6,12 +6,18 @@ import com.netflix.governator.LifecycleInjector;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.explorer.ui.jetty.HollowExplorerUIServer;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.SimpleTransformer;
@@ -38,7 +44,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -290,13 +299,11 @@ public class ShowMeTheFastProgress {
     }
 
     @Test
-    public void testConverter() throws Exception {
-        //        long version = 20170824030803390L;
-        //        long toVersion = 20170824034503068L;
+    public void walkthroughConverterVersions() throws Exception {
         long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
 
         int ordinal = 54076780;
-
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, true);
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
@@ -307,8 +314,16 @@ public class ShowMeTheFastProgress {
 
             StringHollow hStrAt0 = api.getStringHollow(0);
             System.out.println("\t StringHollow @ ordinal==0 - " + (hStrAt0 == null ? null : hStrAt0._getValue()));
+
+            BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+
             PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
+
             StreamDeploymentHollow deployment = stream._getDeployment();
+            System.out.println("\t DeploymentInfo ordinal=" + deployment._getDeploymentInfo().getOrdinal());
+            //            System.out.println(stringifier.stringify(stream));
+
             if (deployment._getS3FullPath() != null) {
                 StringHollow hStr = deployment._getS3FullPath();
                 System.out.println(String.format("\t s3FullPath=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
@@ -325,6 +340,137 @@ public class ShowMeTheFastProgress {
         //        consumer.triggerRefresh();
         //        consumer.triggerRefreshTo(toVersion);
         //        historyUI.join();
+    }
+
+    @Test
+    public void debugConverter() throws Exception {
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+
+        {
+            consumer.triggerRefreshTo(20170824033200595L);
+            System.out.println("\n\n---- ORIGIN ----");
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+        }
+
+        {
+            consumer.triggerRefreshTo(20170824033533733L);
+            System.out.println("\n\n---- BEFORE SUSPECIOUS UPADATE ----");
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+        }
+
+        {
+            consumer.triggerRefreshTo(20170824033754309L);
+            System.out.println("\n\n---- AFTER SUSPECIOUS UPADATE ----");
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+        }
+    }
+
+    @Test
+    public void reproduceConverterIssue() throws Exception {
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace("vmsconverter-muon");
+
+
+        HollowConsumer consumerState1 = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        Thread t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                consumerState1.triggerRefreshTo(20170824033200595L);
+            }
+        });
+        t1.start();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File("/space/converter-data/debug")).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        Thread t2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                consumer.triggerRefreshTo(20170824033200595L);
+            }
+        });
+        t2.start();
+
+        t1.join();
+        t2.join();
+
+        HollowReadStateEngine rEngine = consumer.getStateEngine();
+        HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
+
+        wEngine.prepareForWrite();
+        wEngine.prepareForNextCycle();
+
+        consumer.triggerRefreshTo(20170824033533733L);
+        HollowTypeReadState typeState = consumer.getStateEngine().getTypeState("Package");
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        BitSet previousOrdinals = typeState.getPreviousOrdinals();
+        { // Simulate Converter in removing records from state engine that are in events
+            BitSet modifiedSet = new BitSet();
+            modifiedSet.or(populatedOrdinals);
+            modifiedSet.xor(previousOrdinals);
+
+            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumer.getStateEngine().getSchema("Package")).getPrimaryKey(), consumer.getStateEngine());
+            int o = modifiedSet.nextSetBit(0);
+            List<Object[]> modifiedKeys = new ArrayList<>();
+            while (o != -1) {
+                Object[] recordKey = valDeriver.getRecordKey(o);
+                modifiedKeys.add(recordKey);
+
+                o = modifiedSet.nextSetBit(o + 1);
+            }
+
+            removeEventsData(consumerState1.getStateEngine(), wEngine, modifiedKeys);
+        }
+
+
+        { // Simulate Converter in adding events to blob
+            BitSet newDataSet = new BitSet();
+            int o = populatedOrdinals.nextSetBit(0);
+            while (o != -1) {
+                if (!previousOrdinals.get(o)) {
+                    // new records
+                    newDataSet.set(o);
+                }
+                o = populatedOrdinals.nextSetBit(o + 1);
+            }
+            // @TODO need to add the data with ordinals in newDataSet to write state engine
+        }
+
+        int badStreamDeploymentOrdinal = 2345573;
+        // @TODO then look at SteamDeployment with badStreamDeploymentOrdinal and see if it was able to reproduce issue
+    }
+
+    public void removeEventsData(HollowReadStateEngine rEngine, HollowWriteStateEngine wEngine, List<Object[]> modifiedKeys) {
+        HollowPrimaryKeyIndex coldstartIdx = new HollowPrimaryKeyIndex(rEngine, ((HollowObjectSchema) rEngine.getSchema("Package")).getPrimaryKey());
+
+        BitSet eventOverriddenTypeOrdinals = new BitSet();
+        Map<String, BitSet> ordinalsToRemove = new HashMap<>();
+        for (Object[] recKey : modifiedKeys) {
+            int ordinal = coldstartIdx.getMatchingOrdinal(recKey);
+            if (ordinal != -1)
+                eventOverriddenTypeOrdinals.set(ordinal);
+        }
+        ordinalsToRemove.put("Package", eventOverriddenTypeOrdinals);
+
+        TransitiveSetTraverser.addTransitiveMatches(rEngine, ordinalsToRemove);
+        TransitiveSetTraverser.removeReferencedOutsideClosure(rEngine, ordinalsToRemove);
+        removeOrdinalsFromThisCycle(wEngine, ordinalsToRemove);
+    }
+
+    private void removeOrdinalsFromThisCycle(HollowWriteStateEngine wEngine, Map<String, BitSet> recordsToRemove) {
+        recordsToRemove.entrySet().stream().forEach(entry -> {
+            HollowTypeWriteState typeWriteState = wEngine.getTypeState(entry.getKey());
+            int ordinal = entry.getValue().nextSetBit(0);
+            while (ordinal != -1) {
+                typeWriteState.removeOrdinalFromThisCycle(ordinal);
+                ordinal = entry.getValue().nextSetBit(ordinal + 1);
+            }
+        });
     }
 
     @Test
