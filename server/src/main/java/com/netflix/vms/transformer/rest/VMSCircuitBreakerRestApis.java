@@ -66,7 +66,7 @@ public class VMSCircuitBreakerRestApis {
 			return "[]";
 		
 		// Get the list of cycles for this vip
-		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostName, vipName);
+		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostName, vipName, 100);
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		return gson.toJson(cycles);

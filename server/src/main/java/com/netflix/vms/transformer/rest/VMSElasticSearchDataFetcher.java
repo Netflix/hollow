@@ -32,14 +32,20 @@ import com.google.gson.JsonParser;
  */
 public class VMSElasticSearchDataFetcher {
 	
-	public static List<String> getCycles(String esHostName, String vipName) {
+	public static List<String> getCycles(String esHostName, String vipName, int size) {
 		List<String> indices = getIndices(esHostName, vipName);
 		
 		// Now we will get cycles for each of these indices
+		int i = 0;
 		List<String> cycles = new ArrayList<>();
 		for(String index : indices) {
 			List<String> indexCycles = getCyclesForIndex(esHostName, index);
-			cycles.addAll(indexCycles);
+			for(String cycleId : indexCycles) {
+				cycles.add(cycleId);
+				i++;
+				if(i == size)
+					return cycles;
+			}
 		}
 		
 		return cycles;
@@ -89,17 +95,8 @@ public class VMSElasticSearchDataFetcher {
 	 * @return cycleId as a string, null if no complete cycle found
 	 */
 	public static String getLastCycle(String esHostName, String vipName) {
-		// Get list of indices for this vip
-		List<String> indices = getIndices(esHostName, vipName);
-		
-		String cycleId = null;
-		for(String index : indices) {
-			cycleId = getLastCompletedCycle(esHostName, index);
-			if(cycleId != null)
-				break;
-		}
-		
-		return cycleId;
+		List<String> cycles = getCycles(esHostName, vipName, 10);
+		return cycles.get(1);
 	}
 	
 	/**
