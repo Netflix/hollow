@@ -128,4 +128,12 @@ public class RecordCountVarianceValidatorTests {
 		consumer.triggerRefresh();
 		Assert.assertEquals(3,consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals().cardinality());
 	}
+	
+	@Test
+	public void testGetChangePercent(){
+		RecordCountVarianceValidator val = new RecordCountVarianceValidator("someType", 3.0f);
+		Assert.assertTrue((Float.compare(99.99999652463547f, val.getChangePercent(0, 28382664)) == 0));
+		Assert.assertTrue((Float.compare(99.646645f, val.getChangePercent(1, 283)) == 0));
+		
+	}
 }
