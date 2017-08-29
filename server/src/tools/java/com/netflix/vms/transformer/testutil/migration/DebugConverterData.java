@@ -10,20 +10,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.explorer.ui.jetty.HollowExplorerUIServer;
+import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
-import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
-import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,117 +32,101 @@ import java.util.TreeMap;
 import org.junit.Test;
 
 public class DebugConverterData {
-    private static final boolean isProd = false;
-
-    private static final String VIP_NAME = "feather";
     private static final String CONVERTER_VIP_NAME = "muon";
     private static final String CONVERTER_NAMESPACE = "vmsconverter-muon";
     private static final String WORKING_DIR = "/space/converter-data/debug";
-    private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
-
-
-    @Test
-    public void getLatestTransformerVersion() {
-        long version = getLatestVersion(new HollowBlobKeybaseBuilder(VIP_NAME).getSnapshotKeybase());
-        System.out.println("getLatestTransformerVersion: " + version);
-    }
-
-    @Test
-    public void getLatestConverterVersion() {
-        long version = getLatestVersion(new VMSInputDataKeybaseBuilder(CONVERTER_VIP_NAME).getSnapshotKeybase());
-        System.out.println("getLatestConverterVersion: " + version);
-    }
-
+    private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
 
     public void setup() throws Exception {
-        File workingDir = new File(WORKING_DIR);
-        if (!workingDir.exists()) workingDir.mkdirs();
+        for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT)) {
+            File workingDir = new File(folder);
+            if (!workingDir.exists()) workingDir.mkdirs();
+        }
     }
-
-    private static long getLatestVersion(String keybase) {
-        String proxyUrl = PROXY + "/filestore-version?keybase=" + keybase;
-        String version = HttpHelper.getStringResponse(proxyUrl);
-        System.out.println(String.format(">>> getLatestVersion: keybase=%s, version=%s", keybase, version));
-        return Long.parseLong(version);
-    }
-
 
     @Test
-    public void debugWithVMSInputDataClient() {
-        String workingDir = "/space/converter-data/inputdata";
+    public void debugStreamDeploymentS3PathToStreamIds() {
         long version = 20170824034503068L;
-        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, workingDir, CONVERTER_VIP_NAME);
+        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
         inputClient.triggerRefreshTo(version);
 
         Map<String, Set<Long>> map = new TreeMap<>();
         VMSHollowInputAPI api = inputClient.getAPI();
 
-        boolean isScanStreams = false;
-        if (isScanStreams) {
-            for (PackageStreamHollow stream : api.getAllPackageStreamHollow()) {
-                StreamDeploymentHollow deployment = stream._getDeployment();
-                if (deployment==null) continue;
+        for (PackageStreamHollow stream : api.getAllPackageStreamHollow()) {
+            StreamDeploymentHollow deployment = stream._getDeployment();
+            if (deployment==null) continue;
 
-                StringHollow s3PathComponent = deployment._getS3PathComponent();
-                if (s3PathComponent == null) continue;
+            StringHollow s3PathComponent = deployment._getS3PathComponent();
+            if (s3PathComponent == null) continue;
 
-                String path = s3PathComponent._getValue();
-                Set<Long> ids = map.get(path);
-                if (ids==null) {
-                    ids = new HashSet<>();
-                    map.put(path, ids);
-                }
-                ids.add(stream._getDownloadableIdBoxed());
+            String path = s3PathComponent._getValue();
+            Set<Long> ids = map.get(path);
+            if (ids==null) {
+                ids = new HashSet<>();
+                map.put(path, ids);
             }
-
-            int i = 1;
-            for (Map.Entry<String, Set<Long>> entry : map.entrySet()) {
-                System.out.println(String.format("%d) %s = [%d] - %s", i++, entry.getKey(), entry.getValue().size(), entry.getValue()));
-            }
-            // FOUND: Celeste Holm (1961-1996) = [2] - [572674263, 572672107]
+            ids.add(stream._getDownloadableIdBoxed());
         }
+
+        int i = 1;
+        for (Map.Entry<String, Set<Long>> entry : map.entrySet()) {
+            System.out.println(String.format("%d) %s = [size=%d] downloadIds=%s", i++, entry.getKey(), entry.getValue().size(), entry.getValue()));
+        }
+
+        // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
     }
 
     @Test
-    public void debugWithVMSInputDataClient_loop_Versions() {
+    public void debugVersionsWithBadPackageStream() {
         long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
 
-        String workingDir = "/space/converter-data/inputdata";
-        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, workingDir, CONVERTER_VIP_NAME);
+        // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
+        int i = 1;
+        long badDownloadableId = 572674263L; // long badDownloadableId2 = 572672107L;
+        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
         for (long version : versions) {
             inputClient.triggerRefreshTo(version);
             HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(inputClient.getStateEngine(), "PackageStream", "downloadableId");
-            int ordinal = index.getMatchingOrdinal(572674263L);
+            int ordinal = index.getMatchingOrdinal(badDownloadableId);
 
             VMSHollowInputAPI api = inputClient.getAPI();
             PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
             if (stream._getDeployment()._getS3PathComponent() != null) {
-                System.out.println(String.format("version={}, dId={}, deployment=", version, stream._getDownloadableId(), new HollowRecordStringifier().stringify(stream._getDeployment())));
+                System.out.println(String.format("%d) version=%s, dId=%s, deployment=%s", i++, version, stream._getDownloadableId(), stringifier.stringify(stream._getDeployment())));
             }
         }
+
+        /*
+         * VERSIONS:
+         * 1) version=20170824033754309, dId=572674263, deployment=(StreamDeployment) (ordinal 2345573)
+         * 2) version=20170824034009909, dId=572674263, deployment=(StreamDeployment) (ordinal 2345573)
+         * 3) version=20170824034238345, dId=572674263, deployment=(StreamDeployment) (ordinal 2345573)
+         * 4) version=20170824034503068, dId=572674263, deployment=(StreamDeployment) (ordinal 2345573)
+         */
     }
 
     @Test
-    public void testConverterWithExplorer() throws Exception {
+    public void debugConverterWithHistory() throws Exception {
         long version = 20170824030803390L;
         long toVersion = 20170824034503068L;
 
+        // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).build();
+        HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
+        historyUI.start();
         consumer.triggerRefreshTo(version);
-        HollowExplorerUIServer uiServer = new HollowExplorerUIServer(consumer, 7777);
-        uiServer.start();
-
-        //consumer.triggerRefresh();
         consumer.triggerRefreshTo(toVersion);
-        uiServer.join();
+        historyUI.join();
     }
 
     @Test
     public void walkthroughConverterVersionsWithHollowConsumer() throws Exception {
         long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
 
-        int ordinal = 54076780;
+        int badPackageStreamOrdinal = 54076780;
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
@@ -153,13 +135,10 @@ public class DebugConverterData {
             consumer.triggerRefreshTo(version);
             VMSHollowInputAPI api = (VMSHollowInputAPI) consumer.getAPI();
 
-            StringHollow hStrAt0 = api.getStringHollow(0);
-            System.out.println("\t StringHollow @ ordinal==0 - " + (hStrAt0 == null ? null : hStrAt0._getValue()));
-
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
             System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
 
-            PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
+            PackageStreamHollow stream = api.getPackageStreamHollow(badPackageStreamOrdinal);
 
             StreamDeploymentHollow deployment = stream._getDeployment();
             System.out.println("\t DeploymentInfo ordinal=" + deployment._getDeploymentInfo().getOrdinal());
@@ -175,12 +154,6 @@ public class DebugConverterData {
                 System.out.println(String.format("\t s3PathComponent=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
             }
         }
-
-        //        HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
-        //        historyUI.start();
-        //        consumer.triggerRefresh();
-        //        consumer.triggerRefreshTo(toVersion);
-        //        historyUI.join();
     }
 
     @Test
@@ -189,28 +162,41 @@ public class DebugConverterData {
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
+        // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
+        long badDownloadableId = 572674263L;
+        int fishyStreamDeploymentOrdinal = 2345573;
         {
             consumer.triggerRefreshTo(20170824033200595L);
-            System.out.println("\n\n---- ORIGIN ----");
-            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            System.out.println("\n\n---- FIRST STATE ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
-            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
+
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "PackageStream", "downloadableId");
+            int ordinal = index.getMatchingOrdinal(badDownloadableId);
+            //GenericHollowRecordHelper.instantiate(rEngine, type, ordinal);
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", ordinal));
         }
 
         {
-            consumer.triggerRefreshTo(20170824033533733L);
-            System.out.println("\n\n---- BEFORE SUSPECIOUS UPADATE ----");
-            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            consumer.triggerRefreshTo(20170824033533733L); // This state already seems to be bad since STreamDeployment ordinal is already removed
+            System.out.println("\n\n---- BEFORE SUSPECIOUS UPADATE ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
-            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
+
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "PackageStream", "downloadableId");
+            int ordinal = index.getMatchingOrdinal(badDownloadableId);
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", ordinal));
         }
 
         {
-            consumer.triggerRefreshTo(20170824033754309L);
-            System.out.println("\n\n---- AFTER SUSPECIOUS UPADATE ----");
-            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", 54076780));
+            consumer.triggerRefreshTo(20170824033754309L); // First State with S3Path = Celeste Holm (1961-1996)
+            System.out.println("\n\n---- AFTER SUSPECIOUS UPADATE ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
-            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(2345573));
+            System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
+
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "PackageStream", "downloadableId");
+            int ordinal = index.getMatchingOrdinal(badDownloadableId);
+            System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", ordinal));
         }
     }
 
@@ -218,12 +204,13 @@ public class DebugConverterData {
     public void reproduceConverterIssueSimulatingEvents() throws Exception {
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
 
-
+        long goodStateVersion = 20170824033200595L;
+        long suspeciousStateVersion = 20170824033533733L;
         HollowConsumer consumerState1 = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                consumerState1.triggerRefreshTo(20170824033200595L);
+                consumerState1.triggerRefreshTo(goodStateVersion);
             }
         });
         t1.start();
@@ -232,7 +219,7 @@ public class DebugConverterData {
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                consumer.triggerRefreshTo(20170824033200595L);
+                consumer.triggerRefreshTo(goodStateVersion);
             }
         });
         t2.start();
@@ -246,7 +233,7 @@ public class DebugConverterData {
         wEngine.prepareForWrite();
         wEngine.prepareForNextCycle();
 
-        consumer.triggerRefreshTo(20170824033533733L);
+        consumer.triggerRefreshTo(suspeciousStateVersion);
         HollowTypeReadState typeState = consumer.getStateEngine().getTypeState("Package");
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet previousOrdinals = typeState.getPreviousOrdinals();
