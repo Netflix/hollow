@@ -8,9 +8,12 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
+import com.netflix.hollow.tools.combine.HollowCombiner;
+import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
@@ -23,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -167,19 +171,18 @@ public class DebugConverterData {
         int fishyStreamDeploymentOrdinal = 2345573;
         {
             consumer.triggerRefreshTo(20170824033200595L);
-            System.out.println("\n\n---- FIRST STATE ---- version=" + consumer.getCurrentVersionId());
+            System.out.println("\n\n---- GOOD STATE ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
             System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
 
             HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "PackageStream", "downloadableId");
             int ordinal = index.getMatchingOrdinal(badDownloadableId);
-            //GenericHollowRecordHelper.instantiate(rEngine, type, ordinal);
             System.out.println(stringifier.stringify(consumer.getStateEngine(), "PackageStream", ordinal));
         }
 
         {
             consumer.triggerRefreshTo(20170824033533733L); // This state already seems to be bad since STreamDeployment ordinal is already removed
-            System.out.println("\n\n---- BEFORE SUSPECIOUS UPADATE ---- version=" + consumer.getCurrentVersionId());
+            System.out.println("\n\n---- BAD STATE with PackageStream pointing to ghost StreamDeployment  ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
             System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
 
@@ -190,7 +193,7 @@ public class DebugConverterData {
 
         {
             consumer.triggerRefreshTo(20170824033754309L); // First State with S3Path = Celeste Holm (1961-1996)
-            System.out.println("\n\n---- AFTER SUSPECIOUS UPADATE ---- version=" + consumer.getCurrentVersionId());
+            System.out.println("\n\n---- BAD STATE with PackageStream pointing to ghost StreamDeployment with bad S3PATH = Celeste Holm (1961-1996) ---- version=" + consumer.getCurrentVersionId());
             BitSet ordinals = consumer.getStateEngine().getTypeState("StreamDeployment").getPopulatedOrdinals();
             System.out.println("\t StreamDeployment ordinal 2345573 exists? " + ordinals.get(fishyStreamDeploymentOrdinal));
 
@@ -202,24 +205,25 @@ public class DebugConverterData {
 
     @Test
     public void reproduceConverterIssueSimulatingEvents() throws Exception {
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
 
         long goodStateVersion = 20170824033200595L;
         long suspeciousStateVersion = 20170824033533733L;
-        HollowConsumer consumerState1 = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        HollowConsumer consumerWithGoodState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         Thread t1 = new Thread(new Runnable() {
             @Override
             public void run() {
-                consumerState1.triggerRefreshTo(goodStateVersion);
+                consumerWithGoodState.triggerRefreshTo(goodStateVersion);
             }
         });
         t1.start();
 
-        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        HollowConsumer consumerToTransitionToBadState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                consumer.triggerRefreshTo(goodStateVersion);
+                consumerToTransitionToBadState.triggerRefreshTo(goodStateVersion);
             }
         });
         t2.start();
@@ -227,24 +231,25 @@ public class DebugConverterData {
         t1.join();
         t2.join();
 
-        HollowReadStateEngine rEngine = consumer.getStateEngine();
+        HollowReadStateEngine rEngine = consumerToTransitionToBadState.getStateEngine();
         HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
 
         wEngine.prepareForWrite();
         wEngine.prepareForNextCycle();
 
-        consumer.triggerRefreshTo(suspeciousStateVersion);
-        HollowTypeReadState typeState = consumer.getStateEngine().getTypeState("Package");
+        consumerToTransitionToBadState.triggerRefreshTo(suspeciousStateVersion);
+        HollowTypeReadState typeState = consumerToTransitionToBadState.getStateEngine().getTypeState("Package");
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet previousOrdinals = typeState.getPreviousOrdinals();
+
+        List<Object[]> modifiedKeys = new ArrayList<>();
         { // Simulate Converter in removing records from state engine that are in events
             BitSet modifiedSet = new BitSet();
             modifiedSet.or(populatedOrdinals);
             modifiedSet.xor(previousOrdinals);
 
-            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumer.getStateEngine().getSchema("Package")).getPrimaryKey(), consumer.getStateEngine());
+            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumerToTransitionToBadState.getStateEngine().getSchema("Package")).getPrimaryKey(), consumerToTransitionToBadState.getStateEngine());
             int o = modifiedSet.nextSetBit(0);
-            List<Object[]> modifiedKeys = new ArrayList<>();
             while (o != -1) {
                 Object[] recordKey = valDeriver.getRecordKey(o);
                 modifiedKeys.add(recordKey);
@@ -252,20 +257,50 @@ public class DebugConverterData {
                 o = modifiedSet.nextSetBit(o + 1);
             }
 
-            removeEventsData(consumerState1.getStateEngine(), wEngine, modifiedKeys);
+            removeEventsData(consumerWithGoodState.getStateEngine(), wEngine, modifiedKeys);
         }
 
+        System.out.println("ModifiedKeys Size=" + modifiedKeys.size());
+
+        long badDownloadableId = 572674263L;
+        {
+            HollowPrimaryKeyIndex packageStreamIndex = new HollowPrimaryKeyIndex(consumerWithGoodState.getStateEngine(), "PackageStream", "downloadableId");
+            int ordinal = packageStreamIndex.getMatchingOrdinal(badDownloadableId);
+            System.out.println("GOOD PackageStream" + stringifier.stringify(consumerWithGoodState.getStateEngine(), "PackageStream", ordinal));
+        }
 
         { // Simulate Converter in adding events to blob
-            BitSet newDataSet = new BitSet();
-            int o = populatedOrdinals.nextSetBit(0);
-            while (o != -1) {
-                if (!previousOrdinals.get(o)) {
-                    // new records
-                    newDataSet.set(o);
+            BitSet goodStateModifiedSet = new BitSet();
+            HollowPrimaryKeyIndex packageIndex = new HollowPrimaryKeyIndex(consumerWithGoodState.getStateEngine(), ((HollowObjectSchema) consumerWithGoodState.getStateEngine().getSchema("Package")).getPrimaryKey());
+            for (Object[] keys : modifiedKeys) {
+                int packageOrdinal = packageIndex.getMatchingOrdinal(keys);
+                if (packageOrdinal == -1) {
+                    System.out.println("Not found:" + Arrays.toString(keys));
+                    continue;
                 }
-                o = populatedOrdinals.nextSetBit(o + 1);
+                goodStateModifiedSet.set(packageOrdinal);
             }
+            Map<String, BitSet> ordinalsToInclude = Collections.singletonMap("Package", goodStateModifiedSet);
+            HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), wEngine, consumerWithGoodState.getStateEngine());
+            combiner.combine();
+
+            {
+                HollowReadStateEngine badReadStateEngine = StateEngineRoundTripper.roundTripSnapshot(wEngine);
+                HollowPrimaryKeyIndex packageStreamIndex = new HollowPrimaryKeyIndex(badReadStateEngine, "PackageStream", "downloadableId");
+                int ordinal = packageStreamIndex.getMatchingOrdinal(badDownloadableId);
+                System.out.println("BAD PackageStream" + stringifier.stringify(badReadStateEngine, "PackageStream", ordinal));
+            }
+
+            //            BitSet newDataSet = new BitSet();
+            //            int o = populatedOrdinals.nextSetBit(0);
+            //            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumerToTransitionToBadState.getStateEngine().getSchema("Package")).getPrimaryKey(), consumerToTransitionToBadState.getStateEngine());
+            //            while (o != -1) {
+            //                if (!previousOrdinals.get(o)) {
+            //                    // new records
+            //                    newDataSet.set(o);
+            //                }
+            //                o = populatedOrdinals.nextSetBit(o + 1);
+            //            }
             // @TODO need to add the data with ordinals in newDataSet to write state engine
         }
 
