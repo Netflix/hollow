@@ -17,6 +17,9 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -28,6 +31,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 public class RecordCountVarianceValidator implements Validator {
 	private final String typeName;
 	private final float allowableVariancePercent;
+	private final Logger log = Logger.getLogger(RecordCountVarianceValidator.class.getName());
 	
 	/**
 	 * 
@@ -48,6 +52,7 @@ public class RecordCountVarianceValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
+		log.log(Level.INFO, "Running RecordCountVarianceValidator for type "+typeName);
 		HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
 		int latestCardinality = typeState.getPopulatedOrdinals().cardinality();
 		int previousCardinality = typeState.getPreviousOrdinals().cardinality();
@@ -57,7 +62,7 @@ public class RecordCountVarianceValidator implements Validator {
 		if(previousCardinality == 0)
 			return;
 
-		float actualChangePercent = (float)(100*Math.abs(latestCardinality - previousCardinality))/previousCardinality;
+		float actualChangePercent = getChangePercent(latestCardinality, previousCardinality);
 		if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
 			throw new ValidationException("RecordCountVarianceValidator for type " + typeName
 					+ " failed. Actual variance: " + actualChangePercent + "%; Allowed variance: "
@@ -65,6 +70,12 @@ public class RecordCountVarianceValidator implements Validator {
 							+ "; current cycle record count: " + latestCardinality);
 					
 		}
+	}
+
+	float getChangePercent(int latestCardinality, int previousCardinality) {
+		int diff = Math.abs(latestCardinality - previousCardinality);
+		float changePercent = ((float)100.0* diff)/(float)previousCardinality;
+		return changePercent;
 	}
 }
 	

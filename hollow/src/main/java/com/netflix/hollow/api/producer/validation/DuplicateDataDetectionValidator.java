@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer.validation;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
@@ -36,6 +38,7 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 public class DuplicateDataDetectionValidator implements Validator {
 	String dataTypeName;
 	private String[] fieldPathNames;
+	private final Logger log = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
 	
 	/**
 	 * @param dataTypeName for which this duplicate data detection is needed.
@@ -61,6 +64,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
+		log.log(Level.INFO, "Running DuplicateDataDetectionValidator for type "+dataTypeName);
 		PrimaryKey primaryKey = getPrimaryKey(readState);
 		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(readState.getStateEngine(), primaryKey);
 		Collection<Object[]> duplicateKeys = hollowPrimaryKeyIndex.getDuplicateKeys();
