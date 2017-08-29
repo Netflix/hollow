@@ -23,12 +23,14 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
-import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
+import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
+import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
 import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.util.Set;
 
 /**
@@ -48,8 +50,9 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     private final String classPostfix;
     private final String getterPrefix;
     private final boolean useAggressiveSubstitutions;
+    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions) {
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts) {
         this.packageName = packageName;
         this.apiClassname = apiClassname;
         this.schema = schema;
@@ -59,6 +62,7 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
         this.classPostfix = classPostfix;
         this.getterPrefix = getterPrefix;
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        this.ergonomicShortcuts = ergonomicShortcuts;
     }
 
     @Override
@@ -160,17 +164,52 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     }
 
     private String generateReferenceFieldAccessor(int fieldNum) {
+        Shortcut shortcut = ergonomicShortcuts == null ? null : ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(fieldNum));
+        String fieldName = substituteInvalidChars(schema.getFieldName(fieldNum));
+
         StringBuilder builder = new StringBuilder();
 
-        String fieldName = substituteInvalidChars(schema.getFieldName(fieldNum));
+        if(shortcut != null) {
+            switch(shortcut.getType()) {
+            case BOOLEAN:
+            case DOUBLE:
+            case FLOAT:
+            case INT:
+            case LONG:
+                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append("get" + uppercase(fieldName) + "Boxed() {\n");
+                builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case BYTES:
+                builder.append("    public byte[] ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case STRING:
+                builder.append("    public String ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public boolean ").append(getterPrefix).append("is" + uppercase(fieldName) + "Equal(String testValue) {\n");
+                builder.append("        return delegate().is" + uppercase(fieldName) + "Equal(ordinal, testValue);\n");
+                builder.append("    }\n\n");
+                break;
+            default:
+            }
+        }
+
         String referencedType = schema.getReferencedType(fieldNum);
         
         boolean parameterize = parameterizeClassNames || parameterizedTypes.contains(referencedType);
 
+        String methodName = shortcut != null ? getterPrefix + "get" + uppercase(fieldName) + "HollowReference" : getterPrefix + "get" + uppercase(fieldName); 
+
         if(parameterize)
-            builder.append("    public <T> T ").append(getterPrefix).append("get"+ uppercase(fieldName) + "() {\n");
+            builder.append("    public <T> T ").append(methodName).append("() {\n");
         else
-            builder.append("    public ").append(hollowImplClassname(referencedType, classPostfix, useAggressiveSubstitutions)).append(" ").append(getterPrefix).append("get"+ uppercase(fieldName) + "() {\n");
+            builder.append("    public ").append(hollowImplClassname(referencedType, classPostfix, useAggressiveSubstitutions)).append(" ").append(methodName).append("() {\n");
 
         builder.append("        int refOrdinal = delegate().get" + uppercase(fieldName) + "Ordinal(ordinal);\n");
         builder.append("        if(refOrdinal == -1)\n");

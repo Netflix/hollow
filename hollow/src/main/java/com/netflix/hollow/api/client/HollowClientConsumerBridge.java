@@ -75,8 +75,9 @@ class HollowClientConsumerBridge {
     }
     
     static HollowConsumer.RefreshListener consumerRefreshListenerFor(final HollowUpdateListener listener) {
-        return new HollowConsumer.RefreshListener() {
             
+        return new HollowConsumer.AbstractRefreshListener() {
+
             @Override
             public void refreshStarted(long currentVersion, long requestedVersion) {
                 listener.refreshStarted(currentVersion, requestedVersion);
