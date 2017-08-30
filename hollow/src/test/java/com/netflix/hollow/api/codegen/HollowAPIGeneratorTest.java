@@ -20,13 +20,13 @@ public class HollowAPIGeneratorTest {
 
     @Test
     public void testBooleanFieldErgonimics() throws Exception {
-        // Setup Folders
+        // Setup
         String packageName = "booleanfieldergo";
         String srcDir = String.format("%s/%s/src/", baseDir, packageName);
         System.out.println("Generated Source under: " + srcDir);
         HollowCodeGenerationCompileUtil.cleanupFolder(new File(srcDir), null);
 
-        // Init ObjectMapper 
+        // Init TypeState 
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.initializeTypeState(Movie.class);
