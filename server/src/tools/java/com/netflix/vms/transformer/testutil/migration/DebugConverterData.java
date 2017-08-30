@@ -242,7 +242,7 @@ public class DebugConverterData {
                 int count = 0;
                 while (o != -1) {
                     Object[] recordKey = valDeriver.getRecordKey(o); // @PrimaryKey(packageId, movieId) (long, long)
-                    pw.format("%d,%d\n", recordKey);
+                    pw.format("%d,%d\n", recordKey[0], recordKey[1]);
                     o = modifiedSet.nextSetBit(o + 1);
                     ++count;
                 }
@@ -255,30 +255,11 @@ public class DebugConverterData {
     public void reproduceConverterIssueSimulatingEvents_step2() throws Exception {
         HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
         long goodStateVersion = 20170824033200595L;
-        long suspeciousStateVersion = 20170824033533733L;
 
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
 
         HollowConsumer consumerWithGoodState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                consumerWithGoodState.triggerRefreshTo(goodStateVersion);
-            }
-        });
-        t1.start();
-
-        HollowConsumer consumerToTransitionToBadState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                consumerToTransitionToBadState.triggerRefreshTo(suspeciousStateVersion);
-            }
-        });
-        t2.start();
-
-        t1.join();
-        t2.join();
+        consumerWithGoodState.triggerRefreshTo(goodStateVersion);
 
         List<Object[]> modifiedKeys = new ArrayList<>();
         { // Load modified keys from Step 1
@@ -295,7 +276,7 @@ public class DebugConverterData {
             System.out.println("ModifiedKeys Size=" + modifiedKeys.size());
         }
 
-        HollowReadStateEngine rEngine = consumerToTransitionToBadState.getStateEngine();
+        HollowReadStateEngine rEngine = consumerWithGoodState.getStateEngine();
         HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
 
         wEngine.prepareForWrite();
