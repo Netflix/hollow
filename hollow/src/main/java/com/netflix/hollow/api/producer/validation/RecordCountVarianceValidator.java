@@ -59,8 +59,11 @@ public class RecordCountVarianceValidator implements Validator {
 		
 		// TODO: log message indicating previous state is 0. Can happen for new name space. And also can happen 
 		// when a type gets to zero count then the validation will be skipped.  
-		if(previousCardinality == 0)
+		if(previousCardinality == 0){
+			log.log(Level.WARNING, "previousCardinality is 0. Not running RecordCountVarianceValidator for type "+typeName
+					+". This scenario is not expected except when starting a new namespace.O");
 			return;
+		}
 
 		float actualChangePercent = getChangePercent(latestCardinality, previousCardinality);
 		if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
