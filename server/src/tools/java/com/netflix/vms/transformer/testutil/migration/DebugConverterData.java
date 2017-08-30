@@ -23,6 +23,10 @@ import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -39,6 +43,7 @@ public class DebugConverterData {
     private static final String CONVERTER_VIP_NAME = "muon";
     private static final String CONVERTER_NAMESPACE = "vmsconverter-muon";
     private static final String WORKING_DIR = "/space/converter-data/debug";
+    private static final Path WORKING_PATH = Paths.get(WORKING_DIR);
     private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
 
     public void setup() throws Exception {
@@ -204,12 +209,52 @@ public class DebugConverterData {
     }
 
     @Test
-    public void reproduceConverterIssueSimulatingEvents() throws Exception {
-        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
-
+    public void reproduceConverterIssueSimulatingEvents_step1() throws Exception {
         long goodStateVersion = 20170824033200595L;
         long suspeciousStateVersion = 20170824033533733L;
+
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+
+        consumer.triggerRefreshTo(goodStateVersion);
+
+        HollowReadStateEngine rEngine = consumer.getStateEngine();
+        HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
+
+        wEngine.prepareForWrite();
+        wEngine.prepareForNextCycle();
+
+        consumer.triggerRefreshTo(suspeciousStateVersion);
+        HollowTypeReadState typeState = consumer.getStateEngine().getTypeState("Package");
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        BitSet previousOrdinals = typeState.getPreviousOrdinals();
+
+        { // Simulate Converter in removing records from state engine that are in events
+            BitSet modifiedSet = new BitSet();
+            modifiedSet.or(populatedOrdinals);
+            modifiedSet.xor(previousOrdinals);
+
+            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumer.getStateEngine().getSchema("Package")).getPrimaryKey(), consumer.getStateEngine());
+            try(PrintWriter pw = new PrintWriter(Files.newBufferedWriter(WORKING_PATH.resolve("modified-keys")))) {
+                int o = modifiedSet.nextSetBit(0);
+                while (o != -1) {
+                    Object[] recordKey = valDeriver.getRecordKey(o);
+                    pw.println(Arrays.toString(recordKey));
+                    o = modifiedSet.nextSetBit(o + 1);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void reproduceConverterIssueSimulatingEvents_step2() throws Exception {
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
+        long goodStateVersion = 20170824033200595L;
+        long suspeciousStateVersion = 20170824033533733L;
+
+        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+
         HollowConsumer consumerWithGoodState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         Thread t1 = new Thread(new Runnable() {
             @Override
