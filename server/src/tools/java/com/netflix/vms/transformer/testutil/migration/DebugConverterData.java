@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import org.junit.Test;
@@ -230,7 +231,7 @@ public class DebugConverterData {
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet previousOrdinals = typeState.getPreviousOrdinals();
 
-        { // Simulate Converter in removing records from state engine that are in events
+        { // Determine modified keys
             BitSet modifiedSet = new BitSet();
             modifiedSet.or(populatedOrdinals);
             modifiedSet.xor(previousOrdinals);
@@ -238,11 +239,14 @@ public class DebugConverterData {
             HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumer.getStateEngine().getSchema("Package")).getPrimaryKey(), consumer.getStateEngine());
             try(PrintWriter pw = new PrintWriter(Files.newBufferedWriter(WORKING_PATH.resolve("modified-keys")))) {
                 int o = modifiedSet.nextSetBit(0);
+                int count = 0;
                 while (o != -1) {
-                    Object[] recordKey = valDeriver.getRecordKey(o);
-                    pw.println(Arrays.toString(recordKey));
+                    Object[] recordKey = valDeriver.getRecordKey(o); // @PrimaryKey(packageId, movieId) (long, long)
+                    pw.format("%d,%d\n", recordKey);
                     o = modifiedSet.nextSetBit(o + 1);
+                    ++count;
                 }
+                System.out.println("ModifiedKeys Size=" + count);
             }
         }
     }
@@ -268,7 +272,7 @@ public class DebugConverterData {
         Thread t2 = new Thread(new Runnable() {
             @Override
             public void run() {
-                consumerToTransitionToBadState.triggerRefreshTo(goodStateVersion);
+                consumerToTransitionToBadState.triggerRefreshTo(suspeciousStateVersion);
             }
         });
         t2.start();
@@ -276,36 +280,30 @@ public class DebugConverterData {
         t1.join();
         t2.join();
 
+        List<Object[]> modifiedKeys = new ArrayList<>();
+        { // Load modified keys from Step 1
+            try(Scanner scanner = new Scanner(WORKING_PATH.resolve("modified-keys"))) {
+                while(scanner.hasNextLine()) {
+                    String[] s = scanner.nextLine().split(",");
+                    Long[] key = new Long[]{
+                            Long.parseLong(s[0]),
+                            Long.parseLong(s[1])
+                    };
+                    modifiedKeys.add(key);
+                }
+            }
+            System.out.println("ModifiedKeys Size=" + modifiedKeys.size());
+        }
+
         HollowReadStateEngine rEngine = consumerToTransitionToBadState.getStateEngine();
         HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
 
         wEngine.prepareForWrite();
         wEngine.prepareForNextCycle();
 
-        consumerToTransitionToBadState.triggerRefreshTo(suspeciousStateVersion);
-        HollowTypeReadState typeState = consumerToTransitionToBadState.getStateEngine().getTypeState("Package");
-        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
-        BitSet previousOrdinals = typeState.getPreviousOrdinals();
-
-        List<Object[]> modifiedKeys = new ArrayList<>();
         { // Simulate Converter in removing records from state engine that are in events
-            BitSet modifiedSet = new BitSet();
-            modifiedSet.or(populatedOrdinals);
-            modifiedSet.xor(previousOrdinals);
-
-            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumerToTransitionToBadState.getStateEngine().getSchema("Package")).getPrimaryKey(), consumerToTransitionToBadState.getStateEngine());
-            int o = modifiedSet.nextSetBit(0);
-            while (o != -1) {
-                Object[] recordKey = valDeriver.getRecordKey(o);
-                modifiedKeys.add(recordKey);
-
-                o = modifiedSet.nextSetBit(o + 1);
-            }
-
             removeEventsData(consumerWithGoodState.getStateEngine(), wEngine, modifiedKeys);
         }
-
-        System.out.println("ModifiedKeys Size=" + modifiedKeys.size());
 
         long badDownloadableId = 572674263L;
         {
