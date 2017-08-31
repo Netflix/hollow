@@ -28,7 +28,7 @@ APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
 
 # Netflix: Attempt to use $WORKSPACE/.gradle if we're not told otherwise
-if [ "x$GRADLE_USER_HOME" == "x" ]; then
+if [ "x$GRADLE_USER_HOME" = "x" ]; then
     if [ "x$WORKSPACE" != "x" ]; then
         export GRADLE_USER_HOME="$WORKSPACE/.gradle"
     fi
