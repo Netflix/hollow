@@ -4,11 +4,12 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer;
@@ -23,6 +24,9 @@ import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +42,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.Test;
 
 public class DebugConverterData {
@@ -299,7 +305,7 @@ public class DebugConverterData {
             for (Object[] keys : modifiedKeys) {
                 int packageOrdinal = packageIndex.getMatchingOrdinal(keys);
                 if (packageOrdinal == -1) {
-                    System.out.println("Not found:" + Arrays.toString(keys));
+                    System.out.println("Not found package @PrimaryKey(packageId, movieId) :" + Arrays.toString(keys));
                     continue;
                 }
                 goodStateModifiedSet.set(packageOrdinal);
@@ -307,26 +313,38 @@ public class DebugConverterData {
             Map<String, BitSet> ordinalsToInclude = Collections.singletonMap("Package", goodStateModifiedSet);
             HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), wEngine, consumerWithGoodState.getStateEngine());
             combiner.combine();
-
-            {
-                HollowReadStateEngine badReadStateEngine = StateEngineRoundTripper.roundTripSnapshot(wEngine);
-                HollowPrimaryKeyIndex packageStreamIndex = new HollowPrimaryKeyIndex(badReadStateEngine, "PackageStream", "downloadableId");
-                int ordinal = packageStreamIndex.getMatchingOrdinal(badDownloadableId);
-                System.out.println("BAD PackageStream" + stringifier.stringify(badReadStateEngine, "PackageStream", ordinal));
-            }
-
-            //            BitSet newDataSet = new BitSet();
-            //            int o = populatedOrdinals.nextSetBit(0);
-            //            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumerToTransitionToBadState.getStateEngine().getSchema("Package")).getPrimaryKey(), consumerToTransitionToBadState.getStateEngine());
-            //            while (o != -1) {
-            //                if (!previousOrdinals.get(o)) {
-            //                    // new records
-            //                    newDataSet.set(o);
-            //                }
-            //                o = populatedOrdinals.nextSetBit(o + 1);
-            //            }
-            // @TODO need to add the data with ordinals in newDataSet to write state engine
         }
+
+        // Write to File
+        writeStateEngineToFile(wEngine, WORKING_PATH.resolve("reproBadState").toFile());
+    }
+
+    @Test
+    public void reproduceConverterIssueSimulatingEvents_step3() throws Exception {
+        long badDownloadableId = 572674263L;
+        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
+
+        HollowReadStateEngine badReadStateEngine = readStateEngine(WORKING_PATH.resolve("reproBadState").toFile());
+        HollowPrimaryKeyIndex packageStreamIndex = new HollowPrimaryKeyIndex(badReadStateEngine, "PackageStream", "downloadableId");
+        int ordinal = packageStreamIndex.getMatchingOrdinal(badDownloadableId);
+        System.out.println("BAD PackageStream" + stringifier.stringify(badReadStateEngine, "PackageStream", ordinal));
+
+        int fishyStreamDeploymentOrdinal=2335492;
+        BitSet ordinals = badReadStateEngine.getTypeState("StreamDeployment").getPopulatedOrdinals();
+        System.out.println(String.format("\n\t StreamDeployment ordinal %d exists? %s", fishyStreamDeploymentOrdinal, ordinals.get(fishyStreamDeploymentOrdinal)));
+
+        //            BitSet newDataSet = new BitSet();
+        //            int o = populatedOrdinals.nextSetBit(0);
+        //            HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) consumerToTransitionToBadState.getStateEngine().getSchema("Package")).getPrimaryKey(), consumerToTransitionToBadState.getStateEngine());
+        //            while (o != -1) {
+        //                if (!previousOrdinals.get(o)) {
+        //                    // new records
+        //                    newDataSet.set(o);
+        //                }
+        //                o = populatedOrdinals.nextSetBit(o + 1);
+        //            }
+        // @TODO need to add the data with ordinals in newDataSet to write state engine
+
 
         int badStreamDeploymentOrdinal = 2345573;
         // @TODO then look at SteamDeployment with badStreamDeploymentOrdinal and see if it was able to reproduce issue
@@ -360,5 +378,22 @@ public class DebugConverterData {
                 ordinal = entry.getValue().nextSetBit(ordinal + 1);
             }
         });
+    }
+
+    private void writeStateEngineToFile(HollowWriteStateEngine wEngine, File blobFile) throws IOException {
+        HollowBlobWriter writer = new HollowBlobWriter(wEngine);
+        try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(blobFile))) {
+            writer.writeSnapshot(os);
+        }
+    }
+
+    private HollowReadStateEngine readStateEngine(File blobFile) throws IOException {
+        HollowReadStateEngine stateEngine = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(stateEngine);
+        try (LZ4BlockInputStream is = new LZ4BlockInputStream(new FileInputStream(blobFile))) {
+            reader.readSnapshot(is);
+        }
+
+        return stateEngine;
     }
 }
