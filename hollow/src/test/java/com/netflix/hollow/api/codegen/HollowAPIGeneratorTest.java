@@ -8,15 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HollowAPIGeneratorTest {
-    private String baseDir = System.getProperty("java.io.tmpdir");
+    private String baseDir = "/tmp"; //System.getProperty("java.io.tmpdir");
 
     @Before
     public void setUp() throws IOException {}
-
-    @Test
-    public void clearTmp() {
-        HollowCodeGenerationCompileUtil.cleanupFolder(new File(baseDir), null);
-    }
 
     @Test
     public void testBooleanFieldErgonimics() throws Exception {
