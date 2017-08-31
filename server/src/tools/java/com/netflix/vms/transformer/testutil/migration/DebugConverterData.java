@@ -280,10 +280,10 @@ public class DebugConverterData {
             for (HollowTypeWriteState typeState : wEngine.getOrderedTypeStates()) {
                 BitSet populatedBitSet = toBitSet(typeState.getPopulatedBitSet());
                 BitSet previousBitSet = toBitSet(typeState.getPreviousCyclePopulatedBitSet());
-                BitSet modifiedSet = getModifiedBitSet(populatedBitSet, previousBitSet);
+                BitSet modifiedBitSet = getModifiedBitSet(populatedBitSet, previousBitSet);
 
-                double percent = modifiedSet.cardinality() / populatedBitSet.cardinality();
-                String line = String.format("\t State=%s, cardinality=%s, modified=%s (%s percent)", typeState.getSchema().getName(), populatedBitSet.cardinality(), modifiedSet.cardinality(), percentInstance.format(percent));
+                double percent = modifiedBitSet.cardinality() == 0 ? 0 : (populatedBitSet.cardinality() == 0 ? 1 : modifiedBitSet.cardinality() / populatedBitSet.cardinality());
+                String line = String.format("\t State=%s, populatedBitSet=%s, previousBitSet=%s, modifiedSet=%s (%s percent)", typeState.getSchema().getName(), populatedBitSet.cardinality(), previousBitSet.cardinality(), modifiedBitSet.cardinality(), percentInstance.format(percent));
                 System.out.println(line);
                 pw.println(line);
             }
