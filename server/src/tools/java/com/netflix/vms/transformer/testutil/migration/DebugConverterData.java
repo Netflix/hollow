@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.testutil.migration;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -19,15 +20,21 @@ import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirecto
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
+import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.util.OutputUtil;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +43,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,19 +52,24 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.Test;
 
 public class DebugConverterData {
+    private HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
+    private NumberFormat percentFormat = NumberFormat.getPercentInstance();
+
+    private static final String MODIFIED_PACKAGE_KEY_FILENAME = "modified-package-keys.txt";
+    private static final String IMPACTED_PACKAGE_KEY_FILENAME = "impacted-package-keys.txt";
     private static final String CONVERTER_VIP_NAME = "muon";
     private static final String CONVERTER_NAMESPACE = "vmsconverter-muon";
     private static final String WORKING_DIR = "/space/converter-data/debug";
-    private static final Path WORKING_PATH = Paths.get(WORKING_DIR);
+    private static final String REPRO_DIR = WORKING_DIR + "/repro";
+    private static final Path REPRO_PATH = Paths.get(REPRO_DIR);
     private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
 
     public void setup() throws Exception {
-        for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT)) {
+        percentFormat.setMinimumFractionDigits(1);
+        for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT, REPRO_DIR)) {
             File workingDir = new File(folder);
             if (!workingDir.exists()) workingDir.mkdirs();
         }
@@ -89,7 +102,7 @@ public class DebugConverterData {
 
         int i = 1;
         for (Map.Entry<String, Set<Long>> entry : map.entrySet()) {
-            System.out.println(String.format("%d) %s = [size=%d] downloadIds=%s", i++, entry.getKey(), entry.getValue().size(), entry.getValue()));
+            System.out.printf("%d) %s = [size=%d] downloadIds=%s \n", i++, entry.getKey(), entry.getValue().size(), entry.getValue());
         }
 
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
@@ -98,7 +111,6 @@ public class DebugConverterData {
     @Test
     public void debugVersionsWithBadPackageStream() {
         long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
-        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
 
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
         int i = 1;
@@ -112,7 +124,7 @@ public class DebugConverterData {
             VMSHollowInputAPI api = inputClient.getAPI();
             PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
             if (stream._getDeployment()._getS3PathComponent() != null) {
-                System.out.println(String.format("%d) version=%s, dId=%s, deployment=%s", i++, version, stream._getDownloadableId(), stringifier.stringify(stream._getDeployment())));
+                System.out.printf("%d) version=%s, dId=%s, deployment=%s\n", i++, version, stream._getDownloadableId(), stringifier.stringify(stream._getDeployment()));
             }
         }
 
@@ -164,29 +176,28 @@ public class DebugConverterData {
 
             if (deployment._getS3FullPath() != null) {
                 StringHollow hStr = deployment._getS3FullPath();
-                System.out.println(String.format("\t s3FullPath=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
+                System.out.printf("\t s3FullPath=%s, ordinal=%d\n", hStr._getValue(), hStr.getOrdinal());
             }
 
             if (deployment._getS3PathComponent() != null) {
                 StringHollow hStr = deployment._getS3PathComponent();
-                System.out.println(String.format("\t s3PathComponent=%s, ordinal=%d", hStr._getValue(), hStr.getOrdinal()));
+                System.out.printf("\t s3PathComponent=%s, ordinal=%d\n", hStr._getValue(), hStr.getOrdinal());
             }
         }
     }
 
-    private void doesStreamDeploymentOrdinalExists(HollowReadStateEngine rEngine, int ordinal) {
+    private void doesStreamDeploymentOrdinalExists(HollowReadStateEngine rEngine, long version, int ordinal) {
         HollowTypeReadState typeState = rEngine.getTypeState("StreamDeployment");
         BitSet currSet = typeState.getPopulatedOrdinals();
         BitSet prevSet = typeState.getPreviousOrdinals();
-        System.out.println(String.format("\n------\n\t StreamDeployment ordinal %d exists in (curr:%s, prev:%s)", ordinal, currSet.get(ordinal), prevSet.get(ordinal)));
+        System.out.printf("\n------\n\t [version=%s] StreamDeployment ordinal %d exists in (curr:%s, prev:%s)\n", version, ordinal, currSet.get(ordinal), prevSet.get(ordinal));
     }
 
-    private void debugPackageStream(String label, HollowConsumer consumer, long streamID) {
+    private Set<Integer> debugPackage(String label, HollowConsumer consumer, long streamID) {
         HollowReadStateEngine rEngine = consumer.getStateEngine();
         VMSHollowInputAPI api = (VMSHollowInputAPI) consumer.getAPI();
-        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
 
-        System.out.println(String.format("\n\n---- debugPackageStream [%s] @ version=%s", label, consumer.getCurrentVersionId()));
+        System.out.printf("\n\n---- debugPackageStream [%s] @ version=%s\n", label, consumer.getCurrentVersionId());
         {
             HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(rEngine, "PackageStream", "downloadableId");
             int ordinal = index.getMatchingOrdinal(streamID);
@@ -195,11 +206,35 @@ public class DebugConverterData {
             System.out.println(stringifier.stringify(packageStreamHollow));
             //System.out.println(stringifier.stringify(rEngine, "PackageStream", ordinal));
 
-            doesStreamDeploymentOrdinalExists(rEngine, packageStreamHollow._getDeployment().getOrdinal());
+            doesStreamDeploymentOrdinalExists(rEngine, consumer.getCurrentVersionId(), packageStreamHollow._getDeployment().getOrdinal());
         }
 
+        Map<Integer, Integer> streamToPackageOrdinalMap = new HashMap<>();
+        { // Find out number of PackageStream referenced by Package that are no longer valid (marked deleted)
+            Set<Long> packageIdSet = new HashSet<>();
+            Set<Long> streamIdsSet = new HashSet<>();
 
-        { // Found out number of StreamDeployments referenced by PackageStream that are no longer valid (marked deleted)
+            BitSet badOrdinals = new BitSet();
+            BitSet populatedOrdinals = rEngine.getTypeState("PackageStream").getPopulatedOrdinals();
+            for (PackageHollow rec : api.getAllPackageHollow()) {
+                for (PackageStreamHollow stream : rec._getDownloadables()) {
+                    int ordinal = stream.getOrdinal();
+                    if (ordinal == -1) continue;
+
+                    streamToPackageOrdinalMap.put(ordinal, rec.getOrdinal());
+                    if (populatedOrdinals.get(ordinal)) continue;
+
+                    badOrdinals.set(ordinal);
+                    streamIdsSet.add(stream._getDownloadableId());
+                    packageIdSet.add(rec._getPackageIdBoxed());
+                }
+            }
+            System.out.println("\t # of Package referring invalid (deleted?) Stream: " + packageIdSet.size() + ", ids=" + packageIdSet);
+            System.out.println("\t # of Bad PackageStream (referenced by Package but no longer exists): " + streamIdsSet.size() + ", ids=" + streamIdsSet + ", ordinals=" + badOrdinals);
+        }
+
+        { // Find out number of StreamDeployments referenced by PackageStream that are no longer valid (marked deleted)
+            Set<Integer> packageOrdinalSet = new HashSet<>();
             Set<Long> streamIdsSet = new HashSet<>();
 
             BitSet badOrdinals = new BitSet();
@@ -212,9 +247,13 @@ public class DebugConverterData {
 
                 badOrdinals.set(ordinal);
                 streamIdsSet.add(stream._getDownloadableId());
+                packageOrdinalSet.add(streamToPackageOrdinalMap.get(stream.getOrdinal()));
             }
-            System.out.println("\t # of PackageStream referring invalid (deleted?) StreamDeployment: " + streamIdsSet.size() + ", ids=" + streamIdsSet);
+            System.out.println("\t ---");
             System.out.println("\t # of Bad StreamDeployment (referenced by PackageStream but no longer exists): " + badOrdinals.cardinality() + ", ordinals=" + badOrdinals);
+            System.out.println("\t # of PackageStream referring invalid (deleted?) StreamDeployment: " + streamIdsSet.size() + ", ids=" + streamIdsSet);
+            System.out.println("\t # of Package impacted by PackageStream with invalid child reference: " + packageOrdinalSet.size() + ", ordinals=" + packageOrdinalSet);
+            return packageOrdinalSet;
         }
     }
 
@@ -226,17 +265,18 @@ public class DebugConverterData {
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
         long badDownloadableId = 572674263L;
         consumer.triggerRefreshTo(20170824033200595L);
-        debugPackageStream("GOOD STATE", consumer, badDownloadableId);
+        debugPackage("GOOD STATE", consumer, badDownloadableId);
 
         consumer.triggerRefreshTo(20170824033533733L); // This state already seems to be bad since STreamDeployment ordinal is already removed
-        debugPackageStream("BAD STATE with PackageStream pointing to ghost StreamDeployment", consumer, badDownloadableId);
+        debugPackage("BAD STATE with PackageStream pointing to ghost StreamDeployment", consumer, badDownloadableId);
 
         consumer.triggerRefreshTo(20170824033754309L); // First State with S3Path = Celeste Holm (1961-1996)
-        debugPackageStream("BAD STATE with PackageStream pointing to ghost StreamDeployment with bad S3PATH = Celeste Holm (1961-1996)", consumer, badDownloadableId);
+        debugPackage("BAD STATE with PackageStream pointing to ghost StreamDeployment with bad S3PATH = Celeste Holm (1961-1996)", consumer, badDownloadableId);
     }
 
     @Test
     public void reproduceConverterIssueSimulatingEvents_step1() throws Exception {
+        long start = System.currentTimeMillis();
         long goodStateVersion = 20170824033200595L;
         long suspeciousStateVersion = 20170824033533733L;
         long badDownloadableId = 572674263L;
@@ -246,95 +286,156 @@ public class DebugConverterData {
 
         // Start at good state
         consumer.triggerRefreshTo(goodStateVersion);
-        debugPackageStream("GOOD STATE", consumer, badDownloadableId);
+        debugPackage("GOOD STATE", consumer, badDownloadableId);
 
         // Go to bad state
         consumer.triggerRefreshTo(suspeciousStateVersion);
-        debugPackageStream("BAD STATE", consumer, badDownloadableId);
+        Set<Integer> impactedPackageOrdinals = debugPackage("BAD STATE", consumer, badDownloadableId);
 
         // Determine the modified Packages
+        System.out.println("\n\n -----\n Find modified Package Keys between versions: " + goodStateVersion + " to " + suspeciousStateVersion);
         HollowTypeReadState typeState = consumer.getStateEngine().getTypeState("Package");
-        BitSet modifiedSet = getModifiedBitSet(typeState.getPopulatedOrdinals(), typeState.getPreviousOrdinals());
+        BitSet modifiedBitSet = getModifiedBitSet(typeState.getPopulatedOrdinals(), typeState.getPreviousOrdinals());
         HollowReadStateEngine stateEngine = consumer.getStateEngine();
-        HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) stateEngine.getSchema("Package")).getPrimaryKey(), stateEngine);
-        try(PrintWriter pw = new PrintWriter(Files.newBufferedWriter(WORKING_PATH.resolve("modified-keys")))) {
-            Set<String> pkSet = new HashSet<>();
-            int ordinal = modifiedSet.nextSetBit(0);
+        HollowPrimaryKeyValueDeriver valDeriver = new HollowPrimaryKeyValueDeriver(((HollowObjectSchema) typeState.getSchema()).getPrimaryKey(), stateEngine);
+        BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
+        try (
+                PrintWriter modKeyPW = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve(MODIFIED_PACKAGE_KEY_FILENAME)));
+                PrintWriter impKeyPW = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve(IMPACTED_PACKAGE_KEY_FILENAME)));) {
+            int count = 0;
+            Map<String, List<Integer>> modPKMap = new HashMap<>();
+            Set<String> dupPKSet = new HashSet<>();
+            int ordinal = modifiedBitSet.nextSetBit(0);
             while (ordinal != -1) {
                 Object[] recordKey = valDeriver.getRecordKey(ordinal); // @PrimaryKey(packageId, movieId) (long, long)
                 String line = String.format("%d,%d\n", recordKey[0], recordKey[1]);
-                if (!pkSet.contains(line)) {
-                    pkSet.add(line);
-                    pw.format(line);
+                if (impactedPackageOrdinals.contains(ordinal)) {
+                    System.out.printf("\t %s) Impacted ordinal=%s:%s, @PrimaryKey(packageId, movieId): %s,%s\n", ++count, ordinal, populatedOrdinals.get(ordinal), recordKey[0], recordKey[1]);
+                    impKeyPW.format(line);
                 }
-                ordinal = modifiedSet.nextSetBit(ordinal + 1);
+
+                if (!modPKMap.containsKey(line)) {
+                    List<Integer> ordinals = new ArrayList<>();
+                    ordinals.add(ordinal);
+                    modPKMap.put(line, ordinals);
+                    modKeyPW.format(line);
+                } else {
+                    dupPKSet.add(line);
+                    List<Integer> ordinals = modPKMap.get(line);
+                    ordinals.add(ordinal);
+                }
+                ordinal = modifiedBitSet.nextSetBit(ordinal + 1);
             }
-            System.out.println("ModifiedKeys Size=" + pkSet.size());
+            System.out.println("\n\t # Impacted Package: " + impactedPackageOrdinals.size());
+            System.out.println("\n\t Total Modified Package Keys: " + modPKMap.size() + ", ordinals=" + modifiedBitSet.cardinality());
+
+            count = 0;
+            System.out.println("\n\t Duplicated Package Keys: " + dupPKSet.size());
+            for (String dup : dupPKSet) {
+                List<Integer> list = modPKMap.get(dup);
+                if (list.size() == 2) continue; // Expected since hollow mod=remove + add, so two ordinals modified
+                System.out.printf("\t\t %s) %s: size=%s, ordinals=", ++count, dup.replace('\n', ' '), list.size());
+                for (int o : list) {
+                    System.out.printf("%s:%s; ", o, populatedOrdinals.get(o));
+                }
+                System.out.println("");
+            }
         }
+        System.out.printf("\n\n----\n Total duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
     }
 
-    private void debugWriteStateEngine(String label, HollowWriteStateEngine wEngine) throws IOException {
+    private void debugWriteStateEngine(String label, HollowWriteStateEngine wEngine, boolean isHighlightModified) throws IOException {
         System.out.println("\n----\n WriteStateEngine: " + label);
-        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(WORKING_PATH.resolve("writeStateEngineStat_" + label)))) {
-            NumberFormat percentInstance = NumberFormat.getPercentInstance();
+
+        List<String> modifiedTypes = new ArrayList<>();
+        try (PrintWriter pw = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve("writeStateEngineStat_" + label + ".txt")))) {
             for (HollowTypeWriteState typeState : wEngine.getOrderedTypeStates()) {
                 BitSet populatedBitSet = toBitSet(typeState.getPopulatedBitSet());
                 BitSet previousBitSet = toBitSet(typeState.getPreviousCyclePopulatedBitSet());
                 BitSet modifiedBitSet = getModifiedBitSet(populatedBitSet, previousBitSet);
 
-                double percent = modifiedBitSet.cardinality() == 0 ? 0 : (populatedBitSet.cardinality() == 0 ? 1 : modifiedBitSet.cardinality() / populatedBitSet.cardinality());
-                String line = String.format("\t State=%s, populatedBitSet=%s, previousBitSet=%s, modifiedSet=%s (%s percent)", typeState.getSchema().getName(), populatedBitSet.cardinality(), previousBitSet.cardinality(), modifiedBitSet.cardinality(), percentInstance.format(percent));
+                double percent = previousBitSet.cardinality() == 0 ? 1 : (double) modifiedBitSet.cardinality() / (double) previousBitSet.cardinality();
+                boolean isModified = percent > 0;
+                String line = String.format("\t %s State=%s, populatedBitSet=%s, previousBitSet=%s, modifiedSet=%s (%s percent)", isModified ? "***" : "   ", typeState.getSchema().getName(), populatedBitSet.cardinality(), previousBitSet.cardinality(), modifiedBitSet.cardinality(), percentFormat.format(percent));
+                if (isModified) modifiedTypes.add(line);
                 System.out.println(line);
                 pw.println(line);
             }
         }
+
+        if (isHighlightModified && !modifiedTypes.isEmpty()) {
+            System.out.println("\n\n\t Modified Types: " + label);
+            for (String modType : modifiedTypes) {
+                System.out.println(modType);
+            }
+        }
+    }
+
+    private Set<Object[]> readKeysFromFile(String filename) throws IOException {
+        Set<Object[]> keys = new HashSet<>();
+        { // Load modified keys from Step 1
+            try (Scanner scanner = new Scanner(REPRO_PATH.resolve(filename))) {
+                while (scanner.hasNextLine()) {
+                    String[] s = scanner.nextLine().split(",");
+                    Long[] key = new Long[] { Long.parseLong(s[0]), Long.parseLong(s[1])
+                    };
+                    keys.add(key);
+                }
+            }
+            System.out.println("Keys for " + filename + " Size=" + keys.size());
+        }
+        return keys;
     }
 
     @Test
     public void reproduceConverterIssueSimulatingEvents_step2() throws Exception {
         long goodStateVersion = 20170824033200595L;
+        long suspeciousStateVersion = 20170824033533733L;
 
+        long initStart = System.currentTimeMillis();
+        long start = initStart;
         BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
-        HollowConsumer consumerWithGoodState = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
-        consumerWithGoodState.triggerRefreshTo(goodStateVersion);
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        consumer.triggerRefreshTo(goodStateVersion);
+        System.out.printf("\n\n----\n Init to version=%s, duration=%s\n", consumer.getCurrentVersionId(), OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
 
-        List<Object[]> modifiedKeys = new ArrayList<>();
-        { // Load modified keys from Step 1
-            try(Scanner scanner = new Scanner(WORKING_PATH.resolve("modified-keys"))) {
-                while(scanner.hasNextLine()) {
-                    String[] s = scanner.nextLine().split(",");
-                    Long[] key = new Long[]{
-                            Long.parseLong(s[0]),
-                            Long.parseLong(s[1])
-                    };
-                    modifiedKeys.add(key);
-                }
-            }
-            System.out.println("ModifiedKeys Size=" + modifiedKeys.size());
-        }
+        Set<Object[]> modifiedKeys = readKeysFromFile(MODIFIED_PACKAGE_KEY_FILENAME);
+        Set<Object[]> impactedKeys = readKeysFromFile(IMPACTED_PACKAGE_KEY_FILENAME);
 
         long badDownloadableId = 572674263L;
-        HollowReadStateEngine rEngine = consumerWithGoodState.getStateEngine();
-        debugPackageStream("GOOD STATE", consumerWithGoodState, badDownloadableId);
+        long badPackageId = 1069117L;
+        long badMovieId = 80011653L;
 
+        HollowReadStateEngine rEngine = consumer.getStateEngine();
+        debugPackage("GOOD STATE", consumer, badDownloadableId);
+
+        start = System.currentTimeMillis();
         HollowWriteStateEngine wEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(rEngine);
-        debugWriteStateEngine("Phase1_initialState", wEngine);
+        System.out.printf("\n\n----\n Create Write Engine, duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
+        debugWriteStateEngine("Phase1_initialState", wEngine, false);
 
         { // Simulate Converter in removing records from state engine that are in events
+            start = System.currentTimeMillis();
             wEngine.prepareForWrite();
             wEngine.prepareForNextCycle();
 
             wEngine.addAllObjectsFromPreviousCycle();
             removeEventsData(rEngine, wEngine, modifiedKeys);
+            System.out.printf("\n\n----\n removeEventsData, duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
         }
-        debugWriteStateEngine("Phase2_removeEventsData", wEngine);
+        debugWriteStateEngine("Phase2_removeEventsData", wEngine, true);
 
         { // Simulate Converter in adding events to blob
+            start = System.currentTimeMillis();
             String packageType = "Package";
-            BitSet goodStateModifiedSet = new BitSet();
+            BitSet modifiedPackateOrdinals = new BitSet();
             HollowPrimaryKeyIndex packageIndex = new HollowPrimaryKeyIndex(rEngine, ((HollowObjectSchema) rEngine.getSchema(packageType)).getPrimaryKey());
             for (Object[] keys : modifiedKeys) {
                 int packageOrdinal = packageIndex.getMatchingOrdinal(keys);
+                if (impactedKeys.contains(keys) || (((Long) keys[0]).longValue() == badPackageId && ((Long) keys[1]).longValue() == badMovieId)) {
+                    System.out.println("---- Bad Record Key @PrimaryKey(packageId, movieId) :" + Arrays.toString(keys));
+                    //System.out.println(stringifier.stringify(rEngine, "Package", packageOrdinal));
+                }
                 if (packageOrdinal == -1) {
                     System.out.println("Not found package @PrimaryKey(packageId, movieId) :" + Arrays.toString(keys));
                     continue;
@@ -342,31 +443,43 @@ public class DebugConverterData {
 
                 //                HollowRecord rec = GenericHollowRecordHelper.instantiate(rEngine, packageType, packageOrdinal);
                 //                wEngine.add(packageType, rec);
-                goodStateModifiedSet.set(packageOrdinal);
+                modifiedPackateOrdinals.set(packageOrdinal);
             }
-            Map<String, BitSet> ordinalsToInclude = Collections.singletonMap("Package", goodStateModifiedSet);
-            System.out.println(String.format("\n\n ====\n ModifiedKeys Size=%s, oridinalToinclude=%s diff=%s\n ====\n", modifiedKeys.size(), goodStateModifiedSet.cardinality(), (modifiedKeys.size() - goodStateModifiedSet.cardinality())));
+            Map<String, BitSet> ordinalsToInclude = Collections.singletonMap(packageType, modifiedPackateOrdinals);
+            System.out.printf("\n\n ====\n ModifiedKeys Size=%s, oridinalToinclude=%s diff=%s\n ====\n", modifiedKeys.size(), modifiedPackateOrdinals.cardinality(), (modifiedKeys.size() - modifiedPackateOrdinals.cardinality()));
             HollowCombiner combiner = new HollowCombiner(new HollowCombinerIncludeOrdinalsCopyDirector(ordinalsToInclude), wEngine, rEngine);
             combiner.combine();
+            System.out.printf("\n\n----\n addEventsData, duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
         }
-        debugWriteStateEngine("Phase3_combined", wEngine);
+        debugWriteStateEngine("Phase3_combined", wEngine, true);
 
         // Write to File
+        start = System.currentTimeMillis();
         wEngine.prepareForWrite();
         //wEngine.prepareForNextCycle();
-        debugWriteStateEngine("Phase4_write", wEngine);
-        writeStateEngineToFile(wEngine, WORKING_PATH.resolve("reproBadState.blob").toFile());
+        debugWriteStateEngine("Phase4_write", wEngine, true);
+
+        File snapshotFile = REPRO_PATH.resolve("snapshot-" + suspeciousStateVersion).toFile();
+        writeStateEngineToFile(wEngine, snapshotFile);
+        System.out.printf("\n\n----\n writeStateEngineToFile: %s, duration=%s\n", snapshotFile, OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
+        System.out.printf("\n\n----\n Total duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - initStart, true));
     }
 
     @Test
     public void reproduceConverterIssueSimulatingEvents_step3() throws Exception {
+        long initStart = System.currentTimeMillis();
         long badDownloadableId = 572674263L;
-        HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
+        long badPackageId = 1069117L;
+        long badMovieId = 80011653L;
 
         /*
-         * FROM: reproduceConverterIssueSimulatingEvents_step2
-         *
-         * StreamDeployment ordinal 2345573 exists in (curr:false, prev:true)
+         * FROM: reproduceConverterIssueSimulatingEvents_step1
+         * ------
+         * [version=20170824033533733] StreamDeployment ordinal 2345573 exists in (curr:false, prev:true)
+         * # of Package referring invalid (deleted?) Stream: 0, ids=[]
+         * # of Bad PackageStream (referenced by Package but no longer exists): 0, ids=[], ordinals={}
+         * ---
+         * # of Bad StreamDeployment (referenced by PackageStream but no longer exists): 6, ordinals={1382879, 2138852, 2336947, 2337328, 2338927, 2345573}
          * # of PackageStream referring invalid (deleted?) StreamDeployment: 112, ids=[572673571, 575720530, 599369146, 594949745, 594035810, 594952060, 575638596, 599622833, 575718750, 583546330,
          * 583545309, 599623580, 599625375, 594952285, 594949469, 572223024, 572225072, 590891016, 590888203, 583543293, 594032479, 575719790, 594949175, 599622652, 575717398, 599622139, 572672107,
          * 599623159, 572222039, 537047630, 599624433, 594039589, 594033447, 594038841, 575718913, 590889067, 599625956, 537045340, 590890598, 594039816, 594950932, 594952725, 583546795, 594037260,
@@ -374,22 +487,63 @@ public class DebugConverterData {
          * 594953457, 575639238, 599625524, 575720155, 575719387, 575637955, 575640030, 594034687, 572559031, 594955244, 575639763, 572561596, 572221316, 594951895, 594035653, 537045174, 594038495,
          * 583547519, 575719659, 594033066, 594036650, 594033323, 594951349, 583547141, 594037926, 599624563, 575640473, 572223948, 572223682, 583546385, 572224961, 572562941, 594035383, 590889703,
          * 575638444, 575639467, 572673991, 583544109, 537045988, 575718583, 572559559, 594953628, 537047272, 537048809, 572561107, 572674263, 575638969, 590888655, 594035092, 575718060, 572562399]
-         * Bad StreamDeployment (referenced by PackageStream but no longer exists) count: 6, ordinals={1382879, 2138852, 2336947, 2337328, 2338927, 2345573}
+         * # of Package impacted by PackageStream with invalid child reference: 11, ordinals=[142034, 181682, 172531, 163604, 163892, 184171, 101227, 161192, 133646, 64061, 175055]
+         *
+         *
+         * -----
+         * Find modified Package Keys between versions: 20170824033200595 to 20170824033533733
+         * 1) Impacted @PrimaryKey(packageId, movieId): 391020,70248300
+         * 2) Impacted @PrimaryKey(packageId, movieId): 1197312,80093149
+         * 3) Impacted @PrimaryKey(packageId, movieId): 391021,70248301
+         * 4) Impacted @PrimaryKey(packageId, movieId): 1069117,80011653
+         * 5) Impacted @PrimaryKey(packageId, movieId): 1243457,80113750
+         * 6) Impacted @PrimaryKey(packageId, movieId): 1035671,70309569
+         * 7) Impacted @PrimaryKey(packageId, movieId): 1035624,70309561
+         * 8) Impacted @PrimaryKey(packageId, movieId): 1035654,70309530
+         * 9) Impacted @PrimaryKey(packageId, movieId): 1035622,70309563
+         * 10) Impacted @PrimaryKey(packageId, movieId): 1035663,70309523
+         * 11) Impacted @PrimaryKey(packageId, movieId): 1035640,70309544
+         *
+         * # Impacted Package: 11
+         *
+         * Total Modified Package Keys: 15957
          */
-        HollowReadStateEngine badReadStateEngine = readStateEngine(WORKING_PATH.resolve("reproBadState.blob").toFile());
-        {
-            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(badReadStateEngine, "PackageStream", "downloadableId");
-            int ordinal = index.getMatchingOrdinal(badDownloadableId);
-            System.out.println(stringifier.stringify(badReadStateEngine, "PackageStream", ordinal));
-            //doesStreamDeploymentOrdinalExists(badReadStateEngine, packageStreamHollow._getDeployment().getOrdinal());
-        }
+        File reporDir = new File(REPRO_DIR);
+        BlobRetriever blobRetriever = new HollowFilesystemBlobRetriever(reporDir);
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(reporDir).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
+        consumer.triggerRefresh();
 
-        Set<Integer> badOrdinals = new HashSet<>(Arrays.asList(1382879, 2138852, 2336947, 2337328, 2338927, 2345573));
+        String packageTypeName = "Package";
+        HollowTypeReadState packageTypeState = consumer.getStateEngine().getTypeState(packageTypeName);
+        System.out.printf("Current version=%s\n", consumer.getCurrentVersionId());
+        System.out.printf("Package populatedOrdinals=%s, previousOrdinals=%s\n", packageTypeState.getPopulatedOrdinals().cardinality(), packageTypeState.getPreviousOrdinals().cardinality());
+
+        HollowReadStateEngine badReadStateEngine = consumer.getStateEngine(); //readStateEngine(REPRO_PATH.resolve("reproBadState.blob").toFile());
+        HollowPrimaryKeyIndex packageIndex = new HollowPrimaryKeyIndex(badReadStateEngine, packageTypeName, "packageId", "movieId");
+
+        int i = 0;
+        Set<Object[]> impactedKeys = readKeysFromFile(IMPACTED_PACKAGE_KEY_FILENAME);
+        for (Object[] key : impactedKeys) {
+            int ordinal = packageIndex.getMatchingOrdinal(key);
+            System.out.printf("%d) Package Key=%s, Ordinal=%s\n", ++i, Arrays.toString(key), ordinal);
+            //System.out.println(stringifier.stringify(badReadStateEngine, "Package", ordinal));
+        }
+        debugPackage("REPRO STATE", consumer, badDownloadableId);
+
+        //        {
+        //            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(badReadStateEngine, "PackageStream", "packageId, movieId");
+        //            int ordinal = index.getMatchingOrdinal(badDownloadableId);
+        //            System.out.println(stringifier.stringify(badReadStateEngine, "PackageStream", ordinal));
+        //            //doesStreamDeploymentOrdinalExists(badReadStateEngine, consumer.getCurrentVersionId(), packageStreamHollow._getDeployment().getOrdinal());
+        //        }
+
+        Set<Integer> badStreamDeploymentOrdinals = new HashSet<>(Arrays.asList(1382879, 2138852, 2336947, 2337328, 2338927, 2345573));
         HollowTypeReadState typeState = badReadStateEngine.getTypeState("StreamDeployment");
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         BitSet previousOrdinals = typeState.getPreviousOrdinals();
-        for (int o : badOrdinals) {
-            System.out.println(String.format("Bad ordinal=%d, exists(curr:%s, prev:%s)", o, populatedOrdinals.get(o), previousOrdinals.get(o)));
+        System.out.println("\n\n");
+        for (int o : badStreamDeploymentOrdinals) {
+            System.out.printf("Bad badStreamDeploymentOrdinals=%d, exists(curr:%s, prev:%s)\n", o, populatedOrdinals.get(o), previousOrdinals.get(o));
         }
         //debugPackageStream("GOOD STATE", consumerWithGoodState, badDownloadableId);
 
@@ -408,10 +562,11 @@ public class DebugConverterData {
 
         int badStreamDeploymentOrdinal = 2345573;
         // @TODO then look at SteamDeployment with badStreamDeploymentOrdinal and see if it was able to reproduce issue
+        System.out.printf("\n\n----\n Total duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - initStart, true));
     }
 
     // Ported from ConverterStateEngine.removeEventsData
-    private void removeEventsData(HollowReadStateEngine rEngine, HollowWriteStateEngine wEngine, List<Object[]> modifiedKeys) {
+    private void removeEventsData(HollowReadStateEngine rEngine, HollowWriteStateEngine wEngine, Collection<Object[]> modifiedKeys) {
         HollowPrimaryKeyIndex coldstartIdx = new HollowPrimaryKeyIndex(rEngine, ((HollowObjectSchema) rEngine.getSchema("Package")).getPrimaryKey());
 
         BitSet eventOverriddenTypeOrdinals = new BitSet();
@@ -431,20 +586,30 @@ public class DebugConverterData {
     // Ported from ConverterStateEngine.removeOrdinalsFromThisCycle
     private void removeOrdinalsFromThisCycle(HollowWriteStateEngine wEngine, Map<String, BitSet> recordsToRemove) {
         System.out.println("\n ----\n removeOrdinalsFromThisCycle:");
+
         recordsToRemove.entrySet().stream().forEach(entry -> {
             HollowTypeWriteState typeWriteState = wEngine.getTypeState(entry.getKey());
-            int ordinal = entry.getValue().nextSetBit(0);
-            if (ordinal != -1) System.out.println(String.format("\t remove: type=%s, cardinality=%d", entry.getKey(), entry.getValue().cardinality()));
+            BitSet bitset = entry.getValue();
+            int ordinal = bitset.nextSetBit(0);
+            int priorToRemoveCardinality = typeWriteState.getPopulatedBitSet().cardinality();
+
+            boolean removedData = false;
             while (ordinal != -1) {
                 typeWriteState.removeOrdinalFromThisCycle(ordinal);
-                ordinal = entry.getValue().nextSetBit(ordinal + 1);
+                removedData = true;
+                ordinal = bitset.nextSetBit(ordinal + 1);
+            }
+
+            if (removedData) {
+                double percent = (double) bitset.cardinality() / (double) priorToRemoveCardinality;
+                System.out.printf("\t remove: type=%s, priorToRemoveCardinality=%d, afterRemoveCardinality=%d, removeCardinality=%d, percentageRemoved=%s\n", entry.getKey(), priorToRemoveCardinality, typeWriteState.getPopulatedBitSet().cardinality(), bitset.cardinality(), percentFormat.format(percent));
             }
         });
     }
 
     private void writeStateEngineToFile(HollowWriteStateEngine wEngine, File blobFile) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(wEngine);
-        try (LZ4BlockOutputStream os = new LZ4BlockOutputStream(new FileOutputStream(blobFile))) {
+        try (OutputStream os = new BufferedOutputStream(new FileOutputStream(blobFile))) {
             writer.writeSnapshot(os);
         }
     }
@@ -452,7 +617,7 @@ public class DebugConverterData {
     private HollowReadStateEngine readStateEngine(File blobFile) throws IOException {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
-        try (LZ4BlockInputStream is = new LZ4BlockInputStream(new FileInputStream(blobFile))) {
+        try (InputStream is = new BufferedInputStream(new FileInputStream(blobFile))) {
             reader.readSnapshot(is);
         }
 
