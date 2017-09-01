@@ -1940,7 +1940,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -2003,7 +2003,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -3994,7 +3994,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -4057,7 +4057,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -6048,7 +6048,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -6111,7 +6111,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -8221,7 +8221,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -8284,7 +8284,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -10275,7 +10275,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -10338,7 +10338,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -12348,7 +12348,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -12411,7 +12411,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -14427,7 +14427,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -14490,7 +14490,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -16506,7 +16506,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -16569,7 +16569,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -18585,7 +18585,7 @@
             "requested": "0.9.9-RC2"
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
@@ -18648,7 +18648,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",

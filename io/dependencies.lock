@@ -3022,7 +3022,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -3104,7 +3104,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -6193,7 +6193,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -6275,7 +6275,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -9364,7 +9364,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -9446,7 +9446,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -12654,7 +12654,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -12736,7 +12736,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -15825,7 +15825,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -15907,7 +15907,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -19001,7 +19001,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -19083,7 +19083,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -22177,7 +22177,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -22259,7 +22259,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -25353,7 +25353,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -25435,7 +25435,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
@@ -28529,7 +28529,7 @@
             ]
         },
         "org.slf4j:slf4j-api": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.netflix.archaius:archaius-core",
@@ -28611,7 +28611,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.2",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.dyno:dyno-contrib",
                 "com.netflix.dyno:dyno-core",
