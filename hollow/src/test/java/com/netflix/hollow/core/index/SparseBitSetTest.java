@@ -17,6 +17,7 @@
 */
 package com.netflix.hollow.core.index;
 
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,6 +54,47 @@ public class SparseBitSetTest {
             if (intIndexed.contains(i))
                 Assert.assertTrue("Expected in set, but not found the int " + i, sparseBitSet.get(i));
             else Assert.assertFalse("Not expected in set, but found the int " + i, sparseBitSet.get(i));
+        }
+    }
+
+    @Test
+    public void testEvenNumbersMultipleThread() {
+        for (int j = 0; j < 10; j++) {
+            int maxValue = 500000;
+            sparseBitSet = new HollowSparseIntegerSet.SparseBitSet(maxValue);
+            SimultaneousExecutor executor = new SimultaneousExecutor();
+            int parallelism = executor.getMaximumPoolSize();
+            int taskSize = maxValue / parallelism;
+            for (int i = 0; i < parallelism; i++) {
+                int from = i * taskSize;
+                int to = (from + taskSize) - 1;
+                if (i == (parallelism - 1)) to = maxValue;
+                executor.submit(new Task(sparseBitSet, from, to));
+            }
+            executor.awaitUninterruptibly();
+            HollowSparseIntegerSet.SparseBitSet.compact(sparseBitSet);
+            Assert.assertTrue(sparseBitSet.cardinality() == 250001);
+        }
+
+    }
+
+    private static class Task implements Runnable {
+        HollowSparseIntegerSet.SparseBitSet set;
+        int from;
+        int to;
+
+        public Task(HollowSparseIntegerSet.SparseBitSet set, int from, int to) {
+            this.set = set;
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public void run() {
+            for (int i = from; i <= to; i++) {
+                if ((i % 2) == 0)
+                    set.set(i);
+            }
         }
     }
 
