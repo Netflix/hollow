@@ -53,7 +53,7 @@ public class HollowIncrementalProducer {
         this(producer, 1.0d);
     }
     
-    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
+    protected HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
         this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
