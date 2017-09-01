@@ -354,7 +354,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket != null) {
                     longAtIndex = currentBucket.idx;
-                    longs = currentBucket.longs;
+                    longs = currentBucket.longs.clone();
                 }
 
                 boolean isLongInitialized = (longAtIndex & bitInIndex) != 0;
@@ -418,7 +418,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket == null) return;
                 long longAtIndex = currentBucket.idx;
-                long[] longs = currentBucket.longs;
+                long[] longs = currentBucket.longs.clone();
 
                 // find which bit in index will point to the long in bb
                 long whichLong = i >>> LONG_SHIFT;
