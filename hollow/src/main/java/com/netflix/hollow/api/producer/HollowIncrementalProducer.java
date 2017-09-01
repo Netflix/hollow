@@ -27,6 +27,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
@@ -46,12 +47,18 @@ public class HollowIncrementalProducer {
 
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
+    private final double threadsPerCpu;
     
     public HollowIncrementalProducer(HollowProducer producer) {
+        this(producer, 1.0d);
+    }
+
+    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
+        this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
     }
-    
+
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
         producer.hardRestore(versionDesired, blobRetriever);
     }
@@ -69,7 +76,34 @@ public class HollowIncrementalProducer {
     public void delete(RecordPrimaryKey key) {
         mutations.put(key, DELETE_RECORD);
     }
-    
+
+    public static HollowIncrementalProducer.Builder withProducer(HollowProducer producer) {
+        HollowIncrementalProducer.Builder builder = new HollowIncrementalProducer.Builder();
+        return builder.withProducer(producer);
+    }
+
+    public static class Builder {
+        private HollowProducer producer;
+        private double threadsPerCpu = 1.0d; //Default to 1 thread per CPU
+
+        public Builder withProducer(HollowProducer hollowProducer) {
+            this.producer = hollowProducer;
+            return this;
+        }
+
+        public Builder withThreadsPerCpu(double threadsPerCpu) {
+            this.threadsPerCpu = threadsPerCpu;
+            return this;
+        }
+
+        public HollowIncrementalProducer build() {
+            if(producer == null)
+                throw new IllegalArgumentException("HollowProducer must be specified");
+
+            return new HollowIncrementalProducer(producer, threadsPerCpu);
+        }
+    }
+
     public long runCycle() {
         return producer.runCycle(new Populator() {
             public void populate(WriteState newState) throws Exception {
@@ -138,11 +172,22 @@ public class HollowIncrementalProducer {
                     }
                 }
             }
-            
-            private void addRecords(WriteState newState) {
-                for(Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                    if(entry.getValue() != DELETE_RECORD)
-                        newState.add(entry.getValue());
+
+            private void addRecords(final WriteState newState) {
+                SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+                for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
+                    executor.execute(new Runnable() {
+                        public void run() {
+                            if(entry.getValue() != DELETE_RECORD)
+                                newState.add(entry.getValue());
+                        }
+                    });
+                }
+
+                try {
+                    executor.awaitSuccessfulCompletion();
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
 
