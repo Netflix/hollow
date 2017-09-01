@@ -52,13 +52,13 @@ public class HollowIncrementalProducer {
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d);
     }
-
+    
     public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
         this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
     }
-
+    
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
         producer.hardRestore(versionDesired, blobRetriever);
     }
@@ -81,7 +81,7 @@ public class HollowIncrementalProducer {
         HollowIncrementalProducer.Builder builder = new HollowIncrementalProducer.Builder();
         return builder.withProducer(producer);
     }
-
+    
     public static class Builder {
         private HollowProducer producer;
         private double threadsPerCpu = 1.0d; //Default to 1 thread per CPU
@@ -103,7 +103,7 @@ public class HollowIncrementalProducer {
             return new HollowIncrementalProducer(producer, threadsPerCpu);
         }
     }
-
+    
     public long runCycle() {
         return producer.runCycle(new Populator() {
             public void populate(WriteState newState) throws Exception {
@@ -172,7 +172,7 @@ public class HollowIncrementalProducer {
                     }
                 }
             }
-
+            
             private void addRecords(final WriteState newState) {
                 SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
                 for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
