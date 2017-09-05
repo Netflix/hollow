@@ -165,9 +165,7 @@ public class HollowIncrementalProducerTest {
         initializeData(producer);
 
         /// now we'll be incrementally updating the state by mutating individual records
-        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer.withProducer(producer)
-                .withThreadsPerCpu(2.0d)
-                .build();
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, 2.0d);
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 100));
         incrementalProducer.addOrModify(new TypeA(2, "two", 2));

@@ -53,7 +53,7 @@ public class HollowIncrementalProducer {
         this(producer, 1.0d);
     }
     
-    protected HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
+    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
         this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
@@ -75,33 +75,6 @@ public class HollowIncrementalProducer {
     
     public void delete(RecordPrimaryKey key) {
         mutations.put(key, DELETE_RECORD);
-    }
-
-    public static HollowIncrementalProducer.Builder withProducer(HollowProducer producer) {
-        HollowIncrementalProducer.Builder builder = new HollowIncrementalProducer.Builder();
-        return builder.withProducer(producer);
-    }
-    
-    public static class Builder {
-        private HollowProducer producer;
-        private double threadsPerCpu = 1.0d; //Default to 1 thread per CPU
-
-        public Builder withProducer(HollowProducer hollowProducer) {
-            this.producer = hollowProducer;
-            return this;
-        }
-
-        public Builder withThreadsPerCpu(double threadsPerCpu) {
-            this.threadsPerCpu = threadsPerCpu;
-            return this;
-        }
-
-        public HollowIncrementalProducer build() {
-            if(producer == null)
-                throw new IllegalArgumentException("HollowProducer must be specified");
-
-            return new HollowIncrementalProducer(producer, threadsPerCpu);
-        }
     }
     
     public long runCycle() {
