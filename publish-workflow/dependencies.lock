@@ -1376,7 +1376,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -2829,7 +2829,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4892,7 +4892,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -6345,7 +6345,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -8408,7 +8408,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -9861,7 +9861,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12049,7 +12049,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -13502,7 +13502,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -15565,7 +15565,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -17018,7 +17018,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19081,7 +19081,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -20535,7 +20535,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -22601,7 +22601,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -24055,7 +24055,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -26121,7 +26121,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -27575,7 +27575,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -29641,7 +29641,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -31095,7 +31095,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {

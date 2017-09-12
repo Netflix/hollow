@@ -1477,7 +1477,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -3045,7 +3045,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5287,7 +5287,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -6855,7 +6855,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9152,7 +9152,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -10720,7 +10720,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13045,7 +13045,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -14614,7 +14614,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17939,7 +17939,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -19507,7 +19507,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -21745,7 +21745,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -23313,7 +23313,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -25555,7 +25555,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -27123,7 +27123,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -29388,7 +29388,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -30984,7 +30984,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33306,7 +33306,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -34902,7 +34902,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37224,7 +37224,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -38820,7 +38820,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41142,7 +41142,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -42738,7 +42738,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45060,7 +45060,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -46656,7 +46656,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -48978,7 +48978,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -50574,7 +50574,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52896,7 +52896,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -54492,7 +54492,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -56814,7 +56814,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -58410,7 +58410,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.31",
+            "locked": "60.34",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]

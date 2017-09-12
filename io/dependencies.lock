@@ -1246,7 +1246,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -4439,7 +4439,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -7632,7 +7632,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -10944,7 +10944,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -14137,7 +14137,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -17330,7 +17330,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -20528,7 +20528,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -23726,7 +23726,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
@@ -26924,7 +26924,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.18-platform",
+            "locked": "0.9.0.19-platform",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.suro:suro-client",
