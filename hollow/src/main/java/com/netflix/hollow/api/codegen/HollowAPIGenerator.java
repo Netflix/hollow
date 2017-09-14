@@ -63,6 +63,7 @@ public class HollowAPIGenerator {
     private String classPostfix = "Hollow";
     private String getterPrefix = "_";
     private boolean useAggressiveSubstitutions = false;
+    private boolean useBooleanFieldErgonomics = false;
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -94,8 +95,7 @@ public class HollowAPIGenerator {
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizeSpecificTypeNames) {
         this(apiClassname, packageName, dataset, parameterizeSpecificTypeNames, false, false);
     }
-    
-    
+
     private HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
         this.apiClassname = apiClassname;
         this.packageName = packageName;
@@ -126,6 +126,15 @@ public class HollowAPIGenerator {
      */
     public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+    }
+
+    /**
+     * Use this method to specify to use new boolean field ergonomics for generated API
+     * 
+     * Defaults to false to be backwards compatible
+     */
+    public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
+        this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
     }
 
     
@@ -184,7 +193,7 @@ public class HollowAPIGenerator {
 
     private HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts, useBooleanFieldErgonomics);
         } else if(schema instanceof HollowListSchema) {
             return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         } else if(schema instanceof HollowSetSchema) {
@@ -210,6 +219,7 @@ public class HollowAPIGenerator {
         private String getterPrefix = "";
         private boolean useAggressiveSubstitutions = false;
         private boolean useErgonomicShortcuts = false;
+        private boolean useBooleanFieldErgonomics = false;
         
         public Builder withAPIClassname(String apiClassname) {
             this.apiClassname = apiClassname;
@@ -250,9 +260,14 @@ public class HollowAPIGenerator {
             this.useAggressiveSubstitutions = useAggressiveSubstitutions;
             return this;
         }
-        
+
         public Builder withErgonomicShortcuts() {
             this.useErgonomicShortcuts = true;
+            return this;
+        }
+
+        public Builder withBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
+            this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
             return this;
         }
         
@@ -268,6 +283,7 @@ public class HollowAPIGenerator {
             generator.setClassPostfix(classPostfix);
             generator.setGetterPrefix(getterPrefix);
             generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
+            generator.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
             return generator;
         }
         

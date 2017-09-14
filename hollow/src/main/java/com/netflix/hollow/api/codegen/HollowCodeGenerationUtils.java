@@ -32,8 +32,12 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
@@ -292,5 +296,50 @@ public class HollowCodeGenerationUtils {
             return "String";
         }
         throw new IllegalArgumentException("Java scalar type is not known for FieldType." + fieldType.toString());
+    }
+
+    private static final Set<String> booleanMethodPrefixes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "is", "has", "do", "should", "was", "contains", "enable", "disable", "get")));
+    public static Set<String> getBooleanMethodPrefixes() { return booleanMethodPrefixes; }
+
+    /**
+     * Rules: prepend "get" / "is" + upper case first char of field name
+     *
+     * boolean/Boolean field:
+     *    - has a boolean prefix (@see {@link #booleanMethodPrefixes}), just return it; otherwise, prepend "get" + upper case first char
+     *
+     *      boolean isPrimary - isPrimary()
+     *      boolean hasStreams - hasStreams()
+     *      boolean playable - getPlayable()
+     *      boolean value - getValue()
+     *
+     * other field type: prepend "get" + upper case first char
+     *
+     *      String title - getTitle()
+     *
+     * @param fieldName
+     *            name of field
+     * @param clazz
+     *            type of field
+     * @return accessor method name
+     */
+    public static String generateAccessortMethodName(String fieldName, Class<?> clazz) {
+        String prefix = "get";
+        if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
+            for (String booleanPrefix : booleanMethodPrefixes) {
+                if (fieldName.startsWith(booleanPrefix) && fieldName.length() > booleanPrefix.length()) {
+                    char firstCharAfterBooleanPrefix = fieldName.charAt(booleanPrefix.length());
+                    if (Character.isUpperCase(firstCharAfterBooleanPrefix)) {
+                        return fieldName;
+                    }
+                }
+            }
+        }
+
+        return substituteInvalidChars(prefix + uppercase(fieldName));
+    }
+
+    public static String generateBooleanAccessorMethodName(String fieldName, boolean useBooleanFieldErgonomics) {
+           return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "get" + uppercase(fieldName);
     }
 }
