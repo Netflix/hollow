@@ -1330,7 +1330,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -2611,7 +2611,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -5106,7 +5106,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -6387,7 +6387,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -8937,7 +8937,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -10218,7 +10218,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -12796,7 +12796,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -14078,7 +14078,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -17656,7 +17656,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -18937,7 +18937,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -21428,7 +21428,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -22709,7 +22709,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -25204,7 +25204,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release"
         },
         "com.netflix.servo:servo-apache": {
@@ -26485,7 +26485,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -29000,7 +29000,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -30311,7 +30311,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -32884,7 +32884,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -34195,7 +34195,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -36768,7 +36768,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -38079,7 +38079,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -40652,7 +40652,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -41963,7 +41963,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -44536,7 +44536,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -45847,7 +45847,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -48420,7 +48420,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -49731,7 +49731,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -52304,7 +52304,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -53615,7 +53615,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -56188,7 +56188,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.38",
+            "locked": "1.39",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
@@ -57499,7 +57499,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.270.0",
+            "locked": "2.296.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
