@@ -51,7 +51,7 @@
           <button class="btn-orange"
                   on-click="_executeAction"
                   disabled$="{{ _isActionExecuting }}">
-            Confirm <span>{{ _confirmAction.op }}</span> <span>{{ _confirmAction.region }}</span>?
+            Confirm <span>{{ _confirmAction.op }}</span> <span>{{ _confirmAction.region }} regions</span>?
           </button>
           <button class="btn-orange dropdown-toggle"
                   on-click="_dropdownClick"
@@ -180,6 +180,10 @@
         _presentConfirmation: function (e) {
           e.preventDefault();
           e.stopPropagation();
+
+          var answer = confirm("Do you want to continue to pin all VIPs? If pinning only this vip, please refer: go/pdtoncall.");
+          if(!answer)
+            return;
 
           this._isDropdownOpen = false;
           this._confirmAction = {
