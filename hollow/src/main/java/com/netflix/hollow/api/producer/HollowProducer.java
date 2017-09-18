@@ -298,7 +298,7 @@ public class HollowProducer {
             listeners.fireCycleComplete(cycleStatus);
             metrics.updateCycleMetrics(cycleStatus.build());
             if(metricsCollector !=null)
-                metricsCollector.collect();
+                metricsCollector.collect(metrics);
         }
         
         return toVersion;
@@ -494,7 +494,7 @@ public class HollowProducer {
             listeners.fireArtifactPublish(builder);
             metrics.updateBlobTypeMetrics(builder.build());
             if(metricsCollector !=null)
-                metricsCollector.collect();
+                metricsCollector.collect(metrics);
         }
     }
 

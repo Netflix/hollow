@@ -108,7 +108,7 @@ public class HollowClientUpdater {
 
             metrics.updateTypeStateMetrics(getStateEngine(), version);
             if(metricsCollector != null)
-                metricsCollector.collect();
+                metricsCollector.collect(metrics);
             return getCurrentVersionId() == version;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
@@ -116,7 +116,7 @@ public class HollowClientUpdater {
                 refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
             metrics.updateRefreshFailed();
             if(metricsCollector != null)
-                metricsCollector.collect();
+                metricsCollector.collect(metrics);
             throw th;
         }
     }
