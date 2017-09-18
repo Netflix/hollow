@@ -32,7 +32,7 @@ public class HollowConsumerMetricsTests {
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(version);
 
-        HollowConsumerMetrics hollowConsumerMetrics = consumer.getHollowConsumerMetrics();
+        HollowConsumerMetrics hollowConsumerMetrics = consumer.getMetrics();
         Assert.assertEquals(version, consumer.getCurrentVersionId());
         Assert.assertEquals(hollowConsumerMetrics.getCurrentVersion(), consumer.getCurrentVersionId());
         Assert.assertEquals(hollowConsumerMetrics.getRefreshSucceded(), 1);
@@ -46,7 +46,7 @@ public class HollowConsumerMetricsTests {
             consumer.triggerRefreshTo(0);
         } catch (Exception ignored) { }
 
-        HollowConsumerMetrics hollowConsumerMetrics = consumer.getHollowConsumerMetrics();
+        HollowConsumerMetrics hollowConsumerMetrics = consumer.getMetrics();
         Assert.assertEquals(hollowConsumerMetrics.getRefreshFailed(), 1);
         Assert.assertEquals(hollowConsumerMetrics.getTotalPopulatedOrdinals(), 0);
     }
@@ -71,7 +71,7 @@ public class HollowConsumerMetricsTests {
             consumer.triggerRefreshTo(0);
         } catch (Exception ignored) { }
 
-        HollowConsumerMetrics hollowConsumerMetrics = consumer.getHollowConsumerMetrics();
+        HollowConsumerMetrics hollowConsumerMetrics = consumer.getMetrics();
         Assert.assertEquals(hollowConsumerMetrics.getRefreshFailed(), 1);
         Assert.assertEquals(hollowConsumerMetrics.getRefreshSucceded(), 1);
         Assert.assertEquals(hollowConsumerMetrics.getTotalPopulatedOrdinals(), 1);

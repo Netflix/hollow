@@ -28,7 +28,7 @@ public class HollowProducerMetricsTests {
             }
         });
 
-        HollowProducerMetrics hollowProducerMetrics = producer.getHollowProducerMetrics();
+        HollowProducerMetrics hollowProducerMetrics = producer.getMetrics();
         Assert.assertEquals(hollowProducerMetrics.getCyclesSucceeded(), 1);
         Assert.assertEquals(hollowProducerMetrics.getCyclesCompleted(), 1);
         Assert.assertEquals(hollowProducerMetrics.getTotalPopulatedOrdinals(), 1);
@@ -50,7 +50,7 @@ public class HollowProducerMetricsTests {
             });
         } catch (Exception ignored){ }
 
-        HollowProducerMetrics hollowProducerMetrics = producer.getHollowProducerMetrics();
+        HollowProducerMetrics hollowProducerMetrics = producer.getMetrics();
         Assert.assertEquals(hollowProducerMetrics.getCyclesSucceeded(), 0);
         Assert.assertEquals(hollowProducerMetrics.getCyclesCompleted(), 1);
         Assert.assertEquals(hollowProducerMetrics.getCycleFailed(), 1);

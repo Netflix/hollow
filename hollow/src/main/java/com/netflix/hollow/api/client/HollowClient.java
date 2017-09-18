@@ -111,7 +111,8 @@ public class HollowClient {
                                                hashCodeFinder, 
                                                memoryConfig,
                                                updateListener,
-                                               hollowConsumerMetrics);
+                                               hollowConsumerMetrics,
+                                               null);
         this.announcementWatcher = announcementWatcher;
         announcementWatcher.setClientToNotify(this);
     }

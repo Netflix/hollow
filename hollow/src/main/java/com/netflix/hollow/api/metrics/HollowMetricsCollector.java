@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.metrics;
 
-abstract class HollowMetricsCollector<T extends HollowMetrics> {
+public abstract class HollowMetricsCollector<T extends HollowMetrics> {
 
     private T hollowMetrics;
 
@@ -25,9 +25,9 @@ abstract class HollowMetricsCollector<T extends HollowMetrics> {
         this.hollowMetrics = hollowMetrics;
     }
 
-    T getMetrics() {
+    public T getMetrics() {
         return hollowMetrics;
     }
 
-    abstract void collect();
+    public abstract void collect();
 }
