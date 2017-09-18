@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -42,16 +43,18 @@ public class HollowClientUpdater {
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
+    private final HollowConsumerMetrics hollowConsumerMetrics;
 
     private HollowFilterConfig filter;
 
-    public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator, 
-                               List<HollowConsumer.RefreshListener> updateListeners, 
-                               HollowAPIFactory apiFactory, 
+    public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
+                               List<HollowConsumer.RefreshListener> updateListeners,
+                               HollowAPIFactory apiFactory,
                                HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
-                               HollowObjectHashCodeFinder hashCodeFinder, 
+                               HollowObjectHashCodeFinder hashCodeFinder,
                                HollowConsumer.ObjectLongevityConfig objectLongevityConfig,
-                               HollowConsumer.ObjectLongevityDetector objectLongevityDetector) {
+                               HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
+                               HollowConsumerMetrics hollowConsumerMetrics) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
@@ -62,6 +65,7 @@ public class HollowClientUpdater {
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.objectLongevityConfig = objectLongevityConfig;
         this.staleReferenceDetector.startMonitoring();
+        this.hollowConsumerMetrics = hollowConsumerMetrics;
     }
 
     public synchronized boolean updateTo(long version) throws Throwable {
@@ -97,11 +101,14 @@ public class HollowClientUpdater {
 
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
                 refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), version);
+
+            hollowConsumerMetrics.updateTypeStateMetrics(getStateEngine(), version);
             return getCurrentVersionId() == version;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
                 refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
+            hollowConsumerMetrics.updateRefreshFailed();
             throw th;
         }
     }

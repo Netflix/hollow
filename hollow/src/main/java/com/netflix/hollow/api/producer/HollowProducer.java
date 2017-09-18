@@ -20,6 +20,7 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
@@ -130,7 +131,8 @@ public class HollowProducer {
     private final Executor snapshotPublishExecutor;
     private final int numStatesBetweenSnapshots;
     private int numStatesUntilNextSnapshot;
-    
+    private HollowProducerMetrics hollowProducerMetrics;
+
     private boolean isInitialized;
 
     public HollowProducer(Publisher publisher,
@@ -174,6 +176,15 @@ public class HollowProducer {
         
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
+
+        this.hollowProducerMetrics = new HollowProducerMetrics();
+    }
+
+    /**
+     * Returns the metrics for this producer
+     */
+    public HollowProducerMetrics getHollowProducerMetrics() {
+        return this.hollowProducerMetrics;
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -281,6 +292,7 @@ public class HollowProducer {
             runCycle(task, cycleStatus, toVersion);
         } finally {
             listeners.fireCycleComplete(cycleStatus);
+            hollowProducerMetrics.updateCycleMetrics(cycleStatus.build());
         }
         
         return toVersion;
@@ -474,6 +486,7 @@ public class HollowProducer {
             throw th;
         } finally {
             listeners.fireArtifactPublish(builder);
+            hollowProducerMetrics.updateBlobTypeMetrics(builder.build());
         }
     }
 
