@@ -18,8 +18,6 @@
 package com.netflix.hollow.api.codegen.indexes;
 
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
-
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -30,27 +28,16 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * @see HollowAPIGenerator
  *
  */
-public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
+public class LegacyHollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
 
-    public HollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
+    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
         super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema);
         isGenDefaultConstructor = true;
-        isParameterizedConstructorPublic = false;
+        isParameterizedConstructorPublic = true;
     }
 
     @Override
     protected String getClassName(HollowObjectSchema schema) {
         return schema.getName() + "PrimaryKeyIndex";
-    }
-
-    @Override
-    protected void genFindMatchAPI(StringBuilder builder) {
-        builder.append("    // @TODO: Need to use actual Param Types\n");
-        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(Object... keys) {\n");
-        builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
-        builder.append("        if(ordinal == -1)\n");
-        builder.append("            return null;\n");
-        builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
-        builder.append("    }\n\n");
     }
 }

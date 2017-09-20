@@ -27,6 +27,7 @@ import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateLookupImplGen
 import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowUniqueKeyIndexGenerator;
+import com.netflix.hollow.api.codegen.indexes.LegacyHollowPrimaryKeyIndexGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowFactoryJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowListJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowMapJavaGenerator;
@@ -178,7 +179,9 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
-                if (!reservePrimaryKeyIndexForTypeWithPrimaryKey || ((HollowObjectSchema) schema).getPrimaryKey() != null) {
+                if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
+                    generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
+                } else if (((HollowObjectSchema) schema).getPrimaryKey() != null) {
                     generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
                 }
             }
