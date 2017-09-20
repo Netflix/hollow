@@ -26,6 +26,7 @@ import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateInterfaceGene
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateLookupImplGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
+import com.netflix.hollow.api.codegen.indexes.HollowUniqueKeyIndexGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowFactoryJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowListJavaGenerator;
 import com.netflix.hollow.api.codegen.objects.HollowMapJavaGenerator;
@@ -47,7 +48,7 @@ import java.util.Set;
 
 /**
  * This class is used to generate java code which defines an implementation of a {@link HollowAPI}.
- * 
+ *
  * The generated java code is based on a data model (defined by a set of {@link HollowSchema}), and will
  * contain convenience methods for traversing a dataset, based on the specific fields in the data model.
  */
@@ -59,11 +60,12 @@ public class HollowAPIGenerator {
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
-    
+
     private String classPostfix = "Hollow";
     private String getterPrefix = "_";
     private boolean useAggressiveSubstitutions = false;
     private boolean useBooleanFieldErgonomics = false;
+    private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -78,7 +80,7 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
-     * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when 
+     * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when
      *                               alternate implementations are desired for some types.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, boolean parameterizeAllClassNames) {
@@ -89,7 +91,7 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
-     * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when 
+     * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when
      *                               alternate implementations are desired for some types.
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizeSpecificTypeNames) {
@@ -104,24 +106,24 @@ public class HollowAPIGenerator {
         this.parameterizeClassNames = parameterizeAllClassNames;
         this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
     }
-    
+
     /**
-     * Use this method to override the default postfix "Hollow" for all generated Hollow object classes. 
+     * Use this method to override the default postfix "Hollow" for all generated Hollow object classes.
      */
     public void setClassPostfix(String classPostfix) {
         this.classPostfix = classPostfix;
     }
-    
+
     /**
-     * Use this method to override the default prefix "_" for all getters on all generated Hollow object classes. 
+     * Use this method to override the default prefix "_" for all getters on all generated Hollow object classes.
      */
     public void setGetterPrefix(String getterPrefix) {
         this.getterPrefix = getterPrefix;
     }
-    
+
     /**
      * Use this method to override generated classnames for type names corresponding to any class in the java.lang package.
-     * 
+     *
      * Defaults to false, which overrides only type names corresponding to a few select classes in java.lang.
      */
     public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
@@ -130,21 +132,30 @@ public class HollowAPIGenerator {
 
     /**
      * Use this method to specify to use new boolean field ergonomics for generated API
-     * 
+     *
      * Defaults to false to be backwards compatible
      */
     public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
         this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
     }
 
-    
+    /**
+     * Use this method to specify to only generate PrimaryKeyIndex for Types
+     * that has PrimaryKey defined
+     *
+     * Defaults to false to be backwards compatible
+     */
+    public void reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
+        this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+    }
+
     public void generateFiles(String directory) throws IOException {
         generateFiles(new File(directory));
     }
 
     public void generateFiles(File directory) throws IOException {
         directory.mkdirs();
-        
+
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix, useAggressiveSubstitutions);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname);
         HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, dataset);
@@ -166,7 +177,10 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
-                generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
+                generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
+                if (!reservePrimaryKeyIndexForTypeWithPrimaryKey || ((HollowObjectSchema) schema).getPrimaryKey() != null) {
+                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
+                }
             }
         }
     }
@@ -208,7 +222,7 @@ public class HollowAPIGenerator {
     private HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
         return new HollowFactoryJavaGenerator(packageName, schema, classPostfix, useAggressiveSubstitutions);
     }
-    
+
     public static class Builder {
         private String apiClassname;
         private String packageName;
@@ -220,42 +234,43 @@ public class HollowAPIGenerator {
         private boolean useAggressiveSubstitutions = false;
         private boolean useErgonomicShortcuts = false;
         private boolean useBooleanFieldErgonomics = false;
-        
+        private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
+
         public Builder withAPIClassname(String apiClassname) {
             this.apiClassname = apiClassname;
             return this;
         }
-        
+
         public Builder withPackageName(String packageName) {
             this.packageName = packageName;
             return this;
         }
-        
+
         public Builder withDataModel(HollowDataset dataset) {
             this.dataset = dataset;
             return this;
         }
-        
+
         public Builder withParameterizedTypes(Set<String> parameterizedTypes) {
             this.parameterizedTypes = parameterizedTypes;
             return this;
         }
-        
+
         public Builder withParameterizeAllClassNames(boolean parameterizeAllClassnames) {
             this.parameterizeAllClassnames = parameterizeAllClassnames;
             return this;
         }
-        
+
         public Builder withClassPostfix(String classPostfix) {
             this.classPostfix = classPostfix;
             return this;
         }
-        
+
         public Builder withGetterPrefix(String getterPrefix) {
             this.getterPrefix = getterPrefix;
             return this;
         }
-        
+
         public Builder withAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
             this.useAggressiveSubstitutions = useAggressiveSubstitutions;
             return this;
@@ -270,7 +285,12 @@ public class HollowAPIGenerator {
             this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
             return this;
         }
-        
+
+        public Builder reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
+            this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+            return this;
+        }
+
         public HollowAPIGenerator build() {
             if(apiClassname == null)
                 throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
@@ -278,15 +298,14 @@ public class HollowAPIGenerator {
                 throw new IllegalStateException("Please specify a package name (.withPackageName()) before calling .build()");
             if(dataset == null)
                 throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
-            
+
             HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts);
             generator.setClassPostfix(classPostfix);
             generator.setGetterPrefix(getterPrefix);
             generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
             generator.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
+            generator.reservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
             return generator;
         }
-        
     }
-
 }
