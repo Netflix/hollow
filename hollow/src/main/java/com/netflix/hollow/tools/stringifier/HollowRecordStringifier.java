@@ -97,6 +97,8 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
 
         if(typeDataAccess == null) {
             builder.append("[missing type " + type + "]");
+        } else if (ordinal == -1) {
+            builder.append("[missing data " + type + "]");
         } else {
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
                 appendObjectStringify(builder, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
