@@ -182,7 +182,7 @@ public class HollowAPIGenerator {
                 if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
                     generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
                 } else if (((HollowObjectSchema) schema).getPrimaryKey() != null) {
-                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema)schema));
+                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
                 }
             }
         }

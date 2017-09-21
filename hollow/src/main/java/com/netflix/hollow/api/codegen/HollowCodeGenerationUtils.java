@@ -43,10 +43,10 @@ import java.util.Set;
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
  */
 public class HollowCodeGenerationUtils {
-    
+
     private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
     private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
-    
+
     static {
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
@@ -55,7 +55,7 @@ public class HollowCodeGenerationUtils {
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Object", "HObject");
-        
+
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("AbstractMethodError", "HAbstractMethodError");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Appendable", "HAppendable");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ArithmeticException", "HArithmeticException");
@@ -153,7 +153,7 @@ public class HollowCodeGenerationUtils {
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("VirtualMachineError", "HVirtualMachineError");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Void", "HVoid");
     }
-    
+
     public static String typeAPIClassname(String typeName) {
         return uppercase(typeName) + "TypeAPI";
     }
@@ -168,14 +168,14 @@ public class HollowCodeGenerationUtils {
 
     public static String hollowImplClassname(String typeName, String classPostfix, boolean useAggressiveSubstitutions) {
         String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
-        
-        String sub = useAggressiveSubstitutions ? 
-                                  AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) : 
-                                  DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
-        if(sub != null)
-            return sub;
-        
-        return classname;
+
+        String sub = useAggressiveSubstitutions ?
+                AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
+                    DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
+                if(sub != null)
+                    return sub;
+
+                return classname;
     }
 
     public static String delegateInterfaceName(String typeName) {
@@ -255,45 +255,45 @@ public class HollowCodeGenerationUtils {
         str = str.replace('.', '_');
         return str;
     }
-    
+
     public static String getJavaBoxedType(FieldType fieldType) {
         switch(fieldType) {
-        case BOOLEAN:
-            return "Boolean";
-        case BYTES:
-            return "byte[]";
-        case DOUBLE:
-            return "Double";
-        case FLOAT:
-            return "Float";
-        case LONG:
-            return "Long";
-        case INT:
-        case REFERENCE:
-            return "Integer";
-        case STRING:
-            return "String";
+            case BOOLEAN:
+                return "Boolean";
+            case BYTES:
+                return "byte[]";
+            case DOUBLE:
+                return "Double";
+            case FLOAT:
+                return "Float";
+            case LONG:
+                return "Long";
+            case INT:
+            case REFERENCE:
+                return "Integer";
+            case STRING:
+                return "String";
         }
         throw new IllegalArgumentException("Java boxed type is not known for FieldType." + fieldType.toString());
     }
-    
+
     public static String getJavaScalarType(FieldType fieldType) {
         switch(fieldType) {
-        case BOOLEAN:
-            return "boolean";
-        case BYTES:
-            return "byte[]";
-        case DOUBLE:
-            return "double";
-        case FLOAT:
-            return "float";
-        case LONG:
-            return "long";
-        case INT:
-        case REFERENCE:
-            return "int";
-        case STRING:
-            return "String";
+            case BOOLEAN:
+                return "boolean";
+            case BYTES:
+                return "byte[]";
+            case DOUBLE:
+                return "double";
+            case FLOAT:
+                return "float";
+            case LONG:
+                return "long";
+            case INT:
+            case REFERENCE:
+                return "int";
+            case STRING:
+                return "String";
         }
         throw new IllegalArgumentException("Java scalar type is not known for FieldType." + fieldType.toString());
     }
@@ -340,6 +340,27 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String generateBooleanAccessorMethodName(String fieldName, boolean useBooleanFieldErgonomics) {
-           return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "get" + uppercase(fieldName);
+        return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "get" + uppercase(fieldName);
+    }
+
+    /**
+     * Convert field path into Param name
+     *
+     * Eg:
+     *  - Actor -> actor
+     *  - Actor.name -> actorName
+     */
+    public static String normalizeFieldPathToParamName(String fieldPath) {
+        if (fieldPath.contains(".")) {
+            String[] parts = fieldPath.split("\\.");
+            StringBuilder sb = new StringBuilder();
+            sb.append(lowercase(parts[0]));
+            for (int i = 1; i < parts.length; i++) {
+                sb.append(uppercase(parts[i]));
+            }
+            return sb.toString();
+        } else {
+            return lowercase(fieldPath);
+        }
     }
 }

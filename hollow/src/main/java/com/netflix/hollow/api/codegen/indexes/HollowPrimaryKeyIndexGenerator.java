@@ -21,19 +21,28 @@ package com.netflix.hollow.api.codegen.indexes;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
+    protected final HollowDataset dataset;
+    protected final PrimaryKey pk;
 
-    public HollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
+    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
         super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema);
+        this.dataset = dataset;
+        this.pk = schema.getPrimaryKey();
         isGenDefaultConstructor = true;
         isParameterizedConstructorPublic = false;
     }
@@ -43,11 +52,38 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
         return schema.getName() + "PrimaryKeyIndex";
     }
 
+
+
     @Override
     protected void genFindMatchAPI(StringBuilder builder) {
-        builder.append("    // @TODO: Need to use actual Param Types\n");
-        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(Object... keys) {\n");
-        builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
+        List<String> params = new ArrayList<>();
+        List<String> fieldNames = new ArrayList<>();
+        for (int i = 0; i < pk.numFields(); i++) {
+            String fp = pk.getFieldPath(i);
+
+            FieldType ft = pk.getFieldType(dataset, i);
+            if (FieldType.REFERENCE.equals(fp)) {
+                throw new IllegalArgumentException("Reference Type not supported:" + fp);
+            }
+
+            String fn = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fp);
+            fieldNames.add(fn);
+            params.add(HollowCodeGenerationUtils.getJavaScalarType(ft) + " " + fn);
+        }
+
+        StringBuilder paramsAsStr = new StringBuilder();
+        StringBuilder fieldNamesAsStr = new StringBuilder();
+        for (int i = 0; i < params.size(); i++) {
+            if (i > 0) {
+                paramsAsStr.append(", ");
+                fieldNamesAsStr.append(", ");
+            }
+            paramsAsStr.append(params.get(i));
+            fieldNamesAsStr.append(fieldNames.get(i));
+        }
+
+        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(" + paramsAsStr + ") {\n");
+        builder.append("        int ordinal = idx.getMatchingOrdinal(" + fieldNamesAsStr + ");\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
         builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");

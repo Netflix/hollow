@@ -14,7 +14,7 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
 
     @Override
     protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        builder.reservePrimaryKeyIndexForTypeWithPrimaryKey(false);
+        builder.reservePrimaryKeyIndexForTypeWithPrimaryKey(true);
         return super.initGenerator(builder);
     }
 
@@ -25,11 +25,23 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
         runGenerator(apiClassName, packageName, Movie.class);
     }
 
-    @HollowPrimaryKey(fields="id")
+    @HollowPrimaryKey(fields = { "id", "hasSubtitles", "actor", "role.id" })
     static class Movie {
         int id;
-        boolean playable;
-        boolean isAction;
+
         Boolean hasSubtitles;
+
+        Actor actor;
+        Role role;
+    }
+
+    static class Actor {
+        String name;
+    }
+
+    static class Role {
+        Integer id;
+
+        String name;
     }
 }
