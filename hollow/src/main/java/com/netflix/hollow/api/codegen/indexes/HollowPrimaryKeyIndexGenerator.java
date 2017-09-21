@@ -60,15 +60,16 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
         List<String> fieldNames = new ArrayList<>();
         for (int i = 0; i < pk.numFields(); i++) {
             String fp = pk.getFieldPath(i);
-
-            FieldType ft = pk.getFieldType(dataset, i);
-            if (FieldType.REFERENCE.equals(fp)) {
-                throw new IllegalArgumentException("Reference Type not supported:" + fp);
-            }
-
             String fn = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fp);
             fieldNames.add(fn);
-            params.add(HollowCodeGenerationUtils.getJavaScalarType(ft) + " " + fn);
+
+            FieldType ft = pk.getFieldType(dataset, i);
+            if (FieldType.REFERENCE.equals(ft)) {
+                HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
+                params.add(refSchema.getName() + " " + fn);
+            } else {
+                params.add(HollowCodeGenerationUtils.getJavaScalarType(ft) + " " + fn);
+            }
         }
 
         StringBuilder paramsAsStr = new StringBuilder();

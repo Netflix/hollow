@@ -351,6 +351,7 @@ public class HollowCodeGenerationUtils {
      *  - Actor.name -> actorName
      */
     public static String normalizeFieldPathToParamName(String fieldPath) {
+        String result = null;
         if (fieldPath.contains(".")) {
             String[] parts = fieldPath.split("\\.");
             StringBuilder sb = new StringBuilder();
@@ -358,9 +359,14 @@ public class HollowCodeGenerationUtils {
             for (int i = 1; i < parts.length; i++) {
                 sb.append(uppercase(parts[i]));
             }
-            return sb.toString();
+            result = sb.toString();
         } else {
-            return lowercase(fieldPath);
+            result = lowercase(fieldPath);
         }
+
+        if (result.endsWith("!")) {
+            return result.substring(0, result.length() - 1);
+        }
+        return result;
     }
 }
