@@ -19,7 +19,7 @@ public class VMSInputDataVersionLogger {
                 String inputName = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));
                 String latestCombinedVersion = entry.getValue();
 
-                String inputType = inputBlobHeaders.get(inputName + "coldstartType");
+                String inputType = inputBlobHeaders.get(inputName + "_coldstartType");
                 String coldstartKeybase = inputBlobHeaders.get(inputName + "_coldstartKeybase");
                 String coldstartFilename = inputBlobHeaders.get(inputName + "_coldstartFile") != null ? inputBlobHeaders.get(inputName + "_coldstartFile") : "null";
                 String formattedPublishDate = "n/a";
