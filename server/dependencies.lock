@@ -840,7 +840,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -867,7 +867,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -921,7 +921,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -935,10 +934,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -948,8 +949,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -1322,8 +1322,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -1451,7 +1450,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -2578,14 +2577,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -2594,14 +2591,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -2623,7 +2619,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -3142,7 +3138,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -3422,11 +3417,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -4602,7 +4607,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -4629,7 +4634,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -4683,7 +4688,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -4697,14 +4701,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.17.4",
-            "requested": "1.12.15"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -4714,8 +4716,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -5088,8 +5089,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -5217,7 +5217,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -6344,14 +6344,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -6360,14 +6358,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -6389,7 +6386,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -6908,7 +6905,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -7202,8 +7198,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.4.3.v20170317",
-            "requested": "9.2.15.v20160210"
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -7535,54 +7530,6 @@
             "locked": "1.1.4c",
             "transitive": [
                 "com.thoughtworks.xstream:xstream"
-            ]
-        }
-    },
-    "compileOnly": {
-        "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
-            "requested": "1.12.15"
-        },
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "requested": "3.1.0",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
-            "transitive": [
-                "org.eclipse.jetty:jetty-server"
-            ]
-        },
-        "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
-            "transitive": [
-                "org.eclipse.jetty:jetty-servlet"
-            ]
-        },
-        "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
-            "transitive": [
-                "org.eclipse.jetty:jetty-security"
-            ]
-        },
-        "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
-            "requested": "9.2.15.v20160210"
-        },
-        "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
-            "transitive": [
-                "org.eclipse.jetty:jetty-http",
-                "org.eclipse.jetty:jetty-io"
             ]
         }
     },
@@ -8427,7 +8374,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -8454,7 +8401,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -8508,7 +8455,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -8522,10 +8468,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -8535,8 +8483,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -8909,8 +8856,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -9038,7 +8984,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -10165,14 +10111,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -10181,14 +10125,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -10210,7 +10153,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -10729,7 +10672,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -11009,11 +10951,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -12276,7 +12228,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -12357,7 +12309,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -12371,10 +12322,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -12384,8 +12337,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.15.10",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -12758,8 +12710,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -12887,7 +12838,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -14015,14 +13966,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -14031,14 +13980,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -14060,7 +14008,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -14579,7 +14527,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -14859,11 +14806,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.2.12.v20150709"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -15241,23 +15198,30 @@
             ]
         },
         "org.akhikhl.gretty:gretty-runner": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty7"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty7": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner"
             ]
@@ -15442,23 +15406,30 @@
             ]
         },
         "org.akhikhl.gretty:gretty-runner": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty8"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty8": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner"
             ]
@@ -15686,23 +15657,30 @@
             ]
         },
         "org.akhikhl.gretty:gretty-runner": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-jetty9": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner"
             ]
@@ -15726,66 +15704,66 @@
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-client-impl": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-api": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-common",
                 "org.eclipse.jetty.websocket:websocket-servlet"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-client": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-client-impl",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-common": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-server": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-servlet": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty:jetty-annotations": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -15793,40 +15771,40 @@
             ]
         },
         "org.eclipse.jetty:jetty-jndi": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty:jetty-plus"
             ]
         },
         "org.eclipse.jetty:jetty-jsp": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-plus": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty:jetty-annotations"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty:jetty-servlet"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty:jetty-security"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty.websocket:websocket-server",
@@ -15834,7 +15812,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -15845,7 +15823,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-webapp": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty:jetty-annotations",
@@ -15853,7 +15831,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
-            "locked": "9.2.10.v20150310",
+            "locked": "9.2.22.v20170606",
             "transitive": [
                 "org.eclipse.jetty:jetty-webapp"
             ]
@@ -15905,6 +15883,541 @@
             ]
         }
     },
+    "grettyRunnerJetty93": {
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
+        "commons-cli:commons-cli": {
+            "locked": "1.2",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "2.4",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.2",
+            "transitive": [
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty.websocket:websocket-servlet",
+                "org.eclipse.jetty:apache-jsp",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "javax.websocket:javax.websocket-api": {
+            "locked": "1.0",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-client-impl",
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner": {
+            "locked": "2.0.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner-jetty": {
+            "locked": "2.0.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner-jetty93": {
+            "locked": "2.0.0",
+            "requested": "2.0.0"
+        },
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "org.eclipse.jdt.core.compiler:ecj": {
+            "locked": "4.4.2",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp"
+            ]
+        },
+        "org.eclipse.jetty.toolchain:jetty-schemas": {
+            "locked": "3.1",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp",
+                "org.mortbay.jasper:apache-jsp"
+            ]
+        },
+        "org.eclipse.jetty.websocket:javax-websocket-client-impl": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-api": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty.websocket:websocket-servlet"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-client": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-client-impl",
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-common": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-server": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-servlet": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty:apache-jsp": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93"
+            ]
+        },
+        "org.eclipse.jetty:jetty-annotations": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty:jetty-http": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-server",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-io": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-jndi": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty:jetty-plus"
+            ]
+        },
+        "org.eclipse.jetty:jetty-plus": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-security"
+            ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty.websocket:websocket-server",
+                "org.eclipse.jetty:jetty-webapp"
+            ]
+        },
+        "org.eclipse.jetty:jetty-util": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty:apache-jsp",
+                "org.eclipse.jetty:jetty-http",
+                "org.eclipse.jetty:jetty-io",
+                "org.eclipse.jetty:jetty-jndi",
+                "org.eclipse.jetty:jetty-xml"
+            ]
+        },
+        "org.eclipse.jetty:jetty-webapp": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-annotations",
+                "org.eclipse.jetty:jetty-plus"
+            ]
+        },
+        "org.eclipse.jetty:jetty-xml": {
+            "locked": "9.3.20.v20170531",
+            "transitive": [
+                "org.eclipse.jetty:jetty-webapp"
+            ]
+        },
+        "org.mortbay.jasper:apache-el": {
+            "locked": "8.0.33",
+            "transitive": [
+                "org.mortbay.jasper:apache-jsp"
+            ]
+        },
+        "org.mortbay.jasper:apache-jsp": {
+            "locked": "8.0.33",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp"
+            ]
+        },
+        "org.ow2.asm:asm": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-annotations",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty93",
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.ow2.asm:asm-commons"
+            ]
+        },
+        "org.slf4j:slf4j-api": {
+            "locked": "1.7.7",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        }
+    },
+    "grettyRunnerJetty94": {
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
+        "commons-cli:commons-cli": {
+            "locked": "1.2",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "2.4",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "javax.annotation:javax.annotation-api": {
+            "locked": "1.2",
+            "transitive": [
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "3.1.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty.websocket:websocket-servlet",
+                "org.eclipse.jetty:apache-jsp",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "javax.websocket:javax.websocket-api": {
+            "locked": "1.0",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-client-impl",
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner": {
+            "locked": "2.0.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner-jetty": {
+            "locked": "2.0.0",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94"
+            ]
+        },
+        "org.akhikhl.gretty:gretty-runner-jetty94": {
+            "locked": "2.0.0",
+            "requested": "2.0.0"
+        },
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner"
+            ]
+        },
+        "org.eclipse.jdt.core.compiler:ecj": {
+            "locked": "4.4.2",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp"
+            ]
+        },
+        "org.eclipse.jetty.toolchain:jetty-schemas": {
+            "locked": "3.1",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp",
+                "org.mortbay.jasper:apache-jsp"
+            ]
+        },
+        "org.eclipse.jetty.websocket:javax-websocket-client-impl": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-api": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty.websocket:websocket-servlet"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-client": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-client-impl",
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-common": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-server": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty.websocket:websocket-servlet": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-server"
+            ]
+        },
+        "org.eclipse.jetty:apache-jsp": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94"
+            ]
+        },
+        "org.eclipse.jetty:jetty-annotations": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+            ]
+        },
+        "org.eclipse.jetty:jetty-client": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client"
+            ]
+        },
+        "org.eclipse.jetty:jetty-http": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-server",
+                "org.eclipse.jetty:jetty-client",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-io": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty:jetty-client",
+                "org.eclipse.jetty:jetty-http",
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-jndi": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty:jetty-plus"
+            ]
+        },
+        "org.eclipse.jetty:jetty-plus": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-security"
+            ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty.websocket:websocket-server",
+                "org.eclipse.jetty:jetty-webapp"
+            ]
+        },
+        "org.eclipse.jetty:jetty-util": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
+                "org.eclipse.jetty.websocket:websocket-common",
+                "org.eclipse.jetty:apache-jsp",
+                "org.eclipse.jetty:jetty-http",
+                "org.eclipse.jetty:jetty-io",
+                "org.eclipse.jetty:jetty-jndi",
+                "org.eclipse.jetty:jetty-xml"
+            ]
+        },
+        "org.eclipse.jetty:jetty-webapp": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-annotations",
+                "org.eclipse.jetty:jetty-plus"
+            ]
+        },
+        "org.eclipse.jetty:jetty-xml": {
+            "locked": "9.4.6.v20170531",
+            "transitive": [
+                "org.eclipse.jetty:jetty-webapp"
+            ]
+        },
+        "org.mortbay.jasper:apache-el": {
+            "locked": "8.5.9.1",
+            "transitive": [
+                "org.mortbay.jasper:apache-jsp"
+            ]
+        },
+        "org.mortbay.jasper:apache-jsp": {
+            "locked": "8.5.9.1",
+            "transitive": [
+                "org.eclipse.jetty:apache-jsp"
+            ]
+        },
+        "org.ow2.asm:asm": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-annotations",
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner-jetty94",
+                "org.eclipse.jetty:jetty-annotations"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "5.0.3",
+            "transitive": [
+                "org.ow2.asm:asm-commons"
+            ]
+        },
+        "org.slf4j:slf4j-api": {
+            "locked": "1.7.7",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        }
+    },
     "grettyRunnerTomcat7": {
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
@@ -15937,23 +16450,23 @@
             ]
         },
         "org.akhikhl.gretty:gretty-runner": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-tomcat": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat7"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-tomcat7": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
-            "locked": "7.0.62",
+            "locked": "7.0.78",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat",
                 "org.apache.tomcat.embed:tomcat-embed-jasper",
@@ -15961,32 +16474,39 @@
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-el": {
-            "locked": "7.0.62",
+            "locked": "7.0.78",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat7",
                 "org.apache.tomcat.embed:tomcat-embed-jasper"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-jasper": {
-            "locked": "7.0.62",
+            "locked": "7.0.78",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat7"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-logging-log4j": {
-            "locked": "7.0.62",
+            "locked": "7.0.78",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-websocket": {
-            "locked": "7.0.62",
+            "locked": "7.0.78",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat7"
             ]
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner"
             ]
@@ -16036,64 +16556,69 @@
             ]
         },
         "org.akhikhl.gretty:gretty-runner": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-tomcat": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.akhikhl.gretty:gretty-runner-tomcat8": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
-            "locked": "8.0.23",
+            "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat",
                 "org.akhikhl.gretty:gretty-runner-tomcat8",
                 "org.apache.tomcat.embed:tomcat-embed-jasper",
                 "org.apache.tomcat.embed:tomcat-embed-websocket"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-el": {
-            "locked": "8.0.23",
+            "locked": "8.0.44",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat8",
                 "org.apache.tomcat.embed:tomcat-embed-jasper"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-jasper": {
-            "locked": "8.0.23",
+            "locked": "8.0.44",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-logging-log4j": {
-            "locked": "8.0.23",
+            "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat",
                 "org.akhikhl.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-websocket": {
-            "locked": "8.0.23",
+            "locked": "8.0.44",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner-tomcat8"
             ]
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-runner",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-runner"
             ]
         },
-        "org.eclipse.jdt.core.compiler:ecj": {
-            "locked": "4.4.2",
+        "org.eclipse.jdt:ecj": {
+            "locked": "3.12.3",
             "transitive": [
                 "org.apache.tomcat.embed:tomcat-embed-jasper"
             ]
@@ -16107,11 +16632,17 @@
     },
     "grettySpringLoaded": {
         "org.springframework:springloaded": {
-            "locked": "1.2.3.RELEASE",
-            "requested": "1.2.3.RELEASE"
+            "locked": "1.2.5.RELEASE",
+            "requested": "1.2.5.RELEASE"
         }
     },
     "grettyStarter": {
+        "aopalliance:aopalliance": {
+            "locked": "1.0",
+            "transitive": [
+                "org.springframework:spring-aop"
+            ]
+        },
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
@@ -16149,20 +16680,21 @@
             ]
         },
         "commons-logging:commons-logging": {
-            "locked": "1.1.1",
+            "locked": "1.2",
             "transitive": [
-                "commons-configuration:commons-configuration"
+                "commons-configuration:commons-configuration",
+                "org.springframework:spring-core"
             ]
         },
         "org.akhikhl.gretty:gretty-core": {
-            "locked": "1.2.4",
+            "locked": "2.0.0",
             "transitive": [
                 "org.akhikhl.gretty:gretty-starter"
             ]
         },
         "org.akhikhl.gretty:gretty-starter": {
-            "locked": "1.2.4",
-            "requested": "1.2.4"
+            "locked": "2.0.0",
+            "requested": "2.0.0"
         },
         "org.apache.commons:commons-lang3": {
             "locked": "3.6",
@@ -16170,14 +16702,21 @@
                 "org.akhikhl.gretty:gretty-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk16": {
-            "locked": "1.46",
+        "org.apache.servicemix.bundles:org.apache.servicemix.bundles.bcprov-jdk16": {
+            "locked": "1.46_3",
             "transitive": [
                 "org.akhikhl.gretty:gretty-core"
             ]
         },
-        "org.codehaus.groovy:groovy-all": {
-            "locked": "2.3.10",
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.11",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-core",
+                "org.codehaus.groovy:groovy-json"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.11",
             "transitive": [
                 "org.akhikhl.gretty:gretty-core"
             ]
@@ -16186,6 +16725,60 @@
             "locked": "1.7.7",
             "transitive": [
                 "ch.qos.logback:logback-classic"
+            ]
+        },
+        "org.springframework.boot:spring-boot": {
+            "locked": "1.3.3.RELEASE",
+            "transitive": [
+                "org.springframework.boot:spring-boot-autoconfigure",
+                "org.springframework.boot:spring-boot-devtools"
+            ]
+        },
+        "org.springframework.boot:spring-boot-autoconfigure": {
+            "locked": "1.3.3.RELEASE",
+            "transitive": [
+                "org.springframework.boot:spring-boot-devtools"
+            ]
+        },
+        "org.springframework.boot:spring-boot-devtools": {
+            "locked": "1.3.3.RELEASE",
+            "transitive": [
+                "org.akhikhl.gretty:gretty-core"
+            ]
+        },
+        "org.springframework:spring-aop": {
+            "locked": "4.2.5.RELEASE",
+            "transitive": [
+                "org.springframework:spring-context"
+            ]
+        },
+        "org.springframework:spring-beans": {
+            "locked": "4.2.5.RELEASE",
+            "transitive": [
+                "org.springframework:spring-aop",
+                "org.springframework:spring-context"
+            ]
+        },
+        "org.springframework:spring-context": {
+            "locked": "4.2.5.RELEASE",
+            "transitive": [
+                "org.springframework.boot:spring-boot"
+            ]
+        },
+        "org.springframework:spring-core": {
+            "locked": "4.2.5.RELEASE",
+            "transitive": [
+                "org.springframework.boot:spring-boot",
+                "org.springframework:spring-aop",
+                "org.springframework:spring-beans",
+                "org.springframework:spring-context",
+                "org.springframework:spring-expression"
+            ]
+        },
+        "org.springframework:spring-expression": {
+            "locked": "4.2.5.RELEASE",
+            "transitive": [
+                "org.springframework:spring-context"
             ]
         }
     },
@@ -16225,10 +16818,9 @@
             ]
         }
     },
-    "provided": {
+    "providedCompile": {
         "com.netflix.governator:governator-jetty": {
-            "locked": "1.12.15",
-            "requested": "1.12.15"
+            "locked": "1.17.4"
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
@@ -16238,51 +16830,84 @@
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.2.12.v20150709",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.2.12.v20150709",
             "transitive": [
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.2.12.v20150709",
             "transitive": [
                 "org.eclipse.jetty:jetty-servlet"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.2.12.v20150709",
             "transitive": [
                 "org.eclipse.jetty:jetty-security"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.15.v20160210",
-            "requested": "9.2.15.v20160210"
+            "locked": "9.2.12.v20150709"
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.15.v20160210",
+            "locked": "9.2.12.v20150709",
             "transitive": [
                 "org.eclipse.jetty:jetty-http",
                 "org.eclipse.jetty:jetty-io"
             ]
         }
     },
-    "providedCompile": {
-        "javax.servlet:javax.servlet-api": {
-            "locked": "3.1.0",
-            "requested": "3.1.0"
-        }
-    },
     "providedRuntime": {
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
-            "requested": "3.1.0"
+            "requested": "3.1.0",
+            "transitive": [
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-http": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-io": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-server"
+            ]
+        },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
+        "org.eclipse.jetty:jetty-server": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-security"
+            ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.2.12.v20150709"
+        },
+        "org.eclipse.jetty:jetty-util": {
+            "locked": "9.2.12.v20150709",
+            "transitive": [
+                "org.eclipse.jetty:jetty-http",
+                "org.eclipse.jetty:jetty-io"
+            ]
         }
     },
     "runtime": {
@@ -17126,7 +17751,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -17153,7 +17778,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -17207,7 +17832,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -17221,10 +17845,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -17234,8 +17860,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -17608,8 +18233,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -17737,7 +18361,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -18864,14 +19488,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -18880,14 +19502,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -18909,7 +19530,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -19428,7 +20049,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -19708,11 +20328,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -20888,7 +21518,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -20915,7 +21545,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -20969,7 +21599,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -20983,10 +21612,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -20996,8 +21627,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -21370,8 +22000,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -21499,7 +22128,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -22626,14 +23255,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -22642,14 +23269,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -22671,7 +23297,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -23190,7 +23816,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -23470,11 +24095,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -24654,7 +25289,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -24735,7 +25370,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -24749,10 +25383,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -24762,8 +25398,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.15.10",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -25136,8 +25771,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release"
+            "locked": "1.38"
         },
         "com.netflix.servo:servo-apache": {
             "locked": "0.12.17",
@@ -25265,7 +25899,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -26392,14 +27026,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -26408,14 +27040,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -26437,7 +27068,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -26956,7 +27587,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -27222,6 +27852,9 @@
                 "netflix:nflibrary",
                 "netflix:nflibrary-junit-util"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "project": true
         },
         "org.elasticsearch:elasticsearch": {
             "locked": "2.3.3",
@@ -28433,7 +29066,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -28460,7 +29093,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -28514,7 +29147,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -28528,10 +29160,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -28541,8 +29175,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -28922,8 +29555,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -29054,7 +29686,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -29762,7 +30394,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -30208,14 +30839,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -30224,14 +30853,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -30253,7 +30881,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -30780,7 +31408,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -30964,8 +31591,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -31071,12 +31697,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -32307,7 +32942,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -32334,7 +32969,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -32388,7 +33023,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -32402,10 +33036,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -32415,8 +33051,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -32796,8 +33431,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -32928,7 +33562,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -33636,7 +34270,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -34082,14 +34715,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -34098,14 +34729,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -34127,7 +34757,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -34654,7 +35284,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -34838,8 +35467,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -34945,12 +35573,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -36181,7 +36818,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -36208,7 +36845,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -36262,7 +36899,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -36276,10 +36912,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -36289,8 +36927,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -36670,8 +37307,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -36802,7 +37438,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -37510,7 +38146,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -37956,14 +38591,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -37972,14 +38605,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -38001,7 +38633,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -38528,7 +39160,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -38712,8 +39343,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -38819,12 +39449,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -40055,7 +40694,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -40082,7 +40721,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -40136,7 +40775,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -40150,10 +40788,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -40163,8 +40803,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -40544,8 +41183,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -40676,7 +41314,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -41384,7 +42022,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -41830,14 +42467,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -41846,14 +42481,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -41875,7 +42509,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -42402,7 +43036,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -42586,8 +43219,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -42693,12 +43325,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -43929,7 +44570,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -43956,7 +44597,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -44010,7 +44651,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -44024,10 +44664,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -44037,8 +44679,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -44418,8 +45059,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -44550,7 +45190,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -45258,7 +45898,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -45704,14 +46343,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -45720,14 +46357,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -45749,7 +46385,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -46276,7 +46912,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -46460,8 +47095,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -46567,12 +47201,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -47803,7 +48446,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -47830,7 +48473,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -47884,7 +48527,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -47898,10 +48540,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -47911,8 +48555,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -48292,8 +48935,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -48424,7 +49066,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -49132,7 +49774,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -49578,14 +50219,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -49594,14 +50233,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -49623,7 +50261,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -50150,7 +50788,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -50334,8 +50971,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -50441,12 +51077,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -51677,7 +52322,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -51704,7 +52349,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -51758,7 +52403,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -51772,10 +52416,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -51785,8 +52431,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -52166,8 +52811,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -52298,7 +52942,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -53006,7 +53650,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -53452,14 +54095,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -53468,14 +54109,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -53497,7 +54137,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -54024,7 +54664,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -54208,8 +54847,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -54315,12 +54953,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",
@@ -55551,7 +56198,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.eureka:eureka-client-archaius2",
@@ -55578,7 +56225,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -55632,7 +56279,6 @@
         },
         "com.netflix.governator:governator-core": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -55646,10 +56292,12 @@
         },
         "com.netflix.governator:governator-jersey": {
             "locked": "1.17.4",
-            "requested": "1.15.10",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
+        },
+        "com.netflix.governator:governator-jetty": {
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-providers": {
             "locked": "1.17.4",
@@ -55659,8 +56307,7 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
-            "locked": "1.17.4",
-            "requested": "1.15.10"
+            "locked": "1.17.4"
         },
         "com.netflix.governator:governator-test": {
             "locked": "1.17.4",
@@ -56040,8 +56687,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "1.39",
-            "requested": "latest.release",
+            "locked": "1.38",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
@@ -56172,7 +56818,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer",
@@ -56880,7 +57526,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -57326,14 +57971,12 @@
         },
         "netflix:nf-eventbus": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:base-server"
             ]
         },
         "netflix:nf-eventbus-core": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus-guice",
                 "netflix:platform-core",
@@ -57342,14 +57985,13 @@
         },
         "netflix:nf-eventbus-guice": {
             "locked": "1.32.0",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:nf-eventbus",
                 "netflix:nflibrary"
             ]
         },
         "netflix:nf-filter": {
-            "locked": "2.296.0",
+            "locked": "2.270.0",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -57371,7 +58013,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
+            "locked": "2.87",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:base-server",
@@ -57898,7 +58540,6 @@
         },
         "org.apache.httpcomponents:httpclient": {
             "locked": "4.5.3",
-            "requested": "4.3.4",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -58082,8 +58723,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3.0"
+            "locked": "3.8.0"
         },
         "org.cassandraunit:cassandra-unit-shaded": {
             "locked": "2.1.9.2",
@@ -58189,12 +58829,21 @@
                 "org.eclipse.jetty:jetty-server"
             ]
         },
+        "org.eclipse.jetty:jetty-security": {
+            "locked": "9.4.3.v20170317",
+            "transitive": [
+                "org.eclipse.jetty:jetty-servlet"
+            ]
+        },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.4.3.v20170317",
-            "requested": "9.4.2.v20170220",
             "transitive": [
-                "netflix:netflix-internal-hollow"
+                "netflix:netflix-internal-hollow",
+                "org.eclipse.jetty:jetty-security"
             ]
+        },
+        "org.eclipse.jetty:jetty-servlet": {
+            "locked": "9.4.3.v20170317"
         },
         "org.eclipse.jetty:jetty-util": {
             "locked": "9.4.3.v20170317",

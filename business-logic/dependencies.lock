@@ -266,7 +266,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -457,7 +456,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -1059,7 +1057,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -1486,8 +1483,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -2342,7 +2338,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -2533,7 +2528,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -3135,7 +3129,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -3562,8 +3555,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -4418,7 +4410,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -4609,7 +4600,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -5211,7 +5201,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -5638,8 +5627,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -6613,7 +6601,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -6804,7 +6791,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -7406,7 +7392,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -7833,8 +7818,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -8689,7 +8673,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -8880,7 +8863,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -9482,7 +9464,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -9909,8 +9890,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -10766,7 +10746,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -10958,7 +10937,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -11560,7 +11538,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -11675,12 +11652,6 @@
             "locked": "1.6",
             "transitive": [
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -11811,8 +11782,7 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
-            "requested": "4.11",
+            "locked": "4.12",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -11988,8 +11958,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -12307,8 +12276,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -12476,8 +12444,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
-            "requested": "0.9.9-RC2"
+            "locked": "0.9.10"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.25",
@@ -12578,12 +12545,6 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -12867,7 +12828,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -13059,7 +13019,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -13661,7 +13620,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -13776,12 +13734,6 @@
             "locked": "1.6",
             "transitive": [
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -13912,8 +13864,7 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
-            "requested": "4.11",
+            "locked": "4.12",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -14089,8 +14040,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -14408,8 +14358,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -14577,8 +14526,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
-            "requested": "0.9.9-RC2"
+            "locked": "0.9.10"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.25",
@@ -14679,12 +14627,6 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -14968,7 +14910,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -15160,7 +15101,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -15762,7 +15702,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -15877,12 +15816,6 @@
             "locked": "1.6",
             "transitive": [
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -16013,8 +15946,7 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
-            "requested": "4.11",
+            "locked": "4.12",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -16190,8 +16122,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -16509,8 +16440,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -16678,8 +16608,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
-            "requested": "0.9.9-RC2"
+            "locked": "0.9.10"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.25",
@@ -16780,12 +16709,6 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {
@@ -17069,7 +16992,6 @@
         },
         "com.google.guava:guava": {
             "locked": "19.0",
-            "requested": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -17261,7 +17183,6 @@
         },
         "com.netflix.archaius:archaius2-core": {
             "locked": "2.2.0",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -17863,7 +17784,6 @@
         },
         "commons-codec:commons-codec": {
             "locked": "1.9",
-            "requested": "1.8+",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -17978,12 +17898,6 @@
             "locked": "1.6",
             "transitive": [
                 "netflix:openencryptclient"
-            ]
-        },
-        "dom4j:dom4j": {
-            "locked": "1.6.1",
-            "transitive": [
-                "org.reflections:reflections"
             ]
         },
         "edu.stanford.ppl:snaptree": {
@@ -18114,8 +18028,7 @@
             ]
         },
         "junit:junit": {
-            "locked": "4.11",
-            "requested": "4.11",
+            "locked": "4.12",
             "transitive": [
                 "com.thinkaurelius.thrift:thrift-server"
             ]
@@ -18291,8 +18204,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.93",
-            "requested": "latest.release"
+            "locked": "2.87"
         },
         "netflix:nflibrary": {
             "locked": "4.5.7",
@@ -18610,8 +18522,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -18779,8 +18690,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.9-RC2",
-            "requested": "0.9.9-RC2"
+            "locked": "0.9.10"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.25",
@@ -18881,12 +18791,6 @@
             "transitive": [
                 "org.codehaus.jettison:jettison",
                 "org.codehaus.woodstox:wstx-asl"
-            ]
-        },
-        "xml-apis:xml-apis": {
-            "locked": "1.0.b2",
-            "transitive": [
-                "dom4j:dom4j"
             ]
         },
         "xmlpull:xmlpull": {

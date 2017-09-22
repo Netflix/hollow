@@ -675,8 +675,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -701,7 +700,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -1213,8 +1212,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -3808,8 +3806,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -3834,7 +3831,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -4346,8 +4343,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -6941,8 +6937,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -6967,7 +6962,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -7479,8 +7474,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -10193,8 +10187,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -10219,7 +10212,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -10731,8 +10724,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -13326,8 +13318,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -13352,7 +13343,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -13864,8 +13855,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -16459,8 +16449,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -16485,7 +16474,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -16997,8 +16986,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -17613,7 +17601,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -18565,8 +18552,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -19597,8 +19583,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -19623,7 +19608,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -20135,8 +20120,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -20751,7 +20735,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -21703,8 +21686,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -22735,8 +22717,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -22761,7 +22742,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -23273,8 +23254,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -23889,7 +23869,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -24841,8 +24820,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
@@ -25873,8 +25851,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client": {
-            "locked": "1.8.2",
-            "requested": "latest.release",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-module-rxnetty",
@@ -25899,7 +25876,7 @@
             ]
         },
         "com.netflix.eureka:eureka-client-archaius2": {
-            "locked": "1.8.2",
+            "locked": "1.8.0",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
@@ -26411,8 +26388,7 @@
             ]
         },
         "com.netflix.suro:suro-core": {
-            "locked": "0.9.0.19-platform",
-            "requested": "latest.release",
+            "locked": "0.9.0.18-platform",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-kafka-producer"
@@ -27027,7 +27003,6 @@
         },
         "junit:junit": {
             "locked": "4.12",
-            "requested": "4.11",
             "transitive": [
                 "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
@@ -27979,8 +27954,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.3.0",
-            "requested": "3.3+"
+            "locked": "3.8.0"
         },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
