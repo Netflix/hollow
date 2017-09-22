@@ -128,7 +128,11 @@ public class PrimaryKey {
     public static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath) {
         boolean isReferenceFieldPath = fieldPath.endsWith("!");
 
-        String paths[] = isReferenceFieldPath ? fieldPath.substring(0, fieldPath.length() - 1).split("\\.") : fieldPath.split("\\.");
+        return getFieldPathIndex(dataset, type, (isReferenceFieldPath ? fieldPath.substring(0, fieldPath.length() - 1) : fieldPath), !isReferenceFieldPath);
+    }
+
+    private static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath, boolean isAutoExpand) {
+        String paths[] = fieldPath.split("\\.");
         int pathIndexes[] = new int[paths.length];
 
         String refType = type;
@@ -160,7 +164,7 @@ public class PrimaryKey {
 
         }
 
-        if(!isReferenceFieldPath) {
+        if (isAutoExpand) {
             while(refType != null) {
                 HollowSchema schema = dataset.getSchema(refType);
 

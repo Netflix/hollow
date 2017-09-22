@@ -1,9 +1,11 @@
 package com.netflix.hollow.core.index;
 
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
@@ -90,6 +92,23 @@ public class PrimaryKeyTest {
         } catch(IllegalArgumentException expected) {
             Assert.assertEquals("Invalid field path declaration for type UnknownType: id.  The type UnknownType is unavailable.",
                                 expected.getMessage());
+        }
+    }
+    
+    
+    @Test
+    public void testAutoExpand() {
+        { // verify fieldPath auto expand
+            PrimaryKey autoExpandPK = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType");
+            Assert.assertEquals(FieldType.STRING, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals(null, autoExpandPK.getFieldSchema(writeEngine, 0));
+        }
+
+        { // verify disabled fieldPath auto expand with ending "!" 
+            PrimaryKey autoExpandPK = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType!");
+            Assert.assertNotEquals(FieldType.STRING, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals(FieldType.REFERENCE, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals("SubTypeWithTraversablePrimaryKey", autoExpandPK.getFieldSchema(writeEngine, 0).getName());
         }
     }
     

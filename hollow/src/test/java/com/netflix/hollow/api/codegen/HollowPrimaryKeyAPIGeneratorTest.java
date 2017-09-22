@@ -25,7 +25,7 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
         runGenerator(apiClassName, packageName, Movie.class);
     }
 
-    @HollowPrimaryKey(fields = { "id", "hasSubtitles", "actor", "role.id" })
+    @HollowPrimaryKey(fields = { "id", "hasSubtitles", "actor", "role.id!", "role.rank" })
     static class Movie {
         int id;
 
@@ -41,6 +41,8 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
 
     static class Role {
         Integer id;
+
+        Long rank;
 
         String name;
     }
