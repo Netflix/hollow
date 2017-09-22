@@ -38,8 +38,7 @@ public abstract class HollowObjectAbstractDelegate implements HollowObjectDelega
 
             return dataAccess.isNull(ordinal, fieldIndex);
         } catch(Exception ex) {
-            System.err.printf("ordinal=%s, fieldName=%s, ex=%s", ordinal, fieldName, ex.toString());
-            throw ex;
+            throw new RuntimeException(String.format("Unable to handle ordinal=%s, fieldName=%s", ordinal, fieldName), ex);
         }
     }
 
@@ -63,7 +62,7 @@ public abstract class HollowObjectAbstractDelegate implements HollowObjectDelega
         if(fieldIndex == -1)
             return missingDataHandler().handleReferencedOrdinal(getSchema().getName(), ordinal, fieldName);
 
-        return (int)dataAccess.readOrdinal(ordinal, fieldIndex);
+        return dataAccess.readOrdinal(ordinal, fieldIndex);
     }
 
     @Override
