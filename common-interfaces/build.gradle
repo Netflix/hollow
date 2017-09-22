@@ -1,10 +1,7 @@
-dependencyRecommendations {
-    mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
-}
 dependencies {
     compile 'com.netflix.hollow:hollow:2.+'
     compile 'com.netflix.archaius:archaius2-api'
-    compile 'com.netflix.astyanax:astyanax-cassandra:latest.release'
+    compile 'com.netflix.astyanax:astyanax-cassandra'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile "netflix:videoresolutiontypelibrary:latest.release"
     compile 'netflix:netflix-config'

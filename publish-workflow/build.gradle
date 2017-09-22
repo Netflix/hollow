@@ -1,6 +1,3 @@
-dependencyRecommendations {
-    mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
-}
 dependencies {
     compile project(':vmstransformer-common-interfaces')
     compile project(':vmstransformer-io')
@@ -17,6 +14,7 @@ dependencies {
     testCompile 'org.assertj:assertj-core'
     testCompile 'netflix:nflibrary-junit-util'
 }
+
 configurations {
   // exclude direct and transitive dependencies on platform
   all*.exclude group: 'netflix', module: 'platform'

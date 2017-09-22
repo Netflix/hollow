@@ -1,12 +1,15 @@
 allprojects {
     apply plugin: 'netflix.nebula'
 }
+dependencyRecommendations {
+    mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
+}
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'nebula.javadoc-jar'
     apply plugin: 'nebula.dependency-lock'
-    apply plugin: 'netflix.jacoco'
+    apply plugin: 'jacoco'
     apply plugin: 'netflix.findbugs'
     apply plugin: 'nebula.facet'
 

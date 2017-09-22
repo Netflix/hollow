@@ -1,8 +1,8 @@
 dependencies {
     compile project(':vmstransformer-common-interfaces')
     compile 'org.elasticsearch:elasticsearch:2.3.3'
-    compile 'com.netflix.eureka:eureka-client:latest.release'
-    compile 'com.netflix.suro:suro-core:latest.release'
+    compile 'com.netflix.eureka:eureka-client'
+    compile 'com.netflix.suro:suro-core'
     compile 'netflix:mutation-stream-client:latest.release'
     compile 'netflix:country-launch:latest.release'
     compile 'netflix:content-usage-policy:latest.release'
@@ -10,8 +10,8 @@ dependencies {
         force = true
     }
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.assertj:assertj-core:3.3+'
+    testCompile 'junit:junit'
+    testCompile 'org.assertj:assertj-core'
 }
 
 configurations {
