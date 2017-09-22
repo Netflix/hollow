@@ -605,7 +605,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -1945,7 +1945,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -1953,21 +1953,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -1975,7 +1975,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -1983,13 +1983,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -1997,9 +1997,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -2194,7 +2193,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -3712,7 +3710,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -4372,7 +4369,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -5712,7 +5709,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -5720,21 +5717,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -5742,7 +5739,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -5750,13 +5747,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -5764,9 +5761,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -5961,7 +5957,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -7479,7 +7474,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -8139,7 +8133,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -9479,7 +9473,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -9487,21 +9481,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -9509,7 +9503,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -9517,13 +9511,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -9531,9 +9525,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -9728,7 +9721,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -11246,7 +11238,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -11993,7 +11984,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -13333,7 +13324,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -13341,7 +13332,7 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
@@ -13355,7 +13346,7 @@
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -13363,7 +13354,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -13371,13 +13362,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -13387,7 +13378,6 @@
         "io.netty:netty-transport-native-epoll": {
             "locked": "4.1.6.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -13583,7 +13573,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -15106,7 +15095,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -17516,7 +17504,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -18856,7 +18844,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -18864,21 +18852,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -18886,7 +18874,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -18894,13 +18882,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -18908,9 +18896,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -19105,7 +19092,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -20623,7 +20609,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -21283,7 +21268,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -22623,7 +22608,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -22631,21 +22616,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -22653,7 +22638,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -22661,13 +22646,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -22675,9 +22660,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -22872,7 +22856,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -24390,7 +24373,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -25054,7 +25036,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -26394,7 +26376,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -26402,7 +26384,7 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
@@ -26416,7 +26398,7 @@
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -26424,7 +26406,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -26432,13 +26414,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -26448,7 +26430,6 @@
         "io.netty:netty-transport-native-epoll": {
             "locked": "4.1.6.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -26643,7 +26624,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -28133,7 +28113,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -28817,7 +28796,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -30188,7 +30167,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -30196,21 +30175,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -30218,7 +30197,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -30227,13 +30206,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -30241,9 +30220,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -30453,7 +30431,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -32006,7 +31983,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -32693,7 +32669,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -34064,7 +34040,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -34072,21 +34048,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -34094,7 +34070,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -34103,13 +34079,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -34117,9 +34093,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -34329,7 +34304,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -35882,7 +35856,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -36569,7 +36542,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -37940,7 +37913,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -37948,21 +37921,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -37970,7 +37943,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -37979,13 +37952,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -37993,9 +37966,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -38205,7 +38177,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -39758,7 +39729,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -40445,7 +40415,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -41816,7 +41786,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -41824,21 +41794,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -41846,7 +41816,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -41855,13 +41825,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -41869,9 +41839,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -42081,7 +42050,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -43634,7 +43602,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -44321,7 +44288,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -45692,7 +45659,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -45700,21 +45667,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -45722,7 +45689,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -45731,13 +45698,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -45745,9 +45712,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -45957,7 +45923,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -47510,7 +47475,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -48197,7 +48161,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -49568,7 +49532,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -49576,21 +49540,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -49598,7 +49562,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -49607,13 +49571,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -49621,9 +49585,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -49833,7 +49796,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -51386,7 +51348,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -52073,7 +52034,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -53444,7 +53405,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -53452,21 +53413,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -53474,7 +53435,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -53483,13 +53444,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -53497,9 +53458,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -53709,7 +53669,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -55262,7 +55221,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
@@ -55949,7 +55907,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -57320,7 +57278,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -57328,21 +57286,21 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
@@ -57350,7 +57308,7 @@
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -57359,13 +57317,13 @@
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
@@ -57373,9 +57331,8 @@
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.6.Final",
+            "locked": "4.1.8.Final",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
@@ -57585,7 +57542,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -59138,7 +59094,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
