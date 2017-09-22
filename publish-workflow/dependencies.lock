@@ -2689,7 +2689,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -6161,7 +6160,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -9633,7 +9631,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -13224,7 +13221,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -16696,7 +16692,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -20169,7 +20164,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -23645,7 +23639,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -27121,7 +27114,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -30597,7 +30589,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },

@@ -2385,7 +2385,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -5516,7 +5515,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -8647,7 +8645,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -11897,7 +11894,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -15028,7 +15024,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -18159,7 +18154,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -21293,7 +21287,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -24427,7 +24420,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -27561,7 +27553,6 @@
         },
         "netflix:simone-client": {
             "locked": "1.132",
-            "requested": "latest.release",
             "transitive": [
                 "netflix:content-usage-policy"
             ]

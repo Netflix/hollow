@@ -1073,7 +1073,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -2286,7 +2286,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -2706,6 +2706,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -2898,7 +2899,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -4840,7 +4840,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -6053,7 +6053,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -6473,6 +6473,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -6665,7 +6666,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -8607,7 +8607,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -9820,7 +9820,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -10240,6 +10240,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -10432,7 +10433,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -12461,7 +12461,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -13675,7 +13675,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -14095,6 +14095,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -14287,7 +14288,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -17984,7 +17984,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -19197,7 +19197,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -19617,6 +19617,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -19809,7 +19810,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -21751,7 +21751,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -22964,7 +22964,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -23384,6 +23384,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -23576,7 +23577,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -25522,7 +25522,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -26735,7 +26735,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -27155,6 +27155,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -27347,7 +27348,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -29306,7 +29306,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -30548,7 +30548,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -30969,6 +30969,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -31161,7 +31162,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -33182,7 +33182,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -34424,7 +34424,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -34845,6 +34845,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -35037,7 +35038,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -37058,7 +37058,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -38300,7 +38300,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -38721,6 +38721,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -38913,7 +38914,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -40934,7 +40934,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -42176,7 +42176,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -42597,6 +42597,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -42789,7 +42790,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -44810,7 +44810,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -46052,7 +46052,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -46473,6 +46473,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -46665,7 +46666,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -48686,7 +48686,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -49928,7 +49928,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -50349,6 +50349,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -50541,7 +50542,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -52562,7 +52562,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -53804,7 +53804,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -54225,6 +54225,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -54417,7 +54418,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
@@ -56438,7 +56438,7 @@
             ]
         },
         "com.netflix.karyon:karyon-admin-healthcheck-plugin": {
-            "locked": "2.8.3",
+            "locked": "2.9.0",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -57680,7 +57680,7 @@
             ]
         },
         "netflix:base-server": {
-            "locked": "4.4.3",
+            "locked": "4.5.7",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent",
@@ -58101,6 +58101,7 @@
         "netflix:platform": {
             "locked": "4.5.7",
             "transitive": [
+                "netflix:base-server",
                 "netflix:cryptexclient-standalone",
                 "netflix:geoip-client"
             ]
@@ -58293,7 +58294,6 @@
         "netflix:simone-client": {
             "locked": "1.132",
             "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-io",
                 "netflix:content-usage-policy"
             ]
         },
