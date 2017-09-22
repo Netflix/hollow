@@ -161,21 +161,6 @@
             PINNED_VERSIONS[region] = pinnedVersionMap[region];
         });
 
-        // Get all the versions sorted chronologically .. latest version at the end of the array
-        var versions = blobRows.map(function(blobInfo) {
-            return blobInfo.version; 
-        }).sort();
-
-        Object.keys(PINNED_VERSIONS).forEach(function(region){
-            if(PINNED_VERSIONS[region] == null || PINNED_VERSIONS[region] === "") return; 
-            for(var i = 0; i < versions.length; i++) {
-                if(versions[i] >= PINNED_VERSIONS[region]) {
-                    PINNED_VERSIONS[region] = versions[i];
-                    break;
-                }
-            }
-        });
-
 
 
         blobRows.forEach(function (blobRow) {

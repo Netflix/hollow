@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.fastproperties;
 
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.netflix.config.NetflixConfiguration;
@@ -10,9 +9,7 @@ import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -25,7 +22,6 @@ import org.apache.http.util.EntityUtils;
 public class ClientPinningUtil {
 
     private static final String propertyNameSuffix = "com.netflix.vmsconfig.pin.version";
-    private static final String hermesAnnouncementPropertyNameSuffix = "hermesns.vms.hollow.blob";
     
 	private static String discoveryUrl = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/gutenbergservice-consumer";
 	private static String urlPath = "/REST/consume-service/publish/info/vms.hollow.blob.";
@@ -55,19 +51,14 @@ public class ClientPinningUtil {
 
 
     public static void unpinClients(String vipName, RegionEnum region) throws IOException {
-
-    	List<String> keys = new ArrayList<>();
-    	keys.add(propertyNameSuffix);
-    	keys.add(propertyNameSuffix + ".berlin");
-    	for(String key : keys) {
-        	PersistedPropertiesUtil.deleteFastProperty(key,
-                    null,                                         // no appId
-                    NetflixConfiguration.getEnvironmentEnum(),
-                    region,
-                    null,                                         // no serverId
-                    null,                                         // no stack
-                    null);                                        // no countries    		
-    	}
+    	String key = propertyNameSuffix + "." + vipName;
+    	PersistedPropertiesUtil.deleteFastProperty(key,
+                null,                                         // no appId
+                NetflixConfiguration.getEnvironmentEnum(),
+                region,
+                null,                                         // no serverId
+                null,                                         // no stack
+                null);                                        // no countries    		
     }
 
     /**
@@ -79,35 +70,26 @@ public class ClientPinningUtil {
      */
     public static void pinClients(String vipName, String blobVersion, RegionEnum region) throws IOException {
 
-    	List<String> keys = new ArrayList<>();
-    	keys.add(propertyNameSuffix);
-    	keys.add(propertyNameSuffix + ".berlin");
+    	String key = propertyNameSuffix + "." + vipName;
         EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-        for(String key : keys) {
-            boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
-            if(exists) {
-                // Update property
-                PersistedPropertiesUtil.updateFastProperty(key, blobVersion, null, env, region, null, null, null);
-            } else {
-                // create property
-                PersistedPropertiesUtil.createFastProperty(key, blobVersion, null, env, region, null, null, null);
-            }        	
-        }
+        boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
+        if(exists) {
+            // Update property
+            PersistedPropertiesUtil.updateFastProperty(key, blobVersion, null, env, region, null, null, null);
+        } else {
+            // create property
+            PersistedPropertiesUtil.createFastProperty(key, blobVersion, null, env, region, null, null, null);
+        }        	
 
     }
 
 
     public static String getPinnedVersion(String vipName, RegionEnum region) throws IOException {
-        EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-
     	String key = propertyNameSuffix + "." + vipName;
-        if(PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null)) {
-        	return PersistedPropertiesUtil.getFastPropertyValue(key, null, env, region, null, null, null);
-        } else if(PersistedPropertiesUtil.fastPropertyExists(propertyNameSuffix, null, env, region, null, null, null)){
-        	return PersistedPropertiesUtil.getFastPropertyValue(propertyNameSuffix, null, env, region, null, null, null);
-        }
-        
-        return null;
+    	EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
+    	if(!PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null))
+    		return null;
+    	return PersistedPropertiesUtil.getFastPropertyValue(key, null, env, region, null, null, null);
     }
 
 	private static Map<RegionEnum, String> consumeJson(String json) {

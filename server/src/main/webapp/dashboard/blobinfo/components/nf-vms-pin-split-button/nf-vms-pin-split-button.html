@@ -181,10 +181,6 @@
           e.preventDefault();
           e.stopPropagation();
 
-          var answer = confirm("Do you want to continue to pin all VIPs? If pinning only this vip, please refer: go/pdtoncall.");
-          if(!answer)
-            return;
-
           this._isDropdownOpen = false;
           this._confirmAction = {
             op: e.currentTarget.getAttribute('data-op'),
