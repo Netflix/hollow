@@ -558,8 +558,7 @@ function CycleInputDataInformation(serverInfoView) {
     };
 
     this.refresh = function() {
-        // mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue
-        var inputParams = [ "mutationGroup", "latestEventId", "coldstartVersionId", "coldstartKeybase", "coldstartS3Filename", "coldstartFilePublishDate" ];
+        var inputParams = [ "Input", "Keybase", "Type", "Version", "EventId", "EventCheckpoint", "FileName", "PublishTime" ];
         var tableWidget = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", inputParams);
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getInputDataRegexInfo());
 
