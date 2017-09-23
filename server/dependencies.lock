@@ -28804,13 +28804,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -30431,7 +30431,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -31983,7 +31982,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -32677,13 +32675,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -34304,7 +34302,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -35856,7 +35853,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -36550,13 +36546,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -38177,7 +38173,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -39729,7 +39724,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -40423,13 +40417,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -42050,7 +42044,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -43602,7 +43595,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -44296,13 +44288,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -45923,7 +45915,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -47475,7 +47466,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -48169,13 +48159,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -49796,7 +49786,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -51348,7 +51337,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -52042,13 +52030,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -53669,7 +53657,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -55221,7 +55208,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
@@ -55915,13 +55901,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.35",
+            "locked": "1.36",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.46",
+            "locked": "1.47",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -57542,7 +57528,6 @@
         "net.jpountz.lz4:lz4": {
             "locked": "1.3.0",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:netflix-internal-hollow",
@@ -59094,7 +59079,6 @@
         "org.xerial.snappy:snappy-java": {
             "locked": "1.1.1.7",
             "transitive": [
-                "com.netflix.aeneas:aeneas-test",
                 "com.netflix.astyanax:astyanax-cassandra",
                 "com.netflix.astyanax:astyanax-cql",
                 "netflix:hermes",
