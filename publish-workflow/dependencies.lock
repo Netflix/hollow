@@ -601,7 +601,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -616,7 +616,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -624,13 +624,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -651,7 +651,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -660,13 +660,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -2365,7 +2365,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -2373,7 +2373,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -2784,7 +2784,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -4072,7 +4072,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -4087,7 +4087,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -4095,13 +4095,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -4122,7 +4122,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -4131,13 +4131,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -5836,7 +5836,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -5844,7 +5844,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -6255,7 +6255,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -7543,7 +7543,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -7558,7 +7558,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -7566,13 +7566,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -7593,7 +7593,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -7602,13 +7602,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -9307,7 +9307,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -9315,7 +9315,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -9726,7 +9726,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -11133,7 +11133,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -11148,7 +11148,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -11156,13 +11156,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -11183,7 +11183,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -11192,13 +11192,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -12897,7 +12897,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -12905,7 +12905,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -13316,7 +13316,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -14604,7 +14604,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -14619,7 +14619,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -14627,13 +14627,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -14654,7 +14654,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -14663,13 +14663,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -16368,7 +16368,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -16376,7 +16376,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -16787,7 +16787,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -18075,7 +18075,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -18090,7 +18090,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -18098,13 +18098,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -18125,7 +18125,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -18134,13 +18134,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -19839,7 +19839,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -19847,7 +19847,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -20259,7 +20259,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -21550,7 +21550,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -21565,7 +21565,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -21573,13 +21573,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -21600,7 +21600,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -21609,13 +21609,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -23314,7 +23314,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -23322,7 +23322,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -23734,7 +23734,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25025,7 +25025,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -25040,7 +25040,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -25048,13 +25048,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -25075,7 +25075,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -25084,13 +25084,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -26789,7 +26789,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -26797,7 +26797,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -27209,7 +27209,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -28500,7 +28500,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-api": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -28515,7 +28515,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-archaius1-bridge": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
@@ -28523,13 +28523,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-commons-configuration": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge"
             ]
         },
         "com.netflix.archaius:archaius2-core": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.archaius:archaius2-commons-configuration",
@@ -28550,7 +28550,7 @@
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
                 "com.netflix.governator:governator-test",
@@ -28559,13 +28559,13 @@
             ]
         },
         "com.netflix.archaius:archaius2-persisted2": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "netflix:nf-archaius2"
             ]
         },
         "com.netflix.archaius:archaius2-test": {
-            "locked": "2.2.3",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.governator:governator-test"
             ]
@@ -30264,7 +30264,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -30272,7 +30272,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.35",
+            "locked": "1.34",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -30684,7 +30684,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.103",
+            "locked": "100.0.105",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
