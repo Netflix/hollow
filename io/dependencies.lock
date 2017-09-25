@@ -1994,7 +1994,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -5124,7 +5124,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -8254,7 +8254,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -11503,7 +11503,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -14633,7 +14633,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -17763,7 +17763,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -20896,7 +20896,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -24029,7 +24029,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
@@ -27162,7 +27162,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "38.12",
+            "locked": "39.4",
             "requested": "latest.release"
         },
         "netflix:cryptexclient-standalone": {
