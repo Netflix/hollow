@@ -11,7 +11,7 @@ public class RightsAssetsDelegateCachedImpl extends HollowObjectAbstractDelegate
 
     private final int assetSetIdOrdinal;
     private final int assetsOrdinal;
-   private RightsAssetsTypeAPI typeAPI;
+    private RightsAssetsTypeAPI typeAPI;
 
     public RightsAssetsDelegateCachedImpl(RightsAssetsTypeAPI typeAPI, int ordinal) {
         this.assetSetIdOrdinal = typeAPI.getAssetSetIdOrdinal(ordinal);

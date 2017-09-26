@@ -12,7 +12,7 @@ public class PersonVideoRoleDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Integer sequenceNumber;
     private final Integer roleTypeId;
     private final Long videoId;
-   private PersonVideoRoleTypeAPI typeAPI;
+    private PersonVideoRoleTypeAPI typeAPI;
 
     public PersonVideoRoleDelegateCachedImpl(PersonVideoRoleTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
@@ -22,6 +22,8 @@ public class PersonVideoRoleDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Integer.MIN_VALUE;
         return sequenceNumber.intValue();
     }
 
@@ -30,6 +32,8 @@ public class PersonVideoRoleDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getRoleTypeId(int ordinal) {
+        if(roleTypeId == null)
+            return Integer.MIN_VALUE;
         return roleTypeId.intValue();
     }
 
@@ -38,6 +42,8 @@ public class PersonVideoRoleDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

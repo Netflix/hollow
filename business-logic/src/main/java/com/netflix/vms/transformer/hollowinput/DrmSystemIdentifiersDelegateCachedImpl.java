@@ -13,7 +13,7 @@ public class DrmSystemIdentifiersDelegateCachedImpl extends HollowObjectAbstract
     private final int guidOrdinal;
     private final int nameOrdinal;
     private final Boolean headerDataAvailable;
-   private DrmSystemIdentifiersTypeAPI typeAPI;
+    private DrmSystemIdentifiersTypeAPI typeAPI;
 
     public DrmSystemIdentifiersDelegateCachedImpl(DrmSystemIdentifiersTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class DrmSystemIdentifiersDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 
@@ -40,6 +42,8 @@ public class DrmSystemIdentifiersDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public boolean getHeaderDataAvailable(int ordinal) {
+        if(headerDataAvailable == null)
+            return false;
         return headerDataAvailable.booleanValue();
     }
 

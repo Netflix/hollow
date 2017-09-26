@@ -16,7 +16,7 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     private final Long sha1_3;
     private final Long crc32;
     private final Long createdTimeSeconds;
-   private StreamFileIdentificationTypeAPI typeAPI;
+    private StreamFileIdentificationTypeAPI typeAPI;
 
     public StreamFileIdentificationDelegateCachedImpl(StreamFileIdentificationTypeAPI typeAPI, int ordinal) {
         this.filename = typeAPI.getFilename(ordinal);
@@ -40,6 +40,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getFileSizeInBytes(int ordinal) {
+        if(fileSizeInBytes == null)
+            return Long.MIN_VALUE;
         return fileSizeInBytes.longValue();
     }
 
@@ -48,6 +50,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getSha1_1(int ordinal) {
+        if(sha1_1 == null)
+            return Long.MIN_VALUE;
         return sha1_1.longValue();
     }
 
@@ -56,6 +60,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getSha1_2(int ordinal) {
+        if(sha1_2 == null)
+            return Long.MIN_VALUE;
         return sha1_2.longValue();
     }
 
@@ -64,6 +70,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getSha1_3(int ordinal) {
+        if(sha1_3 == null)
+            return Long.MIN_VALUE;
         return sha1_3.longValue();
     }
 
@@ -72,6 +80,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getCrc32(int ordinal) {
+        if(crc32 == null)
+            return Long.MIN_VALUE;
         return crc32.longValue();
     }
 
@@ -80,6 +90,8 @@ public class StreamFileIdentificationDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getCreatedTimeSeconds(int ordinal) {
+        if(createdTimeSeconds == null)
+            return Long.MIN_VALUE;
         return createdTimeSeconds.longValue();
     }
 

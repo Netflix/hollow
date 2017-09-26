@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DownloadableIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DownloadableIdDelegate {
 
     private final Long value;
-   private DownloadableIdTypeAPI typeAPI;
+    private DownloadableIdTypeAPI typeAPI;
 
     public DownloadableIdDelegateCachedImpl(DownloadableIdTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValueBoxed(ordinal);
@@ -18,6 +18,8 @@ public class DownloadableIdDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getValue(int ordinal) {
+        if(value == null)
+            return Long.MIN_VALUE;
         return value.longValue();
     }
 

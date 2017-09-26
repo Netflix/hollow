@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class ChunkDurationsStringDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ChunkDurationsStringDelegate {
 
     private final String value;
-   private ChunkDurationsStringTypeAPI typeAPI;
+    private ChunkDurationsStringTypeAPI typeAPI;
 
     public ChunkDurationsStringDelegateCachedImpl(ChunkDurationsStringTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

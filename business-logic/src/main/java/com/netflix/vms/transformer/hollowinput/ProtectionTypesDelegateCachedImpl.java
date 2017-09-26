@@ -11,7 +11,7 @@ public class ProtectionTypesDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final int nameOrdinal;
     private final Long id;
-   private ProtectionTypesTypeAPI typeAPI;
+    private ProtectionTypesTypeAPI typeAPI;
 
     public ProtectionTypesDelegateCachedImpl(ProtectionTypesTypeAPI typeAPI, int ordinal) {
         this.nameOrdinal = typeAPI.getNameOrdinal(ordinal);
@@ -24,6 +24,8 @@ public class ProtectionTypesDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 

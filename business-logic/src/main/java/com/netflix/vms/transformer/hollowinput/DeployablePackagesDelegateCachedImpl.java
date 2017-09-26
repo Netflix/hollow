@@ -14,7 +14,7 @@ public class DeployablePackagesDelegateCachedImpl extends HollowObjectAbstractDe
     private final int countryCodesOrdinal;
     private final int tagsOrdinal;
     private final Boolean defaultPackage;
-   private DeployablePackagesTypeAPI typeAPI;
+    private DeployablePackagesTypeAPI typeAPI;
 
     public DeployablePackagesDelegateCachedImpl(DeployablePackagesTypeAPI typeAPI, int ordinal) {
         this.packageId = typeAPI.getPackageIdBoxed(ordinal);
@@ -26,6 +26,8 @@ public class DeployablePackagesDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getPackageId(int ordinal) {
+        if(packageId == null)
+            return Long.MIN_VALUE;
         return packageId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class DeployablePackagesDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -50,6 +54,8 @@ public class DeployablePackagesDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public boolean getDefaultPackage(int ordinal) {
+        if(defaultPackage == null)
+            return false;
         return defaultPackage.booleanValue();
     }
 

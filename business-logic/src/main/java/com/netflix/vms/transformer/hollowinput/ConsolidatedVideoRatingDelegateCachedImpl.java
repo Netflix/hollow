@@ -11,7 +11,7 @@ public class ConsolidatedVideoRatingDelegateCachedImpl extends HollowObjectAbstr
 
     private final int countryRatingsOrdinal;
     private final int countryListOrdinal;
-   private ConsolidatedVideoRatingTypeAPI typeAPI;
+    private ConsolidatedVideoRatingTypeAPI typeAPI;
 
     public ConsolidatedVideoRatingDelegateCachedImpl(ConsolidatedVideoRatingTypeAPI typeAPI, int ordinal) {
         this.countryRatingsOrdinal = typeAPI.getCountryRatingsOrdinal(ordinal);

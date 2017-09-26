@@ -16,7 +16,7 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     private final Long prePromotionDays;
     private final Boolean dayAfterBroadcast;
     private final int disallowedAssetBundlesOrdinal;
-   private ContractTypeAPI typeAPI;
+    private ContractTypeAPI typeAPI;
 
     public ContractDelegateCachedImpl(ContractTypeAPI typeAPI, int ordinal) {
         this.contractId = typeAPI.getContractIdBoxed(ordinal);
@@ -30,6 +30,8 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getContractId(int ordinal) {
+        if(contractId == null)
+            return Long.MIN_VALUE;
         return contractId.longValue();
     }
 
@@ -38,6 +40,8 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public boolean getOriginal(int ordinal) {
+        if(original == null)
+            return false;
         return original.booleanValue();
     }
 
@@ -50,6 +54,8 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public boolean getDayOfBroadcast(int ordinal) {
+        if(dayOfBroadcast == null)
+            return false;
         return dayOfBroadcast.booleanValue();
     }
 
@@ -58,6 +64,8 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getPrePromotionDays(int ordinal) {
+        if(prePromotionDays == null)
+            return Long.MIN_VALUE;
         return prePromotionDays.longValue();
     }
 
@@ -66,6 +74,8 @@ public class ContractDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public boolean getDayAfterBroadcast(int ordinal) {
+        if(dayAfterBroadcast == null)
+            return false;
         return dayAfterBroadcast.booleanValue();
     }
 

@@ -12,7 +12,7 @@ public class CacheDeploymentIntentDelegateCachedImpl extends HollowObjectAbstrac
     private final Long streamProfileId;
     private final int isoCountryCodeOrdinal;
     private final Long bitrateKBPS;
-   private CacheDeploymentIntentTypeAPI typeAPI;
+    private CacheDeploymentIntentTypeAPI typeAPI;
 
     public CacheDeploymentIntentDelegateCachedImpl(CacheDeploymentIntentTypeAPI typeAPI, int ordinal) {
         this.streamProfileId = typeAPI.getStreamProfileIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class CacheDeploymentIntentDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public long getStreamProfileId(int ordinal) {
+        if(streamProfileId == null)
+            return Long.MIN_VALUE;
         return streamProfileId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class CacheDeploymentIntentDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public long getBitrateKBPS(int ordinal) {
+        if(bitrateKBPS == null)
+            return Long.MIN_VALUE;
         return bitrateKBPS.longValue();
     }
 

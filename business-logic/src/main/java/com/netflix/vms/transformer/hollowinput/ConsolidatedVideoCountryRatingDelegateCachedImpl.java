@@ -13,7 +13,7 @@ public class ConsolidatedVideoCountryRatingDelegateCachedImpl extends HollowObje
     private final int reasonsOrdinal;
     private final Long ratingId;
     private final Long certificationSystemId;
-   private ConsolidatedVideoCountryRatingTypeAPI typeAPI;
+    private ConsolidatedVideoCountryRatingTypeAPI typeAPI;
 
     public ConsolidatedVideoCountryRatingDelegateCachedImpl(ConsolidatedVideoCountryRatingTypeAPI typeAPI, int ordinal) {
         this.advisoriesOrdinal = typeAPI.getAdvisoriesOrdinal(ordinal);
@@ -32,6 +32,8 @@ public class ConsolidatedVideoCountryRatingDelegateCachedImpl extends HollowObje
     }
 
     public long getRatingId(int ordinal) {
+        if(ratingId == null)
+            return Long.MIN_VALUE;
         return ratingId.longValue();
     }
 
@@ -40,6 +42,8 @@ public class ConsolidatedVideoCountryRatingDelegateCachedImpl extends HollowObje
     }
 
     public long getCertificationSystemId(int ordinal) {
+        if(certificationSystemId == null)
+            return Long.MIN_VALUE;
         return certificationSystemId.longValue();
     }
 

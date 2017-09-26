@@ -12,7 +12,7 @@ public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final Integer monthOfYear;
     private final Integer year;
     private final Integer dayOfMonth;
-   private ExplicitDateTypeAPI typeAPI;
+    private ExplicitDateTypeAPI typeAPI;
 
     public ExplicitDateDelegateCachedImpl(ExplicitDateTypeAPI typeAPI, int ordinal) {
         this.monthOfYear = typeAPI.getMonthOfYearBoxed(ordinal);
@@ -22,6 +22,8 @@ public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public int getMonthOfYear(int ordinal) {
+        if(monthOfYear == null)
+            return Integer.MIN_VALUE;
         return monthOfYear.intValue();
     }
 
@@ -30,6 +32,8 @@ public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public int getYear(int ordinal) {
+        if(year == null)
+            return Integer.MIN_VALUE;
         return year.intValue();
     }
 
@@ -38,6 +42,8 @@ public class ExplicitDateDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public int getDayOfMonth(int ordinal) {
+        if(dayOfMonth == null)
+            return Integer.MIN_VALUE;
         return dayOfMonth.intValue();
     }
 

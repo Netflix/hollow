@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class StreamProfileIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamProfileIdDelegate {
 
     private final Long value;
-   private StreamProfileIdTypeAPI typeAPI;
+    private StreamProfileIdTypeAPI typeAPI;
 
     public StreamProfileIdDelegateCachedImpl(StreamProfileIdTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValueBoxed(ordinal);
@@ -18,6 +18,8 @@ public class StreamProfileIdDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getValue(int ordinal) {
+        if(value == null)
+            return Long.MIN_VALUE;
         return value.longValue();
     }
 

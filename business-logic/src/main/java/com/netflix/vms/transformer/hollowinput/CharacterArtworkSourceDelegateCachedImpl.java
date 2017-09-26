@@ -21,7 +21,7 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     private final Boolean rolloutExclusive;
     private final int attributesOrdinal;
     private final int localesOrdinal;
-   private CharacterArtworkSourceTypeAPI typeAPI;
+    private CharacterArtworkSourceTypeAPI typeAPI;
 
     public CharacterArtworkSourceDelegateCachedImpl(CharacterArtworkSourceTypeAPI typeAPI, int ordinal) {
         this.sourceFileIdOrdinal = typeAPI.getSourceFileIdOrdinal(ordinal);
@@ -44,6 +44,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public long getCharacterId(int ordinal) {
+        if(characterId == null)
+            return Long.MIN_VALUE;
         return characterId.longValue();
     }
 
@@ -52,6 +54,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public boolean getIsFallback(int ordinal) {
+        if(isFallback == null)
+            return false;
         return isFallback.booleanValue();
     }
 
@@ -64,6 +68,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public int getSeqNum(int ordinal) {
+        if(seqNum == null)
+            return Integer.MIN_VALUE;
         return seqNum.intValue();
     }
 
@@ -72,6 +78,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public int getOrdinalPriority(int ordinal) {
+        if(ordinalPriority == null)
+            return Integer.MIN_VALUE;
         return ordinalPriority.intValue();
     }
 
@@ -88,6 +96,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public boolean getIsSmoky(int ordinal) {
+        if(isSmoky == null)
+            return false;
         return isSmoky.booleanValue();
     }
 
@@ -96,6 +106,8 @@ public class CharacterArtworkSourceDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public boolean getRolloutExclusive(int ordinal) {
+        if(rolloutExclusive == null)
+            return false;
         return rolloutExclusive.booleanValue();
     }
 

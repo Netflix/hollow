@@ -16,7 +16,7 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int windowsOrdinal;
     private final int phaseTypeOrdinal;
     private final Boolean onHold;
-   private RolloutPhaseTypeAPI typeAPI;
+    private RolloutPhaseTypeAPI typeAPI;
 
     public RolloutPhaseDelegateCachedImpl(RolloutPhaseTypeAPI typeAPI, int ordinal) {
         this.seasonMovieId = typeAPI.getSeasonMovieIdBoxed(ordinal);
@@ -30,6 +30,8 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getSeasonMovieId(int ordinal) {
+        if(seasonMovieId == null)
+            return Long.MIN_VALUE;
         return seasonMovieId.longValue();
     }
 
@@ -46,6 +48,8 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public boolean getShowCoreMetadata(int ordinal) {
+        if(showCoreMetadata == null)
+            return false;
         return showCoreMetadata.booleanValue();
     }
 
@@ -62,6 +66,8 @@ public class RolloutPhaseDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public boolean getOnHold(int ordinal) {
+        if(onHold == null)
+            return false;
         return onHold.booleanValue();
     }
 

@@ -13,7 +13,7 @@ public class ArtworkLocaleDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int bcp47CodeOrdinal;
     private final int effectiveDateOrdinal;
     private final int attributesOrdinal;
-   private ArtworkLocaleTypeAPI typeAPI;
+    private ArtworkLocaleTypeAPI typeAPI;
 
     public ArtworkLocaleDelegateCachedImpl(ArtworkLocaleTypeAPI typeAPI, int ordinal) {
         this.territoryCodesOrdinal = typeAPI.getTerritoryCodesOrdinal(ordinal);

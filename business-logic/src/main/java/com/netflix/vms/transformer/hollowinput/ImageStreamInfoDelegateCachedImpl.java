@@ -12,7 +12,7 @@ public class ImageStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Integer imageCount;
     private final int imageFormatOrdinal;
     private final Long offsetMillis;
-   private ImageStreamInfoTypeAPI typeAPI;
+    private ImageStreamInfoTypeAPI typeAPI;
 
     public ImageStreamInfoDelegateCachedImpl(ImageStreamInfoTypeAPI typeAPI, int ordinal) {
         this.imageCount = typeAPI.getImageCountBoxed(ordinal);
@@ -22,6 +22,8 @@ public class ImageStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getImageCount(int ordinal) {
+        if(imageCount == null)
+            return Integer.MIN_VALUE;
         return imageCount.intValue();
     }
 
@@ -34,6 +36,8 @@ public class ImageStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getOffsetMillis(int ordinal) {
+        if(offsetMillis == null)
+            return Long.MIN_VALUE;
         return offsetMillis.longValue();
     }
 

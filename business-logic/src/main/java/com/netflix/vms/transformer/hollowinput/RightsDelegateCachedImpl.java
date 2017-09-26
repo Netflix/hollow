@@ -11,7 +11,7 @@ public class RightsDelegateCachedImpl extends HollowObjectAbstractDelegate imple
 
     private final int windowsOrdinal;
     private final int contractsOrdinal;
-   private RightsTypeAPI typeAPI;
+    private RightsTypeAPI typeAPI;
 
     public RightsDelegateCachedImpl(RightsTypeAPI typeAPI, int ordinal) {
         this.windowsOrdinal = typeAPI.getWindowsOrdinal(ordinal);

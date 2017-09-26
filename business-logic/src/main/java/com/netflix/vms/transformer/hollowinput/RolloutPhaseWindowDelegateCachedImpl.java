@@ -11,7 +11,7 @@ public class RolloutPhaseWindowDelegateCachedImpl extends HollowObjectAbstractDe
 
     private final Long endDate;
     private final Long startDate;
-   private RolloutPhaseWindowTypeAPI typeAPI;
+    private RolloutPhaseWindowTypeAPI typeAPI;
 
     public RolloutPhaseWindowDelegateCachedImpl(RolloutPhaseWindowTypeAPI typeAPI, int ordinal) {
         this.endDate = typeAPI.getEndDateBoxed(ordinal);
@@ -20,6 +20,8 @@ public class RolloutPhaseWindowDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getEndDate(int ordinal) {
+        if(endDate == null)
+            return Long.MIN_VALUE;
         return endDate.longValue();
     }
 
@@ -28,6 +30,8 @@ public class RolloutPhaseWindowDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getStartDate(int ordinal) {
+        if(startDate == null)
+            return Long.MIN_VALUE;
         return startDate.longValue();
     }
 

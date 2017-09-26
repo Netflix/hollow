@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class TranslatedTextDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, TranslatedTextDelegate {
 
     private final int translatedTextsOrdinal;
-   private TranslatedTextTypeAPI typeAPI;
+    private TranslatedTextTypeAPI typeAPI;
 
     public TranslatedTextDelegateCachedImpl(TranslatedTextTypeAPI typeAPI, int ordinal) {
         this.translatedTextsOrdinal = typeAPI.getTranslatedTextsOrdinal(ordinal);

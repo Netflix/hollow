@@ -11,7 +11,7 @@ public class AudioStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final int audioLanguageCodeOrdinal;
     private final Integer audioBitrateKBPS;
-   private AudioStreamInfoTypeAPI typeAPI;
+    private AudioStreamInfoTypeAPI typeAPI;
 
     public AudioStreamInfoDelegateCachedImpl(AudioStreamInfoTypeAPI typeAPI, int ordinal) {
         this.audioLanguageCodeOrdinal = typeAPI.getAudioLanguageCodeOrdinal(ordinal);
@@ -24,6 +24,8 @@ public class AudioStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getAudioBitrateKBPS(int ordinal) {
+        if(audioBitrateKBPS == null)
+            return Integer.MIN_VALUE;
         return audioBitrateKBPS.intValue();
     }
 

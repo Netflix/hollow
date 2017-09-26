@@ -11,7 +11,7 @@ public class VideoAwardDelegateCachedImpl extends HollowObjectAbstractDelegate i
 
     private final Long videoId;
     private final int awardOrdinal;
-   private VideoAwardTypeAPI typeAPI;
+    private VideoAwardTypeAPI typeAPI;
 
     public VideoAwardDelegateCachedImpl(VideoAwardTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class VideoAwardDelegateCachedImpl extends HollowObjectAbstractDelegate i
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

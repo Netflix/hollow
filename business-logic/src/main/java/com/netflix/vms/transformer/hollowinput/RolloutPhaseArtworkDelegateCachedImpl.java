@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class RolloutPhaseArtworkDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RolloutPhaseArtworkDelegate {
 
     private final int sourceFileIdsOrdinal;
-   private RolloutPhaseArtworkTypeAPI typeAPI;
+    private RolloutPhaseArtworkTypeAPI typeAPI;
 
     public RolloutPhaseArtworkDelegateCachedImpl(RolloutPhaseArtworkTypeAPI typeAPI, int ordinal) {
         this.sourceFileIdsOrdinal = typeAPI.getSourceFileIdsOrdinal(ordinal);

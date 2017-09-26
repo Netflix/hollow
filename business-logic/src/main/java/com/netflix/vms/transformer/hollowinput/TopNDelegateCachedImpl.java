@@ -11,7 +11,7 @@ public class TopNDelegateCachedImpl extends HollowObjectAbstractDelegate impleme
 
     private final Long videoId;
     private final int attributesOrdinal;
-   private TopNTypeAPI typeAPI;
+    private TopNTypeAPI typeAPI;
 
     public TopNDelegateCachedImpl(TopNTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class TopNDelegateCachedImpl extends HollowObjectAbstractDelegate impleme
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

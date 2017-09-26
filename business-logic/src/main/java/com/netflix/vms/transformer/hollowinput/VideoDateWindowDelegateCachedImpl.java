@@ -11,7 +11,7 @@ public class VideoDateWindowDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final int countryCodeOrdinal;
     private final int releaseDatesOrdinal;
-   private VideoDateWindowTypeAPI typeAPI;
+    private VideoDateWindowTypeAPI typeAPI;
 
     public VideoDateWindowDelegateCachedImpl(VideoDateWindowTypeAPI typeAPI, int ordinal) {
         this.countryCodeOrdinal = typeAPI.getCountryCodeOrdinal(ordinal);

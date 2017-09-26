@@ -13,7 +13,7 @@ public class MovieRatingsDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int mediaOrdinal;
     private final Long certificationTypeId;
     private final int ratingReasonOrdinal;
-   private MovieRatingsTypeAPI typeAPI;
+    private MovieRatingsTypeAPI typeAPI;
 
     public MovieRatingsDelegateCachedImpl(MovieRatingsTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class MovieRatingsDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -36,6 +38,8 @@ public class MovieRatingsDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getCertificationTypeId(int ordinal) {
+        if(certificationTypeId == null)
+            return Long.MIN_VALUE;
         return certificationTypeId.longValue();
     }
 

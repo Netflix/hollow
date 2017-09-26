@@ -13,7 +13,7 @@ public class IPLDerivativeGroupDelegateCachedImpl extends HollowObjectAbstractDe
     private final Integer submission;
     private final int imageTypeOrdinal;
     private final int derivativesOrdinal;
-   private IPLDerivativeGroupTypeAPI typeAPI;
+    private IPLDerivativeGroupTypeAPI typeAPI;
 
     public IPLDerivativeGroupDelegateCachedImpl(IPLDerivativeGroupTypeAPI typeAPI, int ordinal) {
         this.externalIdOrdinal = typeAPI.getExternalIdOrdinal(ordinal);
@@ -28,6 +28,8 @@ public class IPLDerivativeGroupDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public int getSubmission(int ordinal) {
+        if(submission == null)
+            return Integer.MIN_VALUE;
         return submission.intValue();
     }
 

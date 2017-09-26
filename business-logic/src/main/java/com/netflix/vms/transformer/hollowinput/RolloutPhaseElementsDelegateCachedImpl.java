@@ -11,7 +11,7 @@ public class RolloutPhaseElementsDelegateCachedImpl extends HollowObjectAbstract
 
     private final int localized_metadataOrdinal;
     private final int artworkOrdinal;
-   private RolloutPhaseElementsTypeAPI typeAPI;
+    private RolloutPhaseElementsTypeAPI typeAPI;
 
     public RolloutPhaseElementsDelegateCachedImpl(RolloutPhaseElementsTypeAPI typeAPI, int ordinal) {
         this.localized_metadataOrdinal = typeAPI.getLocalized_metadataOrdinal(ordinal);

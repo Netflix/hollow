@@ -13,7 +13,7 @@ public class TextStreamInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     private final int timedTextTypeOrdinal;
     private final Long imageTimedTextMasterIndexOffset;
     private final Long imageTimedTextMasterIndexLength;
-   private TextStreamInfoTypeAPI typeAPI;
+    private TextStreamInfoTypeAPI typeAPI;
 
     public TextStreamInfoDelegateCachedImpl(TextStreamInfoTypeAPI typeAPI, int ordinal) {
         this.textLanguageCodeOrdinal = typeAPI.getTextLanguageCodeOrdinal(ordinal);
@@ -32,6 +32,8 @@ public class TextStreamInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getImageTimedTextMasterIndexOffset(int ordinal) {
+        if(imageTimedTextMasterIndexOffset == null)
+            return Long.MIN_VALUE;
         return imageTimedTextMasterIndexOffset.longValue();
     }
 
@@ -40,6 +42,8 @@ public class TextStreamInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getImageTimedTextMasterIndexLength(int ordinal) {
+        if(imageTimedTextMasterIndexLength == null)
+            return Long.MIN_VALUE;
         return imageTimedTextMasterIndexLength.longValue();
     }
 

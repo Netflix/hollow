@@ -11,7 +11,7 @@ public class IPLArtworkDerivativeSetDelegateCachedImpl extends HollowObjectAbstr
 
     private final int derivativeSetIdOrdinal;
     private final int derivativesGroupBySourceOrdinal;
-   private IPLArtworkDerivativeSetTypeAPI typeAPI;
+    private IPLArtworkDerivativeSetTypeAPI typeAPI;
 
     public IPLArtworkDerivativeSetDelegateCachedImpl(IPLArtworkDerivativeSetTypeAPI typeAPI, int ordinal) {
         this.derivativeSetIdOrdinal = typeAPI.getDerivativeSetIdOrdinal(ordinal);

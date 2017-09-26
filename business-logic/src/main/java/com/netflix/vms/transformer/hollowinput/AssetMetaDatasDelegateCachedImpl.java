@@ -11,7 +11,7 @@ public class AssetMetaDatasDelegateCachedImpl extends HollowObjectAbstractDelega
 
     private final int assetIdOrdinal;
     private final int trackLabelsOrdinal;
-   private AssetMetaDatasTypeAPI typeAPI;
+    private AssetMetaDatasTypeAPI typeAPI;
 
     public AssetMetaDatasDelegateCachedImpl(AssetMetaDatasTypeAPI typeAPI, int ordinal) {
         this.assetIdOrdinal = typeAPI.getAssetIdOrdinal(ordinal);

@@ -13,7 +13,7 @@ public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     private final int phaseTagOrdinal;
     private final Long startDate;
     private final Long endDate;
-   private AbsoluteScheduleTypeAPI typeAPI;
+    private AbsoluteScheduleTypeAPI typeAPI;
 
     public AbsoluteScheduleDelegateCachedImpl(AbsoluteScheduleTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -36,6 +38,8 @@ public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getStartDate(int ordinal) {
+        if(startDate == null)
+            return Long.MIN_VALUE;
         return startDate.longValue();
     }
 
@@ -44,6 +48,8 @@ public class AbsoluteScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getEndDate(int ordinal) {
+        if(endDate == null)
+            return Long.MIN_VALUE;
         return endDate.longValue();
     }
 

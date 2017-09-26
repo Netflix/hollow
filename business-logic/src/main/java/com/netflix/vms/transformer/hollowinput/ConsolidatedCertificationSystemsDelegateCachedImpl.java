@@ -15,7 +15,7 @@ public class ConsolidatedCertificationSystemsDelegateCachedImpl extends HollowOb
     private final int nameOrdinal;
     private final int descriptionOrdinal;
     private final int officialURLOrdinal;
-   private ConsolidatedCertificationSystemsTypeAPI typeAPI;
+    private ConsolidatedCertificationSystemsTypeAPI typeAPI;
 
     public ConsolidatedCertificationSystemsDelegateCachedImpl(ConsolidatedCertificationSystemsTypeAPI typeAPI, int ordinal) {
         this.certificationSystemId = typeAPI.getCertificationSystemIdBoxed(ordinal);
@@ -28,6 +28,8 @@ public class ConsolidatedCertificationSystemsDelegateCachedImpl extends HollowOb
     }
 
     public long getCertificationSystemId(int ordinal) {
+        if(certificationSystemId == null)
+            return Long.MIN_VALUE;
         return certificationSystemId.longValue();
     }
 

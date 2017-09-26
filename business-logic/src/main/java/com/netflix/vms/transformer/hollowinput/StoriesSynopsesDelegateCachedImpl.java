@@ -12,7 +12,7 @@ public class StoriesSynopsesDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Long movieId;
     private final int narrativeTextOrdinal;
     private final int hooksOrdinal;
-   private StoriesSynopsesTypeAPI typeAPI;
+    private StoriesSynopsesTypeAPI typeAPI;
 
     public StoriesSynopsesDelegateCachedImpl(StoriesSynopsesTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class StoriesSynopsesDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

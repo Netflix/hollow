@@ -11,7 +11,7 @@ public class ShowMemberTypeDelegateCachedImpl extends HollowObjectAbstractDelega
 
     private final int countryCodesOrdinal;
     private final Long sequenceLabelId;
-   private ShowMemberTypeTypeAPI typeAPI;
+    private ShowMemberTypeTypeAPI typeAPI;
 
     public ShowMemberTypeDelegateCachedImpl(ShowMemberTypeTypeAPI typeAPI, int ordinal) {
         this.countryCodesOrdinal = typeAPI.getCountryCodesOrdinal(ordinal);
@@ -24,6 +24,8 @@ public class ShowMemberTypeDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getSequenceLabelId(int ordinal) {
+        if(sequenceLabelId == null)
+            return Long.MIN_VALUE;
         return sequenceLabelId.longValue();
     }
 

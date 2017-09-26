@@ -17,7 +17,7 @@ public class MoviesDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     private final int akaOrdinal;
     private final int transliteratedOrdinal;
     private final int tvSynopsisOrdinal;
-   private MoviesTypeAPI typeAPI;
+    private MoviesTypeAPI typeAPI;
 
     public MoviesDelegateCachedImpl(MoviesTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -32,6 +32,8 @@ public class MoviesDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

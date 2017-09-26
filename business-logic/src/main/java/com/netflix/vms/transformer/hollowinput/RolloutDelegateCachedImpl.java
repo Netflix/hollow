@@ -14,7 +14,7 @@ public class RolloutDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     private final int rolloutNameOrdinal;
     private final int rolloutTypeOrdinal;
     private final int phasesOrdinal;
-   private RolloutTypeAPI typeAPI;
+    private RolloutTypeAPI typeAPI;
 
     public RolloutDelegateCachedImpl(RolloutTypeAPI typeAPI, int ordinal) {
         this.rolloutId = typeAPI.getRolloutIdBoxed(ordinal);
@@ -26,6 +26,8 @@ public class RolloutDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getRolloutId(int ordinal) {
+        if(rolloutId == null)
+            return Long.MIN_VALUE;
         return rolloutId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class RolloutDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

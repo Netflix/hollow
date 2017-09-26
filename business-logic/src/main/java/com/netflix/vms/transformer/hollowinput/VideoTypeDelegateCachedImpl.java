@@ -11,7 +11,7 @@ public class VideoTypeDelegateCachedImpl extends HollowObjectAbstractDelegate im
 
     private final Long videoId;
     private final int countryInfosOrdinal;
-   private VideoTypeTypeAPI typeAPI;
+    private VideoTypeTypeAPI typeAPI;
 
     public VideoTypeDelegateCachedImpl(VideoTypeTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class VideoTypeDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

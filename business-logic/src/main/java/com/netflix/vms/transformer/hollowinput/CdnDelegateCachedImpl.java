@@ -11,7 +11,7 @@ public class CdnDelegateCachedImpl extends HollowObjectAbstractDelegate implemen
 
     private final Long id;
     private final int nameOrdinal;
-   private CdnTypeAPI typeAPI;
+    private CdnTypeAPI typeAPI;
 
     public CdnDelegateCachedImpl(CdnTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class CdnDelegateCachedImpl extends HollowObjectAbstractDelegate implemen
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 

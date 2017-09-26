@@ -11,7 +11,7 @@ public class LanguagesDelegateCachedImpl extends HollowObjectAbstractDelegate im
 
     private final Long languageId;
     private final int nameOrdinal;
-   private LanguagesTypeAPI typeAPI;
+    private LanguagesTypeAPI typeAPI;
 
     public LanguagesDelegateCachedImpl(LanguagesTypeAPI typeAPI, int ordinal) {
         this.languageId = typeAPI.getLanguageIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class LanguagesDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getLanguageId(int ordinal) {
+        if(languageId == null)
+            return Long.MIN_VALUE;
         return languageId.longValue();
     }
 

@@ -11,7 +11,7 @@ public class StreamDeploymentInfoDelegateCachedImpl extends HollowObjectAbstract
 
     private final int cacheDeployedCountriesOrdinal;
     private final int cdnDeploymentsOrdinal;
-   private StreamDeploymentInfoTypeAPI typeAPI;
+    private StreamDeploymentInfoTypeAPI typeAPI;
 
     public StreamDeploymentInfoDelegateCachedImpl(StreamDeploymentInfoTypeAPI typeAPI, int ordinal) {
         this.cacheDeployedCountriesOrdinal = typeAPI.getCacheDeployedCountriesOrdinal(ordinal);

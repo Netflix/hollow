@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class StreamBoxInfoKeyDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamBoxInfoKeyDelegate {
 
     private final String value;
-   private StreamBoxInfoKeyTypeAPI typeAPI;
+    private StreamBoxInfoKeyTypeAPI typeAPI;
 
     public StreamBoxInfoKeyDelegateCachedImpl(StreamBoxInfoKeyTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

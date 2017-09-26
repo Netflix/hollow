@@ -13,7 +13,7 @@ public class ArtworkRecipeDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int cdnFolderOrdinal;
     private final int extensionOrdinal;
     private final int hostNameOrdinal;
-   private ArtworkRecipeTypeAPI typeAPI;
+    private ArtworkRecipeTypeAPI typeAPI;
 
     public ArtworkRecipeDelegateCachedImpl(ArtworkRecipeTypeAPI typeAPI, int ordinal) {
         this.recipeNameOrdinal = typeAPI.getRecipeNameOrdinal(ordinal);

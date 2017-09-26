@@ -12,7 +12,7 @@ public class StreamBoxInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final Integer boxOffset;
     private final Integer boxSize;
     private final int keyOrdinal;
-   private StreamBoxInfoTypeAPI typeAPI;
+    private StreamBoxInfoTypeAPI typeAPI;
 
     public StreamBoxInfoDelegateCachedImpl(StreamBoxInfoTypeAPI typeAPI, int ordinal) {
         this.boxOffset = typeAPI.getBoxOffsetBoxed(ordinal);
@@ -22,6 +22,8 @@ public class StreamBoxInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public int getBoxOffset(int ordinal) {
+        if(boxOffset == null)
+            return Integer.MIN_VALUE;
         return boxOffset.intValue();
     }
 
@@ -30,6 +32,8 @@ public class StreamBoxInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public int getBoxSize(int ordinal) {
+        if(boxSize == null)
+            return Integer.MIN_VALUE;
         return boxSize.intValue();
     }
 
