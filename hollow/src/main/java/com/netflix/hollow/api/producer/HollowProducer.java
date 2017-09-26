@@ -850,17 +850,17 @@ public class HollowProducer {
     }
     
     public static class Builder {
-        private BlobStager stager;
-        private BlobCompressor compressor;
-        private File stagingDir;
-        private Publisher publisher;
-        private Announcer announcer;
-        private List<Validator> validators = new ArrayList<Validator>();
-        private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
-        private VersionMinter versionMinter = new VersionMinterWithCounter();
-        private Executor snapshotPublishExecutor = null;
-        private int numStatesBetweenSnapshots = 0;
-        private long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
+        protected BlobStager stager;
+        protected BlobCompressor compressor;
+        protected File stagingDir;
+        protected Publisher publisher;
+        protected Announcer announcer;
+        protected List<Validator> validators = new ArrayList<Validator>();
+        protected List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
+        protected VersionMinter versionMinter = new VersionMinterWithCounter();
+        protected Executor snapshotPublishExecutor = null;
+        protected int numStatesBetweenSnapshots = 0;
+        protected long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
         
         public Builder withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -928,19 +928,22 @@ public class HollowProducer {
             this.targetMaxTypeShardSize = targetMaxTypeShardSize;
             return this;
         }
-        
-        public HollowProducer build() {
+
+        protected void checkArguments() {
             if(stager != null && compressor != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
             if(stager != null && stagingDir != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
-            
-            BlobStager stager = this.stager;
-            if(stager == null) {
+
+            if(this.stager == null) {
                 BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
                 File stagingDir = this.stagingDir != null ? this.stagingDir : new File(System.getProperty("java.io.tmpdir"));
-                stager = new HollowFilesystemBlobStager(stagingDir, compressor);
+                this.stager = new HollowFilesystemBlobStager(stagingDir, compressor);
             }
+        }
+        
+        public HollowProducer build() {
+            checkArguments();
             
             return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
         }
