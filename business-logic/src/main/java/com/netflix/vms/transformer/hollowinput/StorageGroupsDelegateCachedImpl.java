@@ -12,7 +12,7 @@ public class StorageGroupsDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int idOrdinal;
     private final Long cdnId;
     private final int countriesOrdinal;
-   private StorageGroupsTypeAPI typeAPI;
+    private StorageGroupsTypeAPI typeAPI;
 
     public StorageGroupsDelegateCachedImpl(StorageGroupsTypeAPI typeAPI, int ordinal) {
         this.idOrdinal = typeAPI.getIdOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class StorageGroupsDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getCdnId(int ordinal) {
+        if(cdnId == null)
+            return Long.MIN_VALUE;
         return cdnId.longValue();
     }
 

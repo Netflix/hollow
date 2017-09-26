@@ -15,7 +15,7 @@ public class FestivalsDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final int descriptionOrdinal;
     private final int shortNameOrdinal;
     private final int singularNameOrdinal;
-   private FestivalsTypeAPI typeAPI;
+    private FestivalsTypeAPI typeAPI;
 
     public FestivalsDelegateCachedImpl(FestivalsTypeAPI typeAPI, int ordinal) {
         this.festivalId = typeAPI.getFestivalIdBoxed(ordinal);
@@ -28,6 +28,8 @@ public class FestivalsDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getFestivalId(int ordinal) {
+        if(festivalId == null)
+            return Long.MIN_VALUE;
         return festivalId.longValue();
     }
 

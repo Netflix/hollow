@@ -18,7 +18,7 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean autoPlay;
     private final int firstDisplayDateOrdinal;
     private final int firstDisplayDatesOrdinal;
-   private FlagsTypeAPI typeAPI;
+    private FlagsTypeAPI typeAPI;
 
     public FlagsDelegateCachedImpl(FlagsTypeAPI typeAPI, int ordinal) {
         this.searchOnly = typeAPI.getSearchOnlyBoxed(ordinal);
@@ -34,6 +34,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getSearchOnly(int ordinal) {
+        if(searchOnly == null)
+            return false;
         return searchOnly.booleanValue();
     }
 
@@ -42,6 +44,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getLocalText(int ordinal) {
+        if(localText == null)
+            return false;
         return localText.booleanValue();
     }
 
@@ -50,6 +54,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getLanguageOverride(int ordinal) {
+        if(languageOverride == null)
+            return false;
         return languageOverride.booleanValue();
     }
 
@@ -58,6 +64,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getLocalAudio(int ordinal) {
+        if(localAudio == null)
+            return false;
         return localAudio.booleanValue();
     }
 
@@ -66,6 +74,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getGoLive(int ordinal) {
+        if(goLive == null)
+            return false;
         return goLive.booleanValue();
     }
 
@@ -74,6 +84,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getContentApproved(int ordinal) {
+        if(contentApproved == null)
+            return false;
         return contentApproved.booleanValue();
     }
 
@@ -82,6 +94,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     }
 
     public boolean getAutoPlay(int ordinal) {
+        if(autoPlay == null)
+            return false;
         return autoPlay.booleanValue();
     }
 

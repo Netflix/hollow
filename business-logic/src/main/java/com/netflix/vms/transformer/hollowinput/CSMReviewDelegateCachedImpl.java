@@ -46,7 +46,7 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final int mpaaRatingOrdinal;
     private final int mpaaExplanationOrdinal;
     private final Long runtimeInMins;
-   private CSMReviewTypeAPI typeAPI;
+    private CSMReviewTypeAPI typeAPI;
 
     public CSMReviewDelegateCachedImpl(CSMReviewTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -90,6 +90,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 
@@ -102,6 +104,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getSexualContentAlert(int ordinal) {
+        if(sexualContentAlert == null)
+            return Long.MIN_VALUE;
         return sexualContentAlert.longValue();
     }
 
@@ -110,6 +114,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getConsumerismAlert(int ordinal) {
+        if(consumerismAlert == null)
+            return Long.MIN_VALUE;
         return consumerismAlert.longValue();
     }
 
@@ -142,6 +148,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getAgeRecommendation(int ordinal) {
+        if(ageRecommendation == null)
+            return Long.MIN_VALUE;
         return ageRecommendation.longValue();
     }
 
@@ -150,6 +158,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getViolenceAlert(int ordinal) {
+        if(violenceAlert == null)
+            return Long.MIN_VALUE;
         return violenceAlert.longValue();
     }
 
@@ -182,6 +192,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getSocialBehaviorAlert(int ordinal) {
+        if(socialBehaviorAlert == null)
+            return Long.MIN_VALUE;
         return socialBehaviorAlert.longValue();
     }
 
@@ -214,6 +226,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getLanguageAlert(int ordinal) {
+        if(languageAlert == null)
+            return Long.MIN_VALUE;
         return languageAlert.longValue();
     }
 
@@ -226,6 +240,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getStars(int ordinal) {
+        if(stars == null)
+            return Long.MIN_VALUE;
         return stars.longValue();
     }
 
@@ -238,6 +254,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getDatAlert(int ordinal) {
+        if(datAlert == null)
+            return Long.MIN_VALUE;
         return datAlert.longValue();
     }
 
@@ -250,6 +268,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getGreenBeginsAge(int ordinal) {
+        if(greenBeginsAge == null)
+            return Long.MIN_VALUE;
         return greenBeginsAge.longValue();
     }
 
@@ -258,6 +278,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getRedEndsAge(int ordinal) {
+        if(redEndsAge == null)
+            return Long.MIN_VALUE;
         return redEndsAge.longValue();
     }
 
@@ -266,6 +288,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getMessageAlert(int ordinal) {
+        if(messageAlert == null)
+            return Long.MIN_VALUE;
         return messageAlert.longValue();
     }
 
@@ -282,6 +306,8 @@ public class CSMReviewDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getRuntimeInMins(int ordinal) {
+        if(runtimeInMins == null)
+            return Long.MIN_VALUE;
         return runtimeInMins.longValue();
     }
 

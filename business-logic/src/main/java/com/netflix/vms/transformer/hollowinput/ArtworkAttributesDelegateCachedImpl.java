@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class ArtworkAttributesDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ArtworkAttributesDelegate {
 
     private final int passthroughOrdinal;
-   private ArtworkAttributesTypeAPI typeAPI;
+    private ArtworkAttributesTypeAPI typeAPI;
 
     public ArtworkAttributesDelegateCachedImpl(ArtworkAttributesTypeAPI typeAPI, int ordinal) {
         this.passthroughOrdinal = typeAPI.getPassthroughOrdinal(ordinal);

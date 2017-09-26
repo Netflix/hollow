@@ -13,7 +13,7 @@ public class CharactersDelegateCachedImpl extends HollowObjectAbstractDelegate i
     private final int prefixOrdinal;
     private final int bOrdinal;
     private final int cnOrdinal;
-   private CharactersTypeAPI typeAPI;
+    private CharactersTypeAPI typeAPI;
 
     public CharactersDelegateCachedImpl(CharactersTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class CharactersDelegateCachedImpl extends HollowObjectAbstractDelegate i
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 

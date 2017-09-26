@@ -15,7 +15,7 @@ public class VideoTypeDescriptorDelegateCachedImpl extends HollowObjectAbstractD
     private final Boolean original;
     private final int mediaOrdinal;
     private final Boolean extended;
-   private VideoTypeDescriptorTypeAPI typeAPI;
+    private VideoTypeDescriptorTypeAPI typeAPI;
 
     public VideoTypeDescriptorDelegateCachedImpl(VideoTypeDescriptorTypeAPI typeAPI, int ordinal) {
         this.countryCodeOrdinal = typeAPI.getCountryCodeOrdinal(ordinal);
@@ -40,6 +40,8 @@ public class VideoTypeDescriptorDelegateCachedImpl extends HollowObjectAbstractD
     }
 
     public boolean getOriginal(int ordinal) {
+        if(original == null)
+            return false;
         return original.booleanValue();
     }
 
@@ -52,6 +54,8 @@ public class VideoTypeDescriptorDelegateCachedImpl extends HollowObjectAbstractD
     }
 
     public boolean getExtended(int ordinal) {
+        if(extended == null)
+            return false;
         return extended.booleanValue();
     }
 

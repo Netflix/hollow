@@ -12,7 +12,7 @@ public class VideoRatingRatingDelegateCachedImpl extends HollowObjectAbstractDel
     private final int reasonOrdinal;
     private final Long ratingId;
     private final Long certificationSystemId;
-   private VideoRatingRatingTypeAPI typeAPI;
+    private VideoRatingRatingTypeAPI typeAPI;
 
     public VideoRatingRatingDelegateCachedImpl(VideoRatingRatingTypeAPI typeAPI, int ordinal) {
         this.reasonOrdinal = typeAPI.getReasonOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class VideoRatingRatingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getRatingId(int ordinal) {
+        if(ratingId == null)
+            return Long.MIN_VALUE;
         return ratingId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class VideoRatingRatingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getCertificationSystemId(int ordinal) {
+        if(certificationSystemId == null)
+            return Long.MIN_VALUE;
         return certificationSystemId.longValue();
     }
 

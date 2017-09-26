@@ -12,7 +12,7 @@ public class PersonCharacterResourceDelegateCachedImpl extends HollowObjectAbstr
     private final Long id;
     private final int prefixOrdinal;
     private final int cnOrdinal;
-   private PersonCharacterResourceTypeAPI typeAPI;
+    private PersonCharacterResourceTypeAPI typeAPI;
 
     public PersonCharacterResourceDelegateCachedImpl(PersonCharacterResourceTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class PersonCharacterResourceDelegateCachedImpl extends HollowObjectAbstr
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 

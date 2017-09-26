@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class CharacterQuoteDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, CharacterQuoteDelegate {
 
     private final Long sequenceNumber;
-   private CharacterQuoteTypeAPI typeAPI;
+    private CharacterQuoteTypeAPI typeAPI;
 
     public CharacterQuoteDelegateCachedImpl(CharacterQuoteTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
@@ -18,6 +18,8 @@ public class CharacterQuoteDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Long.MIN_VALUE;
         return sequenceNumber.longValue();
     }
 

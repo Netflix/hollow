@@ -11,7 +11,7 @@ public class TerritoryCountriesDelegateCachedImpl extends HollowObjectAbstractDe
 
     private final int territoryCodeOrdinal;
     private final int countryCodesOrdinal;
-   private TerritoryCountriesTypeAPI typeAPI;
+    private TerritoryCountriesTypeAPI typeAPI;
 
     public TerritoryCountriesDelegateCachedImpl(TerritoryCountriesTypeAPI typeAPI, int ordinal) {
         this.territoryCodeOrdinal = typeAPI.getTerritoryCodeOrdinal(ordinal);

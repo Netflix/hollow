@@ -11,7 +11,7 @@ public class RightsContractPackageDelegateCachedImpl extends HollowObjectAbstrac
 
     private final Long packageId;
     private final Boolean primary;
-   private RightsContractPackageTypeAPI typeAPI;
+    private RightsContractPackageTypeAPI typeAPI;
 
     public RightsContractPackageDelegateCachedImpl(RightsContractPackageTypeAPI typeAPI, int ordinal) {
         this.packageId = typeAPI.getPackageIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class RightsContractPackageDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public long getPackageId(int ordinal) {
+        if(packageId == null)
+            return Long.MIN_VALUE;
         return packageId.longValue();
     }
 
@@ -28,6 +30,8 @@ public class RightsContractPackageDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public boolean getPrimary(int ordinal) {
+        if(primary == null)
+            return false;
         return primary.booleanValue();
     }
 

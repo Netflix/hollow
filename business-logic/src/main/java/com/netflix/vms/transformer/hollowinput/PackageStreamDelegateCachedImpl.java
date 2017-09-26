@@ -20,7 +20,7 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int deploymentOrdinal;
     private final int modificationsOrdinal;
     private final int metadataIdOrdinal;
-   private PackageStreamTypeAPI typeAPI;
+    private PackageStreamTypeAPI typeAPI;
 
     public PackageStreamDelegateCachedImpl(PackageStreamTypeAPI typeAPI, int ordinal) {
         this.downloadableId = typeAPI.getDownloadableIdBoxed(ordinal);
@@ -38,6 +38,8 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getDownloadableId(int ordinal) {
+        if(downloadableId == null)
+            return Long.MIN_VALUE;
         return downloadableId.longValue();
     }
 
@@ -46,6 +48,8 @@ public class PackageStreamDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getStreamProfileId(int ordinal) {
+        if(streamProfileId == null)
+            return Long.MIN_VALUE;
         return streamProfileId.longValue();
     }
 

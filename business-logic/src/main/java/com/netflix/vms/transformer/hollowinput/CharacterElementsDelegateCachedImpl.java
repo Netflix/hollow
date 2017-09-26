@@ -13,7 +13,7 @@ public class CharacterElementsDelegateCachedImpl extends HollowObjectAbstractDel
     private final int bladeBottomLineOrdinal;
     private final int characterBioOrdinal;
     private final int bladeTopLineOrdinal;
-   private CharacterElementsTypeAPI typeAPI;
+    private CharacterElementsTypeAPI typeAPI;
 
     public CharacterElementsDelegateCachedImpl(CharacterElementsTypeAPI typeAPI, int ordinal) {
         this.characterNameOrdinal = typeAPI.getCharacterNameOrdinal(ordinal);

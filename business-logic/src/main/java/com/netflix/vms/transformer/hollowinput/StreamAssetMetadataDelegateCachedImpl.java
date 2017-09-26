@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class StreamAssetMetadataDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamAssetMetadataDelegate {
 
     private final String id;
-   private StreamAssetMetadataTypeAPI typeAPI;
+    private StreamAssetMetadataTypeAPI typeAPI;
 
     public StreamAssetMetadataDelegateCachedImpl(StreamAssetMetadataTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getId(ordinal);

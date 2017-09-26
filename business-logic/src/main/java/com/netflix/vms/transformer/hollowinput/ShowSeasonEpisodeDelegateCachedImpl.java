@@ -13,7 +13,7 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
     private final Long displaySetId;
     private final int countryCodesOrdinal;
     private final int seasonsOrdinal;
-   private ShowSeasonEpisodeTypeAPI typeAPI;
+    private ShowSeasonEpisodeTypeAPI typeAPI;
 
     public ShowSeasonEpisodeDelegateCachedImpl(ShowSeasonEpisodeTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -32,6 +34,8 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getDisplaySetId(int ordinal) {
+        if(displaySetId == null)
+            return Long.MIN_VALUE;
         return displaySetId.longValue();
     }
 

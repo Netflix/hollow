@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class VideoRatingAdvisoryIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoRatingAdvisoryIdDelegate {
 
     private final Long value;
-   private VideoRatingAdvisoryIdTypeAPI typeAPI;
+    private VideoRatingAdvisoryIdTypeAPI typeAPI;
 
     public VideoRatingAdvisoryIdDelegateCachedImpl(VideoRatingAdvisoryIdTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValueBoxed(ordinal);
@@ -18,6 +18,8 @@ public class VideoRatingAdvisoryIdDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public long getValue(int ordinal) {
+        if(value == null)
+            return Long.MIN_VALUE;
         return value.longValue();
     }
 

@@ -12,7 +12,7 @@ public class OverrideScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     private final Long movieId;
     private final int phaseTagOrdinal;
     private final Long availabilityOffset;
-   private OverrideScheduleTypeAPI typeAPI;
+    private OverrideScheduleTypeAPI typeAPI;
 
     public OverrideScheduleDelegateCachedImpl(OverrideScheduleTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class OverrideScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class OverrideScheduleDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getAvailabilityOffset(int ordinal) {
+        if(availabilityOffset == null)
+            return Long.MIN_VALUE;
         return availabilityOffset.longValue();
     }
 

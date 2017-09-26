@@ -26,7 +26,7 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     private final Long scaledPsnrTimesHundred;
     private final Float fps;
     private final int cropParamsOrdinal;
-   private VideoStreamInfoTypeAPI typeAPI;
+    private VideoStreamInfoTypeAPI typeAPI;
 
     public VideoStreamInfoDelegateCachedImpl(VideoStreamInfoTypeAPI typeAPI, int ordinal) {
         this.videoBitrateKBPS = typeAPI.getVideoBitrateKBPSBoxed(ordinal);
@@ -50,6 +50,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVideoBitrateKBPS(int ordinal) {
+        if(videoBitrateKBPS == null)
+            return Integer.MIN_VALUE;
         return videoBitrateKBPS.intValue();
     }
 
@@ -58,6 +60,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVideoPeakBitrateKBPS(int ordinal) {
+        if(videoPeakBitrateKBPS == null)
+            return Integer.MIN_VALUE;
         return videoPeakBitrateKBPS.intValue();
     }
 
@@ -66,6 +70,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getDashHeaderSize(int ordinal) {
+        if(dashHeaderSize == null)
+            return Long.MIN_VALUE;
         return dashHeaderSize.longValue();
     }
 
@@ -74,6 +80,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getDashMediaStartByteOffset(int ordinal) {
+        if(dashMediaStartByteOffset == null)
+            return Long.MIN_VALUE;
         return dashMediaStartByteOffset.longValue();
     }
 
@@ -86,6 +94,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getVmafScore(int ordinal) {
+        if(vmafScore == null)
+            return Long.MIN_VALUE;
         return vmafScore.longValue();
     }
 
@@ -94,6 +104,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafAlgoVersionExp(int ordinal) {
+        if(vmafAlgoVersionExp == null)
+            return Integer.MIN_VALUE;
         return vmafAlgoVersionExp.intValue();
     }
 
@@ -102,6 +114,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafAlgoVersionLts(int ordinal) {
+        if(vmafAlgoVersionLts == null)
+            return Integer.MIN_VALUE;
         return vmafAlgoVersionLts.intValue();
     }
 
@@ -110,6 +124,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafScoreExp(int ordinal) {
+        if(vmafScoreExp == null)
+            return Integer.MIN_VALUE;
         return vmafScoreExp.intValue();
     }
 
@@ -118,6 +134,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafScoreLts(int ordinal) {
+        if(vmafScoreLts == null)
+            return Integer.MIN_VALUE;
         return vmafScoreLts.intValue();
     }
 
@@ -126,6 +144,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafplusScoreExp(int ordinal) {
+        if(vmafplusScoreExp == null)
+            return Integer.MIN_VALUE;
         return vmafplusScoreExp.intValue();
     }
 
@@ -134,6 +154,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafplusScoreLts(int ordinal) {
+        if(vmafplusScoreLts == null)
+            return Integer.MIN_VALUE;
         return vmafplusScoreLts.intValue();
     }
 
@@ -142,6 +164,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafplusPhoneScoreExp(int ordinal) {
+        if(vmafplusPhoneScoreExp == null)
+            return Integer.MIN_VALUE;
         return vmafplusPhoneScoreExp.intValue();
     }
 
@@ -150,6 +174,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public int getVmafplusPhoneScoreLts(int ordinal) {
+        if(vmafplusPhoneScoreLts == null)
+            return Integer.MIN_VALUE;
         return vmafplusPhoneScoreLts.intValue();
     }
 
@@ -158,6 +184,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getScaledPsnrTimesHundred(int ordinal) {
+        if(scaledPsnrTimesHundred == null)
+            return Long.MIN_VALUE;
         return scaledPsnrTimesHundred.longValue();
     }
 
@@ -166,6 +194,8 @@ public class VideoStreamInfoDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public float getFps(int ordinal) {
+        if(fps == null)
+            return Float.NaN;
         return fps.floatValue();
     }
 

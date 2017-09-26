@@ -11,7 +11,7 @@ public class StreamProfileGroupsDelegateCachedImpl extends HollowObjectAbstractD
 
     private final int groupNameOrdinal;
     private final int streamProfileIdsOrdinal;
-   private StreamProfileGroupsTypeAPI typeAPI;
+    private StreamProfileGroupsTypeAPI typeAPI;
 
     public StreamProfileGroupsDelegateCachedImpl(StreamProfileGroupsTypeAPI typeAPI, int ordinal) {
         this.groupNameOrdinal = typeAPI.getGroupNameOrdinal(ordinal);

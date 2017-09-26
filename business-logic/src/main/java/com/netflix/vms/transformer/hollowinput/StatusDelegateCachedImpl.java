@@ -13,7 +13,7 @@ public class StatusDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     private final int countryCodeOrdinal;
     private final int rightsOrdinal;
     private final int flagsOrdinal;
-   private StatusTypeAPI typeAPI;
+    private StatusTypeAPI typeAPI;
 
     public StatusDelegateCachedImpl(StatusTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class StatusDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

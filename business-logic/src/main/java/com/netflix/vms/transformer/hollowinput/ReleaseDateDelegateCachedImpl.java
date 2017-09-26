@@ -15,7 +15,7 @@ public class ReleaseDateDelegateCachedImpl extends HollowObjectAbstractDelegate 
     private final Integer year;
     private final Integer day;
     private final int bcp47codeOrdinal;
-   private ReleaseDateTypeAPI typeAPI;
+    private ReleaseDateTypeAPI typeAPI;
 
     public ReleaseDateDelegateCachedImpl(ReleaseDateTypeAPI typeAPI, int ordinal) {
         this.releaseDateTypeOrdinal = typeAPI.getReleaseDateTypeOrdinal(ordinal);
@@ -36,6 +36,8 @@ public class ReleaseDateDelegateCachedImpl extends HollowObjectAbstractDelegate 
     }
 
     public int getMonth(int ordinal) {
+        if(month == null)
+            return Integer.MIN_VALUE;
         return month.intValue();
     }
 
@@ -44,6 +46,8 @@ public class ReleaseDateDelegateCachedImpl extends HollowObjectAbstractDelegate 
     }
 
     public int getYear(int ordinal) {
+        if(year == null)
+            return Integer.MIN_VALUE;
         return year.intValue();
     }
 
@@ -52,6 +56,8 @@ public class ReleaseDateDelegateCachedImpl extends HollowObjectAbstractDelegate 
     }
 
     public int getDay(int ordinal) {
+        if(day == null)
+            return Integer.MIN_VALUE;
         return day.intValue();
     }
 

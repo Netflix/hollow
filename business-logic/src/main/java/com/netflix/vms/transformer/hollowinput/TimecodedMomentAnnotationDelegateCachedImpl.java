@@ -12,7 +12,7 @@ public class TimecodedMomentAnnotationDelegateCachedImpl extends HollowObjectAbs
     private final int typeOrdinal;
     private final Long startMillis;
     private final Long endMillis;
-   private TimecodedMomentAnnotationTypeAPI typeAPI;
+    private TimecodedMomentAnnotationTypeAPI typeAPI;
 
     public TimecodedMomentAnnotationDelegateCachedImpl(TimecodedMomentAnnotationTypeAPI typeAPI, int ordinal) {
         this.typeOrdinal = typeAPI.getTypeOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class TimecodedMomentAnnotationDelegateCachedImpl extends HollowObjectAbs
     }
 
     public long getStartMillis(int ordinal) {
+        if(startMillis == null)
+            return Long.MIN_VALUE;
         return startMillis.longValue();
     }
 
@@ -34,6 +36,8 @@ public class TimecodedMomentAnnotationDelegateCachedImpl extends HollowObjectAbs
     }
 
     public long getEndMillis(int ordinal) {
+        if(endMillis == null)
+            return Long.MIN_VALUE;
         return endMillis.longValue();
     }
 

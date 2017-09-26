@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class VideoGeneralTitleTypeDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoGeneralTitleTypeDelegate {
 
     private final int valueOrdinal;
-   private VideoGeneralTitleTypeTypeAPI typeAPI;
+    private VideoGeneralTitleTypeTypeAPI typeAPI;
 
     public VideoGeneralTitleTypeDelegateCachedImpl(VideoGeneralTitleTypeTypeAPI typeAPI, int ordinal) {
         this.valueOrdinal = typeAPI.getValueOrdinal(ordinal);

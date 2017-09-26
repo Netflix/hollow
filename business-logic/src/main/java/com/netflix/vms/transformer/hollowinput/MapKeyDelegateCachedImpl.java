@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class MapKeyDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, MapKeyDelegate {
 
     private final String value;
-   private MapKeyTypeAPI typeAPI;
+    private MapKeyTypeAPI typeAPI;
 
     public MapKeyDelegateCachedImpl(MapKeyTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

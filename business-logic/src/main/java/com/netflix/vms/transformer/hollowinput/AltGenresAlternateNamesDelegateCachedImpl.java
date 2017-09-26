@@ -12,7 +12,7 @@ public class AltGenresAlternateNamesDelegateCachedImpl extends HollowObjectAbstr
     private final Long typeId;
     private final int typeOrdinal;
     private final int translatedTextsOrdinal;
-   private AltGenresAlternateNamesTypeAPI typeAPI;
+    private AltGenresAlternateNamesTypeAPI typeAPI;
 
     public AltGenresAlternateNamesDelegateCachedImpl(AltGenresAlternateNamesTypeAPI typeAPI, int ordinal) {
         this.typeId = typeAPI.getTypeIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class AltGenresAlternateNamesDelegateCachedImpl extends HollowObjectAbstr
     }
 
     public long getTypeId(int ordinal) {
+        if(typeId == null)
+            return Long.MIN_VALUE;
         return typeId.longValue();
     }
 

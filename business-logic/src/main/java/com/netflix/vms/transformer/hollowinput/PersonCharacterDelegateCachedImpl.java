@@ -11,7 +11,7 @@ public class PersonCharacterDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final Long personId;
     private final Long characterId;
-   private PersonCharacterTypeAPI typeAPI;
+    private PersonCharacterTypeAPI typeAPI;
 
     public PersonCharacterDelegateCachedImpl(PersonCharacterTypeAPI typeAPI, int ordinal) {
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class PersonCharacterDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getPersonId(int ordinal) {
+        if(personId == null)
+            return Long.MIN_VALUE;
         return personId.longValue();
     }
 
@@ -28,6 +30,8 @@ public class PersonCharacterDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getCharacterId(int ordinal) {
+        if(characterId == null)
+            return Long.MIN_VALUE;
         return characterId.longValue();
     }
 

@@ -12,7 +12,7 @@ public class CertificationSystemRatingDelegateCachedImpl extends HollowObjectAbs
     private final int ratingCodeOrdinal;
     private final Long ratingId;
     private final Long maturityLevel;
-   private CertificationSystemRatingTypeAPI typeAPI;
+    private CertificationSystemRatingTypeAPI typeAPI;
 
     public CertificationSystemRatingDelegateCachedImpl(CertificationSystemRatingTypeAPI typeAPI, int ordinal) {
         this.ratingCodeOrdinal = typeAPI.getRatingCodeOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class CertificationSystemRatingDelegateCachedImpl extends HollowObjectAbs
     }
 
     public long getRatingId(int ordinal) {
+        if(ratingId == null)
+            return Long.MIN_VALUE;
         return ratingId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class CertificationSystemRatingDelegateCachedImpl extends HollowObjectAbs
     }
 
     public long getMaturityLevel(int ordinal) {
+        if(maturityLevel == null)
+            return Long.MIN_VALUE;
         return maturityLevel.longValue();
     }
 

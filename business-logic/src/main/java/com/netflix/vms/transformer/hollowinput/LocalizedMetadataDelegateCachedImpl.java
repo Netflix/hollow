@@ -13,7 +13,7 @@ public class LocalizedMetadataDelegateCachedImpl extends HollowObjectAbstractDel
     private final int attributeNameOrdinal;
     private final int labelOrdinal;
     private final int translatedTextsOrdinal;
-   private LocalizedMetadataTypeAPI typeAPI;
+    private LocalizedMetadataTypeAPI typeAPI;
 
     public LocalizedMetadataDelegateCachedImpl(LocalizedMetadataTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class LocalizedMetadataDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

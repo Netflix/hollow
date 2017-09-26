@@ -15,7 +15,7 @@ public class PackageDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     private final int drmInfoOrdinal;
     private final int downloadablesOrdinal;
     private final int defaultS3PathComponentOrdinal;
-   private PackageTypeAPI typeAPI;
+    private PackageTypeAPI typeAPI;
 
     public PackageDelegateCachedImpl(PackageTypeAPI typeAPI, int ordinal) {
         this.packageId = typeAPI.getPackageIdBoxed(ordinal);
@@ -28,6 +28,8 @@ public class PackageDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getPackageId(int ordinal) {
+        if(packageId == null)
+            return Long.MIN_VALUE;
         return packageId.longValue();
     }
 
@@ -36,6 +38,8 @@ public class PackageDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

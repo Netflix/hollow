@@ -11,7 +11,7 @@ public class RightsAssetDelegateCachedImpl extends HollowObjectAbstractDelegate 
 
     private final int bcp47CodeOrdinal;
     private final int assetTypeOrdinal;
-   private RightsAssetTypeAPI typeAPI;
+    private RightsAssetTypeAPI typeAPI;
 
     public RightsAssetDelegateCachedImpl(RightsAssetTypeAPI typeAPI, int ordinal) {
         this.bcp47CodeOrdinal = typeAPI.getBcp47CodeOrdinal(ordinal);

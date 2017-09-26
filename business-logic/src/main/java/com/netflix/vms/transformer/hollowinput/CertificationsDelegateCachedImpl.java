@@ -12,7 +12,7 @@ public class CertificationsDelegateCachedImpl extends HollowObjectAbstractDelega
     private final Long certificationTypeId;
     private final int nameOrdinal;
     private final int descriptionOrdinal;
-   private CertificationsTypeAPI typeAPI;
+    private CertificationsTypeAPI typeAPI;
 
     public CertificationsDelegateCachedImpl(CertificationsTypeAPI typeAPI, int ordinal) {
         this.certificationTypeId = typeAPI.getCertificationTypeIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class CertificationsDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getCertificationTypeId(int ordinal) {
+        if(certificationTypeId == null)
+            return Long.MIN_VALUE;
         return certificationTypeId.longValue();
     }
 

@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DisallowedSubtitleLangCodeDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DisallowedSubtitleLangCodeDelegate {
 
     private final int valueOrdinal;
-   private DisallowedSubtitleLangCodeTypeAPI typeAPI;
+    private DisallowedSubtitleLangCodeTypeAPI typeAPI;
 
     public DisallowedSubtitleLangCodeDelegateCachedImpl(DisallowedSubtitleLangCodeTypeAPI typeAPI, int ordinal) {
         this.valueOrdinal = typeAPI.getValueOrdinal(ordinal);

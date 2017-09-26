@@ -14,7 +14,7 @@ public class LocalizedCharacterDelegateCachedImpl extends HollowObjectAbstractDe
     private final int labelOrdinal;
     private final int attributeNameOrdinal;
     private final int lastUpdatedOrdinal;
-   private LocalizedCharacterTypeAPI typeAPI;
+    private LocalizedCharacterTypeAPI typeAPI;
 
     public LocalizedCharacterDelegateCachedImpl(LocalizedCharacterTypeAPI typeAPI, int ordinal) {
         this.characterId = typeAPI.getCharacterIdBoxed(ordinal);
@@ -26,6 +26,8 @@ public class LocalizedCharacterDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getCharacterId(int ordinal) {
+        if(characterId == null)
+            return Long.MIN_VALUE;
         return characterId.longValue();
     }
 

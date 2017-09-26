@@ -13,7 +13,7 @@ public class CertificationSystemDelegateCachedImpl extends HollowObjectAbstractD
     private final int countryCodeOrdinal;
     private final int ratingOrdinal;
     private final int officialURLOrdinal;
-   private CertificationSystemTypeAPI typeAPI;
+    private CertificationSystemTypeAPI typeAPI;
 
     public CertificationSystemDelegateCachedImpl(CertificationSystemTypeAPI typeAPI, int ordinal) {
         this.certificationSystemId = typeAPI.getCertificationSystemIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class CertificationSystemDelegateCachedImpl extends HollowObjectAbstractD
     }
 
     public long getCertificationSystemId(int ordinal) {
+        if(certificationSystemId == null)
+            return Long.MIN_VALUE;
         return certificationSystemId.longValue();
     }
 

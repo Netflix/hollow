@@ -19,7 +19,7 @@ public class IPLArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstract
     private final int languageCodeOrdinal;
     private final int modificationsOrdinal;
     private final int overlayTypesOrdinal;
-   private IPLArtworkDerivativeTypeAPI typeAPI;
+    private IPLArtworkDerivativeTypeAPI typeAPI;
 
     public IPLArtworkDerivativeDelegateCachedImpl(IPLArtworkDerivativeTypeAPI typeAPI, int ordinal) {
         this.recipeNameOrdinal = typeAPI.getRecipeNameOrdinal(ordinal);
@@ -40,6 +40,8 @@ public class IPLArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public int getWidthInPixels(int ordinal) {
+        if(widthInPixels == null)
+            return Integer.MIN_VALUE;
         return widthInPixels.intValue();
     }
 
@@ -48,6 +50,8 @@ public class IPLArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public int getHeightInPixels(int ordinal) {
+        if(heightInPixels == null)
+            return Integer.MIN_VALUE;
         return heightInPixels.intValue();
     }
 
@@ -56,6 +60,8 @@ public class IPLArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public int getTargetWidthInPixels(int ordinal) {
+        if(targetWidthInPixels == null)
+            return Integer.MIN_VALUE;
         return targetWidthInPixels.intValue();
     }
 
@@ -64,6 +70,8 @@ public class IPLArtworkDerivativeDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public int getTargetHeightInPixels(int ordinal) {
+        if(targetHeightInPixels == null)
+            return Integer.MIN_VALUE;
         return targetHeightInPixels.intValue();
     }
 

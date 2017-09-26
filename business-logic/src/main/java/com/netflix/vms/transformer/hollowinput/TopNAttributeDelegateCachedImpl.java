@@ -12,7 +12,7 @@ public class TopNAttributeDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int countryOrdinal;
     private final int viewShareOrdinal;
     private final int countryViewHrsOrdinal;
-   private TopNAttributeTypeAPI typeAPI;
+    private TopNAttributeTypeAPI typeAPI;
 
     public TopNAttributeDelegateCachedImpl(TopNAttributeTypeAPI typeAPI, int ordinal) {
         this.countryOrdinal = typeAPI.getCountryOrdinal(ordinal);

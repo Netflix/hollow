@@ -14,7 +14,7 @@ public class MasterScheduleDelegateCachedImpl extends HollowObjectAbstractDelega
     private final int scheduleIdOrdinal;
     private final int phaseTagOrdinal;
     private final Long availabilityOffset;
-   private MasterScheduleTypeAPI typeAPI;
+    private MasterScheduleTypeAPI typeAPI;
 
     public MasterScheduleDelegateCachedImpl(MasterScheduleTypeAPI typeAPI, int ordinal) {
         this.movieTypeOrdinal = typeAPI.getMovieTypeOrdinal(ordinal);
@@ -30,6 +30,8 @@ public class MasterScheduleDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getVersionId(int ordinal) {
+        if(versionId == null)
+            return Long.MIN_VALUE;
         return versionId.longValue();
     }
 
@@ -46,6 +48,8 @@ public class MasterScheduleDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getAvailabilityOffset(int ordinal) {
+        if(availabilityOffset == null)
+            return Long.MIN_VALUE;
         return availabilityOffset.longValue();
     }
 

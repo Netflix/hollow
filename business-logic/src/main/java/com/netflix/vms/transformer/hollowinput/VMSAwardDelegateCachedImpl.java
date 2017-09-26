@@ -14,7 +14,7 @@ public class VMSAwardDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     private final Long festivalId;
     private final int countryCodeOrdinal;
     private final Boolean isMovieAward;
-   private VMSAwardTypeAPI typeAPI;
+    private VMSAwardTypeAPI typeAPI;
 
     public VMSAwardDelegateCachedImpl(VMSAwardTypeAPI typeAPI, int ordinal) {
         this.awardId = typeAPI.getAwardIdBoxed(ordinal);
@@ -26,6 +26,8 @@ public class VMSAwardDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getAwardId(int ordinal) {
+        if(awardId == null)
+            return Long.MIN_VALUE;
         return awardId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class VMSAwardDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Long.MIN_VALUE;
         return sequenceNumber.longValue();
     }
 
@@ -42,6 +46,8 @@ public class VMSAwardDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getFestivalId(int ordinal) {
+        if(festivalId == null)
+            return Long.MIN_VALUE;
         return festivalId.longValue();
     }
 
@@ -54,6 +60,8 @@ public class VMSAwardDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public boolean getIsMovieAward(int ordinal) {
+        if(isMovieAward == null)
+            return false;
         return isMovieAward.booleanValue();
     }
 

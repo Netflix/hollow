@@ -11,7 +11,7 @@ public class VideoDateDelegateCachedImpl extends HollowObjectAbstractDelegate im
 
     private final Long videoId;
     private final int windowOrdinal;
-   private VideoDateTypeAPI typeAPI;
+    private VideoDateTypeAPI typeAPI;
 
     public VideoDateDelegateCachedImpl(VideoDateTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class VideoDateDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

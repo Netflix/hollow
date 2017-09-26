@@ -11,7 +11,7 @@ public class SupplementalsDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     private final Long movieId;
     private final int supplementalsOrdinal;
-   private SupplementalsTypeAPI typeAPI;
+    private SupplementalsTypeAPI typeAPI;
 
     public SupplementalsDelegateCachedImpl(SupplementalsTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class SupplementalsDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

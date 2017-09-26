@@ -12,7 +12,7 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     private final Long sequenceNumber;
     private final Long movieId;
     private final int episodesOrdinal;
-   private SeasonTypeAPI typeAPI;
+    private SeasonTypeAPI typeAPI;
 
     public SeasonDelegateCachedImpl(SeasonTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
@@ -22,6 +22,8 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     }
 
     public long getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Long.MIN_VALUE;
         return sequenceNumber.longValue();
     }
 
@@ -30,6 +32,8 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

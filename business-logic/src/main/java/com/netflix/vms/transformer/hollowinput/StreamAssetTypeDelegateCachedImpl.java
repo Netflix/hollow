@@ -11,7 +11,7 @@ public class StreamAssetTypeDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final Long assetTypeId;
     private final int assetTypeOrdinal;
-   private StreamAssetTypeTypeAPI typeAPI;
+    private StreamAssetTypeTypeAPI typeAPI;
 
     public StreamAssetTypeDelegateCachedImpl(StreamAssetTypeTypeAPI typeAPI, int ordinal) {
         this.assetTypeId = typeAPI.getAssetTypeIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class StreamAssetTypeDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getAssetTypeId(int ordinal) {
+        if(assetTypeId == null)
+            return Long.MIN_VALUE;
         return assetTypeId.longValue();
     }
 

@@ -16,7 +16,7 @@ public class StreamNonImageInfoDelegateCachedImpl extends HollowObjectAbstractDe
     private final int videoInfoOrdinal;
     private final int textInfoOrdinal;
     private final int audioInfoOrdinal;
-   private StreamNonImageInfoTypeAPI typeAPI;
+    private StreamNonImageInfoTypeAPI typeAPI;
 
     public StreamNonImageInfoDelegateCachedImpl(StreamNonImageInfoTypeAPI typeAPI, int ordinal) {
         this.runtimeSeconds = typeAPI.getRuntimeSecondsBoxed(ordinal);
@@ -30,6 +30,8 @@ public class StreamNonImageInfoDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getRuntimeSeconds(int ordinal) {
+        if(runtimeSeconds == null)
+            return Long.MIN_VALUE;
         return runtimeSeconds.longValue();
     }
 

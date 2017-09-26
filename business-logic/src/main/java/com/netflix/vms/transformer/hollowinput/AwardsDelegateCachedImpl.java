@@ -13,7 +13,7 @@ public class AwardsDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     private final int awardNameOrdinal;
     private final int alternateNameOrdinal;
     private final int descriptionOrdinal;
-   private AwardsTypeAPI typeAPI;
+    private AwardsTypeAPI typeAPI;
 
     public AwardsDelegateCachedImpl(AwardsTypeAPI typeAPI, int ordinal) {
         this.awardId = typeAPI.getAwardIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class AwardsDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     }
 
     public long getAwardId(int ordinal) {
+        if(awardId == null)
+            return Long.MIN_VALUE;
         return awardId.longValue();
     }
 

@@ -12,7 +12,7 @@ public class DisallowedAssetBundleDelegateCachedImpl extends HollowObjectAbstrac
     private final Boolean forceSubtitle;
     private final int audioLanguageCodeOrdinal;
     private final int disallowedSubtitleLangCodesOrdinal;
-   private DisallowedAssetBundleTypeAPI typeAPI;
+    private DisallowedAssetBundleTypeAPI typeAPI;
 
     public DisallowedAssetBundleDelegateCachedImpl(DisallowedAssetBundleTypeAPI typeAPI, int ordinal) {
         this.forceSubtitle = typeAPI.getForceSubtitleBoxed(ordinal);
@@ -22,6 +22,8 @@ public class DisallowedAssetBundleDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public boolean getForceSubtitle(int ordinal) {
+        if(forceSubtitle == null)
+            return false;
         return forceSubtitle.booleanValue();
     }
 

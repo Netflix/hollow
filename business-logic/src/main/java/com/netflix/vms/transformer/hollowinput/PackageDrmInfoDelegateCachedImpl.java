@@ -16,7 +16,7 @@ public class PackageDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     private final int keyOrdinal;
     private final int drmHeaderInfoOrdinal;
     private final Boolean keyDecrypted;
-   private PackageDrmInfoTypeAPI typeAPI;
+    private PackageDrmInfoTypeAPI typeAPI;
 
     public PackageDrmInfoDelegateCachedImpl(PackageDrmInfoTypeAPI typeAPI, int ordinal) {
         this.contentPackagerPublicKeyOrdinal = typeAPI.getContentPackagerPublicKeyOrdinal(ordinal);
@@ -38,6 +38,8 @@ public class PackageDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getKeyId(int ordinal) {
+        if(keyId == null)
+            return Long.MIN_VALUE;
         return keyId.longValue();
     }
 
@@ -46,6 +48,8 @@ public class PackageDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getDrmKeyGroup(int ordinal) {
+        if(drmKeyGroup == null)
+            return Long.MIN_VALUE;
         return drmKeyGroup.longValue();
     }
 
@@ -62,6 +66,8 @@ public class PackageDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public boolean getKeyDecrypted(int ordinal) {
+        if(keyDecrypted == null)
+            return false;
         return keyDecrypted.booleanValue();
     }
 

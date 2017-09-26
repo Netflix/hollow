@@ -11,7 +11,7 @@ public class PassthroughDataDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final int singleValuesOrdinal;
     private final int multiValuesOrdinal;
-   private PassthroughDataTypeAPI typeAPI;
+    private PassthroughDataTypeAPI typeAPI;
 
     public PassthroughDataDelegateCachedImpl(PassthroughDataTypeAPI typeAPI, int ordinal) {
         this.singleValuesOrdinal = typeAPI.getSingleValuesOrdinal(ordinal);

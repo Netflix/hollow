@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class LocaleTerritoryCodeDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, LocaleTerritoryCodeDelegate {
 
     private final int valueOrdinal;
-   private LocaleTerritoryCodeTypeAPI typeAPI;
+    private LocaleTerritoryCodeTypeAPI typeAPI;
 
     public LocaleTerritoryCodeDelegateCachedImpl(LocaleTerritoryCodeTypeAPI typeAPI, int ordinal) {
         this.valueOrdinal = typeAPI.getValueOrdinal(ordinal);
