@@ -78,6 +78,7 @@ public class HollowDataAccessorGenerator implements HollowJavaFileGenerator {
         builder.append("\n");
         builder.append("public class " + classname + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
 
+        builder.append("    public static final String TYPE = \"" + type + "\";\n");
         builder.append("    private " + apiClassname + " api;\n\n");
 
         genConstructors(builder);
@@ -89,20 +90,20 @@ public class HollowDataAccessorGenerator implements HollowJavaFileGenerator {
     }
 
     protected void genConstructors(StringBuilder builder) {
-        builder.append("    public " + classname + "(HollowConsumer consumer, String type) {\n");
-        builder.append("        super(consumer, type);\n");
+        builder.append("    public " + classname + "(HollowConsumer consumer) {\n");
+        builder.append("        super(consumer, TYPE);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, String type) {\n");
-        builder.append("        super(rStateEngine, type);\n");
+        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine) {\n");
+        builder.append("        super(rStateEngine, TYPE);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, String type, String ... fieldPaths) {\n");
-        builder.append("        super(rStateEngine, type, fieldPaths);\n");
+        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, String ... fieldPaths) {\n");
+        builder.append("        super(rStateEngine, TYPE, fieldPaths);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, String type, PrimaryKey primaryKey) {\n");
-        builder.append("        super(rStateEngine, type, primaryKey);\n");
+        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {\n");
+        builder.append("        super(rStateEngine, TYPE, primaryKey);\n");
         builder.append("    }\n\n");
     }
 
