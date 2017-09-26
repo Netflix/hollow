@@ -23,7 +23,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
 /*
- * Provide generic way to access data per type to retrieve All, Added, Updated and Removed Records 
+ * Provide generic way to access data per type to retrieve All, Added, Updated and Removed Records
+ * 
+ * It manages data as GenericHollowObject
  */
 public class GenericHollowRecordDataAccessor extends AbstractHollowDataAccessor<GenericHollowObject> {
 

@@ -34,8 +34,7 @@ import java.util.List;
 public abstract class AbstractHollowDataAccessor<T> {
     protected final String type;
     protected final PrimaryKey primaryKey;
-
-    protected HollowReadStateEngine rStateEngine;
+    protected final HollowReadStateEngine rStateEngine;
 
     private List<T> removedRecords;
     private List<T> addedRecords;
@@ -134,16 +133,28 @@ public abstract class AbstractHollowDataAccessor<T> {
         this.updatedRecords = Collections.unmodifiableList(updatedRecords);
     }
 
+    /**
+     * Return the associated Type
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Return the PrimaryKey that can uniquely identify a single record
+     */
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
 
+    /**
+     * Return the Record at specified Ordinal
+     */
     public abstract T getRecord(int ordinal);
 
+    /**
+     * Return all the available Record
+     */
     public Collection<T> getAllRecords() {
         return new AllHollowRecordCollection<T>(rStateEngine.getTypeState(type)) {
             @Override
@@ -153,18 +164,36 @@ public abstract class AbstractHollowDataAccessor<T> {
         };
     }
 
+    /**
+     * Return only the Records that are Added
+     * 
+     * @See {@link #getUpdatedRecords()}
+     */
     public Collection<T> getAddedRecords() {
         return addedRecords;
     }
 
+    /**
+     * Return only the Records that are Removed
+     * 
+     * @See {@link #getUpdatedRecords()}
+     */
     public Collection<T> getRemovedRecords() {
         return removedRecords;
     }
 
+    /**
+     * Return the Records that are Updated with both Before and After
+     * 
+     * @see UpdatedRecord
+     */
     public Collection<UpdatedRecord<T>> getUpdatedRecords() {
         return updatedRecords;
     }
 
+    /**
+     * Keeps track of record before and after Update  
+     */
     public static class UpdatedRecord<T> {
         private final T before;
         private final T after;
