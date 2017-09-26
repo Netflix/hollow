@@ -25,8 +25,6 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
     @Override
     @Before
     public void setup() throws IOException {
-        isCleanupAfterEnabled=false;
-        sourceFolder="/Users/dsu/work/hollow/src";
     }
 
     @Override
