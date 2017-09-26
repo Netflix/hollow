@@ -42,11 +42,15 @@ public abstract class AbstractHollowDataAccessor<T> {
     private List<UpdatedRecord<T>> updatedRecords;
 
     public AbstractHollowDataAccessor(HollowConsumer consumer, String type) {
-        this(consumer.getStateEngine(), type, null);
+        this(consumer.getStateEngine(), type);
     }
 
     public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type) {
-        this(rStateEngine, type, null);
+        this(rStateEngine, type, (PrimaryKey)null);
+    }
+
+    public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, String ... fieldPaths) {
+        this(rStateEngine, type, new PrimaryKey(type, fieldPaths));
     }
 
     public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, PrimaryKey primaryKey) {

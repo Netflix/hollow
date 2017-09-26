@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.api.codegen.api.HollowDataAccessorGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPIListJavaGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPIMapJavaGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPIObjectJavaGenerator;
@@ -178,6 +179,7 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts));
+                generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
                 generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
                 if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
                     generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema));
