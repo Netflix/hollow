@@ -24,7 +24,6 @@ import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.io.IOException;
 import java.util.Arrays;
@@ -37,20 +36,6 @@ import org.junit.Test;
 public class HollowDataAccessorTest extends AbstractStateEngineTest {
     private static final String TEST_TYPE = "TestObject";
     HollowObjectSchema schema;
-
-    private class GenericRecordDataAccessor extends AbstractHollowDataAccessor<GenericHollowObject> {
-        public GenericRecordDataAccessor(HollowReadStateEngine rStateEngine, String type) {
-            super(rStateEngine, type);
-        }
-
-        @Override
-        public GenericHollowObject getRecord(int ordinal) {
-            HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) rStateEngine.getTypeDataAccess(type).getTypeState();
-            GenericHollowObject obj = new GenericHollowObject(new HollowObjectGenericDelegate(typeState), ordinal);
-            return obj;
-        }
-
-    }
 
     @Override
     @Before
@@ -70,7 +55,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
         {
-            GenericRecordDataAccessor dAccessor = new GenericRecordDataAccessor(readStateEngine, TEST_TYPE);
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
             Assert.assertEquals(3, dAccessor.getAddedRecords().size());
             assertList(dAccessor.getAddedRecords(), Arrays.asList(1, 2, 3));
             Assert.assertTrue(dAccessor.getRemovedRecords().isEmpty());
@@ -87,7 +72,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
         roundTripDelta();
         {
-            GenericRecordDataAccessor dAccessor = new GenericRecordDataAccessor(readStateEngine, TEST_TYPE);
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
             Assert.assertEquals(2, dAccessor.getAddedRecords().size());
             assertList(dAccessor.getAddedRecords(), Arrays.asList(1000, 0));
             Assert.assertEquals(1, dAccessor.getRemovedRecords().size());
@@ -108,7 +93,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
         roundTripDelta(); // remove everything
         {
-            GenericRecordDataAccessor dAccessor = new GenericRecordDataAccessor(readStateEngine, TEST_TYPE);
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
             Assert.assertEquals(0, dAccessor.getAddedRecords().size());
             Assert.assertEquals(4, dAccessor.getRemovedRecords().size());
             assertList(dAccessor.getRemovedRecords(), Arrays.asList(1, 3, 1000, 0));
@@ -129,7 +114,7 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
 
         roundTripDelta();
         {
-            GenericRecordDataAccessor dAccessor = new GenericRecordDataAccessor(readStateEngine, TEST_TYPE);
+            GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
             Assert.assertEquals(2, dAccessor.getAddedRecords().size());
             assertList(dAccessor.getAddedRecords(), Arrays.asList(634, 0));
             Assert.assertEquals(0, dAccessor.getRemovedRecords().size());
