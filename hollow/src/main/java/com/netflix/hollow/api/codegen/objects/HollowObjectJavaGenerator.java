@@ -23,6 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isNativeType;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
@@ -55,7 +56,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private final boolean useBooleanFieldErgonomics;
 
     public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+        super(packageName, computeSubPackageName(schema), usePackageGrouping);
 
         this.apiClassname = apiClassname;
         this.schema = schema;
@@ -67,6 +68,14 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.ergonomicShortcuts = ergonomicShortcuts;
         this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+    }
+    
+    private static String computeSubPackageName(HollowObjectSchema schema) {
+        String type = schema.getName();
+        if (isNativeType(type)) {
+            return "core";
+        }
+        return SUB_PACKAGE_NAME;
     }
 
     @Override

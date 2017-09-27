@@ -39,7 +39,7 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "MovieAPI";
+        String apiClassName = "PackageErgoAPI";
         String packageName = "codegen.subpackage.grouping";
         runGenerator(apiClassName, packageName, Movie.class);
     }
@@ -48,9 +48,18 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
     static class Movie {
         int id;
 
+        // Collections
         List<Actor> actors;
-        Map<String, String> map;
-        Set<String> rankings;
+        Map<String, Boolean> map;
+        Set<Long> rankings;
+
+        // Native Types
+        Integer i;
+        Long l;
+        Boolean b;
+        Float f;
+        Double d;
+        String s;
     }
 
     static class Actor {

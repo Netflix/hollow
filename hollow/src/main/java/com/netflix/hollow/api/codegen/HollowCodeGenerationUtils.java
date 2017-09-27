@@ -44,10 +44,15 @@ import java.util.Set;
  */
 public class HollowCodeGenerationUtils {
 
+    private static final Set<String> NATIVE_TYPES = new HashSet<>();
     private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
     private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
 
     static {
+        for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
+            NATIVE_TYPES.add(clzz.getSimpleName());
+        }
+
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
@@ -368,5 +373,9 @@ public class HollowCodeGenerationUtils {
             return result.substring(0, result.length() - 1);
         }
         return result;
+    }
+
+    public static boolean isNativeType(String type) {
+        return NATIVE_TYPES.contains(type);
     }
 }
