@@ -28,8 +28,6 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
     @Override
     @Before
     public void setup() throws IOException {
-        isCleanupAfterEnabled=false;
-        sourceFolder="/Users/dsu/work/hollow/src";
     }
 
     @Override
