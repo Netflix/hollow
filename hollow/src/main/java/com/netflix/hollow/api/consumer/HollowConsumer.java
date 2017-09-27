@@ -24,6 +24,8 @@ import com.netflix.hollow.api.client.StaleHollowReferenceDetector;
 import com.netflix.hollow.api.codegen.HollowAPIClassJavaGenerator;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
@@ -111,7 +113,8 @@ public class HollowConsumer {
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
     protected final ReadWriteLock refreshLock;
-    
+    protected final HollowConsumerMetrics metrics;
+
     private final Executor refreshExecutor;
 
     protected HollowConsumer(BlobRetriever blobRetriever,
@@ -123,15 +126,19 @@ public class HollowConsumer {
                              ObjectLongevityDetector objectLongevityDetector,
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
-                             Executor refreshExecutor) {
-        
-        this.updater = new HollowClientUpdater(blobRetriever, 
+                             Executor refreshExecutor,
+                             HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
+
+        this.metrics = new HollowConsumerMetrics();
+        this.updater = new HollowClientUpdater(blobRetriever,
                                                updateListeners, 
                                                apiFactory, 
                                                doubleSnapshotConfig,
                                                hashCodeFinder, 
                                                objectLongevityConfig, 
-                                               objectLongevityDetector);
+                                               objectLongevityDetector,
+                                               metrics,
+                                               metricsCollector);
         updater.setFilter(dataFilter);
         this.announcementWatcher = announcementWatcher;
         this.refreshExecutor = refreshExecutor;
@@ -268,6 +275,13 @@ public class HollowConsumer {
      */
     public void addRefreshListener(RefreshListener listener) {
         updater.addRefreshListener(listener);
+    }
+
+    /**
+     * Returns the metrics for this consumer
+     */
+    public HollowConsumerMetrics getMetrics() {
+        return metrics;
     }
 
     /**
@@ -673,6 +687,7 @@ public class HollowConsumer {
         private HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
         private File localBlobStoreDir = null;
         private Executor refreshExecutor = null;
+        private HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         
         public HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -729,7 +744,12 @@ public class HollowConsumer {
             this.refreshExecutor = refreshExecutor;
             return this;
         }
-        
+
+        public HollowConsumer.Builder withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
+            this.metricsCollector = metricsCollector;
+            return this;
+        }
+
         @Deprecated
         public HollowConsumer.Builder withHashCodeFinder(HollowObjectHashCodeFinder hashCodeFinder) {
             this.hashCodeFinder = hashCodeFinder;
@@ -763,7 +783,8 @@ public class HollowConsumer {
                                       objectLongevityDetector, 
                                       doubleSnapshotConfig, 
                                       hashCodeFinder, 
-                                      refreshExecutor);
+                                      refreshExecutor,
+                                      metricsCollector);
         }
     }
     

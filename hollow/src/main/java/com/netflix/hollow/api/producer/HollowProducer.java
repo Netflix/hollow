@@ -20,6 +20,8 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
@@ -130,18 +132,20 @@ public class HollowProducer {
     private final Executor snapshotPublishExecutor;
     private final int numStatesBetweenSnapshots;
     private int numStatesUntilNextSnapshot;
-    
+    private HollowProducerMetrics metrics;
+    private HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
+
     private boolean isInitialized;
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null);
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null);
     }
 
     protected HollowProducer(BlobStager blobStager,
@@ -152,7 +156,8 @@ public class HollowProducer {
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
                              int numStatesBetweenSnapshots,
-                             long targetMaxTypeShardSize) {
+                             long targetMaxTypeShardSize,
+                             HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
@@ -174,6 +179,16 @@ public class HollowProducer {
         
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
+
+        this.metrics = new HollowProducerMetrics();
+        this.metricsCollector = metricsCollector;
+    }
+
+    /**
+     * Returns the metrics for this producer
+     */
+    public HollowProducerMetrics getMetrics() {
+        return this.metrics;
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -281,6 +296,9 @@ public class HollowProducer {
             runCycle(task, cycleStatus, toVersion);
         } finally {
             listeners.fireCycleComplete(cycleStatus);
+            metrics.updateCycleMetrics(cycleStatus.build());
+            if(metricsCollector !=null)
+                metricsCollector.collect(metrics);
         }
         
         return toVersion;
@@ -474,6 +492,9 @@ public class HollowProducer {
             throw th;
         } finally {
             listeners.fireArtifactPublish(builder);
+            metrics.updateBlobTypeMetrics(builder.build());
+            if(metricsCollector !=null)
+                metricsCollector.collect(metrics);
         }
     }
 
@@ -861,7 +882,8 @@ public class HollowProducer {
         protected Executor snapshotPublishExecutor = null;
         protected int numStatesBetweenSnapshots = 0;
         protected long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
-        
+        protected HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
+
         public Builder withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
             return this;
@@ -929,6 +951,11 @@ public class HollowProducer {
             return this;
         }
 
+        public Builder withMetricsCollector(HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
+            this.metricsCollector = metricsCollector;
+            return this;
+        }
+        
         protected void checkArguments() {
             if(stager != null && compressor != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
@@ -945,7 +972,7 @@ public class HollowProducer {
         public HollowProducer build() {
             checkArguments();
             
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector);
         }
     }
     
