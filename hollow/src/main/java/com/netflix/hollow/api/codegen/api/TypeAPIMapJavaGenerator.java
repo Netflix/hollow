@@ -25,7 +25,6 @@ import com.netflix.hollow.api.custom.HollowMapTypeAPI;
 
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 
@@ -79,7 +78,6 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("    public ").append(apiClassname).append(" getAPI() {\n");
         builder.append("        return (").append(apiClassname).append(")api;\n");
         builder.append("    }\n\n");
-
 
         builder.append("}");
 

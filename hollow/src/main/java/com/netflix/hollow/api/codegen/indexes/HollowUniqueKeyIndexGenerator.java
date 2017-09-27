@@ -20,7 +20,6 @@ package com.netflix.hollow.api.codegen.indexes;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;

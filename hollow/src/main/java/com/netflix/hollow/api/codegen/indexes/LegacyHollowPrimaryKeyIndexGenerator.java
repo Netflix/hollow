@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
-
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowObjectSchema;

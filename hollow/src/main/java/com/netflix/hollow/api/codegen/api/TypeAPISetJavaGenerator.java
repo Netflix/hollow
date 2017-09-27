@@ -25,7 +25,6 @@ import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 
@@ -80,7 +79,4 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
 
         return builder.toString();
     }
-
-
-
 }

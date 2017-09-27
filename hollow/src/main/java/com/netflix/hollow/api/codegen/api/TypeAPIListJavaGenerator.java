@@ -25,7 +25,6 @@ import com.netflix.hollow.api.custom.HollowListTypeAPI;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 
@@ -76,13 +75,9 @@ public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("        return (").append(apiClassname).append(")api;\n");
         builder.append("    }\n\n");
 
-
-
-
         builder.append("}");
 
         return builder.toString();
     }
-
 
 }

@@ -27,7 +27,6 @@ import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import java.util.Comparator;
