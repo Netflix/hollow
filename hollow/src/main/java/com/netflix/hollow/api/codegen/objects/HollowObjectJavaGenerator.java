@@ -26,9 +26,9 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateB
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
+import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -41,12 +41,11 @@ import java.util.Set;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
+public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "";
 
     private final HollowObjectSchema schema;
-    private final String packageName;
     private final String apiClassname;
-    private final String className;
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
     private final String classPostfix;
@@ -54,9 +53,10 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     private final boolean useAggressiveSubstitutions;
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
     private final boolean useBooleanFieldErgonomics;
-    
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics) {
-        this.packageName = packageName;
+
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+
         this.apiClassname = apiClassname;
         this.schema = schema;
         this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
@@ -70,15 +70,9 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     }
 
     @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
     public String generate() {
         StringBuilder classBuilder = new StringBuilder();
-
-        classBuilder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(classBuilder);
 
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n\n");

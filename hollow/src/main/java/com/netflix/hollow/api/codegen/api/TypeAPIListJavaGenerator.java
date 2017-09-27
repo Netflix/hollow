@@ -37,31 +37,18 @@ import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
  * @author dkoszewnik
  *
  */
-public class TypeAPIListJavaGenerator implements HollowJavaFileGenerator {
-
-    private final String apiClassname;
-    private final String packageName;
-    private final String className;
+public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowListSchema schema;
 
-    public TypeAPIListJavaGenerator(String stateEngineClassname, String packageName, HollowListSchema schema) {
-        this.apiClassname = stateEngineClassname;
-        this.packageName = packageName;
+    public TypeAPIListJavaGenerator(String apiClassname, String packageName, HollowListSchema schema, boolean usePackageGrouping) {
+        super(apiClassname, packageName, schema, usePackageGrouping);
         this.schema = schema;
-        this.className = typeAPIClassname(schema.getName());
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        if(!"".equals(packageName))
-            builder.append("package ").append(packageName).append(";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowListTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowListTypeDataAccess.class.getName() + ";\n");
@@ -72,7 +59,7 @@ public class TypeAPIListJavaGenerator implements HollowJavaFileGenerator {
 
         builder.append("    private final ").append(delegateLookupClassname(schema)).append(" delegateLookupImpl;\n\n");
 
-        builder.append("    ").append(className).append("(").append(apiClassname).append(" api, HollowListTypeDataAccess dataAccess) {\n");
+        builder.append("    public ").append(className).append("(").append(apiClassname).append(" api, HollowListTypeDataAccess dataAccess) {\n");
         builder.append("        super(api, dataAccess);\n");
         builder.append("        this.delegateLookupImpl = new ").append(delegateLookupClassname(schema)).append("(this);\n");
         builder.append("    }\n\n");

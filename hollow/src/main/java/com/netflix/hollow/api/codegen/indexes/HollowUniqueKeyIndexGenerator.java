@@ -32,24 +32,17 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  *
  * @see HollowAPIGenerator
  */
-public class HollowUniqueKeyIndexGenerator implements HollowJavaFileGenerator {
+public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
-    protected final String packageName;
-    protected final String classname;
-    protected final String apiClassname;
-    protected final String classPostfix;
-    protected final boolean useAggressiveSubstitutions;
     protected final HollowObjectSchema schema;
 
     protected boolean isGenDefaultConstructor = false;
     protected boolean isParameterizedConstructorPublic = true;
 
-    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
-        this.classname = getClassName(schema);
-        this.apiClassname = apiClassname;
-        this.packageName = packageName;
-        this.classPostfix = classPostfix;
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+
+        this.className = getClassName(schema);
         this.schema = schema;
     }
 
@@ -58,15 +51,9 @@ public class HollowUniqueKeyIndexGenerator implements HollowJavaFileGenerator {
     }
 
     @Override
-    public String getClassName() {
-        return classname;
-    }
-
-    @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + HollowAPI.class.getName() + ";\n");
@@ -76,7 +63,7 @@ public class HollowUniqueKeyIndexGenerator implements HollowJavaFileGenerator {
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
         builder.append("\n");
-        builder.append("public class " + classname + " implements HollowConsumer.RefreshListener {\n\n");
+        builder.append("public class " + className + " implements HollowConsumer.RefreshListener {\n\n");
 
         builder.append("    private HollowPrimaryKeyIndex idx;\n");
         builder.append("    private " + apiClassname + " api;\n\n");
@@ -99,14 +86,14 @@ public class HollowUniqueKeyIndexGenerator implements HollowJavaFileGenerator {
     }
 
     protected void genDefaultConstructor(StringBuilder builder) {
-        builder.append("    public " + classname + "(HollowConsumer consumer) {\n");
+        builder.append("    public " + className + "(HollowConsumer consumer) {\n");
         builder.append("        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + schema.getName() + "\")).getPrimaryKey().getFieldPaths());\n");
         builder.append("    }\n\n");
     }
 
     protected void genParameterizedConstructor(StringBuilder builder) {
 
-        builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + classname + "(HollowConsumer consumer, String... fieldPaths) {\n");
+        builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, String... fieldPaths) {\n");
         builder.append("        consumer.getRefreshLock().lock();\n");
         builder.append("        try {\n");
         builder.append("            this.api = (" + apiClassname + ")consumer.getAPI();\n");

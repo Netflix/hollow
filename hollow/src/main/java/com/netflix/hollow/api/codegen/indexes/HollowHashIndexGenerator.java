@@ -41,27 +41,14 @@ import java.util.List;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
+public class HollowHashIndexGenerator extends HollowIndexGenerator {
 
-    private final String packageName;
-    private final String classname;
-    private final String apiClassname;
-    private final String classPostfix;
-    private final boolean useAggressiveSubstitutions;
     private final HollowDataset dataset;
     
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset) {
-        this.classname = apiClassname + "HashIndex";
-        this.apiClassname = apiClassname;
-        this.packageName = packageName;
-        this.classPostfix = classPostfix;
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+        this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
-    }
-
-    @Override
-    public String getClassName() {
-        return classname;
     }
 
     @Override
@@ -69,8 +56,7 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
         
         StringBuilder builder = new StringBuilder();
-        
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
         
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + HollowAPI.class.getName() + ";\n");
@@ -82,7 +68,7 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
         builder.append("import " + Iterable.class.getName() + ";\n");
         builder.append("import " + Iterator.class.getName() + ";\n\n");
 
-        builder.append("public class " + classname + " implements HollowConsumer.RefreshListener {\n\n");
+        builder.append("public class " + className + " implements HollowConsumer.RefreshListener {\n\n");
 
         builder.append("    private HollowHashIndex idx;\n");
         builder.append("    private " + apiClassname + " api;\n");
@@ -90,7 +76,7 @@ public class HollowHashIndexGenerator implements HollowJavaFileGenerator {
         builder.append("    private final String selectFieldPath;\n");
         builder.append("    private final String matchFieldPaths[];\n\n");
         
-        builder.append("    public " + classname + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
+        builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
         builder.append("        this.queryType = queryType;");
         builder.append("        this.selectFieldPath = selectFieldPath;\n");
         builder.append("        this.matchFieldPaths = matchFieldPaths;\n");

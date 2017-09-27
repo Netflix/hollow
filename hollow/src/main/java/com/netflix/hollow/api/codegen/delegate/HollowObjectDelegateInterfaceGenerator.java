@@ -26,7 +26,6 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -37,31 +36,17 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowObjectDelegateInterfaceGenerator implements HollowJavaFileGenerator {
+public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegateGenerator {
 
-    private final String packageName;
-    private final HollowObjectSchema schema;
-    private final String className;
-    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
-
-    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts) {
-        this.packageName = packageName;
-        this.schema = schema;
+    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
         this.className = delegateInterfaceName(schema.getName());
-        this.ergonomicShortcuts = ergonomicShortcuts;
-    }
-
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     @Override
     public String generate() {
         StringBuilder classBuilder = new StringBuilder();
-
-        classBuilder.append("package ").append(packageName).append(";\n\n");
+        appendPackageAndCommonImports(classBuilder);
 
         classBuilder.append("import ").append(HollowObjectDelegate.class.getName()).append(";\n\n");
 

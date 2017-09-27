@@ -42,30 +42,17 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowObjectDelegateCachedImplGenerator implements HollowJavaFileGenerator {
+public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegateGenerator {
 
-    private final String packageName;
-    private final HollowObjectSchema schema;
-    private final String className;
-    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
-
-    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts) {
-        this.packageName = packageName;
-        this.schema = schema;
+    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
         this.className = delegateCachedImplName(schema.getName());
-        this.ergonomicShortcuts = ergonomicShortcuts;
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package ").append(packageName).append(";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import ").append(HollowObjectAbstractDelegate.class.getName()).append(";\n");
         builder.append("import ").append(HollowObjectTypeDataAccess.class.getName()).append(";\n");

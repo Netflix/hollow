@@ -30,8 +30,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class LegacyHollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
 
-    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema);
+    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
         isGenDefaultConstructor = true;
         isParameterizedConstructorPublic = true;
     }
