@@ -19,6 +19,7 @@ package com.netflix.hollow.core.memory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -411,4 +412,21 @@ public class ThreadSafeBitSet {
         return true;
     }
 
+    /**
+     * create new BitSet with same bits set
+     */
+    public BitSet toBitSet() {
+        BitSet resultSet = new BitSet();
+        int ordinal = this.nextSetBit(0);
+        while(ordinal!=-1) {
+            resultSet.set(ordinal);
+            ordinal = this.nextSetBit(ordinal + 1);
+        }
+        return resultSet;
+    }
+
+    @Override
+    public String toString() {
+        return toBitSet().toString();
+    }
 }

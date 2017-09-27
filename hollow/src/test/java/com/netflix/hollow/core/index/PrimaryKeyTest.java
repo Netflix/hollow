@@ -1,9 +1,26 @@
+/*
+ *  Copyright 2017 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ */
 package com.netflix.hollow.core.index;
 
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
@@ -90,6 +107,23 @@ public class PrimaryKeyTest {
         } catch(IllegalArgumentException expected) {
             Assert.assertEquals("Invalid field path declaration for type UnknownType: id.  The type UnknownType is unavailable.",
                                 expected.getMessage());
+        }
+    }
+    
+    
+    @Test
+    public void testAutoExpand() {
+        { // verify fieldPath auto expand
+            PrimaryKey autoExpandPK = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType");
+            Assert.assertEquals(FieldType.STRING, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals(null, autoExpandPK.getFieldSchema(writeEngine, 0));
+        }
+
+        { // verify disabled fieldPath auto expand with ending "!" 
+            PrimaryKey autoExpandPK = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType!");
+            Assert.assertNotEquals(FieldType.STRING, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals(FieldType.REFERENCE, autoExpandPK.getFieldType(writeEngine, 0));
+            Assert.assertEquals("SubTypeWithTraversablePrimaryKey", autoExpandPK.getFieldSchema(writeEngine, 0).getName());
         }
     }
     

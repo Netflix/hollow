@@ -29,13 +29,17 @@ public abstract class HollowObjectAbstractDelegate implements HollowObjectDelega
 
     @Override
     public boolean isNull(int ordinal, String fieldName) {
-        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
-        int fieldIndex = getSchema().getPosition(fieldName);
+        try {
+            HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+            int fieldIndex = getSchema().getPosition(fieldName);
 
-        if(fieldIndex == -1)
-            return missingDataHandler().handleIsNull(getSchema().getName(), ordinal, fieldName);
+            if(fieldIndex == -1)
+                return missingDataHandler().handleIsNull(getSchema().getName(), ordinal, fieldName);
 
-        return dataAccess.isNull(ordinal, fieldIndex);
+            return dataAccess.isNull(ordinal, fieldIndex);
+        } catch(Exception ex) {
+            throw new RuntimeException(String.format("Unable to handle ordinal=%s, fieldName=%s", ordinal, fieldName), ex);
+        }
     }
 
     @Override
@@ -58,7 +62,7 @@ public abstract class HollowObjectAbstractDelegate implements HollowObjectDelega
         if(fieldIndex == -1)
             return missingDataHandler().handleReferencedOrdinal(getSchema().getName(), ordinal, fieldName);
 
-        return (int)dataAccess.readOrdinal(ordinal, fieldIndex);
+        return dataAccess.readOrdinal(ordinal, fieldIndex);
     }
 
     @Override
