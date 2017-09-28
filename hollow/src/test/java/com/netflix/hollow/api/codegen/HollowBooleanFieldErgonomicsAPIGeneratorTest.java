@@ -33,8 +33,8 @@ public class HollowBooleanFieldErgonomicsAPIGeneratorTest extends AbstractHollow
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "MovieAPI";
-        String packageName = "codegen.booleanfieldergo";
+        String apiClassName = "BooleanErgoTestAPI";
+        String packageName = "codegen.booleanfield.ergo";
         runGenerator(apiClassName, packageName, Movie.class);
     }
 

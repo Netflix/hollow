@@ -39,8 +39,15 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "PackageErgoAPI";
+        String apiClassName = "PackageErgoTestAPI";
         String packageName = "codegen.subpackage.grouping";
+        runGenerator(apiClassName, packageName, Movie.class);
+    }
+
+    @Test
+    public void testDefaultPackage() throws Exception {
+        String apiClassName = "PackageErgoTestAPI";
+        String packageName = "";
         runGenerator(apiClassName, packageName, Movie.class);
     }
 

@@ -35,8 +35,8 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "MovieAPI";
-        String packageName = "codegen.data.accessor.api";
+        String apiClassName = "DataAccessorTestAPI";
+        String packageName = "codegen.data.accessor";
         runGenerator(apiClassName, packageName, Movie.class);
     }
 
