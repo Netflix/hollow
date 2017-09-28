@@ -960,7 +960,7 @@ public class HollowProducer {
             this.metricsCollector = metricsCollector;
             return this;
         }
-        
+
         public Builder withBlobStorageCleaner(BlobStorageCleaner blobStorageCleaner) {
             this.blobStorageCleaner = blobStorageCleaner;
             return this;
