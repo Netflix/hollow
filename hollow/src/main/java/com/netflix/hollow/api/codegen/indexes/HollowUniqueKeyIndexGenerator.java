@@ -21,7 +21,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImp
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.index.AbstrackHollowUniqueKeyIndex;
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -59,12 +59,12 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
-        builder.append("import " + AbstrackHollowUniqueKeyIndex.class.getName() + ";\n");
+        builder.append("import " + AbstractHollowUniqueKeyIndex.class.getName() + ";\n");
         if (isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
         builder.append("\n");
-        builder.append("public class " + className + " extends " + AbstrackHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + type + "> {\n\n");
+        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + type + "> {\n\n");
 
         {
             genConstructors(builder);

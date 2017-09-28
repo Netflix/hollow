@@ -25,14 +25,14 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  *,
  * @author dsu
  */
-public abstract class AbstrackHollowUniqueKeyIndex<API, T> {
+public abstract class AbstractHollowUniqueKeyIndex<API, T> {
     protected final HollowConsumer consumer;
     protected HollowPrimaryKeyIndex idx;
     protected API api;
     protected boolean isListenToDataRefreah;
     protected RefreshListener refreshListener;
 
-    public AbstrackHollowUniqueKeyIndex(HollowConsumer consumer, String type, boolean isListenToDataRefreah, String... fieldPaths) {
+    public AbstractHollowUniqueKeyIndex(HollowConsumer consumer, String type, boolean isListenToDataRefreah, String... fieldPaths) {
         consumer.getRefreshLock().lock();
         try {
             this.consumer = consumer;
