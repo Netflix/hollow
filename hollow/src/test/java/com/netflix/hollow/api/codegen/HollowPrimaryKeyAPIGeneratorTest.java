@@ -35,7 +35,7 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "MovieAPI";
+        String apiClassName = "PrimaryKeyIndexTestAPI";
         String packageName = "codegen.primarykey";
         runGenerator(apiClassName, packageName, Movie.class);
     }
