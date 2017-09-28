@@ -27,6 +27,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
@@ -46,9 +47,15 @@ public class HollowIncrementalProducer {
 
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
+    private final double threadsPerCpu;
     
     public HollowIncrementalProducer(HollowProducer producer) {
+        this(producer, 1.0d);
+    }
+    
+    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
+        this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
     }
     
@@ -139,10 +146,21 @@ public class HollowIncrementalProducer {
                 }
             }
             
-            private void addRecords(WriteState newState) {
-                for(Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                    if(entry.getValue() != DELETE_RECORD)
-                        newState.add(entry.getValue());
+            private void addRecords(final WriteState newState) {
+                SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+                for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
+                    executor.execute(new Runnable() {
+                        public void run() {
+                            if(entry.getValue() != DELETE_RECORD)
+                                newState.add(entry.getValue());
+                        }
+                    });
+                }
+
+                try {
+                    executor.awaitSuccessfulCompletion();
+                } catch(Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
 

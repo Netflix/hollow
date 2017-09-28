@@ -22,7 +22,6 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
@@ -78,7 +77,6 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
                 return Long.compare(f1.lastModified(), f2.lastModified());
             }
         });
-        Arrays.sort(files, Collections.reverseOrder());
     }
 
     private File[] getFilesByType(final String blobType) {

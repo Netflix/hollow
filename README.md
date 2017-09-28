@@ -5,6 +5,7 @@
 [![Build Status](https://travis-ci.org/Netflix/hollow.svg?branch=master)](https://travis-ci.org/Netflix/hollow)
 [![Join the chat at https://gitter.im/Netflix/hollow](https://badges.gitter.im/Netflix/hollow.svg)](https://gitter.im/Netflix/hollow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/hollow.svg)](#)
+[ ![Download](https://api.bintray.com/packages/netflixoss/maven/hollow/images/download.svg) ](https://bintray.com/netflixoss/maven/hollow/_latestVersion)
 
 Hollow is a java library and toolset for disseminating in-memory datasets from a single producer to many consumers for high performance read-only access. [Read more](http://techblog.netflix.com/2016/12/netflixoss-announcing-hollow.html).
 
@@ -20,18 +21,24 @@ Binaries are available from Maven Central and jcenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|2.6.8|
+|com.netflix.hollow|hollow|2.7.6|
 
-In a Maven .pom file:
+In a Maven `.pom` file:
 
         ...
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
                 <artifactId>hollow</artifactId>
-                <version>2.6.8</version>
+                <version>2.7.6</version>
         </dependency>
         ...
 
+In a Gradle `build.gradle` file:
+
+        ...
+        compile 'com.netflix.hollow:hollow:2.7.6'
+        ...
+        
 ## Get Support
 
 Hollow is maintained by the Platform Data Technologies team at Netflix.  Support can be obtained directly from us or from fellow users through [Gitter](https://gitter.im/Netflix/hollow) or by opening an issue in this project.

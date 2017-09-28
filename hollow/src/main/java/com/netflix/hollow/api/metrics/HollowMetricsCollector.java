@@ -15,19 +15,19 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.metrics;
 
-/**
- * This Dummy blob storage cleaner does nothing
- */
-public class DummyBlobStorageCleaner extends HollowProducer.BlobStorageCleaner {
+public abstract class HollowMetricsCollector<T extends HollowMetrics> {
 
-    @Override
-    public void cleanSnapshots() { }
+    private T metrics;
 
-    @Override
-    public void cleanDeltas() { }
+    public T getMetrics() {
+        return metrics;
+    }
 
-    @Override
-    public void cleanReverseDeltas() { }
+    public void setMetrics(T metrics) {
+        this.metrics = metrics;
+    }
+
+    public abstract void collect(T metrics);
 }

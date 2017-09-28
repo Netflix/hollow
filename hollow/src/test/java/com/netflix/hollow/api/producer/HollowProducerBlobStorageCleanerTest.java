@@ -23,12 +23,14 @@ import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStorageCleaner;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HollowProducerBlobStorageCleanerTest {
@@ -78,8 +80,8 @@ public class HollowProducerBlobStorageCleanerTest {
         File[] filesAfterCleanup = listFiles(HollowProducer.Blob.Type.SNAPSHOT.prefix);
         List<String> fileNamesAfterCleanup = getFileNames(filesAfterCleanup);
 
-        assert files.length == 5;
-        assert !fileNames.equals(fileNamesAfterCleanup);
+        Assert.assertEquals(files.length, 5);
+        Assert.assertNotEquals(fileNames, fileNamesAfterCleanup);
     }
 
     @SuppressWarnings("unused")

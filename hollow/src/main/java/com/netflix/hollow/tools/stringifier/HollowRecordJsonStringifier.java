@@ -130,6 +130,8 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
 
         if(typeDataAccess == null) {
             builder.append("{ }");
+        } else if (ordinal == -1) {
+            builder.append("null");
         } else {
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
                 appendObjectStringify(builder, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
