@@ -43,8 +43,9 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
         super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
         this.dataset = dataset;
         this.pk = schema.getPrimaryKey();
-        isGenDefaultConstructor = true;
+        isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = false;
+        isAutoListenToDataRefresh = false;
     }
 
     @Override
