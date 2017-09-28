@@ -32,6 +32,7 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowProducerBlobStorageCleanerTest {
 
@@ -43,6 +44,9 @@ public class HollowProducerBlobStorageCleanerTest {
     public void setUp() {
         publishDir = new File(SCRATCH_DIR, "publish-dir");
         publishDir.mkdir();
+        for(File file : publishDir.listFiles()) {
+            file.delete();
+        }
     }
 
     @Test
@@ -51,6 +55,7 @@ public class HollowProducerBlobStorageCleanerTest {
         HollowProducer.BlobStorageCleaner blobStorageCleaner = new HollowFilesystemBlobStorageCleaner(publishDir);
         HollowProducer producer = HollowProducer.withPublisher(publisher)
                                                 .withBlobStorageCleaner(blobStorageCleaner)
+                                                .withVersionMinter(new TestVersionMinter())
                                                 .build();
 
         /// initialize the data -- classic producer creates the first state in the delta chain. 
@@ -76,12 +81,15 @@ public class HollowProducerBlobStorageCleanerTest {
 
         incrementalProducer.addOrModify(new TypeA(6, "three", 1000));
         incrementalProducer.runCycle();
+        incrementalProducer.addOrModify(new TypeA(7, "three", 1000));
+        incrementalProducer.runCycle();
 
         File[] filesAfterCleanup = listFiles(HollowProducer.Blob.Type.SNAPSHOT.prefix);
         List<String> fileNamesAfterCleanup = getFileNames(filesAfterCleanup);
 
         Assert.assertEquals(files.length, 5);
-        Assert.assertNotEquals(fileNames, fileNamesAfterCleanup);
+        Assert.assertEquals(Arrays.asList("snapshot-3", "snapshot-4", "snapshot-5", "snapshot-6", "snapshot-7"), fileNamesAfterCleanup);
+        Assert.assertNotEquals(fileNamesAfterCleanup, fileNames);
     }
 
     @SuppressWarnings("unused")
@@ -119,6 +127,15 @@ public class HollowProducerBlobStorageCleanerTest {
     public void removeAllFiles() {
         for(File file : publishDir.listFiles()) {
             file.delete();
+        }
+    }
+
+    private static final class TestVersionMinter implements HollowProducer.VersionMinter  {
+        private static AtomicInteger versionCounter = new AtomicInteger();
+
+        @Override
+        public long mint() {
+            return versionCounter.incrementAndGet();
         }
     }
 }

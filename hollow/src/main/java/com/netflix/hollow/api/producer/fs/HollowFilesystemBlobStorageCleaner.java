@@ -22,6 +22,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
@@ -54,9 +55,8 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
 
         sortByLastModified(files);
 
-        File[] filesToRemove = Arrays.copyOfRange(files, 0, numOfSnapshotsToKeep - 1);
-
-        for(File file : filesToRemove) {
+        for(int i= numOfSnapshotsToKeep; i < files.length; i++){
+            File file = files[i];
             boolean deleted = file.delete();
             if(!deleted) {
                 log.warning("Could not delete snapshot " + file.getPath());
@@ -77,6 +77,7 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
                 return Long.compare(f1.lastModified(), f2.lastModified());
             }
         });
+        Arrays.sort(files, Collections.reverseOrder());
     }
 
     private File[] getFilesByType(final String blobType) {
