@@ -88,7 +88,7 @@ public class HollowProducerBlobStorageCleanerTest {
         List<String> fileNamesAfterCleanup = getFileNames(filesAfterCleanup);
 
         Assert.assertEquals(5, files.length);
-        Assert.assertEquals(Arrays.asList("snapshot-3", "snapshot-4", "snapshot-5", "snapshot-6", "snapshot-7"), fileNamesAfterCleanup);
+        Assert.assertFalse(fileNamesAfterCleanup.contains("snapshot-1"));
         Assert.assertNotEquals(fileNamesAfterCleanup, fileNames);
     }
 
