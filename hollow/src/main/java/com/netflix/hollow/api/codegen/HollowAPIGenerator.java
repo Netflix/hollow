@@ -191,11 +191,11 @@ public class HollowAPIGenerator {
                 generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping));
 
                 generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping));
-                generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping));
                 if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
                     generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping));
                 } else if (((HollowObjectSchema) schema).getPrimaryKey() != null) {
                     generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping));
+                    generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping));
                 }
             }
         }
