@@ -74,7 +74,9 @@ public class HollowFilesystemBlobStorageCleaner extends HollowProducer.BlobStora
     private void sortByLastModified(File[] files) {
         Arrays.sort(files, new Comparator<File>() {
             public int compare(File f1, File f2) {
-                return Long.compare(f1.lastModified(), f2.lastModified());
+                Long lastModifiedF2 = f2.lastModified();
+                Long lastModifiedF1 = f1.lastModified();
+                return lastModifiedF2.compareTo(lastModifiedF1);
             }
         });
         Arrays.sort(files, Collections.reverseOrder());
