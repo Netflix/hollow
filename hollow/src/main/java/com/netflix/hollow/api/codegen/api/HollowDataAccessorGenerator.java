@@ -20,55 +20,46 @@ package com.netflix.hollow.api.codegen.api;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
+import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation. Not intended for external consumption.
  *
  * @see HollowAPIGenerator
  */
-public class HollowDataAccessorGenerator implements HollowJavaFileGenerator {
-
-    protected final String packageName;
-    protected final String classname;
-    protected final String apiClassname;
+public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "accessor";
+    
+    protected final String apiclassName;
     protected final String classPostfix;
     protected final String type;
     protected final boolean useAggressiveSubstitutions;
     protected final HollowObjectSchema schema;
 
-    public HollowDataAccessorGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
-        this.classname = getClassName(schema);
-        this.apiClassname = apiClassname;
+    public HollowDataAccessorGenerator(String packageName, String apiclassName, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+        this.className = getclassName(schema);
+        this.apiclassName = apiclassName;
         this.classPostfix = classPostfix;
-        this.packageName = packageName;
         this.type =  hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.schema = schema;
     }
 
-    protected String getClassName(HollowObjectSchema schema) {
+    protected String getclassName(HollowObjectSchema schema) {
         return schema.getName() + "DataAccessor";
-    }
-
-    @Override
-    public String getClassName() {
-        return classname;
     }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + AbstractHollowDataAccessor.class.getName() + ";\n");
@@ -76,10 +67,10 @@ public class HollowDataAccessorGenerator implements HollowJavaFileGenerator {
         builder.append("import " + HollowReadStateEngine.class.getName() + ";\n");
 
         builder.append("\n");
-        builder.append("public class " + classname + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
+        builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
 
         builder.append("    public static final String TYPE = \"" + type + "\";\n");
-        builder.append("    private " + apiClassname + " api;\n\n");
+        builder.append("    private " + apiclassName + " api;\n\n");
 
         genConstructors(builder);
         genPublicAPIs(builder);
@@ -90,19 +81,19 @@ public class HollowDataAccessorGenerator implements HollowJavaFileGenerator {
     }
 
     protected void genConstructors(StringBuilder builder) {
-        builder.append("    public " + classname + "(HollowConsumer consumer) {\n");
+        builder.append("    public " + className + "(HollowConsumer consumer) {\n");
         builder.append("        super(consumer, TYPE);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine) {\n");
         builder.append("        super(rStateEngine, TYPE);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, String ... fieldPaths) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, String ... fieldPaths) {\n");
         builder.append("        super(rStateEngine, TYPE, fieldPaths);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + classname + "(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {\n");
         builder.append("        super(rStateEngine, TYPE, primaryKey);\n");
         builder.append("    }\n\n");
     }

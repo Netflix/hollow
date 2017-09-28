@@ -39,8 +39,8 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     protected final HollowDataset dataset;
     protected final PrimaryKey pk;
 
-    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema);
+    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
         this.dataset = dataset;
         this.pk = schema.getPrimaryKey();
         isGenDefaultConstructor = true;
@@ -51,8 +51,6 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     protected String getClassName(HollowObjectSchema schema) {
         return schema.getName() + "PrimaryKeyIndex";
     }
-
-
 
     @Override
     protected void genFindMatchAPI(StringBuilder builder) {

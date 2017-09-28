@@ -24,7 +24,6 @@ import com.netflix.hollow.api.custom.HollowAPI;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
@@ -36,34 +35,23 @@ import java.util.Set;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowListJavaGenerator implements HollowJavaFileGenerator {
+public class HollowListJavaGenerator extends HollowCollectionsGenerator {
 
     private final HollowListSchema schema;
-    private final String packageName;
-    private final String apiClassname;
-    private final String className;
     private final String elementClassName;
     private final boolean parameterize;
 
-    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
-        this.packageName = packageName;
-        this.apiClassname = apiClassname;
+    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
+        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
         this.schema = schema;
-        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix, useAggressiveSubstitutions);
         this.parameterize = parameterizeClassNames || parameterizedTypes.contains(schema.getElementType());
     }
 
     @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowList.class.getName() + ";\n");
         builder.append("import " + HollowListSchema.class.getName() + ";\n");

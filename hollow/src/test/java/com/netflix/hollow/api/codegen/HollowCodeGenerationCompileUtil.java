@@ -82,6 +82,7 @@ public class HollowCodeGenerationCompileUtil {
             for (File file : folder.listFiles()) {
                 if (file.isDirectory()) {
                     cleanupFolder(file, timestamp);
+                    file.delete();
                 } else if (timestamp == null || (timestamp.longValue() - file.lastModified() >= 5000)) { // cleanup file if it is older than specified timestamp with some buffer time
                     System.out.println(String.format("\t deleting file: %s, lastModified=%s", file.getName(), new Date(file.lastModified())));
                     file.delete();

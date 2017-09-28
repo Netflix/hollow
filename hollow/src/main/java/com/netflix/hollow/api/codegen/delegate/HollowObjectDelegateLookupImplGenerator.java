@@ -26,7 +26,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
@@ -38,30 +37,17 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowObjectDelegateLookupImplGenerator implements HollowJavaFileGenerator {
+public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegateGenerator {
 
-    private final String packageName;
-    private final HollowObjectSchema schema;
-    private final String className;
-    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
-
-    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts) {
-        this.packageName = packageName;
-        this.schema = schema;
+    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
         this.className = delegateLookupImplName(schema.getName());
-        this.ergonomicShortcuts = ergonomicShortcuts;
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package ").append(packageName).append(";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import ").append(HollowObjectAbstractDelegate.class.getName()).append(";\n");
         builder.append("import ").append(HollowObjectTypeDataAccess.class.getName()).append(";\n");
