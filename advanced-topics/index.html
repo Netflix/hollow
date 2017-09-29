@@ -1,240 +1,408 @@
+
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Advanced Topics - Hollow (Netflix OSS)</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Advanced Topics";
-    var mkdocs_page_input_path = "advanced-topics.md";
-    var mkdocs_page_url = "/advanced-topics/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-
+<html lang="en" class="no-js">
+  <head>
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#fcfcfc">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#fcfcfc;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <link rel="shortcut icon" href="../assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.10.1">
+    
+    
+      
+        <title>Advanced Topics - Hollow (Netflix OSS)</title>
+      
+    
+    
+      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-a20f419c8e.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-23f75ab9c7.palette.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="red" data-md-color-accent="brown">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Hollow (Netflix OSS)" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon md-icon--home"></i>
+          
+        </a>
       </div>
-
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="..">Introduction</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../quick-start/">Quick Start</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../getting-started/">Getting Started</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../indexing-querying/">Indexing/Querying</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../diving-deeper/">Diving Deeper</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">Advanced Topics</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#schema-parser">Schema Parser</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#low-level-input-api">Low Level Input API</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#determining-populated-ordinals">Determining Populated Ordinals</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#caching">Caching</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#hollow-heap-effects">Hollow Heap Effects</a></li>
-                
-                    <li><a class="toctree-l4" href="#double-snapshots">Double Snapshots</a></li>
-                
-                    <li><a class="toctree-l4" href="#type-sharding">Type Sharding</a></li>
-                
-                    <li><a class="toctree-l4" href="#object-longevity">Object Longevity</a></li>
-                
-                    <li><a class="toctree-l4" href="#memory-pooling">Memory Pooling</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#delta-based-producer-input">Delta-Based Producer Input</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#in-memory-data-layout">In-Memory Data Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#object-layout">Object Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#list-layout">List Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#set-layout">Set Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#map-layout">Map Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#primary-key-index-layout">Primary Key Index Layout</a></li>
-                
-                    <li><a class="toctree-l4" href="#hash-index-layout">Hash Index Layout</a></li>
-                
-            
-            </ul>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../glossary/">Glossary</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../community/">Community</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../acknowledgements/">Acknowledgements</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../license/">License</a>
-        
-    </li>
-<li>
-          
-        </ul>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
       </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Hollow (Netflix OSS)</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Advanced Topics</li>
-    <li class="wy-breadcrumbs-aside">
-        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
-      
-        <a href="https://github.com/Netflix/hollow"
-          class="icon icon-github"> GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
               
+            
+            Advanced Topics
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Hollow (Netflix OSS)
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../quick-start/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
+      Getting Started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../indexing-querying/" title="Indexing/Querying" class="md-nav__link">
+      Indexing/Querying
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+      Producers and Consumers
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../tooling/" title="Tooling" class="md-nav__link">
+      Tooling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-modeling/" title="Data Modeling" class="md-nav__link">
+      Data Modeling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../diving-deeper/" title="Diving Deeper" class="md-nav__link">
+      Diving Deeper
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-nav__link">
+      Interacting with a Hollow Dataset
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
+      Data Ingestion
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+    <a href="./" title="Advanced Topics" class="md-nav__link md-nav__link--active">
+      Advanced Topics
+    </a>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../glossary/" title="Glossary" class="md-nav__link">
+      Glossary
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../acknowledgements/" title="Acknowledgements" class="md-nav__link">
+      Acknowledgements
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Netflix/hollow/edit/master/docs/advanced-topics.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
                 <h1 id="schema-parser">Schema Parser</h1>
 <p>Hollow schemas can be serialized as Java Strings.  Calling <code>toString()</code> on a <code>HollowSchema</code> will produce a human-readable representation of the schema.  The following shows the String representations of all of the schemas from a <code>Movie</code>/<code>Actor</code> example data model:</p>
-<pre><code>Movie @PrimaryKey(id) {
+<div class="codehilite"><pre><span></span>Movie @PrimaryKey(id) {
     long id;
     int releaseYear;
     string title;
@@ -252,30 +420,33 @@ Actor {
 String {
     string value;
 }
-</code></pre>
+</pre></div>
+
 
 <p>These representations can be parsed using the <code>HollowSchemaParser</code>, and in turn can be used to initialize the state of a <code>HollowWriteStateEngine</code>:</p>
-<pre><code class="java">String allSchemas = /// a String containing all schemas
+<div class="codehilite"><pre><span></span><span class="n">String</span> <span class="n">allSchemas</span> <span class="o">=</span> <span class="c1">/// a String containing all schemas</span>
 
-List&lt;HollowSchema&gt; schemas = 
-             HollowSchemaParser.parseCollectionOfSchemas(allSchemas);
+<span class="n">List</span><span class="o">&lt;</span><span class="n">HollowSchema</span><span class="o">&gt;</span> <span class="n">schemas</span> <span class="o">=</span> 
+             <span class="n">HollowSchemaParser</span><span class="o">.</span><span class="na">parseCollectionOfSchemas</span><span class="o">(</span><span class="n">allSchemas</span><span class="o">);</span>
 
-HollowWriteStateEngine initializedWriteEngine = 
-             HollowWriteStateCreator.createWithSchemas(schemas);
-</code></pre>
+<span class="n">HollowWriteStateEngine</span> <span class="n">initializedWriteEngine</span> <span class="o">=</span> 
+             <span class="n">HollowWriteStateCreator</span><span class="o">.</span><span class="na">createWithSchemas</span><span class="o">(</span><span class="n">schemas</span><span class="o">);</span>
+</pre></div>
+
 
 <div class="admonition hint">
 <p class="admonition-title">Guiding Data Ingestion with a Data Model</p>
 <p>For a generic data ingestion mechanism, loading the schemas from a text representation comes in handy.  For example, the <a href="../data-ingestion/#json-to-hollow-adapter">JSON to Hollow adapter</a> requires a <code>HollowWriteStateEngine</code> which is preinitialized with a data model.  The data model can be configured in a text file, and loaded with the <code>HollowSchemaParser</code>.</p>
 </div>
 <p>Object schema definitions take the following form:</p>
-<pre><code>ObjectTypeName @PrimaryKey(fieldName1, fieldNameN) {
+<div class="codehilite"><pre><span></span>ObjectTypeName @PrimaryKey(fieldName1, fieldNameN) {
    FieldType1 fieldName1;
    FieldType2 fieldName2;
    ...
    FieldTypeN fieldNameN;
 }
-</code></pre>
+</pre></div>
+
 
 <p>The primary key definition is optional and should be omitted if no primary key should be defined for a type.</p>
 <p>Object schemas may define any of the following field types: <code>int</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>boolean</code>, <code>string</code>, <code>bytes</code>.  If a field has a type other than these, the field will be interpreted as a <code>REFERENCE</code> to another type of that name.</p>
@@ -293,35 +464,37 @@ HollowWriteStateEngine initializedWriteEngine =
 <p>Elements, keys, and values in collection record types cannot be inlined.  Whitespace is unimportant when parsing schema definitions.</p>
 <h1 id="low-level-input-api">Low Level Input API</h1>
 <p>Although Hollow includes a few ready-made data ingestion utilities, other data ingestion utilities can be created.  Adding data into Hollow starts with a <code>HollowWriteStateEngine</code>.  We need to initialize a type state for each schema in our data model:</p>
-<pre><code class="java">HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+<div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowWriteStateEngine</span><span class="o">();</span>
 
-HollowObjectSchema movieSchema = new HollowObjectSchema(&quot;Movie&quot;, 3);
-movieSchema.addField(&quot;id&quot;, FieldType.LONG);
-movieSchema.addField(&quot;title&quot;, FieldType.REFERENCE, &quot;String&quot;);
-movieSchema.addField(&quot;releaseYear&quot;, FieldType.INT);
+<span class="n">HollowObjectSchema</span> <span class="n">movieSchema</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectSchema</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="mi">3</span><span class="o">);</span>
+<span class="n">movieSchema</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="n">FieldType</span><span class="o">.</span><span class="na">LONG</span><span class="o">);</span>
+<span class="n">movieSchema</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;title&quot;</span><span class="o">,</span> <span class="n">FieldType</span><span class="o">.</span><span class="na">REFERENCE</span><span class="o">,</span> <span class="s">&quot;String&quot;</span><span class="o">);</span>
+<span class="n">movieSchema</span><span class="o">.</span><span class="na">addField</span><span class="o">(</span><span class="s">&quot;releaseYear&quot;</span><span class="o">,</span> <span class="n">FieldType</span><span class="o">.</span><span class="na">INT</span><span class="o">);</span>
 
-HollowObjectTypeWriteState movieState = new HollowObjectTypeWriteState(movieSchema);
+<span class="n">HollowObjectTypeWriteState</span> <span class="n">movieState</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectTypeWriteState</span><span class="o">(</span><span class="n">movieSchema</span><span class="o">);</span>
 
-writeEngine.addTypeState(movieState);
-</code></pre>
+<span class="n">writeEngine</span><span class="o">.</span><span class="na">addTypeState</span><span class="o">(</span><span class="n">movieState</span><span class="o">);</span>
+</pre></div>
+
 
 <p>Once we’ve initialized our type states, we can add data into our state engine using HollowWriteRecords:</p>
-<pre><code class="java">HollowObjectSchema stringSchema = /// the String schema
-HollowObjectSchema movieSchema = /// the Movie schema
+<div class="codehilite"><pre><span></span><span class="n">HollowObjectSchema</span> <span class="n">stringSchema</span> <span class="o">=</span> <span class="c1">/// the String schema</span>
+<span class="n">HollowObjectSchema</span> <span class="n">movieSchema</span> <span class="o">=</span> <span class="c1">/// the Movie schema</span>
 
-HollowObjectWriteRecord titleRec = new HollowObjectWriteRecord(stringSchema);
-HollowObjectWriteRecord movieRec = new HollowObjectWriteRecord(movieSchema);
+<span class="n">HollowObjectWriteRecord</span> <span class="n">titleRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectWriteRecord</span><span class="o">(</span><span class="n">stringSchema</span><span class="o">);</span>
+<span class="n">HollowObjectWriteRecord</span> <span class="n">movieRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectWriteRecord</span><span class="o">(</span><span class="n">movieSchema</span><span class="o">);</span>
 
-titleRec.setString(&quot;value&quot;, &quot;The Matrix&quot;);
+<span class="n">titleRec</span><span class="o">.</span><span class="na">setString</span><span class="o">(</span><span class="s">&quot;value&quot;</span><span class="o">,</span> <span class="s">&quot;The Matrix&quot;</span><span class="o">);</span>
 
-int titleOrdinal = writeEngine.addObject(&quot;String&quot;, titleRec);
+<span class="kt">int</span> <span class="n">titleOrdinal</span> <span class="o">=</span> <span class="n">writeEngine</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="s">&quot;String&quot;</span><span class="o">,</span> <span class="n">titleRec</span><span class="o">);</span>
 
-movieRec.setLong(&quot;id&quot;, 1);
-movieRec.setReference(&quot;title&quot;, titleOrdinal);
-movieRec.setInt(&quot;releaseYear&quot;, 1999);
+<span class="n">movieRec</span><span class="o">.</span><span class="na">setLong</span><span class="o">(</span><span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="mi">1</span><span class="o">);</span>
+<span class="n">movieRec</span><span class="o">.</span><span class="na">setReference</span><span class="o">(</span><span class="s">&quot;title&quot;</span><span class="o">,</span> <span class="n">titleOrdinal</span><span class="o">);</span>
+<span class="n">movieRec</span><span class="o">.</span><span class="na">setInt</span><span class="o">(</span><span class="s">&quot;releaseYear&quot;</span><span class="o">,</span> <span class="mi">1999</span><span class="o">);</span>
 
-writeEngine.addObject(&quot;Movie&quot;, movieRec);
-</code></pre>
+<span class="n">writeEngine</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="n">movieRec</span><span class="o">);</span>
+</pre></div>
+
 
 <p>Note that referenced records must be added prior to referencing records in order to obtain the referenced ordinals.</p>
 <div class="admonition tip">
@@ -329,21 +502,22 @@ writeEngine.addObject(&quot;Movie&quot;, movieRec);
 <p><code>HollowWriteRecord</code>s can be reused -- just be sure to call <code>reset()</code> before populating data from the next record.</p>
 </div>
 <p>Each schema type has its own <code>HollowTypeWriteState</code> and <code>HollowWriteRecord</code> implementation:</p>
-<pre><code class="java">HollowObjectSchema objectSchema = /// an Object schema
-HollowListSchema listSchema = /// a List schema
-HollowSetSchema setSchema = /// a Set schema
-HollowMapSchema mapSchema = /// a Map schema
+<div class="codehilite"><pre><span></span><span class="n">HollowObjectSchema</span> <span class="n">objectSchema</span> <span class="o">=</span> <span class="c1">/// an Object schema</span>
+<span class="n">HollowListSchema</span> <span class="n">listSchema</span> <span class="o">=</span> <span class="c1">/// a List schema</span>
+<span class="n">HollowSetSchema</span> <span class="n">setSchema</span> <span class="o">=</span> <span class="c1">/// a Set schema</span>
+<span class="n">HollowMapSchema</span> <span class="n">mapSchema</span> <span class="o">=</span> <span class="c1">/// a Map schema</span>
 
-HollowObjectTypeWriteState objectTypeState = new HollowObjectTypeWriteState(objectSchema);
-HollowListTypeWriteState listTypeState = new HollowListTypeWriteState(listSchema);
-HollowSetTypeWriteState setTypeState = new HollowSetTypeWriteState(setSchema);
-HollowMapTypeWritestate mapTypeState = new HollowMapTypeWriteState(mapSchema);
+<span class="n">HollowObjectTypeWriteState</span> <span class="n">objectTypeState</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectTypeWriteState</span><span class="o">(</span><span class="n">objectSchema</span><span class="o">);</span>
+<span class="n">HollowListTypeWriteState</span> <span class="n">listTypeState</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowListTypeWriteState</span><span class="o">(</span><span class="n">listSchema</span><span class="o">);</span>
+<span class="n">HollowSetTypeWriteState</span> <span class="n">setTypeState</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowSetTypeWriteState</span><span class="o">(</span><span class="n">setSchema</span><span class="o">);</span>
+<span class="n">HollowMapTypeWritestate</span> <span class="n">mapTypeState</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowMapTypeWriteState</span><span class="o">(</span><span class="n">mapSchema</span><span class="o">);</span>
 
-HollowObjectWriteRecord objectRec = new HollowObjectWriteRecord(objectSchema);
-HollowListWriteRecord listRec = new HollowListWriteRecord();
-HollowSetWriteRecord setRec = new HollowSetWriteRecord();
-HollowMapWriteRecord mapRec = new HollowMapWriteRecord();
-</code></pre>
+<span class="n">HollowObjectWriteRecord</span> <span class="n">objectRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectWriteRecord</span><span class="o">(</span><span class="n">objectSchema</span><span class="o">);</span>
+<span class="n">HollowListWriteRecord</span> <span class="n">listRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowListWriteRecord</span><span class="o">();</span>
+<span class="n">HollowSetWriteRecord</span> <span class="n">setRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowSetWriteRecord</span><span class="o">();</span>
+<span class="n">HollowMapWriteRecord</span> <span class="n">mapRec</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowMapWriteRecord</span><span class="o">();</span>
+</pre></div>
+
 
 <p>Using this API, it is possible to create a generic data ingestion mechanism from <em>any</em> type of input source. </p>
 <h1 id="determining-populated-ordinals">Determining Populated Ordinals</h1>
@@ -405,61 +579,64 @@ this default will be changed to 25MB.</p>
 <h1 id="delta-based-producer-input">Delta-Based Producer Input</h1>
 <p>The <a href="../getting-started/">Getting Started</a> section of this documentation describes a producer which every so often reads the <em>entire dataset</em> from some source of truth, re-adds all records to a <code>HollowWriteStateEngine</code>, then produces a delta based on the automatically discovered differences in the dataset since the prior cycle.  It is possible, however, that a producer may <em>receive</em> an incoming stream of events which directly indicate the changes to a dataset, obviating the need to scan through the entire source of truth and re-add the entire dataset on each cycle.</p>
 <p>If desired, a <code>HollowWriteStateEngine</code>’s state can be explicitly modified, rather than recreated, each cycle.  We start such a cycle by re-adding all of the records from the previous cycle to the state engine:</p>
-<pre><code class="java">HollowWriteStateEngine writeEngine = /// the state engine
+<div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="c1">/// the state engine</span>
 
-writeEngine.prepareForNextCycle();
-writeEngine.addAllObjectsFromPreviousCycle();
-</code></pre>
+<span class="n">writeEngine</span><span class="o">.</span><span class="na">prepareForNextCycle</span><span class="o">();</span>
+<span class="n">writeEngine</span><span class="o">.</span><span class="na">addAllObjectsFromPreviousCycle</span><span class="o">();</span>
+</pre></div>
+
 
 <p>We’ll also need an indexed <code>HollowReadStateEngine</code>, which is updated in lock-step with the <code>HollowWriteStateEngine</code>.  The index can be used to retrieve the ordinals of records to be replaced.  These ordinals can be removed from the <code>HollowWriteStateEngine</code>:</p>
-<pre><code class="java">HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-HollowPrimaryKeyIndex idx = 
-                       new HollowPrimaryKeyIndex(readEngine, &quot;Movie&quot;, &quot;id&quot;);
+<div class="codehilite"><pre><span></span><span class="n">HollowObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectMapper</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">);</span>
+<span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+                       <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
 
-HollowTypeWriteState movieTypeState = writeEngine.getTypeState(&quot;Movie&quot;);
+<span class="n">HollowTypeWriteState</span> <span class="n">movieTypeState</span> <span class="o">=</span> <span class="n">writeEngine</span><span class="o">.</span><span class="na">getTypeState</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">);</span>
 
-List&lt;MovieUpdateEvent&gt; eventBatch = /// a batch of events
+<span class="n">List</span><span class="o">&lt;</span><span class="n">MovieUpdateEvent</span><span class="o">&gt;</span> <span class="n">eventBatch</span> <span class="o">=</span> <span class="c1">/// a batch of events</span>
 
-for(MovieUpdateEvent event : eventBatch) {
-    int oldOrdinal = idx.getMatchingOrdinal(event.getMovie().getId());
-    movieTypeState.removeOrdinalFromThisCycle(oldOrdinal);
-    mapper.addObject(event.getMovie());
-}
-</code></pre>
+<span class="k">for</span><span class="o">(</span><span class="n">MovieUpdateEvent</span> <span class="n">event</span> <span class="o">:</span> <span class="n">eventBatch</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">oldOrdinal</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getMovie</span><span class="o">().</span><span class="na">getId</span><span class="o">());</span>
+    <span class="n">movieTypeState</span><span class="o">.</span><span class="na">removeOrdinalFromThisCycle</span><span class="o">(</span><span class="n">oldOrdinal</span><span class="o">);</span>
+    <span class="n">mapper</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getMovie</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <div class="admonition danger">
 <p class="admonition-title">Watch out for Duplicates</p>
 <p>Be careful, this process assumes that no two events will have the same movie ID in the same cycle.  You'll want to dedup the <code>eventBatch</code>.</p>
 </div>
 <p>This process may leave orphaned records around, since the call to <code>removeOrdinalFromThisCycle()</code> doesn’t remove any referenced records.  To solve this, the <a href="../tooling/#transitive-set-traverser"><code>TransitiveSetTraverser</code></a> can be used:</p>
-<pre><code class="java">List&lt;MovieUpdateEvent&gt; eventBatch = /// a batch of events
+<div class="codehilite"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">MovieUpdateEvent</span><span class="o">&gt;</span> <span class="n">eventBatch</span> <span class="o">=</span> <span class="c1">/// a batch of events</span>
 
-/// find the Movie ordinals to remove
-BitSet removedMovieOrdinals = new BitSet();
-for(MovieUpdateEvent event : eventBatch) {
-    int oldOrdinal = idx.getMatchingOrdinal(event.getMovie().getId());
-    removedMovieOrdinals.set(oldOrdinal);
-}
+<span class="c1">/// find the Movie ordinals to remove</span>
+<span class="n">BitSet</span> <span class="n">removedMovieOrdinals</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BitSet</span><span class="o">();</span>
+<span class="k">for</span><span class="o">(</span><span class="n">MovieUpdateEvent</span> <span class="n">event</span> <span class="o">:</span> <span class="n">eventBatch</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">oldOrdinal</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">getMovie</span><span class="o">().</span><span class="na">getId</span><span class="o">());</span>
+    <span class="n">removedMovieOrdinals</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">oldOrdinal</span><span class="o">);</span>
+<span class="o">}</span>
 
-/// initially the removal selection includes just Movies
-Map&lt;String, BitSet&gt; removeRecords = new HashMap&lt;&gt;();
-removeRecords.put(&quot;Movie&quot;, removedMovieOrdinals);
+<span class="c1">/// initially the removal selection includes just Movies</span>
+<span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">BitSet</span><span class="o">&gt;</span> <span class="n">removeRecords</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+<span class="n">removeRecords</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="n">removedMovieOrdinals</span><span class="o">);</span>
 
-/// expand the selection to include any records referenced by selected Movies
-TransitiveSetTraverser.addTransitiveMatches(readEngine, removeRecords);
-/// but don't include records which are also referenced by unselected movies
-TransitiveSetTraverser.removeReferencedOutsideClosure(readEngine, removeRecords);
+<span class="c1">/// expand the selection to include any records referenced by selected Movies</span>
+<span class="n">TransitiveSetTraverser</span><span class="o">.</span><span class="na">addTransitiveMatches</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="n">removeRecords</span><span class="o">);</span>
+<span class="c1">/// but don&#39;t include records which are also referenced by unselected movies</span>
+<span class="n">TransitiveSetTraverser</span><span class="o">.</span><span class="na">removeReferencedOutsideClosure</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="n">removeRecords</span><span class="o">);</span>
 
-/// remove everything in the selection
-for(Map.Entry&lt;String, BitSet&gt; entry : removeRecords) {
-    HollowTypeWriteState typeState = writeEngine.getTypeState(entry.getKey());
-    int removeOrdinal = entry.getValue().nextSetBit(0);
-    while(removeOrdinal != -1) {
-        typeState.removeOrdinalFromThisCycle(removeOrdinal);
-        removeOrdinal = entry.getValue().nextSetBit(removeOrdinal + 1);
-    }
-}
-</code></pre>
+<span class="c1">/// remove everything in the selection</span>
+<span class="k">for</span><span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">BitSet</span><span class="o">&gt;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">removeRecords</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">HollowTypeWriteState</span> <span class="n">typeState</span> <span class="o">=</span> <span class="n">writeEngine</span><span class="o">.</span><span class="na">getTypeState</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">());</span>
+    <span class="kt">int</span> <span class="n">removeOrdinal</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">nextSetBit</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="k">while</span><span class="o">(</span><span class="n">removeOrdinal</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">typeState</span><span class="o">.</span><span class="na">removeOrdinalFromThisCycle</span><span class="o">(</span><span class="n">removeOrdinal</span><span class="o">);</span>
+        <span class="n">removeOrdinal</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">nextSetBit</span><span class="o">(</span><span class="n">removeOrdinal</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>In the above code, each of the <code>Movie</code> ordinals to be replaced are added to a <code>BitSet</code>.  Then, the <code>TransitiveSetTraverser</code> is used to expand the collection of selected records by adding any records referenced by the selected <code>Movies</code>.  Then, the <code>TransitiveSetTraverser</code> is again used to deselect any child records which are also referenced by other Movies which were not selected for removal.  Finally, the selection is actually removed from the <code>HollowWriteStateEngine</code>.</p>
 <h1 id="in-memory-data-layout">In-Memory Data Layout</h1>
@@ -501,51 +678,93 @@ for(Map.Entry&lt;String, BitSet&gt; entry : removeRecords) {
 <p>Each pointer field in the match array bucket references a specific type, and is encoded as the ordinal to which the bucket refers.  Each is represented using a fixed number of bits equal to the maximum ordinal in the referenced type.</p>
 <p>In addition to pointers which allow us to look up the matching key, each bucket in the <em>match array</em> includes the number of matching records, and an offset into the <em>select array</em>.  The <em>select array</em> contains lists of ordinals to matching records.</p>
 <p>When queried with a key, the index will hash the key, then look to the corresponding bucket in the <em>match array</em>.  The match pointers are used to compare the queried key with the matching key.  If a match is found, then the corresponding entries in the select array are returned as a <code>HollowHashIndexResult</code>.  Collisions are resolved with linear probing.  If after linear probing an empty bucket is encountered in the match array, no such record exists in the dataset.</p>
+                
+                  
+                
               
-            </div>
+              
+                
+              
+            </article>
           </div>
-          <footer>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../glossary/" class="btn btn-neutral float-right" title="Glossary">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../data-ingestion/" class="btn btn-neutral" title="Data Ingestion"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../data-ingestion/" title="Data Ingestion" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Data Ingestion
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../glossary/" title="Glossary" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Glossary
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
   
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
-
-</footer>
-	  
-        </div>
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
       </div>
-
-    </section>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/Netflix/hollow" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://gitter.im/Netflix/hollow" class="md-footer-social__link fa fa-gitter"></a>
     
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
       
-          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-f3ab9e5ff8.js"></script>
       
       
-        <span><a href="../data-ingestion/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <script>app.initialize({url:{base:".."}})</script>
       
+    
+    
       
-        <span style="margin-left: 15px"><a href="../glossary/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-
-</body>
+    
+  </body>
 </html>

@@ -1,263 +1,443 @@
+
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Indexing/Querying - Hollow (Netflix OSS)</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Indexing/Querying";
-    var mkdocs_page_input_path = "indexing-querying.md";
-    var mkdocs_page_url = "/indexing-querying/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-
+<html lang="en" class="no-js">
+  <head>
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#fcfcfc">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#fcfcfc;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <link rel="shortcut icon" href="../assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.10.1">
+    
+    
+      
+        <title>Indexing/Querying - Hollow (Netflix OSS)</title>
+      
+    
+    
+      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-a20f419c8e.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-23f75ab9c7.palette.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="red" data-md-color-accent="brown">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Hollow (Netflix OSS)" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon md-icon--home"></i>
+          
+        </a>
       </div>
-
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="..">Introduction</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../quick-start/">Quick Start</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../getting-started/">Getting Started</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">Indexing/Querying</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#a-data-model">A Data Model</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#primary-key-indexes">Primary Key Indexes</a></li>
-                
-                    <li><a class="toctree-l4" href="#default-primary-keys">Default Primary Keys</a></li>
-                
-                    <li><a class="toctree-l4" href="#consumer-specified-primary-keys">Consumer-specified Primary Keys</a></li>
-                
-                    <li><a class="toctree-l4" href="#compound-primary-keys">Compound Primary Keys</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#hash-indexes">Hash Indexes</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#prefix-index">Prefix Index</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#field-paths">Field Paths</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#hash-keys">Hash Keys</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#field-match-scan-queries">Field Match Scan Queries</a></li>
-                
-                    <li><a class="toctree-l4" href="#diving-deeper">Diving Deeper</a></li>
-                
-            
-            </ul>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../diving-deeper/">Diving Deeper</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../advanced-topics/">Advanced Topics</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../glossary/">Glossary</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../community/">Community</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../acknowledgements/">Acknowledgements</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../license/">License</a>
-        
-    </li>
-<li>
-          
-        </ul>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
       </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Hollow (Netflix OSS)</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Indexing/Querying</li>
-    <li class="wy-breadcrumbs-aside">
-        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
-      
-        <a href="https://github.com/Netflix/hollow"
-          class="icon icon-github"> GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
               
+            
+            Indexing/Querying
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Hollow (Netflix OSS)
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../quick-start/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting Started" class="md-nav__link">
+      Getting Started
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+    <a href="./" title="Indexing/Querying" class="md-nav__link md-nav__link--active">
+      Indexing/Querying
+    </a>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+      Producers and Consumers
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../tooling/" title="Tooling" class="md-nav__link">
+      Tooling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-modeling/" title="Data Modeling" class="md-nav__link">
+      Data Modeling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../diving-deeper/" title="Diving Deeper" class="md-nav__link">
+      Diving Deeper
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-nav__link">
+      Interacting with a Hollow Dataset
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
+      Data Ingestion
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../advanced-topics/" title="Advanced Topics" class="md-nav__link">
+      Advanced Topics
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../glossary/" title="Glossary" class="md-nav__link">
+      Glossary
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../acknowledgements/" title="Acknowledgements" class="md-nav__link">
+      Acknowledgements
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Netflix/hollow/edit/master/docs/indexing-querying.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
                 <h1 id="a-data-model">A Data Model</h1>
 <p>For the purposes of these examples, let's imagine we have a data model defined by the following Objects:</p>
-<pre><code class="java">@HollowPrimaryKey(fields=&quot;id&quot;)
-public class Movie {
-    int id;
-    String title;
+<div class="codehilite"><pre><span></span><span class="nd">@HollowPrimaryKey</span><span class="o">(</span><span class="n">fields</span><span class="o">=</span><span class="s">&quot;id&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">id</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
 
-    @HollowHashKey(fields=&quot;actor.actorId&quot;)
-    Set&lt;ActorRole&gt; cast;
-}
+    <span class="nd">@HollowHashKey</span><span class="o">(</span><span class="n">fields</span><span class="o">=</span><span class="s">&quot;actor.actorId&quot;</span><span class="o">)</span>
+    <span class="n">Set</span><span class="o">&lt;</span><span class="n">ActorRole</span><span class="o">&gt;</span> <span class="n">cast</span><span class="o">;</span>
+<span class="o">}</span>
 
-public class ActorRole {
-    Actor actor;
-    int movieId;
-    String characterName;
-}
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ActorRole</span> <span class="o">{</span>
+    <span class="n">Actor</span> <span class="n">actor</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">movieId</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">characterName</span><span class="o">;</span>
+<span class="o">}</span>
 
-@HollowPrimaryKey(fields=&quot;actorId&quot;)
-public class Actor {
-    int actorId;
-    String name;
-}
-</code></pre>
+<span class="nd">@HollowPrimaryKey</span><span class="o">(</span><span class="n">fields</span><span class="o">=</span><span class="s">&quot;actorId&quot;</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Actor</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">actorId</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">name</span><span class="o">;</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <h1 id="primary-key-indexes">Primary Key Indexes</h1>
 <p>When we <a href="../getting-started/#consumer-api-generation">generate a client API</a>, each type in our data model gets a custom index class called <code>&lt;typename&gt;PrimaryKeyIndex</code>.  We can use these classes to look up records based on <em>primary key</em> values.</p>
 <h2 id="default-primary-keys">Default Primary Keys</h2>
 <p>Once we have loaded a dataset into a <code>HollowConsumer</code>, we can use the <code>Movie</code> index to retrieve data by the default primary key <code>id</code>:</p>
-<pre><code class="java">
-HollowConsumer consumer = ...;
+<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="o">...;</span>
 
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer);
+<span class="n">MoviePrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MoviePrimaryKeyIndex</span><span class="o">(</span><span class="n">consumer</span><span class="o">);</span>
 
-int knownMovieId = ...;
+<span class="kt">int</span> <span class="n">knownMovieId</span> <span class="o">=</span> <span class="o">...;</span>
 
-Movie movie = idx.findMatch(knownMovieId);
+<span class="n">Movie</span> <span class="n">movie</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMatch</span><span class="o">(</span><span class="n">knownMovieId</span><span class="o">);</span>
+</pre></div>
 
-</code></pre>
 
 <p>Just as the <code>HollowConsumer</code> will automatically stay up-to-date as your dataset updates, a primary key index will also stay up-to-date with the <code>HollowConsumer</code> with which it is backed.</p>
 <div class="admonition hint">
@@ -266,13 +446,13 @@ Movie movie = idx.findMatch(knownMovieId);
 </div>
 <h2 id="consumer-specified-primary-keys">Consumer-specified Primary Keys</h2>
 <p>In the prior example, our primary key index was using the default primary key defined in the data model.  A primary key index is not restricted to just default primary keys.  For example, we could <em>also</em> index movies by their title:</p>
-<pre><code class="java">MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, &quot;title&quot;);
+<div class="codehilite"><pre><span></span><span class="n">MoviePrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MoviePrimaryKeyIndex</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="s">&quot;title&quot;</span><span class="o">);</span>
 
-String knownMovieTitle = ...;
+<span class="n">String</span> <span class="n">knownMovieTitle</span> <span class="o">=</span> <span class="o">...;</span>
 
-Movie movie = idx.findMatch(knownMovieTitle);
+<span class="n">Movie</span> <span class="n">movie</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMatch</span><span class="o">(</span><span class="n">knownMovieTitle</span><span class="o">);</span>
+</pre></div>
 
-</code></pre>
 
 <div class="admonition note">
 <p class="admonition-title">Primary Keys</p>
@@ -280,53 +460,56 @@ Movie movie = idx.findMatch(knownMovieTitle);
 </div>
 <h2 id="compound-primary-keys">Compound Primary Keys</h2>
 <p>A primary key index may also be specified over multiple fields.  For example, we can define a primary key index for the <code>ActorRole</code> type above:</p>
-<pre><code class="java">ActorRolePrimaryKeyIndex idx = new ActorRolePrimaryKeyIndex(consumer, &quot;actor.id&quot;, &quot;movieId&quot;);
+<div class="codehilite"><pre><span></span><span class="n">ActorRolePrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActorRolePrimaryKeyIndex</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="s">&quot;actor.id&quot;</span><span class="o">,</span> <span class="s">&quot;movieId&quot;</span><span class="o">);</span>
 
-int knownActorId = ...;
-int knownMovieId = ...;
+<span class="kt">int</span> <span class="n">knownActorId</span> <span class="o">=</span> <span class="o">...;</span>
+<span class="kt">int</span> <span class="n">knownMovieId</span> <span class="o">=</span> <span class="o">...;</span>
 
-ActorRole actorRoleInMovie = idx.findMatch(knownActorId, knownMovieId);
-</code></pre>
+<span class="n">ActorRole</span> <span class="n">actorRoleInMovie</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMatch</span><span class="o">(</span><span class="n">knownActorId</span><span class="o">,</span> <span class="n">knownMovieId</span><span class="o">);</span>
+</pre></div>
+
 
 <p>In the above example, we are looking for the actor role which matches <em>both</em> the actor ID and the movie ID.  Note that the actor id was specified with dot-notation as <code>actor.id</code>.  This is a <em>field path</em>, and indicates that the actual value we're indexing belongs to a <em>referenced</em> record.  Note that for a primary key index, we can only traverse through referenced <code>Object</code> records, not <code>List</code>, <code>Set</code>, or <code>Map</code> records.  We'll cover more about field paths <a href="#field-paths">a bit further down</a>.</p>
 <h1 id="hash-indexes">Hash Indexes</h1>
 <p>If we want to find records based on keys for which there is not a one-to-one mapping between records and key values, we want a <em>hash index</em>.  With our generated client API, we have a single class <code>&lt;API classname&gt;HashIndex</code>.  We can use instances of this class to specify hash indexes.  A hash index must specify each of a <em>query type</em>, a <em>select field</em>, and one or more <em>match fields</em>.  If we want to <em>select</em> the same type we are using to search, we should specify our <em>select field</em> as and empty String <code>""</code>.</p>
 <p>For example, if we want to match <code>Movie</code> records which had characters with some name, we can use the following:</p>
-<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;&quot;, &quot;cast.element.characterName.value&quot;);
+<div class="codehilite"><pre><span></span><span class="n">MovieAPIHashIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MovieAPIHashIndex</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.characterName.value&quot;</span><span class="o">);</span>
 
-String knownCharacterName = ...;
+<span class="n">String</span> <span class="n">knownCharacterName</span> <span class="o">=</span> <span class="o">...;</span>
 
-for(Movie movie : idx.findMovieMatches(knownCharacterName)) {
-    System.out.println(&quot;The movie &quot; + movie.getTitle().getValue() +
-                       &quot; has a character named &quot; + knownCharacterName);
-}
-</code></pre>
+<span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">idx</span><span class="o">.</span><span class="na">findMovieMatches</span><span class="o">(</span><span class="n">knownCharacterName</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;The movie &quot;</span> <span class="o">+</span> <span class="n">movie</span><span class="o">.</span><span class="na">getTitle</span><span class="o">().</span><span class="na">getValue</span><span class="o">()</span> <span class="o">+</span>
+                       <span class="s">&quot; has a character named &quot;</span> <span class="o">+</span> <span class="n">knownCharacterName</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>Above, we are <em>selecting</em> the same type from which our query is derived.  However, if we wanted to find <code>Actor</code> records which starred in <code>Movie</code> records that have a specific title, we need to formulate our query at the <code>Movie</code> level, but we are <em>selecting</em> a different node:</p>
-<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element.actor&quot;, &quot;title.value&quot;);
+<div class="codehilite"><pre><span></span><span class="n">MovieAPIHashIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MovieAPIHashIndex</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.actor&quot;</span><span class="o">,</span> <span class="s">&quot;title.value&quot;</span><span class="o">);</span>
 
-String knownMovieTitle = ...;
+<span class="n">String</span> <span class="n">knownMovieTitle</span> <span class="o">=</span> <span class="o">...;</span>
 
-for(Actor actor : idx.findActorMatches(knownMovieTitle)) {
-    System.out.println(&quot;The actor &quot; + actor.getName().getValue() +
-                       &quot; starred in &quot; + knownMovieTitle);
-}
-</code></pre>
+<span class="k">for</span><span class="o">(</span><span class="n">Actor</span> <span class="n">actor</span> <span class="o">:</span> <span class="n">idx</span><span class="o">.</span><span class="na">findActorMatches</span><span class="o">(</span><span class="n">knownMovieTitle</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;The actor &quot;</span> <span class="o">+</span> <span class="n">actor</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">getValue</span><span class="o">()</span> <span class="o">+</span>
+                       <span class="s">&quot; starred in &quot;</span> <span class="o">+</span> <span class="n">knownMovieTitle</span><span class="o">);</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>We can also match at multiple places in a type hierarchy.  For example, if we want to find the <code>ActorRole</code> by actor id and movie title, we can use the following:</p>
-<pre><code class="java">MovieAPIHashIndex idx = new MovieAPIHashIndex(&quot;Movie&quot;, &quot;cast.element&quot;,
-                                              &quot;cast.element.actor.actorId&quot;, &quot;title.value&quot;);
+<div class="codehilite"><pre><span></span><span class="n">MovieAPIHashIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MovieAPIHashIndex</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element&quot;</span><span class="o">,</span>
+                                              <span class="s">&quot;cast.element.actor.actorId&quot;</span><span class="o">,</span> <span class="s">&quot;title.value&quot;</span><span class="o">);</span>
 
-String knownMovieTitle = ...;
-int knownActorId = ...;
+<span class="n">String</span> <span class="n">knownMovieTitle</span> <span class="o">=</span> <span class="o">...;</span>
+<span class="kt">int</span> <span class="n">knownActorId</span> <span class="o">=</span> <span class="o">...;</span>
 
-for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
-    System.out.println(&quot;The actor &quot; + role.getActor().getName().getValue() +
-                       &quot; starred in &quot; + knownMovieTitle +
-                       &quot; as &quot; + role.getCharacterName().getValue());
-}
+<span class="k">for</span><span class="o">(</span><span class="n">ActorRole</span> <span class="n">role</span> <span class="o">:</span> <span class="n">idx</span><span class="o">.</span><span class="na">findActorRoleMatches</span><span class="o">(</span><span class="n">knownActorId</span><span class="o">,</span> <span class="n">knownMovieTitle</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;The actor &quot;</span> <span class="o">+</span> <span class="n">role</span><span class="o">.</span><span class="na">getActor</span><span class="o">().</span><span class="na">getName</span><span class="o">().</span><span class="na">getValue</span><span class="o">()</span> <span class="o">+</span>
+                       <span class="s">&quot; starred in &quot;</span> <span class="o">+</span> <span class="n">knownMovieTitle</span> <span class="o">+</span>
+                       <span class="s">&quot; as &quot;</span> <span class="o">+</span> <span class="n">role</span><span class="o">.</span><span class="na">getCharacterName</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></div>
 
-</code></pre>
 
 <h1 id="prefix-index">Prefix Index</h1>
 <p>A prefix index is used for indexing string values to records containing them. Prefix index in hollow also supports partial matching of string values enabling quick development of features like auto-complete, spell-checkers and others. In order to create a new prefix index, use this class by providing the following arguments in the constructor:
@@ -334,29 +517,28 @@ for(ActorRole role : idx.findActorRoleMatches(knownActorId, knownMovieTitle)) {
 - A type on which the index will record the ordinals
 - A field path that leads to a string value.</p>
 <p>For example, in order to build a prefix index of movie titles to retrieve <code>Movie</code> records, we can create the prefix index as follows:</p>
-<pre><code class="java">
-HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, &quot;Movie&quot;, &quot;title.value&quot;);
-HollowOrdinalIterator it = prefixIndex.findKeysWithPrefix(&quot;A&quot;);
+<div class="codehilite"><pre><span></span><span class="n">HollowPrefixIndex</span> <span class="n">prefixIndex</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowPrefixIndex</span><span class="o">(</span><span class="n">readStateEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;title.value&quot;</span><span class="o">);</span>
+<span class="n">HollowOrdinalIterator</span> <span class="n">it</span> <span class="o">=</span> <span class="n">prefixIndex</span><span class="o">.</span><span class="na">findKeysWithPrefix</span><span class="o">(</span><span class="s">&quot;A&quot;</span><span class="o">);</span>
 
-MovieAPI movieApi = (MovieAPI) consumer.getAPI();
-int ordinal = it.next();
-while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINAL)
-    MovieHollow movieHollow = movieApi.getMovieHollow(ordinal);
-    System.out.println(movieHollow.getTitle().getValue());
-    ordinal = it.next();
-}
+<span class="n">MovieAPI</span> <span class="n">movieApi</span> <span class="o">=</span> <span class="o">(</span><span class="n">MovieAPI</span><span class="o">)</span> <span class="n">consumer</span><span class="o">.</span><span class="na">getAPI</span><span class="o">();</span>
+<span class="kt">int</span> <span class="n">ordinal</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+<span class="k">while</span><span class="o">(</span><span class="n">ordinal</span> <span class="o">!=</span> <span class="n">HollowOrdinalIterator</span><span class="o">.</span><span class="na">NO_MORE_ORDINAL</span><span class="o">)</span>
+    <span class="n">MovieHollow</span> <span class="n">movieHollow</span> <span class="o">=</span> <span class="n">movieApi</span><span class="o">.</span><span class="na">getMovieHollow</span><span class="o">(</span><span class="n">ordinal</span><span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">movieHollow</span><span class="o">.</span><span class="na">getTitle</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+    <span class="n">ordinal</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+<span class="o">}</span>
+</pre></div>
 
-</code></pre>
 
 <p>The above code will print out all the movie titles that begin with the letter "A". Field path could be a reference to an <code>OBJECT</code>, <code>LIST</code>, or a <code>SET</code>, it has to ultimately lead to a String type.</p>
 <p>You can also keep this index updated when a new delta blob is received on the consumer. When a new delta is available, a new prefix is built completely from scratch. While a new prefix index is being built, the current index can continue to answer queries. The implementation of the index takes care of swapping the new updated index with old one. In order to keep your index updated with delta changes, use the following:</p>
-<pre><code class="java">// add the index object as listener for delta updates for type &quot;Movie&quot;.
-prefixIndex.listenForDeltaUpdates();
+<div class="codehilite"><pre><span></span><span class="c1">// add the index object as listener for delta updates for type &quot;Movie&quot;.</span>
+<span class="n">prefixIndex</span><span class="o">.</span><span class="na">listenForDeltaUpdates</span><span class="o">();</span>
 
-// remove the index object as listener for delta updates for type &quot;Movie&quot;.
-prefixIndex.detachFromDeltaUpdates();
+<span class="c1">// remove the index object as listener for delta updates for type &quot;Movie&quot;.</span>
+<span class="n">prefixIndex</span><span class="o">.</span><span class="na">detachFromDeltaUpdates</span><span class="o">();</span>
+</pre></div>
 
-</code></pre>
 
 <h1 id="field-paths">Field Paths</h1>
 <p>A field path indicates how to traverse through a type hierarchy. It contains multiple parts delimited by <code>.</code>, and we need one part per type through which we're traversing. Each part corresponding to an <code>OBJECT</code> type should be equal to the name of a field in that type.</p>
@@ -364,11 +546,12 @@ prefixIndex.detachFromDeltaUpdates();
 <p>Hash <em>index</em> field paths may span through any type.  Each part corresponding to a <code>LIST</code> or <code>SET</code> type should be specified as <code>element</code>. Similarly, each part corresponding to a <code>MAP</code> type should be specified as either <code>key</code> or <code>value</code>.  Hash index field paths are never auto-expanded.</p>
 <h1 id="hash-keys">Hash Keys</h1>
 <p>Notice that in the POJOs of our data model defined at the beginning of this topic, we annotated the <code>Set&lt;ActorRole&gt;</code> in the <code>Movie</code> type with <code>@HollowHashKey(fields="actor.actorId")</code>.  This means that for each of these sets, the data will be hashed by the actor ID in the contained record.  In our generated API, we can easily find any record by actor ID using the <code>findElement()</code> method.  For example:</p>
-<pre><code class="java">Movie movie = ...;
-int knownActorId = ...;
+<div class="codehilite"><pre><span></span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">=</span> <span class="o">...;</span>
+<span class="kt">int</span> <span class="n">knownActorId</span> <span class="o">=</span> <span class="o">...;</span>
 
-ActorRole role = movie.getCast().findElement(knownActorId);
-</code></pre>
+<span class="n">ActorRole</span> <span class="n">role</span> <span class="o">=</span> <span class="n">movie</span><span class="o">.</span><span class="na">getCast</span><span class="o">().</span><span class="na">findElement</span><span class="o">(</span><span class="n">knownActorId</span><span class="o">);</span>
+</pre></div>
+
 
 <p>In this way, each of our set records can be indexed by any field, or combination of fields, for O(1) retrieval of contained records.  The rules for defining a hash key are similar to the rules for defining a primary key:</p>
 <ul>
@@ -385,51 +568,93 @@ ActorRole role = movie.getCast().findElement(knownActorId);
 <p>The <code>HollowFieldMatchQuery</code> can be used to accommodate these use cases.  The Hollow Explorer UI, for example, uses this mechanism to provide a powerful "search-for-anything" capability with reasonable response times for low-volume query traffic.</p>
 <h2 id="diving-deeper">Diving Deeper</h2>
 <p>Lower-level interfaces are available to index data in the absence of a generated API.  See <a href="../diving-deeper/#indexing-data-for-retrieval">Diving Deeper: Indexing Data for Retrieval</a> for a detailed look.</p>
+                
+                  
+                
               
-            </div>
+              
+                
+              
+            </article>
           </div>
-          <footer>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../producer-consumer/" class="btn btn-neutral float-right" title="Producers and Consumers">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../getting-started/" class="btn btn-neutral" title="Getting Started"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../getting-started/" title="Getting Started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Getting Started
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../producer-consumer/" title="Producers and Consumers" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Producers and Consumers
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
   
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
-
-</footer>
-	  
-        </div>
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
       </div>
-
-    </section>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/Netflix/hollow" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://gitter.im/Netflix/hollow" class="md-footer-social__link fa fa-gitter"></a>
     
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
       
-          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-f3ab9e5ff8.js"></script>
       
       
-        <span><a href="../getting-started/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <script>app.initialize({url:{base:".."}})</script>
       
+    
+    
       
-        <span style="margin-left: 15px"><a href="../producer-consumer/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-
-</body>
+    
+  </body>
 </html>

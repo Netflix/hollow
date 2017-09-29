@@ -1,361 +1,706 @@
+
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Getting Started - Hollow (Netflix OSS)</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Getting Started";
-    var mkdocs_page_input_path = "getting-started.md";
-    var mkdocs_page_url = "/getting-started/";
-  </script>
-  
-  <script src="../js/jquery-2.1.1.min.js"></script>
-  <script src="../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
-  
-</head>
-
-<body class="wy-body-for-nav" role="document">
-
-  <div class="wy-grid-for-nav">
-
+<html lang="en" class="no-js">
+  <head>
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
-      <div class="wy-side-nav-search" style="background-color:#fcfcfc">
-        <a href=".." style="border:0;padding:0"> <img style="border-radius:0;width:238px;height:87px;margin:0 0 0 0;background-color:#fcfcfc;border:0;padding:0" class="cornerlogo" src="../img/corner-logo.png"/></a>
-        <div role="search">
-  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-  </form>
-</div>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <link rel="shortcut icon" href="../assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-1.10.1">
+    
+    
+      
+        <title>Getting Started - Hollow (Netflix OSS)</title>
+      
+    
+    
+      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-a20f419c8e.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-23f75ab9c7.palette.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="red" data-md-color-accent="brown">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Hollow (Netflix OSS)" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon md-icon--home"></i>
+          
+        </a>
       </div>
-
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="..">Introduction</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../quick-start/">Quick Start</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 current">
-        <a class="current" href="./">Getting Started</a>
-        
-            <ul>
-            
-                <li class="toctree-l3"><a href="#core-concepts">Core Concepts</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#producing-a-data-snapshot">Producing a Data Snapshot</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#consumer-api-generation">Consumer API Generation</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#consuming-a-data-snapshot">Consuming a Data Snapshot</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#producing-a-delta">Producing a Delta</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#consuming-a-delta">Consuming a Delta</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#indexing-data-for-retrieval">Indexing Data for Retrieval</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#hierarchical-data-models">Hierarchical Data Models</a></li>
-                
-            
-                <li class="toctree-l3"><a href="#restoring-at-startup">Restoring at Startup</a></li>
-                
-            
-            </ul>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../indexing-querying/">Indexing/Querying</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../producer-consumer/">Producers and Consumers</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../tooling/">Tooling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-modeling/">Data Modeling</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../diving-deeper/">Diving Deeper</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../interacting-with-a-dataset/">Interacting with a Hollow Dataset</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../data-ingestion/">Data Ingestion</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../advanced-topics/">Advanced Topics</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../glossary/">Glossary</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../community/">Community</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../acknowledgements/">Acknowledgements</a>
-        
-    </li>
-<li>
-          
-            <li>
-    <li class="toctree-l1 ">
-        <a class="" href="../license/">License</a>
-        
-    </li>
-<li>
-          
-        </ul>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
       </div>
-      &nbsp;
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" style="background:#000000" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="..">Hollow (Netflix OSS)</a>
-      </nav>
-
-      
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
-  <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    
-      
-    
-    <li>Getting Started</li>
-    <li class="wy-breadcrumbs-aside">
-        <a href="http://gitter.im/Netflix/hollow" class="icon fa-comment"> Gitter</a>
-      
-        <a href="https://github.com/Netflix/hollow"
-          class="icon icon-github"> GitHub</a>
-      
-    </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main">
-            <div class="section">
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
               
-                <p>In the <a href="../quick-start/">Quick Start</a> guide, we got a reference implementation of Hollow up and running, with a mock data model that can be easily modified to suit any use case.  After reading this section, you'll have an understanding of the basic usage patterns for Hollow, and how each of the core pieces fit together.</p>
-<h1 id="core-concepts">Core Concepts</h1>
-<p>Hollow manages datasets which are built by a single <em>producer</em>, and disseminated to one or many <em>consumers</em> for read-only access.  A dataset changes over time.  The timeline for a changing dataset can be broken down into discrete <em>data states</em>, each of which is a complete snapshot of the data at a particular point in time.</p>
-<h1 id="producing-a-data-snapshot">Producing a Data Snapshot</h1>
-<p>Let's assume we have a POJO class <code>Movie</code>:</p>
-<pre><code class="java">public class Movie {
-    long id;
-    String title;
-    int releaseYear;
+            
+            Getting Started
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
 
-    public Movie(long id, String title, int releaseYear) {
-        this.id = id;
-        this.title = title;
-        this.releaseYear = releaseYear;
-    }
-}
-</code></pre>
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Hollow (Netflix OSS)
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/Netflix/hollow" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      GitHub
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../quick-start/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Getting Started
+      </label>
+    
+    <a href="./" title="Getting Started" class="md-nav__link md-nav__link--active">
+      Getting Started
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" title="Core Concepts" class="md-nav__link">
+    Core Concepts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#producing-a-data-snapshot" title="Producing a Data Snapshot" class="md-nav__link">
+    Producing a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consumer-api-generation" title="Consumer API Generation" class="md-nav__link">
+    Consumer API Generation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consuming-a-data-snapshot" title="Consuming a Data Snapshot" class="md-nav__link">
+    Consuming a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#producing-a-delta" title="Producing a Delta" class="md-nav__link">
+    Producing a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consuming-a-delta" title="Consuming a Delta" class="md-nav__link">
+    Consuming a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+    Indexing Data for Retrieval
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hierarchical-data-models" title="Hierarchical Data Models" class="md-nav__link">
+    Hierarchical Data Models
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restoring-at-startup" title="Restoring at Startup" class="md-nav__link">
+    Restoring at Startup
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../indexing-querying/" title="Indexing/Querying" class="md-nav__link">
+      Indexing/Querying
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+      Producers and Consumers
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../tooling/" title="Tooling" class="md-nav__link">
+      Tooling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-modeling/" title="Data Modeling" class="md-nav__link">
+      Data Modeling
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../diving-deeper/" title="Diving Deeper" class="md-nav__link">
+      Diving Deeper
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../interacting-with-a-dataset/" title="Interacting with a Hollow Dataset" class="md-nav__link">
+      Interacting with a Hollow Dataset
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
+      Data Ingestion
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../advanced-topics/" title="Advanced Topics" class="md-nav__link">
+      Advanced Topics
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../glossary/" title="Glossary" class="md-nav__link">
+      Glossary
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../acknowledgements/" title="Acknowledgements" class="md-nav__link">
+      Acknowledgements
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../license/" title="License" class="md-nav__link">
+      License
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" title="Core Concepts" class="md-nav__link">
+    Core Concepts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#producing-a-data-snapshot" title="Producing a Data Snapshot" class="md-nav__link">
+    Producing a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consumer-api-generation" title="Consumer API Generation" class="md-nav__link">
+    Consumer API Generation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consuming-a-data-snapshot" title="Consuming a Data Snapshot" class="md-nav__link">
+    Consuming a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#producing-a-delta" title="Producing a Delta" class="md-nav__link">
+    Producing a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consuming-a-delta" title="Consuming a Delta" class="md-nav__link">
+    Consuming a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+    Indexing Data for Retrieval
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hierarchical-data-models" title="Hierarchical Data Models" class="md-nav__link">
+    Hierarchical Data Models
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restoring-at-startup" title="Restoring at Startup" class="md-nav__link">
+    Restoring at Startup
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Netflix/hollow/edit/master/docs/getting-started.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="getting-started">Getting Started</h1>
+<p>In the <a href="../quick-start/">Quick Start</a> guide, we got a reference implementation of Hollow up and running, with a mock data model that can be easily modified to suit any use case.  After reading this section, you'll have an understanding of the basic usage patterns for Hollow, and how each of the core pieces fit together.</p>
+<h2 id="core-concepts">Core Concepts</h2>
+<p>Hollow manages datasets which are built by a single <em>producer</em>, and disseminated to one or many <em>consumers</em> for read-only access.  A dataset changes over time.  The timeline for a changing dataset can be broken down into discrete <em>data states</em>, each of which is a complete snapshot of the data at a particular point in time.</p>
+<h2 id="producing-a-data-snapshot">Producing a Data Snapshot</h2>
+<p>Let's assume we have a POJO class <code>Movie</code>:</p>
+<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">releaseYear</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Movie</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="kt">int</span> <span class="n">releaseYear</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">releaseYear</span> <span class="o">=</span> <span class="n">releaseYear</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>And that many <code>Movie</code>s exist which comprise a dataset that needs to be disseminated:</p>
-<pre><code class="java">List&lt;Movie&gt; movies = Arrays.asList(
-        new Movie(1, &quot;The Matrix&quot;, 1999),
-        new Movie(2, &quot;Beasts of No Nation&quot;, 2015),
-        new Movie(3, &quot;Pulp Fiction&quot;, 1994)
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Movie</span><span class="o">&gt;</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;The Matrix&quot;</span><span class="o">,</span> <span class="mi">1999</span><span class="o">),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;Beasts of No Nation&quot;</span><span class="o">,</span> <span class="mi">2015</span><span class="o">),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="s">&quot;Pulp Fiction&quot;</span><span class="o">,</span> <span class="mi">1994</span><span class="o">)</span>
+<span class="o">);</span>
+</pre></div>
+
 
 <p>We'll need a data <em>producer</em> to create a data state which will be transmitted to consumers:</p>
-<pre><code class="java">File localPublishDir = new File(&quot;/path/to/local/disk/publish/dir&quot;);
+<div class="codehilite"><pre><span></span><span class="n">File</span> <span class="n">localPublishDir</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/path/to/local/disk/publish/dir&quot;</span><span class="o">);</span>
 
-HollowFilesystemPublisher publisher = new HollowFilesystemPublisher(localPublishDir);
-HollowFilesystemAnnouncer announcer = new HollowFilesystemAnnouncer(localPublishDir);
+<span class="n">HollowFilesystemPublisher</span> <span class="n">publisher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemPublisher</span><span class="o">(</span><span class="n">localPublishDir</span><span class="o">);</span>
+<span class="n">HollowFilesystemAnnouncer</span> <span class="n">announcer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemAnnouncer</span><span class="o">(</span><span class="n">localPublishDir</span><span class="o">);</span>
 
-HollowProducer producer = HollowProducer.withPublisher(publisher)
-                                        .withAnnouncer(announcer)
-                                        .build();
+<span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">withAnnouncer</span><span class="o">(</span><span class="n">announcer</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 
-producer.runCycle(new Populator() {
-    public void populate(HollowProducer.WriteState state) {
-        for(Movie movie : movies)
-            state.add(movie);
-    }
-});
+<span class="n">producer</span><span class="o">.</span><span class="na">runCycle</span><span class="o">(</span><span class="k">new</span> <span class="n">Populator</span><span class="o">()</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">populate</span><span class="o">(</span><span class="n">HollowProducer</span><span class="o">.</span><span class="na">WriteState</span> <span class="n">state</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
+            <span class="n">state</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">});</span>
+</pre></div>
 
-</code></pre>
 
 <p>Or, if you prefer, using Java 8:</p>
-<pre><code class="java">producer.runCycle(state -&gt; {
-    for(Movie movie : movies)
-        state.add(movie);
-});
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="na">runCycle</span><span class="o">(</span><span class="n">state</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
+<span class="o">});</span>
+</pre></div>
+
 
 <p>This producer runs a single <em>cycle</em> and produces a data state.  Once this runs, you should have a <em>snapshot</em> blob file on your local disk.  </p>
 <div class="admonition note">
 <p class="admonition-title">Publishing Blobs</p>
 <p>Note that the example code above is writing data to local disk.  This is a great way to start testing.  In a production scenario, data can be written to a remote file store such as Amazon S3 for retrieval by consumers.  See the <a href="https://github.com/Netflix/hollow-reference-implementation">reference implementation</a> and the <a href="../quick-start/">quick start guide</a> for a scalable example using AWS.</p>
 </div>
-<h1 id="consumer-api-generation">Consumer API Generation</h1>
+<h2 id="consumer-api-generation">Consumer API Generation</h2>
 <p>Once the data has been populated into a producer, that producer's <em>state engine</em> is aware of the data model, and can be used to automatically produce a client API.  We can also initialize the data model from a brand new <em>state engine</em> using our POJOs:</p>
-<pre><code class="java">HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-mapper.initializeTypeState(Movie.class);
+<div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowWriteStateEngine</span><span class="o">();</span>
+<span class="n">HollowObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectMapper</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">);</span>
+<span class="n">mapper</span><span class="o">.</span><span class="na">initializeTypeState</span><span class="o">(</span><span class="n">Movie</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-HollowAPIGenerator generator = 
-       new HollowAPIGenerator.Builder().withAPIClassname(&quot;MovieAPI&quot;)
-                                       .withPackageName(&quot;how.hollow.example&quot;)
-                                       .withDataModel(writeEngine)
-                                       .build();
+<span class="n">HollowAPIGenerator</span> <span class="n">generator</span> <span class="o">=</span>
+       <span class="k">new</span> <span class="n">HollowAPIGenerator</span><span class="o">.</span><span class="na">Builder</span><span class="o">().</span><span class="na">withAPIClassname</span><span class="o">(</span><span class="s">&quot;MovieAPI&quot;</span><span class="o">)</span>
+                                       <span class="o">.</span><span class="na">withPackageName</span><span class="o">(</span><span class="s">&quot;how.hollow.example&quot;</span><span class="o">)</span>
+                                       <span class="o">.</span><span class="na">withDataModel</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">)</span>
+                                       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 
-generator.generateFiles(&quot;/path/to/java/api/files&quot;);
-</code></pre>
+<span class="n">generator</span><span class="o">.</span><span class="na">generateFiles</span><span class="o">(</span><span class="s">&quot;/path/to/java/api/files&quot;</span><span class="o">);</span>
+</pre></div>
+
 
 <p>After this code executes, an set of Java files will be written to the location <code>/path/to/java/api/files</code>.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.</p>
 <div class="admonition hint">
 <p class="admonition-title">Initializing multiple types</p>
 <p>If we have multiple top-level types, we should call <code>initializeTypeState()</code> multiple times, once for each class.</p>
 </div>
-<h1 id="consuming-a-data-snapshot">Consuming a Data Snapshot</h1>
+<h2 id="consuming-a-data-snapshot">Consuming a Data Snapshot</h2>
 <p>A data consumer can load a snapshot created by the producer into memory:</p>
-<pre><code class="java">File localPublishDir = new File(&quot;/path/to/local/disk/publish/dir&quot;);
+<div class="codehilite"><pre><span></span><span class="n">File</span> <span class="n">localPublishDir</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">&quot;/path/to/local/disk/publish/dir&quot;</span><span class="o">);</span>
 
-HollowFilesystemBlobRetriever blobRetriever = 
-                                new HollowFilesystemBlobRetriever(localPublishDir);
+<span class="n">HollowFilesystemBlobRetriever</span> <span class="n">blobRetriever</span> <span class="o">=</span>
+                                <span class="k">new</span> <span class="n">HollowFilesystemBlobRetriever</span><span class="o">(</span><span class="n">localPublishDir</span><span class="o">);</span>
 
-HollowFilesystemAnnouncementWatcher announcementWatcher = 
-                                new HollowFilesystemAnnouncementWatcher(localPublishDir);
+<span class="n">HollowFilesystemAnnouncementWatcher</span> <span class="n">announcementWatcher</span> <span class="o">=</span>
+                                <span class="k">new</span> <span class="n">HollowFilesystemAnnouncementWatcher</span><span class="o">(</span><span class="n">localPublishDir</span><span class="o">);</span>
 
-HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever)
-                                        .withAnnouncementWatcher(announcementWatcher)
-                                        .withGeneratedAPIClass(MovieAPI.class)
-                                        .build();
+<span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="n">HollowConsumer</span><span class="o">.</span><span class="na">withBlobRetriever</span><span class="o">(</span><span class="n">blobRetriever</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">withAnnouncementWatcher</span><span class="o">(</span><span class="n">announcementWatcher</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">withGeneratedAPIClass</span><span class="o">(</span><span class="n">MovieAPI</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 
-consumer.triggerRefresh();
-</code></pre>
+<span class="n">consumer</span><span class="o">.</span><span class="na">triggerRefresh</span><span class="o">();</span>
+</pre></div>
+
 
 <p>The <code>HollowConsumer</code> will retrieve data using the provided <code>BlobRetrievier</code>, and will load the latest <em>data state</em> currently announced by the <code>AnnouncementWatcher</code>.</p>
 <p>Once this dataset is loaded into memory, we can access the data for any records using our generated API.  Below, we're iterating over all records:</p>
-<pre><code class="java">MovieAPI movieApi = (MovieAPI)consumer.getAPI();
+<div class="codehilite"><pre><span></span><span class="n">MovieAPI</span> <span class="n">movieApi</span> <span class="o">=</span> <span class="o">(</span><span class="n">MovieAPI</span><span class="o">)</span><span class="n">consumer</span><span class="o">.</span><span class="na">getAPI</span><span class="o">();</span>
 
-for(MovieHollow movie : movieApi.getAllMovieHollow()) {
-    System.out.println(movie.getId() + &quot;, &quot; + 
-                       movie.getTitle().getValue() + &quot;, &quot; + 
-                       movie.getReleaseYear());
-}
-</code></pre>
+<span class="k">for</span><span class="o">(</span><span class="n">MovieHollow</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movieApi</span><span class="o">.</span><span class="na">getAllMovieHollow</span><span class="o">())</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">movie</span><span class="o">.</span><span class="na">getId</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;, &quot;</span> <span class="o">+</span>
+                       <span class="n">movie</span><span class="o">.</span><span class="na">getTitle</span><span class="o">().</span><span class="na">getValue</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;, &quot;</span> <span class="o">+</span>
+                       <span class="n">movie</span><span class="o">.</span><span class="na">getReleaseYear</span><span class="o">());</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>The output of the above code will be:</p>
-<pre><code>1, The Matrix, 1999
+<div class="codehilite"><pre><span></span>1, The Matrix, 1999
 2, Beasts of No Nation, 2015
 3, Pulp Fiction, 1994
-</code></pre>
+</pre></div>
+
 
 <div class="admonition note">
 <p class="admonition-title">Integrating with Infrastructure</p>
-<p>In order to integrate with your infrastructure, you only need to provide Hollow with four implementations of simple interfaces: </p>
+<p>In order to integrate with your infrastructure, you only need to provide Hollow with four implementations of simple interfaces:</p>
 <ul>
 <li>The <code>HollowProducer</code> needs a <code>Publisher</code> and <code>Announcer</code></li>
 <li>The <code>HollowConsumer</code> needs a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code></li>
 </ul>
 <p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  We'll discuss in more detail how to integrate with your specific infrastructure in <a href="../producer-consumer/#infrastructure-integration">Infrastructure Integration</a>.</p>
 </div>
-<h1 id="producing-a-delta">Producing a Delta</h1>
+<h2 id="producing-a-delta">Producing a Delta</h2>
 <p>Some time has passed and the dataset has evolved.  It now contains these records:</p>
-<pre><code class="java">List&lt;Movie&gt; movies = Arrays.asList(
-        new Movie(1, &quot;The Matrix&quot;, 1999),
-        new Movie(2, &quot;Beasts of No Nation&quot;, 2015),
-        new Movie(4, &quot;Goodfellas&quot;, 1990),
-        new Movie(5, &quot;Inception&quot;, 2010)
-);
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Movie</span><span class="o">&gt;</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;The Matrix&quot;</span><span class="o">,</span> <span class="mi">1999</span><span class="o">),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="s">&quot;Beasts of No Nation&quot;</span><span class="o">,</span> <span class="mi">2015</span><span class="o">),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&quot;Goodfellas&quot;</span><span class="o">,</span> <span class="mi">1990</span><span class="o">),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">5</span><span class="o">,</span> <span class="s">&quot;Inception&quot;</span><span class="o">,</span> <span class="mi">2010</span><span class="o">)</span>
+<span class="o">);</span>
+</pre></div>
+
 
 <p>The producer, needs to communicate this updated dataset to consumers.  We're going to create a brand new state, and the entirety of the data for the new state must be added to the state engine in a new <em>cycle</em>.   When the cycle runs, a new data state will be <em>published</em>, and the new data state's (automatically generated) version identifier will be <em>announced</em>.</p>
 <p>Using the same <code>HollowProducer</code> in memory, we can use the following code:</p>
-<pre><code class="java">producer.runCycle(state -&gt; {
-    for(Movie movie : movies)
-        state.add(movie);
-});
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">producer</span><span class="o">.</span><span class="na">runCycle</span><span class="o">(</span><span class="n">state</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
+<span class="o">});</span>
+</pre></div>
+
 
 <p>Let's take a closer look at what the above code does.  The same <code>HollowProducer</code> which was used to produce the <em>snapshot</em> blob is used -- it already knows everything about the prior state and can be transitioned to the next state.  When creating a new state, <strong>all of the movies currently in our dataset are re-added again.</strong>  It's not necessary to figure out which records were added, removed, or modified -- that's Hollow's job.</p>
 <p>Each time we call <code>runCycle</code> we will be producing a <em>data state</em>.  For each state after the first, the <code>HollowProducer</code> will publish three artifacts: a <em>snapshot</em>, a <em>delta</em>, and a <em>reverse delta</em>.  Encoded into the <em>delta</em> is a set of instructions to update a consumer’s data store from the previous state to the current state.  Inversely, encoded into each <em>reverse delta</em> is a set of instructions to update a consumer in reverse -- from the current state to the previous state.  Consumers may use the <em>reverse delta</em> later if we need to <a href="../producer-consumer/#pinning-consumers">pin</a>.</p>
@@ -364,18 +709,19 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 <p class="admonition-title">Producer Cycles</p>
 <p>We call what the producer does to create a data state a <em>cycle</em>.  During each <em>cycle</em>, you’ll want to add <em>every record</em> from your source of truth.  Hollow will handle the details of publishing a delta for all of your established consumer instances, and a snapshot to initialize any consumer instances which start up before your next cycle.</p>
 </div>
-<h1 id="consuming-a-delta">Consuming a Delta</h1>
+<h2 id="consuming-a-delta">Consuming a Delta</h2>
 <p>No manual intervention is necessary to consume the delta you produced.  The <code>HollowConsumer</code> will automatically stay up-to-date.  </p>
 <div class="admonition hint">
 <p class="admonition-title">Announcements keep consumers updated</p>
 <p>When the producer runs a cycle, it <em>announces</em> the latest version.  The <code>AnnouncementWatcher</code> implementation provided to the <code>HollowConsumer</code> will listen for changes to the announced version -- and when updates occur notify the <code>HollowConsumer</code> by calling <code>triggerAsyncRefresh()</code>.  See the source of the <code>HollowFilesystemAnnouncementWatcher</code>, or the <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/S3AnnouncementWatcher.java">two</a> separate <a href="https://github.com/Netflix/hollow-reference-implementation/blob/master/src/main/java/how/hollow/consumer/infrastructure/DynamoDBAnnouncementWatcher.java">examples</a> in the reference implementation.</p>
 </div>
 <p>After this delta has been applied, the consumer is at the new state.  If the generated API is used to iterate over the movies again as shown in the prior consumer example, the new output will be:</p>
-<pre><code>1, The Matrix, 1999
+<div class="codehilite"><pre><span></span>1, The Matrix, 1999
 2, Beasts of No Nation, 2015
 4, Goodfellas, 1990
 5, Inception, 2010
-</code></pre>
+</pre></div>
+
 
 <div class="admonition hint">
 <p class="admonition-title">Thread Safety</p>
@@ -385,25 +731,28 @@ for(MovieHollow movie : movieApi.getAllMovieHollow()) {
 <p class="admonition-title">Adjacent States</p>
 <p>We refer to states which are directly connected via single delta transitions as <em>adjacent</em> states, and a continuous set of adjacent states as a <em>delta chain</em></p>
 </div>
-<h1 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h1>
+<h2 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h2>
 <p>In prior examples the generated Hollow API was used by the data consumer to iterate over all <code>Movie</code> records in the dataset.  Most often, however, it isn’t desirable to iterate over the entire dataset — instead, specific records will be accessed based on some known key.  Let’s assume that the <code>Movie</code>’s id is a known key.</p>
 <p>After a <code>HollowConsumer</code> has been initialized, any type can be indexed.  For example, we can index <code>Movie</code> records by <code>id</code>:</p>
-<pre><code class="java">HollowConsumer consumer = ...;
+<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="o">...;</span>
 
-consumer.triggerRefresh();
+<span class="n">consumer</span><span class="o">.</span><span class="na">triggerRefresh</span><span class="o">();</span>
 
-MoviePrimaryKeyIndex idx = new MoviePrimaryKeyIndex(consumer, &quot;id&quot;);
-</code></pre>
+<span class="n">MoviePrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MoviePrimaryKeyIndex</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
+</pre></div>
+
 
 <p>This index can be held in memory and then used in conjunction with the generated Hollow API to retrieve Movie records by id:</p>
-<pre><code>Movie movie = idx.findMatch(2);
-if(movie != null)
-    System.out.println(&quot;Found Movie: &quot; + movie.getTitle().getValue());
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="nt">Movie</span> <span class="nt">movie</span> <span class="o">=</span> <span class="nt">idx</span><span class="p">.</span><span class="nc">findMatch</span><span class="o">(</span><span class="nt">2</span><span class="o">);</span>
+<span class="nt">if</span><span class="o">(</span><span class="nt">movie</span> <span class="o">!=</span> <span class="nt">null</span><span class="o">)</span>
+    <span class="nt">System</span><span class="p">.</span><span class="nc">out</span><span class="p">.</span><span class="nc">println</span><span class="o">(</span><span class="s2">&quot;Found Movie: &quot;</span> <span class="o">+</span> <span class="nt">movie</span><span class="p">.</span><span class="nc">getTitle</span><span class="o">()</span><span class="p">.</span><span class="nc">getValue</span><span class="o">());</span>
+</pre></div>
+
 
 <p>Which outputs:</p>
-<pre><code>Found Movie: Beasts of No Nation
-</code></pre>
+<div class="codehilite"><pre><span></span>Found Movie: Beasts of No Nation
+</pre></div>
+
 
 <p>In our generated API, each type in our data model has a generated index class.  We can index by any field, or multiple fields.</p>
 <div class="admonition hint">
@@ -415,54 +764,57 @@ if(movie != null)
 <p>Retrievals from Hollow indexes are thread-safe.  They are safe to use across multiple threads, and it is safe to query while a transition is in progress.</p>
 </div>
 <p>We've just begun to scratch the surface of what indexes can do.  See <a href="../indexing-querying/">Indexing/Querying</a> for an in-depth exploration of this topic.</p>
-<h1 id="hierarchical-data-models">Hierarchical Data Models</h1>
+<h2 id="hierarchical-data-models">Hierarchical Data Models</h2>
 <p>Our data models can be much richer than in the prior example.  Assume an updated <code>Movie</code> class:</p>
-<pre><code class="java">public class Movie {
-    long id;
-    String title;
-    int releaseYear;
-    List&lt;Actor&gt; actors;
+<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">title</span><span class="o">;</span>
+    <span class="kt">int</span> <span class="n">releaseYear</span><span class="o">;</span>
+    <span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span> <span class="n">actors</span><span class="o">;</span>
 
-    public Movie(long id, String title, int year, List&lt;Actor&gt; actors) {
-        this.id = id;
-        this.title = title;
-        this.releaseYear = year;
-        this.actors = actors;
-    }
-}
-</code></pre>
+    <span class="kd">public</span> <span class="nf">Movie</span><span class="o">(</span><span class="kt">long</span> <span class="n">id</span><span class="o">,</span> <span class="n">String</span> <span class="n">title</span><span class="o">,</span> <span class="kt">int</span> <span class="n">year</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Actor</span><span class="o">&gt;</span> <span class="n">actors</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">title</span> <span class="o">=</span> <span class="n">title</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">releaseYear</span> <span class="o">=</span> <span class="n">year</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">actors</span> <span class="o">=</span> <span class="n">actors</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>Which references <code>Actor</code> records:</p>
-<pre><code class="java">public class Actor {
-    long actorId;
-    String actorName;
+<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Actor</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">actorId</span><span class="o">;</span>
+    <span class="n">String</span> <span class="n">actorName</span><span class="o">;</span>
 
-    public Actor(long actorId, String actorName) {
-        this.actorId = actorId;
-        this.actorName = actorName;
-    }
-}
-</code></pre>
+    <span class="kd">public</span> <span class="nf">Actor</span><span class="o">(</span><span class="kt">long</span> <span class="n">actorId</span><span class="o">,</span> <span class="n">String</span> <span class="n">actorName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">actorId</span> <span class="o">=</span> <span class="n">actorId</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">actorName</span> <span class="o">=</span> <span class="n">actorName</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
 
 <p>Some records are added to a <code>HollowProducer</code>:</p>
-<pre><code class="java">List&lt;Movie&gt; movies = Arrays.asList(
-        new Movie(1, &quot;The Matrix&quot;, 1999, Arrays.asList(
-                new Actor(101, &quot;Keanu Reeves&quot;),
-                new Actor(102, &quot;Laurence Fishburne&quot;),
-                new Actor(103, &quot;Carrie-Ann Moss&quot;),
-                new Actor(104, &quot;Hugo Weaving&quot;)
-        )),
-        new Movie(6, &quot;Event Horizon&quot;, 1997, Arrays.asList(
-                new Actor(102, &quot;Laurence Fishburne&quot;),
-                new Actor(105, &quot;Sam Neill&quot;)
-        ))
-);
+<div class="codehilite"><pre><span></span><span class="n">List</span><span class="o">&lt;</span><span class="n">Movie</span><span class="o">&gt;</span> <span class="n">movies</span> <span class="o">=</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="s">&quot;The Matrix&quot;</span><span class="o">,</span> <span class="mi">1999</span><span class="o">,</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">101</span><span class="o">,</span> <span class="s">&quot;Keanu Reeves&quot;</span><span class="o">),</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">102</span><span class="o">,</span> <span class="s">&quot;Laurence Fishburne&quot;</span><span class="o">),</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">103</span><span class="o">,</span> <span class="s">&quot;Carrie-Ann Moss&quot;</span><span class="o">),</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">104</span><span class="o">,</span> <span class="s">&quot;Hugo Weaving&quot;</span><span class="o">)</span>
+        <span class="o">)),</span>
+        <span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="mi">6</span><span class="o">,</span> <span class="s">&quot;Event Horizon&quot;</span><span class="o">,</span> <span class="mi">1997</span><span class="o">,</span> <span class="n">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">102</span><span class="o">,</span> <span class="s">&quot;Laurence Fishburne&quot;</span><span class="o">),</span>
+                <span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="mi">105</span><span class="o">,</span> <span class="s">&quot;Sam Neill&quot;</span><span class="o">)</span>
+        <span class="o">))</span>
+<span class="o">);</span>
 
-producer.runCycle(state -&gt; {
-    for(Movie movie : movies)
-        state.addObject(movie);
-});
-</code></pre>
+<span class="n">producer</span><span class="o">.</span><span class="na">runCycle</span><span class="o">(</span><span class="n">state</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="k">for</span><span class="o">(</span><span class="n">Movie</span> <span class="n">movie</span> <span class="o">:</span> <span class="n">movies</span><span class="o">)</span>
+        <span class="n">state</span><span class="o">.</span><span class="na">addObject</span><span class="o">(</span><span class="n">movie</span><span class="o">);</span>
+<span class="o">});</span>
+</pre></div>
+
 
 <p>When we add these movies to the dataset, Hollow will traverse everything referenced by the provided records and add them to the state as well.  Consequently, both a type <code>Movie</code> and a type <code>Actor</code> will exist in the data model after the above code runs.  </p>
 <div class="admonition hint">
@@ -470,90 +822,134 @@ producer.runCycle(state -&gt; {
 <p>Laurence Fishburne starred in both of these films.  Rather than creating two <code>Actor</code> records for Mr. Fishburne, a single record will be created and assigned to both of our <code>Movie</code> records.  This <em>deduplication</em> happens automatically by virtue of having the exact same data contained in both Actor inputs.</p>
 </div>
 <p>Consumers of this dataset may want to also create an index for <code>Actor</code> records.  For example:</p>
-<pre><code class="java">ActorPrimaryKeyIndex actorIdx = new ActorPrimaryKeyIndex(consumer, &quot;actorId&quot;);
+<div class="codehilite"><pre><span></span><span class="n">ActorPrimaryKeyIndex</span> <span class="n">actorIdx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ActorPrimaryKeyIndex</span><span class="o">(</span><span class="n">consumer</span><span class="o">,</span> <span class="s">&quot;actorId&quot;</span><span class="o">);</span>
 
-Actor actor = actorIdx.getMatchingOrdinal(102);
-if(actor != null)
-    System.out.println(&quot;Found Actor: &quot; + actor.getActorName().getValue());
-</code></pre>
+<span class="n">Actor</span> <span class="n">actor</span> <span class="o">=</span> <span class="n">actorIdx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="mi">102</span><span class="o">);</span>
+<span class="k">if</span><span class="o">(</span><span class="n">actor</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Found Actor: &quot;</span> <span class="o">+</span> <span class="n">actor</span><span class="o">.</span><span class="na">getActorName</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
+</pre></div>
+
 
 <p>Outputs:</p>
-<pre><code>Found Actor: Laurence Fishburne
-</code></pre>
+<div class="codehilite"><pre><span></span>Found Actor: Laurence Fishburne
+</pre></div>
 
-<h1 id="restoring-at-startup">Restoring at Startup</h1>
+
+<h2 id="restoring-at-startup">Restoring at Startup</h2>
 <p>From time to time, we need to redeploy our producer.  When we first create a <code>HollowProducer</code> and run a cycle it will not be able to produce a delta, because it does not know anything about the prior <em>data state</em>.  If no action is taken, a new state with only a snapshot will be produced and announced, and clients will load that data state with an operation called a <a href="../advanced-topics/#double-snapshot">double snapshot</a>, which has potentially undesirable performance characteristics.  </p>
 <p>We can remedy this situation by <em>restoring</em> our newly created producer with the last announced data state.  For example:</p>
-<pre><code class="java">Publisher publisher = ...
-Announcer announcer = ...
-BlobRetriever blobRetriever = ...
-AnnouncementWatcher announcementWatcher = ...
+<div class="codehilite"><pre><span></span><span class="n">Publisher</span> <span class="n">publisher</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">Announcer</span> <span class="n">announcer</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">BlobRetriever</span> <span class="n">blobRetriever</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">AnnouncementWatcher</span> <span class="n">announcementWatcher</span> <span class="o">=</span> <span class="o">...</span>
 
-HollowProducer producer = HollowProducer.withPublisher(publisher)
-                                        .withAnnouncer(announcer)
-                                        .build();
+<span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">withAnnouncer</span><span class="o">(</span><span class="n">announcer</span><span class="o">)</span>
+                                        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 
-producer.initializeDataModel(Movie.class);
+<span class="n">producer</span><span class="o">.</span><span class="na">initializeDataModel</span><span class="o">(</span><span class="n">Movie</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 
-long latestAnnouncedVersion = announcementWatcher.getLatestVersion();
-producer.restore(latestAnnouncedVersion, blobRetriever);
+<span class="kt">long</span> <span class="n">latestAnnouncedVersion</span> <span class="o">=</span> <span class="n">announcementWatcher</span><span class="o">.</span><span class="na">getLatestVersion</span><span class="o">();</span>
+<span class="n">producer</span><span class="o">.</span><span class="na">restore</span><span class="o">(</span><span class="n">latestAnnouncedVersion</span><span class="o">,</span> <span class="n">blobRetriever</span><span class="o">);</span>
 
-producer.runCycle(new Populator() {
-   ...
-});
+<span class="n">producer</span><span class="o">.</span><span class="na">runCycle</span><span class="o">(</span><span class="k">new</span> <span class="n">Populator</span><span class="o">()</span> <span class="o">{</span>
+   <span class="o">...</span>
+<span class="o">});</span>
+</pre></div>
 
-</code></pre>
 
 <p>In the above code, we first <em>initialize</em> the data model by providing the set of classes we will add during the cycle.  After that, we <em>restore</em> by providing our <code>BlobRetriever</code> implementation, along with the version which should be restored.  The <code>HollowProducer</code> will will use the <code>BlobRetriever</code> to load the desired state, then use it to <em>restore</em> itself.  In this way, a delta can be produced at startup, and consumers will not have to load a snapshot to get up-to-date.</p>
 <div class="admonition hint">
 <p class="admonition-title">Initializing the data model</p>
 <p>Before <em>restoring</em>, we must always <em>initialize</em> our data model.  When a data model changes between deployments, Hollow will automatically merge records of types which have changed.  In order to do this correctly, Hollow needs to know about the current data model before the restore operation begins.</p>
 </div>
+                
+                  
+                
               
-            </div>
+              
+                
+              
+            </article>
           </div>
-          <footer>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
   
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../indexing-querying/" class="btn btn-neutral float-right" title="Indexing/Querying">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../quick-start/" class="btn btn-neutral" title="Quick Start"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../quick-start/" title="Quick Start" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Quick Start
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../indexing-querying/" title="Indexing/Querying" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Indexing/Querying
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
   
-
-  <hr/>
-
-  <div role="contentinfo">
-    <!-- Copyright etc -->
-    
-  </div>
-
-</footer>
-	  
-        </div>
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
       </div>
-
-    </section>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/Netflix/hollow" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://gitter.im/Netflix/hollow" class="md-footer-social__link fa fa-gitter"></a>
     
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
       
-          <a href="https://github.com/Netflix/hollow" class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-f3ab9e5ff8.js"></script>
       
       
-        <span><a href="../quick-start/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      <script>app.initialize({url:{base:".."}})</script>
       
+    
+    
       
-        <span style="margin-left: 15px"><a href="../indexing-querying/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
-</div>
-    <script src="../js/theme.js"></script>
-
-</body>
+    
+  </body>
 </html>
