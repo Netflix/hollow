@@ -13,7 +13,7 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final Long endDate;
     private final Boolean onHold;
     private final int contractIdsExtOrdinal;
-   private RightsWindowTypeAPI typeAPI;
+    private RightsWindowTypeAPI typeAPI;
 
     public RightsWindowDelegateCachedImpl(RightsWindowTypeAPI typeAPI, int ordinal) {
         this.startDate = typeAPI.getStartDateBoxed(ordinal);
@@ -24,6 +24,8 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getStartDate(int ordinal) {
+        if(startDate == null)
+            return Long.MIN_VALUE;
         return startDate.longValue();
     }
 
@@ -32,6 +34,8 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getEndDate(int ordinal) {
+        if(endDate == null)
+            return Long.MIN_VALUE;
         return endDate.longValue();
     }
 
@@ -40,6 +44,8 @@ public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public boolean getOnHold(int ordinal) {
+        if(onHold == null)
+            return false;
         return onHold.booleanValue();
     }
 

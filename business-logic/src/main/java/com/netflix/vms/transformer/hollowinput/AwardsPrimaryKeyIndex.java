@@ -43,8 +43,11 @@ public class AwardsPrimaryKeyIndex implements HollowConsumer.RefreshListener {
         this.api = (VMSHollowInputAPI)api;
     }
 
+    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
+        this.api = (VMSHollowInputAPI)api;
+    }
+
     @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
     @Override public void blobLoaded(HollowConsumer.Blob transition) { }
     @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
     @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }

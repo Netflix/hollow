@@ -13,7 +13,7 @@ public class RightsContractDelegateCachedImpl extends HollowObjectAbstractDelega
     private final Long contractId;
     private final Long packageId;
     private final int packagesOrdinal;
-   private RightsContractTypeAPI typeAPI;
+    private RightsContractTypeAPI typeAPI;
 
     public RightsContractDelegateCachedImpl(RightsContractTypeAPI typeAPI, int ordinal) {
         this.assetsOrdinal = typeAPI.getAssetsOrdinal(ordinal);
@@ -28,6 +28,8 @@ public class RightsContractDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getContractId(int ordinal) {
+        if(contractId == null)
+            return Long.MIN_VALUE;
         return contractId.longValue();
     }
 
@@ -36,6 +38,8 @@ public class RightsContractDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getPackageId(int ordinal) {
+        if(packageId == null)
+            return Long.MIN_VALUE;
         return packageId.longValue();
     }
 

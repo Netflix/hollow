@@ -15,7 +15,7 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     private final Integer pixelAspectRatioHeight;
     private final Integer targetWidthInPixels;
     private final Integer targetHeightInPixels;
-   private StreamDimensionsTypeAPI typeAPI;
+    private StreamDimensionsTypeAPI typeAPI;
 
     public StreamDimensionsDelegateCachedImpl(StreamDimensionsTypeAPI typeAPI, int ordinal) {
         this.widthInPixels = typeAPI.getWidthInPixelsBoxed(ordinal);
@@ -28,6 +28,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getWidthInPixels(int ordinal) {
+        if(widthInPixels == null)
+            return Integer.MIN_VALUE;
         return widthInPixels.intValue();
     }
 
@@ -36,6 +38,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getHeightInPixels(int ordinal) {
+        if(heightInPixels == null)
+            return Integer.MIN_VALUE;
         return heightInPixels.intValue();
     }
 
@@ -44,6 +48,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getPixelAspectRatioWidth(int ordinal) {
+        if(pixelAspectRatioWidth == null)
+            return Integer.MIN_VALUE;
         return pixelAspectRatioWidth.intValue();
     }
 
@@ -52,6 +58,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getPixelAspectRatioHeight(int ordinal) {
+        if(pixelAspectRatioHeight == null)
+            return Integer.MIN_VALUE;
         return pixelAspectRatioHeight.intValue();
     }
 
@@ -60,6 +68,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getTargetWidthInPixels(int ordinal) {
+        if(targetWidthInPixels == null)
+            return Integer.MIN_VALUE;
         return targetWidthInPixels.intValue();
     }
 
@@ -68,6 +78,8 @@ public class StreamDimensionsDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public int getTargetHeightInPixels(int ordinal) {
+        if(targetHeightInPixels == null)
+            return Integer.MIN_VALUE;
         return targetHeightInPixels.intValue();
     }
 

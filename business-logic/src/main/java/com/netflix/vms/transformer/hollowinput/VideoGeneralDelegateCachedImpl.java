@@ -26,7 +26,7 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final int internalTitleOrdinal;
     private final int episodeTypesOrdinal;
     private final int regulatoryAdvisoriesOrdinal;
-   private VideoGeneralTypeAPI typeAPI;
+    private VideoGeneralTypeAPI typeAPI;
 
     public VideoGeneralDelegateCachedImpl(VideoGeneralTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -50,6 +50,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 
@@ -58,6 +60,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public boolean getTv(int ordinal) {
+        if(tv == null)
+            return false;
         return tv.booleanValue();
     }
 
@@ -74,6 +78,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getRuntime(int ordinal) {
+        if(runtime == null)
+            return Long.MIN_VALUE;
         return runtime.longValue();
     }
 
@@ -86,6 +92,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getFirstReleaseYear(int ordinal) {
+        if(firstReleaseYear == null)
+            return Long.MIN_VALUE;
         return firstReleaseYear.longValue();
     }
 
@@ -94,6 +102,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public boolean getTestTitle(int ordinal) {
+        if(testTitle == null)
+            return false;
         return testTitle.booleanValue();
     }
 
@@ -106,6 +116,8 @@ public class VideoGeneralDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public int getMetadataReleaseDays(int ordinal) {
+        if(metadataReleaseDays == null)
+            return Integer.MIN_VALUE;
         return metadataReleaseDays.intValue();
     }
 

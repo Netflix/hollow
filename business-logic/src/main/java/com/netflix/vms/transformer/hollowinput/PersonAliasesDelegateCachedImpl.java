@@ -11,7 +11,7 @@ public class PersonAliasesDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     private final Long aliasId;
     private final int nameOrdinal;
-   private PersonAliasesTypeAPI typeAPI;
+    private PersonAliasesTypeAPI typeAPI;
 
     public PersonAliasesDelegateCachedImpl(PersonAliasesTypeAPI typeAPI, int ordinal) {
         this.aliasId = typeAPI.getAliasIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class PersonAliasesDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getAliasId(int ordinal) {
+        if(aliasId == null)
+            return Long.MIN_VALUE;
         return aliasId.longValue();
     }
 

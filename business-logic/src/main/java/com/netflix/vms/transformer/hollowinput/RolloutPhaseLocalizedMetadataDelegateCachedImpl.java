@@ -14,7 +14,7 @@ public class RolloutPhaseLocalizedMetadataDelegateCachedImpl extends HollowObjec
     private final int POSTPLAY_OVERRIDE_MESSAGEOrdinal;
     private final int ODP_OVERRIDE_MESSAGEOrdinal;
     private final int TAGLINEOrdinal;
-   private RolloutPhaseLocalizedMetadataTypeAPI typeAPI;
+    private RolloutPhaseLocalizedMetadataTypeAPI typeAPI;
 
     public RolloutPhaseLocalizedMetadataDelegateCachedImpl(RolloutPhaseLocalizedMetadataTypeAPI typeAPI, int ordinal) {
         this.SUPPLEMENTAL_MESSAGEOrdinal = typeAPI.getSUPPLEMENTAL_MESSAGEOrdinal(ordinal);

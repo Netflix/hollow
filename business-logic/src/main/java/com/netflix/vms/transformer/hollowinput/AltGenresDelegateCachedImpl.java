@@ -13,7 +13,7 @@ public class AltGenresDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final int displayNameOrdinal;
     private final int shortNameOrdinal;
     private final int alternateNamesOrdinal;
-   private AltGenresTypeAPI typeAPI;
+    private AltGenresTypeAPI typeAPI;
 
     public AltGenresDelegateCachedImpl(AltGenresTypeAPI typeAPI, int ordinal) {
         this.altGenreId = typeAPI.getAltGenreIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class AltGenresDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getAltGenreId(int ordinal) {
+        if(altGenreId == null)
+            return Long.MIN_VALUE;
         return altGenreId.longValue();
     }
 

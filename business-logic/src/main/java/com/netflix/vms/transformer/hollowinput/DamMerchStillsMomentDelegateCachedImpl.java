@@ -11,7 +11,7 @@ public class DamMerchStillsMomentDelegateCachedImpl extends HollowObjectAbstract
 
     private final int packageIdOrdinal;
     private final int stillTSOrdinal;
-   private DamMerchStillsMomentTypeAPI typeAPI;
+    private DamMerchStillsMomentTypeAPI typeAPI;
 
     public DamMerchStillsMomentDelegateCachedImpl(DamMerchStillsMomentTypeAPI typeAPI, int ordinal) {
         this.packageIdOrdinal = typeAPI.getPackageIdOrdinal(ordinal);

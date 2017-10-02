@@ -14,7 +14,7 @@ public class StreamDrmInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int contentPackagerPublicKeyOrdinal;
     private final int keySeedOrdinal;
     private final int typeOrdinal;
-   private StreamDrmInfoTypeAPI typeAPI;
+    private StreamDrmInfoTypeAPI typeAPI;
 
     public StreamDrmInfoDelegateCachedImpl(StreamDrmInfoTypeAPI typeAPI, int ordinal) {
         this.keyIdOrdinal = typeAPI.getKeyIdOrdinal(ordinal);

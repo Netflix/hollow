@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class CodecPrivateDataStringDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, CodecPrivateDataStringDelegate {
 
     private final String value;
-   private CodecPrivateDataStringTypeAPI typeAPI;
+    private CodecPrivateDataStringTypeAPI typeAPI;
 
     public CodecPrivateDataStringDelegateCachedImpl(CodecPrivateDataStringTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

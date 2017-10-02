@@ -11,7 +11,7 @@ public class PhaseTagDelegateCachedImpl extends HollowObjectAbstractDelegate imp
 
     private final int phaseTagOrdinal;
     private final int scheduleIdOrdinal;
-   private PhaseTagTypeAPI typeAPI;
+    private PhaseTagTypeAPI typeAPI;
 
     public PhaseTagDelegateCachedImpl(PhaseTagTypeAPI typeAPI, int ordinal) {
         this.phaseTagOrdinal = typeAPI.getPhaseTagOrdinal(ordinal);

@@ -21,7 +21,7 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     private final int profileTypeOrdinal;
     private final int fileExtensionOrdinal;
     private final Boolean isAdaptiveSwitching;
-   private StreamProfilesTypeAPI typeAPI;
+    private StreamProfilesTypeAPI typeAPI;
 
     public StreamProfilesDelegateCachedImpl(StreamProfilesTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -40,6 +40,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 
@@ -48,6 +50,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getDrmType(int ordinal) {
+        if(drmType == null)
+            return Long.MIN_VALUE;
         return drmType.longValue();
     }
 
@@ -60,6 +64,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public boolean getIs3D(int ordinal) {
+        if(is3D == null)
+            return false;
         return is3D.booleanValue();
     }
 
@@ -76,6 +82,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getDrmKeyGroup(int ordinal) {
+        if(drmKeyGroup == null)
+            return Long.MIN_VALUE;
         return drmKeyGroup.longValue();
     }
 
@@ -88,6 +96,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getAudioChannelCount(int ordinal) {
+        if(audioChannelCount == null)
+            return Long.MIN_VALUE;
         return audioChannelCount.longValue();
     }
 
@@ -104,6 +114,8 @@ public class StreamProfilesDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public boolean getIsAdaptiveSwitching(int ordinal) {
+        if(isAdaptiveSwitching == null)
+            return false;
         return isAdaptiveSwitching.booleanValue();
     }
 

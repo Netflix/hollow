@@ -12,7 +12,7 @@ public class DrmHeaderInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int keyIdOrdinal;
     private final Long drmSystemId;
     private final int checksumOrdinal;
-   private DrmHeaderInfoTypeAPI typeAPI;
+    private DrmHeaderInfoTypeAPI typeAPI;
 
     public DrmHeaderInfoDelegateCachedImpl(DrmHeaderInfoTypeAPI typeAPI, int ordinal) {
         this.keyIdOrdinal = typeAPI.getKeyIdOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class DrmHeaderInfoDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getDrmSystemId(int ordinal) {
+        if(drmSystemId == null)
+            return Long.MIN_VALUE;
         return drmSystemId.longValue();
     }
 

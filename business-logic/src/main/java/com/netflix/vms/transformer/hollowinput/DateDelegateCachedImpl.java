@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DateDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DateDelegate {
 
     private final Long value;
-   private DateTypeAPI typeAPI;
+    private DateTypeAPI typeAPI;
 
     public DateDelegateCachedImpl(DateTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValueBoxed(ordinal);
@@ -18,6 +18,8 @@ public class DateDelegateCachedImpl extends HollowObjectAbstractDelegate impleme
     }
 
     public long getValue(int ordinal) {
+        if(value == null)
+            return Long.MIN_VALUE;
         return value.longValue();
     }
 

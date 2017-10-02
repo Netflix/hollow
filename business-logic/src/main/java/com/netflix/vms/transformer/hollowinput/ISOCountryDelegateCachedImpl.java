@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class ISOCountryDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ISOCountryDelegate {
 
     private final String value;
-   private ISOCountryTypeAPI typeAPI;
+    private ISOCountryTypeAPI typeAPI;
 
     public ISOCountryDelegateCachedImpl(ISOCountryTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

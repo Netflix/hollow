@@ -13,7 +13,7 @@ public class VideoStreamCropParamsDelegateCachedImpl extends HollowObjectAbstrac
     private final Integer y;
     private final Integer width;
     private final Integer height;
-   private VideoStreamCropParamsTypeAPI typeAPI;
+    private VideoStreamCropParamsTypeAPI typeAPI;
 
     public VideoStreamCropParamsDelegateCachedImpl(VideoStreamCropParamsTypeAPI typeAPI, int ordinal) {
         this.x = typeAPI.getXBoxed(ordinal);
@@ -24,6 +24,8 @@ public class VideoStreamCropParamsDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public int getX(int ordinal) {
+        if(x == null)
+            return Integer.MIN_VALUE;
         return x.intValue();
     }
 
@@ -32,6 +34,8 @@ public class VideoStreamCropParamsDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public int getY(int ordinal) {
+        if(y == null)
+            return Integer.MIN_VALUE;
         return y.intValue();
     }
 
@@ -40,6 +44,8 @@ public class VideoStreamCropParamsDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public int getWidth(int ordinal) {
+        if(width == null)
+            return Integer.MIN_VALUE;
         return width.intValue();
     }
 
@@ -48,6 +54,8 @@ public class VideoStreamCropParamsDelegateCachedImpl extends HollowObjectAbstrac
     }
 
     public int getHeight(int ordinal) {
+        if(height == null)
+            return Integer.MIN_VALUE;
         return height.intValue();
     }
 

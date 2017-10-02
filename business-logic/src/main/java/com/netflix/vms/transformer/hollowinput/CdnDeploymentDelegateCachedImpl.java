@@ -12,7 +12,7 @@ public class CdnDeploymentDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final Long originServerId;
     private final int directoryOrdinal;
     private final int originServerOrdinal;
-   private CdnDeploymentTypeAPI typeAPI;
+    private CdnDeploymentTypeAPI typeAPI;
 
     public CdnDeploymentDelegateCachedImpl(CdnDeploymentTypeAPI typeAPI, int ordinal) {
         this.originServerId = typeAPI.getOriginServerIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class CdnDeploymentDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getOriginServerId(int ordinal) {
+        if(originServerId == null)
+            return Long.MIN_VALUE;
         return originServerId.longValue();
     }
 

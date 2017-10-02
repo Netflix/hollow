@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DerivativeTagDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DerivativeTagDelegate {
 
     private final String value;
-   private DerivativeTagTypeAPI typeAPI;
+    private DerivativeTagTypeAPI typeAPI;
 
     public DerivativeTagDelegateCachedImpl(DerivativeTagTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

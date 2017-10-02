@@ -12,7 +12,7 @@ public class VideoRatingRatingReasonDelegateCachedImpl extends HollowObjectAbstr
     private final Boolean ordered;
     private final Boolean imageOnly;
     private final int idsOrdinal;
-   private VideoRatingRatingReasonTypeAPI typeAPI;
+    private VideoRatingRatingReasonTypeAPI typeAPI;
 
     public VideoRatingRatingReasonDelegateCachedImpl(VideoRatingRatingReasonTypeAPI typeAPI, int ordinal) {
         this.ordered = typeAPI.getOrderedBoxed(ordinal);
@@ -22,6 +22,8 @@ public class VideoRatingRatingReasonDelegateCachedImpl extends HollowObjectAbstr
     }
 
     public boolean getOrdered(int ordinal) {
+        if(ordered == null)
+            return false;
         return ordered.booleanValue();
     }
 
@@ -30,6 +32,8 @@ public class VideoRatingRatingReasonDelegateCachedImpl extends HollowObjectAbstr
     }
 
     public boolean getImageOnly(int ordinal) {
+        if(imageOnly == null)
+            return false;
         return imageOnly.booleanValue();
     }
 

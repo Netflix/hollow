@@ -11,7 +11,7 @@ public class DamMerchStillsDelegateCachedImpl extends HollowObjectAbstractDelega
 
     private final int assetIdOrdinal;
     private final int momentOrdinal;
-   private DamMerchStillsTypeAPI typeAPI;
+    private DamMerchStillsTypeAPI typeAPI;
 
     public DamMerchStillsDelegateCachedImpl(DamMerchStillsTypeAPI typeAPI, int ordinal) {
         this.assetIdOrdinal = typeAPI.getAssetIdOrdinal(ordinal);

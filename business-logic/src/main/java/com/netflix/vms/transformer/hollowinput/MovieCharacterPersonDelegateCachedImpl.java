@@ -11,7 +11,7 @@ public class MovieCharacterPersonDelegateCachedImpl extends HollowObjectAbstract
 
     private final Long movieId;
     private final int charactersOrdinal;
-   private MovieCharacterPersonTypeAPI typeAPI;
+    private MovieCharacterPersonTypeAPI typeAPI;
 
     public MovieCharacterPersonDelegateCachedImpl(MovieCharacterPersonTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class MovieCharacterPersonDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

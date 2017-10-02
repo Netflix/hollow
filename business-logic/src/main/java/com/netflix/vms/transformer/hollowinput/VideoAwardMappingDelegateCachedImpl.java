@@ -14,7 +14,7 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     private final Long year;
     private final Long personId;
     private final Boolean winner;
-   private VideoAwardMappingTypeAPI typeAPI;
+    private VideoAwardMappingTypeAPI typeAPI;
 
     public VideoAwardMappingDelegateCachedImpl(VideoAwardMappingTypeAPI typeAPI, int ordinal) {
         this.awardId = typeAPI.getAwardIdBoxed(ordinal);
@@ -26,6 +26,8 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getAwardId(int ordinal) {
+        if(awardId == null)
+            return Long.MIN_VALUE;
         return awardId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Long.MIN_VALUE;
         return sequenceNumber.longValue();
     }
 
@@ -42,6 +46,8 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getYear(int ordinal) {
+        if(year == null)
+            return Long.MIN_VALUE;
         return year.longValue();
     }
 
@@ -50,6 +56,8 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public long getPersonId(int ordinal) {
+        if(personId == null)
+            return Long.MIN_VALUE;
         return personId.longValue();
     }
 
@@ -58,6 +66,8 @@ public class VideoAwardMappingDelegateCachedImpl extends HollowObjectAbstractDel
     }
 
     public boolean getWinner(int ordinal) {
+        if(winner == null)
+            return false;
         return winner.booleanValue();
     }
 

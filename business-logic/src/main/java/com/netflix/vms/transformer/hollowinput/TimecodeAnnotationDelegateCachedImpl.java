@@ -12,7 +12,7 @@ public class TimecodeAnnotationDelegateCachedImpl extends HollowObjectAbstractDe
     private final Long movieId;
     private final Long packageId;
     private final int timecodeAnnotationsOrdinal;
-   private TimecodeAnnotationTypeAPI typeAPI;
+    private TimecodeAnnotationTypeAPI typeAPI;
 
     public TimecodeAnnotationDelegateCachedImpl(TimecodeAnnotationTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class TimecodeAnnotationDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -30,6 +32,8 @@ public class TimecodeAnnotationDelegateCachedImpl extends HollowObjectAbstractDe
     }
 
     public long getPackageId(int ordinal) {
+        if(packageId == null)
+            return Long.MIN_VALUE;
         return packageId.longValue();
     }
 

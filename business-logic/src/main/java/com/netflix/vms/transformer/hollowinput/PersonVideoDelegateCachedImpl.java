@@ -12,7 +12,7 @@ public class PersonVideoDelegateCachedImpl extends HollowObjectAbstractDelegate 
     private final int aliasIdsOrdinal;
     private final int rolesOrdinal;
     private final Long personId;
-   private PersonVideoTypeAPI typeAPI;
+    private PersonVideoTypeAPI typeAPI;
 
     public PersonVideoDelegateCachedImpl(PersonVideoTypeAPI typeAPI, int ordinal) {
         this.aliasIdsOrdinal = typeAPI.getAliasIdsOrdinal(ordinal);
@@ -30,6 +30,8 @@ public class PersonVideoDelegateCachedImpl extends HollowObjectAbstractDelegate 
     }
 
     public long getPersonId(int ordinal) {
+        if(personId == null)
+            return Long.MIN_VALUE;
         return personId.longValue();
     }
 

@@ -12,7 +12,7 @@ public class OriginServerDelegateCachedImpl extends HollowObjectAbstractDelegate
     private final Long id;
     private final int nameOrdinal;
     private final int storageGroupIdOrdinal;
-   private OriginServerTypeAPI typeAPI;
+    private OriginServerTypeAPI typeAPI;
 
     public OriginServerDelegateCachedImpl(OriginServerTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class OriginServerDelegateCachedImpl extends HollowObjectAbstractDelegate
     }
 
     public long getId(int ordinal) {
+        if(id == null)
+            return Long.MIN_VALUE;
         return id.longValue();
     }
 

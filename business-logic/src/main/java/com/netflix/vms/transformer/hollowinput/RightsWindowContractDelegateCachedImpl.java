@@ -12,7 +12,7 @@ public class RightsWindowContractDelegateCachedImpl extends HollowObjectAbstract
     private final Long contractId;
     private final Boolean download;
     private final int assetSetIdOrdinal;
-   private RightsWindowContractTypeAPI typeAPI;
+    private RightsWindowContractTypeAPI typeAPI;
 
     public RightsWindowContractDelegateCachedImpl(RightsWindowContractTypeAPI typeAPI, int ordinal) {
         this.contractId = typeAPI.getContractIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class RightsWindowContractDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public long getContractId(int ordinal) {
+        if(contractId == null)
+            return Long.MIN_VALUE;
         return contractId.longValue();
     }
 
@@ -30,6 +32,8 @@ public class RightsWindowContractDelegateCachedImpl extends HollowObjectAbstract
     }
 
     public boolean getDownload(int ordinal) {
+        if(download == null)
+            return false;
         return download.booleanValue();
     }
 

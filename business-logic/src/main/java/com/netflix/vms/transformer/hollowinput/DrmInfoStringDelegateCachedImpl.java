@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DrmInfoStringDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DrmInfoStringDelegate {
 
     private final String value;
-   private DrmInfoStringTypeAPI typeAPI;
+    private DrmInfoStringTypeAPI typeAPI;
 
     public DrmInfoStringDelegateCachedImpl(DrmInfoStringTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

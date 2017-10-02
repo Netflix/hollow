@@ -13,7 +13,7 @@ public class IndividualSupplementalDelegateCachedImpl extends HollowObjectAbstra
     private final Long movieId;
     private final Long sequenceNumber;
     private final int passthroughOrdinal;
-   private IndividualSupplementalTypeAPI typeAPI;
+    private IndividualSupplementalTypeAPI typeAPI;
 
     public IndividualSupplementalDelegateCachedImpl(IndividualSupplementalTypeAPI typeAPI, int ordinal) {
         this.identifierOrdinal = typeAPI.getIdentifierOrdinal(ordinal);
@@ -28,6 +28,8 @@ public class IndividualSupplementalDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -36,6 +38,8 @@ public class IndividualSupplementalDelegateCachedImpl extends HollowObjectAbstra
     }
 
     public long getSequenceNumber(int ordinal) {
+        if(sequenceNumber == null)
+            return Long.MIN_VALUE;
         return sequenceNumber.longValue();
     }
 

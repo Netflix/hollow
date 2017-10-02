@@ -12,7 +12,7 @@ public class StoriesSynopsesHookDelegateCachedImpl extends HollowObjectAbstractD
     private final int typeOrdinal;
     private final int rankOrdinal;
     private final int translatedTextsOrdinal;
-   private StoriesSynopsesHookTypeAPI typeAPI;
+    private StoriesSynopsesHookTypeAPI typeAPI;
 
     public StoriesSynopsesHookDelegateCachedImpl(StoriesSynopsesHookTypeAPI typeAPI, int ordinal) {
         this.typeOrdinal = typeAPI.getTypeOrdinal(ordinal);

@@ -11,7 +11,7 @@ public class ConsolidatedVideoRatingsDelegateCachedImpl extends HollowObjectAbst
 
     private final int ratingsOrdinal;
     private final Long videoId;
-   private ConsolidatedVideoRatingsTypeAPI typeAPI;
+    private ConsolidatedVideoRatingsTypeAPI typeAPI;
 
     public ConsolidatedVideoRatingsDelegateCachedImpl(ConsolidatedVideoRatingsTypeAPI typeAPI, int ordinal) {
         this.ratingsOrdinal = typeAPI.getRatingsOrdinal(ordinal);
@@ -24,6 +24,8 @@ public class ConsolidatedVideoRatingsDelegateCachedImpl extends HollowObjectAbst
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

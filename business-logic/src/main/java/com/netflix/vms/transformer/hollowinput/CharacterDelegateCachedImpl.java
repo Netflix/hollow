@@ -13,7 +13,7 @@ public class CharacterDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final int elementsOrdinal;
     private final int quotesOrdinal;
     private final Long lastUpdated;
-   private CharacterTypeAPI typeAPI;
+    private CharacterTypeAPI typeAPI;
 
     public CharacterDelegateCachedImpl(CharacterTypeAPI typeAPI, int ordinal) {
         this.characterId = typeAPI.getCharacterIdBoxed(ordinal);
@@ -24,6 +24,8 @@ public class CharacterDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getCharacterId(int ordinal) {
+        if(characterId == null)
+            return Long.MIN_VALUE;
         return characterId.longValue();
     }
 
@@ -40,6 +42,8 @@ public class CharacterDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getLastUpdated(int ordinal) {
+        if(lastUpdated == null)
+            return Long.MIN_VALUE;
         return lastUpdated.longValue();
     }
 

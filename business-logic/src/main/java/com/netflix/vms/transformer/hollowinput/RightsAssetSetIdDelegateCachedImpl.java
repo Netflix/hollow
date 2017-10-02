@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class RightsAssetSetIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsAssetSetIdDelegate {
 
     private final String value;
-   private RightsAssetSetIdTypeAPI typeAPI;
+    private RightsAssetSetIdTypeAPI typeAPI;
 
     public RightsAssetSetIdDelegateCachedImpl(RightsAssetSetIdTypeAPI typeAPI, int ordinal) {
         this.value = typeAPI.getValue(ordinal);

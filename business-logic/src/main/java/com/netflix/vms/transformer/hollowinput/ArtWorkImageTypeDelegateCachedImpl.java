@@ -12,7 +12,7 @@ public class ArtWorkImageTypeDelegateCachedImpl extends HollowObjectAbstractDele
     private final int imageTypeOrdinal;
     private final int extensionOrdinal;
     private final int recipeOrdinal;
-   private ArtWorkImageTypeTypeAPI typeAPI;
+    private ArtWorkImageTypeTypeAPI typeAPI;
 
     public ArtWorkImageTypeDelegateCachedImpl(ArtWorkImageTypeTypeAPI typeAPI, int ordinal) {
         this.imageTypeOrdinal = typeAPI.getImageTypeOrdinal(ordinal);

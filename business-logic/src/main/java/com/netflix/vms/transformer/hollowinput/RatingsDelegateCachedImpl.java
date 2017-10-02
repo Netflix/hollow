@@ -12,7 +12,7 @@ public class RatingsDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     private final Long ratingId;
     private final int ratingCodeOrdinal;
     private final int descriptionOrdinal;
-   private RatingsTypeAPI typeAPI;
+    private RatingsTypeAPI typeAPI;
 
     public RatingsDelegateCachedImpl(RatingsTypeAPI typeAPI, int ordinal) {
         this.ratingId = typeAPI.getRatingIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class RatingsDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getRatingId(int ordinal) {
+        if(ratingId == null)
+            return Long.MIN_VALUE;
         return ratingId.longValue();
     }
 

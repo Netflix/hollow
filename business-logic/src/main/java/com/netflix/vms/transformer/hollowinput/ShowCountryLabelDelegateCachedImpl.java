@@ -11,7 +11,7 @@ public class ShowCountryLabelDelegateCachedImpl extends HollowObjectAbstractDele
 
     private final Long videoId;
     private final int showMemberTypesOrdinal;
-   private ShowCountryLabelTypeAPI typeAPI;
+    private ShowCountryLabelTypeAPI typeAPI;
 
     public ShowCountryLabelDelegateCachedImpl(ShowCountryLabelTypeAPI typeAPI, int ordinal) {
         this.videoId = typeAPI.getVideoIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class ShowCountryLabelDelegateCachedImpl extends HollowObjectAbstractDele
     }
 
     public long getVideoId(int ordinal) {
+        if(videoId == null)
+            return Long.MIN_VALUE;
         return videoId.longValue();
     }
 

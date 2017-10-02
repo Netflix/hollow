@@ -16,7 +16,7 @@ public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int momentTypeOrdinal;
     private final Long momentSeqNumber;
     private final int tagsOrdinal;
-   private PackageMomentTypeAPI typeAPI;
+    private PackageMomentTypeAPI typeAPI;
 
     public PackageMomentDelegateCachedImpl(PackageMomentTypeAPI typeAPI, int ordinal) {
         this.clipSpecRuntimeMillis = typeAPI.getClipSpecRuntimeMillisBoxed(ordinal);
@@ -30,6 +30,8 @@ public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getClipSpecRuntimeMillis(int ordinal) {
+        if(clipSpecRuntimeMillis == null)
+            return Long.MIN_VALUE;
         return clipSpecRuntimeMillis.longValue();
     }
 
@@ -38,6 +40,8 @@ public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getOffsetMillis(int ordinal) {
+        if(offsetMillis == null)
+            return Long.MIN_VALUE;
         return offsetMillis.longValue();
     }
 
@@ -50,6 +54,8 @@ public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getBifIndex(int ordinal) {
+        if(bifIndex == null)
+            return Long.MIN_VALUE;
         return bifIndex.longValue();
     }
 
@@ -62,6 +68,8 @@ public class PackageMomentDelegateCachedImpl extends HollowObjectAbstractDelegat
     }
 
     public long getMomentSeqNumber(int ordinal) {
+        if(momentSeqNumber == null)
+            return Long.MIN_VALUE;
         return momentSeqNumber.longValue();
     }
 

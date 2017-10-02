@@ -12,7 +12,7 @@ public class PersonsDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     private final Long personId;
     private final int nameOrdinal;
     private final int bioOrdinal;
-   private PersonsTypeAPI typeAPI;
+    private PersonsTypeAPI typeAPI;
 
     public PersonsDelegateCachedImpl(PersonsTypeAPI typeAPI, int ordinal) {
         this.personId = typeAPI.getPersonIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class PersonsDelegateCachedImpl extends HollowObjectAbstractDelegate impl
     }
 
     public long getPersonId(int ordinal) {
+        if(personId == null)
+            return Long.MIN_VALUE;
         return personId.longValue();
     }
 

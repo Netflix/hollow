@@ -11,7 +11,7 @@ public class ShowMemberTypesDelegateCachedImpl extends HollowObjectAbstractDeleg
 
     private final Long showMemberTypeId;
     private final int displayNameOrdinal;
-   private ShowMemberTypesTypeAPI typeAPI;
+    private ShowMemberTypesTypeAPI typeAPI;
 
     public ShowMemberTypesDelegateCachedImpl(ShowMemberTypesTypeAPI typeAPI, int ordinal) {
         this.showMemberTypeId = typeAPI.getShowMemberTypeIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class ShowMemberTypesDelegateCachedImpl extends HollowObjectAbstractDeleg
     }
 
     public long getShowMemberTypeId(int ordinal) {
+        if(showMemberTypeId == null)
+            return Long.MIN_VALUE;
         return showMemberTypeId.longValue();
     }
 

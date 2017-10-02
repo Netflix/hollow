@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class StreamDeploymentLabelDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StreamDeploymentLabelDelegate {
 
     private final int valueOrdinal;
-   private StreamDeploymentLabelTypeAPI typeAPI;
+    private StreamDeploymentLabelTypeAPI typeAPI;
 
     public StreamDeploymentLabelDelegateCachedImpl(StreamDeploymentLabelTypeAPI typeAPI, int ordinal) {
         this.valueOrdinal = typeAPI.getValueOrdinal(ordinal);

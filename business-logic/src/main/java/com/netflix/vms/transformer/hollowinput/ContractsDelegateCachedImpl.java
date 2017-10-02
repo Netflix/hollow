@@ -12,7 +12,7 @@ public class ContractsDelegateCachedImpl extends HollowObjectAbstractDelegate im
     private final Long movieId;
     private final int countryCodeOrdinal;
     private final int contractsOrdinal;
-   private ContractsTypeAPI typeAPI;
+    private ContractsTypeAPI typeAPI;
 
     public ContractsDelegateCachedImpl(ContractsTypeAPI typeAPI, int ordinal) {
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class ContractsDelegateCachedImpl extends HollowObjectAbstractDelegate im
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 

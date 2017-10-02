@@ -10,7 +10,7 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class DashStreamHeaderDataDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, DashStreamHeaderDataDelegate {
 
     private final int boxInfoOrdinal;
-   private DashStreamHeaderDataTypeAPI typeAPI;
+    private DashStreamHeaderDataTypeAPI typeAPI;
 
     public DashStreamHeaderDataDelegateCachedImpl(DashStreamHeaderDataTypeAPI typeAPI, int ordinal) {
         this.boxInfoOrdinal = typeAPI.getBoxInfoOrdinal(ordinal);

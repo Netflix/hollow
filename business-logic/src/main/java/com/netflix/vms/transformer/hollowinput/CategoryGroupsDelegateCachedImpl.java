@@ -11,7 +11,7 @@ public class CategoryGroupsDelegateCachedImpl extends HollowObjectAbstractDelega
 
     private final Long categoryGroupId;
     private final int categoryGroupNameOrdinal;
-   private CategoryGroupsTypeAPI typeAPI;
+    private CategoryGroupsTypeAPI typeAPI;
 
     public CategoryGroupsDelegateCachedImpl(CategoryGroupsTypeAPI typeAPI, int ordinal) {
         this.categoryGroupId = typeAPI.getCategoryGroupIdBoxed(ordinal);
@@ -20,6 +20,8 @@ public class CategoryGroupsDelegateCachedImpl extends HollowObjectAbstractDelega
     }
 
     public long getCategoryGroupId(int ordinal) {
+        if(categoryGroupId == null)
+            return Long.MIN_VALUE;
         return categoryGroupId.longValue();
     }
 

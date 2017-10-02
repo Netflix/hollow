@@ -12,7 +12,7 @@ public class CategoriesDelegateCachedImpl extends HollowObjectAbstractDelegate i
     private final Long categoryId;
     private final int displayNameOrdinal;
     private final int shortNameOrdinal;
-   private CategoriesTypeAPI typeAPI;
+    private CategoriesTypeAPI typeAPI;
 
     public CategoriesDelegateCachedImpl(CategoriesTypeAPI typeAPI, int ordinal) {
         this.categoryId = typeAPI.getCategoryIdBoxed(ordinal);
@@ -22,6 +22,8 @@ public class CategoriesDelegateCachedImpl extends HollowObjectAbstractDelegate i
     }
 
     public long getCategoryId(int ordinal) {
+        if(categoryId == null)
+            return Long.MIN_VALUE;
         return categoryId.longValue();
     }
 

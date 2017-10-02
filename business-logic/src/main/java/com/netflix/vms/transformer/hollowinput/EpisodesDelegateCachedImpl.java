@@ -12,7 +12,7 @@ public class EpisodesDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     private final int episodeNameOrdinal;
     private final Long movieId;
     private final Long episodeId;
-   private EpisodesTypeAPI typeAPI;
+    private EpisodesTypeAPI typeAPI;
 
     public EpisodesDelegateCachedImpl(EpisodesTypeAPI typeAPI, int ordinal) {
         this.episodeNameOrdinal = typeAPI.getEpisodeNameOrdinal(ordinal);
@@ -26,6 +26,8 @@ public class EpisodesDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getMovieId(int ordinal) {
+        if(movieId == null)
+            return Long.MIN_VALUE;
         return movieId.longValue();
     }
 
@@ -34,6 +36,8 @@ public class EpisodesDelegateCachedImpl extends HollowObjectAbstractDelegate imp
     }
 
     public long getEpisodeId(int ordinal) {
+        if(episodeId == null)
+            return Long.MIN_VALUE;
         return episodeId.longValue();
     }
 
