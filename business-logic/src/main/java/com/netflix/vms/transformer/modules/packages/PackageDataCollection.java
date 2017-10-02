@@ -127,19 +127,6 @@ public class PackageDataCollection {
     private void collectTrickPlayType(PackageStreamHollow inputStream, String profileType, int videoId) {
         if (profileType.equals(TRICKPLAY)) {
 
-            // filter if deploymentLabel has "DoNotPlay"
-            boolean shouldFilter = false;
-            StreamDeploymentHollow inputStreamDeployment = inputStream._getDeployment();
-            Set<StreamDeploymentLabelHollow> deploymentLabels = inputStreamDeployment._getDeploymentLabel();
-            if (deploymentLabels != null) {
-                for (StreamDeploymentLabelHollow label : deploymentLabels) {
-                    if (label._getValue().toString().equals("DoNotPlay"))
-                        shouldFilter = true;
-                }
-            }
-
-            if (shouldFilter) return;
-
             TrickPlayItem trickplay = new TrickPlayItem();
             trickplay.imageCount = inputStream._getImageInfo()._getImageCount();
             trickplay.videoId = new Video(videoId);
