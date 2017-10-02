@@ -77,12 +77,14 @@ RegexParserMapper.prototype.getJobBuilderRegexInfo = function() {
 // "mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue"
 RegexParserMapper.prototype.getInputDataRegexInfo = function() {
     var fieldRegex = new Object();
-    fieldRegex["mutationGroup"] = [ /^mutationGroup=(.*)/, 1 ];
-    fieldRegex["latestEventId"] = [ /^latestEventId=(.*)/, 1 ];
-    fieldRegex["coldstartVersionId"] = [ /^coldstartVersionId=(.*)/, 1 ];
-    fieldRegex["coldstartKeybase"] = [ /^coldstartKeybase=(.*)/, 1 ];
-    fieldRegex["coldstartS3Filename"] = [ /^coldstartS3Filename=(.*)/, 1 ];
-    fieldRegex["coldstartFilePublishDate"] = [ /^coldstartFilePublishDate=(.*)/, 1 ];
+    fieldRegex["Input"] = [ /^Input=(.*)/, 1 ];
+    fieldRegex["Keybase"] = [ /^Keybase=(.*)/, 1 ];
+    fieldRegex["Type"] = [ /^Type=(.*)/, 1 ];
+    fieldRegex["Version"] = [ /^Version=(.*)/, 1 ];
+    fieldRegex["EventId"] = [ /^EventId=(.*)/, 1 ];
+    fieldRegex["EventCheckpoint"] = [ /^EventCheckpoint=(.*)/, 1 ];
+    fieldRegex["FileName"] = [ /^FileName=(.*)/, 1 ];
+    fieldRegex["PublishTime"] = [ /^PublishTime=(.*)/, 1 ];
     return fieldRegex;
 };
 
