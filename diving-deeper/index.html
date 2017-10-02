@@ -235,7 +235,19 @@
 
 
   <li class="md-nav__item">
-    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
+      Infrastructure Hooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
       Producers and Consumers
     </a>
   </li>
@@ -279,9 +291,98 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Diving Deeper
+      </label>
+    
     <a href="./" title="Diving Deeper" class="md-nav__link md-nav__link--active">
       Diving Deeper
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#state-engines" title="State Engines" class="md-nav__link">
+    State Engines
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ordinals" title="Ordinals" class="md-nav__link">
+    Ordinals
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-data-snapshot" title="Writing a Data Snapshot" class="md-nav__link">
+    Writing a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-data-snapshot" title="Reading a Data Snapshot" class="md-nav__link">
+    Reading a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-delta" title="Writing a Delta" class="md-nav__link">
+    Writing a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-delta" title="Reading a Delta" class="md-nav__link">
+    Reading a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+    Indexing Data for Retrieval
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hollowprimarykeyindex" title="HollowPrimaryKeyIndex" class="md-nav__link">
+    HollowPrimaryKeyIndex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hollowhashindex" title="HollowHashIndex" class="md-nav__link">
+    HollowHashIndex
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -387,6 +488,82 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#state-engines" title="State Engines" class="md-nav__link">
+    State Engines
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ordinals" title="Ordinals" class="md-nav__link">
+    Ordinals
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-data-snapshot" title="Writing a Data Snapshot" class="md-nav__link">
+    Writing a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-data-snapshot" title="Reading a Data Snapshot" class="md-nav__link">
+    Reading a Data Snapshot
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#writing-a-delta" title="Writing a Delta" class="md-nav__link">
+    Writing a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-delta" title="Reading a Delta" class="md-nav__link">
+    Reading a Delta
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexing-data-for-retrieval" title="Indexing Data for Retrieval" class="md-nav__link">
+    Indexing Data for Retrieval
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hollowprimarykeyindex" title="HollowPrimaryKeyIndex" class="md-nav__link">
+    HollowPrimaryKeyIndex
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hollowhashindex" title="HollowHashIndex" class="md-nav__link">
+    HollowHashIndex
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -400,14 +577,15 @@
                   <a href="https://github.com/Netflix/hollow/edit/master/docs/diving-deeper.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <p>The following section details some lower-level concepts which will provide the backdrop for some more advanced usage of Hollow.  If we didn't have a <code>HollowProducer</code> or <code>HollowConsumer</code>, this section details how we would use Hollow.</p>
-<h1 id="state-engines">State Engines</h1>
+                <h1 id="diving-deeper">Diving Deeper</h1>
+<p>The following section details some lower-level concepts which will provide the backdrop for some more advanced usage of Hollow.  If we didn't have a <code>HollowProducer</code> or <code>HollowConsumer</code>, this section details how we would use Hollow.</p>
+<h2 id="state-engines">State Engines</h2>
 <p>Both the <code>HollowProducer</code> and <code>HollowConsumer</code> handle datasets with a <em>state engine</em>.  A state engine can be transitioned between data states.  A producer uses a <em>write state engine</em> and a consumer uses a <em>read state engine</em>.  </p>
 <ul>
 <li>A <code>HollowReadStateEngine</code> can be obtained from a <code>HollowConsumer</code> via the method <code>getStateEngine()</code>.</li>
 <li>A <code>HollowWriteStateEngine</code> can be obtained from a <code>HollowProducer</code> via the method <code>getWriteEngine()</code>.</li>
 </ul>
-<h1 id="ordinals">Ordinals</h1>
+<h2 id="ordinals">Ordinals</h2>
 <p>Each record in a Hollow data state is assigned to a specific <em>ordinal</em>, which is an integer value. An <em>ordinal</em>:</p>
 <ul>
 <li>is a unique identifier of the record within a type.</li>
@@ -419,13 +597,13 @@
 <p class="admonition-title">Populated Ordinals</p>
 <p>Never modify the <code>BitSet</code> returned from <code>getPopulatedOrdinals()</code> or <code>getPreviousOrdinals()</code>.  Modifying these may corrupt the data store.</p>
 </div>
-<p>It's useful to note that records in Hollow are immutable.  They will never be <em>modified</em>, only removed and added.  A <em>modification</em> probably means that within the same delta there was a removal of a record keyed by some value and an addition of a new record keyed by the same value. </p>
+<p>It's useful to note that records in Hollow are immutable.  They will never be <em>modified</em>, only removed and added.  A <em>modification</em> probably means that within the same delta there was a removal of a record keyed by some value and an addition of a new record keyed by the same value.</p>
 <p>Ordinals have some useful properties:</p>
 <ul>
 <li>It is guaranteed that if an exactly equivalent record exists in two adjacent states, then that record will retain the same ordinal. If, on the other hand, a record does not have an exact equivalent in an adjacent state, then its ordinal will not be populated in the state in which it does not exist.</li>
 <li>After a single delta transition has been applied which removes a record, that record will be marked as not populated, but the data for that record will still be accessible at that ordinal until the <em>next</em> delta transition.  We call these records <em>ghost records</em>.</li>
 </ul>
-<h1 id="writing-a-data-snapshot-low-level">Writing a Data Snapshot (low-level)</h1>
+<h2 id="writing-a-data-snapshot">Writing a Data Snapshot</h2>
 <p>Let's assume we have a POJO class <code>Movie</code>:</p>
 <div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
     <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
@@ -456,7 +634,7 @@
 
 <p>A <code>HollowWriteStateEngine</code> is the main handle to a Hollow dataset for a data producer.  A <code>HollowObjectMapper</code> is one of a few different ways to populate a <code>HollowWriteStateEngine</code> with data.  When starting with POJOs, it's the easiest way.</p>
 <p>We'll use a <code>HollowBlobWriter</code> to write the current state of a <code>HollowWriteStateEngine</code> to an <code>OutputStream</code>.  We call the data which gets written to the <code>OutputStream</code> a <em>blob</em>.  </p>
-<h1 id="reading-a-data-snapshot-low-level">Reading a Data Snapshot (low-level)</h1>
+<h2 id="reading-a-data-snapshot">Reading a Data Snapshot</h2>
 <p>A data consumer can load a snapshot created by the producer into memory:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">readEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowReadStateEngine</span><span class="o">();</span>
 <span class="n">HollowBlobReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowBlobReader</span><span class="o">(</span><span class="n">readEngine</span><span class="o">);</span>
@@ -476,7 +654,7 @@
 </pre></div>
 
 
-<h1 id="writing-a-delta-low-level">Writing a Delta (low-level)</h1>
+<h2 id="writing-a-delta">Writing a Delta</h2>
 <p>Some time has passed and the dataset has evolved.  The producer, with the same <code>HollowWriteStateEngine</code> in memory, needs to communicate this updated dataset to consumers.  The data for the new state must be added to the state engine, after which a transition from the previous state to the new state can be written as a <em>delta</em> blob:</p>
 <div class="codehilite"><pre><span></span><span class="n">writeEngine</span><span class="o">.</span><span class="na">prepareForNextCycle</span><span class="o">();</span>
 
@@ -495,7 +673,7 @@
 <p class="admonition-title">Reverse Deltas</p>
 <p>Just as you can call <code>writeDelta()</code> to write a delta from one state to the next, you can also call <code>writeReverseDelta()</code> to write the reverse operation which will take you from the next state to the prior state.</p>
 </div>
-<h1 id="reading-a-delta-low-level">Reading a Delta (low-level)</h1>
+<h2 id="reading-a-delta">Reading a Delta</h2>
 <p>Once a delta is available the HollowReadStateEngine can be updated on the client:</p>
 <div class="codehilite"><pre><span></span><span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="c1">/// where to load the delta from</span>
 <span class="n">HollowBlobReader</span> <span class="n">reader</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowBlobReader</span><span class="o">(</span><span class="n">readEngine</span><span class="o">);</span>
@@ -513,10 +691,10 @@
 <p class="admonition-title">Delta Mismatch</p>
 <p>If a delta application is attempted onto a <code>HollowReadStateEngine</code> which is at a state from which the delta did not originate, then an exception is thrown and the state engine remains safely unchanged.</p>
 </div>
-<h1 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h1>
+<h2 id="indexing-data-for-retrieval">Indexing Data for Retrieval</h2>
 <p>In prior examples the generated Hollow API was used by the data consumer to iterate over all <code>Movie</code> records in the dataset.  Most often, however, it isn’t desirable to iterate over the entire dataset — instead, specific records will be accessed based on some known key.  Let’s assume that the <code>Movie</code>’s id is a known key.</p>
 <p>After consumers have populated a <code>HollowReadStateEngine</code>, the data can be indexed:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span>
                       <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
 
 <span class="n">idx</span><span class="o">.</span><span class="na">listenForDeltaUpdates</span><span class="o">();</span>
@@ -567,7 +745,7 @@
 
 
 <p>A <code>HollowPrimaryKeyIndex</code> can be defined with a primary key consisting of both fields:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+<div class="codehilite"><pre><span></span><span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span>
             <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="s">&quot;country.id.value&quot;</span><span class="o">);</span>
 <span class="n">idx</span><span class="o">.</span><span class="na">listenForDeltaUpdates</span><span class="o">();</span>
 </pre></div>
@@ -588,7 +766,7 @@
 <p class="admonition-title">Primary Key Violations</p>
 <p>Violations of the "no duplicate" primary key rule can be detected using the <code>getDuplicateKeys()</code> method on a <code>HollowPrimaryKeyIndex</code>, which returns a <code>Collection&lt;Object[]&gt;</code>.  If no duplicate keys exist, the returned Collection will be empty.  If they do, the returned values will indicate the keys for which duplicate records exist.</p>
 </div>
-<p>If a <code>HollowPrimaryKeyIndex</code> will be retained for a long duration, they should be kept updated as deltas are applied to the underlying <code>HollowReadStateEngine</code>.  This is accomplished with a single call after instantiation to the <code>listenForDeltaUpdates()</code> method. </p>
+<p>If a <code>HollowPrimaryKeyIndex</code> will be retained for a long duration, they should be kept updated as deltas are applied to the underlying <code>HollowReadStateEngine</code>.  This is accomplished with a single call after instantiation to the <code>listenForDeltaUpdates()</code> method.</p>
 <div class="admonition warning">
 <p class="admonition-title">Detaching Primary Key Indexes</p>
 <p>If <code>listenForDeltaUpdates()</code> is called on a primary key index, then it cannot be garbage collected.  If you intend to drop an index which is listening for updates, first call <code>detachFromDeltaUpdates()</code> to prevent a memory leak.</p>
@@ -597,7 +775,7 @@
 <h3 id="hollowhashindex">HollowHashIndex</h3>
 <p>It is sometimes desirable to index records by fields other than primary keys.  The <code>HollowHashIndex</code> allows for indexing records by fields or combinations of fields for which values may match multiple records, and records may match multiple values.</p>
 <p>In our <code>Movie</code>/<code>Actor</code> example, we may want to index movies by their starring actors:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span>
             <span class="k">new</span> <span class="n">HollowHashIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.actor.actorId&quot;</span><span class="o">);</span>
 </pre></div>
 
@@ -621,7 +799,7 @@
 
 
 <p>Alternatively, if the data model included the nationality of actors, and we needed to index actors by nationality and the titles of movies in which they starred:</p>
-<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+<div class="codehilite"><pre><span></span><span class="n">HollowHashIndex</span> <span class="n">idx</span> <span class="o">=</span>
             <span class="k">new</span> <span class="n">HollowHashIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;cast.element.actor&quot;</span><span class="o">,</span>
                                             <span class="s">&quot;title.value&quot;</span><span class="o">,</span>
                                             <span class="s">&quot;cast.element.actor.nationality.id.value&quot;</span><span class="o">);</span>
@@ -636,7 +814,7 @@
     <span class="kt">int</span> <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
     <span class="k">while</span><span class="o">(</span><span class="n">matchedOrdinal</span> <span class="o">!=</span> <span class="n">HollowOrdinalIterator</span><span class="o">.</span><span class="na">NO_MORE_ORDINALS</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">Actor</span> <span class="n">actor</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="na">getMovie</span><span class="o">(</span><span class="n">matchedOrdinal</span><span class="o">);</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Matched actor: &quot;</span> <span class="o">+</span> 
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;Matched actor: &quot;</span> <span class="o">+</span>
                                       <span class="n">actor</span><span class="o">.</span><span class="na">getActorName</span><span class="o">().</span><span class="na">getValue</span><span class="o">());</span>
         <span class="n">matchedOrdinal</span> <span class="o">=</span> <span class="n">iter</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
     <span class="o">}</span>

@@ -235,7 +235,19 @@
 
 
   <li class="md-nav__item">
-    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
+      Infrastructure Hooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
       Producers and Consumers
     </a>
   </li>
@@ -315,9 +327,160 @@
       
     
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Advanced Topics
+      </label>
+    
     <a href="./" title="Advanced Topics" class="md-nav__link md-nav__link--active">
       Advanced Topics
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#schema-parser" title="Schema Parser" class="md-nav__link">
+    Schema Parser
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#low-level-input-api" title="Low Level Input API" class="md-nav__link">
+    Low Level Input API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#determining-populated-ordinals" title="Determining Populated Ordinals" class="md-nav__link">
+    Determining Populated Ordinals
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caching" title="Caching" class="md-nav__link">
+    Caching
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hollow-heap-effects" title="Hollow Heap Effects" class="md-nav__link">
+    Hollow Heap Effects
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-snapshots" title="Double Snapshots" class="md-nav__link">
+    Double Snapshots
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-sharding" title="Type Sharding" class="md-nav__link">
+    Type Sharding
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-longevity" title="Object Longevity" class="md-nav__link">
+    Object Longevity
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-pooling" title="Memory Pooling" class="md-nav__link">
+    Memory Pooling
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-based-producer-input" title="Delta-Based Producer Input" class="md-nav__link">
+    Delta-Based Producer Input
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-memory-data-layout" title="In-Memory Data Layout" class="md-nav__link">
+    In-Memory Data Layout
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object-layout" title="Object Layout" class="md-nav__link">
+    Object Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-layout" title="List Layout" class="md-nav__link">
+    List Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set-layout" title="Set Layout" class="md-nav__link">
+    Set Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#map-layout" title="Map Layout" class="md-nav__link">
+    Map Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-key-index-layout" title="Primary Key Index Layout" class="md-nav__link">
+    Primary Key Index Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hash-index-layout" title="Hash Index Layout" class="md-nav__link">
+    Hash Index Layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -387,6 +550,144 @@
     
   
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#schema-parser" title="Schema Parser" class="md-nav__link">
+    Schema Parser
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#low-level-input-api" title="Low Level Input API" class="md-nav__link">
+    Low Level Input API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#determining-populated-ordinals" title="Determining Populated Ordinals" class="md-nav__link">
+    Determining Populated Ordinals
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#caching" title="Caching" class="md-nav__link">
+    Caching
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hollow-heap-effects" title="Hollow Heap Effects" class="md-nav__link">
+    Hollow Heap Effects
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#double-snapshots" title="Double Snapshots" class="md-nav__link">
+    Double Snapshots
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-sharding" title="Type Sharding" class="md-nav__link">
+    Type Sharding
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#object-longevity" title="Object Longevity" class="md-nav__link">
+    Object Longevity
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-pooling" title="Memory Pooling" class="md-nav__link">
+    Memory Pooling
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#delta-based-producer-input" title="Delta-Based Producer Input" class="md-nav__link">
+    Delta-Based Producer Input
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-memory-data-layout" title="In-Memory Data Layout" class="md-nav__link">
+    In-Memory Data Layout
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#object-layout" title="Object Layout" class="md-nav__link">
+    Object Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#list-layout" title="List Layout" class="md-nav__link">
+    List Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#set-layout" title="Set Layout" class="md-nav__link">
+    Set Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#map-layout" title="Map Layout" class="md-nav__link">
+    Map Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#primary-key-index-layout" title="Primary Key Index Layout" class="md-nav__link">
+    Primary Key Index Layout
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hash-index-layout" title="Hash Index Layout" class="md-nav__link">
+    Hash Index Layout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -400,7 +701,9 @@
                   <a href="https://github.com/Netflix/hollow/edit/master/docs/advanced-topics.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="schema-parser">Schema Parser</h1>
+                <h1 id="advanced-topics">Advanced Topics</h1>
+<p>This section covers few topics in details to give a deep insight into implementation of Hollow.</p>
+<h2 id="schema-parser">Schema Parser</h2>
 <p>Hollow schemas can be serialized as Java Strings.  Calling <code>toString()</code> on a <code>HollowSchema</code> will produce a human-readable representation of the schema.  The following shows the String representations of all of the schemas from a <code>Movie</code>/<code>Actor</code> example data model:</p>
 <div class="codehilite"><pre><span></span>Movie @PrimaryKey(id) {
     long id;
@@ -426,10 +729,10 @@ String {
 <p>These representations can be parsed using the <code>HollowSchemaParser</code>, and in turn can be used to initialize the state of a <code>HollowWriteStateEngine</code>:</p>
 <div class="codehilite"><pre><span></span><span class="n">String</span> <span class="n">allSchemas</span> <span class="o">=</span> <span class="c1">/// a String containing all schemas</span>
 
-<span class="n">List</span><span class="o">&lt;</span><span class="n">HollowSchema</span><span class="o">&gt;</span> <span class="n">schemas</span> <span class="o">=</span> 
+<span class="n">List</span><span class="o">&lt;</span><span class="n">HollowSchema</span><span class="o">&gt;</span> <span class="n">schemas</span> <span class="o">=</span>
              <span class="n">HollowSchemaParser</span><span class="o">.</span><span class="na">parseCollectionOfSchemas</span><span class="o">(</span><span class="n">allSchemas</span><span class="o">);</span>
 
-<span class="n">HollowWriteStateEngine</span> <span class="n">initializedWriteEngine</span> <span class="o">=</span> 
+<span class="n">HollowWriteStateEngine</span> <span class="n">initializedWriteEngine</span> <span class="o">=</span>
              <span class="n">HollowWriteStateCreator</span><span class="o">.</span><span class="na">createWithSchemas</span><span class="o">(</span><span class="n">schemas</span><span class="o">);</span>
 </pre></div>
 
@@ -462,7 +765,7 @@ String {
 </ul>
 <p><code>Set</code> and <code>Map</code> types may optionally define a <a href="../indexing-querying/#hash-keys">hash key</a>.  The hash key definition should be omitted if no hash key should be defined for a type.</p>
 <p>Elements, keys, and values in collection record types cannot be inlined.  Whitespace is unimportant when parsing schema definitions.</p>
-<h1 id="low-level-input-api">Low Level Input API</h1>
+<h2 id="low-level-input-api">Low Level Input API</h2>
 <p>Although Hollow includes a few ready-made data ingestion utilities, other data ingestion utilities can be created.  Adding data into Hollow starts with a <code>HollowWriteStateEngine</code>.  We need to initialize a type state for each schema in our data model:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowWriteStateEngine</span><span class="o">();</span>
 
@@ -519,23 +822,23 @@ String {
 </pre></div>
 
 
-<p>Using this API, it is possible to create a generic data ingestion mechanism from <em>any</em> type of input source. </p>
-<h1 id="determining-populated-ordinals">Determining Populated Ordinals</h1>
+<p>Using this API, it is possible to create a generic data ingestion mechanism from <em>any</em> type of input source.</p>
+<h2 id="determining-populated-ordinals">Determining Populated Ordinals</h2>
 <p>Many lower-level operations require knowledge of the currently populated ordinals (i.e. those which are not holes), or knowledge of ordinals which were populated in state prior to the last delta application.  We can determine this from any <em>type state</em> in a <code>HollowReadStateEngine</code>.  Both of these are useful, for example, if consumers wish to inspect exactly what has changed.</p>
 <p>Each <code>HollowTypeReadState</code> underneath a <code>HollowReadStateEngine</code> contains the methods <code>getPopulatedOrdinals()</code> and <code>getPreviousOrdinals()</code>.  Each of these methods returns a <code>java.util.BitSet</code>.  The contents of returned <code>BitSet</code>s may be inspected, but should never be modified.</p>
-<h1 id="caching">Caching</h1>
+<h2 id="caching">Caching</h2>
 <p>Although a lot of effort has gone into minimizing the cost to read Hollow data, there is still inevitably a performance difference between accessing a field in a POJO and accessing a field in Hollow.  In general, this will not be a performance bottleneck, but in some rare cases the performance of tight inner loops may suffer on consumers.  </p>
 <p>When there is a type with a low cardinality, we can instantiate and cache a POJO implementation for each ordinal, which can be used by consumers in tight inner loops.  This is accomplished by simply passing a <code>Set&lt;String&gt;</code> as the second constructor argument when instantiating a custom-generated Hollow API.  The elements in the Set should be the types to cache.</p>
 <div class="admonition danger">
 <p class="admonition-title">Avoid Premature Optimization</p>
 <p>Caching should be used judiciously.  In all but the tightest of loops, caching will be unnecessary, and can even be detrimental to performance for types with a large cardinality.</p>
 </div>
-<h1 id="hollow-heap-effects">Hollow Heap Effects</h1>
-<h2 id="double-snapshots">Double Snapshots</h2>
+<h2 id="hollow-heap-effects">Hollow Heap Effects</h2>
+<h3 id="double-snapshots">Double Snapshots</h3>
 <p>At times, a new state may be produced to which there is no available delta from the previous state.  When this <em>broken delta chain</em> scenario occurs, consumers will by default attempt to load a snapshot to the latest state.  If a consumer loads a snapshot when it currently has a state loaded for the same dataset, we call this a <em>double snapshot</em>.  Double snapshots result in a doubling of the heap usage of your dataset.  This is because Hollow assumes that consumers may be actively using the current state, and it therefore must retain the current state to provide data while the next state is loaded.  Only after the next state is fully loaded can the old state be dropped.</p>
-<p>If using the <a href="../producer-consumer/#consumer-framework"><code>Hollow Consumer</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>DoubleSnapshotConfig</code>.  In this case, you should check for 'stuck' clients in a <code>RefreshListener</code>, so that you may take the appropriate operational action.</p>
-<p>If a dataset is large, double snapshots should be avoided for performance reasons.  Double snapshots can be entirely avoided by <a href="../producer-consumer/#restoring-at-startup">restoring</a> a <code>HollowWriteStateEngine</code> at producer initialization time, and, if necessary, using the <a href="../tooling/#patching"><code>HollowStateDeltaPatcher</code></a> to operationally fill lost or missing deltas in the event an unforeseen issue occurs.  </p>
-<h2 id="type-sharding">Type Sharding</h2>
+<p>If using the <a href="../producer-consumer-apis/#the-hollowconsumer"><code>Hollow Consumer</code></a>, you can configure consumers to never attempt a double snapshot.  This is accomplished with a custom <code>DoubleSnapshotConfig</code>.  In this case, you should check for 'stuck' clients in a <code>RefreshListener</code>, so that you may take the appropriate operational action.</p>
+<p>If a dataset is large, double snapshots should be avoided for performance reasons.  Double snapshots can be entirely avoided by <a href="../producer-consumer-apis/#restoring-at-startup">restoring</a> a <code>HollowWriteStateEngine</code> at producer initialization time, and, if necessary, using the <a href="../tooling/#patching"><code>HollowStateDeltaPatcher</code></a> to operationally fill lost or missing deltas in the event an unforeseen issue occurs.  </p>
+<h3 id="type-sharding">Type Sharding</h3>
 <p>During a delta transition each individual record type builds the entire next state of the type in memory while the current state is retained to answer requests.  This means that the memory pool Hollow reserves needs to be large enough to compose an extra copy of the largest type.  This is a miniaturized version of the <a href="./#double-snapshots">double snapshot</a> problem.</p>
 <p>To address this problem, large types can be transparently sharded into smaller individual chunks, each of which updates independently.  The effect of this feature is that Hollow only needs to retain a large enough memory pool to update the largest <em>chunk</em> across all types.</p>
 <p>Type sharding can be specified in two ways:  </p>
@@ -543,21 +846,21 @@ String {
 <li>The recommended way is to specify a target max type shard size via a call to <code>setTargetMaxTypeShardSize(long bytes)</code> on a <code>HollowWriteStateEngine</code> prior to writing the first snapshot.  With this call, the number of shards will be automatically calculated based on the target excess memory pool size.</li>
 <li>Additionally, the number of shards for a type can be explicitly specified by annotating a POJO with the <code>@HollowShardLargeType</code> annotation when using the <a href="../data-ingestion/#hollowobjectmapper"><code>HollowObjectMapper</code></a> for data ingestion.  This can be useful if rapid growth is anticipated in a type.</li>
 </ul>
-<p>Within a continuous delta chain, the type sharding configuration cannot be changed.  When a producer <a href="../producer-consumer/#restoring-at-startup">restores</a> the previously produced state at startup, then the restored <code>HollowWriteStateEngine</code> will always retain the sharding configuration of the prior state rather than recalculating based on the current size of each type.  Consequently, if the changes in a dataset over time results in a type sharding configuration which is highly suboptimal, it is recommended to start a new delta chain, which may require a double snapshot on all consumers, a simultaneous restart of all consumers, or a new <a href="../producer-consumer/#blob-namespaces">blob namespace</a> to which consumers can migrate over a period of time.</p>
+<p>Within a continuous delta chain, the type sharding configuration cannot be changed.  When a producer <a href="../producer-consumer-apis/#restoring-at-startup">restores</a> the previously produced state at startup, then the restored <code>HollowWriteStateEngine</code> will always retain the sharding configuration of the prior state rather than recalculating based on the current size of each type.  Consequently, if the changes in a dataset over time results in a type sharding configuration which is highly suboptimal, it is recommended to start a new delta chain, which may require a double snapshot on all consumers, a simultaneous restart of all consumers, or a new <a href="../infrastructure/#blob-namespaces">blob namespace</a> to which consumers can migrate over a period of time.</p>
 <div class="admonition warning">
 <p class="admonition-title">Backwards Compatibility</p>
-<p>Type sharding is new in v2.1.0.  Consumers can read blobs produced by producers v2.1.0 and later <em>as long as type sharding is disabled</em>. 
+<p>Type sharding is new in v2.1.0.  Consumers can read blobs produced by producers v2.1.0 and later <em>as long as type sharding is disabled</em>.
 If you are sure that all consumers are using v2.1.0 or later, it is safe to turn on type sharding.</p>
-<p>In order to avoid causing issues for early adopters, the default target max type shard size is currently set to <code>Long.MAX_VALUE</code>.  At a later time, 
+<p>In order to avoid causing issues for early adopters, the default target max type shard size is currently set to <code>Long.MAX_VALUE</code>.  At a later time,
 this default will be changed to 25MB.</p>
 </div>
-<h2 id="object-longevity">Object Longevity</h2>
+<h3 id="object-longevity">Object Longevity</h3>
 <p>A Hollow object returned from a generated API contains a reference to the Hollow data store, and an ordinal.  For this reason, if a reference to a Hollow object is retained by the consumer for an extended period of time, and the underlying record changes unexpected results may begin to be returned from these references.  We call Hollow objects which were obtained from a no longer current state stale references.</p>
 <p>It is best practice to <strong>never</strong> cache Hollow objects.  However, if it somehow <em>cannot</em> be guaranteed that Hollow Objects will never be cached at the consumer, and guaranteed protection against accidentally cached objects is necessary, then <em>object longevity</em> can be enabled.</p>
 <p>With object longevity, Hollow objects will, after an update, be backed by a reserved copy of the data at the time the reference was created.  This guarantees that even if a reference is held for a long time, it will continue to return the same data when interrogated.</p>
-<p>When object longevity is defined, Two durations are defined: </p>
+<p>When object longevity is defined, Two durations are defined:</p>
 <ul>
-<li>a grace period, and </li>
+<li>a grace period, and</li>
 <li>a usage detection period.  </li>
 </ul>
 <p>The grace period is defined by its duration, in milliseconds, after a reference becomes stale.  During the grace period, usage of stale references is acceptable.  The usage detection period is defined by its duration, in milliseconds, after the grace period has expired.  During the usage detection period, usage of stale references is unexpected, but will not result in failed interrogations of Hollow objects.  After the usage detection period expires, data will be dropped if no usage was detected in the usage detection period.  If stale references are interrogated <em>after</em> their backing data is dropped, then Exceptions will be thrown.</p>
@@ -572,11 +875,11 @@ this default will be changed to 25MB.</p>
 <p>Your implementation of the <code>ObjectLongevityConfig</code> may be backed by a dynamic configuration and safely change on live running consumers.  For example, <code>forceDropData()</code> may be operationally useful for boxes that are exhibiting memory leaks due to non-critical cached Hollow objects.</p>
 <div class="admonition hint">
 <p class="admonition-title">How It Works</p>
-<p>When enabled, object longevity is achieved using the <code>HollowHistory</code> data structure, which results in a minimal heap overhead. </p>
+<p>When enabled, object longevity is achieved using the <code>HollowHistory</code> data structure, which results in a minimal heap overhead.</p>
 </div>
-<h2 id="memory-pooling">Memory Pooling</h2>
+<h3 id="memory-pooling">Memory Pooling</h3>
 <p>Hollow pools and reuses memory to minimize GC effects while updating data.  This pool of memory is kept arrays on the heap.  Each array in the pool has a fixed length.  When a long array or a byte array is required in Hollow, it will stitch together pooled array segments as a <code>SegmentedByteArray</code> or <code>SegmentedLongArray</code>.  These classes encapsulate the details of treating segmented arrays as contiguous ranges of values.</p>
-<h1 id="delta-based-producer-input">Delta-Based Producer Input</h1>
+<h2 id="delta-based-producer-input">Delta-Based Producer Input</h2>
 <p>The <a href="../getting-started/">Getting Started</a> section of this documentation describes a producer which every so often reads the <em>entire dataset</em> from some source of truth, re-adds all records to a <code>HollowWriteStateEngine</code>, then produces a delta based on the automatically discovered differences in the dataset since the prior cycle.  It is possible, however, that a producer may <em>receive</em> an incoming stream of events which directly indicate the changes to a dataset, obviating the need to scan through the entire source of truth and re-add the entire dataset on each cycle.</p>
 <p>If desired, a <code>HollowWriteStateEngine</code>’s state can be explicitly modified, rather than recreated, each cycle.  We start such a cycle by re-adding all of the records from the previous cycle to the state engine:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">writeEngine</span> <span class="o">=</span> <span class="c1">/// the state engine</span>
@@ -588,7 +891,7 @@ this default will be changed to 25MB.</p>
 
 <p>We’ll also need an indexed <code>HollowReadStateEngine</code>, which is updated in lock-step with the <code>HollowWriteStateEngine</code>.  The index can be used to retrieve the ordinals of records to be replaced.  These ordinals can be removed from the <code>HollowWriteStateEngine</code>:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowObjectMapper</span> <span class="n">mapper</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowObjectMapper</span><span class="o">(</span><span class="n">writeEngine</span><span class="o">);</span>
-<span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> 
+<span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span>
                        <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">readEngine</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
 
 <span class="n">HollowTypeWriteState</span> <span class="n">movieTypeState</span> <span class="o">=</span> <span class="n">writeEngine</span><span class="o">.</span><span class="na">getTypeState</span><span class="o">(</span><span class="s">&quot;Movie&quot;</span><span class="o">);</span>
@@ -639,7 +942,7 @@ this default will be changed to 25MB.</p>
 
 
 <p>In the above code, each of the <code>Movie</code> ordinals to be replaced are added to a <code>BitSet</code>.  Then, the <code>TransitiveSetTraverser</code> is used to expand the collection of selected records by adding any records referenced by the selected <code>Movies</code>.  Then, the <code>TransitiveSetTraverser</code> is again used to deselect any child records which are also referenced by other Movies which were not selected for removal.  Finally, the selection is actually removed from the <code>HollowWriteStateEngine</code>.</p>
-<h1 id="in-memory-data-layout">In-Memory Data Layout</h1>
+<h2 id="in-memory-data-layout">In-Memory Data Layout</h2>
 <p>Each record in Hollow begins with a fixed-length number of bits.  At the lowest level, these bits are held in long arrays using the class <code>FixedLengthElementArray</code>.  This class allows for storage and retrieval of fixed-length data in a range of bits.  For example, if a <code>FixedLengthElementArray</code> was queried for the 6-bit value starting at bit 7 in the following example range of bits:</p>
 <p><img alt="Bit String" src="../img/memlayout-bitstring.png" /></p>
 <p>The value <code>100100</code> in binary, or <code>36</code> in base 10, would be returned.</p>

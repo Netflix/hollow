@@ -235,7 +235,19 @@
 
 
   <li class="md-nav__item">
-    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
+      Infrastructure Hooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
       Producers and Consumers
     </a>
   </li>
@@ -352,6 +364,60 @@
   <a href="#transitive-set-traverser" title="Transitive Set Traverser" class="md-nav__link">
     Transitive Set Traverser
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dataset-manipulation-tools" title="Dataset Manipulation Tools" class="md-nav__link">
+    Dataset Manipulation Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filtering" title="Filtering" class="md-nav__link">
+    Filtering
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combining" title="Combining" class="md-nav__link">
+    Combining
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitting" title="Splitting" class="md-nav__link">
+    Splitting
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-manipulation-tools" title="State Manipulation Tools" class="md-nav__link">
+    State Manipulation Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patching" title="Patching" class="md-nav__link">
+    Patching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -574,6 +640,60 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dataset-manipulation-tools" title="Dataset Manipulation Tools" class="md-nav__link">
+    Dataset Manipulation Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filtering" title="Filtering" class="md-nav__link">
+    Filtering
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combining" title="Combining" class="md-nav__link">
+    Combining
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitting" title="Splitting" class="md-nav__link">
+    Splitting
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state-manipulation-tools" title="State Manipulation Tools" class="md-nav__link">
+    State Manipulation Tools
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#patching" title="Patching" class="md-nav__link">
+    Patching
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
     </ul>
@@ -591,12 +711,12 @@
                   <a href="https://github.com/Netflix/hollow/edit/master/docs/tooling.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <p>Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.</p>
-<h1 id="insight-tools">Insight Tools</h1>
+                <h1 id="insight-tools">Insight Tools</h1>
+<p>Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.</p>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
 <h3 id="explorer-setup">Explorer Setup</h3>
-<p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
+<p>The <code>HollowExplorerUI</code> class in the <em>hollow-explorer-ui</em> project is instantiated using either a <code>HollowReadStateEngine</code> or a <a href="../producer-consumer-apis/#the-hollowconsumer"><code>HollowConsumer</code></a> and a base URL path:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="c1">/// or your HollowReadStateEngine</span>
 
 <span class="n">HollowExplorerUI</span> <span class="n">ui</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowExplorerUI</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">,</span> <span class="n">consumer</span><span class="o">);</span>
@@ -604,8 +724,8 @@
 
 
 <p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span> 
-                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> 
+<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span>
+                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span>
                       <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span>
 </pre></div>
 
@@ -623,7 +743,7 @@
 <p>The above call to <code>server.join()</code> will block forever.  While the above code is running, you can point a browser to <em>http://localhost:8080</em> to explore your data.</p>
 <div class="admonition warning">
 <p class="admonition-title">Jetty: Optional Dependency</p>
-<p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency: </p>
+<p>If using the <code>HollowExplorerUIServer</code>, you'll need to include a dependency on Jetty.  For example, with a Gradle build you may add the dependency:</p>
 <p><code>compile 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'</code></p>
 </div>
 <h3 id="explorer-usage">Explorer Usage</h3>
@@ -655,8 +775,8 @@
 
 <p>The <code>HollowHistoryUI</code> will by default be configured to track all of the types for which primary keys have been specified.  By default, it will track changes through the latest rolling 1024 states.  This default can be changed with another parameter in the constructor.</p>
 <p>Incoming requests should be sent to the <code>handle</code> method in your <code>HollowExplorerUI</code> instance:</p>
-<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span> 
-                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span> 
+<div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">handle</span><span class="o">(</span><span class="n">String</span> <span class="n">target</span><span class="o">,</span>
+                      <span class="n">HttpServletRequest</span> <span class="n">req</span><span class="o">,</span>
                       <span class="n">HttpServletResponse</span> <span class="n">resp</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span>
 </pre></div>
 
@@ -693,13 +813,13 @@
 <p><img alt="History Lookup" src="../img/history-lookup.png" /></p>
 <p>Clicking on individual records will bring us back to the object diff view page to see what was changed.</p>
 <h2 id="diff-tool">Diff Tool</h2>
-<p>Just as the Hollow history tool UI makes the differences between any two <em>adjacent</em> states in a delta chain readily accessible, the Hollow diff tool is used to investigate the differences between any two <em>arbitrary</em> data states, even those which may exist in different delta chains. </p>
+<p>Just as the Hollow history tool UI makes the differences between any two <em>adjacent</em> states in a delta chain readily accessible, the Hollow diff tool is used to investigate the differences between any two <em>arbitrary</em> data states, even those which may exist in different delta chains.</p>
 <p>This is especially useful as a step in a regular release cadence, as the differences between data states produced, for example, in a test environment and production environment can be evaluated at a glance.  Sometimes, unintended consequences of code updates may be discovered this way, which prevents production issues before they happen.</p>
 <p>Initiating a diff between two data states is accomplished by loading both states into separate <code>HollowReadStateEngines</code> in memory, and then instantiating a <code>HollowDiff</code> and configuring it with the primary keys of types to diff.  For our <code>Movie</code>/<code>Actor</code> example:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span> <span class="n">testConsumer</span> <span class="o">=</span> <span class="c1">/// load the test data</span>
 <span class="n">HollowConsumer</span> <span class="n">prodConsumer</span> <span class="o">=</span> <span class="c1">/// load the prod data</span>
 
-<span class="n">HollowReadStateEngine</span> <span class="n">testData</span> <span class="o">=</span> <span class="n">testConsumer</span><span class="o">.</span><span class="na">getStateEngine</span><span class="o">();</span> 
+<span class="n">HollowReadStateEngine</span> <span class="n">testData</span> <span class="o">=</span> <span class="n">testConsumer</span><span class="o">.</span><span class="na">getStateEngine</span><span class="o">();</span>
 <span class="n">HollowReadStateEngine</span> <span class="n">prodData</span> <span class="o">=</span> <span class="n">prodConsumer</span><span class="o">.</span><span class="na">getStateEngine</span><span class="o">();</span>
 
 <span class="n">HollowDiff</span> <span class="n">diff</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowDiff</span><span class="o">(</span><span class="n">testData</span><span class="o">,</span> <span class="n">prodData</span><span class="o">);</span>
@@ -713,7 +833,7 @@
 <p>A diff is calculated by matching records of the same type based on defined primary keys.  The unmatched records in both states are tracked, and detailed differences between field values in matching pairs are also tracked.</p>
 <div class="admonition hint">
 <p class="admonition-title">Primary Keys</p>
-<p>The <code>HollowDiff</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset. </p>
+<p>The <code>HollowDiff</code> will, by default, automatically configure any primary keys which are defined in the <code>Object</code> schemas of your dataset.</p>
 </div>
 <p>Hollow includes a ready-made UI which can be applied to a <code>HollowDiff</code>.    The <code>HollowDiffUI</code> class can be used in the context of an existing web container, or can be invoked via the <code>HollowDiffUIServer</code>, which uses the Jetty HTTP Servlet Server:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowDiff</span> <span class="n">diff</span> <span class="o">=</span> <span class="c1">/// build the diff</span>
@@ -761,7 +881,7 @@
 <p>Once this is enabled, and some time has passed for samples to be gathered, the results can be collected for analysis:</p>
 <div class="codehilite"><pre><span></span><span class="k">for</span><span class="o">(</span><span class="n">SampleResult</span> <span class="n">result</span> <span class="o">:</span> <span class="n">api</span><span class="o">.</span><span class="na">getAccessSampleResults</span><span class="o">())</span> <span class="o">{</span>
     <span class="k">if</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getNumSamples</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">)</span>
-        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getIdentifier</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span> 
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">result</span><span class="o">.</span><span class="na">getIdentifier</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;: &quot;</span> <span class="o">+</span>
                                                   <span class="n">result</span><span class="o">.</span><span class="na">getNumSamples</span><span class="o">());</span>
 <span class="o">}</span>
 </pre></div>
@@ -794,8 +914,8 @@
 </pre></div>
 
 
-<h1 id="dataset-manipulation-tools">Dataset Manipulation Tools</h1>
-<h2 id="filtering">Filtering</h2>
+<h2 id="dataset-manipulation-tools">Dataset Manipulation Tools</h2>
+<h3 id="filtering">Filtering</h3>
 <p>Sometimes, a dataset will be of interest to multiple different types of consumers, but not all consumers may be interested in all aspects of a dataset.  In these cases, it’s possible to omit certain types and fields from a client’s view of the data.  This is typically done to tailor a consumer’s heap footprint and startup time costs based on their data needs.</p>
 <p>Using our <code>Movie</code>/<code>Actor</code> example above, if there was a consumer which was interested in <code>Movie</code> records, but not <code>Actor</code> records, that consumer might construct a consumer-side data filter configuration in the following way:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowFilterConfig</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilterConfig</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
@@ -822,7 +942,7 @@
 </pre></div>
 
 
-<h2 id="combining">Combining</h2>
+<h3 id="combining">Combining</h3>
 <p>The <code>HollowCombiner</code> is used to copy data from one or more copies of hollow datasets in <code>HollowReadStateEngine</code>s into a single <code>HollowWriteStateEngine</code>.  If each of the inputs contain the same data model, the following is sufficient to combine them:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">input1</span> <span class="o">=</span> <span class="c1">/// an input</span>
 <span class="n">HollowReadStateEngine</span> <span class="n">input2</span> <span class="o">=</span> <span class="c1">/// another input</span>
@@ -844,7 +964,7 @@
 <div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">input</span> <span class="o">=</span> <span class="c1">/// an input</span>
 <span class="n">HollowPrimaryKeyIndex</span> <span class="n">idx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowPrimaryKeyIndex</span><span class="o">(</span><span class="n">input</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">,</span> <span class="s">&quot;id&quot;</span><span class="o">);</span>
 
-<span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span> <span class="n">director</span> <span class="o">=</span> 
+<span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span> <span class="n">director</span> <span class="o">=</span>
                           <span class="k">new</span> <span class="n">HollowCombinerExcludePrimaryKeysCopyDirector</span><span class="o">();</span>
 
 <span class="n">director</span><span class="o">.</span><span class="na">excludeKey</span><span class="o">(</span><span class="n">idx</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>
@@ -870,18 +990,18 @@
 
 
 <p>If multiple records exist in the inputs matching a single value for any of the supplied primary keys, then only one such record will be copied to the output.  The specific record which is copied will be the record from the input was supplied earliest in the constructor of the <code>HollowCombiner</code>.  Further, if any record references another record which was omitted because it would have been duplicate based on this rule, then that reference is remapped in the output state to the matching record which was chosen to be included.</p>
-<h2 id="splitting">Splitting</h2>
+<h3 id="splitting">Splitting</h3>
 <p>A single dataset can be sharded into multiple datasets using a <code>HollowSplitter</code>.  The <code>HollowSplitter</code> takes a <code>HollowSplitterCopyDirector</code>, which indicates:</p>
 <ul>
 <li><em>top level</em> types to split,</li>
-<li>the number of shards to create, and </li>
+<li>the number of shards to create, and</li>
 <li>which shard to send individual records.</li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Top Level Types</p>
 <p>Top level types are those which are not referenced by any other types.  In our <code>Movie</code>/<code>Actor</code> example, <code>Movie</code> is a top-level type, but <code>Actor</code> is not.</p>
 </div>
-<p>Two default implementations of <code>HollowSplitterCopyDirector</code> are available: </p>
+<p>Two default implementations of <code>HollowSplitterCopyDirector</code> are available:</p>
 <ul>
 <li><code>HollowSplitterOrdinalCopyDirector</code></li>
 <li><code>HollowSplitterPrimaryKeyCopyDirector</code>.  </li>
@@ -890,7 +1010,7 @@
 <p>Our <code>Movie</code>/<code>Actor</code> example may use the splitter to split a dataset into four shards with the following invocation:</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">stateEngine</span> <span class="o">=</span> <span class="c1">/// a state engine</span>
 
-<span class="n">HollowSplitterCopyDirector</span> <span class="n">director</span> <span class="o">=</span> 
+<span class="n">HollowSplitterCopyDirector</span> <span class="n">director</span> <span class="o">=</span>
                             <span class="k">new</span> <span class="n">HollowSplitterOrdinalCopyDirector</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="s">&quot;Movie&quot;</span><span class="o">);</span>
 
 <span class="n">HollowSplitter</span> <span class="n">splitter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowSplitter</span><span class="o">(</span><span class="n">director</span><span class="o">,</span> <span class="n">stateEngine</span><span class="o">);</span>
@@ -903,8 +1023,8 @@
 </pre></div>
 
 
-<h1 id="state-manipulation-tools">State Manipulation Tools</h1>
-<h2 id="patching">Patching</h2>
+<h2 id="state-manipulation-tools">State Manipulation Tools</h2>
+<h3 id="patching">Patching</h3>
 <p>Using the <code>HollowWriteStateEngine</code>’s restore capability, it’s possible to produce deltas forever, so that consumers never have to load a snapshot after initialization.  However, if environmental hiccups cause a producer to fail to publish a delta, or if a delta is lost, or if it’s desired to publish a delta between non-adjacent states, then the <code>HollowStateDeltaPatcher</code> may be used to produce deltas between two arbitrary states within the same delta chain.</p>
 <p>The <code>HollowStateDeltaPatcher</code> must produce <em>two</em> delta transitions to create a transition between arbitrary states.  This is because non-adjacent states may have different records occupying the same ordinals.  Since no ordinal may be removed and added in adjacent states, the state patcher must create an intermediate state in which modified records do not share any ordinals.</p>
 <p>See the <code>HollowStateDeltaPatcher</code> javadocs for usage details.</p>
@@ -926,7 +1046,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../producer-consumer/" title="Producers and Consumers" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>

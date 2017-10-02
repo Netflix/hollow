@@ -381,7 +381,19 @@
 
 
   <li class="md-nav__item">
-    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
+      Infrastructure Hooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
       Producers and Consumers
     </a>
   </li>
@@ -831,7 +843,7 @@ TYPES: [Movie]
 <p>Run the consumer.  You'll see the same output from prior steps, except now the Hollow input data is coming from S3, and the state version announcement is read from DynamoDB.</p>
 <div class="admonition note">
 <p class="admonition-title">Pinning The State</p>
-<p>The provided <code>DynamoDBAnnouncementWatcher</code> can be <em>pinned</em>.  If the announcement item in DynamoDB contains a field <code>pin_version</code>, then the consumer will go to the version indicated in that field, instead of the version the producer announces.  See <a href="../producer-consumer/#pinning-consumers">Pinning Consumers</a> for more details about pinning data.</p>
+<p>The provided <code>DynamoDBAnnouncementWatcher</code> can be <em>pinned</em>.  If the announcement item in DynamoDB contains a field <code>pin_version</code>, then the consumer will go to the version indicated in that field, instead of the version the producer announces.  See <a href="../producer-consumer-apis/#pinning-consumers">Pinning Consumers</a> for more details about pinning data.</p>
 </div>
 <h3 id="plug-in-your-data-model">Plug In Your Data Model</h3>
 <p>Congratulations!  You now have a living, breathing, fully production scalable implementation of Hollow in your hands.  All that's left to do is substitute your data model for the example provided.  The data model can be defined, as in this example, with a set of POJO classes.  Take this starting point and make it your own -- remove the classes underneath <code>how.hollow.producer.datamodel</code> and replace them with your data model.</p>

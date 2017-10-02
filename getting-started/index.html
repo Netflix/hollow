@@ -327,7 +327,19 @@
 
 
   <li class="md-nav__item">
-    <a href="../producer-consumer/" title="Producers and Consumers" class="md-nav__link">
+    <a href="../infrastructure/" title="Infrastructure Hooks" class="md-nav__link">
+      Infrastructure Hooks
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../producer-consumer-apis/" title="Producers and Consumers" class="md-nav__link">
       Producers and Consumers
     </a>
   </li>
@@ -680,7 +692,7 @@
 <li>The <code>HollowProducer</code> needs a <code>Publisher</code> and <code>Announcer</code></li>
 <li>The <code>HollowConsumer</code> needs a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code></li>
 </ul>
-<p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  We'll discuss in more detail how to integrate with your specific infrastructure in <a href="../producer-consumer/#infrastructure-integration">Infrastructure Integration</a>.</p>
+<p>Your <code>BlobRetriever</code> and <code>AnnouncementWatcher</code> implementations should be mirror your <code>Publisher</code> and <code>Announcer</code> interfaces.   Here, we're publishing and retrieving from local disk.  In production, we'll be publishing to and retrieving from a remote file store.  We'll discuss in more detail how to integrate with your specific infrastructure in <a href="../infrastructure/#infrastructure-integration">Infrastructure Integration</a>.</p>
 </div>
 <h2 id="producing-a-delta">Producing a Delta</h2>
 <p>Some time has passed and the dataset has evolved.  It now contains these records:</p>
@@ -703,7 +715,7 @@
 
 
 <p>Let's take a closer look at what the above code does.  The same <code>HollowProducer</code> which was used to produce the <em>snapshot</em> blob is used -- it already knows everything about the prior state and can be transitioned to the next state.  When creating a new state, <strong>all of the movies currently in our dataset are re-added again.</strong>  It's not necessary to figure out which records were added, removed, or modified -- that's Hollow's job.</p>
-<p>Each time we call <code>runCycle</code> we will be producing a <em>data state</em>.  For each state after the first, the <code>HollowProducer</code> will publish three artifacts: a <em>snapshot</em>, a <em>delta</em>, and a <em>reverse delta</em>.  Encoded into the <em>delta</em> is a set of instructions to update a consumer’s data store from the previous state to the current state.  Inversely, encoded into each <em>reverse delta</em> is a set of instructions to update a consumer in reverse -- from the current state to the previous state.  Consumers may use the <em>reverse delta</em> later if we need to <a href="../producer-consumer/#pinning-consumers">pin</a>.</p>
+<p>Each time we call <code>runCycle</code> we will be producing a <em>data state</em>.  For each state after the first, the <code>HollowProducer</code> will publish three artifacts: a <em>snapshot</em>, a <em>delta</em>, and a <em>reverse delta</em>.  Encoded into the <em>delta</em> is a set of instructions to update a consumer’s data store from the previous state to the current state.  Inversely, encoded into each <em>reverse delta</em> is a set of instructions to update a consumer in reverse -- from the current state to the previous state.  Consumers may use the <em>reverse delta</em> later if we need to <a href="../infrastructure/#pinning-consumers">pin</a>.</p>
 <p>When consumers initialize, they will use the most recent <em>snapshot</em> to initialize their data store.  After initialization, consumers will keep up to date using <em>deltas</em>.</p>
 <div class="admonition note">
 <p class="admonition-title">Producer Cycles</p>
