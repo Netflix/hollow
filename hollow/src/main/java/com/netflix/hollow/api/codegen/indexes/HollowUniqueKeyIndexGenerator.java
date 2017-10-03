@@ -23,8 +23,6 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
@@ -63,7 +61,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         if (isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
-        builder.append("\n");
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + type + "> {\n\n");
 
         {
