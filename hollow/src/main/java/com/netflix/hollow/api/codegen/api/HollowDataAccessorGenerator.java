@@ -67,6 +67,7 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import " + HollowReadStateEngine.class.getName() + ";\n");
 
         builder.append("\n");
+        builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
 
         builder.append("    public static final String TYPE = \"" + type + "\";\n");
@@ -83,18 +84,22 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     protected void genConstructors(StringBuilder builder) {
         builder.append("    public " + className + "(HollowConsumer consumer) {\n");
         builder.append("        super(consumer, TYPE);\n");
+        builder.append("        this.api = (" + apiclassName + ")consumer.getAPI();\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api) {\n");
         builder.append("        super(rStateEngine, TYPE);\n");
+        builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, String ... fieldPaths) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api, String ... fieldPaths) {\n");
         builder.append("        super(rStateEngine, TYPE, fieldPaths);\n");
+        builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {\n");
+        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api, PrimaryKey primaryKey) {\n");
         builder.append("        super(rStateEngine, TYPE, primaryKey);\n");
+        builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
     }
 

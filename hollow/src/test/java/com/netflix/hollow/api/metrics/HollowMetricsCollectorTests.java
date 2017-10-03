@@ -18,6 +18,24 @@ public class HollowMetricsCollectorTests {
     }
 
     @Test
+    public void testNullMetricsCollector() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                                                .withBlobStager(new HollowInMemoryBlobStager())
+                                                .build();
+
+        long version = producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState state) throws Exception {
+                state.add(Integer.valueOf(1));
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                                                .withMetricsCollector(null)
+                                                .build();
+        consumer.triggerRefreshTo(version);
+    }
+
+    @Test
     public void metricsCollectorWhenPublishingSnapshot() {
         FakePublisherHollowMetricsCollector metricsCollector = new FakePublisherHollowMetricsCollector();
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
