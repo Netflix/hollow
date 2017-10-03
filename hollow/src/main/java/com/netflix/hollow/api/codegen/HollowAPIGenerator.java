@@ -170,7 +170,9 @@ public class HollowAPIGenerator {
 
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
         HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname, usePackageGrouping);
-        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, dataset, usePackageGrouping);
+
+        boolean isListenToDataRefreah = !reservePrimaryKeyIndexForTypeWithPrimaryKey; // NOTE: to be backwards compatible
+        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, dataset, usePackageGrouping, isListenToDataRefreah);
 
         generateFile(directory, apiClassGenerator);
         generateFile(directory, apiFactoryGenerator);

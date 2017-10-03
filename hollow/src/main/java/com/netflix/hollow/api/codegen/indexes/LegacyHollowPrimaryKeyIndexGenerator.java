@@ -31,8 +31,9 @@ public class LegacyHollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGe
 
     public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
         super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
-        isGenDefaultConstructor = true;
+        isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = true;
+        isAutoListenToDataRefresh = true;
     }
 
     @Override

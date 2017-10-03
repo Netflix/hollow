@@ -125,6 +125,10 @@ public class HollowClientUpdater {
         refreshListeners.add(refreshListener);
     }
 
+    public void removeRefreshListener(HollowConsumer.RefreshListener refreshListener) {
+        refreshListeners.remove(refreshListener);
+    }
+
     public long getCurrentVersionId() {
         if(hollowDataHolder != null)
             return hollowDataHolder.getCurrentVersion();

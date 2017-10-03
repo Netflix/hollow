@@ -192,6 +192,7 @@ public class HollowConsumer {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
         refreshExecutor.execute(new Runnable() {
+            @Override
             public void run() {
                 try {
                     long delay = targetBeginTime - System.currentTimeMillis();
@@ -275,6 +276,13 @@ public class HollowConsumer {
      */
     public void addRefreshListener(RefreshListener listener) {
         updater.addRefreshListener(listener);
+    }
+
+    /**
+     * Remove a {@link RefreshListener} from this consumer.
+     */
+    public void removeRefreshListener(RefreshListener listener) {
+        updater.removeRefreshListener(listener);
     }
 
     /**
@@ -766,6 +774,7 @@ public class HollowConsumer {
             
             if(refreshExecutor == null)
                 refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+                    @Override
                     public Thread newThread(Runnable r) {
                         Thread t = new Thread(r);
                         t.setDaemon(true);
