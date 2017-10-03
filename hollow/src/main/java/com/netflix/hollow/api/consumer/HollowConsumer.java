@@ -684,18 +684,18 @@ public class HollowConsumer {
     }
     
     public static class Builder {
-        private HollowConsumer.BlobRetriever blobRetriever = null;
-        private HollowConsumer.AnnouncementWatcher announcementWatcher = null;
-        private HollowFilterConfig filterConfig = null;
-        private List<HollowConsumer.RefreshListener> refreshListeners = new CopyOnWriteArrayList<HollowConsumer.RefreshListener>();
-        private HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
-        private HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
-        private HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
-        private HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
-        private HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
-        private File localBlobStoreDir = null;
-        private Executor refreshExecutor = null;
-        private HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+        protected HollowConsumer.BlobRetriever blobRetriever = null;
+        protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
+        protected HollowFilterConfig filterConfig = null;
+        protected List<HollowConsumer.RefreshListener> refreshListeners = new CopyOnWriteArrayList<HollowConsumer.RefreshListener>();
+        protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
+        protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
+        protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
+        protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
+        protected HollowConsumer.ObjectLongevityDetector objectLongevityDetector = ObjectLongevityDetector.DEFAULT_DETECTOR;
+        protected File localBlobStoreDir = null;
+        protected Executor refreshExecutor = null;
+        protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
         
         public HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -763,15 +763,15 @@ public class HollowConsumer {
             this.hashCodeFinder = hashCodeFinder;
             return this;
         }
-        
-        public HollowConsumer build() {
-            if(blobRetriever == null && localBlobStoreDir == null) 
+
+        protected void checkArguments() {
+            if(blobRetriever == null && localBlobStoreDir == null)
                 throw new IllegalArgumentException("A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
-            
+
             BlobRetriever blobRetriever = this.blobRetriever;
             if(localBlobStoreDir != null)
-                blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir, blobRetriever);
-            
+                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir, blobRetriever);
+
             if(refreshExecutor == null)
                 refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
                     @Override
@@ -781,8 +781,10 @@ public class HollowConsumer {
                         return t;
                     }
                 });
-            
-            
+        }
+        
+        public HollowConsumer build() {
+            checkArguments();
             return new HollowConsumer(blobRetriever, 
                                       announcementWatcher,
                                       refreshListeners,
