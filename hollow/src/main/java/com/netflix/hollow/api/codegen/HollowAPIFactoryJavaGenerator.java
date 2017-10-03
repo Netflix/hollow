@@ -35,8 +35,8 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
 
     private final String apiClassname;
 
-    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
         this.apiClassname = apiClassname;
         this.className = apiClassname + "Factory";
     }

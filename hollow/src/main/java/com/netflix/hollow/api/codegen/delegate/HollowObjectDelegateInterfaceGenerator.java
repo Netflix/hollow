@@ -38,8 +38,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
+    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = delegateInterfaceName(schema.getName());
     }
 

@@ -39,8 +39,8 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     protected final HollowDataset dataset;
     protected final PrimaryKey pk;
 
-    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
+    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping, useHollowPrimitiveTypes);
         this.dataset = dataset;
         this.pk = schema.getPrimaryKey();
         isGenSimpleConstructor = true;

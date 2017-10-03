@@ -43,8 +43,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
     private final HollowDataset dataset;
     private final boolean isListenToDataRefreah;
     
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping, boolean isListenToDataRefreah) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping, boolean isListenToDataRefreah, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
         this.isListenToDataRefreah = isListenToDataRefreah;

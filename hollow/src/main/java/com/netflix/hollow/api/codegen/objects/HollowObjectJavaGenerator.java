@@ -55,8 +55,8 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
     private final boolean useBooleanFieldErgonomics;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping) {
-        super(packageName, computeSubPackageName(schema), usePackageGrouping);
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, computeSubPackageName(schema), usePackageGrouping, useHollowPrimitiveTypes);
 
         this.apiClassname = apiClassname;
         this.schema = schema;

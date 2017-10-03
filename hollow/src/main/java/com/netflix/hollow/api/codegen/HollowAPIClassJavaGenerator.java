@@ -65,8 +65,8 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
     private final boolean useAggressiveSubstitutions;
 
 
-    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
 
         this.className = apiClassname;
         this.dataset = dataset;

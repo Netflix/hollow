@@ -43,8 +43,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  */
 public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
+    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = delegateCachedImplName(schema.getName());
     }
 

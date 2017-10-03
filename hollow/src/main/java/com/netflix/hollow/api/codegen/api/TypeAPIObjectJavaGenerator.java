@@ -52,8 +52,8 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         }
     });
 
-    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema, boolean usePackageGrouping) {
-        super(apiClassname, packageName, schema, usePackageGrouping);
+    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(apiClassname, packageName, schema, usePackageGrouping, useHollowPrimitiveTypes);
         this.objectSchema = schema;
 
         this.importClasses.add(HollowObjectTypeAPI.class);
