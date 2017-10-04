@@ -64,6 +64,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("import " + AbstractHollowHashIndex.class.getName() + ";\n");
         builder.append("import " + AbstractHollowOrdinalIterable.class.getName() + ";\n\n");
 
+        builder.append("\n");
+        builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowHashIndex.class.getSimpleName() + "<" + apiClassname + "> {\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
