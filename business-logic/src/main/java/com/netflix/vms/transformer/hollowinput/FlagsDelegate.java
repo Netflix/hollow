@@ -38,6 +38,50 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public int getFirstDisplayDatesOrdinal(int ordinal);
 
+    public boolean getLiveOnSite(int ordinal);
+
+    public Boolean getLiveOnSiteBoxed(int ordinal);
+
+    public int getOffsiteReasonsOrdinal(int ordinal);
+
+    public boolean getContentApproved(int ordinal);
+
+    public Boolean getContentApprovedBoxed(int ordinal);
+
+    public boolean getAllowIncomplete(int ordinal);
+
+    public Boolean getAllowIncompleteBoxed(int ordinal);
+
+    public boolean getGoLivePartialSubDubIgnored(int ordinal);
+
+    public Boolean getGoLivePartialSubDubIgnoredBoxed(int ordinal);
+
+    public int getAlternateLanguageOrdinal(int ordinal);
+
+    public boolean getHasRequiredLanguages(int ordinal);
+
+    public Boolean getHasRequiredLanguagesBoxed(int ordinal);
+
+    public boolean getHasRequiredStreams(int ordinal);
+
+    public Boolean getHasRequiredStreamsBoxed(int ordinal);
+
+    public boolean getReleaseAsAvailable(int ordinal);
+
+    public Boolean getReleaseAsAvailableBoxed(int ordinal);
+
+    public int getRemoveAssetOrdinal(int ordinal);
+
+    public boolean getRemoveFromWebsiteOverride(int ordinal);
+
+    public Boolean getRemoveFromWebsiteOverrideBoxed(int ordinal);
+
+    public int getRequiredLangsOrdinal(int ordinal);
+
+    public boolean getSearchOnlyOverride(int ordinal);
+
+    public Boolean getSearchOnlyOverrideBoxed(int ordinal);
+
     public FlagsTypeAPI getTypeAPI();
 
 }

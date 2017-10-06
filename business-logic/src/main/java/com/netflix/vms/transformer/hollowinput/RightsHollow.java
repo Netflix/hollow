@@ -17,13 +17,6 @@ public class RightsHollow extends HollowObject {
         return  api().getListOfRightsWindowHollow(refOrdinal);
     }
 
-    public ListOfRightsContractHollow _getContracts() {
-        int refOrdinal = delegate().getContractsOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getListOfRightsContractHollow(refOrdinal);
-    }
-
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

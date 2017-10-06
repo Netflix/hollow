@@ -18,7 +18,20 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "contentApproved",
             "autoPlay",
             "firstDisplayDate",
-            "firstDisplayDates"
+            "firstDisplayDates",
+            "liveOnSite",
+            "offsiteReasons",
+            "contentApproved",
+            "allowIncomplete",
+            "goLivePartialSubDubIgnored",
+            "alternateLanguage",
+            "hasRequiredLanguages",
+            "hasRequiredStreams",
+            "releaseAsAvailable",
+            "removeAsset",
+            "removeFromWebsiteOverride",
+            "requiredLangs",
+            "searchOnlyOverride"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
     }
@@ -140,6 +153,172 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     public MapOfFlagsFirstDisplayDatesTypeAPI getFirstDisplayDatesTypeAPI() {
         return getAPI().getMapOfFlagsFirstDisplayDatesTypeAPI();
     }
+
+    public boolean getLiveOnSite(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "liveOnSite") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]) == Boolean.TRUE;
+    }
+
+    public Boolean getLiveOnSiteBoxed(int ordinal) {
+        if(fieldIndex[9] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "liveOnSite");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]);
+    }
+
+
+
+    public int getOffsiteReasonsOrdinal(int ordinal) {
+        if(fieldIndex[10] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "offsiteReasons");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
+    }
+
+    public ListOfStringTypeAPI getOffsiteReasonsTypeAPI() {
+        return getAPI().getListOfStringTypeAPI();
+    }
+
+    public boolean getContentApproved(int ordinal) {
+        if(fieldIndex[11] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]) == Boolean.TRUE;
+    }
+
+    public Boolean getContentApprovedBoxed(int ordinal) {
+        if(fieldIndex[11] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]);
+    }
+
+
+
+    public boolean getAllowIncomplete(int ordinal) {
+        if(fieldIndex[12] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "allowIncomplete") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]) == Boolean.TRUE;
+    }
+
+    public Boolean getAllowIncompleteBoxed(int ordinal) {
+        if(fieldIndex[12] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "allowIncomplete");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]);
+    }
+
+
+
+    public boolean getGoLivePartialSubDubIgnored(int ordinal) {
+        if(fieldIndex[13] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "goLivePartialSubDubIgnored") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[13]) == Boolean.TRUE;
+    }
+
+    public Boolean getGoLivePartialSubDubIgnoredBoxed(int ordinal) {
+        if(fieldIndex[13] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "goLivePartialSubDubIgnored");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[13]);
+    }
+
+
+
+    public int getAlternateLanguageOrdinal(int ordinal) {
+        if(fieldIndex[14] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "alternateLanguage");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[14]);
+    }
+
+    public StringTypeAPI getAlternateLanguageTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
+
+    public boolean getHasRequiredLanguages(int ordinal) {
+        if(fieldIndex[15] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredLanguages") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]) == Boolean.TRUE;
+    }
+
+    public Boolean getHasRequiredLanguagesBoxed(int ordinal) {
+        if(fieldIndex[15] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredLanguages");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]);
+    }
+
+
+
+    public boolean getHasRequiredStreams(int ordinal) {
+        if(fieldIndex[16] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredStreams") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]) == Boolean.TRUE;
+    }
+
+    public Boolean getHasRequiredStreamsBoxed(int ordinal) {
+        if(fieldIndex[16] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredStreams");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]);
+    }
+
+
+
+    public boolean getReleaseAsAvailable(int ordinal) {
+        if(fieldIndex[17] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "releaseAsAvailable") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[17]) == Boolean.TRUE;
+    }
+
+    public Boolean getReleaseAsAvailableBoxed(int ordinal) {
+        if(fieldIndex[17] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "releaseAsAvailable");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[17]);
+    }
+
+
+
+    public int getRemoveAssetOrdinal(int ordinal) {
+        if(fieldIndex[18] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "removeAsset");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[18]);
+    }
+
+    public StringTypeAPI getRemoveAssetTypeAPI() {
+        return getAPI().getStringTypeAPI();
+    }
+
+    public boolean getRemoveFromWebsiteOverride(int ordinal) {
+        if(fieldIndex[19] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "removeFromWebsiteOverride") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[19]) == Boolean.TRUE;
+    }
+
+    public Boolean getRemoveFromWebsiteOverrideBoxed(int ordinal) {
+        if(fieldIndex[19] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "removeFromWebsiteOverride");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[19]);
+    }
+
+
+
+    public int getRequiredLangsOrdinal(int ordinal) {
+        if(fieldIndex[20] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "requiredLangs");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[20]);
+    }
+
+    public SetOfStringTypeAPI getRequiredLangsTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public boolean getSearchOnlyOverride(int ordinal) {
+        if(fieldIndex[21] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "searchOnlyOverride") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[21]) == Boolean.TRUE;
+    }
+
+    public Boolean getSearchOnlyOverrideBoxed(int ordinal) {
+        if(fieldIndex[21] == -1)
+            return missingDataHandler().handleBoolean("Flags", ordinal, "searchOnlyOverride");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[21]);
+    }
+
+
 
     public FlagsDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

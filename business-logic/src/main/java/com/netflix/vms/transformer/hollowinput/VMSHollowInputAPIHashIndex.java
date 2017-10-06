@@ -559,68 +559,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<MapOfFlagsFirstDisplayDatesHollow> findMapOfFlagsFirstDisplayDatesMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MapOfFlagsFirstDisplayDatesHollow>() {
-            public Iterator<MapOfFlagsFirstDisplayDatesHollow> iterator() {
-                return new Iterator<MapOfFlagsFirstDisplayDatesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MapOfFlagsFirstDisplayDatesHollow next() {
-                        MapOfFlagsFirstDisplayDatesHollow obj = api.getMapOfFlagsFirstDisplayDatesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<FlagsHollow> findFlagsMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<FlagsHollow>() {
-            public Iterator<FlagsHollow> iterator() {
-                return new Iterator<FlagsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public FlagsHollow next() {
-                        FlagsHollow obj = api.getFlagsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
     public Iterable<PersonCharacterHollow> findPersonCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
@@ -869,37 +807,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<RightsAssetSetIdHollow> findRightsAssetSetIdMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsAssetSetIdHollow>() {
-            public Iterator<RightsAssetSetIdHollow> iterator() {
-                return new Iterator<RightsAssetSetIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsAssetSetIdHollow next() {
-                        RightsAssetSetIdHollow obj = api.getRightsAssetSetIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
     public Iterable<RightsContractPackageHollow> findRightsContractPackageMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
@@ -950,130 +857,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
 
                     public ListOfRightsContractPackageHollow next() {
                         ListOfRightsContractPackageHollow obj = api.getListOfRightsContractPackageHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<RightsWindowContractHollow> findRightsWindowContractMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsWindowContractHollow>() {
-            public Iterator<RightsWindowContractHollow> iterator() {
-                return new Iterator<RightsWindowContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsWindowContractHollow next() {
-                        RightsWindowContractHollow obj = api.getRightsWindowContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<ListOfRightsWindowContractHollow> findListOfRightsWindowContractMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsWindowContractHollow>() {
-            public Iterator<ListOfRightsWindowContractHollow> iterator() {
-                return new Iterator<ListOfRightsWindowContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsWindowContractHollow next() {
-                        ListOfRightsWindowContractHollow obj = api.getListOfRightsWindowContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<RightsWindowHollow> findRightsWindowMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsWindowHollow>() {
-            public Iterator<RightsWindowHollow> iterator() {
-                return new Iterator<RightsWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsWindowHollow next() {
-                        RightsWindowHollow obj = api.getRightsWindowHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<ListOfRightsWindowHollow> findListOfRightsWindowMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsWindowHollow>() {
-            public Iterator<ListOfRightsWindowHollow> iterator() {
-                return new Iterator<ListOfRightsWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsWindowHollow next() {
-                        ListOfRightsWindowHollow obj = api.getListOfRightsWindowHollow(next);
                         next = iter.next();
                         return obj;
                     }
@@ -3194,37 +2977,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<RightsAssetHollow> findRightsAssetMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsAssetHollow>() {
-            public Iterator<RightsAssetHollow> iterator() {
-                return new Iterator<RightsAssetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsAssetHollow next() {
-                        RightsAssetHollow obj = api.getRightsAssetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
     public Iterable<RightsContractAssetHollow> findRightsContractAssetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
@@ -3287,16 +3039,16 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<RightsContractHollow> findRightsContractMatches(Object... keys) {
+    public Iterable<RightsWindowContractHollow> findRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
             return Collections.emptySet();
 
         final HollowOrdinalIterator iter = matches.iterator();
 
-        return new Iterable<RightsContractHollow>() {
-            public Iterator<RightsContractHollow> iterator() {
-                return new Iterator<RightsContractHollow>() {
+        return new Iterable<RightsWindowContractHollow>() {
+            public Iterator<RightsWindowContractHollow> iterator() {
+                return new Iterator<RightsWindowContractHollow>() {
 
                     private int next = iter.next();
 
@@ -3304,8 +3056,8 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
                         return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
                     }
 
-                    public RightsContractHollow next() {
-                        RightsContractHollow obj = api.getRightsContractHollow(next);
+                    public RightsWindowContractHollow next() {
+                        RightsWindowContractHollow obj = api.getRightsWindowContractHollow(next);
                         next = iter.next();
                         return obj;
                     }
@@ -3318,16 +3070,16 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<ListOfRightsContractHollow> findListOfRightsContractMatches(Object... keys) {
+    public Iterable<ListOfRightsWindowContractHollow> findListOfRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
             return Collections.emptySet();
 
         final HollowOrdinalIterator iter = matches.iterator();
 
-        return new Iterable<ListOfRightsContractHollow>() {
-            public Iterator<ListOfRightsContractHollow> iterator() {
-                return new Iterator<ListOfRightsContractHollow>() {
+        return new Iterable<ListOfRightsWindowContractHollow>() {
+            public Iterator<ListOfRightsWindowContractHollow> iterator() {
+                return new Iterator<ListOfRightsWindowContractHollow>() {
 
                     private int next = iter.next();
 
@@ -3335,8 +3087,70 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
                         return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
                     }
 
-                    public ListOfRightsContractHollow next() {
-                        ListOfRightsContractHollow obj = api.getListOfRightsContractHollow(next);
+                    public ListOfRightsWindowContractHollow next() {
+                        ListOfRightsWindowContractHollow obj = api.getListOfRightsWindowContractHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<RightsWindowHollow> findRightsWindowMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<RightsWindowHollow>() {
+            public Iterator<RightsWindowHollow> iterator() {
+                return new Iterator<RightsWindowHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public RightsWindowHollow next() {
+                        RightsWindowHollow obj = api.getRightsWindowHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<ListOfRightsWindowHollow> findListOfRightsWindowMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<ListOfRightsWindowHollow>() {
+            public Iterator<ListOfRightsWindowHollow> iterator() {
+                return new Iterator<ListOfRightsWindowHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public ListOfRightsWindowHollow next() {
+                        ListOfRightsWindowHollow obj = api.getListOfRightsWindowHollow(next);
                         next = iter.next();
                         return obj;
                     }
@@ -3628,68 +3442,6 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
-    public Iterable<SetOfRightsAssetHollow> findSetOfRightsAssetMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SetOfRightsAssetHollow>() {
-            public Iterator<SetOfRightsAssetHollow> iterator() {
-                return new Iterator<SetOfRightsAssetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SetOfRightsAssetHollow next() {
-                        SetOfRightsAssetHollow obj = api.getSetOfRightsAssetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
-    public Iterable<RightsAssetsHollow> findRightsAssetsMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
-
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsAssetsHollow>() {
-            public Iterator<RightsAssetsHollow> iterator() {
-                return new Iterator<RightsAssetsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsAssetsHollow next() {
-                        RightsAssetsHollow obj = api.getRightsAssetsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
-            }
-        };
-    }
-
     public Iterable<SetOfStringHollow> findSetOfStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)
@@ -3709,6 +3461,37 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
 
                     public SetOfStringHollow next() {
                         SetOfStringHollow obj = api.getSetOfStringHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
+    public Iterable<FlagsHollow> findFlagsMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<FlagsHollow>() {
+            public Iterator<FlagsHollow> iterator() {
+                return new Iterator<FlagsHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public FlagsHollow next() {
+                        FlagsHollow obj = api.getFlagsHollow(next);
                         next = iter.next();
                         return obj;
                     }

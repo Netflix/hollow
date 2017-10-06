@@ -10,21 +10,15 @@ import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 public class RightsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsDelegate {
 
     private final int windowsOrdinal;
-    private final int contractsOrdinal;
     private RightsTypeAPI typeAPI;
 
     public RightsDelegateCachedImpl(RightsTypeAPI typeAPI, int ordinal) {
         this.windowsOrdinal = typeAPI.getWindowsOrdinal(ordinal);
-        this.contractsOrdinal = typeAPI.getContractsOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
     public int getWindowsOrdinal(int ordinal) {
         return windowsOrdinal;
-    }
-
-    public int getContractsOrdinal(int ordinal) {
-        return contractsOrdinal;
     }
 
     @Override
