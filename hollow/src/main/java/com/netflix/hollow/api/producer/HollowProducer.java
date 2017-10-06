@@ -149,6 +149,19 @@ public class HollowProducer {
 
         this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null, new DummyBlobStorageCleaner());
     }
+    
+    protected HollowProducer(BlobStager blobStager,
+            Publisher publisher,
+            Announcer announcer,
+            List<Validator> validators,
+            List<HollowProducerListener> listeners,
+            VersionMinter versionMinter,
+            Executor snapshotPublishExecutor,
+            int numStatesBetweenSnapshots,
+            long targetMaxTypeShardSize,
+            HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
+        this(blobStager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, new DummyBlobStorageCleaner());
+    }
 
     protected HollowProducer(BlobStager blobStager,
                              Publisher publisher,
@@ -166,6 +179,7 @@ public class HollowProducer {
         this.versionMinter = versionMinter;
         this.blobStager = blobStager;
         this.snapshotPublishExecutor = snapshotPublishExecutor == null ? new Executor() {
+            @Override
             public void execute(Runnable command) {
                 command.run();
             }
@@ -213,6 +227,7 @@ public class HollowProducer {
 
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever, new RestoreAction() {
+            @Override
             public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
                 restoreTo.restoreFrom(restoreFrom);
             }
@@ -221,6 +236,7 @@ public class HollowProducer {
     
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever, new RestoreAction() {
+            @Override
             public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
                 HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom);
             }
@@ -415,6 +431,7 @@ public class HollowProducer {
                 
                 if(--numStatesUntilNextSnapshot < 0) {
                     snapshotPublishExecutor.execute(new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
@@ -707,8 +724,10 @@ public class HollowProducer {
     
     public static interface BlobCompressor {
         public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
+            @Override
             public OutputStream compress(OutputStream os) { return os; }
 
+            @Override
             public InputStream decompress(InputStream is) { return is; }
         };
 
