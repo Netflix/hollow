@@ -297,7 +297,7 @@ public class HollowProducer {
     public long runCycle(Populator task) {
         if(!singleProducerEnforcer.isPrimary()) {
             // TODO: minimum time spacing between cycles
-            log.log(Level.WARNING, "cycle not executed -- not primary");
+            log.log(Level.INFO, "cycle not executed -- not primary");
             return lastSucessfulCycle;
         }
 
