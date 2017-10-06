@@ -30,30 +30,21 @@ import java.util.Set;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowAPIFactoryJavaGenerator implements HollowJavaFileGenerator {
+public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "core";
 
-    private final String packageName;
-    private final String className;
     private final String apiClassname;
 
-    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname) {
-        this.packageName = packageName;
+    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, boolean usePackageGrouping) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
         this.apiClassname = apiClassname;
         this.className = apiClassname + "Factory";
     }
 
     @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        if(!"".equals(packageName)) {
-            builder.append("package ").append(packageName).append(";\n\n");
-        }
+        appendPackageAndCommonImports(builder);
 
         builder.append("import ").append(HollowAPIFactory.class.getName()).append(";\n");
         builder.append("import ").append(HollowAPI.class.getName()).append(";\n");

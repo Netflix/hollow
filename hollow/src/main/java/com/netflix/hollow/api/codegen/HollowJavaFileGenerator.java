@@ -31,5 +31,4 @@ public interface HollowJavaFileGenerator {
     public String getClassName();
 
     public String generate();
-
 }

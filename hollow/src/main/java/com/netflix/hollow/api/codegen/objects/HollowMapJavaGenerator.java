@@ -22,7 +22,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPICl
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowMap;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
@@ -39,41 +38,31 @@ import java.util.Set;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowMapJavaGenerator implements HollowJavaFileGenerator {
+public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
 
     private final HollowMapSchema schema;
     private final HollowDataset dataset;
-    private final String packageName;
-    private final String apiClassname;
-    private final String className;
     private final String keyClassName;
     private final String valueClassName;
     
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
-        this.packageName = packageName;
-        this.apiClassname = apiClassname;
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
+        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
         this.schema = schema;
         this.dataset = dataset;
-        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix, useAggressiveSubstitutions);
         this.valueClassName = hollowImplClassname(schema.getValueType(), classPostfix, useAggressiveSubstitutions);
         this.parameterizeKey = parameterizeClassNames || parameterizedTypes.contains(schema.getKeyType());
         this.parameterizeValue = parameterizeClassNames || parameterizedTypes.contains(schema.getValueType());
     }
 
-    @Override
-    public String getClassName() {
-        return className;
-    }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowMap.class.getName() + ";\n");
         builder.append("import " + HollowMapSchema.class.getName() + ";\n");

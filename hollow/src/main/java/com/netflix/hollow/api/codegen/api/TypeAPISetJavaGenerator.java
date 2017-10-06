@@ -25,7 +25,6 @@ import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 
@@ -37,31 +36,18 @@ import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
  * @author dkoszewnik
  *
  */
-public class TypeAPISetJavaGenerator implements HollowJavaFileGenerator {
-
-    private final String apiClassname;
-    private final String packageName;
-    private final String className;
+public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowSetSchema schema;
 
-    public TypeAPISetJavaGenerator(String stateEngineClassname, String packageName, HollowSetSchema schema) {
-        this.apiClassname = stateEngineClassname;
-        this.packageName = packageName;
+    public TypeAPISetJavaGenerator(String apiClassname, String packageName, HollowSetSchema schema, boolean usePackageGrouping) {
+        super(apiClassname, packageName, schema, usePackageGrouping);
         this.schema = schema;
-        this.className = typeAPIClassname(schema.getName());
-    }
-
-    @Override
-    public String getClassName() {
-        return className;
     }
 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        if(!"".equals(packageName))
-            builder.append("package ").append(packageName).append(";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowSetTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowSetTypeDataAccess.class.getName() + ";\n");
@@ -72,7 +58,7 @@ public class TypeAPISetJavaGenerator implements HollowJavaFileGenerator {
 
         builder.append("    private final ").append(delegateLookupClassname(schema)).append(" delegateLookupImpl;\n\n");
 
-        builder.append("    ").append(className).append("(").append(apiClassname).append(" api, HollowSetTypeDataAccess dataAccess) {\n");
+        builder.append("    public ").append(className).append("(").append(apiClassname).append(" api, HollowSetTypeDataAccess dataAccess) {\n");
         builder.append("        super(api, dataAccess);\n");
         builder.append("        this.delegateLookupImpl = new ").append(delegateLookupClassname(schema)).append("(this);\n");
         builder.append("    }\n\n");
@@ -93,7 +79,4 @@ public class TypeAPISetJavaGenerator implements HollowJavaFileGenerator {
 
         return builder.toString();
     }
-
-
-
 }

@@ -20,6 +20,8 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
@@ -123,6 +125,7 @@ public class HollowProducer {
     private final Publisher publisher;
     private final List<Validator> validators;
     private final Announcer announcer;
+    private final BlobStorageCleaner blobStorageCleaner;
     private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
     private final ListenerSupport listeners;
@@ -130,18 +133,34 @@ public class HollowProducer {
     private final Executor snapshotPublishExecutor;
     private final int numStatesBetweenSnapshots;
     private int numStatesUntilNextSnapshot;
-    
+    private HollowProducerMetrics metrics;
+    private HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
+
     private boolean isInitialized;
 
     public HollowProducer(Publisher publisher,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.<Validator>emptyList(), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null, new DummyBlobStorageCleaner());
     }
 
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE);
+
+        this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null, new DummyBlobStorageCleaner());
+    }
+    
+    protected HollowProducer(BlobStager blobStager,
+            Publisher publisher,
+            Announcer announcer,
+            List<Validator> validators,
+            List<HollowProducerListener> listeners,
+            VersionMinter versionMinter,
+            Executor snapshotPublishExecutor,
+            int numStatesBetweenSnapshots,
+            long targetMaxTypeShardSize,
+            HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
+        this(blobStager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, new DummyBlobStorageCleaner());
     }
 
     protected HollowProducer(BlobStager blobStager,
@@ -152,13 +171,15 @@ public class HollowProducer {
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
                              int numStatesBetweenSnapshots,
-                             long targetMaxTypeShardSize) {
+                             long targetMaxTypeShardSize,
+                             HollowMetricsCollector<HollowProducerMetrics> metricsCollector, BlobStorageCleaner blobStorageCleaner) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
         this.blobStager = blobStager;
         this.snapshotPublishExecutor = snapshotPublishExecutor == null ? new Executor() {
+            @Override
             public void execute(Runnable command) {
                 command.run();
             }
@@ -171,9 +192,20 @@ public class HollowProducer {
         this.objectMapper = new HollowObjectMapper(writeEngine);
         this.listeners = new ListenerSupport();
         this.readStates = ReadStateHelper.newDeltaChain();
-        
+        this.blobStorageCleaner = blobStorageCleaner;
+
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
+
+        this.metrics = new HollowProducerMetrics();
+        this.metricsCollector = metricsCollector;
+    }
+
+    /**
+     * Returns the metrics for this producer
+     */
+    public HollowProducerMetrics getMetrics() {
+        return this.metrics;
     }
 
     public void initializeDataModel(Class<?>...classes) {
@@ -195,6 +227,7 @@ public class HollowProducer {
 
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever, new RestoreAction() {
+            @Override
             public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
                 restoreTo.restoreFrom(restoreFrom);
             }
@@ -203,6 +236,7 @@ public class HollowProducer {
     
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever, new RestoreAction() {
+            @Override
             public void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo) {
                 HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom);
             }
@@ -281,6 +315,9 @@ public class HollowProducer {
             runCycle(task, cycleStatus, toVersion);
         } finally {
             listeners.fireCycleComplete(cycleStatus);
+            metrics.updateCycleMetrics(cycleStatus.build());
+            if(metricsCollector !=null)
+                metricsCollector.collect(metrics);
         }
         
         return toVersion;
@@ -394,6 +431,7 @@ public class HollowProducer {
                 
                 if(--numStatesUntilNextSnapshot < 0) {
                     snapshotPublishExecutor.execute(new Runnable() {
+                        @Override
                         public void run() {
                             try {
                                 publishBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
@@ -474,6 +512,10 @@ public class HollowProducer {
             throw th;
         } finally {
             listeners.fireArtifactPublish(builder);
+            metrics.updateBlobTypeMetrics(builder.build());
+            if(metricsCollector !=null)
+                metricsCollector.collect(metrics);
+            blobStorageCleaner.clean(blobType);
         }
     }
 
@@ -682,8 +724,10 @@ public class HollowProducer {
     
     public static interface BlobCompressor {
         public static final BlobCompressor NO_COMPRESSION = new BlobCompressor() {
+            @Override
             public OutputStream compress(OutputStream os) { return os; }
 
+            @Override
             public InputStream decompress(InputStream is) { return is; }
         };
 
@@ -850,23 +894,25 @@ public class HollowProducer {
     }
     
     public static class Builder {
-        private BlobStager stager;
-        private BlobCompressor compressor;
-        private File stagingDir;
-        private Publisher publisher;
-        private Announcer announcer;
-        private List<Validator> validators = new ArrayList<Validator>();
-        private List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
-        private VersionMinter versionMinter = new VersionMinterWithCounter();
-        private Executor snapshotPublishExecutor = null;
-        private int numStatesBetweenSnapshots = 0;
-        private long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
-        
+        protected BlobStager stager;
+        protected BlobCompressor compressor;
+        protected File stagingDir;
+        protected Publisher publisher;
+        protected Announcer announcer;
+        protected List<Validator> validators = new ArrayList<Validator>();
+        protected List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
+        protected VersionMinter versionMinter = new VersionMinterWithCounter();
+        protected Executor snapshotPublishExecutor = null;
+        protected int numStatesBetweenSnapshots = 0;
+        protected long targetMaxTypeShardSize = DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE;
+        protected HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
+        protected BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
+
         public Builder withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
             return this;
         }
-        
+
         public Builder withBlobCompressor(HollowProducer.BlobCompressor compressor) {
             this.compressor = compressor;
             return this;
@@ -928,22 +974,85 @@ public class HollowProducer {
             this.targetMaxTypeShardSize = targetMaxTypeShardSize;
             return this;
         }
-        
-        public HollowProducer build() {
+
+        public Builder withMetricsCollector(HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
+            this.metricsCollector = metricsCollector;
+            return this;
+        }
+
+        public Builder withBlobStorageCleaner(BlobStorageCleaner blobStorageCleaner) {
+            this.blobStorageCleaner = blobStorageCleaner;
+            return this;
+        }
+
+        protected void checkArguments() {
             if(stager != null && compressor != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and BlobCompressor were specified -- please specify only one of these.");
             if(stager != null && stagingDir != null)
                 throw new IllegalArgumentException("Both a custom BlobStager and a staging directory were specified -- please specify only one of these.");
-            
-            BlobStager stager = this.stager;
-            if(stager == null) {
+
+            if(this.stager == null) {
                 BlobCompressor compressor = this.compressor != null ? this.compressor : BlobCompressor.NO_COMPRESSION;
                 File stagingDir = this.stagingDir != null ? this.stagingDir : new File(System.getProperty("java.io.tmpdir"));
-                stager = new HollowFilesystemBlobStager(stagingDir, compressor);
+                this.stager = new HollowFilesystemBlobStager(stagingDir, compressor);
             }
+        }
+        
+        public HollowProducer build() {
+            checkArguments();
             
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize);
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner);
         }
     }
-    
+
+    /**
+     * Provides the opportunity to clean the blob storage.
+     * It allows users to implement logic base on Blob Type.
+     */
+    public static abstract class BlobStorageCleaner {
+        public void clean(Blob.Type blobType) {
+            switch(blobType) {
+                case SNAPSHOT:
+                    cleanSnapshots();
+                    break;
+                case DELTA:
+                    cleanDeltas();
+                    break;
+                case REVERSE_DELTA:
+                    cleanReverseDeltas();
+                    break;
+            }
+        }
+
+        /**
+         * This method provides an opportunity to remove old snapshots.
+         */
+        public abstract void cleanSnapshots();
+
+        /**
+         * This method provides an opportunity to remove old deltas.
+         */
+        public abstract void cleanDeltas();
+
+        /**
+         * This method provides an opportunity to remove old reverse deltas.
+         */
+        public abstract void cleanReverseDeltas();
+    }
+
+    /**
+     * This Dummy blob storage cleaner does nothing
+     */
+    private static class DummyBlobStorageCleaner extends HollowProducer.BlobStorageCleaner {
+
+        @Override
+        public void cleanSnapshots() { }
+
+        @Override
+        public void cleanDeltas() { }
+
+        @Override
+        public void cleanReverseDeltas() { }
+    }
+
 }

@@ -354,7 +354,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket != null) {
                     longAtIndex = currentBucket.idx;
-                    longs = currentBucket.longs;
+                    longs = currentBucket.longs.clone();
                 }
 
                 boolean isLongInitialized = (longAtIndex & bitInIndex) != 0;
@@ -418,7 +418,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 Bucket currentBucket = buckets.get(index);
                 if (currentBucket == null) return;
                 long longAtIndex = currentBucket.idx;
-                long[] longs = currentBucket.longs;
+                long[] longs = currentBucket.longs.clone();
 
                 // find which bit in index will point to the long in bb
                 long whichLong = i >>> LONG_SHIFT;
@@ -434,7 +434,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                 // unset whichBitInIndex in value
                 // to clear 3rd bit (00100 whichBitInLong) in 00101(value), & with 11011 to get 00001
                 long updatedValue = value & ~whichBitInLong;
-
+                boolean isBucketEmpty = false;
                 if (updatedValue != 0) {
                     longs[offset] = updatedValue;
                 } else {
@@ -445,6 +445,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                     if (oldLongsLen == 1) {
                         longs = null;
                         longAtIndex = 0;
+                        isBucketEmpty = true;
                     } else {
                         // copy everything over, except the long at the given offset,
 
@@ -463,8 +464,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
                         longAtIndex &= ~bitInIndex;
                     }
                 }
-
-                Bucket updatedBucket = new Bucket(longAtIndex, longs);
+                Bucket updatedBucket = null;
+                if (!isBucketEmpty) updatedBucket = new Bucket(longAtIndex, longs);
                 if (buckets.compareAndSet(index, currentBucket, updatedBucket))
                     break;
 
