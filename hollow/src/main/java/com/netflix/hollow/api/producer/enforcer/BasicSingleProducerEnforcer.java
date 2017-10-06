@@ -21,17 +21,17 @@ public class BasicSingleProducerEnforcer extends AbstractSingleProducerEnforcer 
     private boolean isPrimary = true;
 
     @Override
-    void _enable() {
+    protected void _enable() {
         isPrimary = true;
     }
 
     @Override
-    void _disable() {
+    protected void _disable() {
         isPrimary = false;
     }
 
     @Override
-    boolean _isPrimary() {
+    protected boolean _isPrimary() {
         return isPrimary;
     }
 

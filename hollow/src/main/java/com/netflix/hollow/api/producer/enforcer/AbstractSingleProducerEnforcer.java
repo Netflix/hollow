@@ -28,11 +28,11 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     private boolean wasPrimary = false;
     private final Logger logger = Logger.getLogger(AbstractSingleProducerEnforcer.class.getName());
 
-    abstract void _enable();
+    protected abstract void _enable();
 
-    abstract void _disable();
+    protected abstract void _disable();
 
-    abstract boolean _isPrimary();
+    protected abstract boolean _isPrimary();
 
     @Override
     public void enable() {
