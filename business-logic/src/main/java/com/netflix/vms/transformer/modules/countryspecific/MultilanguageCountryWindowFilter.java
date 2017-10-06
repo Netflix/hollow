@@ -4,7 +4,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
-import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
@@ -13,6 +12,7 @@ import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class MultilanguageCountryWindowFilter {
 
@@ -31,13 +31,13 @@ public class MultilanguageCountryWindowFilter {
      * AUDIO + DESCRIPTIVE_AUDIO - (101), AUDIO + SUBTITLES + DESCRIPTIVE_AUDIO - (111) and so on..
      *
      * @param language
-     * @param contract
+     * @param contractAssets
      * @return
      */
-    public long contractAvailabilityForLanguage(String language, RightsContractHollow contract) {
+    public long contractAvailabilityForLanguage(String language, List<RightsContractAssetHollow> contractAssets) {
         long availability = 0;
 
-        for (RightsContractAssetHollow assetInput : contract._getAssets()) {
+        for (RightsContractAssetHollow assetInput : contractAssets) {
             ContractAsset asset = rightsContractAssetCache.getResult(assetInput.getOrdinal());
             if (asset == null) {
                 asset = new ContractAsset(assetInput);

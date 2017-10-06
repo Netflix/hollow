@@ -14,7 +14,6 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean languageOverride;
     private final Boolean localAudio;
     private final Boolean goLive;
-    private final Boolean contentApproved;
     private final Boolean autoPlay;
     private final int firstDisplayDateOrdinal;
     private final int firstDisplayDatesOrdinal;
@@ -39,7 +38,6 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.languageOverride = typeAPI.getLanguageOverrideBoxed(ordinal);
         this.localAudio = typeAPI.getLocalAudioBoxed(ordinal);
         this.goLive = typeAPI.getGoLiveBoxed(ordinal);
-        this.contentApproved = typeAPI.getContentApprovedBoxed(ordinal);
         this.autoPlay = typeAPI.getAutoPlayBoxed(ordinal);
         this.firstDisplayDateOrdinal = typeAPI.getFirstDisplayDateOrdinal(ordinal);
         this.firstDisplayDatesOrdinal = typeAPI.getFirstDisplayDatesOrdinal(ordinal);
@@ -107,16 +105,6 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
 
     public Boolean getGoLiveBoxed(int ordinal) {
         return goLive;
-    }
-
-    public boolean getContentApproved(int ordinal) {
-        if(contentApproved == null)
-            return false;
-        return contentApproved.booleanValue();
-    }
-
-    public Boolean getContentApprovedBoxed(int ordinal) {
-        return contentApproved;
     }
 
     public boolean getAutoPlay(int ordinal) {

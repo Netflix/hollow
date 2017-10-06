@@ -15,7 +15,6 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "languageOverride",
             "localAudio",
             "goLive",
-            "contentApproved",
             "autoPlay",
             "firstDisplayDate",
             "firstDisplayDates",
@@ -106,38 +105,24 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public boolean getContentApproved(int ordinal) {
+    public boolean getAutoPlay(int ordinal) {
         if(fieldIndex[5] == -1)
-            return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved") == Boolean.TRUE;
+            return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay") == Boolean.TRUE;
         return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]) == Boolean.TRUE;
     }
 
-    public Boolean getContentApprovedBoxed(int ordinal) {
+    public Boolean getAutoPlayBoxed(int ordinal) {
         if(fieldIndex[5] == -1)
-            return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved");
+            return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay");
         return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]);
     }
 
 
 
-    public boolean getAutoPlay(int ordinal) {
-        if(fieldIndex[6] == -1)
-            return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]) == Boolean.TRUE;
-    }
-
-    public Boolean getAutoPlayBoxed(int ordinal) {
-        if(fieldIndex[6] == -1)
-            return missingDataHandler().handleBoolean("Flags", ordinal, "autoPlay");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[6]);
-    }
-
-
-
     public int getFirstDisplayDateOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[6] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
     }
 
     public DateTypeAPI getFirstDisplayDateTypeAPI() {
@@ -145,9 +130,9 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getFirstDisplayDatesOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[7] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "firstDisplayDates");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public MapOfFlagsFirstDisplayDatesTypeAPI getFirstDisplayDatesTypeAPI() {
@@ -155,23 +140,23 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public boolean getLiveOnSite(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "liveOnSite") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[8]) == Boolean.TRUE;
     }
 
     public Boolean getLiveOnSiteBoxed(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "liveOnSite");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[9]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[8]);
     }
 
 
 
     public int getOffsiteReasonsOrdinal(int ordinal) {
-        if(fieldIndex[10] == -1)
+        if(fieldIndex[9] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "offsiteReasons");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
     }
 
     public ListOfStringTypeAPI getOffsiteReasonsTypeAPI() {
@@ -179,51 +164,51 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public boolean getContentApproved(int ordinal) {
-        if(fieldIndex[11] == -1)
+        if(fieldIndex[10] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]) == Boolean.TRUE;
     }
 
     public Boolean getContentApprovedBoxed(int ordinal) {
-        if(fieldIndex[11] == -1)
+        if(fieldIndex[10] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "contentApproved");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[10]);
     }
 
 
 
     public boolean getAllowIncomplete(int ordinal) {
-        if(fieldIndex[12] == -1)
+        if(fieldIndex[11] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "allowIncomplete") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]) == Boolean.TRUE;
     }
 
     public Boolean getAllowIncompleteBoxed(int ordinal) {
-        if(fieldIndex[12] == -1)
+        if(fieldIndex[11] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "allowIncomplete");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[11]);
     }
 
 
 
     public boolean getGoLivePartialSubDubIgnored(int ordinal) {
-        if(fieldIndex[13] == -1)
+        if(fieldIndex[12] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "goLivePartialSubDubIgnored") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[13]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]) == Boolean.TRUE;
     }
 
     public Boolean getGoLivePartialSubDubIgnoredBoxed(int ordinal) {
-        if(fieldIndex[13] == -1)
+        if(fieldIndex[12] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "goLivePartialSubDubIgnored");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[13]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[12]);
     }
 
 
 
     public int getAlternateLanguageOrdinal(int ordinal) {
-        if(fieldIndex[14] == -1)
+        if(fieldIndex[13] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "alternateLanguage");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[14]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[13]);
     }
 
     public StringTypeAPI getAlternateLanguageTypeAPI() {
@@ -231,51 +216,51 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public boolean getHasRequiredLanguages(int ordinal) {
-        if(fieldIndex[15] == -1)
+        if(fieldIndex[14] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredLanguages") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[14]) == Boolean.TRUE;
     }
 
     public Boolean getHasRequiredLanguagesBoxed(int ordinal) {
-        if(fieldIndex[15] == -1)
+        if(fieldIndex[14] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredLanguages");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[14]);
     }
 
 
 
     public boolean getHasRequiredStreams(int ordinal) {
-        if(fieldIndex[16] == -1)
+        if(fieldIndex[15] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredStreams") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]) == Boolean.TRUE;
     }
 
     public Boolean getHasRequiredStreamsBoxed(int ordinal) {
-        if(fieldIndex[16] == -1)
+        if(fieldIndex[15] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "hasRequiredStreams");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[15]);
     }
 
 
 
     public boolean getReleaseAsAvailable(int ordinal) {
-        if(fieldIndex[17] == -1)
+        if(fieldIndex[16] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "releaseAsAvailable") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[17]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]) == Boolean.TRUE;
     }
 
     public Boolean getReleaseAsAvailableBoxed(int ordinal) {
-        if(fieldIndex[17] == -1)
+        if(fieldIndex[16] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "releaseAsAvailable");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[17]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[16]);
     }
 
 
 
     public int getRemoveAssetOrdinal(int ordinal) {
-        if(fieldIndex[18] == -1)
+        if(fieldIndex[17] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "removeAsset");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[18]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[17]);
     }
 
     public StringTypeAPI getRemoveAssetTypeAPI() {
@@ -283,23 +268,23 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public boolean getRemoveFromWebsiteOverride(int ordinal) {
-        if(fieldIndex[19] == -1)
+        if(fieldIndex[18] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "removeFromWebsiteOverride") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[19]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[18]) == Boolean.TRUE;
     }
 
     public Boolean getRemoveFromWebsiteOverrideBoxed(int ordinal) {
-        if(fieldIndex[19] == -1)
+        if(fieldIndex[18] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "removeFromWebsiteOverride");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[19]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[18]);
     }
 
 
 
     public int getRequiredLangsOrdinal(int ordinal) {
-        if(fieldIndex[20] == -1)
+        if(fieldIndex[19] == -1)
             return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "requiredLangs");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[20]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[19]);
     }
 
     public SetOfStringTypeAPI getRequiredLangsTypeAPI() {
@@ -307,15 +292,15 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
     public boolean getSearchOnlyOverride(int ordinal) {
-        if(fieldIndex[21] == -1)
+        if(fieldIndex[20] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "searchOnlyOverride") == Boolean.TRUE;
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[21]) == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[20]) == Boolean.TRUE;
     }
 
     public Boolean getSearchOnlyOverrideBoxed(int ordinal) {
-        if(fieldIndex[21] == -1)
+        if(fieldIndex[20] == -1)
             return missingDataHandler().handleBoolean("Flags", ordinal, "searchOnlyOverride");
-        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[21]);
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[20]);
     }
 
 

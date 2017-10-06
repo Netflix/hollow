@@ -53,14 +53,6 @@ public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getGoLiveBoxed(ordinal);
     }
 
-    public boolean getContentApproved(int ordinal) {
-        return typeAPI.getContentApproved(ordinal);
-    }
-
-    public Boolean getContentApprovedBoxed(int ordinal) {
-        return typeAPI.getContentApprovedBoxed(ordinal);
-    }
-
     public boolean getAutoPlay(int ordinal) {
         return typeAPI.getAutoPlay(ordinal);
     }

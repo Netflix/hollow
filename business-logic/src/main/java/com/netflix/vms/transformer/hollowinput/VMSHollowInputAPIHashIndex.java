@@ -559,6 +559,37 @@ public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListene
         };
     }
 
+    public Iterable<MapOfFlagsFirstDisplayDatesHollow> findMapOfFlagsFirstDisplayDatesMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null)
+            return Collections.emptySet();
+
+        final HollowOrdinalIterator iter = matches.iterator();
+
+        return new Iterable<MapOfFlagsFirstDisplayDatesHollow>() {
+            public Iterator<MapOfFlagsFirstDisplayDatesHollow> iterator() {
+                return new Iterator<MapOfFlagsFirstDisplayDatesHollow>() {
+
+                    private int next = iter.next();
+
+                    public boolean hasNext() {
+                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
+                    }
+
+                    public MapOfFlagsFirstDisplayDatesHollow next() {
+                        MapOfFlagsFirstDisplayDatesHollow obj = api.getMapOfFlagsFirstDisplayDatesHollow(next);
+                        next = iter.next();
+                        return obj;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
+    }
+
     public Iterable<PersonCharacterHollow> findPersonCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null)

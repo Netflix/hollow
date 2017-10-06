@@ -26,10 +26,6 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public Boolean getGoLiveBoxed(int ordinal);
 
-    public boolean getContentApproved(int ordinal);
-
-    public Boolean getContentApprovedBoxed(int ordinal);
-
     public boolean getAutoPlay(int ordinal);
 
     public Boolean getAutoPlayBoxed(int ordinal);

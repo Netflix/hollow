@@ -50,14 +50,6 @@ public class FlagsHollow extends HollowObject {
         return delegate().getGoLiveBoxed(ordinal);
     }
 
-    public boolean _getContentApproved() {
-        return delegate().getContentApproved(ordinal);
-    }
-
-    public Boolean _getContentApprovedBoxed() {
-        return delegate().getContentApprovedBoxed(ordinal);
-    }
-
     public boolean _getAutoPlay() {
         return delegate().getAutoPlay(ordinal);
     }

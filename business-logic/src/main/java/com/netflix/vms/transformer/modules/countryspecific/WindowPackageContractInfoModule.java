@@ -5,7 +5,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
-import com.netflix.vms.transformer.hollowinput.RightsContractHollow;
+import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -48,18 +48,18 @@ public class WindowPackageContractInfoModule {
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
-    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsContractHollow rightsContract, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
+    public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsWindowContractHollow windowContractHollow, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
         
         
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) rightsContract._getContractId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getContractId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
-        info.videoContractInfo.primaryPackageId = (int) rightsContract._getPackageId();
+        info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
         assignContracInfo(info, contract);
-        info.videoContractInfo.assetBcp47Codes = rightsContract._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
+        info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
 
         // create package info
         info.videoPackageInfo = newEmptyVideoPackageInfo();
@@ -91,13 +91,13 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsContractHollow rightsContract, ContractHollow contract, int videoId) {
+    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow, ContractHollow contract, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) rightsContract._getContractId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getContractId();
         info.videoContractInfo.primaryPackageId = packageId;
         assignContracInfo(info, contract);
-        info.videoContractInfo.assetBcp47Codes = rightsContract._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
+        info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
         info.videoPackageInfo = getFilteredVideoPackageInfo(videoId, packageId);
         return info;
     }
