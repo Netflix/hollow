@@ -183,9 +183,11 @@ public class ContractRestrictionModule {
         if (contract._getPackageId() == packageId)
             return true;
 
-        for (RightsContractPackageHollow pkg : contract._getPackages()) {
-            if (pkg._getPackageId() == packageId)
-                return true;
+        if (contract._getPackages() != null) {
+            for (RightsContractPackageHollow pkg : contract._getPackages()) {
+                if (pkg._getPackageId() == packageId)
+                    return true;
+            }
         }
 
         return false;
