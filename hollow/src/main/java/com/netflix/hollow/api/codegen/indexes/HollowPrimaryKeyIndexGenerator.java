@@ -17,109 +17,76 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
+
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
-import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
  */
-public class HollowPrimaryKeyIndexGenerator implements HollowJavaFileGenerator {
+public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
+    protected final HollowDataset dataset;
+    protected final PrimaryKey pk;
 
-    private final String packageName;
-    private final String classname;
-    private final String apiClassname;
-    private final String classPostfix;
-    private final boolean useAggressiveSubstitutions;
-    private final HollowObjectSchema schema;
-    
-    public HollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema) {
-        this.classname = schema.getName() + "PrimaryKeyIndex";
-        this.apiClassname = apiClassname;
-        this.packageName = packageName;
-        this.classPostfix = classPostfix;
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
-        this.schema = schema;
-    }
-    
-    @Override
-    public String getClassName() {
-        return classname;
+    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping);
+        this.dataset = dataset;
+        this.pk = schema.getPrimaryKey();
+        isGenSimpleConstructor = true;
+        isParameterizedConstructorPublic = false;
+        isAutoListenToDataRefresh = false;
     }
 
     @Override
-    public String generate() {
-        StringBuilder builder = new StringBuilder();
-        
-        builder.append("package " + packageName + ";\n\n");
-        
-        
-        builder.append("import " + HollowConsumer.class.getName() + ";\n");
-        builder.append("import " + HollowAPI.class.getName() + ";\n");
-        builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
-        builder.append("import " + HollowPrimaryKeyIndex.class.getName() + ";\n");
-        builder.append("import " + HollowReadStateEngine.class.getName() + ";\n\n");
-        
-        builder.append("public class " + classname + " implements HollowConsumer.RefreshListener {\n\n");
-        
-        builder.append("    private HollowPrimaryKeyIndex idx;\n");
-        builder.append("    private " + apiClassname + " api;\n\n");
-        
-        builder.append("    public " + classname + "(HollowConsumer consumer) {\n");
-        builder.append("        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + schema.getName() + "\")).getPrimaryKey().getFieldPaths());\n");
-        builder.append("    }\n\n");
-        
-        builder.append("    public " + classname + "(HollowConsumer consumer, String... fieldPaths) {\n");
-        builder.append("        consumer.getRefreshLock().lock();\n");
-        builder.append("        try {\n");
-        builder.append("            this.api = (" + apiClassname + ")consumer.getAPI();\n");
-        builder.append("            this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), \"" + schema.getName() + "\", fieldPaths);\n");
-        builder.append("            idx.listenForDeltaUpdates();\n");
-        builder.append("            consumer.addRefreshListener(this);\n");
-        builder.append("        } catch(ClassCastException cce) {\n");
-        builder.append("            throw new ClassCastException(\"The HollowConsumer provided was not created with the " + apiClassname + " generated API class.\");\n");
-        builder.append("        } finally {\n");
-        builder.append("            consumer.getRefreshLock().unlock();\n");
-        builder.append("        }\n");
-        builder.append("    }\n\n");
+    protected String getClassName(HollowObjectSchema schema) {
+        return schema.getName() + "PrimaryKeyIndex";
+    }
 
-        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(Object... keys) {\n");
-        builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
+    @Override
+    protected void genFindMatchAPI(StringBuilder builder) {
+        List<String> params = new ArrayList<>();
+        List<String> fieldNames = new ArrayList<>();
+        for (int i = 0; i < pk.numFields(); i++) {
+            String fp = pk.getFieldPath(i);
+            String fn = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fp);
+            fieldNames.add(fn);
+
+            FieldType ft = pk.getFieldType(dataset, i);
+            if (FieldType.REFERENCE.equals(ft)) {
+                HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
+                params.add(refSchema.getName() + " " + fn);
+            } else {
+                params.add(HollowCodeGenerationUtils.getJavaScalarType(ft) + " " + fn);
+            }
+        }
+
+        StringBuilder paramsAsStr = new StringBuilder();
+        StringBuilder fieldNamesAsStr = new StringBuilder();
+        for (int i = 0; i < params.size(); i++) {
+            if (i > 0) {
+                paramsAsStr.append(", ");
+                fieldNamesAsStr.append(", ");
+            }
+            paramsAsStr.append(params.get(i));
+            fieldNamesAsStr.append(fieldNames.get(i));
+        }
+
+        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(" + paramsAsStr + ") {\n");
+        builder.append("        int ordinal = idx.getMatchingOrdinal(" + fieldNamesAsStr + ");\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
         builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
         builder.append("    }\n\n");
-        
-        builder.append("    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {\n");
-        builder.append("        idx.detachFromDeltaUpdates();\n");
-        builder.append("        idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());\n");
-        builder.append("        idx.listenForDeltaUpdates();\n");
-        builder.append("        this.api = (" + apiClassname + ")api;\n");
-        builder.append("    }\n\n");
-        
-        builder.append("    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {\n");
-        builder.append("        this.api = (" + apiClassname + ")api;\n");
-        builder.append("    }\n\n");
-
-        
-        builder.append("    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }\n");
-        builder.append("    @Override public void blobLoaded(HollowConsumer.Blob transition) { }\n");
-        builder.append("    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }\n");
-        builder.append("    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }\n");
-
-        builder.append("}");
-        
-        return builder.toString();
     }
-
-    
 }

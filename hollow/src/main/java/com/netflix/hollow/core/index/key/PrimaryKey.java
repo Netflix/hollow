@@ -29,7 +29,7 @@ import java.util.Arrays;
  * <p>
  * The field definitions in a primary key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
  * the field definition <i>movie.country.id</i> may be used to traverse a child record referenced by the field <i>movie</i>, its child
- * record referenced by the field <i>country</i>, and finally the country's field <i>id</i>. 
+ * record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
  * <p>
  *
  */
@@ -39,12 +39,12 @@ public class PrimaryKey {
     private final String[] fieldPaths;
 
     /**
-     * Define a PrimaryKey, which specifies a set of one or more field(s) which should be unique for each record of the given type. 
-     * 
+     * Define a PrimaryKey, which specifies a set of one or more field(s) which should be unique for each record of the given type.
+     *
      * @param type
-     * @param fieldPaths  The field definitions in a primary key may be hierarchical (traverse multiple record types) via dot-notation.  
-     * For example, the field definition <i>movie.country.id</i> may be used to traverse a child record referenced by the field <i>movie</i>, 
-     * its child record referenced by the field <i>country</i>, and finally the country's field <i>id</i>. 
+     * @param fieldPaths  The field definitions in a primary key may be hierarchical (traverse multiple record types) via dot-notation.
+     * For example, the field definition <i>movie.country.id</i> may be used to traverse a child record referenced by the field <i>movie</i>,
+     * its child record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
      */
     public PrimaryKey(String type, String... fieldPaths) {
         if (fieldPaths == null || fieldPaths.length == 0) throw new IllegalArgumentException("fieldPaths can't not be null or empty");
@@ -73,15 +73,19 @@ public class PrimaryKey {
         return getFieldType(dataset, type, fieldPaths[fieldPathIdx]);
     }
 
+    public HollowObjectSchema getFieldSchema(HollowDataset dataset, int fieldPathIdx) {
+        return getFieldSchema(dataset, type, fieldPaths[fieldPathIdx]);
+    }
+
     /**
-     * The field path index is the object schemas' field positions for a particular field path. 
+     * The field path index is the object schemas' field positions for a particular field path.
      */
     public int[] getFieldPathIndex(HollowDataset dataset, int fieldPathIdx) {
         return getFieldPathIndex(dataset, type, fieldPaths[fieldPathIdx]);
     }
 
     /**
-     * Returns the ultimate field type of the specified type/field path in the provided dataset. 
+     * Returns the ultimate field type of the specified type/field path in the provided dataset.
      */
     public static FieldType getFieldType(HollowDataset dataAccess, String type, String fieldPath) {
         HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
@@ -92,66 +96,81 @@ public class PrimaryKey {
     }
 
     /**
-     * Returns a separated field path, which has been auto-expanded if necessary based on the provided primary key field path. 
+     * Returns the ultimate field Schema of the specified type/field path in the provided dataset.
+     */
+    public static HollowObjectSchema getFieldSchema(HollowDataset dataAccess, String type, String fieldPath) {
+        HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
+        int pathIndexes[] = getFieldPathIndex(dataAccess, type, fieldPath);
+        for (int i = 0; i < pathIndexes.length; i++)
+            schema = (HollowObjectSchema)dataAccess.getSchema(schema.getReferencedType(pathIndexes[i]));
+        return schema;
+    }
+
+    /**
+     * Returns a separated field path, which has been auto-expanded if necessary based on the provided primary key field path.
      */
     public static String[] getCompleteFieldPathParts(HollowDataset dataset, String type, String fieldPath) {
         int fieldPathIdx[] = getFieldPathIndex(dataset, type, fieldPath);
         String fieldPathParts[] = new String[fieldPathIdx.length];
-        
+
         HollowObjectSchema schema = (HollowObjectSchema) dataset.getSchema(type);
         for(int i=0;i<fieldPathParts.length;i++) {
             fieldPathParts[i] = schema.getFieldName(fieldPathIdx[i]);
             schema = (HollowObjectSchema) dataset.getSchema(schema.getReferencedType(fieldPathIdx[i]));
         }
-        
+
         return fieldPathParts;
     }
-    
+
     /**
-     * The field path index is the object schemas' field positions for a particular field path. 
+     * The field path index is the object schemas' field positions for a particular field path.
      */
     public static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath) {
         boolean isReferenceFieldPath = fieldPath.endsWith("!");
-        
-        String paths[] = isReferenceFieldPath ? fieldPath.substring(0, fieldPath.length() - 1).split("\\.") : fieldPath.split("\\.");
+
+        return getFieldPathIndex(dataset, type, (isReferenceFieldPath ? fieldPath.substring(0, fieldPath.length() - 1) : fieldPath), !isReferenceFieldPath);
+    }
+
+    private static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath, boolean isAutoExpand) {
+        String paths[] = fieldPath.split("\\.");
         int pathIndexes[] = new int[paths.length];
 
         String refType = type;
 
         for(int i=0;i<paths.length;i++) {
             HollowSchema schema = dataset.getSchema(refType);
-            
+
             if(schema == null)
                 throw new IllegalArgumentException("Invalid field path declaration for type " + type + ": " + fieldPath +".  The type " + refType + " is unavailable.");
-            
+
             if(schema.getSchemaType() != SchemaType.OBJECT)
                 throw new IllegalArgumentException("Invalid field path declaration for type " + type + ": " + fieldPath + ".  " +
-                                                   "Field paths may only traverse through OBJECT types, but this declaration passes through a " + schema.getSchemaType().toString() + " type (" + refType + ").");
-            
-            
+                        "Field paths may only traverse through OBJECT types, but this declaration passes through a " + schema.getSchemaType().toString() + " type (" + refType + ").");
+
+
             HollowObjectSchema objectSchema = (HollowObjectSchema)dataset.getSchema(refType);
             pathIndexes[i] = objectSchema.getPosition(paths[i]);
-            
+
             if(pathIndexes[i] == -1)
                 throw new IllegalArgumentException("Invalid field path declaration for type " + type + ": " + fieldPath + ".  " +
-                                                   "At element " + i + ", the field " + paths[i] + " was not found in type " + refType + ".");
-            
+                        "At element " + i + ", the field " + paths[i] + " was not found in type " + refType + ".");
+
             refType = objectSchema.getReferencedType(pathIndexes[i]);
-            
+
             if(i < paths.length - 1 && refType == null)
                 throw new IllegalArgumentException("Invalid field path declaration for type " + type + ": " + fieldPath + ".  " +
-                                                   "No available traversal after element " + i + ": " + paths[i] + ".");
-            
-                
+                        "No available traversal after element " + i + ": " + paths[i] + ".");
+
+
         }
-        
-        if(!isReferenceFieldPath) {
+
+        if (isAutoExpand) {
             while(refType != null) {
                 HollowSchema schema = dataset.getSchema(refType);
-                
+
                 if(schema.getSchemaType() == SchemaType.OBJECT) {
                     HollowObjectSchema objectSchema = (HollowObjectSchema)schema;
-                    
+
                     if(objectSchema.numFields() == 1) {
                         pathIndexes = Arrays.copyOf(pathIndexes, pathIndexes.length + 1);
                         pathIndexes[pathIndexes.length - 1] = 0;
@@ -167,12 +186,12 @@ public class PrimaryKey {
                         return pathIndexes;
                     }
                 }
-                
+
                 throw new IllegalArgumentException("Invalid field path declaration for type " + type + ": " + fieldPath + ".  This path ends in a REFERENCE field which is not auto-traversable.  " +
-                                                   "If this is intended to actually indicate a REFERENCE field, specify the field path as \"" + fieldPath + "!\".");
+                        "If this is intended to actually indicate a REFERENCE field, specify the field path as \"" + fieldPath + "!\".");
             }
         }
-        
+
         return pathIndexes;
     }
 

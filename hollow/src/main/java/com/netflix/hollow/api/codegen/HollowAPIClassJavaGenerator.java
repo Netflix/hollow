@@ -56,18 +56,18 @@ import java.util.Set;
  * 
  * @see HollowAPIGenerator
  */
-public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
+public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "";
 
-    private final String packageName;
-    private final String className;
     private final HollowDataset dataset;
     private final boolean parameterizeClassNames;
     private final String classPostfix;
     private final boolean useAggressiveSubstitutions;
 
 
-    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions) {
-        this.packageName = packageName;
+    public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+
         this.className = apiClassname;
         this.dataset = dataset;
         this.parameterizeClassNames = parameterizeClassNames;
@@ -76,19 +76,11 @@ public class HollowAPIClassJavaGenerator implements HollowJavaFileGenerator {
     }
 
     @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
     public String generate() {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
 
         StringBuilder builder = new StringBuilder();
-
-        if(!"".equals(packageName)) {
-            builder.append("package ").append(packageName).append(";\n\n");
-        }
+        appendPackageAndCommonImports(builder);
 
         builder.append("import ").append(Collection.class.getName()).append(";\n");
         builder.append("import ").append(Collections.class.getName()).append(";\n");

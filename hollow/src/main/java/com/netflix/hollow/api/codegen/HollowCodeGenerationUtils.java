@@ -32,18 +32,27 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
  */
 public class HollowCodeGenerationUtils {
-    
+
+    private static final Set<String> NATIVE_TYPES = new HashSet<>();
     private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
     private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
-    
+
     static {
+        for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
+            NATIVE_TYPES.add(clzz.getSimpleName());
+        }
+
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
@@ -51,7 +60,7 @@ public class HollowCodeGenerationUtils {
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Double", "HDouble");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Boolean", "HBoolean");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Object", "HObject");
-        
+
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("AbstractMethodError", "HAbstractMethodError");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Appendable", "HAppendable");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("ArithmeticException", "HArithmeticException");
@@ -149,7 +158,7 @@ public class HollowCodeGenerationUtils {
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("VirtualMachineError", "HVirtualMachineError");
         AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.put("Void", "HVoid");
     }
-    
+
     public static String typeAPIClassname(String typeName) {
         return uppercase(typeName) + "TypeAPI";
     }
@@ -164,14 +173,14 @@ public class HollowCodeGenerationUtils {
 
     public static String hollowImplClassname(String typeName, String classPostfix, boolean useAggressiveSubstitutions) {
         String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
-        
-        String sub = useAggressiveSubstitutions ? 
-                                  AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) : 
-                                  DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
-        if(sub != null)
-            return sub;
-        
-        return classname;
+
+        String sub = useAggressiveSubstitutions ?
+                AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
+                    DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
+                if(sub != null)
+                    return sub;
+
+                return classname;
     }
 
     public static String delegateInterfaceName(String typeName) {
@@ -251,46 +260,122 @@ public class HollowCodeGenerationUtils {
         str = str.replace('.', '_');
         return str;
     }
-    
+
     public static String getJavaBoxedType(FieldType fieldType) {
         switch(fieldType) {
-        case BOOLEAN:
-            return "Boolean";
-        case BYTES:
-            return "byte[]";
-        case DOUBLE:
-            return "Double";
-        case FLOAT:
-            return "Float";
-        case LONG:
-            return "Long";
-        case INT:
-        case REFERENCE:
-            return "Integer";
-        case STRING:
-            return "String";
+            case BOOLEAN:
+                return "Boolean";
+            case BYTES:
+                return "byte[]";
+            case DOUBLE:
+                return "Double";
+            case FLOAT:
+                return "Float";
+            case LONG:
+                return "Long";
+            case INT:
+            case REFERENCE:
+                return "Integer";
+            case STRING:
+                return "String";
         }
         throw new IllegalArgumentException("Java boxed type is not known for FieldType." + fieldType.toString());
     }
-    
+
     public static String getJavaScalarType(FieldType fieldType) {
         switch(fieldType) {
-        case BOOLEAN:
-            return "boolean";
-        case BYTES:
-            return "byte[]";
-        case DOUBLE:
-            return "double";
-        case FLOAT:
-            return "float";
-        case LONG:
-            return "long";
-        case INT:
-        case REFERENCE:
-            return "int";
-        case STRING:
-            return "String";
+            case BOOLEAN:
+                return "boolean";
+            case BYTES:
+                return "byte[]";
+            case DOUBLE:
+                return "double";
+            case FLOAT:
+                return "float";
+            case LONG:
+                return "long";
+            case INT:
+            case REFERENCE:
+                return "int";
+            case STRING:
+                return "String";
         }
         throw new IllegalArgumentException("Java scalar type is not known for FieldType." + fieldType.toString());
+    }
+
+    private static final Set<String> booleanMethodPrefixes = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            "is", "has", "do", "should", "was", "contains", "enable", "disable", "get")));
+    public static Set<String> getBooleanMethodPrefixes() { return booleanMethodPrefixes; }
+
+    /**
+     * Rules: prepend "get" / "is" + upper case first char of field name
+     *
+     * boolean/Boolean field:
+     *    - has a boolean prefix (@see {@link #booleanMethodPrefixes}), just return it; otherwise, prepend "get" + upper case first char
+     *
+     *      boolean isPrimary - isPrimary()
+     *      boolean hasStreams - hasStreams()
+     *      boolean playable - getPlayable()
+     *      boolean value - getValue()
+     *
+     * other field type: prepend "get" + upper case first char
+     *
+     *      String title - getTitle()
+     *
+     * @param fieldName
+     *            name of field
+     * @param clazz
+     *            type of field
+     * @return accessor method name
+     */
+    public static String generateAccessortMethodName(String fieldName, Class<?> clazz) {
+        String prefix = "get";
+        if (boolean.class.equals(clazz) || Boolean.class.equals(clazz)) {
+            for (String booleanPrefix : booleanMethodPrefixes) {
+                if (fieldName.startsWith(booleanPrefix) && fieldName.length() > booleanPrefix.length()) {
+                    char firstCharAfterBooleanPrefix = fieldName.charAt(booleanPrefix.length());
+                    if (Character.isUpperCase(firstCharAfterBooleanPrefix)) {
+                        return fieldName;
+                    }
+                }
+            }
+        }
+
+        return substituteInvalidChars(prefix + uppercase(fieldName));
+    }
+
+    public static String generateBooleanAccessorMethodName(String fieldName, boolean useBooleanFieldErgonomics) {
+        return useBooleanFieldErgonomics ? generateAccessortMethodName(fieldName, boolean.class) : "get" + uppercase(fieldName);
+    }
+
+    /**
+     * Convert field path into Param name
+     *
+     * Eg:
+     *  - Actor -> actor
+     *  - Actor.name -> actorName
+     */
+    public static String normalizeFieldPathToParamName(String fieldPath) {
+        String result = null;
+        if (fieldPath.contains(".")) {
+            String[] parts = fieldPath.split("\\.");
+            StringBuilder sb = new StringBuilder();
+            sb.append(lowercase(parts[0]));
+            for (int i = 1; i < parts.length; i++) {
+                sb.append(uppercase(parts[i]));
+            }
+            result = sb.toString();
+        } else {
+            result = lowercase(fieldPath);
+        }
+
+        if (result.endsWith("!")) {
+            return result.substring(0, result.length() - 1);
+        }
+        return result;
+    }
+
+    public static boolean isNativeType(String type) {
+        return NATIVE_TYPES.contains(type);
     }
 }

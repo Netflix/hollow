@@ -22,15 +22,18 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImp
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isNativeType;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
+import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Set;
 
 /**
@@ -39,21 +42,22 @@ import java.util.Set;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
+public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "";
 
     private final HollowObjectSchema schema;
-    private final String packageName;
     private final String apiClassname;
-    private final String className;
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
     private final String classPostfix;
     private final String getterPrefix;
     private final boolean useAggressiveSubstitutions;
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
+    private final boolean useBooleanFieldErgonomics;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts) {
-        this.packageName = packageName;
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping) {
+        super(packageName, computeSubPackageName(schema), usePackageGrouping);
+
         this.apiClassname = apiClassname;
         this.schema = schema;
         this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
@@ -63,18 +67,21 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
         this.getterPrefix = getterPrefix;
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.ergonomicShortcuts = ergonomicShortcuts;
+        this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
     }
-
-    @Override
-    public String getClassName() {
-        return className;
+    
+    private static String computeSubPackageName(HollowObjectSchema schema) {
+        String type = schema.getName();
+        if (isNativeType(type)) {
+            return "core";
+        }
+        return SUB_PACKAGE_NAME;
     }
 
     @Override
     public String generate() {
         StringBuilder classBuilder = new StringBuilder();
-
-        classBuilder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(classBuilder);
 
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n\n");
@@ -176,10 +183,12 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
             case FLOAT:
             case INT:
             case LONG:
-                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append("get" + uppercase(fieldName) + "Boxed() {\n");
+                String methodName = (shortcut.getType()==FieldType.BOOLEAN) ? generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName);
+
+                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "Boxed() {\n");
                 builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
                 builder.append("    }\n\n");
-                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
                 builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
                 builder.append("    }\n\n");
                 break;
@@ -201,10 +210,16 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
         }
 
         String referencedType = schema.getReferencedType(fieldNum);
-        
+
         boolean parameterize = parameterizeClassNames || parameterizedTypes.contains(referencedType);
 
-        String methodName = shortcut != null ? getterPrefix + "get" + uppercase(fieldName) + "HollowReference" : getterPrefix + "get" + uppercase(fieldName); 
+        String methodName = null;
+        if (shortcut != null) {
+            methodName = getterPrefix + "get" + uppercase(fieldName) + "HollowReference";
+        } else {
+            boolean isBooleanRefType = Boolean.class.getSimpleName().equals(referencedType);
+            methodName = getterPrefix + (isBooleanRefType ?  generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName)); 
+        }
 
         if(parameterize)
             builder.append("    public <T> T ").append(methodName).append("() {\n");
@@ -288,13 +303,14 @@ public class HollowObjectJavaGenerator implements HollowJavaFileGenerator {
     private String generateBooleanFieldAccessor(int fieldNum) {
         StringBuilder builder = new StringBuilder();
 
-        String fieldName = substituteInvalidChars(schema.getFieldName(fieldNum));
+        String fieldName = schema.getFieldName(fieldNum);
+        String methodName = generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics);
 
-        builder.append("    public boolean ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("() {\n");
+        builder.append("    public boolean ").append(getterPrefix).append(methodName).append("() {\n");
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Boolean ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
+        builder.append("    public Boolean ").append(getterPrefix).append(methodName).append("Boxed() {\n");
         builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
         builder.append("    }");
 

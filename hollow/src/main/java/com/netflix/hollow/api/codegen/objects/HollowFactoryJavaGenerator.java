@@ -30,7 +30,7 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowJavaFileGenerator;
+import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
@@ -43,30 +43,23 @@ import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
  * @see HollowAPIGenerator
  * 
  */
-public class HollowFactoryJavaGenerator implements HollowJavaFileGenerator {
+public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator {
+    public static final String SUB_PACKAGE_NAME = "core";
 
-    private final String packageName;
     private final String objectClassName;
-    private final String className;
     private final HollowSchema schema;
 
-    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions) {
-        this.packageName = packageName;
+    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
         this.objectClassName = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.className = hollowFactoryClassname(schema.getName());
         this.schema = schema;
     }
 
     @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("package " + packageName + ";\n\n");
+        appendPackageAndCommonImports(builder);
 
         builder.append("import " + HollowFactory.class.getName() + ";\n");
         builder.append("import " + HollowTypeDataAccess.class.getName() + ";\n");
