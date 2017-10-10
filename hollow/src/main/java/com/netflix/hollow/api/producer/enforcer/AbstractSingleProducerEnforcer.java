@@ -86,7 +86,7 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     }
 
     // visible for testing
-    boolean getWasPrimary() {
+    protected boolean getWasPrimary() {
         return wasPrimary;
     }
 
