@@ -164,7 +164,7 @@ public class HollowProducer {
             int numStatesBetweenSnapshots,
             long targetMaxTypeShardSize,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
-        this(blobStager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, new DummyBlobStorageCleaner());
+        this(blobStager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer());
     }
 
     protected HollowProducer(BlobStager blobStager,
