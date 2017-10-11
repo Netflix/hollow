@@ -311,7 +311,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -349,7 +350,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -2563,7 +2564,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2965,7 +2966,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -3027,7 +3028,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -3497,7 +3498,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -3535,7 +3537,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -5749,7 +5751,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6151,7 +6153,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -6213,7 +6215,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -6683,7 +6685,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -6721,7 +6724,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -8935,7 +8938,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9337,7 +9340,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -9399,7 +9402,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -9988,7 +9991,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -10026,7 +10030,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -12240,7 +12244,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -12642,7 +12646,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -12704,7 +12708,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -13174,7 +13178,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -13212,7 +13217,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -15426,7 +15431,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -15828,7 +15833,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -15890,7 +15895,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -16360,7 +16365,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -16398,7 +16404,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -18656,7 +18662,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19075,7 +19081,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -19149,7 +19155,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -19619,7 +19625,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -19657,7 +19664,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -21915,7 +21922,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -22334,7 +22341,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -22408,7 +22415,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -22878,7 +22885,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -22916,7 +22924,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -25174,7 +25182,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -25593,7 +25601,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -25667,7 +25675,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
@@ -26137,7 +26145,8 @@
                 "netflix:common-data-format",
                 "netflix:concurrent",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "org.reflections:reflections"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -26175,7 +26184,7 @@
             ]
         },
         "com.google.guava:guava": {
-            "locked": "20.0",
+            "locked": "19.0",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -28433,7 +28442,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.41",
+            "locked": "60.43",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -28852,7 +28861,7 @@
             ]
         },
         "org.javassist:javassist": {
-            "locked": "3.21.0-GA",
+            "locked": "3.20.0-GA",
             "transitive": [
                 "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command",
@@ -28926,7 +28935,7 @@
             ]
         },
         "org.reflections:reflections": {
-            "locked": "0.9.11",
+            "locked": "0.9.10",
             "transitive": [
                 "netflix:vms-utils"
             ]
