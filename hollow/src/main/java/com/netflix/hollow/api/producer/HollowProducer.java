@@ -153,7 +153,21 @@ public class HollowProducer {
 
         this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null, new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer());
     }
-    
+
+    @Deprecated // TOBE cleaned up on Hollow 3
+    protected HollowProducer(BlobStager blobStager,
+            Publisher publisher,
+            Announcer announcer,
+            List<Validator> validators,
+            List<HollowProducerListener> listeners,
+            VersionMinter versionMinter,
+            Executor snapshotPublishExecutor,
+            int numStatesBetweenSnapshots,
+            long targetMaxTypeShardSize) {
+        this(blobStager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, null, new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer());
+    }
+
+    @Deprecated // TOBE cleaned up on Hollow 3
     protected HollowProducer(BlobStager blobStager,
             Publisher publisher,
             Announcer announcer,
