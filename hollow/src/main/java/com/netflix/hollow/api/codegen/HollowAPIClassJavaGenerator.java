@@ -23,6 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowObj
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.consumer.HollowConsumerAPI;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider;
@@ -86,6 +87,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import ").append(Collections.class.getName()).append(";\n");
         builder.append("import ").append(Set.class.getName()).append(";\n");
         builder.append("import ").append(Map.class.getName()).append(";\n");
+        builder.append("import ").append(HollowConsumerAPI.class.getName()).append(";\n");
         builder.append("import ").append(HollowAPI.class.getName()).append(";\n");
         builder.append("import ").append(HollowDataAccess.class.getName()).append(";\n");
         builder.append("import ").append(HollowTypeDataAccess.class.getName()).append(";\n");
@@ -108,7 +110,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
 
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class ").append(className).append(" extends HollowAPI {\n\n");
+        builder.append("public class ").append(className).append(" extends HollowAPI implements HollowConsumerAPI {\n\n");
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 
