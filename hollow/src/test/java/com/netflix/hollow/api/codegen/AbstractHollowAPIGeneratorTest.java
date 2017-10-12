@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 
 public class AbstractHollowAPIGeneratorTest {
-    protected boolean isCleanupAfterEnabled = false;
+    protected boolean isCleanupAfterEnabled = true;
     protected String tmpFolder = System.getProperty("java.io.tmpdir");
     protected String sourceFolder = String.format("%s/src", tmpFolder);
     protected String clazzFolder = String.format("%s/classes", tmpFolder);

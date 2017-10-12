@@ -31,7 +31,11 @@ abstract class HollowMetrics {
     private long totalHeapFootprint = 0L;
     private int totalPopulatedOrdinals = 0;
 
-    public void update(HollowReadStateEngine hollowReadStateEngine, long version) {
+    protected void update(long version) {
+        setCurrentVersion(version);
+    }
+
+    protected void update(HollowReadStateEngine hollowReadStateEngine, long version) {
         setCurrentVersion(version);
         calculateTypeMetrics(hollowReadStateEngine);
     }

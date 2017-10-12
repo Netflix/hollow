@@ -45,8 +45,13 @@ public class HollowProducerMetrics extends HollowMetrics {
             return;
         }
         cyclesSucceeded++;
-        HollowReadStateEngine hollowReadStateEngine = producerStatus.getReadState().getStateEngine();
-        super.update(hollowReadStateEngine, producerStatus.getVersion());
+
+        if(producerStatus.getReadState() != null) {
+            HollowReadStateEngine hollowReadStateEngine = producerStatus.getReadState().getStateEngine();
+            super.update(hollowReadStateEngine, producerStatus.getVersion());
+        } else {
+            super.update(producerStatus.getVersion());
+        }
     }
 
     public void updateBlobTypeMetrics(HollowProducerListener.PublishStatus publishStatus) {

@@ -62,8 +62,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + type + "> {\n\n");
-
+        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type, classPostfix, useAggressiveSubstitutions) + "> {\n\n");
         {
             genConstructors(builder);
             genPublicAPIs(builder);
