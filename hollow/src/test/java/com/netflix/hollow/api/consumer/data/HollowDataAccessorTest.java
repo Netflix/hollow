@@ -56,6 +56,9 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
         roundTripSnapshot();
         {
             GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
+            dAccessor.computeDataChange();
+            Assert.assertTrue(dAccessor.isDataChangeComputed());
+
             Assert.assertEquals(3, dAccessor.getAddedRecords().size());
             assertList(dAccessor.getAddedRecords(), Arrays.asList(1, 2, 3));
             Assert.assertTrue(dAccessor.getRemovedRecords().isEmpty());
@@ -73,12 +76,16 @@ public class HollowDataAccessorTest extends AbstractStateEngineTest {
         roundTripDelta();
         {
             GenericHollowRecordDataAccessor dAccessor = new GenericHollowRecordDataAccessor(readStateEngine, TEST_TYPE);
+            Assert.assertFalse(dAccessor.isDataChangeComputed()); // Make sure it does not pre compute
+
             Assert.assertEquals(2, dAccessor.getAddedRecords().size());
             assertList(dAccessor.getAddedRecords(), Arrays.asList(1000, 0));
             Assert.assertEquals(1, dAccessor.getRemovedRecords().size());
             assertList(dAccessor.getRemovedRecords(), Arrays.asList(2));
             Assert.assertEquals(1, dAccessor.getUpdatedRecords().size());
             assertUpdatedList(dAccessor.getUpdatedRecords(), Arrays.asList("three"), Arrays.asList("three_updated"));
+
+            Assert.assertTrue(dAccessor.isDataChangeComputed()); // Make sure data change is computed once data change API are invoked
         }
 
         HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(TEST_TYPE);
