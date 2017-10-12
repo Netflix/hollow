@@ -25,27 +25,39 @@ import java.util.Collection;
 
 public interface HollowConsumerAPI {
 
-    public Collection<HBoolean> getAllHBoolean();
+    public interface BooleanRetriever {
+        public Collection<HBoolean> getAllHBoolean();
 
-    public HBoolean getHBoolean(int ordinal);
+        public HBoolean getHBoolean(int ordinal);
+    }
 
-    public Collection<HDouble> getAllHDouble();
+    public interface DoubleRetriever {
+        public Collection<HDouble> getAllHDouble();
 
-    public HDouble getHDouble(int ordinal);
+        public HDouble getHDouble(int ordinal);
+    }
 
-    public Collection<HFloat> getAllHFloat();
+    public interface FloatRetriever {
+        public Collection<HFloat> getAllHFloat();
 
-    public HFloat getHFloat(int ordinal);
+        public HFloat getHFloat(int ordinal);
+    }
 
-    public Collection<HInteger> getAllHInteger();
+    public interface IntegerRetriever {
+        public Collection<HInteger> getAllHInteger();
 
-    public HInteger getHInteger(int ordinal);
+        public HInteger getHInteger(int ordinal);
+    }
 
-    public Collection<HLong> getAllHLong();
+    public interface LongRetriever {
+        public Collection<HLong> getAllHLong();
 
-    public HLong getHLong(int ordinal);
+        public HLong getHLong(int ordinal);
+    }
 
-    public Collection<HString> getAllHString();
+    public interface StringRetriever {
+        public Collection<HString> getAllHString();
 
-    public HString getHString(int ordinal);
+        public HString getHString(int ordinal);
+    }
 }

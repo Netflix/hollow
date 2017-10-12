@@ -33,6 +33,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,13 +45,13 @@ import java.util.Set;
  */
 public class HollowCodeGenerationUtils {
 
-    private static final Set<String> NATIVE_TYPES = new HashSet<>();
+    private static final Set<String> PRIMITIVE_TYPES = new HashSet<>();
     private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
     private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
 
     static {
         for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
-            NATIVE_TYPES.add(clzz.getSimpleName());
+            PRIMITIVE_TYPES.add(clzz.getSimpleName());
         }
 
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
@@ -244,6 +245,10 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String uppercase(String str) {
+        return upperFirstChar(str);
+    }
+
+    public static String upperFirstChar(String str) {
         if(str == null || str.length() == 0)
             return str;
 
@@ -375,7 +380,18 @@ public class HollowCodeGenerationUtils {
         return result;
     }
 
-    public static boolean isNativeType(String type) {
-        return NATIVE_TYPES.contains(type);
+    public static boolean isPrimitiveType(String type) {
+        return PRIMITIVE_TYPES.contains(type);
+    }
+
+    public static Set<String> getPrimitiveTypes(Collection<HollowSchema> schemaList) {
+        Set<String> primitiveTypes = new HashSet<>();
+        for (HollowSchema schema : schemaList) {
+            String type = schema.getName();
+            if (!isPrimitiveType(type)) continue;
+
+            primitiveTypes.add(type);
+        }
+        return primitiveTypes;
     }
 }

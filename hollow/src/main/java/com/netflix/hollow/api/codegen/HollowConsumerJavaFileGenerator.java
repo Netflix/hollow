@@ -23,10 +23,10 @@ package com.netflix.hollow.api.codegen;
  * @author dsu
  */
 public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileGenerator {
-    private final boolean usePackageGrouping;
-    private final boolean useHollowPrimitiveTypes;
-    private final String packageName;
-    private final String subPackageName;
+    protected final boolean usePackageGrouping;
+    protected final boolean useHollowPrimitiveTypes;
+    protected final String packageName;
+    protected final String subPackageName;
     protected String className;
 
     public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {

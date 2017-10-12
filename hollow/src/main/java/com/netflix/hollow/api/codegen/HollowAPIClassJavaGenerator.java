@@ -88,6 +88,7 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import ").append(Set.class.getName()).append(";\n");
         builder.append("import ").append(Map.class.getName()).append(";\n");
         builder.append("import ").append(HollowConsumerAPI.class.getName()).append(";\n");
+        builder.append("import ").append(HollowConsumerAPI.class.getName()).append(".*;\n");
         builder.append("import ").append(HollowAPI.class.getName()).append(";\n");
         builder.append("import ").append(HollowDataAccess.class.getName()).append(";\n");
         builder.append("import ").append(HollowTypeDataAccess.class.getName()).append(";\n");
@@ -108,9 +109,19 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import ").append(SampleResult.class.getName()).append(";\n");
         builder.append("import ").append(AllHollowRecordCollection.class.getName()).append(";\n");
 
-
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class ").append(className).append(" extends HollowAPI implements HollowConsumerAPI {\n\n");
+        builder.append("public class ").append(className).append(" extends HollowAPI ");
+        Set<String> primitiveTypes = HollowCodeGenerationUtils.getPrimitiveTypes(schemaList); // Implement Primitive Type Retriever(s)
+        if (useHollowPrimitiveTypes && !primitiveTypes.isEmpty()) {
+            builder.append("implements ");
+            int itemCount = 0;
+            for(String pType : primitiveTypes) {
+                if (itemCount++ > 0) builder.append(",");
+
+                builder.append(" HollowConsumerAPI.").append(HollowCodeGenerationUtils.upperFirstChar(pType)).append("Retriever");
+            }
+        }
+        builder.append(" {\n\n");
 
         builder.append("    private final HollowObjectCreationSampler objectCreationSampler;\n\n");
 

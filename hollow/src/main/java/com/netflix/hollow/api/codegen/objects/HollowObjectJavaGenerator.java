@@ -23,7 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isNativeType;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
@@ -72,7 +72,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     
     private static String computeSubPackageName(HollowObjectSchema schema) {
         String type = schema.getName();
-        if (isNativeType(type)) {
+        if (isPrimitiveType(type)) {
             return "core";
         }
         return SUB_PACKAGE_NAME;
