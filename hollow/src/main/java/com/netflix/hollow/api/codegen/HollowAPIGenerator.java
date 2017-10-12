@@ -193,20 +193,16 @@ public class HollowAPIGenerator {
     private void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
-            boolean isGenCoreClasses = !(useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type));
+            if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type 
 
-            if (isGenCoreClasses) {
-                generateFile(directory, getStaticAPIGenerator(schema));
-                generateFile(directory, getHollowObjectGenerator(schema));
-                generateFile(directory, getHollowFactoryGenerator(schema));
-            }
+            generateFile(directory, getStaticAPIGenerator(schema));
+            generateFile(directory, getHollowObjectGenerator(schema));
+            generateFile(directory, getHollowFactoryGenerator(schema));
 
             if(schema.getSchemaType() == SchemaType.OBJECT) {
-                if (isGenCoreClasses) {
-                    generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
-                    generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
-                    generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
-                }
+                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
+                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
+                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
 
                 generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes));
                 if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
