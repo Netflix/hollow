@@ -88,7 +88,6 @@ public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import ").append(Set.class.getName()).append(";\n");
         builder.append("import ").append(Map.class.getName()).append(";\n");
         builder.append("import ").append(HollowConsumerAPI.class.getName()).append(";\n");
-        builder.append("import ").append(HollowConsumerAPI.class.getName()).append(".*;\n");
         builder.append("import ").append(HollowAPI.class.getName()).append(";\n");
         builder.append("import ").append(HollowDataAccess.class.getName()).append(";\n");
         builder.append("import ").append(HollowTypeDataAccess.class.getName()).append(";\n");
