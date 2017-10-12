@@ -7,19 +7,17 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.type.HDouble;
 
-public class DoubleDataAccessor extends AbstractHollowDataAccessor<HDouble> {
+public class DoubleDataAccessor extends AbstractHollowDataAccessor<Double> {
 
-    public static final String TYPE = "HDouble";
+    public static final String TYPE = "Double";
     private HollowConsumerAPI.DoubleRetriever api;
 
     public DoubleDataAccessor(HollowConsumer consumer) {
-        super(consumer, TYPE);
-        this.api = (HollowConsumerAPI.DoubleRetriever)consumer.getAPI();
+        this(consumer.getStateEngine(), (HollowConsumerAPI.DoubleRetriever)consumer.getAPI());
     }
 
     public DoubleDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.DoubleRetriever api) {
-        super(rStateEngine, TYPE);
-        this.api = api;
+        this(rStateEngine, api, "value");
     }
 
     public DoubleDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.DoubleRetriever api, String ... fieldPaths) {
@@ -32,7 +30,8 @@ public class DoubleDataAccessor extends AbstractHollowDataAccessor<HDouble> {
         this.api = api;
     }
 
-    @Override public HDouble getRecord(int ordinal){
-        return api.getHDouble(ordinal);
+    @Override public Double getRecord(int ordinal){
+        HDouble val = api.getHDouble(ordinal);
+        return val == null ? null : val.getValueBoxed();
     }
 }

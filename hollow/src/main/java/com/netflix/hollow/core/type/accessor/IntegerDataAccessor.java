@@ -7,19 +7,17 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.type.HInteger;
 
-public class IntegerDataAccessor extends AbstractHollowDataAccessor<HInteger> {
+public class IntegerDataAccessor extends AbstractHollowDataAccessor<Integer> {
 
-    public static final String TYPE = "HInteger";
+    public static final String TYPE = "Integer";
     private HollowConsumerAPI.IntegerRetriever api;
 
     public IntegerDataAccessor(HollowConsumer consumer) {
-        super(consumer, TYPE);
-        this.api = (HollowConsumerAPI.IntegerRetriever)consumer.getAPI();
+        this(consumer.getStateEngine(), (HollowConsumerAPI.IntegerRetriever)consumer.getAPI());
     }
 
     public IntegerDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.IntegerRetriever api) {
-        super(rStateEngine, TYPE);
-        this.api = api;
+        this(rStateEngine, api, "value");
     }
 
     public IntegerDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.IntegerRetriever api, String ... fieldPaths) {
@@ -32,8 +30,8 @@ public class IntegerDataAccessor extends AbstractHollowDataAccessor<HInteger> {
         this.api = api;
     }
 
-    @Override public HInteger getRecord(int ordinal){
-        return api.getHInteger(ordinal);
+    @Override public Integer getRecord(int ordinal){
+        HInteger val = api.getHInteger(ordinal);
+        return val == null ? null : val.getValueBoxed();
     }
-
 }

@@ -7,19 +7,17 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.type.HLong;
 
-public class LongDataAccessor extends AbstractHollowDataAccessor<HLong> {
+public class LongDataAccessor extends AbstractHollowDataAccessor<Long> {
 
-    public static final String TYPE = "HLong";
+    public static final String TYPE = "Long";
     private HollowConsumerAPI.LongRetriever api;
 
     public LongDataAccessor(HollowConsumer consumer) {
-        super(consumer, TYPE);
-        this.api = (HollowConsumerAPI.LongRetriever)consumer.getAPI();
+        this(consumer.getStateEngine(), (HollowConsumerAPI.LongRetriever)consumer.getAPI());
     }
 
     public LongDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.LongRetriever api) {
-        super(rStateEngine, TYPE);
-        this.api = api;
+        this(rStateEngine, api, "value");
     }
 
     public LongDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.LongRetriever api, String ... fieldPaths) {
@@ -32,8 +30,8 @@ public class LongDataAccessor extends AbstractHollowDataAccessor<HLong> {
         this.api = api;
     }
 
-    @Override public HLong getRecord(int ordinal){
-        return api.getHLong(ordinal);
+    @Override public Long getRecord(int ordinal){
+        HLong val = api.getHLong(ordinal);
+        return val==null ? null : val.getValueBoxed();
     }
-
 }

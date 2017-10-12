@@ -7,19 +7,17 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.type.HString;
 
-public class StringDataAccessor extends AbstractHollowDataAccessor<HString> {
+public class StringDataAccessor extends AbstractHollowDataAccessor<String> {
 
-    public static final String TYPE = "HString";
+    public static final String TYPE = "String";
     private HollowConsumerAPI.StringRetriever api;
 
     public StringDataAccessor(HollowConsumer consumer) {
-        super(consumer, TYPE);
-        this.api = (HollowConsumerAPI.StringRetriever)consumer.getAPI();
+        this(consumer.getStateEngine(), (HollowConsumerAPI.StringRetriever)consumer.getAPI());
     }
 
     public StringDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.StringRetriever api) {
-        super(rStateEngine, TYPE);
-        this.api = api;
+        this(rStateEngine, api, "value");
     }
 
     public StringDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.StringRetriever api, String ... fieldPaths) {
@@ -32,8 +30,8 @@ public class StringDataAccessor extends AbstractHollowDataAccessor<HString> {
         this.api = api;
     }
 
-    @Override public HString getRecord(int ordinal){
-        return api.getHString(ordinal);
+    @Override public String getRecord(int ordinal){
+        HString val = api.getHString(ordinal);
+        return val == null ? null : val.getValue();
     }
-
 }

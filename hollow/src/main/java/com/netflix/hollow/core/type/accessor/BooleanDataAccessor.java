@@ -7,19 +7,17 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.type.HBoolean;
 
-public class BooleanDataAccessor extends AbstractHollowDataAccessor<HBoolean> {
+public class BooleanDataAccessor extends AbstractHollowDataAccessor<Boolean> {
 
-    public static final String TYPE = "HBoolean";
+    public static final String TYPE = "Boolean";
     private HollowConsumerAPI.BooleanRetriever api;
 
     public BooleanDataAccessor(HollowConsumer consumer) {
-        super(consumer, TYPE);
-        this.api = (HollowConsumerAPI.BooleanRetriever)consumer.getAPI();
+        this(consumer.getStateEngine(), (HollowConsumerAPI.BooleanRetriever)consumer.getAPI());
     }
 
     public BooleanDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.BooleanRetriever api) {
-        super(rStateEngine, TYPE);
-        this.api = api;
+        this(rStateEngine, api, "value");
     }
 
     public BooleanDataAccessor(HollowReadStateEngine rStateEngine, HollowConsumerAPI.BooleanRetriever api, String ... fieldPaths) {
@@ -32,8 +30,8 @@ public class BooleanDataAccessor extends AbstractHollowDataAccessor<HBoolean> {
         this.api = api;
     }
 
-    @Override public HBoolean getRecord(int ordinal){
-        return api.getHBoolean(ordinal);
+    @Override public Boolean getRecord(int ordinal){
+        HBoolean val = api.getHBoolean(ordinal);
+        return val == null ? null : val.getValueBoxed();
     }
-
 }
