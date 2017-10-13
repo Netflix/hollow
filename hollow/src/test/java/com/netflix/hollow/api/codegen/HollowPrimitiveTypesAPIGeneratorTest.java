@@ -28,6 +28,8 @@ public class HollowPrimitiveTypesAPIGeneratorTest extends AbstractHollowAPIGener
     @Override
     @Before
     public void setup() throws IOException {
+        isCleanupAfterEnabled=false;
+        sourceFolder="/Users/dsu/work/hollow/src";
     }
 
     @Override
@@ -47,31 +49,37 @@ public class HollowPrimitiveTypesAPIGeneratorTest extends AbstractHollowAPIGener
 
     @HollowPrimaryKey(fields = { "id" })
     static class Movie {
-        int id;
-
-        // Collections
-        List<Actor> actors;
-        Map<String, Boolean> map;
-        Set<Long> rankings;
+        int i;
+        long l;
+        boolean b;
+        float f;
+        double d;
 
         // Native Types
-        Integer i;
-        Long l;
-        Boolean b;
-        Float f;
-        Double d;
-        String s;
-    }
+        Integer iObj;
+        Long lObj;
+        Boolean bObj;
+        Float fObj;
+        Double dObj;
+        String sObj;
 
-    static class Actor {
-        String name;
+        // Collections
+        Map<String, Boolean> map;
 
-        Role role;
-    }
+        // Set
+        Set<Long> setLong;
+        Set<Integer> setInteger;
+        Set<Float> setFloat;
+        Set<Double> setDouble;
+        Set<String> setString;
+        Set<Boolean> setBoolean;
 
-    static class Role {
-        Integer id;
-
-        String name;
+        // List
+        List<Long> listLong;
+        List<Integer> listInteger;
+        List<Float> listFloat;
+        List<Double> listDouble;
+        List<String> listString;
+        List<Boolean> listBoolean;
     }
 }

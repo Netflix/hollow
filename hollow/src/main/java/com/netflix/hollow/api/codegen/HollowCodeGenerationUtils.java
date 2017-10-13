@@ -41,17 +41,21 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A class containing convenience methods for the {@link HollowAPIGenerator}.  Not intended for external consumption.
+ * A class containing convenience methods for the {@link HollowAPIGenerator}. Not intended for external consumption.
  */
 public class HollowCodeGenerationUtils {
 
     private static final Set<String> PRIMITIVE_TYPES = new HashSet<>();
-    private static final Map<String,String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
-    private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
+    private static final Set<String> BASIC_PRIMITIVE_COLLEFCTIONS = new HashSet<>();
+    private static final Map<String, String> DEFAULT_CLASS_NAME_SUBSTITUTIONS = new HashMap<String, String>();
+    private static final Map<String, String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String, String>();
 
     static {
-        for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
-            PRIMITIVE_TYPES.add(clzz.getSimpleName());
+        for (Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
+            String name = clzz.getSimpleName();
+            PRIMITIVE_TYPES.add(name);
+            BASIC_PRIMITIVE_COLLEFCTIONS.add("ListOf" + name);
+            BASIC_PRIMITIVE_COLLEFCTIONS.add("SetOf" + name);
         }
 
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
@@ -175,13 +179,11 @@ public class HollowCodeGenerationUtils {
     public static String hollowImplClassname(String typeName, String classPostfix, boolean useAggressiveSubstitutions) {
         String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
 
-        String sub = useAggressiveSubstitutions ?
-                AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
-                    DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
-                if(sub != null)
-                    return sub;
+        String sub = useAggressiveSubstitutions ? AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) : DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
+        if (sub != null)
+            return sub;
 
-                return classname;
+        return classname;
     }
 
     public static String delegateInterfaceName(String typeName) {
@@ -189,13 +191,13 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String delegateInterfaceName(HollowSchema schema) {
-        if(schema instanceof HollowObjectSchema)
+        if (schema instanceof HollowObjectSchema)
             return delegateInterfaceName(schema.getName());
-        if(schema instanceof HollowListSchema)
+        if (schema instanceof HollowListSchema)
             return HollowListDelegate.class.getSimpleName();
-        if(schema instanceof HollowSetSchema)
+        if (schema instanceof HollowSetSchema)
             return HollowSetDelegate.class.getSimpleName();
-        if(schema instanceof HollowMapSchema)
+        if (schema instanceof HollowMapSchema)
             return HollowMapDelegate.class.getSimpleName();
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getSimpleName() + "?");
     }
@@ -205,13 +207,13 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String delegateCachedClassname(HollowSchema schema) {
-        if(schema instanceof HollowObjectSchema)
+        if (schema instanceof HollowObjectSchema)
             return delegateCachedImplName(schema.getName());
-        if(schema instanceof HollowListSchema)
+        if (schema instanceof HollowListSchema)
             return HollowListCachedDelegate.class.getSimpleName();
-        if(schema instanceof HollowSetSchema)
+        if (schema instanceof HollowSetSchema)
             return HollowSetCachedDelegate.class.getSimpleName();
-        if(schema instanceof HollowMapSchema)
+        if (schema instanceof HollowMapSchema)
             return HollowMapCachedDelegate.class.getSimpleName();
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getSimpleName() + "?");
     }
@@ -221,19 +223,19 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String delegateLookupClassname(HollowSchema schema) {
-        if(schema instanceof HollowObjectSchema)
+        if (schema instanceof HollowObjectSchema)
             return delegateLookupImplName(schema.getName());
-        if(schema instanceof HollowListSchema)
+        if (schema instanceof HollowListSchema)
             return HollowListLookupDelegate.class.getSimpleName();
-        if(schema instanceof HollowSetSchema)
+        if (schema instanceof HollowSetSchema)
             return HollowSetLookupDelegate.class.getSimpleName();
-        if(schema instanceof HollowMapSchema)
+        if (schema instanceof HollowMapSchema)
             return HollowMapLookupDelegate.class.getSimpleName();
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getSimpleName() + "?");
     }
 
     public static String lowercase(String str) {
-        if(str == null || str.length() == 0)
+        if (str == null || str.length() == 0)
             return str;
 
         StringBuilder builder = new StringBuilder();
@@ -249,7 +251,7 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String upperFirstChar(String str) {
-        if(str == null || str.length() == 0)
+        if (str == null || str.length() == 0)
             return str;
 
         StringBuilder builder = new StringBuilder();
@@ -267,7 +269,7 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String getJavaBoxedType(FieldType fieldType) {
-        switch(fieldType) {
+        switch (fieldType) {
             case BOOLEAN:
                 return "Boolean";
             case BYTES:
@@ -288,7 +290,7 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String getJavaScalarType(FieldType fieldType) {
-        switch(fieldType) {
+        switch (fieldType) {
             case BOOLEAN:
                 return "boolean";
             case BYTES:
@@ -325,7 +327,7 @@ public class HollowCodeGenerationUtils {
      *
      * other field type: prepend "get" + upper case first char
      *
-     *      String title - getTitle()
+     * String title - getTitle()
      *
      * @param fieldName
      *            name of field
@@ -382,6 +384,10 @@ public class HollowCodeGenerationUtils {
 
     public static boolean isPrimitiveType(String type) {
         return PRIMITIVE_TYPES.contains(type);
+    }
+
+    public static boolean isBasicPrimitiveCollection(String type) {
+        return BASIC_PRIMITIVE_COLLEFCTIONS.contains(type);
     }
 
     public static Set<String> getPrimitiveTypes(Collection<HollowSchema> schemaList) {

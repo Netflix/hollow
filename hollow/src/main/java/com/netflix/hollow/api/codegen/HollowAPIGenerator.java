@@ -193,7 +193,7 @@ public class HollowAPIGenerator {
     private void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
-            if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type 
+            if (useHollowPrimitiveTypes && (HollowCodeGenerationUtils.isPrimitiveType(type) || HollowCodeGenerationUtils.isBasicPrimitiveCollection(type))) continue; // skip if using hollow primitive type
 
             generateFile(directory, getStaticAPIGenerator(schema));
             generateFile(directory, getHollowObjectGenerator(schema));

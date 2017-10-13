@@ -15,12 +15,18 @@
  */
 package com.netflix.hollow.api.consumer;
 
+import com.netflix.hollow.core.type.BooleanTypeAPI;
+import com.netflix.hollow.core.type.DoubleTypeAPI;
+import com.netflix.hollow.core.type.FloatTypeAPI;
 import com.netflix.hollow.core.type.HBoolean;
 import com.netflix.hollow.core.type.HDouble;
 import com.netflix.hollow.core.type.HFloat;
 import com.netflix.hollow.core.type.HInteger;
 import com.netflix.hollow.core.type.HLong;
 import com.netflix.hollow.core.type.HString;
+import com.netflix.hollow.core.type.IntegerTypeAPI;
+import com.netflix.hollow.core.type.LongTypeAPI;
+import com.netflix.hollow.core.type.StringTypeAPI;
 import java.util.Collection;
 
 public interface HollowConsumerAPI {
@@ -29,35 +35,47 @@ public interface HollowConsumerAPI {
         public Collection<HBoolean> getAllHBoolean();
 
         public HBoolean getHBoolean(int ordinal);
+
+        public BooleanTypeAPI getBooleanTypeAPI();
     }
 
     public interface DoubleRetriever {
         public Collection<HDouble> getAllHDouble();
 
         public HDouble getHDouble(int ordinal);
+
+        public DoubleTypeAPI getDoubleTypeAPI();
     }
 
     public interface FloatRetriever {
         public Collection<HFloat> getAllHFloat();
 
         public HFloat getHFloat(int ordinal);
+
+        public FloatTypeAPI getFloatTypeAPI();
     }
 
     public interface IntegerRetriever {
         public Collection<HInteger> getAllHInteger();
 
         public HInteger getHInteger(int ordinal);
+
+        public IntegerTypeAPI getIntegerTypeAPI();
     }
 
     public interface LongRetriever {
         public Collection<HLong> getAllHLong();
 
         public HLong getHLong(int ordinal);
+
+        public LongTypeAPI getLongTypeAPI();
     }
 
     public interface StringRetriever {
         public Collection<HString> getAllHString();
 
         public HString getHString(int ordinal);
+
+        public StringTypeAPI getStringTypeAPI();
     }
 }
