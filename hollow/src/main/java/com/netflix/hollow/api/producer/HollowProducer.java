@@ -19,24 +19,7 @@ package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.metrics.HollowMetricsCollector;
-import com.netflix.hollow.api.metrics.HollowProducerMetrics;
-import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
-import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
-import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
-import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
-import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
-import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
-import com.netflix.hollow.core.read.engine.HollowBlobReader;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import com.netflix.hollow.tools.checksum.HollowChecksum;
-import com.netflix.hollow.tools.compact.HollowCompactor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +32,27 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
+import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
+import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
+import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
+import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+import com.netflix.hollow.api.producer.validation.ValidationStatus;
+import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
+import com.netflix.hollow.core.read.engine.HollowBlobReader;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.tools.checksum.HollowChecksum;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 
 /**
  * 
@@ -146,7 +150,6 @@ public class HollowProducer {
     public HollowProducer(Publisher publisher,
                           Validator validator,
                           Announcer announcer) {
-
         this(new HollowFilesystemBlobStager(), publisher, announcer, Collections.singletonList(validator), Collections.<HollowProducerListener>emptyList(), new VersionMinterWithCounter(), null, 0, DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null, new DummyBlobStorageCleaner());
     }
     
@@ -164,10 +167,23 @@ public class HollowProducer {
     }
 
     protected HollowProducer(BlobStager blobStager,
+            Publisher publisher,
+            Announcer announcer,
+            List<Validator> validators,
+            List<HollowProducerListener> listeners,
+            VersionMinter versionMinter,
+            Executor snapshotPublishExecutor,
+            int numStatesBetweenSnapshots,
+            long targetMaxTypeShardSize,
+            HollowMetricsCollector<HollowProducerMetrics> metricsCollector, BlobStorageCleaner blobStorageCleaner) {
+    	this(blobStager, publisher, announcer, validators, listeners, Collections.<HollowValidationListener>emptyList(), versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner);
+    }
+    protected HollowProducer(BlobStager blobStager,
                              Publisher publisher,
                              Announcer announcer,
                              List<Validator> validators,
                              List<HollowProducerListener> listeners,
+                             List<HollowValidationListener> vallisteners,
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
                              int numStatesBetweenSnapshots,
@@ -196,6 +212,10 @@ public class HollowProducer {
 
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
+        
+        for(HollowValidationListener vallistener: vallisteners){
+        	this.listeners.add(vallistener);
+        }
 
         this.metrics = new HollowProducerMetrics();
         this.metricsCollector = metricsCollector;
@@ -604,15 +624,18 @@ public class HollowProducer {
 
     private void validate(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireValidationStart(readState);
+        ValidationStatus.Builder valStatus = ValidationStatus.builder().withReadState(readState).withVersion(readState.getVersion());
         try {
             List<Throwable> validationFailures = new ArrayList<Throwable>();
             
             for(Validator validator : validators) {
+            	Throwable throwable = null;
                 try {
                     validator.validate(readState);
                 } catch(Throwable th) {
                     validationFailures.add(th);
                 }
+                valStatus.addValidatorStatus(throwable, validator.toString());
             }
             
             if(!validationFailures.isEmpty()) {
@@ -622,13 +645,16 @@ public class HollowProducer {
             }
             
             status.success();
+            valStatus.success();
         } catch (Throwable th) {
             status.fail(th);
+            valStatus.fail(th);
             throw th;
         } finally {
-            listeners.fireValidationComplete(status);
+            listeners.fireValidationComplete(status, valStatus);
         }
     }
+    
 
     private void announce(HollowProducer.ReadState readState) {
         if(announcer != null) {
@@ -901,6 +927,7 @@ public class HollowProducer {
         protected Announcer announcer;
         protected List<Validator> validators = new ArrayList<Validator>();
         protected List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
+        protected List<HollowValidationListener> validationListeners = new ArrayList<HollowValidationListener>();
         protected VersionMinter versionMinter = new VersionMinterWithCounter();
         protected Executor snapshotPublishExecutor = null;
         protected int numStatesBetweenSnapshots = 0;
@@ -955,6 +982,17 @@ public class HollowProducer {
             return this;
         }
         
+        public Builder withValidationListener(HollowValidationListener listener) {
+            this.validationListeners.add(listener);
+            return this;
+        }
+        
+        public Builder withValidationListeners(HollowValidationListener... listeners) {
+            for(HollowValidationListener listener : listeners)
+                this.validationListeners.add(listener);
+            return this;
+        }
+        
         public Builder withVersionMinter(HollowProducer.VersionMinter versionMinter) {
             this.versionMinter = versionMinter;
             return this;
@@ -1001,7 +1039,7 @@ public class HollowProducer {
         public HollowProducer build() {
             checkArguments();
             
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner);
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, validationListeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner);
         }
     }
 

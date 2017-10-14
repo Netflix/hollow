@@ -75,7 +75,7 @@ public class HollowProducerBlobStorageCleanerTest {
 
         File[] files = listFiles(HollowProducer.Blob.Type.SNAPSHOT.prefix);
         List<String> fileNames = getFileNames(files);
-        assert files.length == 5;
+        Assert.assertEquals(5, files.length);
 
         incrementalProducer.addOrModify(new TypeA(6, "three", 1000));
         incrementalProducer.runCycle();

@@ -19,11 +19,11 @@ package com.netflix.hollow.api.producer.validation;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
+import com.netflix.hollow.api.producer.HollowProducerListener.Status;
+import com.netflix.hollow.api.producer.validation.ValidatorStatus.Builder;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -32,13 +32,14 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 
 /**
  * 
- * @author lkanchanapalli
+ * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
  *
  */
 public class DuplicateDataDetectionValidator implements Validator {
-	String dataTypeName;
-	private String[] fieldPathNames;
-	private final Logger log = Logger.getLogger(DuplicateDataDetectionValidator.class.getName());
+	private final String dataTypeName;
+	private final String[] fieldPathNames;
+	// Status is used to track validation details. Helps surface information.
+	private ValidatorStatus status = null;
 	
 	/**
 	 * @param dataTypeName for which this duplicate data detection is needed.
@@ -64,17 +65,33 @@ public class DuplicateDataDetectionValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		log.log(Level.INFO, "Running DuplicateDataDetectionValidator for type "+dataTypeName);
-		PrimaryKey primaryKey = getPrimaryKey(readState);
-		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(readState.getStateEngine(), primaryKey);
+		Builder statusBuilder = initializeForValidation(readState);
+		
+		PrimaryKey primaryKey = getPrimaryKey(readState, statusBuilder);
+		String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
+		statusBuilder.addAdditionalInfo(FIELD_PATH_NAME , fieldPaths);
+		
+		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(readState.getStateEngine(), primaryKey );
 		Collection<Object[]> duplicateKeys = hollowPrimaryKeyIndex.getDuplicateKeys();
 		
 		if(duplicateKeys != null && !duplicateKeys.isEmpty()){
-			String duplicateIds = getDuplicateIDsString(duplicateKeys);
-			String errorMsg = String.format("Duplicate keys found for type %s. Unique key is defined as %s. Duplicate IDs are: %s", dataTypeName, 
-					Arrays.toString(primaryKey.getFieldPaths()), duplicateIds);
-			throw new ValidationException(errorMsg);
+			handleEndValidation(statusBuilder, Status.FAIL, String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths, getDuplicateIDsString(duplicateKeys)));
 		}
+		handleEndValidation(statusBuilder, Status.SUCCESS, null);
+	}
+
+	private Builder initializeForValidation(ReadState readState) {
+		status = null;
+		Builder statusBuilder = ValidatorStatus.builder().withVersion(readState.getVersion());
+		statusBuilder.addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
+		return statusBuilder;
+	}
+	
+	@Override
+	public String toString(){
+		if(status != null)
+			return status.toString();
+		return("DuplicateDataDetectionValidator status for "+dataTypeName+" is null. This is unexpected. Please check validator definition.");
 	}
 	
 	private String getDuplicateIDsString(Collection<Object[]> dupKeysCollection) {
@@ -85,23 +102,42 @@ public class DuplicateDataDetectionValidator implements Validator {
         return message.toString();
 	}
 
-	private PrimaryKey getPrimaryKey(ReadState readState) {
+	private PrimaryKey getPrimaryKey(ReadState readState, Builder statusBuilder) {
 		PrimaryKey primaryKey = null;
 
 		if (fieldPathNames == null) {
 			HollowSchema schema = readState.getStateEngine().getSchema(dataTypeName);
 			if (schema.getSchemaType() != (SchemaType.OBJECT))
-				throw new ValidationException("Primary key validation is defined but schema type of "+ dataTypeName+" is not Object. This validation cannot be done.");
+				handleEndValidation(statusBuilder, Status.FAIL,  String.format(NOT_AN_OBJECT_ERROR_MSGR_FORMAT, dataTypeName));
+			
 			HollowObjectSchema oSchema = (HollowObjectSchema) schema;
 			primaryKey = oSchema.getPrimaryKey();
 		} else {
 			primaryKey = new PrimaryKey(dataTypeName, fieldPathNames);
 		}
 		if (primaryKey == null)
-			throw new ValidationException(
-					"Primary key validation defined but unable to find primary key for data type " + dataTypeName);
+			handleEndValidation(statusBuilder, Status.FAIL,  String.format(NO_PRIMARY_KEY_ERRRO_MSG_FORMAT, dataTypeName));
 
 		return primaryKey;
 	}
-
+	
+	private void handleEndValidation(Builder statusBuilder, Status status, String message) {
+		statusBuilder.withStatus(status);
+		if(message != null){
+			ValidationException validationException = new ValidationException(message);
+			statusBuilder.withThrowable(validationException);
+			this.status = statusBuilder.build();
+			throw validationException;
+		}
+		this.status = statusBuilder.build();
+	}
+	
+	private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT = "Duplicate keys found for type %s. Unique key is defined as %s. "
+				+ "Duplicate IDs are: %s";
+	private static final String NO_PRIMARY_KEY_ERRRO_MSG_FORMAT = "DuplicateDataDetectionValidator defined but unable to find primary key "
+			+ "for data type %s. Please check schema definition.";
+	private static final String NOT_AN_OBJECT_ERROR_MSGR_FORMAT = "DuplicateDataDetectionValidator is defined but schema type of %s "
+				+ "is not Object. This validation cannot be done.";
+	private static final String FIELD_PATH_NAME = "FieldPaths";
+	private static final String DATA_TYPE_NAME = "Typename";
 }

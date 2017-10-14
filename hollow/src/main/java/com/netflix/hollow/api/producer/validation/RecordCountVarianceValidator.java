@@ -17,21 +17,21 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
+import com.netflix.hollow.api.producer.HollowProducerListener.Status;
+import com.netflix.hollow.api.producer.validation.ValidatorStatus.Builder;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
 /**
- * @author lkanchanapalli
+ * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
  *
  */
 public class RecordCountVarianceValidator implements Validator {
 	private final String typeName;
 	private final float allowableVariancePercent;
-	private final Logger log = Logger.getLogger(RecordCountVarianceValidator.class.getName());
+	// status is used to capture details about validation. Helps surface information.
+	private ValidatorStatus status = null;
 	
 	/**
 	 * 
@@ -52,27 +52,42 @@ public class RecordCountVarianceValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		log.log(Level.INFO, "Running RecordCountVarianceValidator for type "+typeName);
+		Builder builder = initializeForValidation(readState);
+		
 		HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
 		int latestCardinality = typeState.getPopulatedOrdinals().cardinality();
 		int previousCardinality = typeState.getPreviousOrdinals().cardinality();
+		builder.addAdditionalInfo(LATEST_CARDINALITY_NAME, String.valueOf(latestCardinality));
+		builder.addAdditionalInfo(PREVIOUS_CARDINALITY_NAME, String.valueOf(previousCardinality));
 		
-		// TODO: log message indicating previous state is 0. Can happen for new name space. And also can happen 
-		// when a type gets to zero count then the validation will be skipped.  
-		if(previousCardinality == 0){
-			log.log(Level.WARNING, "Previoud record count is 0. Not running RecordCountVarianceValidator for type "+typeName
-					+". This scenario is not expected except when starting a new namespace.");
+		if(previousCardinality  == 0){
+			handleEndValidation(builder, Status.SKIP, false, String.format(ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT, typeName));
 			return;
 		}
 
-		float actualChangePercent = getChangePercent(latestCardinality, previousCardinality);
-		if (Float.compare(actualChangePercent, allowableVariancePercent) > 0) {
-			throw new ValidationException("RecordCountVarianceValidator for type " + typeName
-					+ " failed. Actual variance: " + actualChangePercent + "%; Allowed variance: "
-					+ allowableVariancePercent + "%;  previous cycle record count: " + previousCardinality
-							+ "; current cycle record count: " + latestCardinality);
-					
+		float actualChangePercent = getChangePercent(latestCardinality , previousCardinality );
+		builder.addAdditionalInfo(ACTUAL_CHANGE_PERCENT_NAME, String.valueOf(actualChangePercent));
+		
+		if (Float.compare(actualChangePercent , allowableVariancePercent) > 0) {
+			String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent, allowableVariancePercent);
+			handleEndValidation(builder, Status.FAIL, true, message);
 		}
+		handleEndValidation(builder, Status.SUCCESS, false, null);
+	}
+	
+	@Override
+	public String toString(){
+		if(status != null)
+			return status.toString();
+		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
+	}
+
+	private Builder initializeForValidation(ReadState readState) {
+		status = null;
+		Builder builder = ValidatorStatus.builder().withVersion(readState.getVersion());
+		builder.addAdditionalInfo(ALLOWABLE_VARIANCE_PERCENT_NAME, String.valueOf(allowableVariancePercent));
+		builder.addAdditionalInfo(DATA_TYPE_NAME, typeName);
+		return builder;
 	}
 
 	float getChangePercent(int latestCardinality, int previousCardinality) {
@@ -80,5 +95,28 @@ public class RecordCountVarianceValidator implements Validator {
 		float changePercent = ((float)100.0* diff)/(float)previousCardinality;
 		return changePercent;
 	}
+	
+	private void handleEndValidation(Builder builder, Status status, boolean throwException, String message){
+		ValidationException validationException = null;
+		builder.withStatus(status);
+		builder.withMessage(message);
+		if(throwException){
+			validationException = new ValidationException(message);
+			builder.withThrowable(validationException);
+			this.status = builder.build();
+			throw validationException;
+		}
+		this.status = builder.build();
+	}
+	
+	private static final String DATA_TYPE_NAME = "Typename";
+	private static final String ALLOWABLE_VARIANCE_PERCENT_NAME = "AllowableVariancePercent";
+	private static final String LATEST_CARDINALITY_NAME = "LatestRecordCount";
+	private static final String PREVIOUS_CARDINALITY_NAME = "PreviousRecordCount";
+	private static final String ACTUAL_CHANGE_PERCENT_NAME = "ActualChangePercent";
+	private static final String ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT = "Previous record count is 0. Not running RecordCountVarianceValidator for type %s. "
+																		+"This scenario is not expected except when starting a new namespace." ;
+	private static final String FAILED_RECORD_COUNT_VALIDATION = "Record count validation for type %s has failed as actual change percent %s "
+																	+ "is greater than allowed change percent %s.";
 }
 	

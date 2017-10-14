@@ -482,6 +482,6 @@ public interface HollowProducerListener extends EventListener {
     }
 
     public enum Status {
-        SUCCESS, FAIL
+        SUCCESS, FAIL, SKIP
     }
 }
