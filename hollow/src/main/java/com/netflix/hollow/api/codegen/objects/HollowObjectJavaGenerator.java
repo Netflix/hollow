@@ -54,8 +54,9 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private final boolean useAggressiveSubstitutions;
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
     private final boolean useBooleanFieldErgonomics;
+    private final boolean restrictApiToFieldType;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping, boolean useHollowPrimitiveTypes, boolean restrictApiToFieldType) {
         super(packageName, computeSubPackageName(schema), usePackageGrouping, useHollowPrimitiveTypes);
 
         this.apiClassname = apiClassname;
@@ -68,6 +69,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.ergonomicShortcuts = ergonomicShortcuts;
         this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+        this.restrictApiToFieldType = restrictApiToFieldType;
     }
     
     private static String computeSubPackageName(HollowObjectSchema schema) {
@@ -185,12 +187,18 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
             case LONG:
                 String methodName = (shortcut.getType()==FieldType.BOOLEAN) ? generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName);
 
-                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "Boxed() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-                builder.append("    }\n\n");
-                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
-                builder.append("    }\n\n");
+                if(restrictApiToFieldType) {
+                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                    builder.append("    }\n\n");
+                } else {
+                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "Boxed() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+                    builder.append("    }\n\n");
+                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                    builder.append("    }\n\n");
+                }
                 break;
             case BYTES:
                 builder.append("    public byte[] ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
@@ -244,9 +252,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Float ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
-        builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-        builder.append("    }");
+        if(!restrictApiToFieldType) {
+            builder.append("    public Float ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
+            builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+            builder.append("    }");
+        }
 
 
         return builder.toString();
@@ -261,9 +271,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Double ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
-        builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-        builder.append("    }");
+        if(!restrictApiToFieldType) {
+            builder.append("    public Double ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
+            builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+            builder.append("    }");
+        }
 
         return builder.toString();
     }
@@ -277,9 +289,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Long ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
-        builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-        builder.append("    }");
+        if(!restrictApiToFieldType) {
+            builder.append("    public Long ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
+            builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+            builder.append("    }");
+        }
 
         return builder.toString();
     }
@@ -293,9 +307,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Integer ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
-        builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-        builder.append("    }");
+        if(!restrictApiToFieldType) {
+            builder.append("    public Integer ").append(getterPrefix).append("get").append(uppercase(fieldName)).append("Boxed() {\n");
+            builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+            builder.append("    }");
+        }
 
         return builder.toString();
     }
@@ -310,9 +326,11 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public Boolean ").append(getterPrefix).append(methodName).append("Boxed() {\n");
-        builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-        builder.append("    }");
+        if(!restrictApiToFieldType) {
+            builder.append("    public Boolean ").append(getterPrefix).append(methodName).append("Boxed() {\n");
+            builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+            builder.append("    }");
+        }
 
         return builder.toString();
     }
