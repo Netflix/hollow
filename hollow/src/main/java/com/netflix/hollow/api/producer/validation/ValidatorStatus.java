@@ -24,8 +24,12 @@ import javax.annotation.Generated;
 
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 /**
+ * *************************************
+ * NOTE: Beta API subject to change.   *
+ * *************************************
  * 
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
+ * 
  * ValidationStatus has one instance per each validator that ran. 
  * For now ValidationStatus builds these and sets toString on validator as the message (where validators provide any details).
  * In next iteration this might be directly returned by validators.

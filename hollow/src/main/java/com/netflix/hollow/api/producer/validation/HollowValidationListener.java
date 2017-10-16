@@ -22,8 +22,15 @@ import java.util.concurrent.TimeUnit;
 
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 /**
+ * *************************************
+ * NOTE: Beta API subject to change.   *
+ * *************************************
  * 
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
+ * 
+ * Listener provides updates and more visibility into validation run. 
+ * For now the visibility depends on toString of each validator. 
+ * In next iteration validators provided more structured data.
  *
  */
 public interface HollowValidationListener extends EventListener{

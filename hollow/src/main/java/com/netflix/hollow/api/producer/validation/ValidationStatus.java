@@ -26,9 +26,13 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 /**
- * 
+ * *************************************
+ * NOTE: Beta API subject to change.   *
+ * *************************************
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
+ * 
  * Validation listener uses this to provide visibility into validations that ran.
+ * This aggregates information across multiple validators per run.
  *
  */
 public class ValidationStatus {
