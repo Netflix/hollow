@@ -7,6 +7,9 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
+import com.netflix.vms.transformer.hollowoutput.VideoSeason;
+import com.netflix.vms.transformer.hollowoutput.VideoShow;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,6 +64,7 @@ public class VideoCollectionsDataHierarchy {
             topNodeVideoCollectionsData.topNode = topNode;
             topNodeVideoCollectionsData.episodesForSeasonSequenceNumberMap = new SortedMapOfIntegerToListOfVideoEpisode(new HashMap<com.netflix.vms.transformer.hollowoutput.Integer, List<VideoEpisode>>());
             topNodeVideoCollectionsData.supplementalVideos = supplementalVideos;
+            topNodeVideoCollectionsData.videoShow = new VideoShow();// todo populate this object from display sets data.
         }
 
         addSupplementalVideoCollectionsData(supplementalVideos, null, null);
@@ -90,6 +94,7 @@ public class VideoCollectionsDataHierarchy {
         currentSeason.supplementalVideos = supplementalVideos;
         currentSeason.episodesForSeasonSequenceNumberMap = constants.EMPTY_EPISODE_SEQUENCE_NUMBER_MAP;
         currentSeason.seasonNumber = sequenceNumber;
+        currentSeason.videoSeason = new VideoSeason();// Todo populate this object from display sets data.
 
         addSupplementalVideoCollectionsData(supplementalVideos, null, currentSeason.seasonNumber);
     }

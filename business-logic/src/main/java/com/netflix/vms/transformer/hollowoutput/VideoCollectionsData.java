@@ -17,73 +17,58 @@ public class VideoCollectionsData implements Cloneable {
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
     public int seasonNumber = -1;
     public VideoEpisode videoEpisode = null;
+    public VideoSeason videoSeason = null;
+    public VideoShow videoShow = null;
 
-    public boolean equals(Object other) {
-        if(other == this)  return true;
-        if(!(other instanceof VideoCollectionsData))
-            return false;
 
-        VideoCollectionsData o = (VideoCollectionsData) other;
-        if(o.nodeType == null) {
-            if(nodeType != null) return false;
-        } else if(!o.nodeType.equals(nodeType)) return false;
-        if(o.topNodeType == null) {
-            if(topNodeType != null) return false;
-        } else if(!o.topNodeType.equals(topNodeType)) return false;
-        if(o.videoEpisodes == null) {
-            if(videoEpisodes != null) return false;
-        } else if(!o.videoEpisodes.equals(videoEpisodes)) return false;
-        if(o.showChildren == null) {
-            if(showChildren != null) return false;
-        } else if(!o.showChildren.equals(showChildren)) return false;
-        if(o.seasonChildren == null) {
-            if(seasonChildren != null) return false;
-        } else if(!o.seasonChildren.equals(seasonChildren)) return false;
-        if(o.supplementalVideoParents == null) {
-            if(supplementalVideoParents != null) return false;
-        } else if(!o.supplementalVideoParents.equals(supplementalVideoParents)) return false;
-        if(o.supplementalVideos == null) {
-            if(supplementalVideos != null) return false;
-        } else if(!o.supplementalVideos.equals(supplementalVideos)) return false;
-        if(o.showParent == null) {
-            if(showParent != null) return false;
-        } else if(!o.showParent.equals(showParent)) return false;
-        if(o.seasonParent == null) {
-            if(seasonParent != null) return false;
-        } else if(!o.seasonParent.equals(seasonParent)) return false;
-        if(o.topNode == null) {
-            if(topNode != null) return false;
-        } else if(!o.topNode.equals(topNode)) return false;
-        if(o.episodesForSeasonSequenceNumberMap == null) {
-            if(episodesForSeasonSequenceNumberMap != null) return false;
-        } else if(!o.episodesForSeasonSequenceNumberMap.equals(episodesForSeasonSequenceNumberMap)) return false;
-        if (o.seasonNumber != this.seasonNumber) return false;
-        if(o.videoEpisode == null) {
-            if(videoEpisode != null) return false;
-        } else if(!o.videoEpisode.equals(videoEpisode)) return false;
-        return true;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VideoCollectionsData)) return false;
+
+        VideoCollectionsData that = (VideoCollectionsData) o;
+
+        if (seasonNumber != that.seasonNumber) return false;
+        if (!nodeType.equals(that.nodeType)) return false;
+        if (!topNodeType.equals(that.topNodeType)) return false;
+        if (!videoEpisodes.equals(that.videoEpisodes)) return false;
+        if (!showChildren.equals(that.showChildren)) return false;
+        if (!seasonChildren.equals(that.seasonChildren)) return false;
+        if (!supplementalVideoParents.equals(that.supplementalVideoParents)) return false;
+        if (!supplementalVideos.equals(that.supplementalVideos)) return false;
+        if (!showParent.equals(that.showParent)) return false;
+        if (!seasonParent.equals(that.seasonParent)) return false;
+        if (!topNode.equals(that.topNode)) return false;
+        if (!episodesForSeasonSequenceNumberMap.equals(that.episodesForSeasonSequenceNumberMap)) return false;
+        if (!videoEpisode.equals(that.videoEpisode)) return false;
+        if (!videoSeason.equals(that.videoSeason)) return false;
+        return videoShow.equals(that.videoShow);
     }
 
+    @Override
     public int hashCode() {
-        int hashCode = 1;
-        hashCode = hashCode * 31 + (nodeType == null ? 1237 : nodeType.hashCode());
-        hashCode = hashCode * 31 + (topNodeType == null ? 1237 : topNodeType.hashCode());
-        hashCode = hashCode * 31 + (videoEpisodes == null ? 1237 : videoEpisodes.hashCode());
-        hashCode = hashCode * 31 + (showChildren == null ? 1237 : showChildren.hashCode());
-        hashCode = hashCode * 31 + (seasonChildren == null ? 1237 : seasonChildren.hashCode());
-        hashCode = hashCode * 31 + (supplementalVideoParents == null ? 1237 : supplementalVideoParents.hashCode());
-        hashCode = hashCode * 31 + (supplementalVideos == null ? 1237 : supplementalVideos.hashCode());
-        hashCode = hashCode * 31 + (showParent == null ? 1237 : showParent.hashCode());
-        hashCode = hashCode * 31 + (seasonParent == null ? 1237 : seasonParent.hashCode());
-        hashCode = hashCode * 31 + (topNode == null ? 1237 : topNode.hashCode());
-        hashCode = hashCode * 31 + (episodesForSeasonSequenceNumberMap == null ? 1237 : episodesForSeasonSequenceNumberMap.hashCode());
-        hashCode = hashCode * 31 + (videoEpisode == null ? 1237 : videoEpisode.hashCode());
-        return hashCode;
+        int result = nodeType.hashCode();
+        result = 31 * result + topNodeType.hashCode();
+        result = 31 * result + videoEpisodes.hashCode();
+        result = 31 * result + showChildren.hashCode();
+        result = 31 * result + seasonChildren.hashCode();
+        result = 31 * result + supplementalVideoParents.hashCode();
+        result = 31 * result + supplementalVideos.hashCode();
+        result = 31 * result + showParent.hashCode();
+        result = 31 * result + seasonParent.hashCode();
+        result = 31 * result + topNode.hashCode();
+        result = 31 * result + episodesForSeasonSequenceNumberMap.hashCode();
+        result = 31 * result + seasonNumber;
+        result = 31 * result + videoEpisode.hashCode();
+        result = 31 * result + videoSeason.hashCode();
+        result = 31 * result + videoShow.hashCode();
+        return result;
     }
 
     public String toString() {
         StringBuilder builder = new StringBuilder("VideoCollectionsData{");
         builder.append("nodeType=").append(nodeType);
+
         builder.append(",topNodeType=").append(topNodeType);
         builder.append(",videoEpisodes=").append(videoEpisodes);
         builder.append(",showChildren=").append(showChildren);
@@ -96,6 +81,8 @@ public class VideoCollectionsData implements Cloneable {
         builder.append(",episodesForSeasonSequenceNumberMap=").append(episodesForSeasonSequenceNumberMap);
         builder.append(",seasonNumber=").append(seasonNumber);
         builder.append(",videoEpisode=").append(videoEpisode);
+        builder.append(",videoSeason=").append(videoSeason);
+        builder.append(",videoShow=").append(videoShow);
         builder.append("}");
         return builder.toString();
     }
