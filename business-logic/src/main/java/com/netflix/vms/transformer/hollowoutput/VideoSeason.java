@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
+
 /**
  * Adding attributes specific for a video type that is a season. An instance of this class is used in VideoCollectionsData.
  */
@@ -10,7 +12,7 @@ public class VideoSeason {
     public int episodeSkipping = 0;
     public Boolean filterUnavailableEpisodes = true;
     public Boolean useLatestEpisodeAsDefault = false;
-    public String merchOrder = "regular";
+    public @HollowInline String merchOrder = "regular";
 
     @Override
     public boolean equals(Object o) {
@@ -36,5 +38,17 @@ public class VideoSeason {
         result = 31 * result + useLatestEpisodeAsDefault.hashCode();
         result = 31 * result + merchOrder.hashCode();
         return result;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("VideoSeason{");
+        builder.append("hideEpisodeNumbers=").append(hideEpisodeNumbers);
+        builder.append(",episodicNewBadge=").append(episodicNewBadge);
+        builder.append(",episodeSkipping=").append(episodeSkipping);
+        builder.append(",filterUnavailableEpisodes=").append(filterUnavailableEpisodes);
+        builder.append(",useLatestEpisodeAsDefault=").append(useLatestEpisodeAsDefault);
+        builder.append(",merchOrder=").append(merchOrder);
+        builder.append("}");
+        return builder.toString();
     }
 }
