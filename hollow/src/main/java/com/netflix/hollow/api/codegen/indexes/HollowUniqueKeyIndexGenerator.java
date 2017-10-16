@@ -39,8 +39,8 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     protected boolean isParameterizedConstructorPublic = true;
     protected boolean isAutoListenToDataRefresh = false;
 
-    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
 
         this.type = schema.getName();
         this.className = getClassName(schema);
@@ -61,9 +61,8 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         if (isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
-        builder.append("\n");
+        builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type, classPostfix, useAggressiveSubstitutions) + "> {\n\n");
-
         {
             genConstructors(builder);
             genPublicAPIs(builder);

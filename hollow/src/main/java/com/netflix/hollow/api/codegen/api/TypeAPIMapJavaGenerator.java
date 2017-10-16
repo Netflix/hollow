@@ -39,8 +39,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowMapSchema schema;
 
-    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema, boolean usePackageGrouping) {
-        super(apiClassname, packageName, schema, usePackageGrouping);
+    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(apiClassname, packageName, schema, usePackageGrouping, useHollowPrimitiveTypes);
         this.schema = schema;
     }
 

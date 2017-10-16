@@ -48,8 +48,8 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
         this.schema = schema;
         this.dataset = dataset;
         this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix, useAggressiveSubstitutions);

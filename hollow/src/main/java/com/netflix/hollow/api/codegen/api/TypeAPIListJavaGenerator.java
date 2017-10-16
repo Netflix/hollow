@@ -39,8 +39,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowListSchema schema;
 
-    public TypeAPIListJavaGenerator(String apiClassname, String packageName, HollowListSchema schema, boolean usePackageGrouping) {
-        super(apiClassname, packageName, schema, usePackageGrouping);
+    public TypeAPIListJavaGenerator(String apiClassname, String packageName, HollowListSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(apiClassname, packageName, schema, usePackageGrouping, useHollowPrimitiveTypes);
         this.schema = schema;
     }
 

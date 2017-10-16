@@ -39,8 +39,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
+    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = delegateLookupImplName(schema.getName());
     }
 

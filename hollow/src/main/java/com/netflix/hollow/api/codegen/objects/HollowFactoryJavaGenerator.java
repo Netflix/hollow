@@ -49,8 +49,8 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
     private final String objectClassName;
     private final HollowSchema schema;
 
-    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
         this.objectClassName = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
         this.className = hollowFactoryClassname(schema.getName());
         this.schema = schema;
