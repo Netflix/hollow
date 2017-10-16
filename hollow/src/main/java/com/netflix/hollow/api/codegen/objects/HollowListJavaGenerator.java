@@ -41,8 +41,8 @@ public class HollowListJavaGenerator extends HollowCollectionsGenerator {
     private final String elementClassName;
     private final boolean parameterize;
 
-    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowListJavaGenerator(String packageName, String apiClassname, HollowListSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
         this.schema = schema;
         this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix, useAggressiveSubstitutions);
         this.parameterize = parameterizeClassNames || parameterizedTypes.contains(schema.getElementType());

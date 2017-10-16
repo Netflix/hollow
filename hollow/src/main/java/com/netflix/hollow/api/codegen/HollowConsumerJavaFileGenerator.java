@@ -23,15 +23,17 @@ package com.netflix.hollow.api.codegen;
  * @author dsu
  */
 public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileGenerator {
-    private final boolean usePackageGrouping;
-    private final String packageName;
-    private final String subPackageName;
+    protected final boolean usePackageGrouping;
+    protected final boolean useHollowPrimitiveTypes;
+    protected final String packageName;
+    protected final String subPackageName;
     protected String className;
 
-    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, boolean usePackageGrouping) {
+    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
         this.packageName = packageName;
         this.subPackageName = subPackageName;
         this.usePackageGrouping = usePackageGrouping;
+        this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
     }
 
     public String getSubPackageName() {
@@ -47,6 +49,10 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
         String fullPackageName = createFullPackageName(packageName, subPackageName, usePackageGrouping);
         if (!isEmpty(fullPackageName)) {
             builder.append("package ").append(fullPackageName).append(";\n\n");
+
+            if (useHollowPrimitiveTypes) {
+                builder.append("import com.netflix.hollow.core.type.*;\n");
+            }
 
             if (usePackageGrouping) {
                 builder.append("import ").append(packageName).append(".*;\n");

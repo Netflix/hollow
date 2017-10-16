@@ -23,7 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isNativeType;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
@@ -55,8 +55,8 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
     private final boolean useBooleanFieldErgonomics;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping) {
-        super(packageName, computeSubPackageName(schema), usePackageGrouping);
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, String getterPrefix, boolean useAggressiveSubstitutions, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean useBooleanFieldErgonomics, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, computeSubPackageName(schema), usePackageGrouping, useHollowPrimitiveTypes);
 
         this.apiClassname = apiClassname;
         this.schema = schema;
@@ -72,7 +72,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     
     private static String computeSubPackageName(HollowObjectSchema schema) {
         String type = schema.getName();
-        if (isNativeType(type)) {
+        if (isPrimitiveType(type)) {
             return "core";
         }
         return SUB_PACKAGE_NAME;

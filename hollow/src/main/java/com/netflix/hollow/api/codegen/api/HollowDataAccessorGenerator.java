@@ -42,8 +42,8 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     protected final boolean useAggressiveSubstitutions;
     protected final HollowObjectSchema schema;
 
-    public HollowDataAccessorGenerator(String packageName, String apiclassName, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowDataAccessorGenerator(String packageName, String apiclassName, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = getclassName(schema);
         this.apiclassName = apiclassName;
         this.classPostfix = classPostfix;

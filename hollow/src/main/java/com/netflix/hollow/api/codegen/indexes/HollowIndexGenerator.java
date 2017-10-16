@@ -24,8 +24,8 @@ public abstract class HollowIndexGenerator extends HollowConsumerJavaFileGenerat
     protected final String classPostfix;
     protected final boolean useAggressiveSubstitutions;
 
-    public HollowIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
         this.apiClassname = apiClassname;
         this.classPostfix = classPostfix;
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;

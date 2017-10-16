@@ -43,8 +43,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
     private final HollowDataset dataset;
     private final boolean isListenToDataRefreah;
     
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping, boolean isListenToDataRefreah) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping, boolean isListenToDataRefreah, boolean useHollowPrimitiveTypes) {
+        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
         this.isListenToDataRefreah = isListenToDataRefreah;
@@ -64,6 +64,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("import " + AbstractHollowHashIndex.class.getName() + ";\n");
         builder.append("import " + AbstractHollowOrdinalIterable.class.getName() + ";\n\n");
 
+        builder.append("\n");
+        builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowHashIndex.class.getSimpleName() + "<" + apiClassname + "> {\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
