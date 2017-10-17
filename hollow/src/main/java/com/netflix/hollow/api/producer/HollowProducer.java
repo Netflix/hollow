@@ -318,7 +318,24 @@ public class HollowProducer {
     protected HollowObjectMapper getObjectMapper() {
         return objectMapper;
     }
-     
+
+    /**
+     * Invoke this method to alter runCycle behavior. If this Producer is not primary, runCycle is a no-op. Note that by default,
+     * SingleProducerEnforcer is instantiated as BasicSingleProducerEnforcer, which is initialized to return true for isPrimary() 
+     * 
+     * @param doEnable true if enable primary producer, if false 
+     * @return true if the intended action was successful
+     */
+    public boolean enablePrimaryProducer(boolean doEnable) {
+
+        if(doEnable) {
+            singleProducerEnforcer.enable();
+        } else {
+            singleProducerEnforcer.disable();
+        }
+        return (singleProducerEnforcer.isPrimary() == doEnable);
+    }
+
     /**
      * Each cycle produces a single data state.
      * 
