@@ -23,9 +23,11 @@ import java.util.Collection;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.ValidatorStatus.Builder;
+import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.Builder;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
@@ -33,13 +35,20 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 /**
  * 
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
+ * 
+ * This validator uses HollowPrimaryKey definition to find duplicates for a given type. 
+ * Validator fails if no HollowPrimaryKey is defined for the given type or if given type has duplicate objects.
+ * 
+ * Note that if an object only has primary key fields then the duplicates are deduped by Hollow and will not result
+ * in failing this validator. Ex: If Movie type has int id and String name and if primary key is also int id and String name
+ * this validator will not fail as the two objects are deduped.
  *
  */
 public class DuplicateDataDetectionValidator implements Validator {
 	private final String dataTypeName;
 	private final String[] fieldPathNames;
 	// Status is used to track validation details. Helps surface information.
-	private ValidatorStatus status = null;
+	private IndividualValidatorStatus status = null;
 	
 	/**
 	 * @param dataTypeName for which this duplicate data detection is needed.
@@ -71,18 +80,24 @@ public class DuplicateDataDetectionValidator implements Validator {
 		String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
 		statusBuilder.addAdditionalInfo(FIELD_PATH_NAME , fieldPaths);
 		
-		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(readState.getStateEngine(), primaryKey );
-		Collection<Object[]> duplicateKeys = hollowPrimaryKeyIndex.getDuplicateKeys();
-		
+		Collection<Object[]> duplicateKeys = getDuplicateKeys(readState.getStateEngine(), primaryKey);
 		if(duplicateKeys != null && !duplicateKeys.isEmpty()){
 			handleEndValidation(statusBuilder, Status.FAIL, String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths, getDuplicateIDsString(duplicateKeys)));
 		}
 		handleEndValidation(statusBuilder, Status.SUCCESS, null);
 	}
 
+	private Collection<Object[]> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
+		HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
+		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);
+		if(hollowPrimaryKeyIndex == null)
+			hollowPrimaryKeyIndex = new HollowPrimaryKeyIndex(stateEngine, primaryKey );
+		return hollowPrimaryKeyIndex.getDuplicateKeys();
+	}
+
 	private Builder initializeForValidation(ReadState readState) {
 		status = null;
-		Builder statusBuilder = ValidatorStatus.builder().withVersion(readState.getVersion());
+		Builder statusBuilder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
 		statusBuilder.addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
 		return statusBuilder;
 	}
@@ -123,7 +138,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 	
 	private void handleEndValidation(Builder statusBuilder, Status status, String message) {
 		statusBuilder.withStatus(status);
-		if(message != null){
+		if(message != null && status == Status.FAIL){
 			ValidationException validationException = new ValidationException(message);
 			statusBuilder.withThrowable(validationException);
 			this.status = statusBuilder.build();

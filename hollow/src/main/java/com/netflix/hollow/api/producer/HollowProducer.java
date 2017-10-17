@@ -44,7 +44,7 @@ import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
-import com.netflix.hollow.api.producer.validation.ValidationStatus;
+import com.netflix.hollow.api.producer.validation.OverallValidationStatus;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -189,7 +189,7 @@ public class HollowProducer {
                              Announcer announcer,
                              List<Validator> validators,
                              List<HollowProducerListener> listeners,
-                             List<HollowValidationListener> vallisteners,
+                             List<HollowValidationListener> validationListeners,
                              VersionMinter versionMinter,
                              Executor snapshotPublishExecutor,
                              int numStatesBetweenSnapshots,
@@ -222,7 +222,7 @@ public class HollowProducer {
         for(HollowProducerListener listener : listeners)
             this.listeners.add(listener);
         
-        for(HollowValidationListener vallistener: vallisteners){
+        for(HollowValidationListener vallistener: validationListeners){
         	this.listeners.add(vallistener);
         }
 
@@ -640,7 +640,7 @@ public class HollowProducer {
 
     private void validate(HollowProducer.ReadState readState) {
         ProducerStatus.Builder status = listeners.fireValidationStart(readState);
-        ValidationStatus.Builder valStatus = ValidationStatus.builder().withReadState(readState).withVersion(readState.getVersion());
+        OverallValidationStatus.OverallValidationBuilder valStatus = OverallValidationStatus.builder().withReadState(readState).withVersion(readState.getVersion());
         try {
             List<Throwable> validationFailures = new ArrayList<Throwable>();
             
@@ -651,7 +651,7 @@ public class HollowProducer {
                 } catch(Throwable th) {
                     validationFailures.add(th);
                 }
-                valStatus.addValidatorStatus(throwable, validator.toString());
+                valStatus.addIndividualValidatorStatus(throwable, validator.toString());
             }
             
             if(!validationFailures.isEmpty()) {
@@ -996,11 +996,6 @@ public class HollowProducer {
         public Builder withListeners(HollowProducerListener... listeners) {
             for(HollowProducerListener listener : listeners)
                 this.listeners.add(listener);
-            return this;
-        }
-        
-        public Builder withValidationListener(HollowValidationListener listener) {
-            this.validationListeners.add(listener);
             return this;
         }
         

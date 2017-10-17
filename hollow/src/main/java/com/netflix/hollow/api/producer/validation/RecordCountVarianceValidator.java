@@ -20,18 +20,22 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.ValidatorStatus.Builder;
+import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.Builder;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
 /**
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
  *
+ * Used to validate if the cardinality change in current cycle is with in the allowed percent for a given typeName.
+ * Ex: 0% allowableVariancePercent ensures type cardinality does not vary at all for cycle to cycle. Ex: Number of state in United States.
+ * 10% allowableVariancePercent: from previous cycle any addition or removal within 10% cardinality is valid. 
+ * Anything more results in failure of validation.
  */
 public class RecordCountVarianceValidator implements Validator {
 	private final String typeName;
 	private final float allowableVariancePercent;
 	// status is used to capture details about validation. Helps surface information.
-	private ValidatorStatus status = null;
+	private IndividualValidatorStatus status = null;
 	
 	/**
 	 * 
@@ -84,7 +88,7 @@ public class RecordCountVarianceValidator implements Validator {
 
 	private Builder initializeForValidation(ReadState readState) {
 		status = null;
-		Builder builder = ValidatorStatus.builder().withVersion(readState.getVersion());
+		Builder builder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
 		builder.addAdditionalInfo(ALLOWABLE_VARIANCE_PERCENT_NAME, String.valueOf(allowableVariancePercent));
 		builder.addAdditionalInfo(DATA_TYPE_NAME, typeName);
 		return builder;

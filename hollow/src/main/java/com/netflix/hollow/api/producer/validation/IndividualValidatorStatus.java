@@ -20,8 +20,6 @@ package com.netflix.hollow.api.producer.validation;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 /**
  * *************************************
@@ -34,15 +32,14 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  * For now ValidationStatus builds these and sets toString on validator as the message (where validators provide any details).
  * In next iteration this might be directly returned by validators.
  */
-class ValidatorStatus {
+class IndividualValidatorStatus {
     private final long version;
     private final Status status;
     private final String message;
     private final Throwable throwable;
     private final Map<String, String> additionalInfo;
 
-	@Generated("SparkTools")
-	private ValidatorStatus(Builder builder) {
+	private IndividualValidatorStatus(Builder builder) {
 		this.version = builder.version;
 		this.status = builder.status;
 		this.message = builder.message;
@@ -50,7 +47,7 @@ class ValidatorStatus {
 		this.additionalInfo = builder.additionalInfo;
 	}
 
-	public ValidatorStatus(long version, Status status, String message,Throwable throwable, Map<String,String> additionalInfo) {
+	public IndividualValidatorStatus(long version, Status status, String message,Throwable throwable, Map<String,String> additionalInfo) {
 		super();
 		this.version = version;
 		this.status = status;
@@ -93,17 +90,15 @@ class ValidatorStatus {
 		return builder.toString();
 	}
 	/**
-	 * Creates builder to build {@link ValidatorStatus}.
+	 * Creates builder to build {@link IndividualValidatorStatus}.
 	 * @return created builder
 	 */
-	@Generated("SparkTools")
 	public static Builder builder() {
 		return new Builder();
 	}
 	/**
-	 * Builder to build {@link ValidatorStatus}.
+	 * Builder to build {@link IndividualValidatorStatus}.
 	 */
-	@Generated("SparkTools")
 	public static final class Builder {
 		private long version;
 		private Status status;
@@ -140,8 +135,8 @@ class ValidatorStatus {
 			return this;
 		}
 
-		public ValidatorStatus build() {
-			return new ValidatorStatus(this);
+		public IndividualValidatorStatus build() {
+			return new IndividualValidatorStatus(this);
 		}
 	}
 }

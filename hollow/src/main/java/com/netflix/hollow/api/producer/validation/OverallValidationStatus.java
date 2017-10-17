@@ -20,8 +20,6 @@ package com.netflix.hollow.api.producer.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Generated;
-
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -35,15 +33,14 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  * This aggregates information across multiple validators per run.
  *
  */
-public class ValidationStatus {
+public class OverallValidationStatus {
     private final long version;
     private final Status status;
     private final Throwable throwable;
     private final HollowProducer.ReadState readState;
-    private final List<ValidatorStatus> validatorStatusList;
+    private final List<IndividualValidatorStatus> validatorStatusList;
 
-	@Generated("SparkTools")
-	private ValidationStatus(Builder builder) {
+	private OverallValidationStatus(OverallValidationBuilder builder) {
 		this.version = builder.version;
 		this.status = builder.status;
 		this.throwable = builder.throwable;
@@ -51,8 +48,8 @@ public class ValidationStatus {
 		this.validatorStatusList = builder.validatorStatusList;
 	}
     
-	public ValidationStatus(long version, Status status, Throwable throwable, ReadState readState,
-			List<ValidatorStatus> validatorStatusList) {
+	public OverallValidationStatus(long version, Status status, Throwable throwable, ReadState readState,
+			List<IndividualValidatorStatus> validatorStatusList) {
 		super();
 		this.version = version;
 		this.status = status;
@@ -77,7 +74,7 @@ public class ValidationStatus {
 		return readState;
 	}
 
-	public List<ValidatorStatus> getValidatorStatusList() {
+	public List<IndividualValidatorStatus> getValidatorStatusList() {
 		return validatorStatusList;
 	}
 
@@ -88,63 +85,59 @@ public class ValidationStatus {
 	}
 
 	/**
-	 * Creates builder to build {@link ValidationStatus}.
+	 * Creates builder to build {@link OverallValidationStatus}.
 	 * @return created builder
 	 */
-	@Generated("SparkTools")
-	public static Builder builder() {
-		return new Builder();
+	public static OverallValidationBuilder builder() {
+		return new OverallValidationBuilder();
 	}
 
 	/**
-	 * Builder to build {@link ValidationStatus}.
+	 * Builder to build {@link OverallValidationStatus}.
 	 */
-	@Generated("SparkTools")
-	public static final class Builder {
+	public static final class OverallValidationBuilder {
 		private long version;
 		private Status status;
 		private Throwable throwable;
 		private HollowProducer.ReadState readState;
-		private List<ValidatorStatus> validatorStatusList;
+		private List<IndividualValidatorStatus> validatorStatusList;
 
-		private Builder() {
+		private OverallValidationBuilder() {
 			validatorStatusList = new ArrayList<>();
 		}
 
-		public Builder withVersion(long version) {
+		public OverallValidationBuilder withVersion(long version) {
 			this.version = version;
 			return this;
 		}
 
-		public Builder success() {
+		public OverallValidationBuilder success() {
 			this.status = Status.SUCCESS;
 			return this;
 		}
 		
-		public Builder fail(Throwable th) {
+		public OverallValidationBuilder fail(Throwable th) {
 			this.status = Status.FAIL;
 			this.throwable = th;
 			return this;
 		}
 
-		public Builder withThrowable(Throwable throwable) {
-			this.throwable = throwable;
-			return this;
-		}
-
-		public Builder withReadState(HollowProducer.ReadState readState) {
+		public OverallValidationBuilder withReadState(HollowProducer.ReadState readState) {
 			this.readState = readState;
 			return this;
 		}
 
-		public Builder addValidatorStatus(Throwable th, String message) {
+		public OverallValidationBuilder addIndividualValidatorStatus(Throwable th, String message) {
 			Status success = (th == null)? Status.SUCCESS: Status.FAIL;
-			this.validatorStatusList.add(ValidatorStatus.builder().withStatus(success).withMessage(message).withThrowable(th).withVersion(version).build());
+			this.validatorStatusList.add(IndividualValidatorStatus.builder().withStatus(success).withMessage(message).withThrowable(th).withVersion(version).build());
+			if(status == Status.FAIL){
+				this.status = Status.FAIL;
+			}
 			return this;
 		}
 
-		public ValidationStatus build() {
-			return new ValidationStatus(this);
+		public OverallValidationStatus build() {
+			return new OverallValidationStatus(this);
 		}
 	}
     
