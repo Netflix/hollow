@@ -37,9 +37,10 @@ public class SensitiveVideoServerSideUtil {
         return false;
     }
 
-    public static final Date getMetadataAvailabilityDate(boolean inDVDCatalog, Set<VideoSetType> videoSetTypes, Long firstDisplayDate, Long firstPhaseStartDate,
+    public static final Date getMetadataAvailabilityDate(boolean inDVDCatalog, boolean isOriginal, Set<VideoSetType> videoSetTypes, Long firstDisplayDate, Long firstPhaseStartDate,
             Long availabilityDate, Integer prePromoDays, Integer metadataReleaseDays, CycleConstants constants, Long earliestScheduledPhaseDate) {
-        if (inDVDCatalog) return constants.EXEMPT_HOLD_BACK_DATE;
+        if (inDVDCatalog && !isOriginal)
+            return constants.EXEMPT_HOLD_BACK_DATE;
 
         Long gracePeriodDate = null;
         if (availabilityDate!=null) {
