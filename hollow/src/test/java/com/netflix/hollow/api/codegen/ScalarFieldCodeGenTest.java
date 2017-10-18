@@ -38,6 +38,7 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
         builder.withErgonomicShortcuts();
         builder.withPackageGrouping();
         builder.withHollowPrimitiveTypes(true);
+        builder.withRestrictApiToFieldType();
         return super.initGenerator(builder);
     }
 
@@ -57,19 +58,19 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
         Map<String, Boolean> map;
         Set<Long> rankings;
 
-        Integer intBoxed;
+        Integer intObj;
         int intPrimitive;
         
-        Long longBoxed;
+        Long longObj;
         long longPrimitive;
         
-        Boolean boolBoxed;
+        Boolean boolObj;
         boolean boolPrimitive;
 
-        Float floatBoxed;
+        Float floatObj;
         float floatPrimitive;
         
-        Double doubleBoxed;
+        Double doubleObj;
         double doublePrimitive;
         
         
