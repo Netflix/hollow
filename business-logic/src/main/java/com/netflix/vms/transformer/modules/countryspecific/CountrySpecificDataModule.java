@@ -8,9 +8,9 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
-import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -22,6 +22,7 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
+import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.MulticatalogCountryData;
@@ -41,7 +42,6 @@ import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -331,6 +331,16 @@ public class CountrySpecificDataModule {
         return null;
     }
 
+    private VideoTypeDescriptorHollow getVideoTypeDescriptor(long videoId, String countryCode) {
+        HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
+        if (queryResult == null)
+            return null;
+
+        int ordinal = queryResult.iterator().next();
+        VideoTypeDescriptorHollow countryType = api.getVideoTypeDescriptorHollow(ordinal);
+        return countryType;
+    }
+
     private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
@@ -343,8 +353,10 @@ public class CountrySpecificDataModule {
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
-        boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode);
-        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(inDVDCatalog, videoSetTypes, firstDisplayDate, firstPhaseStartDate,
+        VideoTypeDescriptorHollow videoType = getVideoTypeDescriptor(videoId, countryCode);
+        boolean isOriginal = videoType == null ? false : videoType._getOriginal();
+        boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoType, videoId, countryCode);
+        data.metadataAvailabilityDate = SensitiveVideoServerSideUtil.getMetadataAvailabilityDate(inDVDCatalog, isOriginal, videoSetTypes, firstDisplayDate, firstPhaseStartDate,
                 availabilityDate, prePromoDays, metadataReleaseDays, constants, earliestPhaseDate);
         data.isSensitiveMetaData = SensitiveVideoServerSideUtil.isSensitiveMetaData(data.metadataAvailabilityDate, ctx);
     }
@@ -385,13 +397,13 @@ public class CountrySpecificDataModule {
             if (earliestStart == null || earliestStart > currentOffsetDate)
                 earliestStart = currentOffsetDate;
         }
-        
+
         if(earliestStart != null)
             rollup.newEarliestScheduledPhaseDate(earliestStart);
-        
+
         if(rollup.getRolledUpEarliestScheduledPhaseDate() != Long.MAX_VALUE)
             earliestStart = rollup.getRolledUpEarliestScheduledPhaseDate();
-        
+
         return earliestStart;
     }
 

@@ -16,6 +16,10 @@ public class DVDCatalogUtil {
         int ordinal = queryResult.iterator().next();
 
         VideoTypeDescriptorHollow countryType = api.getVideoTypeDescriptorHollow(ordinal);
+        return isVideoInDVDCatalog(api, countryType, videoId, countryCode);
+    }
+
+    public static boolean isVideoInDVDCatalog(VMSHollowInputAPI api, VideoTypeDescriptorHollow countryType, long videoId, String countryCode) {
         if ("US".equals(countryCode) && countryType._getExtended())
             return true;
 
