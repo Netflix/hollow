@@ -17,9 +17,6 @@ public class VideoCollectionsData implements Cloneable {
     public SortedMapOfIntegerToListOfVideoEpisode episodesForSeasonSequenceNumberMap = null;
     public int seasonNumber = -1;
     public VideoEpisode videoEpisode = null;
-    public VideoSeason videoSeason = null;
-    public VideoShow videoShow = null;
-
 
     @Override
     public boolean equals(Object o) {
@@ -29,46 +26,47 @@ public class VideoCollectionsData implements Cloneable {
         VideoCollectionsData that = (VideoCollectionsData) o;
 
         if (seasonNumber != that.seasonNumber) return false;
-        if (!nodeType.equals(that.nodeType)) return false;
-        if (!topNodeType.equals(that.topNodeType)) return false;
-        if (!videoEpisodes.equals(that.videoEpisodes)) return false;
-        if (!showChildren.equals(that.showChildren)) return false;
-        if (!seasonChildren.equals(that.seasonChildren)) return false;
-        if (!supplementalVideoParents.equals(that.supplementalVideoParents)) return false;
-        if (!supplementalVideos.equals(that.supplementalVideos)) return false;
-        if (!showParent.equals(that.showParent)) return false;
-        if (!seasonParent.equals(that.seasonParent)) return false;
-        if (!topNode.equals(that.topNode)) return false;
-        if (!episodesForSeasonSequenceNumberMap.equals(that.episodesForSeasonSequenceNumberMap)) return false;
-        if (!videoEpisode.equals(that.videoEpisode)) return false;
-        if (!videoSeason.equals(that.videoSeason)) return false;
-        return videoShow.equals(that.videoShow);
+        if (nodeType != null ? !nodeType.equals(that.nodeType) : that.nodeType != null) return false;
+        if (topNodeType != null ? !topNodeType.equals(that.topNodeType) : that.topNodeType != null) return false;
+        if (videoEpisodes != null ? !videoEpisodes.equals(that.videoEpisodes) : that.videoEpisodes != null)
+            return false;
+        if (showChildren != null ? !showChildren.equals(that.showChildren) : that.showChildren != null) return false;
+        if (seasonChildren != null ? !seasonChildren.equals(that.seasonChildren) : that.seasonChildren != null)
+            return false;
+        if (supplementalVideoParents != null ? !supplementalVideoParents.equals(that.supplementalVideoParents) : that.supplementalVideoParents != null)
+            return false;
+        if (supplementalVideos != null ? !supplementalVideos.equals(that.supplementalVideos) : that.supplementalVideos != null)
+            return false;
+        if (showParent != null ? !showParent.equals(that.showParent) : that.showParent != null) return false;
+        if (seasonParent != null ? !seasonParent.equals(that.seasonParent) : that.seasonParent != null) return false;
+        if (topNode != null ? !topNode.equals(that.topNode) : that.topNode != null) return false;
+        if (episodesForSeasonSequenceNumberMap != null ? !episodesForSeasonSequenceNumberMap.equals(that.episodesForSeasonSequenceNumberMap) : that.episodesForSeasonSequenceNumberMap != null)
+            return false;
+        return videoEpisode != null ? videoEpisode.equals(that.videoEpisode) : that.videoEpisode == null;
     }
 
     @Override
     public int hashCode() {
-        int result = nodeType.hashCode();
-        result = 31 * result + topNodeType.hashCode();
-        result = 31 * result + videoEpisodes.hashCode();
-        result = 31 * result + showChildren.hashCode();
-        result = 31 * result + seasonChildren.hashCode();
-        result = 31 * result + supplementalVideoParents.hashCode();
-        result = 31 * result + supplementalVideos.hashCode();
-        result = 31 * result + showParent.hashCode();
-        result = 31 * result + seasonParent.hashCode();
-        result = 31 * result + topNode.hashCode();
-        result = 31 * result + episodesForSeasonSequenceNumberMap.hashCode();
+        int result = nodeType != null ? nodeType.hashCode() : 0;
+        result = 31 * result + (topNodeType != null ? topNodeType.hashCode() : 0);
+        result = 31 * result + (videoEpisodes != null ? videoEpisodes.hashCode() : 0);
+        result = 31 * result + (showChildren != null ? showChildren.hashCode() : 0);
+        result = 31 * result + (seasonChildren != null ? seasonChildren.hashCode() : 0);
+        result = 31 * result + (supplementalVideoParents != null ? supplementalVideoParents.hashCode() : 0);
+        result = 31 * result + (supplementalVideos != null ? supplementalVideos.hashCode() : 0);
+        result = 31 * result + (showParent != null ? showParent.hashCode() : 0);
+        result = 31 * result + (seasonParent != null ? seasonParent.hashCode() : 0);
+        result = 31 * result + (topNode != null ? topNode.hashCode() : 0);
+        result = 31 * result + (episodesForSeasonSequenceNumberMap != null ? episodesForSeasonSequenceNumberMap.hashCode() : 0);
         result = 31 * result + seasonNumber;
-        result = 31 * result + videoEpisode.hashCode();
-        result = 31 * result + videoSeason.hashCode();
-        result = 31 * result + videoShow.hashCode();
+        result = 31 * result + (videoEpisode != null ? videoEpisode.hashCode() : 0);
         return result;
     }
 
     public String toString() {
+
         StringBuilder builder = new StringBuilder("VideoCollectionsData{");
         builder.append("nodeType=").append(nodeType);
-
         builder.append(",topNodeType=").append(topNodeType);
         builder.append(",videoEpisodes=").append(videoEpisodes);
         builder.append(",showChildren=").append(showChildren);
@@ -81,8 +79,6 @@ public class VideoCollectionsData implements Cloneable {
         builder.append(",episodesForSeasonSequenceNumberMap=").append(episodesForSeasonSequenceNumberMap);
         builder.append(",seasonNumber=").append(seasonNumber);
         builder.append(",videoEpisode=").append(videoEpisode);
-        builder.append(",videoSeason=").append(videoSeason);
-        builder.append(",videoShow=").append(videoShow);
         builder.append("}");
         return builder.toString();
     }
