@@ -30,7 +30,7 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
     @Override
     @Before
     public void setup() throws IOException {
-        isCleanupAfterEnabled = false;
+        // isCleanupAfterEnabled = false;
     }
 
     @Override
