@@ -38,8 +38,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes, boolean restrictApiToFieldType) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes, restrictApiToFieldType);
+    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = delegateInterfaceName(schema.getName());
     }
 
@@ -58,36 +58,26 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
             switch(schema.getFieldType(i)) {
             case BOOLEAN:
                 classBuilder.append("    public boolean get").append(methodFieldName).append("(int ordinal);\n\n");
-                if(!restrictApiToFieldType) {
-                    classBuilder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                }
+                classBuilder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case BYTES:
                 classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");
                 break;
             case DOUBLE:
                 classBuilder.append("    public double get").append(methodFieldName).append("(int ordinal);\n\n");
-                if(!restrictApiToFieldType) {
-                    classBuilder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                }
+                classBuilder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case FLOAT:
                 classBuilder.append("    public float get").append(methodFieldName).append("(int ordinal);\n\n");
-                if(!restrictApiToFieldType) {
-                    classBuilder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                }
+                classBuilder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case INT:
                 classBuilder.append("    public int get").append(methodFieldName).append("(int ordinal);\n\n");
-                if(!restrictApiToFieldType) {
-                    classBuilder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                }
+                classBuilder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case LONG:
                 classBuilder.append("    public long get").append(methodFieldName).append("(int ordinal);\n\n");
-                if(!restrictApiToFieldType) {
-                    classBuilder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                }
+                classBuilder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                 break;
             case REFERENCE:
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
@@ -98,12 +88,8 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
                     case FLOAT:
                     case INT:
                     case LONG:
-                        if(restrictApiToFieldType) {
-                            classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
-                        } else {
-                            classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
-                            classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
-                        }
+                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType()) + " get").append(methodFieldName).append("(int ordinal);\n\n");
+                        classBuilder.append("    public " + HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType()) + " get").append(methodFieldName).append("Boxed(int ordinal);\n\n");
                         break;
                     case BYTES:
                         classBuilder.append("    public byte[] get").append(methodFieldName).append("(int ordinal);\n\n");

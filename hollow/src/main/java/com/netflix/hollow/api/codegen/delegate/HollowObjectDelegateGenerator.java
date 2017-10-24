@@ -24,12 +24,10 @@ public abstract class HollowObjectDelegateGenerator extends HollowConsumerJavaFi
 
     protected final HollowObjectSchema schema;
     protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
-    protected final boolean restrictApiToFieldType;
 
-    public HollowObjectDelegateGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes, boolean restrictApiToFieldType) {
+    public HollowObjectDelegateGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
         super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
         this.schema = schema;
         this.ergonomicShortcuts = ergonomicShortcuts;
-        this.restrictApiToFieldType = restrictApiToFieldType;
     }
 }

@@ -43,8 +43,8 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  */
 public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes, boolean restrictApiToFieldType) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes, restrictApiToFieldType);
+    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
+        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
         this.className = delegateCachedImplName(schema.getName());
     }
 
@@ -140,13 +140,13 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             if(schema.getFieldType(i) == FieldType.REFERENCE) {
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
                 if(shortcut != null)
-                    addAccessor(builder, shortcut.getType(), fieldName, true);
+                    addAccessor(builder, shortcut.getType(), fieldName);
                 
                 builder.append("    public int get").append(uppercase(fieldName)).append("Ordinal(int ordinal) {\n");
                 builder.append("        return ").append(fieldName).append("Ordinal;\n");
                 builder.append("    }\n\n");
             } else {
-                addAccessor(builder, fieldType, fieldName, false);
+                addAccessor(builder, fieldType, fieldName);
             }
         }
 
@@ -173,31 +173,17 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
         return builder.toString();
     }
 
-    private void addAccessor(StringBuilder builder, FieldType fieldType, String fieldName, boolean reference) {
+    private void addAccessor(StringBuilder builder, FieldType fieldType, String fieldName) {
         switch(fieldType) {
         case BOOLEAN:
-            if(restrictApiToFieldType) {
-                if(!reference) {
-                    builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        if(").append(fieldName).append(" == null)\n");
-                    builder.append("            return false;\n");
-                    builder.append("        return ").append(fieldName).append(".booleanValue();\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public Boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        return ").append(fieldName).append(";\n");
-                    builder.append("    }\n\n");
-                }
-            } else {
-                builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                builder.append("        if(").append(fieldName).append(" == null)\n");
-                builder.append("            return false;\n");
-                builder.append("        return ").append(fieldName).append(".booleanValue();\n");
-                builder.append("    }\n\n");
-                builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-                builder.append("        return ").append(fieldName).append(";\n");
-                builder.append("    }\n\n");
-            }
+            builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return false;\n");
+            builder.append("        return ").append(fieldName).append(".booleanValue();\n");
+            builder.append("    }\n\n");
+            builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("        return ").append(fieldName).append(";\n");
+            builder.append("    }\n\n");
             break;
         case BYTES:
             builder.append("    public byte[] get").append(uppercase(fieldName)).append("(int ordinal) {\n");
@@ -205,100 +191,44 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             builder.append("    }\n\n");
             break;
         case DOUBLE:
-            if(restrictApiToFieldType) {
-                if(!reference) {
-                    builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        if(").append(fieldName).append(" == null)\n");
-                    builder.append("            return Double.NaN;\n");
-                    builder.append("        return ").append(fieldName).append(".doubleValue();\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public Double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        return ").append(fieldName).append(";\n");
-                    builder.append("    }\n\n");
-                }
-            } else {
-                builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                builder.append("        if(").append(fieldName).append(" == null)\n");
-                builder.append("            return Double.NaN;\n");
-                builder.append("        return ").append(fieldName).append(".doubleValue();\n");
-                builder.append("    }\n\n");
-                builder.append("    public Double get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-                builder.append("        return ").append(fieldName).append(";\n");
-                builder.append("    }\n\n");
-            }
+            builder.append("    public double get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Double.NaN;\n");
+            builder.append("        return ").append(fieldName).append(".doubleValue();\n");
+            builder.append("    }\n\n");
+            builder.append("    public Double get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("        return ").append(fieldName).append(";\n");
+            builder.append("    }\n\n");
             break;
         case FLOAT:
-            if(restrictApiToFieldType) {
-                if(!reference) {
-                    builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        if(").append(fieldName).append(" == null)\n");
-                    builder.append("            return Float.NaN;\n");
-                    builder.append("        return ").append(fieldName).append(".floatValue();\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public Float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        return ").append(fieldName).append(";\n");
-                    builder.append("    }\n\n");
-                }
-            } else {
-                builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                builder.append("        if(").append(fieldName).append(" == null)\n");
-                builder.append("            return Float.NaN;\n");
-                builder.append("        return ").append(fieldName).append(".floatValue();\n");
-                builder.append("    }\n\n");
-                builder.append("    public Float get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-                builder.append("        return ").append(fieldName).append(";\n");
-                builder.append("    }\n\n");
-            }
+            builder.append("    public float get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Float.NaN;\n");
+            builder.append("        return ").append(fieldName).append(".floatValue();\n");
+            builder.append("    }\n\n");
+            builder.append("    public Float get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("        return ").append(fieldName).append(";\n");
+            builder.append("    }\n\n");
             break;
         case INT:
-            if(restrictApiToFieldType) {
-                if(!reference) {
-                    builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        if(").append(fieldName).append(" == null)\n");
-                    builder.append("            return Integer.MIN_VALUE;\n");
-                    builder.append("        return ").append(fieldName).append(".intValue();\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public Integer get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        return ").append(fieldName).append(";\n");
-                    builder.append("    }\n\n");
-                }
-            } else {
-                builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                builder.append("        if(").append(fieldName).append(" == null)\n");
-                builder.append("            return Integer.MIN_VALUE;\n");
-                builder.append("        return ").append(fieldName).append(".intValue();\n");
-                builder.append("    }\n\n");
-                builder.append("    public Integer get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-                builder.append("        return ").append(fieldName).append(";\n");
-                builder.append("    }\n\n");
-            }
+            builder.append("    public int get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Integer.MIN_VALUE;\n");
+            builder.append("        return ").append(fieldName).append(".intValue();\n");
+            builder.append("    }\n\n");
+            builder.append("    public Integer get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("        return ").append(fieldName).append(";\n");
+            builder.append("    }\n\n");
             break;
         case LONG:
-            if(restrictApiToFieldType) {
-                if(!reference) {
-                    builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        if(").append(fieldName).append(" == null)\n");
-                    builder.append("            return Long.MIN_VALUE;\n");
-                    builder.append("        return ").append(fieldName).append(".longValue();\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public Long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                    builder.append("        return ").append(fieldName).append(";\n");
-                    builder.append("    }\n\n");
-                }
-            } else {
-                builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-                builder.append("        if(").append(fieldName).append(" == null)\n");
-                builder.append("            return Long.MIN_VALUE;\n");
-                builder.append("        return ").append(fieldName).append(".longValue();\n");
-                builder.append("    }\n\n");
-                builder.append("    public Long get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
-                builder.append("        return ").append(fieldName).append(";\n");
-                builder.append("    }\n\n");
-            }
+            builder.append("    public long get").append(uppercase(fieldName)).append("(int ordinal) {\n");
+            builder.append("        if(").append(fieldName).append(" == null)\n");
+            builder.append("            return Long.MIN_VALUE;\n");
+            builder.append("        return ").append(fieldName).append(".longValue();\n");
+            builder.append("    }\n\n");
+            builder.append("    public Long get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
+            builder.append("        return ").append(fieldName).append(";\n");
+            builder.append("    }\n\n");
             break;
         case STRING:
             builder.append("    public String get").append(uppercase(fieldName)).append("(int ordinal) {\n");
