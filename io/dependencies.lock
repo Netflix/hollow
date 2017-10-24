@@ -7543,7 +7543,8 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1"
+            "locked": "3.0.1",
+            "requested": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -7614,7 +7615,8 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.8"
+            "locked": "0.7.8",
+            "requested": "0.7.8"
         }
     },
     "jacocoAnt": {
@@ -7625,7 +7627,8 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.7.8"
+            "locked": "0.7.8",
+            "requested": "0.7.8"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.7.8",
