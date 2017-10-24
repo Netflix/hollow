@@ -17,9 +17,9 @@ package com.netflix.hollow.api.codegen;
 
 /**
  * Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  * @author dsu
  */
 public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileGenerator {
@@ -28,6 +28,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     protected final String packageName;
     protected final String subPackageName;
     protected String className;
+    protected boolean useCollectionsImport=false;
 
     public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
         this.packageName = packageName;
@@ -45,6 +46,10 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
         return className;
     }
 
+    public void useCollectionsImport() {
+        this.useCollectionsImport=true;
+    }
+
     protected void appendPackageAndCommonImports(StringBuilder builder) {
         String fullPackageName = createFullPackageName(packageName, subPackageName, usePackageGrouping);
         if (!isEmpty(fullPackageName)) {
@@ -57,7 +62,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
             if (usePackageGrouping) {
                 builder.append("import ").append(packageName).append(".*;\n");
                 builder.append("import ").append(packageName).append(".core.*;\n");
-                builder.append("import ").append(packageName).append(".collections.*;\n\n");
+                if (useCollectionsImport) builder.append("import ").append(packageName).append(".collections.*;\n\n");
             }
         }
     }

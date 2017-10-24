@@ -61,7 +61,9 @@ public class HollowAPIGenerator {
     private final HollowDataset dataset;
     private final Set<String> parameterizedTypes;
     private final boolean parameterizeClassNames;
+    private final boolean hasCollectionsInDataSet;
     private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
+
 
     private String classPostfix = "Hollow";
     private String getterPrefix = "_";
@@ -107,9 +109,21 @@ public class HollowAPIGenerator {
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.dataset = dataset;
+        this.hasCollectionsInDataSet = hasCollectionsInDataSet(dataset);
         this.parameterizedTypes = parameterizedTypes;
         this.parameterizeClassNames = parameterizeAllClassNames;
         this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
+    }
+
+    private static boolean hasCollectionsInDataSet(HollowDataset dataset) {
+        for(HollowSchema schema : dataset.getSchemas()) {
+            if ((schema instanceof HollowListSchema) ||
+                    (schema instanceof HollowSetSchema) ||
+                    (schema instanceof HollowMapSchema)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -203,7 +217,7 @@ public class HollowAPIGenerator {
     private void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
-            if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type 
+            if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type
 
             generateFile(directory, getStaticAPIGenerator(schema));
             generateFile(directory, getHollowObjectGenerator(schema));
@@ -228,7 +242,9 @@ public class HollowAPIGenerator {
     private void generateFile(File directory, HollowJavaFileGenerator generator) throws IOException {
         // create sub folder if not using default package and sub packages are enabled
         if ((packageName!=null && !packageName.trim().isEmpty()) && usePackageGrouping && (generator instanceof HollowConsumerJavaFileGenerator)) {
-            directory = new File(directory, ((HollowConsumerJavaFileGenerator)generator).getSubPackageName());
+            HollowConsumerJavaFileGenerator consumerCodeGenerator = (HollowConsumerJavaFileGenerator)generator;
+            if (hasCollectionsInDataSet) consumerCodeGenerator.useCollectionsImport();
+            directory = new File(directory, consumerCodeGenerator.getSubPackageName());
         }
         if (!directory.exists()) directory.mkdirs();
 
