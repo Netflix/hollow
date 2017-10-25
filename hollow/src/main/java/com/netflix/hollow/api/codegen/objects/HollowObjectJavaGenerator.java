@@ -18,12 +18,12 @@
 package com.netflix.hollow.api.codegen.objects;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.generateBooleanAccessorMethodName;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
@@ -38,9 +38,9 @@ import java.util.Set;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "";
@@ -69,10 +69,10 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         this.ergonomicShortcuts = ergonomicShortcuts;
         this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
     }
-    
+
     private static String computeSubPackageName(HollowObjectSchema schema) {
         String type = schema.getName();
-        if (isPrimitiveType(type)) {
+        if (isPrimitiveType(type) || schema.isEnumType()) {
             return "core";
         }
         return SUB_PACKAGE_NAME;
@@ -198,12 +198,22 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
                 builder.append("    }\n\n");
                 break;
             case STRING:
-                builder.append("    public String ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
-                builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
-                builder.append("    }\n\n");
-                builder.append("    public boolean ").append(getterPrefix).append("is" + uppercase(fieldName) + "Equal(String testValue) {\n");
-                builder.append("        return delegate().is" + uppercase(fieldName) + "Equal(ordinal, testValue);\n");
-                builder.append("    }\n\n");
+                Class<?> enumClass = shortcut.getEnumClass();
+                if (enumClass!=null) {
+                    String enumType = enumClass.getCanonicalName();
+                    builder.append("    public ").append(enumType).append(" ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                    builder.append("        String value = delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                    builder.append("        if (value==null) return null;\n");
+                    builder.append("        return ").append(enumType).append(".valueOf(value);\n");
+                    builder.append("    }\n\n");
+                } else {
+                    builder.append("    public String ").append(getterPrefix).append("get" + uppercase(fieldName) + "() {\n");
+                    builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
+                    builder.append("    }\n\n");
+                    builder.append("    public boolean ").append(getterPrefix).append("is" + uppercase(fieldName) + "Equal(String testValue) {\n");
+                    builder.append("        return delegate().is" + uppercase(fieldName) + "Equal(ordinal, testValue);\n");
+                    builder.append("    }\n\n");
+                }
                 break;
             default:
             }
@@ -218,7 +228,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
             methodName = getterPrefix + "get" + uppercase(fieldName) + "HollowReference";
         } else {
             boolean isBooleanRefType = Boolean.class.getSimpleName().equals(referencedType);
-            methodName = getterPrefix + (isBooleanRefType ?  generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName)); 
+            methodName = getterPrefix + (isBooleanRefType ?  generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName));
         }
 
         if(parameterize)
