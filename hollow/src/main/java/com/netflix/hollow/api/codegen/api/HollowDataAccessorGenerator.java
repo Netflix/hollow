@@ -35,10 +35,11 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "accessor";
-    
+
     protected final String apiclassName;
     protected final String classPostfix;
     protected final String type;
+    protected final String javaType;
     protected final boolean useAggressiveSubstitutions;
     protected final HollowObjectSchema schema;
 
@@ -48,12 +49,15 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
         this.apiclassName = apiclassName;
         this.classPostfix = classPostfix;
         this.type =  hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
+        this.javaType = schema.isEnumType() ? schema.getEnumClass().getCanonicalName() : type;
         this.useAggressiveSubstitutions = useAggressiveSubstitutions;
         this.schema = schema;
     }
 
     protected String getclassName(HollowObjectSchema schema) {
-        return schema.getName() + "DataAccessor";
+        String name = schema.getName();
+        if (schema.isEnumType()) name = name.replaceFirst("HEnum", "");
+        return name + "DataAccessor";
     }
 
     @Override
@@ -68,7 +72,7 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
 
         builder.append("\n");
         builder.append("@SuppressWarnings(\"all\")\n");
-        builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
+        builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + javaType  +"> {\n\n");
 
         builder.append("    public static final String TYPE = \"" + type + "\";\n");
         builder.append("    private " + apiclassName + " api;\n\n");
@@ -104,8 +108,13 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     }
 
     protected void genPublicAPIs(StringBuilder builder) {
-        builder.append("    @Override public " + type + " getRecord(int ordinal){\n");
-        builder.append("        return api.get" + type + "(ordinal);\n");
+        builder.append("    @Override public " + javaType + " getRecord(int ordinal){\n");
+        if (schema.isEnumType()) {
+            builder.append("        " + type + " value =  api.get" + type + "(ordinal);\n");
+            builder.append("        return value == null ? null : " + schema.getEnumClass().getCanonicalName() + ".valueOf(value.get_name());\n");
+        } else {
+            builder.append("        return api.get" + type + "(ordinal);\n");
+        }
         builder.append("    }\n\n");
     }
 }
