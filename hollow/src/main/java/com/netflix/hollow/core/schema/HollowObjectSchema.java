@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,6 +44,7 @@ public class HollowObjectSchema extends HollowSchema {
     protected final String referencedTypes[];
     private final HollowTypeReadState referencedFieldTypeStates[];  /// populated during deserialization
     private final PrimaryKey primaryKey;
+    private Class<Enum<?>> enumClass;
 
     private int size;
 
@@ -61,6 +61,18 @@ public class HollowObjectSchema extends HollowSchema {
         this.referencedTypes = new String[numFields];
         this.referencedFieldTypeStates = new HollowTypeReadState[numFields];
         this.primaryKey = primaryKey;
+    }
+
+    public void setEnumClass(Class<Enum<?>> enumClass) {
+        this.enumClass = enumClass;
+    }
+
+    public boolean isEnumType() {
+        return enumClass!=null;
+    }
+
+    public Class<Enum<?>> getEnumClass() {
+        return enumClass;
     }
 
     public int numFields() {

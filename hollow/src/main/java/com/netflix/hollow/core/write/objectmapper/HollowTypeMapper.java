@@ -20,12 +20,11 @@ package com.netflix.hollow.core.write.objectmapper;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class HollowTypeMapper {
 
@@ -59,9 +58,12 @@ public abstract class HollowTypeMapper {
     protected static String getDefaultTypeName(Type type) {
         if(type instanceof Class) {
             Class<?> clazz = (Class<?>)type;
+            if (clazz.isEnum()) return "HEnum"+clazz.getSimpleName();
+
             HollowTypeName explicitTypeName = clazz.getAnnotation(HollowTypeName.class);
             if(explicitTypeName != null)
                 return explicitTypeName.name();
+
             return clazz.getSimpleName();
         }
 
@@ -77,7 +79,7 @@ public abstract class HollowTypeMapper {
 
         return clazz.getSimpleName();
     }
-    
+
     protected long cycleSpecificAssignedOrdinalBits() {
         return getTypeWriteState().getStateEngine().getNextStateRandomizedTag() & ASSIGNED_ORDINAL_CYCLE_MASK;
     }

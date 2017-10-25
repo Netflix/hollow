@@ -37,7 +37,7 @@ import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowObjectTypeMapper extends HollowTypeMapper {
-    
+
     private static final Unsafe unsafe = HollowUnsafeHandle.getUnsafe();
     private final HollowObjectMapper parentMapper;
 
@@ -50,7 +50,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final long assignedOrdinalFieldOffset;
 
     private final List<MappedField> mappedFields;
-    
+
     private volatile int primaryKeyFieldPathIdx[][];
 
     public HollowObjectTypeMapper(HollowObjectMapper parentMapper, Class<?> clazz, String declaredTypeName, Set<Type> visited) {
@@ -58,7 +58,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         this.clazz = clazz;
         this.typeName = declaredTypeName != null ? declaredTypeName : getDefaultTypeName(clazz);
         this.mappedFields = new ArrayList<MappedField>();
-        
+
         if(clazz == String.class) {
             try {
                 mappedFields.add(new MappedField(clazz.getDeclaredField("value")));
@@ -74,7 +74,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         } else {
             /// gather fields from type hierarchy
             Class<?> currentClass = clazz;
-            
+
             while(currentClass != Object.class && currentClass != Enum.class) {
                 if(currentClass.isInterface()) {
                     throw new IllegalArgumentException("Unexpected interface " + currentClass.getSimpleName() + " passed as field.");
@@ -82,25 +82,30 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     throw new IllegalArgumentException("Unexpected array " + currentClass.getSimpleName() + " passed as field. Consider using collections or marking as transient.");
                 }
                 Field[] declaredFields = currentClass.getDeclaredFields();
-    
+
                 for(int i=0;i<declaredFields.length;i++) {
                     if(!Modifier.isTransient(declaredFields[i].getModifiers()) &&
-                       !Modifier.isStatic(declaredFields[i].getModifiers()) && 
+                       !Modifier.isStatic(declaredFields[i].getModifiers()) &&
                        !"__assigned_ordinal".equals(declaredFields[i].getName()) &&
                        declaredFields[i].getAnnotation(HollowTransient.class) == null) {
 
                         mappedFields.add(new MappedField(declaredFields[i], visited));
                     }
                 }
-    
+
                 if(currentClass.isEnum())
                     mappedFields.add(new MappedField(MappedFieldType.ENUM_NAME));
-                
+
                 currentClass = currentClass.getSuperclass();
             }
         }
 
         this.schema = new HollowObjectSchema(typeName, mappedFields.size(), getKeyFieldPaths(clazz));
+        if (clazz.isEnum()) {
+            @SuppressWarnings("unchecked")
+            Class<Enum<?>> enumClass = ((Class<Enum<?>>)clazz);
+            this.schema.setEnumClass(enumClass);
+        }
 
         for(MappedField field : mappedFields) {
             if(field.getFieldType() == MappedFieldType.REFERENCE) {
@@ -123,7 +128,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 assignedOrdinalType = AssignedOrdinalType.LONG;
             else if(declaredField.getType() == int.class)
                 assignedOrdinalType = AssignedOrdinalType.INT;
-            
+
         } catch (Exception ignore) { }
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
         this.assignedOrdinalType = assignedOrdinalType;
@@ -137,7 +142,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
         return primaryKey == null ? null : primaryKey.fields();
     }
-    
+
     private static int getNumShards(Class<?> clazz) {
         HollowShardLargeType numShardsAnnotation = clazz.getAnnotation(HollowShardLargeType.class);
         if(numShardsAnnotation != null)
@@ -179,7 +184,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         int assignedOrdinal = writeState.add(rec);
         switch(assignedOrdinalType) {
         case LONG:
-            unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
+            unsafe.putLong(obj, assignedOrdinalFieldOffset, assignedOrdinal | cycleSpecificAssignedOrdinalBits());
             break;
         case INT:
             unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
@@ -192,33 +197,33 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     Object[] extractPrimaryKey(Object obj) {
         int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;
-        
+
         if(primaryKeyFieldPathIdx == null) {
             primaryKeyFieldPathIdx = calculatePrimaryKeyFieldPathIdx(primaryKeyFieldPathIdx);
             this.primaryKeyFieldPathIdx = primaryKeyFieldPathIdx;
         }
-        
+
         Object key[] = new Object[primaryKeyFieldPathIdx.length];
-        
+
         for(int i=0;i<key.length;i++) {
             key[i] = retrieveFieldValue(obj, primaryKeyFieldPathIdx[i], 0);
         }
-        
+
         return key;
     }
 
     private int[][] calculatePrimaryKeyFieldPathIdx(int[][] primaryKeyFieldPathIdx) {
         if(schema.getPrimaryKey() == null)
             throw new IllegalArgumentException("Type " + typeName + " does not have a primary key defined");
-        
+
         primaryKeyFieldPathIdx = new int[schema.getPrimaryKey().numFields()][];
-        
+
         for(int i=0;i<primaryKeyFieldPathIdx.length;i++)
             primaryKeyFieldPathIdx[i] = schema.getPrimaryKey().getFieldPathIndex(parentMapper.getStateEngine(), i);
-        
+
         return primaryKeyFieldPathIdx;
     }
-    
+
     String[] getDefaultElementHashKey() {
         PrimaryKey pKey = schema.getPrimaryKey();
         if (pKey != null) return pKey.getFieldPaths();
@@ -260,7 +265,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
         }
-        
+
         @SuppressWarnings("deprecation")
         private MappedField(Field f, Set<Type> visitedTypes) {
             this.fieldOffset = unsafe.objectFieldOffset(f);
@@ -270,10 +275,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isInlinedField = f.isAnnotationPresent(HollowInline.class);
-            
+
 
             HollowTypeMapper subTypeMapper = null;
-            
+
             if(type == int.class) {
                 fieldType = MappedFieldType.INT;
             } else if(type == short.class) {
@@ -317,19 +322,19 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             } else {
                 if(isInlinedField)
                     throw new IllegalStateException("@HollowInline annotation defined on field " + f + ", which is not either a String or boxed primitive.");
-                
+
                 fieldType = MappedFieldType.REFERENCE;
                 if(visitedTypes.contains(this.type)){
                     throw new IllegalStateException("circular reference detected on field " + f + "; this type of relationship is not supported");
                 }
                 // guard recursion here
                 visitedTypes.add(this.type);
-                subTypeMapper = parentMapper.getTypeMapper(type, 
-                        typeNameAnnotation != null ? typeNameAnnotation.name() : null, 
-                                hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null, 
-                                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1, 
+                subTypeMapper = parentMapper.getTypeMapper(type,
+                        typeNameAnnotation != null ? typeNameAnnotation.name() : null,
+                                hashKeyAnnotation != null ? hashKeyAnnotation.fields() : null,
+                                        numShardsAnnotation != null ? numShardsAnnotation.numShards() : -1,
                                                 visitedTypes);
-                
+
                 // once we've safely returned from a leaf node in recursion, we can remove this MappedField's type
                 visitedTypes.remove(this.type);
             }
@@ -366,7 +371,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         @SuppressWarnings("deprecation")
         public void copy(Object obj, HollowObjectWriteRecord rec) {
             Object fieldObject;
-            
+
             switch(fieldType) {
                 case BOOLEAN:
                     rec.setBoolean(fieldName, unsafe.getBoolean(obj, fieldOffset));
@@ -429,7 +434,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case INLINED_CHAR:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
-                        rec.setInt(fieldName, (int)((Character)fieldObject).charValue());
+                        rec.setInt(fieldName, ((Character)fieldObject).charValue());
                     break;
                 case INLINED_LONG:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
@@ -469,7 +474,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
             }
         }
-        
+
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
             Object fieldObject;
 
@@ -481,7 +486,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     return null;
                 return ((HollowObjectTypeMapper)subTypeMapper).retrieveFieldValue(fieldObject, fieldPathIdx, idx+1);
             }
-            
+
 
             switch(fieldType) {
             case BOOLEAN:
@@ -540,7 +545,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
     }
-    
+
     private static enum AssignedOrdinalType {
         INT,
         LONG,
@@ -571,24 +576,24 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         REFERENCE(FieldType.REFERENCE),
         ENUM_NAME(FieldType.STRING, "_name"),
         DATE_TIME(FieldType.LONG, "value");
-        
+
         private final FieldType schemaFieldType;
         private final String specialFieldName;
-        
+
         private MappedFieldType(FieldType schemaFieldType) {
             this.specialFieldName = null;
             this.schemaFieldType = schemaFieldType;
         }
-        
+
         private MappedFieldType(FieldType schemaFieldType, String specialFieldName) {
             this.schemaFieldType = schemaFieldType;
             this.specialFieldName = specialFieldName;
         }
-        
+
         public String getSpecialFieldName() {
             return specialFieldName;
         }
-        
+
         public FieldType getSchemaFieldType() {
             return schemaFieldType;
         }

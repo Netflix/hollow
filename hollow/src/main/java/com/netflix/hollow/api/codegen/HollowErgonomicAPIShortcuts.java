@@ -17,45 +17,44 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import java.util.Collections;
-
-import java.util.Arrays;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HollowErgonomicAPIShortcuts {
-    
+
     public static final HollowErgonomicAPIShortcuts NO_SHORTCUTS = new HollowErgonomicAPIShortcuts();
-    
+
     private final Map<String, Shortcut> shortcutFieldPaths;
-    
+
     private HollowErgonomicAPIShortcuts() {
         this.shortcutFieldPaths = Collections.emptyMap();
     }
-    
+
     HollowErgonomicAPIShortcuts(HollowDataset dataset) {
         this.shortcutFieldPaths = new HashMap<String, Shortcut>();
         populatePaths(dataset);
     }
-    
+
     public Shortcut getShortcut(String typeField) {
         return shortcutFieldPaths.get(typeField);
     }
-    
+
     int numShortcuts() {
         return shortcutFieldPaths.size();
     }
-    
+
     private void populatePaths(HollowDataset dataset) {
         for(HollowSchema schema : dataset.getSchemas()) {
             if(schema.getSchemaType() == SchemaType.OBJECT) {
                 HollowObjectSchema objSchema = (HollowObjectSchema)schema;
-                
+
                 for(int i=0;i<objSchema.numFields();i++) {
                     if(objSchema.getFieldType(i) == FieldType.REFERENCE) {
                         HollowSchema refSchema = dataset.getSchema(objSchema.getReferencedType(i));
@@ -71,10 +70,14 @@ public class HollowErgonomicAPIShortcuts {
             }
         }
     }
-    
+
     private Shortcut getShortcutFieldPath(HollowDataset dataset, HollowSchema schema) {
         if(schema.getSchemaType() == SchemaType.OBJECT) {
             HollowObjectSchema objSchema = (HollowObjectSchema)schema;
+            if (objSchema.isEnumType()) {
+                return new Shortcut(new String[] { objSchema.getName() }, new String[] { objSchema.getFieldName(0) }, objSchema.getFieldType(0), objSchema.getEnumClass());
+            }
+
             if(objSchema.numFields() == 1) {
                 if(objSchema.getFieldType(0) == FieldType.REFERENCE) {
                     HollowSchema refSchema = dataset.getSchema(objSchema.getReferencedType(0));
@@ -87,18 +90,19 @@ public class HollowErgonomicAPIShortcuts {
                             shortcutPath[0] = objSchema.getFieldName(0);
                             System.arraycopy(childShortcut.getPath(), 0, shortcutPath, 1, childShortcut.getPath().length);
                             System.arraycopy(childShortcut.getPathTypes(), 0, shortcutPathTypes, 1, childShortcut.getPathTypes().length);
-                            return new Shortcut(shortcutPathTypes, shortcutPath, childShortcut.getType());
+                            return new Shortcut(shortcutPathTypes, shortcutPath, childShortcut.getType(), null);
                         }
                     }
                 } else {
-                    return new Shortcut(new String[] { objSchema.getName() }, new String[] { objSchema.getFieldName(0) }, objSchema.getFieldType(0));
+                    return new Shortcut(new String[] { objSchema.getName() }, new String[] { objSchema.getFieldName(0) }, objSchema.getFieldType(0), null);
                 }
             }
         }
-        
+
         return null;
     }
-    
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         for(Map.Entry<String, Shortcut> entry : shortcutFieldPaths.entrySet()) {
@@ -106,30 +110,37 @@ public class HollowErgonomicAPIShortcuts {
         }
         return builder.toString();
     }
-    
+
     public static class Shortcut {
         public final String[] pathTypes;
         public final String[] path;
         public final FieldType type;
-        
-        public Shortcut(String[] pathTypes, String[] path, FieldType type) {
+        public final Class<Enum<?>> enumClass;
+
+        public Shortcut(String[] pathTypes, String[] path, FieldType type,  Class<Enum<?>> enumClass) {
             this.pathTypes = pathTypes;
             this.path = path;
             this.type = type;
+            this.enumClass = enumClass;
         }
-        
+
         public String[] getPath() {
             return path;
         }
-        
+
         public String[] getPathTypes() {
             return pathTypes;
         }
-        
+
         public FieldType getType() {
             return type;
         }
-        
+
+        public Class<Enum<?>> getEnumClass() {
+            return enumClass;
+        }
+
+        @Override
         public String toString() {
             return Arrays.toString(path) + " (" + type.toString() + ")";
         }
