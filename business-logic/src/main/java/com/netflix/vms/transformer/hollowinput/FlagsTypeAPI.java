@@ -8,7 +8,7 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
     private final FlagsDelegateLookupImpl delegateLookupImpl;
 
-    FlagsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public FlagsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "searchOnly",
             "localText",

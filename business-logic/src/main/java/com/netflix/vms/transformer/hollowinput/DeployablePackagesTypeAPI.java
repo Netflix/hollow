@@ -8,7 +8,7 @@ public class DeployablePackagesTypeAPI extends HollowObjectTypeAPI {
 
     private final DeployablePackagesDelegateLookupImpl delegateLookupImpl;
 
-    DeployablePackagesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DeployablePackagesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "movieId",

@@ -10,7 +10,7 @@ public class DisallowedSubtitleLangCodesListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    DisallowedSubtitleLangCodesListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public DisallowedSubtitleLangCodesListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

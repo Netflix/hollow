@@ -8,7 +8,7 @@ public class DisallowedSubtitleLangCodeTypeAPI extends HollowObjectTypeAPI {
 
     private final DisallowedSubtitleLangCodeDelegateLookupImpl delegateLookupImpl;
 
-    DisallowedSubtitleLangCodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DisallowedSubtitleLangCodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

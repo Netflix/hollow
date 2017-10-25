@@ -8,7 +8,7 @@ public class ArtWorkImageTypeTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtWorkImageTypeDelegateLookupImpl delegateLookupImpl;
 
-    ArtWorkImageTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ArtWorkImageTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "imageType",
             "extension",

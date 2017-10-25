@@ -8,7 +8,7 @@ public class CharacterElementsTypeAPI extends HollowObjectTypeAPI {
 
     private final CharacterElementsDelegateLookupImpl delegateLookupImpl;
 
-    CharacterElementsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CharacterElementsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "characterName",
             "bladeBottomLine",

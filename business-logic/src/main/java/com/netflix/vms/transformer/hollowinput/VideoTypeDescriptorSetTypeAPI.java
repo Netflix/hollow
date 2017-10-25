@@ -10,7 +10,7 @@ public class VideoTypeDescriptorSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    VideoTypeDescriptorSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public VideoTypeDescriptorSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

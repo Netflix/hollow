@@ -10,7 +10,7 @@ public class RolloutPhaseWindowMapTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;
 
-    RolloutPhaseWindowMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
+    public RolloutPhaseWindowMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowMapLookupDelegate(this);
     }

@@ -8,7 +8,7 @@ public class IndividualSupplementalTypeAPI extends HollowObjectTypeAPI {
 
     private final IndividualSupplementalDelegateLookupImpl delegateLookupImpl;
 
-    IndividualSupplementalTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public IndividualSupplementalTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "identifier",
             "movieId",

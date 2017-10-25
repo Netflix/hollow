@@ -10,7 +10,7 @@ public class VideoRatingArrayOfRatingTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    VideoRatingArrayOfRatingTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public VideoRatingArrayOfRatingTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

@@ -12,6 +12,10 @@ public interface TurboCollectionsDelegate extends HollowObjectDelegate {
 
     public int getPrefixOrdinal(int ordinal);
 
+    public int getDesOrdinal(int ordinal);
+
+    public int getEvi_nOrdinal(int ordinal);
+
     public int getChar_nOrdinal(int ordinal);
 
     public int getNav_snOrdinal(int ordinal);

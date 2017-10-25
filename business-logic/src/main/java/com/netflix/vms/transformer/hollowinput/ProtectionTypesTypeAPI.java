@@ -8,7 +8,7 @@ public class ProtectionTypesTypeAPI extends HollowObjectTypeAPI {
 
     private final ProtectionTypesDelegateLookupImpl delegateLookupImpl;
 
-    ProtectionTypesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ProtectionTypesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "name",
             "id"

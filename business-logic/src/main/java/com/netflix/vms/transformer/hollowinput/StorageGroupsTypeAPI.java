@@ -8,7 +8,7 @@ public class StorageGroupsTypeAPI extends HollowObjectTypeAPI {
 
     private final StorageGroupsDelegateLookupImpl delegateLookupImpl;
 
-    StorageGroupsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StorageGroupsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "cdnId",

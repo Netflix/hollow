@@ -8,7 +8,7 @@ public class PersonAliasesTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonAliasesDelegateLookupImpl delegateLookupImpl;
 
-    PersonAliasesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PersonAliasesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "aliasId",
             "name"

@@ -25,6 +25,20 @@ public class TurboCollectionsHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
+    public TranslatedTextHollow _getDes() {
+        int refOrdinal = delegate().getDesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getTranslatedTextHollow(refOrdinal);
+    }
+
+    public TranslatedTextHollow _getEvi_n() {
+        int refOrdinal = delegate().getEvi_nOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getTranslatedTextHollow(refOrdinal);
+    }
+
     public TranslatedTextHollow _getChar_n() {
         int refOrdinal = delegate().getChar_nOrdinal(ordinal);
         if(refOrdinal == -1)

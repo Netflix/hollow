@@ -1,32 +1,22 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
-public class ContractPrimaryKeyIndex implements HollowConsumer.RefreshListener {
-
-    private HollowPrimaryKeyIndex idx;
-    private VMSHollowInputAPI api;
+@SuppressWarnings("all")
+public class ContractPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ContractHollow> {
 
     public ContractPrimaryKeyIndex(HollowConsumer consumer) {
         this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Contract")).getPrimaryKey().getFieldPaths());
     }
 
     public ContractPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
-        consumer.getRefreshLock().lock();
-        try {
-            this.api = (VMSHollowInputAPI)consumer.getAPI();
-            this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "Contract", fieldPaths);
-            idx.listenForDeltaUpdates();
-            consumer.addRefreshListener(this);
-        } catch(ClassCastException cce) {
-            throw new ClassCastException("The HollowConsumer provided was not created with the VMSHollowInputAPI generated API class.");
-        } finally {
-            consumer.getRefreshLock().unlock();
-        }
+        this(consumer, true, fieldPaths);
+    }
+
+    public ContractPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "Contract", isListenToDataRefreah, fieldPaths);
     }
 
     public ContractHollow findMatch(Object... keys) {
@@ -36,19 +26,4 @@ public class ContractPrimaryKeyIndex implements HollowConsumer.RefreshListener {
         return api.getContractHollow(ordinal);
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        idx.detachFromDeltaUpdates();
-        idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
-        idx.listenForDeltaUpdates();
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
 }

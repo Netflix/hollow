@@ -10,7 +10,7 @@ public class EpisodeListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    EpisodeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public EpisodeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

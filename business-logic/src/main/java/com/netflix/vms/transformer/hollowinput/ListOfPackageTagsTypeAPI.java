@@ -10,7 +10,7 @@ public class ListOfPackageTagsTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ListOfPackageTagsTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public ListOfPackageTagsTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

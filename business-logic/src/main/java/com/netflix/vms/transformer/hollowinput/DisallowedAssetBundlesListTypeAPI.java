@@ -10,7 +10,7 @@ public class DisallowedAssetBundlesListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    DisallowedAssetBundlesListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public DisallowedAssetBundlesListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

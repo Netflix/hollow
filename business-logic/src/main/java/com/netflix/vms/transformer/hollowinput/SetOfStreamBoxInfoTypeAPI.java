@@ -10,7 +10,7 @@ public class SetOfStreamBoxInfoTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    SetOfStreamBoxInfoTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public SetOfStreamBoxInfoTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

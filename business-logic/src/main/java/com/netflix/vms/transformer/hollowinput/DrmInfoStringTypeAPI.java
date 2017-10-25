@@ -8,7 +8,7 @@ public class DrmInfoStringTypeAPI extends HollowObjectTypeAPI {
 
     private final DrmInfoStringDelegateLookupImpl delegateLookupImpl;
 
-    DrmInfoStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DrmInfoStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

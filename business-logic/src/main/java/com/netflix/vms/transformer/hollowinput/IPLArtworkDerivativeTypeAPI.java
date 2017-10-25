@@ -8,7 +8,7 @@ public class IPLArtworkDerivativeTypeAPI extends HollowObjectTypeAPI {
 
     private final IPLArtworkDerivativeDelegateLookupImpl delegateLookupImpl;
 
-    IPLArtworkDerivativeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public IPLArtworkDerivativeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "recipeName",
             "widthInPixels",

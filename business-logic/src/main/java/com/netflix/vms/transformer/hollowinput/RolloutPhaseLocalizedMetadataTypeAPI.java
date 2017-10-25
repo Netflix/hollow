@@ -8,7 +8,7 @@ public class RolloutPhaseLocalizedMetadataTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseLocalizedMetadataDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseLocalizedMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutPhaseLocalizedMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "SUPPLEMENTAL_MESSAGE",
             "MERCH_OVERRIDE_MESSAGE",

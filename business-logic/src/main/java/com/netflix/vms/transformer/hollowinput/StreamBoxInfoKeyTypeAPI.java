@@ -8,7 +8,7 @@ public class StreamBoxInfoKeyTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamBoxInfoKeyDelegateLookupImpl delegateLookupImpl;
 
-    StreamBoxInfoKeyTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StreamBoxInfoKeyTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

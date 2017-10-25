@@ -8,7 +8,7 @@ public class FestivalsTypeAPI extends HollowObjectTypeAPI {
 
     private final FestivalsDelegateLookupImpl delegateLookupImpl;
 
-    FestivalsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public FestivalsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "festivalId",
             "copyright",

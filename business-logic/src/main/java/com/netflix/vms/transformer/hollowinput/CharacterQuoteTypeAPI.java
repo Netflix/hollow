@@ -8,7 +8,7 @@ public class CharacterQuoteTypeAPI extends HollowObjectTypeAPI {
 
     private final CharacterQuoteDelegateLookupImpl delegateLookupImpl;
 
-    CharacterQuoteTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CharacterQuoteTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber"
         });

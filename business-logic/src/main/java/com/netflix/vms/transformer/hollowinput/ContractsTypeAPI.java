@@ -8,7 +8,7 @@ public class ContractsTypeAPI extends HollowObjectTypeAPI {
 
     private final ContractsDelegateLookupImpl delegateLookupImpl;
 
-    ContractsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ContractsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "countryCode",

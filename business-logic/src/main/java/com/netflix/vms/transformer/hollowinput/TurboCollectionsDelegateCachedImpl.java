@@ -11,6 +11,8 @@ public class TurboCollectionsDelegateCachedImpl extends HollowObjectAbstractDele
 
     private final Long id;
     private final int prefixOrdinal;
+    private final int desOrdinal;
+    private final int evi_nOrdinal;
     private final int char_nOrdinal;
     private final int nav_snOrdinal;
     private final int dnOrdinal;
@@ -256,6 +258,8 @@ public class TurboCollectionsDelegateCachedImpl extends HollowObjectAbstractDele
     public TurboCollectionsDelegateCachedImpl(TurboCollectionsTypeAPI typeAPI, int ordinal) {
         this.id = typeAPI.getIdBoxed(ordinal);
         this.prefixOrdinal = typeAPI.getPrefixOrdinal(ordinal);
+        this.desOrdinal = typeAPI.getDesOrdinal(ordinal);
+        this.evi_nOrdinal = typeAPI.getEvi_nOrdinal(ordinal);
         this.char_nOrdinal = typeAPI.getChar_nOrdinal(ordinal);
         this.nav_snOrdinal = typeAPI.getNav_snOrdinal(ordinal);
         this.dnOrdinal = typeAPI.getDnOrdinal(ordinal);
@@ -511,6 +515,14 @@ public class TurboCollectionsDelegateCachedImpl extends HollowObjectAbstractDele
 
     public int getPrefixOrdinal(int ordinal) {
         return prefixOrdinal;
+    }
+
+    public int getDesOrdinal(int ordinal) {
+        return desOrdinal;
+    }
+
+    public int getEvi_nOrdinal(int ordinal) {
+        return evi_nOrdinal;
     }
 
     public int getChar_nOrdinal(int ordinal) {

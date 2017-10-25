@@ -8,7 +8,7 @@ public class LanguagesTypeAPI extends HollowObjectTypeAPI {
 
     private final LanguagesDelegateLookupImpl delegateLookupImpl;
 
-    LanguagesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public LanguagesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "languageId",
             "name"

@@ -8,7 +8,7 @@ public class CdnDeploymentTypeAPI extends HollowObjectTypeAPI {
 
     private final CdnDeploymentDelegateLookupImpl delegateLookupImpl;
 
-    CdnDeploymentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CdnDeploymentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "originServerId",
             "directory",

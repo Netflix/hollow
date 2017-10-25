@@ -8,7 +8,7 @@ public class CharacterArtworkSourceTypeAPI extends HollowObjectTypeAPI {
 
     private final CharacterArtworkSourceDelegateLookupImpl delegateLookupImpl;
 
-    CharacterArtworkSourceTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CharacterArtworkSourceTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sourceFileId",
             "characterId",

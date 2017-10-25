@@ -8,7 +8,7 @@ public class EpisodeTypeAPI extends HollowObjectTypeAPI {
 
     private final EpisodeDelegateLookupImpl delegateLookupImpl;
 
-    EpisodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public EpisodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber",
             "movieId"

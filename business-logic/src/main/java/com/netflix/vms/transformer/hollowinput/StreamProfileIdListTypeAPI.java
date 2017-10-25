@@ -10,7 +10,7 @@ public class StreamProfileIdListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    StreamProfileIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public StreamProfileIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

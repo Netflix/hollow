@@ -10,7 +10,7 @@ public class VideoAwardListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    VideoAwardListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public VideoAwardListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

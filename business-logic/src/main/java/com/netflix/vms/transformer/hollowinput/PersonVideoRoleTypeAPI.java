@@ -8,7 +8,7 @@ public class PersonVideoRoleTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonVideoRoleDelegateLookupImpl delegateLookupImpl;
 
-    PersonVideoRoleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PersonVideoRoleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber",
             "roleTypeId",

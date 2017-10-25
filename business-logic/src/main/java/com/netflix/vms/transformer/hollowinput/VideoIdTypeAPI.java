@@ -8,7 +8,7 @@ public class VideoIdTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoIdDelegateLookupImpl delegateLookupImpl;
 
-    VideoIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

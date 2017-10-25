@@ -8,7 +8,7 @@ public class AssetMetaDatasTypeAPI extends HollowObjectTypeAPI {
 
     private final AssetMetaDatasDelegateLookupImpl delegateLookupImpl;
 
-    AssetMetaDatasTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public AssetMetaDatasTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "assetId",
             "trackLabels"

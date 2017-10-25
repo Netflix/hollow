@@ -7,6 +7,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import java.util.Collections;
 import java.util.Set;
 
+@SuppressWarnings("all")
 public class VMSHollowInputAPIFactory implements HollowAPIFactory {
 
     private final Set<String> cachedTypes;

@@ -8,7 +8,7 @@ public class PassthroughDataTypeAPI extends HollowObjectTypeAPI {
 
     private final PassthroughDataDelegateLookupImpl delegateLookupImpl;
 
-    PassthroughDataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PassthroughDataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "singleValues",
             "multiValues"

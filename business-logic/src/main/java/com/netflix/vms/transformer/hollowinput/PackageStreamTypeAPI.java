@@ -8,7 +8,7 @@ public class PackageStreamTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageStreamDelegateLookupImpl delegateLookupImpl;
 
-    PackageStreamTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PackageStreamTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "downloadableId",
             "streamProfileId",

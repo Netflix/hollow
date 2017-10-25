@@ -10,7 +10,7 @@ public class ISOCountrySetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    ISOCountrySetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public ISOCountrySetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

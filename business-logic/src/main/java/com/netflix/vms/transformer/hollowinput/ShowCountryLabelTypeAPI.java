@@ -8,7 +8,7 @@ public class ShowCountryLabelTypeAPI extends HollowObjectTypeAPI {
 
     private final ShowCountryLabelDelegateLookupImpl delegateLookupImpl;
 
-    ShowCountryLabelTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ShowCountryLabelTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
             "showMemberTypes"

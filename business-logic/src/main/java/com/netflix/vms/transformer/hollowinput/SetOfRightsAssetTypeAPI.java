@@ -10,7 +10,7 @@ public class SetOfRightsAssetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    SetOfRightsAssetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public SetOfRightsAssetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

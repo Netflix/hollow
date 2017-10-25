@@ -8,7 +8,7 @@ public class TranslatedTextValueTypeAPI extends HollowObjectTypeAPI {
 
     private final TranslatedTextValueDelegateLookupImpl delegateLookupImpl;
 
-    TranslatedTextValueTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TranslatedTextValueTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

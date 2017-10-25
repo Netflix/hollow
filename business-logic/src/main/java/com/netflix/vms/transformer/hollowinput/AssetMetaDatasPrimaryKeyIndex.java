@@ -1,32 +1,22 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
-public class AssetMetaDatasPrimaryKeyIndex implements HollowConsumer.RefreshListener {
-
-    private HollowPrimaryKeyIndex idx;
-    private VMSHollowInputAPI api;
+@SuppressWarnings("all")
+public class AssetMetaDatasPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, AssetMetaDatasHollow> {
 
     public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer) {
         this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AssetMetaDatas")).getPrimaryKey().getFieldPaths());
     }
 
     public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
-        consumer.getRefreshLock().lock();
-        try {
-            this.api = (VMSHollowInputAPI)consumer.getAPI();
-            this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "AssetMetaDatas", fieldPaths);
-            idx.listenForDeltaUpdates();
-            consumer.addRefreshListener(this);
-        } catch(ClassCastException cce) {
-            throw new ClassCastException("The HollowConsumer provided was not created with the VMSHollowInputAPI generated API class.");
-        } finally {
-            consumer.getRefreshLock().unlock();
-        }
+        this(consumer, true, fieldPaths);
+    }
+
+    public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "AssetMetaDatas", isListenToDataRefreah, fieldPaths);
     }
 
     public AssetMetaDatasHollow findMatch(Object... keys) {
@@ -36,19 +26,4 @@ public class AssetMetaDatasPrimaryKeyIndex implements HollowConsumer.RefreshList
         return api.getAssetMetaDatasHollow(ordinal);
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        idx.detachFromDeltaUpdates();
-        idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
-        idx.listenForDeltaUpdates();
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
 }

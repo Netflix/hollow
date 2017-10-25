@@ -10,7 +10,7 @@ public class ListOfRightsContractTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ListOfRightsContractTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public ListOfRightsContractTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

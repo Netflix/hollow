@@ -10,7 +10,7 @@ public class TopNAttributesSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    TopNAttributesSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public TopNAttributesSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

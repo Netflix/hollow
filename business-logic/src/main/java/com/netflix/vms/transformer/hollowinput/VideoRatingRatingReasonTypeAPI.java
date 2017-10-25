@@ -8,7 +8,7 @@ public class VideoRatingRatingReasonTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoRatingRatingReasonDelegateLookupImpl delegateLookupImpl;
 
-    VideoRatingRatingReasonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoRatingRatingReasonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "ordered",
             "imageOnly",

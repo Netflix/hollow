@@ -8,7 +8,7 @@ public class ChunkDurationsStringTypeAPI extends HollowObjectTypeAPI {
 
     private final ChunkDurationsStringDelegateLookupImpl delegateLookupImpl;
 
-    ChunkDurationsStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ChunkDurationsStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });
