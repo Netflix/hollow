@@ -8,7 +8,7 @@ public class IPLDerivativeGroupTypeAPI extends HollowObjectTypeAPI {
 
     private final IPLDerivativeGroupDelegateLookupImpl delegateLookupImpl;
 
-    IPLDerivativeGroupTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public IPLDerivativeGroupTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "externalId",
             "submission",

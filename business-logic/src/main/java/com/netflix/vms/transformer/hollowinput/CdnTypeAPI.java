@@ -8,7 +8,7 @@ public class CdnTypeAPI extends HollowObjectTypeAPI {
 
     private final CdnDelegateLookupImpl delegateLookupImpl;
 
-    CdnTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CdnTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "name"

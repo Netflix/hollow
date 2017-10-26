@@ -10,7 +10,7 @@ public class MultiValuePassthroughMapTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;
 
-    MultiValuePassthroughMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
+    public MultiValuePassthroughMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowMapLookupDelegate(this);
     }

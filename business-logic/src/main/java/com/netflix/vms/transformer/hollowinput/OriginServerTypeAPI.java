@@ -8,7 +8,7 @@ public class OriginServerTypeAPI extends HollowObjectTypeAPI {
 
     private final OriginServerDelegateLookupImpl delegateLookupImpl;
 
-    OriginServerTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public OriginServerTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id",
             "name",

@@ -8,7 +8,7 @@ public class ArtworkAttributesTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtworkAttributesDelegateLookupImpl delegateLookupImpl;
 
-    ArtworkAttributesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ArtworkAttributesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "passthrough"
         });

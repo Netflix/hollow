@@ -8,7 +8,7 @@ public class CertificationSystemRatingTypeAPI extends HollowObjectTypeAPI {
 
     private final CertificationSystemRatingDelegateLookupImpl delegateLookupImpl;
 
-    CertificationSystemRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CertificationSystemRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "ratingCode",
             "ratingId",

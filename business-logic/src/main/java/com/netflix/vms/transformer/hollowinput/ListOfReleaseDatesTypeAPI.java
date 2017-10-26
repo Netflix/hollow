@@ -10,7 +10,7 @@ public class ListOfReleaseDatesTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ListOfReleaseDatesTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public ListOfReleaseDatesTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

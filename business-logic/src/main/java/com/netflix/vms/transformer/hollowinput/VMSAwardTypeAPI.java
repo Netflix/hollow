@@ -8,7 +8,7 @@ public class VMSAwardTypeAPI extends HollowObjectTypeAPI {
 
     private final VMSAwardDelegateLookupImpl delegateLookupImpl;
 
-    VMSAwardTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VMSAwardTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "awardId",
             "sequenceNumber",

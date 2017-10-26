@@ -8,7 +8,7 @@ public class RolloutTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutDelegateLookupImpl delegateLookupImpl;
 
-    RolloutTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "rolloutId",
             "movieId",

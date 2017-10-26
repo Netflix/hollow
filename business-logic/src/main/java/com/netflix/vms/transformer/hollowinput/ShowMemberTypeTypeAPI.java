@@ -8,7 +8,7 @@ public class ShowMemberTypeTypeAPI extends HollowObjectTypeAPI {
 
     private final ShowMemberTypeDelegateLookupImpl delegateLookupImpl;
 
-    ShowMemberTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ShowMemberTypeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "countryCodes",
             "sequenceLabelId"

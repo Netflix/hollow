@@ -9,7 +9,7 @@ public class VideoStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoStreamInfoDelegateLookupImpl delegateLookupImpl;
 
-    VideoStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoBitrateKBPS",
             "videoPeakBitrateKBPS",

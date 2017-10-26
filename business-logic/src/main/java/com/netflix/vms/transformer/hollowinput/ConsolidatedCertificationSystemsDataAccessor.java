@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class ConsolidatedCertificationSystemsDataAccessor extends AbstractHollowDataAccessor<ConsolidatedCertificationSystemsHollow> {
 
     public static final String TYPE = "ConsolidatedCertificationSystemsHollow";
@@ -12,18 +13,22 @@ public class ConsolidatedCertificationSystemsDataAccessor extends AbstractHollow
 
     public ConsolidatedCertificationSystemsDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine) {
+    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public ConsolidatedCertificationSystemsDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public ConsolidatedCertificationSystemsHollow getRecord(int ordinal){

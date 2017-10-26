@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class PackageMomentDataAccessor extends AbstractHollowDataAccessor<PackageMomentHollow> {
 
     public static final String TYPE = "PackageMomentHollow";
@@ -12,18 +13,22 @@ public class PackageMomentDataAccessor extends AbstractHollowDataAccessor<Packag
 
     public PackageMomentDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine) {
+    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public PackageMomentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public PackageMomentHollow getRecord(int ordinal){

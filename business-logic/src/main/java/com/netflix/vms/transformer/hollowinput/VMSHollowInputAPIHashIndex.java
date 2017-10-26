@@ -1,6718 +1,2387 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.Collections;
 import java.lang.Iterable;
-import java.util.Iterator;
+import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
+import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 
-public class VMSHollowInputAPIHashIndex implements HollowConsumer.RefreshListener {
 
-    private HollowHashIndex idx;
-    private VMSHollowInputAPI api;
-    private final String queryType;    private final String selectFieldPath;
-    private final String matchFieldPaths[];
+@SuppressWarnings("all")
+public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollowInputAPI> {
 
     public VMSHollowInputAPIHashIndex(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {
-        this.queryType = queryType;        this.selectFieldPath = selectFieldPath;
-        this.matchFieldPaths = matchFieldPaths;
-        consumer.getRefreshLock().lock();
-        try {
-            this.api = (VMSHollowInputAPI)consumer.getAPI();
-            this.idx = new HollowHashIndex(consumer.getStateEngine(), queryType, selectFieldPath, matchFieldPaths);
-            consumer.addRefreshListener(this);
-        } catch(ClassCastException cce) {
-            throw new ClassCastException("The HollowConsumer provided was not created with the VMSHollowInputAPI generated API class.");
-        } finally {
-            consumer.getRefreshLock().unlock();
-        }
+        super(consumer, true, queryType, selectFieldPath, matchFieldPaths);
+    }
+
+    public VMSHollowInputAPIHashIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String queryType, String selectFieldPath, String... matchFieldPaths) {
+        super(consumer, isListenToDataRefreah, queryType, selectFieldPath, matchFieldPaths);
     }
 
     public Iterable<CharacterQuoteHollow> findCharacterQuoteMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterQuoteHollow>() {
-            public Iterator<CharacterQuoteHollow> iterator() {
-                return new Iterator<CharacterQuoteHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterQuoteHollow next() {
-                        CharacterQuoteHollow obj = api.getCharacterQuoteHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterQuoteHollow>(matches.iterator()) {
+            public CharacterQuoteHollow getData(int ordinal) {
+                return api.getCharacterQuoteHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharacterQuoteListHollow> findCharacterQuoteListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterQuoteListHollow>() {
-            public Iterator<CharacterQuoteListHollow> iterator() {
-                return new Iterator<CharacterQuoteListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterQuoteListHollow next() {
-                        CharacterQuoteListHollow obj = api.getCharacterQuoteListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterQuoteListHollow>(matches.iterator()) {
+            public CharacterQuoteListHollow getData(int ordinal) {
+                return api.getCharacterQuoteListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ChunkDurationsStringHollow> findChunkDurationsStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ChunkDurationsStringHollow>() {
-            public Iterator<ChunkDurationsStringHollow> iterator() {
-                return new Iterator<ChunkDurationsStringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ChunkDurationsStringHollow next() {
-                        ChunkDurationsStringHollow obj = api.getChunkDurationsStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ChunkDurationsStringHollow>(matches.iterator()) {
+            public ChunkDurationsStringHollow getData(int ordinal) {
+                return api.getChunkDurationsStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<CodecPrivateDataStringHollow> findCodecPrivateDataStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CodecPrivateDataStringHollow>() {
-            public Iterator<CodecPrivateDataStringHollow> iterator() {
-                return new Iterator<CodecPrivateDataStringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CodecPrivateDataStringHollow next() {
-                        CodecPrivateDataStringHollow obj = api.getCodecPrivateDataStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CodecPrivateDataStringHollow>(matches.iterator()) {
+            public CodecPrivateDataStringHollow getData(int ordinal) {
+                return api.getCodecPrivateDataStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<DateHollow> findDateMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DateHollow>() {
-            public Iterator<DateHollow> iterator() {
-                return new Iterator<DateHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DateHollow next() {
-                        DateHollow obj = api.getDateHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DateHollow>(matches.iterator()) {
+            public DateHollow getData(int ordinal) {
+                return api.getDateHollow(ordinal);
             }
         };
     }
 
     public Iterable<DerivativeTagHollow> findDerivativeTagMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DerivativeTagHollow>() {
-            public Iterator<DerivativeTagHollow> iterator() {
-                return new Iterator<DerivativeTagHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DerivativeTagHollow next() {
-                        DerivativeTagHollow obj = api.getDerivativeTagHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DerivativeTagHollow>(matches.iterator()) {
+            public DerivativeTagHollow getData(int ordinal) {
+                return api.getDerivativeTagHollow(ordinal);
             }
         };
     }
 
     public Iterable<DownloadableIdHollow> findDownloadableIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DownloadableIdHollow>() {
-            public Iterator<DownloadableIdHollow> iterator() {
-                return new Iterator<DownloadableIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DownloadableIdHollow next() {
-                        DownloadableIdHollow obj = api.getDownloadableIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DownloadableIdHollow>(matches.iterator()) {
+            public DownloadableIdHollow getData(int ordinal) {
+                return api.getDownloadableIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<DownloadableIdListHollow> findDownloadableIdListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DownloadableIdListHollow>() {
-            public Iterator<DownloadableIdListHollow> iterator() {
-                return new Iterator<DownloadableIdListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DownloadableIdListHollow next() {
-                        DownloadableIdListHollow obj = api.getDownloadableIdListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DownloadableIdListHollow>(matches.iterator()) {
+            public DownloadableIdListHollow getData(int ordinal) {
+                return api.getDownloadableIdListHollow(ordinal);
             }
         };
     }
 
     public Iterable<DrmInfoStringHollow> findDrmInfoStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DrmInfoStringHollow>() {
-            public Iterator<DrmInfoStringHollow> iterator() {
-                return new Iterator<DrmInfoStringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DrmInfoStringHollow next() {
-                        DrmInfoStringHollow obj = api.getDrmInfoStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DrmInfoStringHollow>(matches.iterator()) {
+            public DrmInfoStringHollow getData(int ordinal) {
+                return api.getDrmInfoStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<EpisodeHollow> findEpisodeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<EpisodeHollow>() {
-            public Iterator<EpisodeHollow> iterator() {
-                return new Iterator<EpisodeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public EpisodeHollow next() {
-                        EpisodeHollow obj = api.getEpisodeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<EpisodeHollow>(matches.iterator()) {
+            public EpisodeHollow getData(int ordinal) {
+                return api.getEpisodeHollow(ordinal);
             }
         };
     }
 
     public Iterable<EpisodeListHollow> findEpisodeListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<EpisodeListHollow>() {
-            public Iterator<EpisodeListHollow> iterator() {
-                return new Iterator<EpisodeListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public EpisodeListHollow next() {
-                        EpisodeListHollow obj = api.getEpisodeListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<EpisodeListHollow>(matches.iterator()) {
+            public EpisodeListHollow getData(int ordinal) {
+                return api.getEpisodeListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ExplicitDateHollow> findExplicitDateMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ExplicitDateHollow>() {
-            public Iterator<ExplicitDateHollow> iterator() {
-                return new Iterator<ExplicitDateHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ExplicitDateHollow next() {
-                        ExplicitDateHollow obj = api.getExplicitDateHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ExplicitDateHollow>(matches.iterator()) {
+            public ExplicitDateHollow getData(int ordinal) {
+                return api.getExplicitDateHollow(ordinal);
             }
         };
     }
 
     public Iterable<ISOCountryHollow> findISOCountryMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ISOCountryHollow>() {
-            public Iterator<ISOCountryHollow> iterator() {
-                return new Iterator<ISOCountryHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ISOCountryHollow next() {
-                        ISOCountryHollow obj = api.getISOCountryHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ISOCountryHollow>(matches.iterator()) {
+            public ISOCountryHollow getData(int ordinal) {
+                return api.getISOCountryHollow(ordinal);
             }
         };
     }
 
     public Iterable<ISOCountryListHollow> findISOCountryListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ISOCountryListHollow>() {
-            public Iterator<ISOCountryListHollow> iterator() {
-                return new Iterator<ISOCountryListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ISOCountryListHollow next() {
-                        ISOCountryListHollow obj = api.getISOCountryListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ISOCountryListHollow>(matches.iterator()) {
+            public ISOCountryListHollow getData(int ordinal) {
+                return api.getISOCountryListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ISOCountrySetHollow> findISOCountrySetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ISOCountrySetHollow>() {
-            public Iterator<ISOCountrySetHollow> iterator() {
-                return new Iterator<ISOCountrySetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ISOCountrySetHollow next() {
-                        ISOCountrySetHollow obj = api.getISOCountrySetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ISOCountrySetHollow>(matches.iterator()) {
+            public ISOCountrySetHollow getData(int ordinal) {
+                return api.getISOCountrySetHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfDerivativeTagHollow> findListOfDerivativeTagMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfDerivativeTagHollow>() {
-            public Iterator<ListOfDerivativeTagHollow> iterator() {
-                return new Iterator<ListOfDerivativeTagHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfDerivativeTagHollow next() {
-                        ListOfDerivativeTagHollow obj = api.getListOfDerivativeTagHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfDerivativeTagHollow>(matches.iterator()) {
+            public ListOfDerivativeTagHollow getData(int ordinal) {
+                return api.getListOfDerivativeTagHollow(ordinal);
             }
         };
     }
 
     public Iterable<MapKeyHollow> findMapKeyMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MapKeyHollow>() {
-            public Iterator<MapKeyHollow> iterator() {
-                return new Iterator<MapKeyHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MapKeyHollow next() {
-                        MapKeyHollow obj = api.getMapKeyHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MapKeyHollow>(matches.iterator()) {
+            public MapKeyHollow getData(int ordinal) {
+                return api.getMapKeyHollow(ordinal);
             }
         };
     }
 
     public Iterable<MapOfFlagsFirstDisplayDatesHollow> findMapOfFlagsFirstDisplayDatesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MapOfFlagsFirstDisplayDatesHollow>() {
-            public Iterator<MapOfFlagsFirstDisplayDatesHollow> iterator() {
-                return new Iterator<MapOfFlagsFirstDisplayDatesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MapOfFlagsFirstDisplayDatesHollow next() {
-                        MapOfFlagsFirstDisplayDatesHollow obj = api.getMapOfFlagsFirstDisplayDatesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MapOfFlagsFirstDisplayDatesHollow>(matches.iterator()) {
+            public MapOfFlagsFirstDisplayDatesHollow getData(int ordinal) {
+                return api.getMapOfFlagsFirstDisplayDatesHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonCharacterHollow> findPersonCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonCharacterHollow>() {
-            public Iterator<PersonCharacterHollow> iterator() {
-                return new Iterator<PersonCharacterHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonCharacterHollow next() {
-                        PersonCharacterHollow obj = api.getPersonCharacterHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonCharacterHollow>(matches.iterator()) {
+            public PersonCharacterHollow getData(int ordinal) {
+                return api.getPersonCharacterHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharacterListHollow> findCharacterListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterListHollow>() {
-            public Iterator<CharacterListHollow> iterator() {
-                return new Iterator<CharacterListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterListHollow next() {
-                        CharacterListHollow obj = api.getCharacterListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterListHollow>(matches.iterator()) {
+            public CharacterListHollow getData(int ordinal) {
+                return api.getCharacterListHollow(ordinal);
             }
         };
     }
 
     public Iterable<MovieCharacterPersonHollow> findMovieCharacterPersonMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MovieCharacterPersonHollow>() {
-            public Iterator<MovieCharacterPersonHollow> iterator() {
-                return new Iterator<MovieCharacterPersonHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MovieCharacterPersonHollow next() {
-                        MovieCharacterPersonHollow obj = api.getMovieCharacterPersonHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MovieCharacterPersonHollow>(matches.iterator()) {
+            public MovieCharacterPersonHollow getData(int ordinal) {
+                return api.getMovieCharacterPersonHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonVideoAliasIdHollow> findPersonVideoAliasIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonVideoAliasIdHollow>() {
-            public Iterator<PersonVideoAliasIdHollow> iterator() {
-                return new Iterator<PersonVideoAliasIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonVideoAliasIdHollow next() {
-                        PersonVideoAliasIdHollow obj = api.getPersonVideoAliasIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonVideoAliasIdHollow>(matches.iterator()) {
+            public PersonVideoAliasIdHollow getData(int ordinal) {
+                return api.getPersonVideoAliasIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonVideoAliasIdsListHollow> findPersonVideoAliasIdsListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonVideoAliasIdsListHollow>() {
-            public Iterator<PersonVideoAliasIdsListHollow> iterator() {
-                return new Iterator<PersonVideoAliasIdsListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonVideoAliasIdsListHollow next() {
-                        PersonVideoAliasIdsListHollow obj = api.getPersonVideoAliasIdsListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonVideoAliasIdsListHollow>(matches.iterator()) {
+            public PersonVideoAliasIdsListHollow getData(int ordinal) {
+                return api.getPersonVideoAliasIdsListHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonVideoRoleHollow> findPersonVideoRoleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonVideoRoleHollow>() {
-            public Iterator<PersonVideoRoleHollow> iterator() {
-                return new Iterator<PersonVideoRoleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonVideoRoleHollow next() {
-                        PersonVideoRoleHollow obj = api.getPersonVideoRoleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonVideoRoleHollow>(matches.iterator()) {
+            public PersonVideoRoleHollow getData(int ordinal) {
+                return api.getPersonVideoRoleHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonVideoRolesListHollow> findPersonVideoRolesListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonVideoRolesListHollow>() {
-            public Iterator<PersonVideoRolesListHollow> iterator() {
-                return new Iterator<PersonVideoRolesListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonVideoRolesListHollow next() {
-                        PersonVideoRolesListHollow obj = api.getPersonVideoRolesListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonVideoRolesListHollow>(matches.iterator()) {
+            public PersonVideoRolesListHollow getData(int ordinal) {
+                return api.getPersonVideoRolesListHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonVideoHollow> findPersonVideoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonVideoHollow>() {
-            public Iterator<PersonVideoHollow> iterator() {
-                return new Iterator<PersonVideoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonVideoHollow next() {
-                        PersonVideoHollow obj = api.getPersonVideoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonVideoHollow>(matches.iterator()) {
+            public PersonVideoHollow getData(int ordinal) {
+                return api.getPersonVideoHollow(ordinal);
             }
         };
     }
 
     public Iterable<RightsContractPackageHollow> findRightsContractPackageMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsContractPackageHollow>() {
-            public Iterator<RightsContractPackageHollow> iterator() {
-                return new Iterator<RightsContractPackageHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsContractPackageHollow next() {
-                        RightsContractPackageHollow obj = api.getRightsContractPackageHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RightsContractPackageHollow>(matches.iterator()) {
+            public RightsContractPackageHollow getData(int ordinal) {
+                return api.getRightsContractPackageHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfRightsContractPackageHollow> findListOfRightsContractPackageMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsContractPackageHollow>() {
-            public Iterator<ListOfRightsContractPackageHollow> iterator() {
-                return new Iterator<ListOfRightsContractPackageHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsContractPackageHollow next() {
-                        ListOfRightsContractPackageHollow obj = api.getListOfRightsContractPackageHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfRightsContractPackageHollow>(matches.iterator()) {
+            public ListOfRightsContractPackageHollow getData(int ordinal) {
+                return api.getListOfRightsContractPackageHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseWindowHollow> findRolloutPhaseWindowMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseWindowHollow>() {
-            public Iterator<RolloutPhaseWindowHollow> iterator() {
-                return new Iterator<RolloutPhaseWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseWindowHollow next() {
-                        RolloutPhaseWindowHollow obj = api.getRolloutPhaseWindowHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseWindowHollow>(matches.iterator()) {
+            public RolloutPhaseWindowHollow getData(int ordinal) {
+                return api.getRolloutPhaseWindowHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseWindowMapHollow> findRolloutPhaseWindowMapMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseWindowMapHollow>() {
-            public Iterator<RolloutPhaseWindowMapHollow> iterator() {
-                return new Iterator<RolloutPhaseWindowMapHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseWindowMapHollow next() {
-                        RolloutPhaseWindowMapHollow obj = api.getRolloutPhaseWindowMapHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseWindowMapHollow>(matches.iterator()) {
+            public RolloutPhaseWindowMapHollow getData(int ordinal) {
+                return api.getRolloutPhaseWindowMapHollow(ordinal);
             }
         };
     }
 
     public Iterable<SeasonHollow> findSeasonMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SeasonHollow>() {
-            public Iterator<SeasonHollow> iterator() {
-                return new Iterator<SeasonHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SeasonHollow next() {
-                        SeasonHollow obj = api.getSeasonHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SeasonHollow>(matches.iterator()) {
+            public SeasonHollow getData(int ordinal) {
+                return api.getSeasonHollow(ordinal);
             }
         };
     }
 
     public Iterable<SeasonListHollow> findSeasonListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SeasonListHollow>() {
-            public Iterator<SeasonListHollow> iterator() {
-                return new Iterator<SeasonListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SeasonListHollow next() {
-                        SeasonListHollow obj = api.getSeasonListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SeasonListHollow>(matches.iterator()) {
+            public SeasonListHollow getData(int ordinal) {
+                return api.getSeasonListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ShowMemberTypeHollow> findShowMemberTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ShowMemberTypeHollow>() {
-            public Iterator<ShowMemberTypeHollow> iterator() {
-                return new Iterator<ShowMemberTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ShowMemberTypeHollow next() {
-                        ShowMemberTypeHollow obj = api.getShowMemberTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ShowMemberTypeHollow>(matches.iterator()) {
+            public ShowMemberTypeHollow getData(int ordinal) {
+                return api.getShowMemberTypeHollow(ordinal);
             }
         };
     }
 
     public Iterable<ShowMemberTypeListHollow> findShowMemberTypeListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ShowMemberTypeListHollow>() {
-            public Iterator<ShowMemberTypeListHollow> iterator() {
-                return new Iterator<ShowMemberTypeListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ShowMemberTypeListHollow next() {
-                        ShowMemberTypeListHollow obj = api.getShowMemberTypeListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ShowMemberTypeListHollow>(matches.iterator()) {
+            public ShowMemberTypeListHollow getData(int ordinal) {
+                return api.getShowMemberTypeListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ShowCountryLabelHollow> findShowCountryLabelMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ShowCountryLabelHollow>() {
-            public Iterator<ShowCountryLabelHollow> iterator() {
-                return new Iterator<ShowCountryLabelHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ShowCountryLabelHollow next() {
-                        ShowCountryLabelHollow obj = api.getShowCountryLabelHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ShowCountryLabelHollow>(matches.iterator()) {
+            public ShowCountryLabelHollow getData(int ordinal) {
+                return api.getShowCountryLabelHollow(ordinal);
             }
         };
     }
 
     public Iterable<ShowSeasonEpisodeHollow> findShowSeasonEpisodeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ShowSeasonEpisodeHollow>() {
-            public Iterator<ShowSeasonEpisodeHollow> iterator() {
-                return new Iterator<ShowSeasonEpisodeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ShowSeasonEpisodeHollow next() {
-                        ShowSeasonEpisodeHollow obj = api.getShowSeasonEpisodeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ShowSeasonEpisodeHollow>(matches.iterator()) {
+            public ShowSeasonEpisodeHollow getData(int ordinal) {
+                return api.getShowSeasonEpisodeHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamAssetMetadataHollow> findStreamAssetMetadataMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamAssetMetadataHollow>() {
-            public Iterator<StreamAssetMetadataHollow> iterator() {
-                return new Iterator<StreamAssetMetadataHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamAssetMetadataHollow next() {
-                        StreamAssetMetadataHollow obj = api.getStreamAssetMetadataHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamAssetMetadataHollow>(matches.iterator()) {
+            public StreamAssetMetadataHollow getData(int ordinal) {
+                return api.getStreamAssetMetadataHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamBoxInfoKeyHollow> findStreamBoxInfoKeyMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamBoxInfoKeyHollow>() {
-            public Iterator<StreamBoxInfoKeyHollow> iterator() {
-                return new Iterator<StreamBoxInfoKeyHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamBoxInfoKeyHollow next() {
-                        StreamBoxInfoKeyHollow obj = api.getStreamBoxInfoKeyHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamBoxInfoKeyHollow>(matches.iterator()) {
+            public StreamBoxInfoKeyHollow getData(int ordinal) {
+                return api.getStreamBoxInfoKeyHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamBoxInfoHollow> findStreamBoxInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamBoxInfoHollow>() {
-            public Iterator<StreamBoxInfoHollow> iterator() {
-                return new Iterator<StreamBoxInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamBoxInfoHollow next() {
-                        StreamBoxInfoHollow obj = api.getStreamBoxInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamBoxInfoHollow>(matches.iterator()) {
+            public StreamBoxInfoHollow getData(int ordinal) {
+                return api.getStreamBoxInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<SetOfStreamBoxInfoHollow> findSetOfStreamBoxInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SetOfStreamBoxInfoHollow>() {
-            public Iterator<SetOfStreamBoxInfoHollow> iterator() {
-                return new Iterator<SetOfStreamBoxInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SetOfStreamBoxInfoHollow next() {
-                        SetOfStreamBoxInfoHollow obj = api.getSetOfStreamBoxInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SetOfStreamBoxInfoHollow>(matches.iterator()) {
+            public SetOfStreamBoxInfoHollow getData(int ordinal) {
+                return api.getSetOfStreamBoxInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<DashStreamHeaderDataHollow> findDashStreamHeaderDataMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DashStreamHeaderDataHollow>() {
-            public Iterator<DashStreamHeaderDataHollow> iterator() {
-                return new Iterator<DashStreamHeaderDataHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DashStreamHeaderDataHollow next() {
-                        DashStreamHeaderDataHollow obj = api.getDashStreamHeaderDataHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DashStreamHeaderDataHollow>(matches.iterator()) {
+            public DashStreamHeaderDataHollow getData(int ordinal) {
+                return api.getDashStreamHeaderDataHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDimensionsHollow> findStreamDimensionsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDimensionsHollow>() {
-            public Iterator<StreamDimensionsHollow> iterator() {
-                return new Iterator<StreamDimensionsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDimensionsHollow next() {
-                        StreamDimensionsHollow obj = api.getStreamDimensionsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDimensionsHollow>(matches.iterator()) {
+            public StreamDimensionsHollow getData(int ordinal) {
+                return api.getStreamDimensionsHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamFileIdentificationHollow> findStreamFileIdentificationMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamFileIdentificationHollow>() {
-            public Iterator<StreamFileIdentificationHollow> iterator() {
-                return new Iterator<StreamFileIdentificationHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamFileIdentificationHollow next() {
-                        StreamFileIdentificationHollow obj = api.getStreamFileIdentificationHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamFileIdentificationHollow>(matches.iterator()) {
+            public StreamFileIdentificationHollow getData(int ordinal) {
+                return api.getStreamFileIdentificationHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamProfileIdHollow> findStreamProfileIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamProfileIdHollow>() {
-            public Iterator<StreamProfileIdHollow> iterator() {
-                return new Iterator<StreamProfileIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamProfileIdHollow next() {
-                        StreamProfileIdHollow obj = api.getStreamProfileIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamProfileIdHollow>(matches.iterator()) {
+            public StreamProfileIdHollow getData(int ordinal) {
+                return api.getStreamProfileIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamProfileIdListHollow> findStreamProfileIdListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamProfileIdListHollow>() {
-            public Iterator<StreamProfileIdListHollow> iterator() {
-                return new Iterator<StreamProfileIdListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamProfileIdListHollow next() {
-                        StreamProfileIdListHollow obj = api.getStreamProfileIdListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamProfileIdListHollow>(matches.iterator()) {
+            public StreamProfileIdListHollow getData(int ordinal) {
+                return api.getStreamProfileIdListHollow(ordinal);
             }
         };
     }
 
     public Iterable<StringHollow> findStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StringHollow>() {
-            public Iterator<StringHollow> iterator() {
-                return new Iterator<StringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StringHollow next() {
-                        StringHollow obj = api.getStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StringHollow>(matches.iterator()) {
+            public StringHollow getData(int ordinal) {
+                return api.getStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<AbsoluteScheduleHollow> findAbsoluteScheduleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AbsoluteScheduleHollow>() {
-            public Iterator<AbsoluteScheduleHollow> iterator() {
-                return new Iterator<AbsoluteScheduleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AbsoluteScheduleHollow next() {
-                        AbsoluteScheduleHollow obj = api.getAbsoluteScheduleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AbsoluteScheduleHollow>(matches.iterator()) {
+            public AbsoluteScheduleHollow getData(int ordinal) {
+                return api.getAbsoluteScheduleHollow(ordinal);
             }
         };
     }
 
     public Iterable<ArtWorkImageTypeHollow> findArtWorkImageTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtWorkImageTypeHollow>() {
-            public Iterator<ArtWorkImageTypeHollow> iterator() {
-                return new Iterator<ArtWorkImageTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtWorkImageTypeHollow next() {
-                        ArtWorkImageTypeHollow obj = api.getArtWorkImageTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ArtWorkImageTypeHollow>(matches.iterator()) {
+            public ArtWorkImageTypeHollow getData(int ordinal) {
+                return api.getArtWorkImageTypeHollow(ordinal);
             }
         };
     }
 
     public Iterable<ArtworkRecipeHollow> findArtworkRecipeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkRecipeHollow>() {
-            public Iterator<ArtworkRecipeHollow> iterator() {
-                return new Iterator<ArtworkRecipeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkRecipeHollow next() {
-                        ArtworkRecipeHollow obj = api.getArtworkRecipeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ArtworkRecipeHollow>(matches.iterator()) {
+            public ArtworkRecipeHollow getData(int ordinal) {
+                return api.getArtworkRecipeHollow(ordinal);
             }
         };
     }
 
     public Iterable<AudioStreamInfoHollow> findAudioStreamInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AudioStreamInfoHollow>() {
-            public Iterator<AudioStreamInfoHollow> iterator() {
-                return new Iterator<AudioStreamInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AudioStreamInfoHollow next() {
-                        AudioStreamInfoHollow obj = api.getAudioStreamInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AudioStreamInfoHollow>(matches.iterator()) {
+            public AudioStreamInfoHollow getData(int ordinal) {
+                return api.getAudioStreamInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<CSMReviewHollow> findCSMReviewMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CSMReviewHollow>() {
-            public Iterator<CSMReviewHollow> iterator() {
-                return new Iterator<CSMReviewHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CSMReviewHollow next() {
-                        CSMReviewHollow obj = api.getCSMReviewHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CSMReviewHollow>(matches.iterator()) {
+            public CSMReviewHollow getData(int ordinal) {
+                return api.getCSMReviewHollow(ordinal);
             }
         };
     }
 
     public Iterable<CacheDeploymentIntentHollow> findCacheDeploymentIntentMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CacheDeploymentIntentHollow>() {
-            public Iterator<CacheDeploymentIntentHollow> iterator() {
-                return new Iterator<CacheDeploymentIntentHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CacheDeploymentIntentHollow next() {
-                        CacheDeploymentIntentHollow obj = api.getCacheDeploymentIntentHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CacheDeploymentIntentHollow>(matches.iterator()) {
+            public CacheDeploymentIntentHollow getData(int ordinal) {
+                return api.getCacheDeploymentIntentHollow(ordinal);
             }
         };
     }
 
     public Iterable<CdnHollow> findCdnMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CdnHollow>() {
-            public Iterator<CdnHollow> iterator() {
-                return new Iterator<CdnHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CdnHollow next() {
-                        CdnHollow obj = api.getCdnHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CdnHollow>(matches.iterator()) {
+            public CdnHollow getData(int ordinal) {
+                return api.getCdnHollow(ordinal);
             }
         };
     }
 
     public Iterable<CdnDeploymentHollow> findCdnDeploymentMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CdnDeploymentHollow>() {
-            public Iterator<CdnDeploymentHollow> iterator() {
-                return new Iterator<CdnDeploymentHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CdnDeploymentHollow next() {
-                        CdnDeploymentHollow obj = api.getCdnDeploymentHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CdnDeploymentHollow>(matches.iterator()) {
+            public CdnDeploymentHollow getData(int ordinal) {
+                return api.getCdnDeploymentHollow(ordinal);
             }
         };
     }
 
     public Iterable<CdnDeploymentSetHollow> findCdnDeploymentSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CdnDeploymentSetHollow>() {
-            public Iterator<CdnDeploymentSetHollow> iterator() {
-                return new Iterator<CdnDeploymentSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CdnDeploymentSetHollow next() {
-                        CdnDeploymentSetHollow obj = api.getCdnDeploymentSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CdnDeploymentSetHollow>(matches.iterator()) {
+            public CdnDeploymentSetHollow getData(int ordinal) {
+                return api.getCdnDeploymentSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<CertificationSystemRatingHollow> findCertificationSystemRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CertificationSystemRatingHollow>() {
-            public Iterator<CertificationSystemRatingHollow> iterator() {
-                return new Iterator<CertificationSystemRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CertificationSystemRatingHollow next() {
-                        CertificationSystemRatingHollow obj = api.getCertificationSystemRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CertificationSystemRatingHollow>(matches.iterator()) {
+            public CertificationSystemRatingHollow getData(int ordinal) {
+                return api.getCertificationSystemRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<CertificationSystemRatingListHollow> findCertificationSystemRatingListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CertificationSystemRatingListHollow>() {
-            public Iterator<CertificationSystemRatingListHollow> iterator() {
-                return new Iterator<CertificationSystemRatingListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CertificationSystemRatingListHollow next() {
-                        CertificationSystemRatingListHollow obj = api.getCertificationSystemRatingListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CertificationSystemRatingListHollow>(matches.iterator()) {
+            public CertificationSystemRatingListHollow getData(int ordinal) {
+                return api.getCertificationSystemRatingListHollow(ordinal);
             }
         };
     }
 
     public Iterable<CertificationSystemHollow> findCertificationSystemMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CertificationSystemHollow>() {
-            public Iterator<CertificationSystemHollow> iterator() {
-                return new Iterator<CertificationSystemHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CertificationSystemHollow next() {
-                        CertificationSystemHollow obj = api.getCertificationSystemHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CertificationSystemHollow>(matches.iterator()) {
+            public CertificationSystemHollow getData(int ordinal) {
+                return api.getCertificationSystemHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharacterElementsHollow> findCharacterElementsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterElementsHollow>() {
-            public Iterator<CharacterElementsHollow> iterator() {
-                return new Iterator<CharacterElementsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterElementsHollow next() {
-                        CharacterElementsHollow obj = api.getCharacterElementsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterElementsHollow>(matches.iterator()) {
+            public CharacterElementsHollow getData(int ordinal) {
+                return api.getCharacterElementsHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharacterHollow> findCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterHollow>() {
-            public Iterator<CharacterHollow> iterator() {
-                return new Iterator<CharacterHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterHollow next() {
-                        CharacterHollow obj = api.getCharacterHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterHollow>(matches.iterator()) {
+            public CharacterHollow getData(int ordinal) {
+                return api.getCharacterHollow(ordinal);
             }
         };
     }
 
     public Iterable<DamMerchStillsMomentHollow> findDamMerchStillsMomentMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DamMerchStillsMomentHollow>() {
-            public Iterator<DamMerchStillsMomentHollow> iterator() {
-                return new Iterator<DamMerchStillsMomentHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DamMerchStillsMomentHollow next() {
-                        DamMerchStillsMomentHollow obj = api.getDamMerchStillsMomentHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DamMerchStillsMomentHollow>(matches.iterator()) {
+            public DamMerchStillsMomentHollow getData(int ordinal) {
+                return api.getDamMerchStillsMomentHollow(ordinal);
             }
         };
     }
 
     public Iterable<DamMerchStillsHollow> findDamMerchStillsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DamMerchStillsHollow>() {
-            public Iterator<DamMerchStillsHollow> iterator() {
-                return new Iterator<DamMerchStillsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DamMerchStillsHollow next() {
-                        DamMerchStillsHollow obj = api.getDamMerchStillsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DamMerchStillsHollow>(matches.iterator()) {
+            public DamMerchStillsHollow getData(int ordinal) {
+                return api.getDamMerchStillsHollow(ordinal);
             }
         };
     }
 
     public Iterable<DisallowedSubtitleLangCodeHollow> findDisallowedSubtitleLangCodeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DisallowedSubtitleLangCodeHollow>() {
-            public Iterator<DisallowedSubtitleLangCodeHollow> iterator() {
-                return new Iterator<DisallowedSubtitleLangCodeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DisallowedSubtitleLangCodeHollow next() {
-                        DisallowedSubtitleLangCodeHollow obj = api.getDisallowedSubtitleLangCodeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DisallowedSubtitleLangCodeHollow>(matches.iterator()) {
+            public DisallowedSubtitleLangCodeHollow getData(int ordinal) {
+                return api.getDisallowedSubtitleLangCodeHollow(ordinal);
             }
         };
     }
 
     public Iterable<DisallowedSubtitleLangCodesListHollow> findDisallowedSubtitleLangCodesListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DisallowedSubtitleLangCodesListHollow>() {
-            public Iterator<DisallowedSubtitleLangCodesListHollow> iterator() {
-                return new Iterator<DisallowedSubtitleLangCodesListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DisallowedSubtitleLangCodesListHollow next() {
-                        DisallowedSubtitleLangCodesListHollow obj = api.getDisallowedSubtitleLangCodesListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DisallowedSubtitleLangCodesListHollow>(matches.iterator()) {
+            public DisallowedSubtitleLangCodesListHollow getData(int ordinal) {
+                return api.getDisallowedSubtitleLangCodesListHollow(ordinal);
             }
         };
     }
 
     public Iterable<DisallowedAssetBundleHollow> findDisallowedAssetBundleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DisallowedAssetBundleHollow>() {
-            public Iterator<DisallowedAssetBundleHollow> iterator() {
-                return new Iterator<DisallowedAssetBundleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DisallowedAssetBundleHollow next() {
-                        DisallowedAssetBundleHollow obj = api.getDisallowedAssetBundleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DisallowedAssetBundleHollow>(matches.iterator()) {
+            public DisallowedAssetBundleHollow getData(int ordinal) {
+                return api.getDisallowedAssetBundleHollow(ordinal);
             }
         };
     }
 
     public Iterable<DisallowedAssetBundlesListHollow> findDisallowedAssetBundlesListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DisallowedAssetBundlesListHollow>() {
-            public Iterator<DisallowedAssetBundlesListHollow> iterator() {
-                return new Iterator<DisallowedAssetBundlesListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DisallowedAssetBundlesListHollow next() {
-                        DisallowedAssetBundlesListHollow obj = api.getDisallowedAssetBundlesListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DisallowedAssetBundlesListHollow>(matches.iterator()) {
+            public DisallowedAssetBundlesListHollow getData(int ordinal) {
+                return api.getDisallowedAssetBundlesListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ContractHollow> findContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ContractHollow>() {
-            public Iterator<ContractHollow> iterator() {
-                return new Iterator<ContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ContractHollow next() {
-                        ContractHollow obj = api.getContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ContractHollow>(matches.iterator()) {
+            public ContractHollow getData(int ordinal) {
+                return api.getContractHollow(ordinal);
             }
         };
     }
 
     public Iterable<DrmHeaderInfoHollow> findDrmHeaderInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DrmHeaderInfoHollow>() {
-            public Iterator<DrmHeaderInfoHollow> iterator() {
-                return new Iterator<DrmHeaderInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DrmHeaderInfoHollow next() {
-                        DrmHeaderInfoHollow obj = api.getDrmHeaderInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DrmHeaderInfoHollow>(matches.iterator()) {
+            public DrmHeaderInfoHollow getData(int ordinal) {
+                return api.getDrmHeaderInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<DrmHeaderInfoListHollow> findDrmHeaderInfoListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DrmHeaderInfoListHollow>() {
-            public Iterator<DrmHeaderInfoListHollow> iterator() {
-                return new Iterator<DrmHeaderInfoListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DrmHeaderInfoListHollow next() {
-                        DrmHeaderInfoListHollow obj = api.getDrmHeaderInfoListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DrmHeaderInfoListHollow>(matches.iterator()) {
+            public DrmHeaderInfoListHollow getData(int ordinal) {
+                return api.getDrmHeaderInfoListHollow(ordinal);
             }
         };
     }
 
     public Iterable<DrmSystemIdentifiersHollow> findDrmSystemIdentifiersMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DrmSystemIdentifiersHollow>() {
-            public Iterator<DrmSystemIdentifiersHollow> iterator() {
-                return new Iterator<DrmSystemIdentifiersHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DrmSystemIdentifiersHollow next() {
-                        DrmSystemIdentifiersHollow obj = api.getDrmSystemIdentifiersHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DrmSystemIdentifiersHollow>(matches.iterator()) {
+            public DrmSystemIdentifiersHollow getData(int ordinal) {
+                return api.getDrmSystemIdentifiersHollow(ordinal);
             }
         };
     }
 
     public Iterable<IPLArtworkDerivativeHollow> findIPLArtworkDerivativeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IPLArtworkDerivativeHollow>() {
-            public Iterator<IPLArtworkDerivativeHollow> iterator() {
-                return new Iterator<IPLArtworkDerivativeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IPLArtworkDerivativeHollow next() {
-                        IPLArtworkDerivativeHollow obj = api.getIPLArtworkDerivativeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IPLArtworkDerivativeHollow>(matches.iterator()) {
+            public IPLArtworkDerivativeHollow getData(int ordinal) {
+                return api.getIPLArtworkDerivativeHollow(ordinal);
             }
         };
     }
 
     public Iterable<IPLDerivativeSetHollow> findIPLDerivativeSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IPLDerivativeSetHollow>() {
-            public Iterator<IPLDerivativeSetHollow> iterator() {
-                return new Iterator<IPLDerivativeSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IPLDerivativeSetHollow next() {
-                        IPLDerivativeSetHollow obj = api.getIPLDerivativeSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IPLDerivativeSetHollow>(matches.iterator()) {
+            public IPLDerivativeSetHollow getData(int ordinal) {
+                return api.getIPLDerivativeSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<IPLDerivativeGroupHollow> findIPLDerivativeGroupMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IPLDerivativeGroupHollow>() {
-            public Iterator<IPLDerivativeGroupHollow> iterator() {
-                return new Iterator<IPLDerivativeGroupHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IPLDerivativeGroupHollow next() {
-                        IPLDerivativeGroupHollow obj = api.getIPLDerivativeGroupHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IPLDerivativeGroupHollow>(matches.iterator()) {
+            public IPLDerivativeGroupHollow getData(int ordinal) {
+                return api.getIPLDerivativeGroupHollow(ordinal);
             }
         };
     }
 
     public Iterable<IPLDerivativeGroupSetHollow> findIPLDerivativeGroupSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IPLDerivativeGroupSetHollow>() {
-            public Iterator<IPLDerivativeGroupSetHollow> iterator() {
-                return new Iterator<IPLDerivativeGroupSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IPLDerivativeGroupSetHollow next() {
-                        IPLDerivativeGroupSetHollow obj = api.getIPLDerivativeGroupSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IPLDerivativeGroupSetHollow>(matches.iterator()) {
+            public IPLDerivativeGroupSetHollow getData(int ordinal) {
+                return api.getIPLDerivativeGroupSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<IPLArtworkDerivativeSetHollow> findIPLArtworkDerivativeSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IPLArtworkDerivativeSetHollow>() {
-            public Iterator<IPLArtworkDerivativeSetHollow> iterator() {
-                return new Iterator<IPLArtworkDerivativeSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IPLArtworkDerivativeSetHollow next() {
-                        IPLArtworkDerivativeSetHollow obj = api.getIPLArtworkDerivativeSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IPLArtworkDerivativeSetHollow>(matches.iterator()) {
+            public IPLArtworkDerivativeSetHollow getData(int ordinal) {
+                return api.getIPLArtworkDerivativeSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<ImageStreamInfoHollow> findImageStreamInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ImageStreamInfoHollow>() {
-            public Iterator<ImageStreamInfoHollow> iterator() {
-                return new Iterator<ImageStreamInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ImageStreamInfoHollow next() {
-                        ImageStreamInfoHollow obj = api.getImageStreamInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ImageStreamInfoHollow>(matches.iterator()) {
+            public ImageStreamInfoHollow getData(int ordinal) {
+                return api.getImageStreamInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfContractHollow> findListOfContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfContractHollow>() {
-            public Iterator<ListOfContractHollow> iterator() {
-                return new Iterator<ListOfContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfContractHollow next() {
-                        ListOfContractHollow obj = api.getListOfContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfContractHollow>(matches.iterator()) {
+            public ListOfContractHollow getData(int ordinal) {
+                return api.getListOfContractHollow(ordinal);
             }
         };
     }
 
     public Iterable<ContractsHollow> findContractsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ContractsHollow>() {
-            public Iterator<ContractsHollow> iterator() {
-                return new Iterator<ContractsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ContractsHollow next() {
-                        ContractsHollow obj = api.getContractsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ContractsHollow>(matches.iterator()) {
+            public ContractsHollow getData(int ordinal) {
+                return api.getContractsHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfPackageTagsHollow> findListOfPackageTagsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfPackageTagsHollow>() {
-            public Iterator<ListOfPackageTagsHollow> iterator() {
-                return new Iterator<ListOfPackageTagsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfPackageTagsHollow next() {
-                        ListOfPackageTagsHollow obj = api.getListOfPackageTagsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfPackageTagsHollow>(matches.iterator()) {
+            public ListOfPackageTagsHollow getData(int ordinal) {
+                return api.getListOfPackageTagsHollow(ordinal);
             }
         };
     }
 
     public Iterable<DeployablePackagesHollow> findDeployablePackagesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<DeployablePackagesHollow>() {
-            public Iterator<DeployablePackagesHollow> iterator() {
-                return new Iterator<DeployablePackagesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public DeployablePackagesHollow next() {
-                        DeployablePackagesHollow obj = api.getDeployablePackagesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<DeployablePackagesHollow>(matches.iterator()) {
+            public DeployablePackagesHollow getData(int ordinal) {
+                return api.getDeployablePackagesHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfStringHollow> findListOfStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfStringHollow>() {
-            public Iterator<ListOfStringHollow> iterator() {
-                return new Iterator<ListOfStringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfStringHollow next() {
-                        ListOfStringHollow obj = api.getListOfStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfStringHollow>(matches.iterator()) {
+            public ListOfStringHollow getData(int ordinal) {
+                return api.getListOfStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<LocaleTerritoryCodeHollow> findLocaleTerritoryCodeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<LocaleTerritoryCodeHollow>() {
-            public Iterator<LocaleTerritoryCodeHollow> iterator() {
-                return new Iterator<LocaleTerritoryCodeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public LocaleTerritoryCodeHollow next() {
-                        LocaleTerritoryCodeHollow obj = api.getLocaleTerritoryCodeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<LocaleTerritoryCodeHollow>(matches.iterator()) {
+            public LocaleTerritoryCodeHollow getData(int ordinal) {
+                return api.getLocaleTerritoryCodeHollow(ordinal);
             }
         };
     }
 
     public Iterable<LocaleTerritoryCodeListHollow> findLocaleTerritoryCodeListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<LocaleTerritoryCodeListHollow>() {
-            public Iterator<LocaleTerritoryCodeListHollow> iterator() {
-                return new Iterator<LocaleTerritoryCodeListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public LocaleTerritoryCodeListHollow next() {
-                        LocaleTerritoryCodeListHollow obj = api.getLocaleTerritoryCodeListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<LocaleTerritoryCodeListHollow>(matches.iterator()) {
+            public LocaleTerritoryCodeListHollow getData(int ordinal) {
+                return api.getLocaleTerritoryCodeListHollow(ordinal);
             }
         };
     }
 
     public Iterable<MasterScheduleHollow> findMasterScheduleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MasterScheduleHollow>() {
-            public Iterator<MasterScheduleHollow> iterator() {
-                return new Iterator<MasterScheduleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MasterScheduleHollow next() {
-                        MasterScheduleHollow obj = api.getMasterScheduleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MasterScheduleHollow>(matches.iterator()) {
+            public MasterScheduleHollow getData(int ordinal) {
+                return api.getMasterScheduleHollow(ordinal);
             }
         };
     }
 
     public Iterable<MultiValuePassthroughMapHollow> findMultiValuePassthroughMapMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MultiValuePassthroughMapHollow>() {
-            public Iterator<MultiValuePassthroughMapHollow> iterator() {
-                return new Iterator<MultiValuePassthroughMapHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MultiValuePassthroughMapHollow next() {
-                        MultiValuePassthroughMapHollow obj = api.getMultiValuePassthroughMapHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MultiValuePassthroughMapHollow>(matches.iterator()) {
+            public MultiValuePassthroughMapHollow getData(int ordinal) {
+                return api.getMultiValuePassthroughMapHollow(ordinal);
             }
         };
     }
 
     public Iterable<OriginServerHollow> findOriginServerMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<OriginServerHollow>() {
-            public Iterator<OriginServerHollow> iterator() {
-                return new Iterator<OriginServerHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public OriginServerHollow next() {
-                        OriginServerHollow obj = api.getOriginServerHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<OriginServerHollow>(matches.iterator()) {
+            public OriginServerHollow getData(int ordinal) {
+                return api.getOriginServerHollow(ordinal);
             }
         };
     }
 
     public Iterable<OverrideScheduleHollow> findOverrideScheduleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<OverrideScheduleHollow>() {
-            public Iterator<OverrideScheduleHollow> iterator() {
-                return new Iterator<OverrideScheduleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public OverrideScheduleHollow next() {
-                        OverrideScheduleHollow obj = api.getOverrideScheduleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<OverrideScheduleHollow>(matches.iterator()) {
+            public OverrideScheduleHollow getData(int ordinal) {
+                return api.getOverrideScheduleHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageDrmInfoHollow> findPackageDrmInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageDrmInfoHollow>() {
-            public Iterator<PackageDrmInfoHollow> iterator() {
-                return new Iterator<PackageDrmInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageDrmInfoHollow next() {
-                        PackageDrmInfoHollow obj = api.getPackageDrmInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageDrmInfoHollow>(matches.iterator()) {
+            public PackageDrmInfoHollow getData(int ordinal) {
+                return api.getPackageDrmInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageDrmInfoListHollow> findPackageDrmInfoListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageDrmInfoListHollow>() {
-            public Iterator<PackageDrmInfoListHollow> iterator() {
-                return new Iterator<PackageDrmInfoListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageDrmInfoListHollow next() {
-                        PackageDrmInfoListHollow obj = api.getPackageDrmInfoListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageDrmInfoListHollow>(matches.iterator()) {
+            public PackageDrmInfoListHollow getData(int ordinal) {
+                return api.getPackageDrmInfoListHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageMomentHollow> findPackageMomentMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageMomentHollow>() {
-            public Iterator<PackageMomentHollow> iterator() {
-                return new Iterator<PackageMomentHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageMomentHollow next() {
-                        PackageMomentHollow obj = api.getPackageMomentHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageMomentHollow>(matches.iterator()) {
+            public PackageMomentHollow getData(int ordinal) {
+                return api.getPackageMomentHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageMomentListHollow> findPackageMomentListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageMomentListHollow>() {
-            public Iterator<PackageMomentListHollow> iterator() {
-                return new Iterator<PackageMomentListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageMomentListHollow next() {
-                        PackageMomentListHollow obj = api.getPackageMomentListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageMomentListHollow>(matches.iterator()) {
+            public PackageMomentListHollow getData(int ordinal) {
+                return api.getPackageMomentListHollow(ordinal);
             }
         };
     }
 
     public Iterable<PhaseTagHollow> findPhaseTagMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PhaseTagHollow>() {
-            public Iterator<PhaseTagHollow> iterator() {
-                return new Iterator<PhaseTagHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PhaseTagHollow next() {
-                        PhaseTagHollow obj = api.getPhaseTagHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PhaseTagHollow>(matches.iterator()) {
+            public PhaseTagHollow getData(int ordinal) {
+                return api.getPhaseTagHollow(ordinal);
             }
         };
     }
 
     public Iterable<PhaseTagListHollow> findPhaseTagListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PhaseTagListHollow>() {
-            public Iterator<PhaseTagListHollow> iterator() {
-                return new Iterator<PhaseTagListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PhaseTagListHollow next() {
-                        PhaseTagListHollow obj = api.getPhaseTagListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PhaseTagListHollow>(matches.iterator()) {
+            public PhaseTagListHollow getData(int ordinal) {
+                return api.getPhaseTagListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ProtectionTypesHollow> findProtectionTypesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ProtectionTypesHollow>() {
-            public Iterator<ProtectionTypesHollow> iterator() {
-                return new Iterator<ProtectionTypesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ProtectionTypesHollow next() {
-                        ProtectionTypesHollow obj = api.getProtectionTypesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ProtectionTypesHollow>(matches.iterator()) {
+            public ProtectionTypesHollow getData(int ordinal) {
+                return api.getProtectionTypesHollow(ordinal);
             }
         };
     }
 
     public Iterable<ReleaseDateHollow> findReleaseDateMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ReleaseDateHollow>() {
-            public Iterator<ReleaseDateHollow> iterator() {
-                return new Iterator<ReleaseDateHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ReleaseDateHollow next() {
-                        ReleaseDateHollow obj = api.getReleaseDateHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ReleaseDateHollow>(matches.iterator()) {
+            public ReleaseDateHollow getData(int ordinal) {
+                return api.getReleaseDateHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfReleaseDatesHollow> findListOfReleaseDatesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfReleaseDatesHollow>() {
-            public Iterator<ListOfReleaseDatesHollow> iterator() {
-                return new Iterator<ListOfReleaseDatesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfReleaseDatesHollow next() {
-                        ListOfReleaseDatesHollow obj = api.getListOfReleaseDatesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfReleaseDatesHollow>(matches.iterator()) {
+            public ListOfReleaseDatesHollow getData(int ordinal) {
+                return api.getListOfReleaseDatesHollow(ordinal);
             }
         };
     }
 
     public Iterable<RightsContractAssetHollow> findRightsContractAssetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsContractAssetHollow>() {
-            public Iterator<RightsContractAssetHollow> iterator() {
-                return new Iterator<RightsContractAssetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsContractAssetHollow next() {
-                        RightsContractAssetHollow obj = api.getRightsContractAssetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RightsContractAssetHollow>(matches.iterator()) {
+            public RightsContractAssetHollow getData(int ordinal) {
+                return api.getRightsContractAssetHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfRightsContractAssetHollow> findListOfRightsContractAssetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsContractAssetHollow>() {
-            public Iterator<ListOfRightsContractAssetHollow> iterator() {
-                return new Iterator<ListOfRightsContractAssetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsContractAssetHollow next() {
-                        ListOfRightsContractAssetHollow obj = api.getListOfRightsContractAssetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfRightsContractAssetHollow>(matches.iterator()) {
+            public ListOfRightsContractAssetHollow getData(int ordinal) {
+                return api.getListOfRightsContractAssetHollow(ordinal);
             }
         };
     }
 
     public Iterable<RightsWindowContractHollow> findRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsWindowContractHollow>() {
-            public Iterator<RightsWindowContractHollow> iterator() {
-                return new Iterator<RightsWindowContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsWindowContractHollow next() {
-                        RightsWindowContractHollow obj = api.getRightsWindowContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RightsWindowContractHollow>(matches.iterator()) {
+            public RightsWindowContractHollow getData(int ordinal) {
+                return api.getRightsWindowContractHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfRightsWindowContractHollow> findListOfRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsWindowContractHollow>() {
-            public Iterator<ListOfRightsWindowContractHollow> iterator() {
-                return new Iterator<ListOfRightsWindowContractHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsWindowContractHollow next() {
-                        ListOfRightsWindowContractHollow obj = api.getListOfRightsWindowContractHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfRightsWindowContractHollow>(matches.iterator()) {
+            public ListOfRightsWindowContractHollow getData(int ordinal) {
+                return api.getListOfRightsWindowContractHollow(ordinal);
             }
         };
     }
 
     public Iterable<RightsWindowHollow> findRightsWindowMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsWindowHollow>() {
-            public Iterator<RightsWindowHollow> iterator() {
-                return new Iterator<RightsWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsWindowHollow next() {
-                        RightsWindowHollow obj = api.getRightsWindowHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RightsWindowHollow>(matches.iterator()) {
+            public RightsWindowHollow getData(int ordinal) {
+                return api.getRightsWindowHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfRightsWindowHollow> findListOfRightsWindowMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfRightsWindowHollow>() {
-            public Iterator<ListOfRightsWindowHollow> iterator() {
-                return new Iterator<ListOfRightsWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfRightsWindowHollow next() {
-                        ListOfRightsWindowHollow obj = api.getListOfRightsWindowHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfRightsWindowHollow>(matches.iterator()) {
+            public ListOfRightsWindowHollow getData(int ordinal) {
+                return api.getListOfRightsWindowHollow(ordinal);
             }
         };
     }
 
     public Iterable<RightsHollow> findRightsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RightsHollow>() {
-            public Iterator<RightsHollow> iterator() {
-                return new Iterator<RightsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RightsHollow next() {
-                        RightsHollow obj = api.getRightsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RightsHollow>(matches.iterator()) {
+            public RightsHollow getData(int ordinal) {
+                return api.getRightsHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseArtworkSourceFileIdHollow> findRolloutPhaseArtworkSourceFileIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseArtworkSourceFileIdHollow>() {
-            public Iterator<RolloutPhaseArtworkSourceFileIdHollow> iterator() {
-                return new Iterator<RolloutPhaseArtworkSourceFileIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseArtworkSourceFileIdHollow next() {
-                        RolloutPhaseArtworkSourceFileIdHollow obj = api.getRolloutPhaseArtworkSourceFileIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseArtworkSourceFileIdHollow>(matches.iterator()) {
+            public RolloutPhaseArtworkSourceFileIdHollow getData(int ordinal) {
+                return api.getRolloutPhaseArtworkSourceFileIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseArtworkSourceFileIdListHollow> findRolloutPhaseArtworkSourceFileIdListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseArtworkSourceFileIdListHollow>() {
-            public Iterator<RolloutPhaseArtworkSourceFileIdListHollow> iterator() {
-                return new Iterator<RolloutPhaseArtworkSourceFileIdListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseArtworkSourceFileIdListHollow next() {
-                        RolloutPhaseArtworkSourceFileIdListHollow obj = api.getRolloutPhaseArtworkSourceFileIdListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseArtworkSourceFileIdListHollow>(matches.iterator()) {
+            public RolloutPhaseArtworkSourceFileIdListHollow getData(int ordinal) {
+                return api.getRolloutPhaseArtworkSourceFileIdListHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseArtworkHollow> findRolloutPhaseArtworkMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseArtworkHollow>() {
-            public Iterator<RolloutPhaseArtworkHollow> iterator() {
-                return new Iterator<RolloutPhaseArtworkHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseArtworkHollow next() {
-                        RolloutPhaseArtworkHollow obj = api.getRolloutPhaseArtworkHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseArtworkHollow>(matches.iterator()) {
+            public RolloutPhaseArtworkHollow getData(int ordinal) {
+                return api.getRolloutPhaseArtworkHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseLocalizedMetadataHollow> findRolloutPhaseLocalizedMetadataMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseLocalizedMetadataHollow>() {
-            public Iterator<RolloutPhaseLocalizedMetadataHollow> iterator() {
-                return new Iterator<RolloutPhaseLocalizedMetadataHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseLocalizedMetadataHollow next() {
-                        RolloutPhaseLocalizedMetadataHollow obj = api.getRolloutPhaseLocalizedMetadataHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseLocalizedMetadataHollow>(matches.iterator()) {
+            public RolloutPhaseLocalizedMetadataHollow getData(int ordinal) {
+                return api.getRolloutPhaseLocalizedMetadataHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseElementsHollow> findRolloutPhaseElementsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseElementsHollow>() {
-            public Iterator<RolloutPhaseElementsHollow> iterator() {
-                return new Iterator<RolloutPhaseElementsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseElementsHollow next() {
-                        RolloutPhaseElementsHollow obj = api.getRolloutPhaseElementsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseElementsHollow>(matches.iterator()) {
+            public RolloutPhaseElementsHollow getData(int ordinal) {
+                return api.getRolloutPhaseElementsHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseHollow> findRolloutPhaseMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseHollow>() {
-            public Iterator<RolloutPhaseHollow> iterator() {
-                return new Iterator<RolloutPhaseHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseHollow next() {
-                        RolloutPhaseHollow obj = api.getRolloutPhaseHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseHollow>(matches.iterator()) {
+            public RolloutPhaseHollow getData(int ordinal) {
+                return api.getRolloutPhaseHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutPhaseListHollow> findRolloutPhaseListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutPhaseListHollow>() {
-            public Iterator<RolloutPhaseListHollow> iterator() {
-                return new Iterator<RolloutPhaseListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutPhaseListHollow next() {
-                        RolloutPhaseListHollow obj = api.getRolloutPhaseListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutPhaseListHollow>(matches.iterator()) {
+            public RolloutPhaseListHollow getData(int ordinal) {
+                return api.getRolloutPhaseListHollow(ordinal);
             }
         };
     }
 
     public Iterable<RolloutHollow> findRolloutMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RolloutHollow>() {
-            public Iterator<RolloutHollow> iterator() {
-                return new Iterator<RolloutHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RolloutHollow next() {
-                        RolloutHollow obj = api.getRolloutHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RolloutHollow>(matches.iterator()) {
+            public RolloutHollow getData(int ordinal) {
+                return api.getRolloutHollow(ordinal);
             }
         };
     }
 
     public Iterable<SetOfStringHollow> findSetOfStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SetOfStringHollow>() {
-            public Iterator<SetOfStringHollow> iterator() {
-                return new Iterator<SetOfStringHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SetOfStringHollow next() {
-                        SetOfStringHollow obj = api.getSetOfStringHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SetOfStringHollow>(matches.iterator()) {
+            public SetOfStringHollow getData(int ordinal) {
+                return api.getSetOfStringHollow(ordinal);
             }
         };
     }
 
     public Iterable<FlagsHollow> findFlagsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<FlagsHollow>() {
-            public Iterator<FlagsHollow> iterator() {
-                return new Iterator<FlagsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public FlagsHollow next() {
-                        FlagsHollow obj = api.getFlagsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<FlagsHollow>(matches.iterator()) {
+            public FlagsHollow getData(int ordinal) {
+                return api.getFlagsHollow(ordinal);
             }
         };
     }
 
     public Iterable<SingleValuePassthroughMapHollow> findSingleValuePassthroughMapMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SingleValuePassthroughMapHollow>() {
-            public Iterator<SingleValuePassthroughMapHollow> iterator() {
-                return new Iterator<SingleValuePassthroughMapHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SingleValuePassthroughMapHollow next() {
-                        SingleValuePassthroughMapHollow obj = api.getSingleValuePassthroughMapHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SingleValuePassthroughMapHollow>(matches.iterator()) {
+            public SingleValuePassthroughMapHollow getData(int ordinal) {
+                return api.getSingleValuePassthroughMapHollow(ordinal);
             }
         };
     }
 
     public Iterable<PassthroughDataHollow> findPassthroughDataMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PassthroughDataHollow>() {
-            public Iterator<PassthroughDataHollow> iterator() {
-                return new Iterator<PassthroughDataHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PassthroughDataHollow next() {
-                        PassthroughDataHollow obj = api.getPassthroughDataHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PassthroughDataHollow>(matches.iterator()) {
+            public PassthroughDataHollow getData(int ordinal) {
+                return api.getPassthroughDataHollow(ordinal);
             }
         };
     }
 
     public Iterable<ArtworkAttributesHollow> findArtworkAttributesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkAttributesHollow>() {
-            public Iterator<ArtworkAttributesHollow> iterator() {
-                return new Iterator<ArtworkAttributesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkAttributesHollow next() {
-                        ArtworkAttributesHollow obj = api.getArtworkAttributesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ArtworkAttributesHollow>(matches.iterator()) {
+            public ArtworkAttributesHollow getData(int ordinal) {
+                return api.getArtworkAttributesHollow(ordinal);
             }
         };
     }
 
     public Iterable<ArtworkLocaleHollow> findArtworkLocaleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkLocaleHollow>() {
-            public Iterator<ArtworkLocaleHollow> iterator() {
-                return new Iterator<ArtworkLocaleHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkLocaleHollow next() {
-                        ArtworkLocaleHollow obj = api.getArtworkLocaleHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ArtworkLocaleHollow>(matches.iterator()) {
+            public ArtworkLocaleHollow getData(int ordinal) {
+                return api.getArtworkLocaleHollow(ordinal);
             }
         };
     }
 
     public Iterable<ArtworkLocaleListHollow> findArtworkLocaleListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ArtworkLocaleListHollow>() {
-            public Iterator<ArtworkLocaleListHollow> iterator() {
-                return new Iterator<ArtworkLocaleListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ArtworkLocaleListHollow next() {
-                        ArtworkLocaleListHollow obj = api.getArtworkLocaleListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ArtworkLocaleListHollow>(matches.iterator()) {
+            public ArtworkLocaleListHollow getData(int ordinal) {
+                return api.getArtworkLocaleListHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharacterArtworkSourceHollow> findCharacterArtworkSourceMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharacterArtworkSourceHollow>() {
-            public Iterator<CharacterArtworkSourceHollow> iterator() {
-                return new Iterator<CharacterArtworkSourceHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharacterArtworkSourceHollow next() {
-                        CharacterArtworkSourceHollow obj = api.getCharacterArtworkSourceHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharacterArtworkSourceHollow>(matches.iterator()) {
+            public CharacterArtworkSourceHollow getData(int ordinal) {
+                return api.getCharacterArtworkSourceHollow(ordinal);
             }
         };
     }
 
     public Iterable<IndividualSupplementalHollow> findIndividualSupplementalMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<IndividualSupplementalHollow>() {
-            public Iterator<IndividualSupplementalHollow> iterator() {
-                return new Iterator<IndividualSupplementalHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public IndividualSupplementalHollow next() {
-                        IndividualSupplementalHollow obj = api.getIndividualSupplementalHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<IndividualSupplementalHollow>(matches.iterator()) {
+            public IndividualSupplementalHollow getData(int ordinal) {
+                return api.getIndividualSupplementalHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonArtworkSourceHollow> findPersonArtworkSourceMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonArtworkSourceHollow>() {
-            public Iterator<PersonArtworkSourceHollow> iterator() {
-                return new Iterator<PersonArtworkSourceHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonArtworkSourceHollow next() {
-                        PersonArtworkSourceHollow obj = api.getPersonArtworkSourceHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonArtworkSourceHollow>(matches.iterator()) {
+            public PersonArtworkSourceHollow getData(int ordinal) {
+                return api.getPersonArtworkSourceHollow(ordinal);
             }
         };
     }
 
     public Iterable<StatusHollow> findStatusMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StatusHollow>() {
-            public Iterator<StatusHollow> iterator() {
-                return new Iterator<StatusHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StatusHollow next() {
-                        StatusHollow obj = api.getStatusHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StatusHollow>(matches.iterator()) {
+            public StatusHollow getData(int ordinal) {
+                return api.getStatusHollow(ordinal);
             }
         };
     }
 
     public Iterable<StorageGroupsHollow> findStorageGroupsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StorageGroupsHollow>() {
-            public Iterator<StorageGroupsHollow> iterator() {
-                return new Iterator<StorageGroupsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StorageGroupsHollow next() {
-                        StorageGroupsHollow obj = api.getStorageGroupsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StorageGroupsHollow>(matches.iterator()) {
+            public StorageGroupsHollow getData(int ordinal) {
+                return api.getStorageGroupsHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamAssetTypeHollow> findStreamAssetTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamAssetTypeHollow>() {
-            public Iterator<StreamAssetTypeHollow> iterator() {
-                return new Iterator<StreamAssetTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamAssetTypeHollow next() {
-                        StreamAssetTypeHollow obj = api.getStreamAssetTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamAssetTypeHollow>(matches.iterator()) {
+            public StreamAssetTypeHollow getData(int ordinal) {
+                return api.getStreamAssetTypeHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDeploymentInfoHollow> findStreamDeploymentInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDeploymentInfoHollow>() {
-            public Iterator<StreamDeploymentInfoHollow> iterator() {
-                return new Iterator<StreamDeploymentInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDeploymentInfoHollow next() {
-                        StreamDeploymentInfoHollow obj = api.getStreamDeploymentInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDeploymentInfoHollow>(matches.iterator()) {
+            public StreamDeploymentInfoHollow getData(int ordinal) {
+                return api.getStreamDeploymentInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDeploymentLabelHollow> findStreamDeploymentLabelMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDeploymentLabelHollow>() {
-            public Iterator<StreamDeploymentLabelHollow> iterator() {
-                return new Iterator<StreamDeploymentLabelHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDeploymentLabelHollow next() {
-                        StreamDeploymentLabelHollow obj = api.getStreamDeploymentLabelHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDeploymentLabelHollow>(matches.iterator()) {
+            public StreamDeploymentLabelHollow getData(int ordinal) {
+                return api.getStreamDeploymentLabelHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDeploymentLabelSetHollow> findStreamDeploymentLabelSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDeploymentLabelSetHollow>() {
-            public Iterator<StreamDeploymentLabelSetHollow> iterator() {
-                return new Iterator<StreamDeploymentLabelSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDeploymentLabelSetHollow next() {
-                        StreamDeploymentLabelSetHollow obj = api.getStreamDeploymentLabelSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDeploymentLabelSetHollow>(matches.iterator()) {
+            public StreamDeploymentLabelSetHollow getData(int ordinal) {
+                return api.getStreamDeploymentLabelSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDeploymentHollow> findStreamDeploymentMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDeploymentHollow>() {
-            public Iterator<StreamDeploymentHollow> iterator() {
-                return new Iterator<StreamDeploymentHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDeploymentHollow next() {
-                        StreamDeploymentHollow obj = api.getStreamDeploymentHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDeploymentHollow>(matches.iterator()) {
+            public StreamDeploymentHollow getData(int ordinal) {
+                return api.getStreamDeploymentHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamDrmInfoHollow> findStreamDrmInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamDrmInfoHollow>() {
-            public Iterator<StreamDrmInfoHollow> iterator() {
-                return new Iterator<StreamDrmInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamDrmInfoHollow next() {
-                        StreamDrmInfoHollow obj = api.getStreamDrmInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamDrmInfoHollow>(matches.iterator()) {
+            public StreamDrmInfoHollow getData(int ordinal) {
+                return api.getStreamDrmInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamProfileGroupsHollow> findStreamProfileGroupsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamProfileGroupsHollow>() {
-            public Iterator<StreamProfileGroupsHollow> iterator() {
-                return new Iterator<StreamProfileGroupsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamProfileGroupsHollow next() {
-                        StreamProfileGroupsHollow obj = api.getStreamProfileGroupsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamProfileGroupsHollow>(matches.iterator()) {
+            public StreamProfileGroupsHollow getData(int ordinal) {
+                return api.getStreamProfileGroupsHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamProfilesHollow> findStreamProfilesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamProfilesHollow>() {
-            public Iterator<StreamProfilesHollow> iterator() {
-                return new Iterator<StreamProfilesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamProfilesHollow next() {
-                        StreamProfilesHollow obj = api.getStreamProfilesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamProfilesHollow>(matches.iterator()) {
+            public StreamProfilesHollow getData(int ordinal) {
+                return api.getStreamProfilesHollow(ordinal);
             }
         };
     }
 
     public Iterable<SupplementalsListHollow> findSupplementalsListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SupplementalsListHollow>() {
-            public Iterator<SupplementalsListHollow> iterator() {
-                return new Iterator<SupplementalsListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SupplementalsListHollow next() {
-                        SupplementalsListHollow obj = api.getSupplementalsListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SupplementalsListHollow>(matches.iterator()) {
+            public SupplementalsListHollow getData(int ordinal) {
+                return api.getSupplementalsListHollow(ordinal);
             }
         };
     }
 
     public Iterable<SupplementalsHollow> findSupplementalsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<SupplementalsHollow>() {
-            public Iterator<SupplementalsHollow> iterator() {
-                return new Iterator<SupplementalsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public SupplementalsHollow next() {
-                        SupplementalsHollow obj = api.getSupplementalsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<SupplementalsHollow>(matches.iterator()) {
+            public SupplementalsHollow getData(int ordinal) {
+                return api.getSupplementalsHollow(ordinal);
             }
         };
     }
 
     public Iterable<TerritoryCountriesHollow> findTerritoryCountriesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TerritoryCountriesHollow>() {
-            public Iterator<TerritoryCountriesHollow> iterator() {
-                return new Iterator<TerritoryCountriesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TerritoryCountriesHollow next() {
-                        TerritoryCountriesHollow obj = api.getTerritoryCountriesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TerritoryCountriesHollow>(matches.iterator()) {
+            public TerritoryCountriesHollow getData(int ordinal) {
+                return api.getTerritoryCountriesHollow(ordinal);
             }
         };
     }
 
     public Iterable<TextStreamInfoHollow> findTextStreamInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TextStreamInfoHollow>() {
-            public Iterator<TextStreamInfoHollow> iterator() {
-                return new Iterator<TextStreamInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TextStreamInfoHollow next() {
-                        TextStreamInfoHollow obj = api.getTextStreamInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TextStreamInfoHollow>(matches.iterator()) {
+            public TextStreamInfoHollow getData(int ordinal) {
+                return api.getTextStreamInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<TimecodedMomentAnnotationHollow> findTimecodedMomentAnnotationMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TimecodedMomentAnnotationHollow>() {
-            public Iterator<TimecodedMomentAnnotationHollow> iterator() {
-                return new Iterator<TimecodedMomentAnnotationHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TimecodedMomentAnnotationHollow next() {
-                        TimecodedMomentAnnotationHollow obj = api.getTimecodedMomentAnnotationHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TimecodedMomentAnnotationHollow>(matches.iterator()) {
+            public TimecodedMomentAnnotationHollow getData(int ordinal) {
+                return api.getTimecodedMomentAnnotationHollow(ordinal);
             }
         };
     }
 
     public Iterable<TimecodeAnnotationsListHollow> findTimecodeAnnotationsListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TimecodeAnnotationsListHollow>() {
-            public Iterator<TimecodeAnnotationsListHollow> iterator() {
-                return new Iterator<TimecodeAnnotationsListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TimecodeAnnotationsListHollow next() {
-                        TimecodeAnnotationsListHollow obj = api.getTimecodeAnnotationsListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TimecodeAnnotationsListHollow>(matches.iterator()) {
+            public TimecodeAnnotationsListHollow getData(int ordinal) {
+                return api.getTimecodeAnnotationsListHollow(ordinal);
             }
         };
     }
 
     public Iterable<TimecodeAnnotationHollow> findTimecodeAnnotationMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TimecodeAnnotationHollow>() {
-            public Iterator<TimecodeAnnotationHollow> iterator() {
-                return new Iterator<TimecodeAnnotationHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TimecodeAnnotationHollow next() {
-                        TimecodeAnnotationHollow obj = api.getTimecodeAnnotationHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TimecodeAnnotationHollow>(matches.iterator()) {
+            public TimecodeAnnotationHollow getData(int ordinal) {
+                return api.getTimecodeAnnotationHollow(ordinal);
             }
         };
     }
 
     public Iterable<TopNAttributeHollow> findTopNAttributeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TopNAttributeHollow>() {
-            public Iterator<TopNAttributeHollow> iterator() {
-                return new Iterator<TopNAttributeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TopNAttributeHollow next() {
-                        TopNAttributeHollow obj = api.getTopNAttributeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TopNAttributeHollow>(matches.iterator()) {
+            public TopNAttributeHollow getData(int ordinal) {
+                return api.getTopNAttributeHollow(ordinal);
             }
         };
     }
 
     public Iterable<TopNAttributesSetHollow> findTopNAttributesSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TopNAttributesSetHollow>() {
-            public Iterator<TopNAttributesSetHollow> iterator() {
-                return new Iterator<TopNAttributesSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TopNAttributesSetHollow next() {
-                        TopNAttributesSetHollow obj = api.getTopNAttributesSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TopNAttributesSetHollow>(matches.iterator()) {
+            public TopNAttributesSetHollow getData(int ordinal) {
+                return api.getTopNAttributesSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<TopNHollow> findTopNMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TopNHollow>() {
-            public Iterator<TopNHollow> iterator() {
-                return new Iterator<TopNHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TopNHollow next() {
-                        TopNHollow obj = api.getTopNHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TopNHollow>(matches.iterator()) {
+            public TopNHollow getData(int ordinal) {
+                return api.getTopNHollow(ordinal);
             }
         };
     }
 
     public Iterable<TranslatedTextValueHollow> findTranslatedTextValueMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TranslatedTextValueHollow>() {
-            public Iterator<TranslatedTextValueHollow> iterator() {
-                return new Iterator<TranslatedTextValueHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TranslatedTextValueHollow next() {
-                        TranslatedTextValueHollow obj = api.getTranslatedTextValueHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TranslatedTextValueHollow>(matches.iterator()) {
+            public TranslatedTextValueHollow getData(int ordinal) {
+                return api.getTranslatedTextValueHollow(ordinal);
             }
         };
     }
 
     public Iterable<MapOfTranslatedTextHollow> findMapOfTranslatedTextMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MapOfTranslatedTextHollow>() {
-            public Iterator<MapOfTranslatedTextHollow> iterator() {
-                return new Iterator<MapOfTranslatedTextHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MapOfTranslatedTextHollow next() {
-                        MapOfTranslatedTextHollow obj = api.getMapOfTranslatedTextHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MapOfTranslatedTextHollow>(matches.iterator()) {
+            public MapOfTranslatedTextHollow getData(int ordinal) {
+                return api.getMapOfTranslatedTextHollow(ordinal);
             }
         };
     }
 
     public Iterable<AltGenresAlternateNamesHollow> findAltGenresAlternateNamesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AltGenresAlternateNamesHollow>() {
-            public Iterator<AltGenresAlternateNamesHollow> iterator() {
-                return new Iterator<AltGenresAlternateNamesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AltGenresAlternateNamesHollow next() {
-                        AltGenresAlternateNamesHollow obj = api.getAltGenresAlternateNamesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AltGenresAlternateNamesHollow>(matches.iterator()) {
+            public AltGenresAlternateNamesHollow getData(int ordinal) {
+                return api.getAltGenresAlternateNamesHollow(ordinal);
             }
         };
     }
 
     public Iterable<AltGenresAlternateNamesListHollow> findAltGenresAlternateNamesListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AltGenresAlternateNamesListHollow>() {
-            public Iterator<AltGenresAlternateNamesListHollow> iterator() {
-                return new Iterator<AltGenresAlternateNamesListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AltGenresAlternateNamesListHollow next() {
-                        AltGenresAlternateNamesListHollow obj = api.getAltGenresAlternateNamesListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AltGenresAlternateNamesListHollow>(matches.iterator()) {
+            public AltGenresAlternateNamesListHollow getData(int ordinal) {
+                return api.getAltGenresAlternateNamesListHollow(ordinal);
             }
         };
     }
 
     public Iterable<LocalizedCharacterHollow> findLocalizedCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<LocalizedCharacterHollow>() {
-            public Iterator<LocalizedCharacterHollow> iterator() {
-                return new Iterator<LocalizedCharacterHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public LocalizedCharacterHollow next() {
-                        LocalizedCharacterHollow obj = api.getLocalizedCharacterHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<LocalizedCharacterHollow>(matches.iterator()) {
+            public LocalizedCharacterHollow getData(int ordinal) {
+                return api.getLocalizedCharacterHollow(ordinal);
             }
         };
     }
 
     public Iterable<LocalizedMetadataHollow> findLocalizedMetadataMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<LocalizedMetadataHollow>() {
-            public Iterator<LocalizedMetadataHollow> iterator() {
-                return new Iterator<LocalizedMetadataHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public LocalizedMetadataHollow next() {
-                        LocalizedMetadataHollow obj = api.getLocalizedMetadataHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<LocalizedMetadataHollow>(matches.iterator()) {
+            public LocalizedMetadataHollow getData(int ordinal) {
+                return api.getLocalizedMetadataHollow(ordinal);
             }
         };
     }
 
     public Iterable<StoriesSynopsesHookHollow> findStoriesSynopsesHookMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StoriesSynopsesHookHollow>() {
-            public Iterator<StoriesSynopsesHookHollow> iterator() {
-                return new Iterator<StoriesSynopsesHookHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StoriesSynopsesHookHollow next() {
-                        StoriesSynopsesHookHollow obj = api.getStoriesSynopsesHookHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StoriesSynopsesHookHollow>(matches.iterator()) {
+            public StoriesSynopsesHookHollow getData(int ordinal) {
+                return api.getStoriesSynopsesHookHollow(ordinal);
             }
         };
     }
 
     public Iterable<StoriesSynopsesHookListHollow> findStoriesSynopsesHookListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StoriesSynopsesHookListHollow>() {
-            public Iterator<StoriesSynopsesHookListHollow> iterator() {
-                return new Iterator<StoriesSynopsesHookListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StoriesSynopsesHookListHollow next() {
-                        StoriesSynopsesHookListHollow obj = api.getStoriesSynopsesHookListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StoriesSynopsesHookListHollow>(matches.iterator()) {
+            public StoriesSynopsesHookListHollow getData(int ordinal) {
+                return api.getStoriesSynopsesHookListHollow(ordinal);
             }
         };
     }
 
     public Iterable<TranslatedTextHollow> findTranslatedTextMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TranslatedTextHollow>() {
-            public Iterator<TranslatedTextHollow> iterator() {
-                return new Iterator<TranslatedTextHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TranslatedTextHollow next() {
-                        TranslatedTextHollow obj = api.getTranslatedTextHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TranslatedTextHollow>(matches.iterator()) {
+            public TranslatedTextHollow getData(int ordinal) {
+                return api.getTranslatedTextHollow(ordinal);
             }
         };
     }
 
     public Iterable<AltGenresHollow> findAltGenresMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AltGenresHollow>() {
-            public Iterator<AltGenresHollow> iterator() {
-                return new Iterator<AltGenresHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AltGenresHollow next() {
-                        AltGenresHollow obj = api.getAltGenresHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AltGenresHollow>(matches.iterator()) {
+            public AltGenresHollow getData(int ordinal) {
+                return api.getAltGenresHollow(ordinal);
             }
         };
     }
 
     public Iterable<AssetMetaDatasHollow> findAssetMetaDatasMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AssetMetaDatasHollow>() {
-            public Iterator<AssetMetaDatasHollow> iterator() {
-                return new Iterator<AssetMetaDatasHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AssetMetaDatasHollow next() {
-                        AssetMetaDatasHollow obj = api.getAssetMetaDatasHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AssetMetaDatasHollow>(matches.iterator()) {
+            public AssetMetaDatasHollow getData(int ordinal) {
+                return api.getAssetMetaDatasHollow(ordinal);
             }
         };
     }
 
     public Iterable<AwardsHollow> findAwardsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<AwardsHollow>() {
-            public Iterator<AwardsHollow> iterator() {
-                return new Iterator<AwardsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public AwardsHollow next() {
-                        AwardsHollow obj = api.getAwardsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<AwardsHollow>(matches.iterator()) {
+            public AwardsHollow getData(int ordinal) {
+                return api.getAwardsHollow(ordinal);
             }
         };
     }
 
     public Iterable<CategoriesHollow> findCategoriesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CategoriesHollow>() {
-            public Iterator<CategoriesHollow> iterator() {
-                return new Iterator<CategoriesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CategoriesHollow next() {
-                        CategoriesHollow obj = api.getCategoriesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CategoriesHollow>(matches.iterator()) {
+            public CategoriesHollow getData(int ordinal) {
+                return api.getCategoriesHollow(ordinal);
             }
         };
     }
 
     public Iterable<CategoryGroupsHollow> findCategoryGroupsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CategoryGroupsHollow>() {
-            public Iterator<CategoryGroupsHollow> iterator() {
-                return new Iterator<CategoryGroupsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CategoryGroupsHollow next() {
-                        CategoryGroupsHollow obj = api.getCategoryGroupsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CategoryGroupsHollow>(matches.iterator()) {
+            public CategoryGroupsHollow getData(int ordinal) {
+                return api.getCategoryGroupsHollow(ordinal);
             }
         };
     }
 
     public Iterable<CertificationsHollow> findCertificationsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CertificationsHollow>() {
-            public Iterator<CertificationsHollow> iterator() {
-                return new Iterator<CertificationsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CertificationsHollow next() {
-                        CertificationsHollow obj = api.getCertificationsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CertificationsHollow>(matches.iterator()) {
+            public CertificationsHollow getData(int ordinal) {
+                return api.getCertificationsHollow(ordinal);
             }
         };
     }
 
     public Iterable<CharactersHollow> findCharactersMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<CharactersHollow>() {
-            public Iterator<CharactersHollow> iterator() {
-                return new Iterator<CharactersHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public CharactersHollow next() {
-                        CharactersHollow obj = api.getCharactersHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<CharactersHollow>(matches.iterator()) {
+            public CharactersHollow getData(int ordinal) {
+                return api.getCharactersHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedCertSystemRatingHollow> findConsolidatedCertSystemRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedCertSystemRatingHollow>() {
-            public Iterator<ConsolidatedCertSystemRatingHollow> iterator() {
-                return new Iterator<ConsolidatedCertSystemRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedCertSystemRatingHollow next() {
-                        ConsolidatedCertSystemRatingHollow obj = api.getConsolidatedCertSystemRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedCertSystemRatingHollow>(matches.iterator()) {
+            public ConsolidatedCertSystemRatingHollow getData(int ordinal) {
+                return api.getConsolidatedCertSystemRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedCertSystemRatingListHollow> findConsolidatedCertSystemRatingListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedCertSystemRatingListHollow>() {
-            public Iterator<ConsolidatedCertSystemRatingListHollow> iterator() {
-                return new Iterator<ConsolidatedCertSystemRatingListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedCertSystemRatingListHollow next() {
-                        ConsolidatedCertSystemRatingListHollow obj = api.getConsolidatedCertSystemRatingListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedCertSystemRatingListHollow>(matches.iterator()) {
+            public ConsolidatedCertSystemRatingListHollow getData(int ordinal) {
+                return api.getConsolidatedCertSystemRatingListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedCertificationSystemsHollow> findConsolidatedCertificationSystemsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedCertificationSystemsHollow>() {
-            public Iterator<ConsolidatedCertificationSystemsHollow> iterator() {
-                return new Iterator<ConsolidatedCertificationSystemsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedCertificationSystemsHollow next() {
-                        ConsolidatedCertificationSystemsHollow obj = api.getConsolidatedCertificationSystemsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedCertificationSystemsHollow>(matches.iterator()) {
+            public ConsolidatedCertificationSystemsHollow getData(int ordinal) {
+                return api.getConsolidatedCertificationSystemsHollow(ordinal);
             }
         };
     }
 
     public Iterable<EpisodesHollow> findEpisodesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<EpisodesHollow>() {
-            public Iterator<EpisodesHollow> iterator() {
-                return new Iterator<EpisodesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public EpisodesHollow next() {
-                        EpisodesHollow obj = api.getEpisodesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<EpisodesHollow>(matches.iterator()) {
+            public EpisodesHollow getData(int ordinal) {
+                return api.getEpisodesHollow(ordinal);
             }
         };
     }
 
     public Iterable<FestivalsHollow> findFestivalsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<FestivalsHollow>() {
-            public Iterator<FestivalsHollow> iterator() {
-                return new Iterator<FestivalsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public FestivalsHollow next() {
-                        FestivalsHollow obj = api.getFestivalsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<FestivalsHollow>(matches.iterator()) {
+            public FestivalsHollow getData(int ordinal) {
+                return api.getFestivalsHollow(ordinal);
             }
         };
     }
 
     public Iterable<LanguagesHollow> findLanguagesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<LanguagesHollow>() {
-            public Iterator<LanguagesHollow> iterator() {
-                return new Iterator<LanguagesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public LanguagesHollow next() {
-                        LanguagesHollow obj = api.getLanguagesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<LanguagesHollow>(matches.iterator()) {
+            public LanguagesHollow getData(int ordinal) {
+                return api.getLanguagesHollow(ordinal);
             }
         };
     }
 
     public Iterable<MovieRatingsHollow> findMovieRatingsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MovieRatingsHollow>() {
-            public Iterator<MovieRatingsHollow> iterator() {
-                return new Iterator<MovieRatingsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MovieRatingsHollow next() {
-                        MovieRatingsHollow obj = api.getMovieRatingsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MovieRatingsHollow>(matches.iterator()) {
+            public MovieRatingsHollow getData(int ordinal) {
+                return api.getMovieRatingsHollow(ordinal);
             }
         };
     }
 
     public Iterable<MoviesHollow> findMoviesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<MoviesHollow>() {
-            public Iterator<MoviesHollow> iterator() {
-                return new Iterator<MoviesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public MoviesHollow next() {
-                        MoviesHollow obj = api.getMoviesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<MoviesHollow>(matches.iterator()) {
+            public MoviesHollow getData(int ordinal) {
+                return api.getMoviesHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonAliasesHollow> findPersonAliasesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonAliasesHollow>() {
-            public Iterator<PersonAliasesHollow> iterator() {
-                return new Iterator<PersonAliasesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonAliasesHollow next() {
-                        PersonAliasesHollow obj = api.getPersonAliasesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonAliasesHollow>(matches.iterator()) {
+            public PersonAliasesHollow getData(int ordinal) {
+                return api.getPersonAliasesHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonCharacterResourceHollow> findPersonCharacterResourceMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonCharacterResourceHollow>() {
-            public Iterator<PersonCharacterResourceHollow> iterator() {
-                return new Iterator<PersonCharacterResourceHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonCharacterResourceHollow next() {
-                        PersonCharacterResourceHollow obj = api.getPersonCharacterResourceHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonCharacterResourceHollow>(matches.iterator()) {
+            public PersonCharacterResourceHollow getData(int ordinal) {
+                return api.getPersonCharacterResourceHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonsHollow> findPersonsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonsHollow>() {
-            public Iterator<PersonsHollow> iterator() {
-                return new Iterator<PersonsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonsHollow next() {
-                        PersonsHollow obj = api.getPersonsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonsHollow>(matches.iterator()) {
+            public PersonsHollow getData(int ordinal) {
+                return api.getPersonsHollow(ordinal);
             }
         };
     }
 
     public Iterable<RatingsHollow> findRatingsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<RatingsHollow>() {
-            public Iterator<RatingsHollow> iterator() {
-                return new Iterator<RatingsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public RatingsHollow next() {
-                        RatingsHollow obj = api.getRatingsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<RatingsHollow>(matches.iterator()) {
+            public RatingsHollow getData(int ordinal) {
+                return api.getRatingsHollow(ordinal);
             }
         };
     }
 
     public Iterable<ShowMemberTypesHollow> findShowMemberTypesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ShowMemberTypesHollow>() {
-            public Iterator<ShowMemberTypesHollow> iterator() {
-                return new Iterator<ShowMemberTypesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ShowMemberTypesHollow next() {
-                        ShowMemberTypesHollow obj = api.getShowMemberTypesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ShowMemberTypesHollow>(matches.iterator()) {
+            public ShowMemberTypesHollow getData(int ordinal) {
+                return api.getShowMemberTypesHollow(ordinal);
             }
         };
     }
 
     public Iterable<StoriesSynopsesHollow> findStoriesSynopsesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StoriesSynopsesHollow>() {
-            public Iterator<StoriesSynopsesHollow> iterator() {
-                return new Iterator<StoriesSynopsesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StoriesSynopsesHollow next() {
-                        StoriesSynopsesHollow obj = api.getStoriesSynopsesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StoriesSynopsesHollow>(matches.iterator()) {
+            public StoriesSynopsesHollow getData(int ordinal) {
+                return api.getStoriesSynopsesHollow(ordinal);
             }
         };
     }
 
     public Iterable<TurboCollectionsHollow> findTurboCollectionsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<TurboCollectionsHollow>() {
-            public Iterator<TurboCollectionsHollow> iterator() {
-                return new Iterator<TurboCollectionsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public TurboCollectionsHollow next() {
-                        TurboCollectionsHollow obj = api.getTurboCollectionsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<TurboCollectionsHollow>(matches.iterator()) {
+            public TurboCollectionsHollow getData(int ordinal) {
+                return api.getTurboCollectionsHollow(ordinal);
             }
         };
     }
 
     public Iterable<VMSAwardHollow> findVMSAwardMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VMSAwardHollow>() {
-            public Iterator<VMSAwardHollow> iterator() {
-                return new Iterator<VMSAwardHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VMSAwardHollow next() {
-                        VMSAwardHollow obj = api.getVMSAwardHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VMSAwardHollow>(matches.iterator()) {
+            public VMSAwardHollow getData(int ordinal) {
+                return api.getVMSAwardHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoArtworkSourceHollow> findVideoArtworkSourceMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoArtworkSourceHollow>() {
-            public Iterator<VideoArtworkSourceHollow> iterator() {
-                return new Iterator<VideoArtworkSourceHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoArtworkSourceHollow next() {
-                        VideoArtworkSourceHollow obj = api.getVideoArtworkSourceHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoArtworkSourceHollow>(matches.iterator()) {
+            public VideoArtworkSourceHollow getData(int ordinal) {
+                return api.getVideoArtworkSourceHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoAwardMappingHollow> findVideoAwardMappingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoAwardMappingHollow>() {
-            public Iterator<VideoAwardMappingHollow> iterator() {
-                return new Iterator<VideoAwardMappingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoAwardMappingHollow next() {
-                        VideoAwardMappingHollow obj = api.getVideoAwardMappingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoAwardMappingHollow>(matches.iterator()) {
+            public VideoAwardMappingHollow getData(int ordinal) {
+                return api.getVideoAwardMappingHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoAwardListHollow> findVideoAwardListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoAwardListHollow>() {
-            public Iterator<VideoAwardListHollow> iterator() {
-                return new Iterator<VideoAwardListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoAwardListHollow next() {
-                        VideoAwardListHollow obj = api.getVideoAwardListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoAwardListHollow>(matches.iterator()) {
+            public VideoAwardListHollow getData(int ordinal) {
+                return api.getVideoAwardListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoAwardHollow> findVideoAwardMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoAwardHollow>() {
-            public Iterator<VideoAwardHollow> iterator() {
-                return new Iterator<VideoAwardHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoAwardHollow next() {
-                        VideoAwardHollow obj = api.getVideoAwardHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoAwardHollow>(matches.iterator()) {
+            public VideoAwardHollow getData(int ordinal) {
+                return api.getVideoAwardHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoDateWindowHollow> findVideoDateWindowMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoDateWindowHollow>() {
-            public Iterator<VideoDateWindowHollow> iterator() {
-                return new Iterator<VideoDateWindowHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoDateWindowHollow next() {
-                        VideoDateWindowHollow obj = api.getVideoDateWindowHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoDateWindowHollow>(matches.iterator()) {
+            public VideoDateWindowHollow getData(int ordinal) {
+                return api.getVideoDateWindowHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoDateWindowListHollow> findVideoDateWindowListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoDateWindowListHollow>() {
-            public Iterator<VideoDateWindowListHollow> iterator() {
-                return new Iterator<VideoDateWindowListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoDateWindowListHollow next() {
-                        VideoDateWindowListHollow obj = api.getVideoDateWindowListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoDateWindowListHollow>(matches.iterator()) {
+            public VideoDateWindowListHollow getData(int ordinal) {
+                return api.getVideoDateWindowListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoDateHollow> findVideoDateMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoDateHollow>() {
-            public Iterator<VideoDateHollow> iterator() {
-                return new Iterator<VideoDateHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoDateHollow next() {
-                        VideoDateHollow obj = api.getVideoDateHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoDateHollow>(matches.iterator()) {
+            public VideoDateHollow getData(int ordinal) {
+                return api.getVideoDateHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralAliasHollow> findVideoGeneralAliasMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralAliasHollow>() {
-            public Iterator<VideoGeneralAliasHollow> iterator() {
-                return new Iterator<VideoGeneralAliasHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralAliasHollow next() {
-                        VideoGeneralAliasHollow obj = api.getVideoGeneralAliasHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralAliasHollow>(matches.iterator()) {
+            public VideoGeneralAliasHollow getData(int ordinal) {
+                return api.getVideoGeneralAliasHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralAliasListHollow> findVideoGeneralAliasListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralAliasListHollow>() {
-            public Iterator<VideoGeneralAliasListHollow> iterator() {
-                return new Iterator<VideoGeneralAliasListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralAliasListHollow next() {
-                        VideoGeneralAliasListHollow obj = api.getVideoGeneralAliasListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralAliasListHollow>(matches.iterator()) {
+            public VideoGeneralAliasListHollow getData(int ordinal) {
+                return api.getVideoGeneralAliasListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralEpisodeTypeHollow> findVideoGeneralEpisodeTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralEpisodeTypeHollow>() {
-            public Iterator<VideoGeneralEpisodeTypeHollow> iterator() {
-                return new Iterator<VideoGeneralEpisodeTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralEpisodeTypeHollow next() {
-                        VideoGeneralEpisodeTypeHollow obj = api.getVideoGeneralEpisodeTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralEpisodeTypeHollow>(matches.iterator()) {
+            public VideoGeneralEpisodeTypeHollow getData(int ordinal) {
+                return api.getVideoGeneralEpisodeTypeHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralEpisodeTypeListHollow> findVideoGeneralEpisodeTypeListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralEpisodeTypeListHollow>() {
-            public Iterator<VideoGeneralEpisodeTypeListHollow> iterator() {
-                return new Iterator<VideoGeneralEpisodeTypeListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralEpisodeTypeListHollow next() {
-                        VideoGeneralEpisodeTypeListHollow obj = api.getVideoGeneralEpisodeTypeListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralEpisodeTypeListHollow>(matches.iterator()) {
+            public VideoGeneralEpisodeTypeListHollow getData(int ordinal) {
+                return api.getVideoGeneralEpisodeTypeListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralTitleTypeHollow> findVideoGeneralTitleTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralTitleTypeHollow>() {
-            public Iterator<VideoGeneralTitleTypeHollow> iterator() {
-                return new Iterator<VideoGeneralTitleTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralTitleTypeHollow next() {
-                        VideoGeneralTitleTypeHollow obj = api.getVideoGeneralTitleTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralTitleTypeHollow>(matches.iterator()) {
+            public VideoGeneralTitleTypeHollow getData(int ordinal) {
+                return api.getVideoGeneralTitleTypeHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralTitleTypeListHollow> findVideoGeneralTitleTypeListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralTitleTypeListHollow>() {
-            public Iterator<VideoGeneralTitleTypeListHollow> iterator() {
-                return new Iterator<VideoGeneralTitleTypeListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralTitleTypeListHollow next() {
-                        VideoGeneralTitleTypeListHollow obj = api.getVideoGeneralTitleTypeListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralTitleTypeListHollow>(matches.iterator()) {
+            public VideoGeneralTitleTypeListHollow getData(int ordinal) {
+                return api.getVideoGeneralTitleTypeListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoGeneralHollow> findVideoGeneralMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoGeneralHollow>() {
-            public Iterator<VideoGeneralHollow> iterator() {
-                return new Iterator<VideoGeneralHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoGeneralHollow next() {
-                        VideoGeneralHollow obj = api.getVideoGeneralHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoGeneralHollow>(matches.iterator()) {
+            public VideoGeneralHollow getData(int ordinal) {
+                return api.getVideoGeneralHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoIdHollow> findVideoIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoIdHollow>() {
-            public Iterator<VideoIdHollow> iterator() {
-                return new Iterator<VideoIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoIdHollow next() {
-                        VideoIdHollow obj = api.getVideoIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoIdHollow>(matches.iterator()) {
+            public VideoIdHollow getData(int ordinal) {
+                return api.getVideoIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<ListOfVideoIdsHollow> findListOfVideoIdsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ListOfVideoIdsHollow>() {
-            public Iterator<ListOfVideoIdsHollow> iterator() {
-                return new Iterator<ListOfVideoIdsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ListOfVideoIdsHollow next() {
-                        ListOfVideoIdsHollow obj = api.getListOfVideoIdsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ListOfVideoIdsHollow>(matches.iterator()) {
+            public ListOfVideoIdsHollow getData(int ordinal) {
+                return api.getListOfVideoIdsHollow(ordinal);
             }
         };
     }
 
     public Iterable<PersonBioHollow> findPersonBioMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PersonBioHollow>() {
-            public Iterator<PersonBioHollow> iterator() {
-                return new Iterator<PersonBioHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PersonBioHollow next() {
-                        PersonBioHollow obj = api.getPersonBioHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PersonBioHollow>(matches.iterator()) {
+            public PersonBioHollow getData(int ordinal) {
+                return api.getPersonBioHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingAdvisoryIdHollow> findVideoRatingAdvisoryIdMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingAdvisoryIdHollow>() {
-            public Iterator<VideoRatingAdvisoryIdHollow> iterator() {
-                return new Iterator<VideoRatingAdvisoryIdHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingAdvisoryIdHollow next() {
-                        VideoRatingAdvisoryIdHollow obj = api.getVideoRatingAdvisoryIdHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingAdvisoryIdHollow>(matches.iterator()) {
+            public VideoRatingAdvisoryIdHollow getData(int ordinal) {
+                return api.getVideoRatingAdvisoryIdHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingAdvisoryIdListHollow> findVideoRatingAdvisoryIdListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingAdvisoryIdListHollow>() {
-            public Iterator<VideoRatingAdvisoryIdListHollow> iterator() {
-                return new Iterator<VideoRatingAdvisoryIdListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingAdvisoryIdListHollow next() {
-                        VideoRatingAdvisoryIdListHollow obj = api.getVideoRatingAdvisoryIdListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingAdvisoryIdListHollow>(matches.iterator()) {
+            public VideoRatingAdvisoryIdListHollow getData(int ordinal) {
+                return api.getVideoRatingAdvisoryIdListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingAdvisoriesHollow> findVideoRatingAdvisoriesMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingAdvisoriesHollow>() {
-            public Iterator<VideoRatingAdvisoriesHollow> iterator() {
-                return new Iterator<VideoRatingAdvisoriesHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingAdvisoriesHollow next() {
-                        VideoRatingAdvisoriesHollow obj = api.getVideoRatingAdvisoriesHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingAdvisoriesHollow>(matches.iterator()) {
+            public VideoRatingAdvisoriesHollow getData(int ordinal) {
+                return api.getVideoRatingAdvisoriesHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedVideoCountryRatingHollow> findConsolidatedVideoCountryRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedVideoCountryRatingHollow>() {
-            public Iterator<ConsolidatedVideoCountryRatingHollow> iterator() {
-                return new Iterator<ConsolidatedVideoCountryRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedVideoCountryRatingHollow next() {
-                        ConsolidatedVideoCountryRatingHollow obj = api.getConsolidatedVideoCountryRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedVideoCountryRatingHollow>(matches.iterator()) {
+            public ConsolidatedVideoCountryRatingHollow getData(int ordinal) {
+                return api.getConsolidatedVideoCountryRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedVideoCountryRatingListHollow> findConsolidatedVideoCountryRatingListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedVideoCountryRatingListHollow>() {
-            public Iterator<ConsolidatedVideoCountryRatingListHollow> iterator() {
-                return new Iterator<ConsolidatedVideoCountryRatingListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedVideoCountryRatingListHollow next() {
-                        ConsolidatedVideoCountryRatingListHollow obj = api.getConsolidatedVideoCountryRatingListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedVideoCountryRatingListHollow>(matches.iterator()) {
+            public ConsolidatedVideoCountryRatingListHollow getData(int ordinal) {
+                return api.getConsolidatedVideoCountryRatingListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedVideoRatingHollow> findConsolidatedVideoRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedVideoRatingHollow>() {
-            public Iterator<ConsolidatedVideoRatingHollow> iterator() {
-                return new Iterator<ConsolidatedVideoRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedVideoRatingHollow next() {
-                        ConsolidatedVideoRatingHollow obj = api.getConsolidatedVideoRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedVideoRatingHollow>(matches.iterator()) {
+            public ConsolidatedVideoRatingHollow getData(int ordinal) {
+                return api.getConsolidatedVideoRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedVideoRatingListHollow> findConsolidatedVideoRatingListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedVideoRatingListHollow>() {
-            public Iterator<ConsolidatedVideoRatingListHollow> iterator() {
-                return new Iterator<ConsolidatedVideoRatingListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedVideoRatingListHollow next() {
-                        ConsolidatedVideoRatingListHollow obj = api.getConsolidatedVideoRatingListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedVideoRatingListHollow>(matches.iterator()) {
+            public ConsolidatedVideoRatingListHollow getData(int ordinal) {
+                return api.getConsolidatedVideoRatingListHollow(ordinal);
             }
         };
     }
 
     public Iterable<ConsolidatedVideoRatingsHollow> findConsolidatedVideoRatingsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<ConsolidatedVideoRatingsHollow>() {
-            public Iterator<ConsolidatedVideoRatingsHollow> iterator() {
-                return new Iterator<ConsolidatedVideoRatingsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public ConsolidatedVideoRatingsHollow next() {
-                        ConsolidatedVideoRatingsHollow obj = api.getConsolidatedVideoRatingsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<ConsolidatedVideoRatingsHollow>(matches.iterator()) {
+            public ConsolidatedVideoRatingsHollow getData(int ordinal) {
+                return api.getConsolidatedVideoRatingsHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingRatingReasonIdsHollow> findVideoRatingRatingReasonIdsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingRatingReasonIdsHollow>() {
-            public Iterator<VideoRatingRatingReasonIdsHollow> iterator() {
-                return new Iterator<VideoRatingRatingReasonIdsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingRatingReasonIdsHollow next() {
-                        VideoRatingRatingReasonIdsHollow obj = api.getVideoRatingRatingReasonIdsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingRatingReasonIdsHollow>(matches.iterator()) {
+            public VideoRatingRatingReasonIdsHollow getData(int ordinal) {
+                return api.getVideoRatingRatingReasonIdsHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingRatingReasonArrayOfIdsHollow> findVideoRatingRatingReasonArrayOfIdsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingRatingReasonArrayOfIdsHollow>() {
-            public Iterator<VideoRatingRatingReasonArrayOfIdsHollow> iterator() {
-                return new Iterator<VideoRatingRatingReasonArrayOfIdsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingRatingReasonArrayOfIdsHollow next() {
-                        VideoRatingRatingReasonArrayOfIdsHollow obj = api.getVideoRatingRatingReasonArrayOfIdsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingRatingReasonArrayOfIdsHollow>(matches.iterator()) {
+            public VideoRatingRatingReasonArrayOfIdsHollow getData(int ordinal) {
+                return api.getVideoRatingRatingReasonArrayOfIdsHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingRatingReasonHollow> findVideoRatingRatingReasonMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingRatingReasonHollow>() {
-            public Iterator<VideoRatingRatingReasonHollow> iterator() {
-                return new Iterator<VideoRatingRatingReasonHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingRatingReasonHollow next() {
-                        VideoRatingRatingReasonHollow obj = api.getVideoRatingRatingReasonHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingRatingReasonHollow>(matches.iterator()) {
+            public VideoRatingRatingReasonHollow getData(int ordinal) {
+                return api.getVideoRatingRatingReasonHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingRatingHollow> findVideoRatingRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingRatingHollow>() {
-            public Iterator<VideoRatingRatingHollow> iterator() {
-                return new Iterator<VideoRatingRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingRatingHollow next() {
-                        VideoRatingRatingHollow obj = api.getVideoRatingRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingRatingHollow>(matches.iterator()) {
+            public VideoRatingRatingHollow getData(int ordinal) {
+                return api.getVideoRatingRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingArrayOfRatingHollow> findVideoRatingArrayOfRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingArrayOfRatingHollow>() {
-            public Iterator<VideoRatingArrayOfRatingHollow> iterator() {
-                return new Iterator<VideoRatingArrayOfRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingArrayOfRatingHollow next() {
-                        VideoRatingArrayOfRatingHollow obj = api.getVideoRatingArrayOfRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingArrayOfRatingHollow>(matches.iterator()) {
+            public VideoRatingArrayOfRatingHollow getData(int ordinal) {
+                return api.getVideoRatingArrayOfRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoRatingHollow> findVideoRatingMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoRatingHollow>() {
-            public Iterator<VideoRatingHollow> iterator() {
-                return new Iterator<VideoRatingHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoRatingHollow next() {
-                        VideoRatingHollow obj = api.getVideoRatingHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoRatingHollow>(matches.iterator()) {
+            public VideoRatingHollow getData(int ordinal) {
+                return api.getVideoRatingHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoStreamCropParamsHollow> findVideoStreamCropParamsMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoStreamCropParamsHollow>() {
-            public Iterator<VideoStreamCropParamsHollow> iterator() {
-                return new Iterator<VideoStreamCropParamsHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoStreamCropParamsHollow next() {
-                        VideoStreamCropParamsHollow obj = api.getVideoStreamCropParamsHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoStreamCropParamsHollow>(matches.iterator()) {
+            public VideoStreamCropParamsHollow getData(int ordinal) {
+                return api.getVideoStreamCropParamsHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoStreamInfoHollow> findVideoStreamInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoStreamInfoHollow>() {
-            public Iterator<VideoStreamInfoHollow> iterator() {
-                return new Iterator<VideoStreamInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoStreamInfoHollow next() {
-                        VideoStreamInfoHollow obj = api.getVideoStreamInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoStreamInfoHollow>(matches.iterator()) {
+            public VideoStreamInfoHollow getData(int ordinal) {
+                return api.getVideoStreamInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<StreamNonImageInfoHollow> findStreamNonImageInfoMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<StreamNonImageInfoHollow>() {
-            public Iterator<StreamNonImageInfoHollow> iterator() {
-                return new Iterator<StreamNonImageInfoHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public StreamNonImageInfoHollow next() {
-                        StreamNonImageInfoHollow obj = api.getStreamNonImageInfoHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<StreamNonImageInfoHollow>(matches.iterator()) {
+            public StreamNonImageInfoHollow getData(int ordinal) {
+                return api.getStreamNonImageInfoHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageStreamHollow> findPackageStreamMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageStreamHollow>() {
-            public Iterator<PackageStreamHollow> iterator() {
-                return new Iterator<PackageStreamHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageStreamHollow next() {
-                        PackageStreamHollow obj = api.getPackageStreamHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageStreamHollow>(matches.iterator()) {
+            public PackageStreamHollow getData(int ordinal) {
+                return api.getPackageStreamHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageStreamSetHollow> findPackageStreamSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageStreamSetHollow>() {
-            public Iterator<PackageStreamSetHollow> iterator() {
-                return new Iterator<PackageStreamSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageStreamSetHollow next() {
-                        PackageStreamSetHollow obj = api.getPackageStreamSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageStreamSetHollow>(matches.iterator()) {
+            public PackageStreamSetHollow getData(int ordinal) {
+                return api.getPackageStreamSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<PackageHollow> findPackageMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<PackageHollow>() {
-            public Iterator<PackageHollow> iterator() {
-                return new Iterator<PackageHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public PackageHollow next() {
-                        PackageHollow obj = api.getPackageHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<PackageHollow>(matches.iterator()) {
+            public PackageHollow getData(int ordinal) {
+                return api.getPackageHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoTypeMediaHollow> findVideoTypeMediaMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoTypeMediaHollow>() {
-            public Iterator<VideoTypeMediaHollow> iterator() {
-                return new Iterator<VideoTypeMediaHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoTypeMediaHollow next() {
-                        VideoTypeMediaHollow obj = api.getVideoTypeMediaHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoTypeMediaHollow>(matches.iterator()) {
+            public VideoTypeMediaHollow getData(int ordinal) {
+                return api.getVideoTypeMediaHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoTypeMediaListHollow> findVideoTypeMediaListMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoTypeMediaListHollow>() {
-            public Iterator<VideoTypeMediaListHollow> iterator() {
-                return new Iterator<VideoTypeMediaListHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoTypeMediaListHollow next() {
-                        VideoTypeMediaListHollow obj = api.getVideoTypeMediaListHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoTypeMediaListHollow>(matches.iterator()) {
+            public VideoTypeMediaListHollow getData(int ordinal) {
+                return api.getVideoTypeMediaListHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoTypeDescriptorHollow> findVideoTypeDescriptorMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoTypeDescriptorHollow>() {
-            public Iterator<VideoTypeDescriptorHollow> iterator() {
-                return new Iterator<VideoTypeDescriptorHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoTypeDescriptorHollow next() {
-                        VideoTypeDescriptorHollow obj = api.getVideoTypeDescriptorHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoTypeDescriptorHollow>(matches.iterator()) {
+            public VideoTypeDescriptorHollow getData(int ordinal) {
+                return api.getVideoTypeDescriptorHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoTypeDescriptorSetHollow> findVideoTypeDescriptorSetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoTypeDescriptorSetHollow>() {
-            public Iterator<VideoTypeDescriptorSetHollow> iterator() {
-                return new Iterator<VideoTypeDescriptorSetHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoTypeDescriptorSetHollow next() {
-                        VideoTypeDescriptorSetHollow obj = api.getVideoTypeDescriptorSetHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoTypeDescriptorSetHollow>(matches.iterator()) {
+            public VideoTypeDescriptorSetHollow getData(int ordinal) {
+                return api.getVideoTypeDescriptorSetHollow(ordinal);
             }
         };
     }
 
     public Iterable<VideoTypeHollow> findVideoTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null)
-            return Collections.emptySet();
+        if(matches == null) return Collections.emptySet();
 
-        final HollowOrdinalIterator iter = matches.iterator();
-
-        return new Iterable<VideoTypeHollow>() {
-            public Iterator<VideoTypeHollow> iterator() {
-                return new Iterator<VideoTypeHollow>() {
-
-                    private int next = iter.next();
-
-                    public boolean hasNext() {
-                        return next != HollowOrdinalIterator.NO_MORE_ORDINALS;
-                    }
-
-                    public VideoTypeHollow next() {
-                        VideoTypeHollow obj = api.getVideoTypeHollow(next);
-                        next = iter.next();
-                        return obj;
-                    }
-
-                    public void remove() {
-                        throw new UnsupportedOperationException();
-                    }
-                };
+        return new AbstractHollowOrdinalIterable<VideoTypeHollow>(matches.iterator()) {
+            public VideoTypeHollow getData(int ordinal) {
+                return api.getVideoTypeHollow(ordinal);
             }
         };
     }
-
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        reindex(stateEngine, api);
-    }
-
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        reindex(stateEngine, api);
-    }
-
-    private void reindex(HollowReadStateEngine stateEngine, HollowAPI api) {
-        this.idx = new HollowHashIndex(stateEngine, queryType, selectFieldPath, matchFieldPaths);
-        this.api = (VMSHollowInputAPI) api;
-    }
-
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
 
 }

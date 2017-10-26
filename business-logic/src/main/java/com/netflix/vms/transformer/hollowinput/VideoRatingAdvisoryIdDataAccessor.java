@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class VideoRatingAdvisoryIdDataAccessor extends AbstractHollowDataAccessor<VideoRatingAdvisoryIdHollow> {
 
     public static final String TYPE = "VideoRatingAdvisoryIdHollow";
@@ -12,18 +13,22 @@ public class VideoRatingAdvisoryIdDataAccessor extends AbstractHollowDataAccesso
 
     public VideoRatingAdvisoryIdDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine) {
+    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public VideoRatingAdvisoryIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public VideoRatingAdvisoryIdHollow getRecord(int ordinal){

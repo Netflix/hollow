@@ -10,7 +10,7 @@ public class CdnDeploymentSetTypeAPI extends HollowSetTypeAPI {
 
     private final HollowSetLookupDelegate delegateLookupImpl;
 
-    CdnDeploymentSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
+    public CdnDeploymentSetTypeAPI(VMSHollowInputAPI api, HollowSetTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowSetLookupDelegate(this);
     }

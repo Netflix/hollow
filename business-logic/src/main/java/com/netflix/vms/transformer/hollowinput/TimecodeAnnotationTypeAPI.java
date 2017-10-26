@@ -8,7 +8,7 @@ public class TimecodeAnnotationTypeAPI extends HollowObjectTypeAPI {
 
     private final TimecodeAnnotationDelegateLookupImpl delegateLookupImpl;
 
-    TimecodeAnnotationTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TimecodeAnnotationTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "packageId",

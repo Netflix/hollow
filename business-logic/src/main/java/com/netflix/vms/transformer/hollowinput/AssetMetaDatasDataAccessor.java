@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class AssetMetaDatasDataAccessor extends AbstractHollowDataAccessor<AssetMetaDatasHollow> {
 
     public static final String TYPE = "AssetMetaDatasHollow";
@@ -12,18 +13,22 @@ public class AssetMetaDatasDataAccessor extends AbstractHollowDataAccessor<Asset
 
     public AssetMetaDatasDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine) {
+    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public AssetMetaDatasDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public AssetMetaDatasHollow getRecord(int ordinal){

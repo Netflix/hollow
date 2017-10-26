@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class RolloutPhaseArtworkSourceFileIdDataAccessor extends AbstractHollowDataAccessor<RolloutPhaseArtworkSourceFileIdHollow> {
 
     public static final String TYPE = "RolloutPhaseArtworkSourceFileIdHollow";
@@ -12,18 +13,22 @@ public class RolloutPhaseArtworkSourceFileIdDataAccessor extends AbstractHollowD
 
     public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine) {
+    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public RolloutPhaseArtworkSourceFileIdDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public RolloutPhaseArtworkSourceFileIdHollow getRecord(int ordinal){

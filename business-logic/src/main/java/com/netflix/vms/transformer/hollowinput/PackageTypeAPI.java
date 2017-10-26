@@ -8,7 +8,7 @@ public class PackageTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageDelegateLookupImpl delegateLookupImpl;
 
-    PackageTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PackageTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "movieId",

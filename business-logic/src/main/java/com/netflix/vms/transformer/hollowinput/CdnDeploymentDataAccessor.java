@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class CdnDeploymentDataAccessor extends AbstractHollowDataAccessor<CdnDeploymentHollow> {
 
     public static final String TYPE = "CdnDeploymentHollow";
@@ -12,18 +13,22 @@ public class CdnDeploymentDataAccessor extends AbstractHollowDataAccessor<CdnDep
 
     public CdnDeploymentDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine) {
+    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public CdnDeploymentDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public CdnDeploymentHollow getRecord(int ordinal){

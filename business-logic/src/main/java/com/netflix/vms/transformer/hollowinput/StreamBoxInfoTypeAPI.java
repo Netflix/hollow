@@ -8,7 +8,7 @@ public class StreamBoxInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamBoxInfoDelegateLookupImpl delegateLookupImpl;
 
-    StreamBoxInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StreamBoxInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "boxOffset",
             "boxSize",

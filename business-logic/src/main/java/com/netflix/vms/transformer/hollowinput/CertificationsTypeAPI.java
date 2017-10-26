@@ -8,7 +8,7 @@ public class CertificationsTypeAPI extends HollowObjectTypeAPI {
 
     private final CertificationsDelegateLookupImpl delegateLookupImpl;
 
-    CertificationsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CertificationsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "certificationTypeId",
             "name",

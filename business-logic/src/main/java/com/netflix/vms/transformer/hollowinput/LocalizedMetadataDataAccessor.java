@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class LocalizedMetadataDataAccessor extends AbstractHollowDataAccessor<LocalizedMetadataHollow> {
 
     public static final String TYPE = "LocalizedMetadataHollow";
@@ -12,18 +13,22 @@ public class LocalizedMetadataDataAccessor extends AbstractHollowDataAccessor<Lo
 
     public LocalizedMetadataDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine) {
+    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public LocalizedMetadataDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public LocalizedMetadataHollow getRecord(int ordinal){

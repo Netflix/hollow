@@ -8,7 +8,7 @@ public class TopNAttributeTypeAPI extends HollowObjectTypeAPI {
 
     private final TopNAttributeDelegateLookupImpl delegateLookupImpl;
 
-    TopNAttributeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TopNAttributeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "country",
             "viewShare",

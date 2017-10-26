@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class PhaseTagDataAccessor extends AbstractHollowDataAccessor<PhaseTagHollow> {
 
     public static final String TYPE = "PhaseTagHollow";
@@ -12,18 +13,22 @@ public class PhaseTagDataAccessor extends AbstractHollowDataAccessor<PhaseTagHol
 
     public PhaseTagDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine) {
+    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public PhaseTagDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public PhaseTagHollow getRecord(int ordinal){

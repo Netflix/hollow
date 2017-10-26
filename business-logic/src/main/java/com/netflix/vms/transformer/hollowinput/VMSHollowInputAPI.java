@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Map;
+import com.netflix.hollow.api.consumer.HollowConsumerAPI;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
@@ -25,7 +26,7 @@ import com.netflix.hollow.api.sampling.SampleResult;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
 
 @SuppressWarnings("all")
-public class VMSHollowInputAPI extends HollowAPI {
+public class VMSHollowInputAPI extends HollowAPI  {
 
     private final HollowObjectCreationSampler objectCreationSampler;
 

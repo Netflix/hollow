@@ -8,7 +8,7 @@ public class CodecPrivateDataStringTypeAPI extends HollowObjectTypeAPI {
 
     private final CodecPrivateDataStringDelegateLookupImpl delegateLookupImpl;
 
-    CodecPrivateDataStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CodecPrivateDataStringTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

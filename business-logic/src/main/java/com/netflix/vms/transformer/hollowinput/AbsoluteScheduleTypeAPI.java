@@ -8,7 +8,7 @@ public class AbsoluteScheduleTypeAPI extends HollowObjectTypeAPI {
 
     private final AbsoluteScheduleDelegateLookupImpl delegateLookupImpl;
 
-    AbsoluteScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public AbsoluteScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "phaseTag",

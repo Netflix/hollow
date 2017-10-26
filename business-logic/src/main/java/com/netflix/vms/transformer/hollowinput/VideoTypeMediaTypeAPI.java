@@ -8,7 +8,7 @@ public class VideoTypeMediaTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoTypeMediaDelegateLookupImpl delegateLookupImpl;
 
-    VideoTypeMediaTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoTypeMediaTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

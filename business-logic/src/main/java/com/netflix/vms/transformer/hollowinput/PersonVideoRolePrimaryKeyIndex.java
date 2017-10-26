@@ -1,32 +1,22 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
-public class PersonVideoRolePrimaryKeyIndex implements HollowConsumer.RefreshListener {
-
-    private HollowPrimaryKeyIndex idx;
-    private VMSHollowInputAPI api;
+@SuppressWarnings("all")
+public class PersonVideoRolePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, PersonVideoRoleHollow> {
 
     public PersonVideoRolePrimaryKeyIndex(HollowConsumer consumer) {
         this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonVideoRole")).getPrimaryKey().getFieldPaths());
     }
 
     public PersonVideoRolePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
-        consumer.getRefreshLock().lock();
-        try {
-            this.api = (VMSHollowInputAPI)consumer.getAPI();
-            this.idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "PersonVideoRole", fieldPaths);
-            idx.listenForDeltaUpdates();
-            consumer.addRefreshListener(this);
-        } catch(ClassCastException cce) {
-            throw new ClassCastException("The HollowConsumer provided was not created with the VMSHollowInputAPI generated API class.");
-        } finally {
-            consumer.getRefreshLock().unlock();
-        }
+        this(consumer, true, fieldPaths);
+    }
+
+    public PersonVideoRolePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "PersonVideoRole", isListenToDataRefreah, fieldPaths);
     }
 
     public PersonVideoRoleHollow findMatch(Object... keys) {
@@ -36,19 +26,4 @@ public class PersonVideoRolePrimaryKeyIndex implements HollowConsumer.RefreshLis
         return api.getPersonVideoRoleHollow(ordinal);
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        idx.detachFromDeltaUpdates();
-        idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
-        idx.listenForDeltaUpdates();
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
 }

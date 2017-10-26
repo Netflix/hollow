@@ -8,7 +8,7 @@ public class StreamDeploymentInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamDeploymentInfoDelegateLookupImpl delegateLookupImpl;
 
-    StreamDeploymentInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StreamDeploymentInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "cacheDeployedCountries",
             "cdnDeployments"

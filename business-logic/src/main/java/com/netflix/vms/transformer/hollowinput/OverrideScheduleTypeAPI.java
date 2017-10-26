@@ -8,7 +8,7 @@ public class OverrideScheduleTypeAPI extends HollowObjectTypeAPI {
 
     private final OverrideScheduleDelegateLookupImpl delegateLookupImpl;
 
-    OverrideScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public OverrideScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "phaseTag",

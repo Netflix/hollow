@@ -8,7 +8,7 @@ public class TerritoryCountriesTypeAPI extends HollowObjectTypeAPI {
 
     private final TerritoryCountriesDelegateLookupImpl delegateLookupImpl;
 
-    TerritoryCountriesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TerritoryCountriesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "territoryCode",
             "countryCodes"

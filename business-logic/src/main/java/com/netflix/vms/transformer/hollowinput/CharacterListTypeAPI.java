@@ -10,7 +10,7 @@ public class CharacterListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    CharacterListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public CharacterListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

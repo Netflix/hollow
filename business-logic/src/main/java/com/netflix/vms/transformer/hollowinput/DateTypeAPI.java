@@ -8,7 +8,7 @@ public class DateTypeAPI extends HollowObjectTypeAPI {
 
     private final DateDelegateLookupImpl delegateLookupImpl;
 
-    DateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

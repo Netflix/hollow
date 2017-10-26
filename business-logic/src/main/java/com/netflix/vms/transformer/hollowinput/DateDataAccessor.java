@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class DateDataAccessor extends AbstractHollowDataAccessor<DateHollow> {
 
     public static final String TYPE = "DateHollow";
@@ -12,18 +13,22 @@ public class DateDataAccessor extends AbstractHollowDataAccessor<DateHollow> {
 
     public DateDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public DateDataAccessor(HollowReadStateEngine rStateEngine) {
+    public DateDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public DateDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public DateDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public DateDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public DateDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public DateHollow getRecord(int ordinal){

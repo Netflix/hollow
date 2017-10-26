@@ -8,7 +8,7 @@ public class MasterScheduleTypeAPI extends HollowObjectTypeAPI {
 
     private final MasterScheduleDelegateLookupImpl delegateLookupImpl;
 
-    MasterScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public MasterScheduleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieType",
             "versionId",

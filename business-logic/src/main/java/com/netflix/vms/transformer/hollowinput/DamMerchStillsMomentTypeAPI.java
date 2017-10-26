@@ -8,7 +8,7 @@ public class DamMerchStillsMomentTypeAPI extends HollowObjectTypeAPI {
 
     private final DamMerchStillsMomentDelegateLookupImpl delegateLookupImpl;
 
-    DamMerchStillsMomentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DamMerchStillsMomentTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "stillTS"

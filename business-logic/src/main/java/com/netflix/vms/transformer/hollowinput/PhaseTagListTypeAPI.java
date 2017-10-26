@@ -10,7 +10,7 @@ public class PhaseTagListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    PhaseTagListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public PhaseTagListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

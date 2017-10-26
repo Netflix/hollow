@@ -8,7 +8,7 @@ public class StatusTypeAPI extends HollowObjectTypeAPI {
 
     private final StatusDelegateLookupImpl delegateLookupImpl;
 
-    StatusTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StatusTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "countryCode",

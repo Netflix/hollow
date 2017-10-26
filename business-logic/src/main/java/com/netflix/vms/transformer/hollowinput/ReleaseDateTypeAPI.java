@@ -8,7 +8,7 @@ public class ReleaseDateTypeAPI extends HollowObjectTypeAPI {
 
     private final ReleaseDateDelegateLookupImpl delegateLookupImpl;
 
-    ReleaseDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ReleaseDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "releaseDateType",
             "distributorName",

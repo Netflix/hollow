@@ -8,7 +8,7 @@ public class RolloutPhaseElementsTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseElementsDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseElementsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutPhaseElementsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "localized_metadata",
             "artwork"

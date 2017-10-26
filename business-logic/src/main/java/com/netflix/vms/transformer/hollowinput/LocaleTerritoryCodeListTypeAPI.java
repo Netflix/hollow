@@ -10,7 +10,7 @@ public class LocaleTerritoryCodeListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    LocaleTerritoryCodeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public LocaleTerritoryCodeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

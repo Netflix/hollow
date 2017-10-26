@@ -10,7 +10,7 @@ public class SingleValuePassthroughMapTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;
 
-    SingleValuePassthroughMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
+    public SingleValuePassthroughMapTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowMapLookupDelegate(this);
     }

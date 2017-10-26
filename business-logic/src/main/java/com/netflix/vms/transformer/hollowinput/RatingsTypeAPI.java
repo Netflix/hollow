@@ -8,7 +8,7 @@ public class RatingsTypeAPI extends HollowObjectTypeAPI {
 
     private final RatingsDelegateLookupImpl delegateLookupImpl;
 
-    RatingsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RatingsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "ratingId",
             "ratingCode",

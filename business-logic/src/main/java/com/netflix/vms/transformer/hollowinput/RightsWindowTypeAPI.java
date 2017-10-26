@@ -8,7 +8,7 @@ public class RightsWindowTypeAPI extends HollowObjectTypeAPI {
 
     private final RightsWindowDelegateLookupImpl delegateLookupImpl;
 
-    RightsWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RightsWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "startDate",
             "endDate",

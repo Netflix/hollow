@@ -8,7 +8,7 @@ public class RightsWindowContractTypeAPI extends HollowObjectTypeAPI {
 
     private final RightsWindowContractDelegateLookupImpl delegateLookupImpl;
 
-    RightsWindowContractTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RightsWindowContractTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "contractId",
             "download",

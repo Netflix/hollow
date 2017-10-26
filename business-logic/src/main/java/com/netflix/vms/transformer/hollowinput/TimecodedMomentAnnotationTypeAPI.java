@@ -8,7 +8,7 @@ public class TimecodedMomentAnnotationTypeAPI extends HollowObjectTypeAPI {
 
     private final TimecodedMomentAnnotationDelegateLookupImpl delegateLookupImpl;
 
-    TimecodedMomentAnnotationTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TimecodedMomentAnnotationTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "type",
             "startMillis",

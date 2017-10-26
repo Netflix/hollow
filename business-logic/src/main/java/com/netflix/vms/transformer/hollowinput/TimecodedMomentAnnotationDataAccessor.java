@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class TimecodedMomentAnnotationDataAccessor extends AbstractHollowDataAccessor<TimecodedMomentAnnotationHollow> {
 
     public static final String TYPE = "TimecodedMomentAnnotationHollow";
@@ -12,18 +13,22 @@ public class TimecodedMomentAnnotationDataAccessor extends AbstractHollowDataAcc
 
     public TimecodedMomentAnnotationDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine) {
+    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public TimecodedMomentAnnotationDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public TimecodedMomentAnnotationHollow getRecord(int ordinal){

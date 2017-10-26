@@ -8,7 +8,7 @@ public class VideoStreamCropParamsTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoStreamCropParamsDelegateLookupImpl delegateLookupImpl;
 
-    VideoStreamCropParamsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoStreamCropParamsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "x",
             "y",

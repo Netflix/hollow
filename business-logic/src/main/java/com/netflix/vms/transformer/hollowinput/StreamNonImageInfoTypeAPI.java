@@ -8,7 +8,7 @@ public class StreamNonImageInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamNonImageInfoDelegateLookupImpl delegateLookupImpl;
 
-    StreamNonImageInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StreamNonImageInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "runtimeSeconds",
             "drmInfo",

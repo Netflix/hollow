@@ -8,7 +8,7 @@ public class PackageDrmInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final PackageDrmInfoDelegateLookupImpl delegateLookupImpl;
 
-    PackageDrmInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PackageDrmInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "contentPackagerPublicKey",
             "keySeed",

@@ -8,7 +8,7 @@ public class RolloutPhaseArtworkTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseArtworkDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseArtworkTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutPhaseArtworkTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sourceFileIds"
         });

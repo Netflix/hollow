@@ -8,7 +8,7 @@ public class RightsContractPackageTypeAPI extends HollowObjectTypeAPI {
 
     private final RightsContractPackageDelegateLookupImpl delegateLookupImpl;
 
-    RightsContractPackageTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RightsContractPackageTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "packageId",
             "primary"

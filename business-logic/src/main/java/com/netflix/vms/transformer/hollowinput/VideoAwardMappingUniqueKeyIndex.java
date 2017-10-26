@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+<<<<<<< HEAD:business-logic/src/main/java/com/netflix/vms/transformer/hollowinput/VideoAwardMappingUniqueKeyIndex.java
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -22,6 +23,24 @@ public class VideoAwardMappingUniqueKeyIndex implements HollowConsumer.RefreshLi
         } finally {
             consumer.getRefreshLock().unlock();
         }
+=======
+import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+
+@SuppressWarnings("all")
+public class RightsAssetSetIdPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RightsAssetSetIdHollow> {
+
+    public RightsAssetSetIdPrimaryKeyIndex(HollowConsumer consumer) {
+        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RightsAssetSetId")).getPrimaryKey().getFieldPaths());
+    }
+
+    public RightsAssetSetIdPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
+        this(consumer, true, fieldPaths);
+    }
+
+    public RightsAssetSetIdPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "RightsAssetSetId", isListenToDataRefreah, fieldPaths);
+>>>>>>> master:business-logic/src/main/java/com/netflix/vms/transformer/hollowinput/RightsAssetSetIdPrimaryKeyIndex.java
     }
 
     public VideoAwardMappingHollow findMatch(Object... keys) {
@@ -31,19 +50,4 @@ public class VideoAwardMappingUniqueKeyIndex implements HollowConsumer.RefreshLi
         return api.getVideoAwardMappingHollow(ordinal);
     }
 
-    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        idx.detachFromDeltaUpdates();
-        idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
-        idx.listenForDeltaUpdates();
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-        this.api = (VMSHollowInputAPI)api;
-    }
-
-    @Override public void refreshStarted(long currentVersion, long requestedVersion) { }
-    @Override public void blobLoaded(HollowConsumer.Blob transition) { }
-    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) { }
-    @Override public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) { }
 }

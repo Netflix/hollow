@@ -10,7 +10,7 @@ public class VideoGeneralEpisodeTypeListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    VideoGeneralEpisodeTypeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public VideoGeneralEpisodeTypeListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

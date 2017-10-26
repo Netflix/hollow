@@ -10,7 +10,7 @@ public class ArtworkLocaleListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ArtworkLocaleListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public ArtworkLocaleListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

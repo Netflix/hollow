@@ -8,7 +8,7 @@ public class VideoAwardMappingTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoAwardMappingDelegateLookupImpl delegateLookupImpl;
 
-    VideoAwardMappingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoAwardMappingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "awardId",
             "sequenceNumber",

@@ -10,7 +10,7 @@ public class PersonVideoAliasIdsListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    PersonVideoAliasIdsListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public PersonVideoAliasIdsListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

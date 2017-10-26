@@ -5,6 +5,7 @@ import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
+@SuppressWarnings("all")
 public class StreamNonImageInfoDataAccessor extends AbstractHollowDataAccessor<StreamNonImageInfoHollow> {
 
     public static final String TYPE = "StreamNonImageInfoHollow";
@@ -12,18 +13,22 @@ public class StreamNonImageInfoDataAccessor extends AbstractHollowDataAccessor<S
 
     public StreamNonImageInfoDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
+        this.api = (VMSHollowInputAPI)consumer.getAPI();
     }
 
-    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine) {
+    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api) {
         super(rStateEngine, TYPE);
+        this.api = api;
     }
 
-    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine, String ... fieldPaths) {
+    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
+        this.api = api;
     }
 
-    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine, PrimaryKey primaryKey) {
+    public StreamNonImageInfoDataAccessor(HollowReadStateEngine rStateEngine, VMSHollowInputAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
+        this.api = api;
     }
 
     @Override public StreamNonImageInfoHollow getRecord(int ordinal){

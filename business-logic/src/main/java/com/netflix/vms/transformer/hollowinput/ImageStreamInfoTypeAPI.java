@@ -8,7 +8,7 @@ public class ImageStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final ImageStreamInfoDelegateLookupImpl delegateLookupImpl;
 
-    ImageStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ImageStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "imageCount",
             "imageFormat",
