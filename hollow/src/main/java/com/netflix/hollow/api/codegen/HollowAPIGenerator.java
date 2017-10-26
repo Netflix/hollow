@@ -274,103 +274,15 @@ public class HollowAPIGenerator {
         return new HollowFactoryJavaGenerator(packageName, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
     }
 
-    public static class Builder {
-        protected String apiClassname;
-        protected String packageName;
-        protected HollowDataset dataset;
-        protected Set<String> parameterizedTypes = Collections.emptySet();
-        protected boolean parameterizeAllClassnames = false;
-        protected String classPostfix = "";
-        protected String getterPrefix = "";
-        protected boolean useAggressiveSubstitutions = false;
-        protected boolean useErgonomicShortcuts = false;
-        protected boolean useBooleanFieldErgonomics = false;
-        protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-        protected boolean usePackageGrouping = false;
-        protected boolean useHollowPrimitiveTypes = false;
-
-        public Builder withAPIClassname(String apiClassname) {
-            this.apiClassname = apiClassname;
-            return this;
+    public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
+        @Override
+        protected HollowAPIGenerator  instantiateGenerator() {
+            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts);
         }
 
-        public Builder withPackageName(String packageName) {
-            this.packageName = packageName;
+        @Override
+        protected Builder getBuilder() {
             return this;
-        }
-
-        public Builder withDataModel(HollowDataset dataset) {
-            this.dataset = dataset;
-            return this;
-        }
-
-        public Builder withParameterizedTypes(Set<String> parameterizedTypes) {
-            this.parameterizedTypes = parameterizedTypes;
-            return this;
-        }
-
-        public Builder withParameterizeAllClassNames(boolean parameterizeAllClassnames) {
-            this.parameterizeAllClassnames = parameterizeAllClassnames;
-            return this;
-        }
-
-        public Builder withClassPostfix(String classPostfix) {
-            this.classPostfix = classPostfix;
-            return this;
-        }
-
-        public Builder withGetterPrefix(String getterPrefix) {
-            this.getterPrefix = getterPrefix;
-            return this;
-        }
-
-        public Builder withAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-            this.useAggressiveSubstitutions = useAggressiveSubstitutions;
-            return this;
-        }
-
-        public Builder withErgonomicShortcuts() {
-            this.useErgonomicShortcuts = true;
-            return this;
-        }
-
-        public Builder withPackageGrouping() {
-            this.usePackageGrouping = true;
-            return this;
-        }
-
-        public Builder withBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
-            this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
-            return this;
-        }
-
-        public Builder reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-            this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
-            return this;
-        }
-
-        public Builder withHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-            this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
-            return this;
-        }
-
-        public HollowAPIGenerator build() {
-            if(apiClassname == null)
-                throw new IllegalStateException("Please specify an API classname (.withAPIClassname()) before calling .build()");
-            if(packageName == null)
-                throw new IllegalStateException("Please specify a package name (.withPackageName()) before calling .build()");
-            if(dataset == null)
-                throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
-
-            HollowAPIGenerator generator = new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts);
-            generator.setClassPostfix(classPostfix);
-            generator.setGetterPrefix(getterPrefix);
-            generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
-            generator.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
-            generator.reservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
-            generator.setUsePackageGrouping(usePackageGrouping);
-            generator.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
-            return generator;
         }
     }
 }
