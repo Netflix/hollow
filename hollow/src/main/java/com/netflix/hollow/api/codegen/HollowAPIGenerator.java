@@ -55,23 +55,22 @@ import java.util.Set;
  * contain convenience methods for traversing a dataset, based on the specific fields in the data model.
  */
 public class HollowAPIGenerator {
+    protected final String apiClassname;
+    protected final String packageName;
+    protected final HollowDataset dataset;
+    protected final Set<String> parameterizedTypes;
+    protected final boolean parameterizeClassNames;
+    protected final boolean hasCollectionsInDataSet;
+    protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-    private final String apiClassname;
-    private final String packageName;
-    private final HollowDataset dataset;
-    private final Set<String> parameterizedTypes;
-    private final boolean parameterizeClassNames;
-    private final boolean hasCollectionsInDataSet;
-    private final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-
-    private String classPostfix = "Hollow";
-    private String getterPrefix = "_";
-    private boolean usePackageGrouping = false;
-    private boolean useAggressiveSubstitutions = false;
-    private boolean useBooleanFieldErgonomics = false;
-    private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-    private boolean useHollowPrimitiveTypes = false;
+    protected String classPostfix = "Hollow";
+    protected String getterPrefix = "_";
+    protected boolean usePackageGrouping = false;
+    protected boolean useAggressiveSubstitutions = false;
+    protected boolean useBooleanFieldErgonomics = false;
+    protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
+    protected boolean useHollowPrimitiveTypes = false;
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -104,7 +103,7 @@ public class HollowAPIGenerator {
         this(apiClassname, packageName, dataset, parameterizeSpecificTypeNames, false, false);
     }
 
-    private HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
+    protected HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.dataset = dataset;
@@ -114,7 +113,7 @@ public class HollowAPIGenerator {
         this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
     }
 
-    private static boolean hasCollectionsInDataSet(HollowDataset dataset) {
+    protected static boolean hasCollectionsInDataSet(HollowDataset dataset) {
         for(HollowSchema schema : dataset.getSchemas()) {
             if ((schema instanceof HollowListSchema) ||
                     (schema instanceof HollowSetSchema) ||
@@ -204,7 +203,7 @@ public class HollowAPIGenerator {
         generateFilesForHollowSchemas(directory);
     }
 
-    private void generateFilesForHollowSchemas(File directory) throws IOException {
+    protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
             if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type
@@ -229,7 +228,7 @@ public class HollowAPIGenerator {
         }
     }
 
-    private void generateFile(File directory, HollowJavaFileGenerator generator) throws IOException {
+    protected void generateFile(File directory, HollowJavaFileGenerator generator) throws IOException {
         // create sub folder if not using default package and sub packages are enabled
         if ((packageName!=null && !packageName.trim().isEmpty()) && usePackageGrouping && (generator instanceof HollowConsumerJavaFileGenerator)) {
             HollowConsumerJavaFileGenerator consumerCodeGenerator = (HollowConsumerJavaFileGenerator)generator;
@@ -243,7 +242,7 @@ public class HollowAPIGenerator {
         writer.close();
     }
 
-    private HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
+    protected HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
             return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes);
         } else if(schema instanceof HollowListSchema) {
@@ -257,7 +256,7 @@ public class HollowAPIGenerator {
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
-    private HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
+    protected HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
             return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts, useBooleanFieldErgonomics, usePackageGrouping, useHollowPrimitiveTypes);
         } else if(schema instanceof HollowListSchema) {
@@ -271,24 +270,24 @@ public class HollowAPIGenerator {
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
-    private HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
+    protected HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
         return new HollowFactoryJavaGenerator(packageName, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
     }
 
     public static class Builder {
-        private String apiClassname;
-        private String packageName;
-        private HollowDataset dataset;
-        private Set<String> parameterizedTypes = Collections.emptySet();
-        private boolean parameterizeAllClassnames = false;
-        private String classPostfix = "";
-        private String getterPrefix = "";
-        private boolean useAggressiveSubstitutions = false;
-        private boolean useErgonomicShortcuts = false;
-        private boolean useBooleanFieldErgonomics = false;
-        private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-        private boolean usePackageGrouping = false;
-        private boolean useHollowPrimitiveTypes = false;
+        protected String apiClassname;
+        protected String packageName;
+        protected HollowDataset dataset;
+        protected Set<String> parameterizedTypes = Collections.emptySet();
+        protected boolean parameterizeAllClassnames = false;
+        protected String classPostfix = "";
+        protected String getterPrefix = "";
+        protected boolean useAggressiveSubstitutions = false;
+        protected boolean useErgonomicShortcuts = false;
+        protected boolean useBooleanFieldErgonomics = false;
+        protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
+        protected boolean usePackageGrouping = false;
+        protected boolean useHollowPrimitiveTypes = false;
 
         public Builder withAPIClassname(String apiClassname) {
             this.apiClassname = apiClassname;
