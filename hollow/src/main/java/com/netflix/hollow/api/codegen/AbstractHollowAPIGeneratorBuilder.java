@@ -33,6 +33,7 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
     protected boolean usePackageGrouping = false;
     protected boolean useHollowPrimitiveTypes = false;
+    protected boolean restrictApiToFieldType = false;
 
     protected abstract G instantiateGenerator();
 
@@ -98,6 +99,15 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         return getBuilder();
     }
 
+    /**
+     * NOTE: Have to be enabled with withErgonomicShortcuts
+     */
+    public B withRestrictApiToFieldType() {
+        restrictApiToFieldType = true;
+        return getBuilder();
+    }
+
+
     public B withHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
         this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
         return getBuilder();
@@ -111,6 +121,10 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         if (dataset == null)
             throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
 
+        if(restrictApiToFieldType && !useErgonomicShortcuts) {
+            throw new IllegalStateException(" restrictApiToFieldType requires withErgonomicShortcuts");
+        }
+
         G generator = instantiateGenerator();
         generator.setClassPostfix(classPostfix);
         generator.setGetterPrefix(getterPrefix);
@@ -119,6 +133,7 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         generator.reservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
         generator.setUsePackageGrouping(usePackageGrouping);
         generator.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
+        generator.setRestrictApiToFieldType(restrictApiToFieldType);
         return generator;
     }
 }

@@ -71,6 +71,7 @@ public class HollowAPIGenerator {
     protected boolean useBooleanFieldErgonomics = false;
     protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
     protected boolean useHollowPrimitiveTypes = false;
+    protected boolean restrictApiToFieldType = false;
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -183,6 +184,15 @@ public class HollowAPIGenerator {
         this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
     }
 
+    /**
+     * If setRestrictApiToFieldType is true, api code only generates get<FieldName> with return type as per schema
+     *
+     * Defaults to false to be backwards compatible
+     */
+    public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
+        this.restrictApiToFieldType = restrictApiToFieldType;
+    }
+
     public void generateFiles(String directory) throws IOException {
         generateFiles(new File(directory));
     }
@@ -258,7 +268,7 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts, useBooleanFieldErgonomics, usePackageGrouping, useHollowPrimitiveTypes);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts, useBooleanFieldErgonomics, usePackageGrouping, useHollowPrimitiveTypes, restrictApiToFieldType);
         } else if(schema instanceof HollowListSchema) {
             return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
         } else if(schema instanceof HollowSetSchema) {
