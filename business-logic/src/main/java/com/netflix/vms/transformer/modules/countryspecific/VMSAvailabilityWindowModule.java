@@ -363,22 +363,22 @@ public class VMSAvailabilityWindowModule {
                     }
                 }
 
-                outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
-
-                if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
-                    availabilityWindows.add(outputWindow);
-                    if (rollup.doEpisode()) {
-                        if (isMulticatalogRollup)
-                            rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
-                        if (isGoLive)
-                            rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup.getSeasonSequenceNumber());
-                    }
-                }
-
-                if (includedWindowPackageData)
-                    includedPackageDataCount++;
-
             } // end of for loop for iterating through contracts in a window
+
+            outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
+
+            if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
+                availabilityWindows.add(outputWindow);
+                if (rollup.doEpisode()) {
+                    if (isMulticatalogRollup)
+                        rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
+                    if (isGoLive)
+                        rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup.getSeasonSequenceNumber());
+                }
+            }
+
+            if (includedWindowPackageData)
+                includedPackageDataCount++;
 
         } // end of for loop for iterating through windows for this video
 
@@ -442,19 +442,6 @@ public class VMSAvailabilityWindowModule {
 
         return availabilityWindows;
     }
-
-//    private final LinkedHashMap<Long, RightsWindowContract> theRightsContractMap = new LinkedHashMap<>();
-//
-//    private LinkedHashMap<Long, RightsWindowContract> getRightsContractMap(RightsHollow rights, RightsWindowHollow window) {
-//        theRightsContractMap.clear();
-//        for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-//            long contractId = rightsWindowContract._getContractId();
-//            RightsContractHollow contract = getRightContract(rights, contractId);
-//            theRightsContractMap.put(contractId, new RightsWindowContract(contractId, contract, rightsWindowContract._getDownload()));
-//        }
-//
-//        return theRightsContractMap;
-//    }
 
     // Return AvailabilityWindow from MediaData
     private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues
