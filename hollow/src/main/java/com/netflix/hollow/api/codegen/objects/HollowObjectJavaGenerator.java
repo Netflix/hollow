@@ -186,15 +186,14 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
             case INT:
             case LONG:
                 String methodName = (shortcut.getType()==FieldType.BOOLEAN) ? generateBooleanAccessorMethodName(fieldName, useBooleanFieldErgonomics) : "get" + uppercase(fieldName);
-
-                if(restrictApiToFieldType) {
-                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
-                    builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
-                    builder.append("    }\n\n");
-                } else {
-                    builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "Boxed() {\n");
-                    builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
-                    builder.append("    }\n\n");
+                builder.append("    public ").append(HollowCodeGenerationUtils.getJavaBoxedType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName);
+                if(!restrictApiToFieldType) {
+                    builder.append("Boxed");
+                }
+                builder.append("() {\n");
+                builder.append("        return delegate().get" + uppercase(fieldName) + "Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                if(!restrictApiToFieldType) {
                     builder.append("    public ").append(HollowCodeGenerationUtils.getJavaScalarType(shortcut.getType())).append(" ").append(getterPrefix).append(methodName + "() {\n");
                     builder.append("        return delegate().get" + uppercase(fieldName) + "(ordinal);\n");
                     builder.append("    }\n\n");
