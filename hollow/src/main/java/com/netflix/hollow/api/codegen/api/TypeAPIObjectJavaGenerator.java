@@ -22,22 +22,22 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  * @author dkoszewnik
  *
  */
@@ -52,8 +52,8 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         }
     });
 
-    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(apiClassname, packageName, schema, usePackageGrouping, useHollowPrimitiveTypes);
+    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, config);
         this.objectSchema = schema;
 
         this.importClasses.add(HollowObjectTypeAPI.class);

@@ -24,6 +24,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPICl
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
@@ -37,14 +38,14 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts,CodeGeneratorConfig config) {
+        super(packageName, schema, ergonomicShortcuts, config);
         this.className = delegateCachedImplName(schema.getName());
     }
 
@@ -117,9 +118,9 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
                 if(shortcut != null) {
                     String ordinalVariableName = fieldName + "TempOrdinal";
-                    
+
                     builder.append("        int ").append(ordinalVariableName).append(" = typeAPI.get").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
-                    
+
                     for(int j=0;j<shortcut.getPath().length-1;j++) {
                         String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[j]);
                         builder.append("        " + ordinalVariableName + " = " + ordinalVariableName + " == -1 ? -1 : typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[j])).append("Ordinal(").append(ordinalVariableName).append(");\n");
@@ -141,7 +142,7 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(i));
                 if(shortcut != null)
                     addAccessor(builder, shortcut.getType(), fieldName);
-                
+
                 builder.append("    public int get").append(uppercase(fieldName)).append("Ordinal(int ordinal) {\n");
                 builder.append("        return ").append(fieldName).append("Ordinal;\n");
                 builder.append("    }\n\n");

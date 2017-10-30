@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
@@ -34,29 +34,29 @@ import java.util.List;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowHashIndexGenerator extends HollowIndexGenerator {
 
     private final HollowDataset dataset;
     private final boolean isListenToDataRefreah;
-    
-    public HollowHashIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowDataset dataset, boolean usePackageGrouping, boolean isListenToDataRefreah, boolean useHollowPrimitiveTypes) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+
+    public HollowHashIndexGenerator(String packageName, String apiClassname, HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, config);
         this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
-        this.isListenToDataRefreah = isListenToDataRefreah;
+        this.isListenToDataRefreah = config.isListenToDataRefresh();
     }
 
     @Override
     public String generate() {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
-        
+
         StringBuilder builder = new StringBuilder();
         appendPackageAndCommonImports(builder);
-        
+
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + HollowHashIndexResult.class.getName() + ";\n");
         builder.append("import " + Collections.class.getName() + ";\n");
@@ -77,12 +77,12 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("    }\n\n");
 
         for(HollowSchema schema : schemaList) {
-            builder.append("    public Iterable<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
+            builder.append("    public Iterable<" + hollowImplClassname(schema.getName()) + "> find" + substituteInvalidChars(schema.getName()) + "Matches(Object... keys) {\n");
             builder.append("        HollowHashIndexResult matches = idx.findMatches(keys);\n");
             builder.append("        if(matches == null) return Collections.emptySet();\n\n");
-            builder.append("        return new AbstractHollowOrdinalIterable<" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + ">(matches.iterator()) {\n");
-            builder.append("            public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " getData(int ordinal) {\n");
-            builder.append("                return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
+            builder.append("        return new AbstractHollowOrdinalIterable<" + hollowImplClassname(schema.getName()) + ">(matches.iterator()) {\n");
+            builder.append("            public " + hollowImplClassname(schema.getName()) + " getData(int ordinal) {\n");
+            builder.append("                return api.get" + hollowImplClassname(schema.getName()) + "(ordinal);\n");
             builder.append("            }\n");
             builder.append("        };\n");
             builder.append("    }\n\n");

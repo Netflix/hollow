@@ -17,23 +17,22 @@
  */
 package com.netflix.hollow.api.codegen.objects;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
-import com.netflix.hollow.api.custom.HollowAPI;
-
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.Set;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowSetJavaGenerator extends HollowCollectionsGenerator {
 
@@ -41,10 +40,11 @@ public class HollowSetJavaGenerator extends HollowCollectionsGenerator {
     private final String elementClassName;
     private final boolean parameterize;
 
-    public HollowSetJavaGenerator(String packageName, String apiClassname, HollowSetSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowSetJavaGenerator(String packageName, String apiClassname, HollowSetSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, config);
+
         this.schema = schema;
-        this.elementClassName = hollowImplClassname(schema.getElementType(), classPostfix, useAggressiveSubstitutions);
+        this.elementClassName = hollowImplClassname(schema.getElementType());
         this.parameterize = parameterizeClassNames || parameterizedTypes.contains(schema.getElementType());
     }
 

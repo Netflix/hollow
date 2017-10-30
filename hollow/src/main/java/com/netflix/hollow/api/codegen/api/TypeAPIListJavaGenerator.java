@@ -20,27 +20,27 @@ package com.netflix.hollow.api.codegen.api;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  * @author dkoszewnik
  *
  */
 public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowListSchema schema;
 
-    public TypeAPIListJavaGenerator(String apiClassname, String packageName, HollowListSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(apiClassname, packageName, schema, usePackageGrouping, useHollowPrimitiveTypes);
+    public TypeAPIListJavaGenerator(String apiClassname, String packageName, HollowListSchema schema, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, config);
         this.schema = schema;
     }
 

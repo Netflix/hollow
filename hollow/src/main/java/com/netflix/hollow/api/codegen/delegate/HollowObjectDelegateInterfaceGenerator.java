@@ -23,6 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPICl
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
@@ -32,14 +33,14 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, CodeGeneratorConfig config) {
+        super(packageName, schema, ergonomicShortcuts, config);
         this.className = delegateInterfaceName(schema.getName());
     }
 
@@ -102,7 +103,7 @@ public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegate
                     default:
                     }
                 }
-                
+
                 classBuilder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal);\n\n");
                 break;
             case STRING:

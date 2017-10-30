@@ -63,15 +63,7 @@ public class HollowAPIGenerator {
     protected final boolean hasCollectionsInDataSet;
     protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-
-    protected String classPostfix = "Hollow";
-    protected String getterPrefix = "_";
-    protected boolean usePackageGrouping = false;
-    protected boolean useAggressiveSubstitutions = false;
-    protected boolean useBooleanFieldErgonomics = false;
-    protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-    protected boolean useHollowPrimitiveTypes = false;
-    protected boolean restrictApiToFieldType = false;
+    protected CodeGeneratorConfig config = new CodeGeneratorConfig();
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -125,18 +117,22 @@ public class HollowAPIGenerator {
         return false;
     }
 
+    protected void setCodeGeneratorConfig(CodeGeneratorConfig config) {
+        this.config = config;
+    }
+
     /**
      * Use this method to override the default postfix "Hollow" for all generated Hollow object classes.
      */
     public void setClassPostfix(String classPostfix) {
-        this.classPostfix = classPostfix;
+        config.classPostfix = classPostfix;
     }
 
     /**
      * Use this method to override the default prefix "_" for all getters on all generated Hollow object classes.
      */
     public void setGetterPrefix(String getterPrefix) {
-        this.getterPrefix = getterPrefix;
+        config.getterPrefix = getterPrefix;
     }
 
     /**
@@ -145,7 +141,7 @@ public class HollowAPIGenerator {
      * Defaults to false, which overrides only type names corresponding to a few select classes in java.lang.
      */
     public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        config.useAggressiveSubstitutions = useAggressiveSubstitutions;
     }
 
     /**
@@ -154,7 +150,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
-        this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+        config.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
     }
 
     /**
@@ -163,7 +159,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUsePackageGrouping(boolean usePackageGrouping) {
-        this.usePackageGrouping = usePackageGrouping;
+        config.usePackageGrouping = usePackageGrouping;
     }
 
     /**
@@ -172,7 +168,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-        this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+        config.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
     }
 
     /**
@@ -181,7 +177,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUseHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-        this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
+        config.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
     }
 
     /**
@@ -190,7 +186,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
-        this.restrictApiToFieldType = restrictApiToFieldType;
+        config.restrictApiToFieldType = restrictApiToFieldType;
     }
 
     public void generateFiles(String directory) throws IOException {
@@ -200,11 +196,10 @@ public class HollowAPIGenerator {
     public void generateFiles(File directory) throws IOException {
         directory.mkdirs();
 
-        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
-        HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname, usePackageGrouping, useHollowPrimitiveTypes);
+        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, config);
+        HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname, config);
 
-        boolean isListenToDataRefreah = !reservePrimaryKeyIndexForTypeWithPrimaryKey; // NOTE: to be backwards compatible
-        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, dataset, usePackageGrouping, isListenToDataRefreah, useHollowPrimitiveTypes);
+        HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, dataset, config);
 
         generateFile(directory, apiClassGenerator);
         generateFile(directory, apiFactoryGenerator);
@@ -216,23 +211,24 @@ public class HollowAPIGenerator {
     protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();
-            if (useHollowPrimitiveTypes && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type
+            if (config.isUseHollowPrimitiveTypes() && HollowCodeGenerationUtils.isPrimitiveType(type)) continue; // skip if using hollow primitive type
 
             generateFile(directory, getStaticAPIGenerator(schema));
             generateFile(directory, getHollowObjectGenerator(schema));
             generateFile(directory, getHollowFactoryGenerator(schema));
 
             if(schema.getSchemaType() == SchemaType.OBJECT) {
-                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
-                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
-                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, (HollowObjectSchema)schema, ergonomicShortcuts, usePackageGrouping, useHollowPrimitiveTypes));
+                HollowObjectSchema objSchema = (HollowObjectSchema)schema;
+                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, objSchema, ergonomicShortcuts, config));
+                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, objSchema, ergonomicShortcuts, config));
+                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, objSchema, ergonomicShortcuts, config));
 
-                generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes));
-                if (!reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-                    generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes));
-                } else if (((HollowObjectSchema) schema).getPrimaryKey() != null) {
-                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes));
-                    generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes));
+                generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, objSchema, config));
+                if (!config.isReservePrimaryKeyIndexForTypeWithPrimaryKey()) {
+                    generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, objSchema, config));
+                } else if ((objSchema).getPrimaryKey() != null) {
+                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname,  objSchema, config));
+                    generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, objSchema, config));
                 }
             }
         }
@@ -240,7 +236,7 @@ public class HollowAPIGenerator {
 
     protected void generateFile(File directory, HollowJavaFileGenerator generator) throws IOException {
         // create sub folder if not using default package and sub packages are enabled
-        if ((packageName!=null && !packageName.trim().isEmpty()) && usePackageGrouping && (generator instanceof HollowConsumerJavaFileGenerator)) {
+        if ((packageName!=null && !packageName.trim().isEmpty()) && config.isUsePackageGrouping() && (generator instanceof HollowConsumerJavaFileGenerator)) {
             HollowConsumerJavaFileGenerator consumerCodeGenerator = (HollowConsumerJavaFileGenerator)generator;
             if (hasCollectionsInDataSet) consumerCodeGenerator.useCollectionsImport();
             directory = new File(directory, consumerCodeGenerator.getSubPackageName());
@@ -254,13 +250,13 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, usePackageGrouping, useHollowPrimitiveTypes);
+            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, config);
         } else if(schema instanceof HollowListSchema) {
-            return new TypeAPIListJavaGenerator(apiClassname, packageName, (HollowListSchema)schema, usePackageGrouping, useHollowPrimitiveTypes);
+            return new TypeAPIListJavaGenerator(apiClassname, packageName, (HollowListSchema)schema, config);
         } else if(schema instanceof HollowSetSchema) {
-            return new TypeAPISetJavaGenerator(apiClassname, packageName, (HollowSetSchema)schema, usePackageGrouping, useHollowPrimitiveTypes);
+            return new TypeAPISetJavaGenerator(apiClassname, packageName, (HollowSetSchema)schema, config);
         } else if(schema instanceof HollowMapSchema) {
-            return new TypeAPIMapJavaGenerator(apiClassname, packageName, (HollowMapSchema)schema, usePackageGrouping, useHollowPrimitiveTypes);
+            return new TypeAPIMapJavaGenerator(apiClassname, packageName, (HollowMapSchema)schema, config);
         }
 
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
@@ -268,20 +264,20 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, getterPrefix, useAggressiveSubstitutions, ergonomicShortcuts, useBooleanFieldErgonomics, usePackageGrouping, useHollowPrimitiveTypes, restrictApiToFieldType);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, ergonomicShortcuts, config);
         } else if(schema instanceof HollowListSchema) {
-            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, config);
         } else if(schema instanceof HollowSetSchema) {
-            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, config);
         } else if(schema instanceof HollowMapSchema) {
-            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+            return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, config);
         }
 
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
     }
 
     protected HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
-        return new HollowFactoryJavaGenerator(packageName, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+        return new HollowFactoryJavaGenerator(packageName, schema, config);
     }
 
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
@@ -293,6 +289,164 @@ public class HollowAPIGenerator {
         @Override
         protected Builder getBuilder() {
             return this;
+        }
+    }
+
+    public class CodeGeneratorConfig {
+        private String classPostfix = "Hollow";
+        private String getterPrefix = "_";
+        private boolean usePackageGrouping = false;
+        private boolean useAggressiveSubstitutions = false;
+        private boolean useBooleanFieldErgonomics = false;
+        private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
+        private boolean useHollowPrimitiveTypes = false;
+        private boolean restrictApiToFieldType = false;
+
+        public String getClassPostfix() {
+            return classPostfix;
+        }
+
+        public void setClassPostfix(String classPostfix) {
+            this.classPostfix = classPostfix;
+        }
+
+        public String getGetterPrefix() {
+            return getterPrefix;
+        }
+
+        public void setGetterPrefix(String getterPrefix) {
+            this.getterPrefix = getterPrefix;
+        }
+
+        public boolean isUsePackageGrouping() {
+            return usePackageGrouping;
+        }
+
+        public void setUsePackageGrouping(boolean usePackageGrouping) {
+            this.usePackageGrouping = usePackageGrouping;
+        }
+
+        public boolean isUseAggressiveSubstitutions() {
+            return useAggressiveSubstitutions;
+        }
+
+        public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
+            this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        }
+
+        public boolean isUseBooleanFieldErgonomics() {
+            return useBooleanFieldErgonomics;
+        }
+
+        public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
+            this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+        }
+
+        public boolean isReservePrimaryKeyIndexForTypeWithPrimaryKey() {
+            return reservePrimaryKeyIndexForTypeWithPrimaryKey;
+        }
+
+        public void setReservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
+            this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+        }
+
+        public boolean isListenToDataRefresh() {
+            return !reservePrimaryKeyIndexForTypeWithPrimaryKey; // NOTE: to be backwards compatible
+        }
+
+        public boolean isUseHollowPrimitiveTypes() {
+            return useHollowPrimitiveTypes;
+        }
+
+        public void setUseHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
+            this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
+        }
+
+        public boolean isRestrictApiToFieldType() {
+            return restrictApiToFieldType;
+        }
+
+        public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
+            this.restrictApiToFieldType = restrictApiToFieldType;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + ((classPostfix == null) ? 0 : classPostfix.hashCode());
+            result = prime * result + ((getterPrefix == null) ? 0 : getterPrefix.hashCode());
+            result = prime * result + (reservePrimaryKeyIndexForTypeWithPrimaryKey ? 1231 : 1237);
+            result = prime * result + (restrictApiToFieldType ? 1231 : 1237);
+            result = prime * result + (useAggressiveSubstitutions ? 1231 : 1237);
+            result = prime * result + (useBooleanFieldErgonomics ? 1231 : 1237);
+            result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
+            result = prime * result + (usePackageGrouping ? 1231 : 1237);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            CodeGeneratorConfig other = (CodeGeneratorConfig) obj;
+            if (!getOuterType().equals(other.getOuterType()))
+                return false;
+            if (classPostfix == null) {
+                if (other.classPostfix != null)
+                    return false;
+            } else if (!classPostfix.equals(other.classPostfix))
+                return false;
+            if (getterPrefix == null) {
+                if (other.getterPrefix != null)
+                    return false;
+            } else if (!getterPrefix.equals(other.getterPrefix))
+                return false;
+            if (reservePrimaryKeyIndexForTypeWithPrimaryKey != other.reservePrimaryKeyIndexForTypeWithPrimaryKey)
+                return false;
+            if (restrictApiToFieldType != other.restrictApiToFieldType)
+                return false;
+            if (useAggressiveSubstitutions != other.useAggressiveSubstitutions)
+                return false;
+            if (useBooleanFieldErgonomics != other.useBooleanFieldErgonomics)
+                return false;
+            if (useHollowPrimitiveTypes != other.useHollowPrimitiveTypes)
+                return false;
+            if (usePackageGrouping != other.usePackageGrouping)
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("GeneratorConfig [classPostfix=");
+            builder.append(classPostfix);
+            builder.append(", getterPrefix=");
+            builder.append(getterPrefix);
+            builder.append(", usePackageGrouping=");
+            builder.append(usePackageGrouping);
+            builder.append(", useAggressiveSubstitutions=");
+            builder.append(useAggressiveSubstitutions);
+            builder.append(", useBooleanFieldErgonomics=");
+            builder.append(useBooleanFieldErgonomics);
+            builder.append(", reservePrimaryKeyIndexForTypeWithPrimaryKey=");
+            builder.append(reservePrimaryKeyIndexForTypeWithPrimaryKey);
+            builder.append(", useHollowPrimitiveTypes=");
+            builder.append(useHollowPrimitiveTypes);
+            builder.append(", restrictApiToFieldType=");
+            builder.append(restrictApiToFieldType);
+            builder.append("]");
+            return builder.toString();
+        }
+
+        private HollowAPIGenerator getOuterType() {
+            return HollowAPIGenerator.this;
         }
     }
 }

@@ -18,9 +18,8 @@
 package com.netflix.hollow.api.codegen.indexes;
 
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
-
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowDataset;
@@ -39,8 +38,8 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     protected final HollowDataset dataset;
     protected final PrimaryKey pk;
 
-    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, config);
         this.dataset = dataset;
         this.pk = schema.getPrimaryKey();
         isGenSimpleConstructor = true;
@@ -82,11 +81,11 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
             fieldNamesAsStr.append(fieldNames.get(i));
         }
 
-        builder.append("    public " + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + " findMatch(" + paramsAsStr + ") {\n");
+        builder.append("    public " + hollowImplClassname(schema.getName()) + " findMatch(" + paramsAsStr + ") {\n");
         builder.append("        int ordinal = idx.getMatchingOrdinal(" + fieldNamesAsStr + ");\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
-        builder.append("        return api.get" + hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
+        builder.append("        return api.get" + hollowImplClassname(schema.getName()) + "(ordinal);\n");
         builder.append("    }\n\n");
     }
 }

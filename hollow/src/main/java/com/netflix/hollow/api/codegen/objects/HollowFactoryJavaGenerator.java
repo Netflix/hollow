@@ -19,29 +19,28 @@ package com.netflix.hollow.api.codegen.objects;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateCachedClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowFactoryClassname;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
+import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "core";
@@ -49,9 +48,10 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
     private final String objectClassName;
     private final HollowSchema schema;
 
-    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
-        this.objectClassName = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
+    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
+
+        this.objectClassName = hollowImplClassname(schema.getName());
         this.className = hollowFactoryClassname(schema.getName());
         this.schema = schema;
     }
