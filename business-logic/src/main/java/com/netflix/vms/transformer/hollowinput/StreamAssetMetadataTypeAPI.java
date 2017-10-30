@@ -8,7 +8,7 @@ public class StreamAssetMetadataTypeAPI extends HollowObjectTypeAPI {
 
     private final StreamAssetMetadataDelegateLookupImpl delegateLookupImpl;
 
-    StreamAssetMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StreamAssetMetadataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "id"
         });

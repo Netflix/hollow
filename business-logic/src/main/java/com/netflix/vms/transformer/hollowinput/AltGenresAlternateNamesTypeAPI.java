@@ -8,7 +8,7 @@ public class AltGenresAlternateNamesTypeAPI extends HollowObjectTypeAPI {
 
     private final AltGenresAlternateNamesDelegateLookupImpl delegateLookupImpl;
 
-    AltGenresAlternateNamesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public AltGenresAlternateNamesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "typeId",
             "type",

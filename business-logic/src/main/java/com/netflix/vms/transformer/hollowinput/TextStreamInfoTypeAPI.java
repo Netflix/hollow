@@ -8,7 +8,7 @@ public class TextStreamInfoTypeAPI extends HollowObjectTypeAPI {
 
     private final TextStreamInfoDelegateLookupImpl delegateLookupImpl;
 
-    TextStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TextStreamInfoTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "textLanguageCode",
             "timedTextType",

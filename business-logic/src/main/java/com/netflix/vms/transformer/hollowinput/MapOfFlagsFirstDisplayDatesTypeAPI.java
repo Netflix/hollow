@@ -10,7 +10,7 @@ public class MapOfFlagsFirstDisplayDatesTypeAPI extends HollowMapTypeAPI {
 
     private final HollowMapLookupDelegate delegateLookupImpl;
 
-    MapOfFlagsFirstDisplayDatesTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
+    public MapOfFlagsFirstDisplayDatesTypeAPI(VMSHollowInputAPI api, HollowMapTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowMapLookupDelegate(this);
     }

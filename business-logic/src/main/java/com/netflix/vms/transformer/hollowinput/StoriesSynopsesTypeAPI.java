@@ -8,7 +8,7 @@ public class StoriesSynopsesTypeAPI extends HollowObjectTypeAPI {
 
     private final StoriesSynopsesDelegateLookupImpl delegateLookupImpl;
 
-    StoriesSynopsesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StoriesSynopsesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "narrativeText",

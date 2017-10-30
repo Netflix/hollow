@@ -8,7 +8,7 @@ public class DashStreamHeaderDataTypeAPI extends HollowObjectTypeAPI {
 
     private final DashStreamHeaderDataDelegateLookupImpl delegateLookupImpl;
 
-    DashStreamHeaderDataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DashStreamHeaderDataTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "boxInfo"
         });

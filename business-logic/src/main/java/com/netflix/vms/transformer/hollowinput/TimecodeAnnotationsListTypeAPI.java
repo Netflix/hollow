@@ -10,7 +10,7 @@ public class TimecodeAnnotationsListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    TimecodeAnnotationsListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public TimecodeAnnotationsListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

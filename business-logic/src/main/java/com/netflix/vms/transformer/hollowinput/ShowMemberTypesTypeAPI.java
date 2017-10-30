@@ -8,7 +8,7 @@ public class ShowMemberTypesTypeAPI extends HollowObjectTypeAPI {
 
     private final ShowMemberTypesDelegateLookupImpl delegateLookupImpl;
 
-    ShowMemberTypesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ShowMemberTypesTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "showMemberTypeId",
             "displayName"

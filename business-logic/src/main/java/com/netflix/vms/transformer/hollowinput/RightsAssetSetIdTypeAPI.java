@@ -8,7 +8,7 @@ public class RightsAssetSetIdTypeAPI extends HollowObjectTypeAPI {
 
     private final RightsAssetSetIdDelegateLookupImpl delegateLookupImpl;
 
-    RightsAssetSetIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RightsAssetSetIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

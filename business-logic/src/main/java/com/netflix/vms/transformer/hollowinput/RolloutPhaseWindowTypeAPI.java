@@ -8,7 +8,7 @@ public class RolloutPhaseWindowTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseWindowDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutPhaseWindowTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "endDate",
             "startDate"

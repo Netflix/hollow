@@ -8,7 +8,7 @@ public class ConsolidatedCertificationSystemsTypeAPI extends HollowObjectTypeAPI
 
     private final ConsolidatedCertificationSystemsDelegateLookupImpl delegateLookupImpl;
 
-    ConsolidatedCertificationSystemsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ConsolidatedCertificationSystemsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "certificationSystemId",
             "countryCode",

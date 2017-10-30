@@ -8,7 +8,7 @@ public class DerivativeTagTypeAPI extends HollowObjectTypeAPI {
 
     private final DerivativeTagDelegateLookupImpl delegateLookupImpl;
 
-    DerivativeTagTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DerivativeTagTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

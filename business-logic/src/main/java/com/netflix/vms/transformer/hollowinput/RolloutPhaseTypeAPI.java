@@ -8,7 +8,7 @@ public class RolloutPhaseTypeAPI extends HollowObjectTypeAPI {
 
     private final RolloutPhaseDelegateLookupImpl delegateLookupImpl;
 
-    RolloutPhaseTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RolloutPhaseTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "seasonMovieId",
             "elements",

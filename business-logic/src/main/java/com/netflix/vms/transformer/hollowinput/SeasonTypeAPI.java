@@ -8,7 +8,7 @@ public class SeasonTypeAPI extends HollowObjectTypeAPI {
 
     private final SeasonDelegateLookupImpl delegateLookupImpl;
 
-    SeasonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public SeasonTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber",
             "movieId",

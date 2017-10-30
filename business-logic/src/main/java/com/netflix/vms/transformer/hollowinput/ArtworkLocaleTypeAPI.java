@@ -8,7 +8,7 @@ public class ArtworkLocaleTypeAPI extends HollowObjectTypeAPI {
 
     private final ArtworkLocaleDelegateLookupImpl delegateLookupImpl;
 
-    ArtworkLocaleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ArtworkLocaleTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "territoryCodes",
             "bcp47Code",

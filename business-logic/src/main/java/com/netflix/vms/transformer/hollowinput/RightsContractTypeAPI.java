@@ -8,7 +8,7 @@ public class RightsContractTypeAPI extends HollowObjectTypeAPI {
 
     private final RightsContractDelegateLookupImpl delegateLookupImpl;
 
-    RightsContractTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public RightsContractTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "assets",
             "contractId",

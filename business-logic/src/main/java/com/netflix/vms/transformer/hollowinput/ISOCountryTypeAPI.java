@@ -8,7 +8,7 @@ public class ISOCountryTypeAPI extends HollowObjectTypeAPI {
 
     private final ISOCountryDelegateLookupImpl delegateLookupImpl;
 
-    ISOCountryTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ISOCountryTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

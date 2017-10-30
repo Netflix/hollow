@@ -8,7 +8,7 @@ public class VideoDateTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoDateDelegateLookupImpl delegateLookupImpl;
 
-    VideoDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
             "window"

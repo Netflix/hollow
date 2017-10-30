@@ -8,7 +8,7 @@ public class LocalizedCharacterTypeAPI extends HollowObjectTypeAPI {
 
     private final LocalizedCharacterDelegateLookupImpl delegateLookupImpl;
 
-    LocalizedCharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public LocalizedCharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "characterId",
             "translatedTexts",

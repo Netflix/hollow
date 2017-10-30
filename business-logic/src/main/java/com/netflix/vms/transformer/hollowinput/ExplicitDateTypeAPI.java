@@ -8,7 +8,7 @@ public class ExplicitDateTypeAPI extends HollowObjectTypeAPI {
 
     private final ExplicitDateDelegateLookupImpl delegateLookupImpl;
 
-    ExplicitDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ExplicitDateTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "monthOfYear",
             "year",

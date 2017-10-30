@@ -8,7 +8,7 @@ public class PersonArtworkSourceTypeAPI extends HollowObjectTypeAPI {
 
     private final PersonArtworkSourceDelegateLookupImpl delegateLookupImpl;
 
-    PersonArtworkSourceTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PersonArtworkSourceTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sourceFileId",
             "personId",

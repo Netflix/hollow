@@ -8,7 +8,7 @@ public class VideoTypeDescriptorTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoTypeDescriptorDelegateLookupImpl delegateLookupImpl;
 
-    VideoTypeDescriptorTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoTypeDescriptorTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "countryCode",
             "copyright",

@@ -8,7 +8,7 @@ public class PhaseTagTypeAPI extends HollowObjectTypeAPI {
 
     private final PhaseTagDelegateLookupImpl delegateLookupImpl;
 
-    PhaseTagTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public PhaseTagTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "phaseTag",
             "scheduleId"

@@ -8,7 +8,7 @@ public class IPLArtworkDerivativeSetTypeAPI extends HollowObjectTypeAPI {
 
     private final IPLArtworkDerivativeSetDelegateLookupImpl delegateLookupImpl;
 
-    IPLArtworkDerivativeSetTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public IPLArtworkDerivativeSetTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "derivativeSetId",
             "derivativesGroupBySource"

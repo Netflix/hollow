@@ -8,7 +8,7 @@ public class ShowSeasonEpisodeTypeAPI extends HollowObjectTypeAPI {
 
     private final ShowSeasonEpisodeDelegateLookupImpl delegateLookupImpl;
 
-    ShowSeasonEpisodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ShowSeasonEpisodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "displaySetId",

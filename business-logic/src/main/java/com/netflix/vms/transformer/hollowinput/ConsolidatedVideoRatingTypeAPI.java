@@ -8,7 +8,7 @@ public class ConsolidatedVideoRatingTypeAPI extends HollowObjectTypeAPI {
 
     private final ConsolidatedVideoRatingDelegateLookupImpl delegateLookupImpl;
 
-    ConsolidatedVideoRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ConsolidatedVideoRatingTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "countryRatings",
             "countryList"

@@ -8,7 +8,7 @@ public class VideoGeneralAliasTypeAPI extends HollowObjectTypeAPI {
 
     private final VideoGeneralAliasDelegateLookupImpl delegateLookupImpl;
 
-    VideoGeneralAliasTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public VideoGeneralAliasTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

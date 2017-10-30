@@ -8,7 +8,7 @@ public class TopNTypeAPI extends HollowObjectTypeAPI {
 
     private final TopNDelegateLookupImpl delegateLookupImpl;
 
-    TopNTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public TopNTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "videoId",
             "attributes"

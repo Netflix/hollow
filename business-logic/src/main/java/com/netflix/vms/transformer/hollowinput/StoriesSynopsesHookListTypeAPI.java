@@ -10,7 +10,7 @@ public class StoriesSynopsesHookListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    StoriesSynopsesHookListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public StoriesSynopsesHookListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

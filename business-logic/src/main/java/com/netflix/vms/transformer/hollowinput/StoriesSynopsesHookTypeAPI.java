@@ -8,7 +8,7 @@ public class StoriesSynopsesHookTypeAPI extends HollowObjectTypeAPI {
 
     private final StoriesSynopsesHookDelegateLookupImpl delegateLookupImpl;
 
-    StoriesSynopsesHookTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public StoriesSynopsesHookTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "type",
             "rank",

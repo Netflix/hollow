@@ -10,7 +10,7 @@ public class RolloutPhaseArtworkSourceFileIdListTypeAPI extends HollowListTypeAP
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    RolloutPhaseArtworkSourceFileIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public RolloutPhaseArtworkSourceFileIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

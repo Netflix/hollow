@@ -8,7 +8,7 @@ public class ConsolidatedVideoRatingsTypeAPI extends HollowObjectTypeAPI {
 
     private final ConsolidatedVideoRatingsDelegateLookupImpl delegateLookupImpl;
 
-    ConsolidatedVideoRatingsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public ConsolidatedVideoRatingsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "ratings",
             "videoId"

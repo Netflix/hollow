@@ -8,7 +8,7 @@ public class CharacterTypeAPI extends HollowObjectTypeAPI {
 
     private final CharacterDelegateLookupImpl delegateLookupImpl;
 
-    CharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public CharacterTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "characterId",
             "elements",

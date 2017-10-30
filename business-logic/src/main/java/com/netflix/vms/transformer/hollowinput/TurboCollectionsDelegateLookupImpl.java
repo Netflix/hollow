@@ -25,6 +25,14 @@ public class TurboCollectionsDelegateLookupImpl extends HollowObjectAbstractDele
         return typeAPI.getPrefixOrdinal(ordinal);
     }
 
+    public int getDesOrdinal(int ordinal) {
+        return typeAPI.getDesOrdinal(ordinal);
+    }
+
+    public int getEvi_nOrdinal(int ordinal) {
+        return typeAPI.getEvi_nOrdinal(ordinal);
+    }
+
     public int getChar_nOrdinal(int ordinal) {
         return typeAPI.getChar_nOrdinal(ordinal);
     }

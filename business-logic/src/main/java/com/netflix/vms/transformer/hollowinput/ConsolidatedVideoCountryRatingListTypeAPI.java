@@ -10,7 +10,7 @@ public class ConsolidatedVideoCountryRatingListTypeAPI extends HollowListTypeAPI
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    ConsolidatedVideoCountryRatingListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public ConsolidatedVideoCountryRatingListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }

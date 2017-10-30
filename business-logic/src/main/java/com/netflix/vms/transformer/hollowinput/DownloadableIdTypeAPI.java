@@ -8,7 +8,7 @@ public class DownloadableIdTypeAPI extends HollowObjectTypeAPI {
 
     private final DownloadableIdDelegateLookupImpl delegateLookupImpl;
 
-    DownloadableIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
+    public DownloadableIdTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "value"
         });

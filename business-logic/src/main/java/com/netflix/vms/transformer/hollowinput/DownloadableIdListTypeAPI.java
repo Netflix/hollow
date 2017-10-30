@@ -10,7 +10,7 @@ public class DownloadableIdListTypeAPI extends HollowListTypeAPI {
 
     private final HollowListLookupDelegate delegateLookupImpl;
 
-    DownloadableIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
+    public DownloadableIdListTypeAPI(VMSHollowInputAPI api, HollowListTypeDataAccess dataAccess) {
         super(api, dataAccess);
         this.delegateLookupImpl = new HollowListLookupDelegate(this);
     }
