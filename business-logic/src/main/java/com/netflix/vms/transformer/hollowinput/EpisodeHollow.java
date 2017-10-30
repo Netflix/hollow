@@ -26,6 +26,30 @@ public class EpisodeHollow extends HollowObject {
         return delegate().getMovieIdBoxed(ordinal);
     }
 
+    public boolean _getMidSeason() {
+        return delegate().getMidSeason(ordinal);
+    }
+
+    public Boolean _getMidSeasonBoxed() {
+        return delegate().getMidSeasonBoxed(ordinal);
+    }
+
+    public boolean _getSeasonFinale() {
+        return delegate().getSeasonFinale(ordinal);
+    }
+
+    public Boolean _getSeasonFinaleBoxed() {
+        return delegate().getSeasonFinaleBoxed(ordinal);
+    }
+
+    public boolean _getShowFinale() {
+        return delegate().getShowFinale(ordinal);
+    }
+
+    public Boolean _getShowFinaleBoxed() {
+        return delegate().getShowFinaleBoxed(ordinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

@@ -1,13 +1,10 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import com.netflix.hollow.core.write.objectmapper.HollowInline;
-
 /**
  * This class contains flags that contain information on merching/display order for a video.
  */
 public class MerchingBehaviour {
 
-    public @HollowInline
     String merchOrder = "regular";
     public Boolean episodicNewBadge = false;
 

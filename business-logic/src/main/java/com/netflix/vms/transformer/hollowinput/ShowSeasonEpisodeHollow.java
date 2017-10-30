@@ -40,6 +40,29 @@ public class ShowSeasonEpisodeHollow extends HollowObject {
         return  api().getSeasonListHollow(refOrdinal);
     }
 
+    public boolean _getHideSeasonNumbers() {
+        return delegate().getHideSeasonNumbers(ordinal);
+    }
+
+    public Boolean _getHideSeasonNumbersBoxed() {
+        return delegate().getHideSeasonNumbersBoxed(ordinal);
+    }
+
+    public boolean _getEpisodicNewBadge() {
+        return delegate().getEpisodicNewBadge(ordinal);
+    }
+
+    public Boolean _getEpisodicNewBadgeBoxed() {
+        return delegate().getEpisodicNewBadgeBoxed(ordinal);
+    }
+
+    public StringHollow _getMerchOrder() {
+        int refOrdinal = delegate().getMerchOrderOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getStringHollow(refOrdinal);
+    }
+
     public VMSHollowInputAPI api() {
         return typeApi().getAPI();
     }

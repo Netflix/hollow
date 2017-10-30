@@ -12,12 +12,24 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
     private final Long sequenceNumber;
     private final Long movieId;
     private final int episodesOrdinal;
+    private final Boolean hideEpisodeNumbers;
+    private final Boolean episodicNewBadge;
+    private final Integer episodeSkipping;
+    private final Boolean filterUnavailableEpisodes;
+    private final Boolean useLatestEpisodeAsDefault;
+    private final int merchOrderOrdinal;
     private SeasonTypeAPI typeAPI;
 
     public SeasonDelegateCachedImpl(SeasonTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
         this.episodesOrdinal = typeAPI.getEpisodesOrdinal(ordinal);
+        this.hideEpisodeNumbers = typeAPI.getHideEpisodeNumbersBoxed(ordinal);
+        this.episodicNewBadge = typeAPI.getEpisodicNewBadgeBoxed(ordinal);
+        this.episodeSkipping = typeAPI.getEpisodeSkippingBoxed(ordinal);
+        this.filterUnavailableEpisodes = typeAPI.getFilterUnavailableEpisodesBoxed(ordinal);
+        this.useLatestEpisodeAsDefault = typeAPI.getUseLatestEpisodeAsDefaultBoxed(ordinal);
+        this.merchOrderOrdinal = typeAPI.getMerchOrderOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -43,6 +55,60 @@ public class SeasonDelegateCachedImpl extends HollowObjectAbstractDelegate imple
 
     public int getEpisodesOrdinal(int ordinal) {
         return episodesOrdinal;
+    }
+
+    public boolean getHideEpisodeNumbers(int ordinal) {
+        if(hideEpisodeNumbers == null)
+            return false;
+        return hideEpisodeNumbers.booleanValue();
+    }
+
+    public Boolean getHideEpisodeNumbersBoxed(int ordinal) {
+        return hideEpisodeNumbers;
+    }
+
+    public boolean getEpisodicNewBadge(int ordinal) {
+        if(episodicNewBadge == null)
+            return false;
+        return episodicNewBadge.booleanValue();
+    }
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal) {
+        return episodicNewBadge;
+    }
+
+    public int getEpisodeSkipping(int ordinal) {
+        if(episodeSkipping == null)
+            return Integer.MIN_VALUE;
+        return episodeSkipping.intValue();
+    }
+
+    public Integer getEpisodeSkippingBoxed(int ordinal) {
+        return episodeSkipping;
+    }
+
+    public boolean getFilterUnavailableEpisodes(int ordinal) {
+        if(filterUnavailableEpisodes == null)
+            return false;
+        return filterUnavailableEpisodes.booleanValue();
+    }
+
+    public Boolean getFilterUnavailableEpisodesBoxed(int ordinal) {
+        return filterUnavailableEpisodes;
+    }
+
+    public boolean getUseLatestEpisodeAsDefault(int ordinal) {
+        if(useLatestEpisodeAsDefault == null)
+            return false;
+        return useLatestEpisodeAsDefault.booleanValue();
+    }
+
+    public Boolean getUseLatestEpisodeAsDefaultBoxed(int ordinal) {
+        return useLatestEpisodeAsDefault;
+    }
+
+    public int getMerchOrderOrdinal(int ordinal) {
+        return merchOrderOrdinal;
     }
 
     @Override

@@ -29,6 +29,30 @@ public class EpisodeDelegateLookupImpl extends HollowObjectAbstractDelegate impl
         return typeAPI.getMovieIdBoxed(ordinal);
     }
 
+    public boolean getMidSeason(int ordinal) {
+        return typeAPI.getMidSeason(ordinal);
+    }
+
+    public Boolean getMidSeasonBoxed(int ordinal) {
+        return typeAPI.getMidSeasonBoxed(ordinal);
+    }
+
+    public boolean getSeasonFinale(int ordinal) {
+        return typeAPI.getSeasonFinale(ordinal);
+    }
+
+    public Boolean getSeasonFinaleBoxed(int ordinal) {
+        return typeAPI.getSeasonFinaleBoxed(ordinal);
+    }
+
+    public boolean getShowFinale(int ordinal) {
+        return typeAPI.getShowFinale(ordinal);
+    }
+
+    public Boolean getShowFinaleBoxed(int ordinal) {
+        return typeAPI.getShowFinaleBoxed(ordinal);
+    }
+
     public EpisodeTypeAPI getTypeAPI() {
         return typeAPI;
     }

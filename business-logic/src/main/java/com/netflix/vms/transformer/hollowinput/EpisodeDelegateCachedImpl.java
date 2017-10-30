@@ -11,11 +11,17 @@ public class EpisodeDelegateCachedImpl extends HollowObjectAbstractDelegate impl
 
     private final Long sequenceNumber;
     private final Long movieId;
+    private final Boolean midSeason;
+    private final Boolean seasonFinale;
+    private final Boolean showFinale;
     private EpisodeTypeAPI typeAPI;
 
     public EpisodeDelegateCachedImpl(EpisodeTypeAPI typeAPI, int ordinal) {
         this.sequenceNumber = typeAPI.getSequenceNumberBoxed(ordinal);
         this.movieId = typeAPI.getMovieIdBoxed(ordinal);
+        this.midSeason = typeAPI.getMidSeasonBoxed(ordinal);
+        this.seasonFinale = typeAPI.getSeasonFinaleBoxed(ordinal);
+        this.showFinale = typeAPI.getShowFinaleBoxed(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -37,6 +43,36 @@ public class EpisodeDelegateCachedImpl extends HollowObjectAbstractDelegate impl
 
     public Long getMovieIdBoxed(int ordinal) {
         return movieId;
+    }
+
+    public boolean getMidSeason(int ordinal) {
+        if(midSeason == null)
+            return false;
+        return midSeason.booleanValue();
+    }
+
+    public Boolean getMidSeasonBoxed(int ordinal) {
+        return midSeason;
+    }
+
+    public boolean getSeasonFinale(int ordinal) {
+        if(seasonFinale == null)
+            return false;
+        return seasonFinale.booleanValue();
+    }
+
+    public Boolean getSeasonFinaleBoxed(int ordinal) {
+        return seasonFinale;
+    }
+
+    public boolean getShowFinale(int ordinal) {
+        if(showFinale == null)
+            return false;
+        return showFinale.booleanValue();
+    }
+
+    public Boolean getShowFinaleBoxed(int ordinal) {
+        return showFinale;
     }
 
     @Override

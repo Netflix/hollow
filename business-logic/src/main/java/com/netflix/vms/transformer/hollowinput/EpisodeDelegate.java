@@ -14,6 +14,18 @@ public interface EpisodeDelegate extends HollowObjectDelegate {
 
     public Long getMovieIdBoxed(int ordinal);
 
+    public boolean getMidSeason(int ordinal);
+
+    public Boolean getMidSeasonBoxed(int ordinal);
+
+    public boolean getSeasonFinale(int ordinal);
+
+    public Boolean getSeasonFinaleBoxed(int ordinal);
+
+    public boolean getShowFinale(int ordinal);
+
+    public Boolean getShowFinaleBoxed(int ordinal);
+
     public EpisodeTypeAPI getTypeAPI();
 
 }
