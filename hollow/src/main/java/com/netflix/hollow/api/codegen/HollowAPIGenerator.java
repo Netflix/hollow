@@ -106,6 +106,9 @@ public class HollowAPIGenerator {
         this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
     }
 
+    /**
+     * Determine whether DataSet contains any collections schema
+     */
     protected static boolean hasCollectionsInDataSet(HollowDataset dataset) {
         for(HollowSchema schema : dataset.getSchemas()) {
             if ((schema instanceof HollowListSchema) ||
@@ -117,6 +120,9 @@ public class HollowAPIGenerator {
         return false;
     }
 
+    /**
+     * Set the CodeGeneratorConfig
+     */
     protected void setCodeGeneratorConfig(CodeGeneratorConfig config) {
         this.config = config;
     }
@@ -189,10 +195,16 @@ public class HollowAPIGenerator {
         config.setRestrictApiToFieldType( restrictApiToFieldType);
     }
 
+    /**
+     * Generate files under the specified directory
+     */
     public void generateFiles(String directory) throws IOException {
         generateFiles(new File(directory));
     }
 
+    /**
+     * Generate files under the specified directory
+     */
     public void generateFiles(File directory) throws IOException {
         directory.mkdirs();
 
@@ -208,6 +220,9 @@ public class HollowAPIGenerator {
         generateFilesForHollowSchemas(directory);
     }
 
+    /**
+     * Generate files based on dataset schemas under the specified directory
+     */
     protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
             String type = schema.getName();

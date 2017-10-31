@@ -19,6 +19,11 @@ import com.netflix.hollow.core.HollowDataset;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Abstract Hollow API Generator Builder - to be extended to create customized Builders
+ *
+ * @author dsu
+ */
 public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollowAPIGeneratorBuilder<?, ?>, G extends HollowAPIGenerator> {
     protected String apiClassname;
     protected String packageName;
