@@ -20,8 +20,8 @@ package com.netflix.hollow.api.codegen.api;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowMapTypeAPI;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;

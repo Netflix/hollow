@@ -15,7 +15,7 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 
 public abstract class HollowIndexGenerator extends HollowConsumerJavaFileGenerator {

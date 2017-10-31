@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.api.client.HollowAPIFactory;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;

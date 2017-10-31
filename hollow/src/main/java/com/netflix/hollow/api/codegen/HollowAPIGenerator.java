@@ -63,7 +63,7 @@ public class HollowAPIGenerator {
     protected final boolean hasCollectionsInDataSet;
     protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-    protected CodeGeneratorConfig config = new CodeGeneratorConfig();
+    protected CodeGeneratorConfig config = new CodeGeneratorConfig("Hollow", "_"); // NOTE: to be backwards compatible
 
     /**
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
@@ -125,14 +125,14 @@ public class HollowAPIGenerator {
      * Use this method to override the default postfix "Hollow" for all generated Hollow object classes.
      */
     public void setClassPostfix(String classPostfix) {
-        config.classPostfix = classPostfix;
+        config.setClassPostfix(classPostfix);
     }
 
     /**
      * Use this method to override the default prefix "_" for all getters on all generated Hollow object classes.
      */
     public void setGetterPrefix(String getterPrefix) {
-        config.getterPrefix = getterPrefix;
+        config.setGetterPrefix(getterPrefix);
     }
 
     /**
@@ -141,7 +141,7 @@ public class HollowAPIGenerator {
      * Defaults to false, which overrides only type names corresponding to a few select classes in java.lang.
      */
     public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-        config.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        config.setUseAggressiveSubstitutions( useAggressiveSubstitutions);
     }
 
     /**
@@ -150,7 +150,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
-        config.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+        config.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
     }
 
     /**
@@ -159,7 +159,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUsePackageGrouping(boolean usePackageGrouping) {
-        config.usePackageGrouping = usePackageGrouping;
+        config.setUsePackageGrouping( usePackageGrouping );
     }
 
     /**
@@ -168,7 +168,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-        config.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+        config.setReservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
     }
 
     /**
@@ -177,7 +177,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUseHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-        config.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
+        config.setUseHollowPrimitiveTypes( useHollowPrimitiveTypes);
     }
 
     /**
@@ -186,7 +186,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
-        config.restrictApiToFieldType = restrictApiToFieldType;
+        config.setRestrictApiToFieldType( restrictApiToFieldType);
     }
 
     public void generateFiles(String directory) throws IOException {
@@ -289,164 +289,6 @@ public class HollowAPIGenerator {
         @Override
         protected Builder getBuilder() {
             return this;
-        }
-    }
-
-    public class CodeGeneratorConfig {
-        private String classPostfix = "Hollow";
-        private String getterPrefix = "_";
-        private boolean usePackageGrouping = false;
-        private boolean useAggressiveSubstitutions = false;
-        private boolean useBooleanFieldErgonomics = false;
-        private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-        private boolean useHollowPrimitiveTypes = false;
-        private boolean restrictApiToFieldType = false;
-
-        public String getClassPostfix() {
-            return classPostfix;
-        }
-
-        public void setClassPostfix(String classPostfix) {
-            this.classPostfix = classPostfix;
-        }
-
-        public String getGetterPrefix() {
-            return getterPrefix;
-        }
-
-        public void setGetterPrefix(String getterPrefix) {
-            this.getterPrefix = getterPrefix;
-        }
-
-        public boolean isUsePackageGrouping() {
-            return usePackageGrouping;
-        }
-
-        public void setUsePackageGrouping(boolean usePackageGrouping) {
-            this.usePackageGrouping = usePackageGrouping;
-        }
-
-        public boolean isUseAggressiveSubstitutions() {
-            return useAggressiveSubstitutions;
-        }
-
-        public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-            this.useAggressiveSubstitutions = useAggressiveSubstitutions;
-        }
-
-        public boolean isUseBooleanFieldErgonomics() {
-            return useBooleanFieldErgonomics;
-        }
-
-        public void setUseBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
-            this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
-        }
-
-        public boolean isReservePrimaryKeyIndexForTypeWithPrimaryKey() {
-            return reservePrimaryKeyIndexForTypeWithPrimaryKey;
-        }
-
-        public void setReservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-            this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
-        }
-
-        public boolean isListenToDataRefresh() {
-            return !reservePrimaryKeyIndexForTypeWithPrimaryKey; // NOTE: to be backwards compatible
-        }
-
-        public boolean isUseHollowPrimitiveTypes() {
-            return useHollowPrimitiveTypes;
-        }
-
-        public void setUseHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-            this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
-        }
-
-        public boolean isRestrictApiToFieldType() {
-            return restrictApiToFieldType;
-        }
-
-        public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
-            this.restrictApiToFieldType = restrictApiToFieldType;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + getOuterType().hashCode();
-            result = prime * result + ((classPostfix == null) ? 0 : classPostfix.hashCode());
-            result = prime * result + ((getterPrefix == null) ? 0 : getterPrefix.hashCode());
-            result = prime * result + (reservePrimaryKeyIndexForTypeWithPrimaryKey ? 1231 : 1237);
-            result = prime * result + (restrictApiToFieldType ? 1231 : 1237);
-            result = prime * result + (useAggressiveSubstitutions ? 1231 : 1237);
-            result = prime * result + (useBooleanFieldErgonomics ? 1231 : 1237);
-            result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
-            result = prime * result + (usePackageGrouping ? 1231 : 1237);
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            CodeGeneratorConfig other = (CodeGeneratorConfig) obj;
-            if (!getOuterType().equals(other.getOuterType()))
-                return false;
-            if (classPostfix == null) {
-                if (other.classPostfix != null)
-                    return false;
-            } else if (!classPostfix.equals(other.classPostfix))
-                return false;
-            if (getterPrefix == null) {
-                if (other.getterPrefix != null)
-                    return false;
-            } else if (!getterPrefix.equals(other.getterPrefix))
-                return false;
-            if (reservePrimaryKeyIndexForTypeWithPrimaryKey != other.reservePrimaryKeyIndexForTypeWithPrimaryKey)
-                return false;
-            if (restrictApiToFieldType != other.restrictApiToFieldType)
-                return false;
-            if (useAggressiveSubstitutions != other.useAggressiveSubstitutions)
-                return false;
-            if (useBooleanFieldErgonomics != other.useBooleanFieldErgonomics)
-                return false;
-            if (useHollowPrimitiveTypes != other.useHollowPrimitiveTypes)
-                return false;
-            if (usePackageGrouping != other.usePackageGrouping)
-                return false;
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder builder = new StringBuilder();
-            builder.append("GeneratorConfig [classPostfix=");
-            builder.append(classPostfix);
-            builder.append(", getterPrefix=");
-            builder.append(getterPrefix);
-            builder.append(", usePackageGrouping=");
-            builder.append(usePackageGrouping);
-            builder.append(", useAggressiveSubstitutions=");
-            builder.append(useAggressiveSubstitutions);
-            builder.append(", useBooleanFieldErgonomics=");
-            builder.append(useBooleanFieldErgonomics);
-            builder.append(", reservePrimaryKeyIndexForTypeWithPrimaryKey=");
-            builder.append(reservePrimaryKeyIndexForTypeWithPrimaryKey);
-            builder.append(", useHollowPrimitiveTypes=");
-            builder.append(useHollowPrimitiveTypes);
-            builder.append(", restrictApiToFieldType=");
-            builder.append(restrictApiToFieldType);
-            builder.append("]");
-            return builder.toString();
-        }
-
-        private HollowAPIGenerator getOuterType() {
-            return HollowAPIGenerator.this;
         }
     }
 }

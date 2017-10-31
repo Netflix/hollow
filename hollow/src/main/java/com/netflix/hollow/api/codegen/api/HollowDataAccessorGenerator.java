@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;

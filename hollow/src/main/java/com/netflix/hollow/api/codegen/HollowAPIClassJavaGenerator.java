@@ -22,7 +22,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowObj
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.consumer.HollowConsumerAPI;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;

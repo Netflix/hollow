@@ -19,8 +19,8 @@ package com.netflix.hollow.api.codegen.objects;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;

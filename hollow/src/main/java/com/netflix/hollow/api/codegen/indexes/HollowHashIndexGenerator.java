@@ -19,8 +19,8 @@ package com.netflix.hollow.api.codegen.indexes;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;

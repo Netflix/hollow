@@ -25,15 +25,9 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     protected HollowDataset dataset;
     protected Set<String> parameterizedTypes = Collections.emptySet();
     protected boolean parameterizeAllClassnames = false;
-    protected String classPostfix = "";
-    protected String getterPrefix = "";
-    protected boolean useAggressiveSubstitutions = false;
     protected boolean useErgonomicShortcuts = false;
-    protected boolean useBooleanFieldErgonomics = false;
-    protected boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
-    protected boolean usePackageGrouping = false;
-    protected boolean useHollowPrimitiveTypes = false;
-    protected boolean restrictApiToFieldType = false;
+
+    protected CodeGeneratorConfig config = new CodeGeneratorConfig();
 
     protected abstract G instantiateGenerator();
 
@@ -65,17 +59,17 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     }
 
     public B withClassPostfix(String classPostfix) {
-        this.classPostfix = classPostfix;
+        config.setClassPostfix(classPostfix);
         return getBuilder();
     }
 
     public B withGetterPrefix(String getterPrefix) {
-        this.getterPrefix = getterPrefix;
+        config.setGetterPrefix(getterPrefix);
         return getBuilder();
     }
 
     public B withAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        config.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
         return getBuilder();
     }
 
@@ -85,17 +79,17 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     }
 
     public B withPackageGrouping() {
-        this.usePackageGrouping = true;
+        config.setUsePackageGrouping(true);
         return getBuilder();
     }
 
     public B withBooleanFieldErgonomics(boolean useBooleanFieldErgonomics) {
-        this.useBooleanFieldErgonomics = useBooleanFieldErgonomics;
+        config.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
         return getBuilder();
     }
 
     public B reservePrimaryKeyIndexForTypeWithPrimaryKey(boolean reservePrimaryKeyIndexForTypeWithPrimaryKey) {
-        this.reservePrimaryKeyIndexForTypeWithPrimaryKey = reservePrimaryKeyIndexForTypeWithPrimaryKey;
+        config.setReservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
         return getBuilder();
     }
 
@@ -103,13 +97,13 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
      * NOTE: Have to be enabled with withErgonomicShortcuts
      */
     public B withRestrictApiToFieldType() {
-        restrictApiToFieldType = true;
+        config.setRestrictApiToFieldType(true);
         return getBuilder();
     }
 
 
     public B withHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-        this.useHollowPrimitiveTypes = useHollowPrimitiveTypes;
+        config.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
         return getBuilder();
     }
 
@@ -121,19 +115,13 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         if (dataset == null)
             throw new IllegalStateException("Please specify a data model (.withDataModel()) before calling .build()");
 
-        if(restrictApiToFieldType && !useErgonomicShortcuts) {
+        if(config.isRestrictApiToFieldType() && !useErgonomicShortcuts) {
             throw new IllegalStateException(" restrictApiToFieldType requires withErgonomicShortcuts");
         }
 
         G generator = instantiateGenerator();
-        generator.setClassPostfix(classPostfix);
-        generator.setGetterPrefix(getterPrefix);
-        generator.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
-        generator.setUseBooleanFieldErgonomics(useBooleanFieldErgonomics);
-        generator.reservePrimaryKeyIndexForTypeWithPrimaryKey(reservePrimaryKeyIndexForTypeWithPrimaryKey);
-        generator.setUsePackageGrouping(usePackageGrouping);
-        generator.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
-        generator.setRestrictApiToFieldType(restrictApiToFieldType);
+        generator.setCodeGeneratorConfig(config);
+
         return generator;
     }
 }

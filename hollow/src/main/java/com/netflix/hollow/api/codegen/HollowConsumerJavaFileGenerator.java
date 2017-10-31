@@ -15,8 +15,6 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
-
 /**
  * Not intended for external consumption.
  *

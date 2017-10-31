@@ -18,8 +18,8 @@
 package com.netflix.hollow.api.codegen.indexes;
 
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowDataset;
