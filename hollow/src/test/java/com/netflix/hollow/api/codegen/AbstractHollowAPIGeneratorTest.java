@@ -23,7 +23,9 @@ import org.junit.After;
 import org.junit.Before;
 
 public class AbstractHollowAPIGeneratorTest {
-    protected boolean isCleanupAfterEnabled = true;
+    protected boolean isForParity = false;
+    protected boolean isCleanupBeforeEnabled = isForParity ? false : true;
+    protected boolean isCleanupAfterEnabled = isForParity ? false : true;
     protected String tmpFolder = System.getProperty("java.io.tmpdir");
     protected String sourceFolder = String.format("%s/src", tmpFolder);
     protected String clazzFolder = String.format("%s/classes", tmpFolder);
@@ -32,12 +34,15 @@ public class AbstractHollowAPIGeneratorTest {
     public void setup() throws IOException {}
 
     protected void runGenerator(String apiClassName, String packageName, Class<?> clazz) throws Exception {
-        // Setup Folders
-        System.out.println(String.format("Folders: \n\tsource=%s \n\tclasses=%s", sourceFolder, clazzFolder));
-        HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
-        HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
+        System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s", this.getClass().getSimpleName(), sourceFolder, clazzFolder));
 
-        // Init ObjectMapper 
+        // Setup Folders
+        if (isCleanupBeforeEnabled) {
+            HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
+            HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
+        }
+
+        // Init ObjectMapper
         HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.initializeTypeState(clazz);
