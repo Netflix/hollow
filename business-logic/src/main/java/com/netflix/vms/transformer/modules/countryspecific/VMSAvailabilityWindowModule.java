@@ -346,7 +346,7 @@ public class VMSAvailabilityWindowModule {
                         // package list is empty for the given contract -- use the contract only
 
                         if (locale == null) {
-                            // build info with package data
+                            // build info without package data, Use the assets and contract data though
                             WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
