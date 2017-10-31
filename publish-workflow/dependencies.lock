@@ -2531,13 +2531,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -5718,13 +5718,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -8905,13 +8905,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -12214,13 +12214,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -15401,13 +15401,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -18620,13 +18620,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -21880,13 +21880,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -25140,13 +25140,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -28400,13 +28400,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.3",
+            "locked": "2.0.14",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.37",
+            "locked": "1.48",
             "transitive": [
                 "netflix:simone-client"
             ]
