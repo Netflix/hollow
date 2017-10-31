@@ -18,6 +18,8 @@ package com.netflix.hollow.api.codegen;
 public class CodeGeneratorConfig {
     private String classPostfix = "";
     private String getterPrefix = "";
+
+    // @TODO: Need to default this to be true in next major version of Hollow
     private boolean usePackageGrouping = false;
     private boolean useAggressiveSubstitutions = false;
     private boolean useBooleanFieldErgonomics = false;

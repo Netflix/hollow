@@ -147,7 +147,7 @@ public class HollowAPIGenerator {
      * Defaults to false, which overrides only type names corresponding to a few select classes in java.lang.
      */
     public void setUseAggressiveSubstitutions(boolean useAggressiveSubstitutions) {
-        config.setUseAggressiveSubstitutions( useAggressiveSubstitutions);
+        config.setUseAggressiveSubstitutions(useAggressiveSubstitutions);
     }
 
     /**
@@ -165,7 +165,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUsePackageGrouping(boolean usePackageGrouping) {
-        config.setUsePackageGrouping( usePackageGrouping );
+        config.setUsePackageGrouping(usePackageGrouping );
     }
 
     /**
@@ -183,7 +183,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setUseHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
-        config.setUseHollowPrimitiveTypes( useHollowPrimitiveTypes);
+        config.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
     }
 
     /**
@@ -192,7 +192,7 @@ public class HollowAPIGenerator {
      * Defaults to false to be backwards compatible
      */
     public void setRestrictApiToFieldType(boolean restrictApiToFieldType) {
-        config.setRestrictApiToFieldType( restrictApiToFieldType);
+        config.setRestrictApiToFieldType(restrictApiToFieldType);
     }
 
     /**

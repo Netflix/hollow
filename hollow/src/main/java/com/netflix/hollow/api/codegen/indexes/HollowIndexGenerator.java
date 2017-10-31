@@ -22,13 +22,9 @@ public abstract class HollowIndexGenerator extends HollowConsumerJavaFileGenerat
     public static final String SUB_PACKAGE_NAME = "index";
 
     protected final String apiClassname;
-    //protected final String classPostfix;
-    //protected final boolean useAggressiveSubstitutions;
 
     public HollowIndexGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
         super(packageName, SUB_PACKAGE_NAME, config);
         this.apiClassname = apiClassname;
-        //this.classPostfix = config.getClassPostfix();
-        //this.useAggressiveSubstitutions = config.isUseAggressiveSubstitutions();
     }
 }
