@@ -17,10 +17,6 @@ public class RightsDelegateLookupImpl extends HollowObjectAbstractDelegate imple
         return typeAPI.getWindowsOrdinal(ordinal);
     }
 
-    public int getContractsOrdinal(int ordinal) {
-        return typeAPI.getContractsOrdinal(ordinal);
-    }
-
     public RightsTypeAPI getTypeAPI() {
         return typeAPI;
     }

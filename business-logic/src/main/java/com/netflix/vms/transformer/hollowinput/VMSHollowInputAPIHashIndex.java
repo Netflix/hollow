@@ -217,17 +217,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<FlagsHollow> findFlagsMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<FlagsHollow>(matches.iterator()) {
-            public FlagsHollow getData(int ordinal) {
-                return api.getFlagsHollow(ordinal);
-            }
-        };
-    }
-
     public Iterable<PersonCharacterHollow> findPersonCharacterMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -316,17 +305,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<RightsAssetSetIdHollow> findRightsAssetSetIdMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<RightsAssetSetIdHollow>(matches.iterator()) {
-            public RightsAssetSetIdHollow getData(int ordinal) {
-                return api.getRightsAssetSetIdHollow(ordinal);
-            }
-        };
-    }
-
     public Iterable<RightsContractPackageHollow> findRightsContractPackageMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -345,50 +323,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<ListOfRightsContractPackageHollow>(matches.iterator()) {
             public ListOfRightsContractPackageHollow getData(int ordinal) {
                 return api.getListOfRightsContractPackageHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<RightsWindowContractHollow> findRightsWindowContractMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<RightsWindowContractHollow>(matches.iterator()) {
-            public RightsWindowContractHollow getData(int ordinal) {
-                return api.getRightsWindowContractHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<ListOfRightsWindowContractHollow> findListOfRightsWindowContractMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<ListOfRightsWindowContractHollow>(matches.iterator()) {
-            public ListOfRightsWindowContractHollow getData(int ordinal) {
-                return api.getListOfRightsWindowContractHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<RightsWindowHollow> findRightsWindowMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<RightsWindowHollow>(matches.iterator()) {
-            public RightsWindowHollow getData(int ordinal) {
-                return api.getRightsWindowHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<ListOfRightsWindowHollow> findListOfRightsWindowMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<ListOfRightsWindowHollow>(matches.iterator()) {
-            public ListOfRightsWindowHollow getData(int ordinal) {
-                return api.getListOfRightsWindowHollow(ordinal);
             }
         };
     }
@@ -1141,17 +1075,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<RightsAssetHollow> findRightsAssetMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<RightsAssetHollow>(matches.iterator()) {
-            public RightsAssetHollow getData(int ordinal) {
-                return api.getRightsAssetHollow(ordinal);
-            }
-        };
-    }
-
     public Iterable<RightsContractAssetHollow> findRightsContractAssetMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -1174,24 +1097,46 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<RightsContractHollow> findRightsContractMatches(Object... keys) {
+    public Iterable<RightsWindowContractHollow> findRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
 
-        return new AbstractHollowOrdinalIterable<RightsContractHollow>(matches.iterator()) {
-            public RightsContractHollow getData(int ordinal) {
-                return api.getRightsContractHollow(ordinal);
+        return new AbstractHollowOrdinalIterable<RightsWindowContractHollow>(matches.iterator()) {
+            public RightsWindowContractHollow getData(int ordinal) {
+                return api.getRightsWindowContractHollow(ordinal);
             }
         };
     }
 
-    public Iterable<ListOfRightsContractHollow> findListOfRightsContractMatches(Object... keys) {
+    public Iterable<ListOfRightsWindowContractHollow> findListOfRightsWindowContractMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
 
-        return new AbstractHollowOrdinalIterable<ListOfRightsContractHollow>(matches.iterator()) {
-            public ListOfRightsContractHollow getData(int ordinal) {
-                return api.getListOfRightsContractHollow(ordinal);
+        return new AbstractHollowOrdinalIterable<ListOfRightsWindowContractHollow>(matches.iterator()) {
+            public ListOfRightsWindowContractHollow getData(int ordinal) {
+                return api.getListOfRightsWindowContractHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<RightsWindowHollow> findRightsWindowMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<RightsWindowHollow>(matches.iterator()) {
+            public RightsWindowHollow getData(int ordinal) {
+                return api.getRightsWindowHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ListOfRightsWindowHollow> findListOfRightsWindowMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ListOfRightsWindowHollow>(matches.iterator()) {
+            public ListOfRightsWindowHollow getData(int ordinal) {
+                return api.getListOfRightsWindowHollow(ordinal);
             }
         };
     }
@@ -1295,28 +1240,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<SetOfRightsAssetHollow> findSetOfRightsAssetMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<SetOfRightsAssetHollow>(matches.iterator()) {
-            public SetOfRightsAssetHollow getData(int ordinal) {
-                return api.getSetOfRightsAssetHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<RightsAssetsHollow> findRightsAssetsMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<RightsAssetsHollow>(matches.iterator()) {
-            public RightsAssetsHollow getData(int ordinal) {
-                return api.getRightsAssetsHollow(ordinal);
-            }
-        };
-    }
-
     public Iterable<SetOfStringHollow> findSetOfStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -1324,6 +1247,17 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<SetOfStringHollow>(matches.iterator()) {
             public SetOfStringHollow getData(int ordinal) {
                 return api.getSetOfStringHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<FlagsHollow> findFlagsMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<FlagsHollow>(matches.iterator()) {
+            public FlagsHollow getData(int ordinal) {
+                return api.getFlagsHollow(ordinal);
             }
         };
     }

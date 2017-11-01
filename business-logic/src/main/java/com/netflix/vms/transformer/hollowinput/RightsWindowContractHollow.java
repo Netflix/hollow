@@ -26,11 +26,26 @@ public class RightsWindowContractHollow extends HollowObject {
         return delegate().getDownloadBoxed(ordinal);
     }
 
-    public RightsAssetSetIdHollow _getAssetSetId() {
-        int refOrdinal = delegate().getAssetSetIdOrdinal(ordinal);
+    public long _getPackageId() {
+        return delegate().getPackageId(ordinal);
+    }
+
+    public Long _getPackageIdBoxed() {
+        return delegate().getPackageIdBoxed(ordinal);
+    }
+
+    public ListOfRightsContractAssetHollow _getAssets() {
+        int refOrdinal = delegate().getAssetsOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getRightsAssetSetIdHollow(refOrdinal);
+        return  api().getListOfRightsContractAssetHollow(refOrdinal);
+    }
+
+    public ListOfRightsContractPackageHollow _getPackages() {
+        int refOrdinal = delegate().getPackagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getListOfRightsContractPackageHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

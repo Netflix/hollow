@@ -90,63 +90,65 @@ public class RolloutVideoModule extends AbstractTransformModule {
                 summary.rolloutInfoMap.put(new com.netflix.vms.transformer.hollowoutput.Integer(info.rolloutId), info);
 
                 RolloutPhaseListHollow phaseListHollow = rollout._getPhases();
-                for (RolloutPhaseHollow phaseHollow : phaseListHollow) {
-                    Phase phase = new Phase();
-                    initialize(phase);
-                    phase.rolloutId = info.rolloutId;
-                    phase.video = info.video;
+                if (phaseListHollow != null) {
+                    for (RolloutPhaseHollow phaseHollow : phaseListHollow) {
+                        Phase phase = new Phase();
+                        initialize(phase);
+                        phase.rolloutId = info.rolloutId;
+                        phase.video = info.video;
 
-                    copy(phaseHollow, phase);
+                        copy(phaseHollow, phase);
 
-                    RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
-                    for(Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phaseWindows.entrySet()) {
-                        AvailabilityWindow w = new AvailabilityWindow();
-                        RolloutPhaseWindowHollow inputPhaseWindow = entry.getValue();
-                        copy(inputPhaseWindow, w);
-                        ISOCountry country = cycleConstants.getISOCountry(entry.getKey()._getValue());
-                        phase.windowsMap.put(country, w);
+                        RolloutPhaseWindowMapHollow phaseWindows = phaseHollow._getWindows();
+                        for (Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phaseWindows.entrySet()) {
+                            AvailabilityWindow w = new AvailabilityWindow();
+                            RolloutPhaseWindowHollow inputPhaseWindow = entry.getValue();
+                            copy(inputPhaseWindow, w);
+                            ISOCountry country = cycleConstants.getISOCountry(entry.getKey()._getValue());
+                            phase.windowsMap.put(country, w);
 
-                        List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);
-                        if (phaseWindowList == null) {
-                            phaseWindowList = new ArrayList<RolloutPhaseWindow>();
-                            summary.phaseWindowMap.put(country, phaseWindowList);
+                            List<RolloutPhaseWindow> phaseWindowList = summary.phaseWindowMap.get(country);
+                            if (phaseWindowList == null) {
+                                phaseWindowList = new ArrayList<RolloutPhaseWindow>();
+                                summary.phaseWindowMap.put(country, phaseWindowList);
+                            }
+                            RolloutPhaseWindow phaseWindow = new RolloutPhaseWindow();
+                            phaseWindow.phaseWindow = w;
+                            phaseWindowList.add(phaseWindow);
                         }
-                        RolloutPhaseWindow phaseWindow = new RolloutPhaseWindow();
-                        phaseWindow.phaseWindow = w;
-                        phaseWindowList.add(phaseWindow);
+
+                        RolloutPhaseElementsHollow phaseElements = phaseHollow._getElements();
+                        RolloutPhaseLocalizedMetadataHollow localized = phaseElements._getLocalized_metadata();
+
+                        if (localized._getSUPPLEMENTAL_MESSAGE() != null)
+                            phase.rawL10nAttribs.put(new Strings("SUPPLEMENTAL_MESSAGE"), new Strings(localized._getSUPPLEMENTAL_MESSAGE()._getValue()));
+                        if (localized._getTAGLINE() != null)
+                            phase.rawL10nAttribs.put(new Strings("TAGLINE"), new Strings(localized._getTAGLINE()._getValue()));
+                        if (localized._getMERCH_OVERRIDE_MESSAGE() != null)
+                            phase.rawL10nAttribs.put(new Strings("MERCH_OVERRIDE_MESSAGE"), new Strings(localized._getMERCH_OVERRIDE_MESSAGE()._getValue()));
+                        if (localized._getPOSTPLAY_OVERRIDE_MESSAGE() != null)
+                            phase.rawL10nAttribs.put(new Strings("POSTPLAY_OVERRIDE_MESSAGE"), new Strings(localized._getPOSTPLAY_OVERRIDE_MESSAGE()._getValue()));
+                        if (localized._getODP_OVERRIDE_MESSAGE() != null)
+                            phase.rawL10nAttribs.put(new Strings("ODP_OVERRIDE_MESSAGE"), new Strings(localized._getODP_OVERRIDE_MESSAGE()._getValue()));
+
+
+                        for (RolloutTrailer rolloutTrailer : phase.trailers) {
+                            IndividualSupplementalHollow indivTrailerHollow = trailerIdToTrailerMap.get(rolloutTrailer.video.value);
+                            if (indivTrailerHollow == null)
+                                continue;
+
+                            SupplementalVideo sv = new SupplementalVideo();
+                            copy(rolloutTrailer, sv);
+                            copy(indivTrailerHollow, sv);
+                            sv.parent = new Video(videoId);
+                            phase.supplementalVideos.add(sv);
+                        }
+                        Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
+
+                        summary.allPhases.add(phase);
                     }
 
-                    RolloutPhaseElementsHollow phaseElements = phaseHollow._getElements();
-                    RolloutPhaseLocalizedMetadataHollow localized = phaseElements._getLocalized_metadata();
-
-                    if (localized._getSUPPLEMENTAL_MESSAGE() != null)
-                        phase.rawL10nAttribs.put(new Strings("SUPPLEMENTAL_MESSAGE"), new Strings(localized._getSUPPLEMENTAL_MESSAGE()._getValue()));
-                    if (localized._getTAGLINE() != null)
-                        phase.rawL10nAttribs.put(new Strings("TAGLINE"), new Strings(localized._getTAGLINE()._getValue()));
-                    if(localized._getMERCH_OVERRIDE_MESSAGE() != null)
-                        phase.rawL10nAttribs.put(new Strings("MERCH_OVERRIDE_MESSAGE"), new Strings(localized._getMERCH_OVERRIDE_MESSAGE()._getValue()));
-                    if(localized._getPOSTPLAY_OVERRIDE_MESSAGE() != null)
-                        phase.rawL10nAttribs.put(new Strings("POSTPLAY_OVERRIDE_MESSAGE"), new Strings(localized._getPOSTPLAY_OVERRIDE_MESSAGE()._getValue()));
-                    if(localized._getODP_OVERRIDE_MESSAGE() != null)
-                        phase.rawL10nAttribs.put(new Strings("ODP_OVERRIDE_MESSAGE"), new Strings(localized._getODP_OVERRIDE_MESSAGE()._getValue()));
-
-
-                    for (RolloutTrailer rolloutTrailer : phase.trailers) {
-                        IndividualSupplementalHollow indivTrailerHollow = trailerIdToTrailerMap.get(rolloutTrailer.video.value);
-                        if (indivTrailerHollow == null)
-                            continue;
-
-                        SupplementalVideo sv = new SupplementalVideo();
-                        copy(rolloutTrailer, sv);
-                        copy(indivTrailerHollow, sv);
-                        sv.parent = new Video(videoId);
-                        phase.supplementalVideos.add(sv);
-                    }
-                    Collections.sort(phase.supplementalVideos, new SupplementalVideoComparator());
-
-                    summary.allPhases.add(phase);
                 }
-
             }
             mapper.addObject(output);
         }
