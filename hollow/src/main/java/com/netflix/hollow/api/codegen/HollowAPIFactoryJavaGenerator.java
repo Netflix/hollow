@@ -26,17 +26,17 @@ import java.util.Set;
 
 /**
  * This class contains template logic for generating a {@link HollowAPIFactory} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "core";
 
     private final String apiClassname;
 
-    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
         this.apiClassname = apiClassname;
         this.className = apiClassname + "Factory";
     }
@@ -62,23 +62,23 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
         builder.append("    public ").append(className).append("() {\n");
         builder.append("        this(Collections.<String>emptySet());\n");
         builder.append("    }\n\n");
-        
+
         builder.append("    public ").append(className).append("(Set<String> cachedTypes) {\n");
         builder.append("        this.cachedTypes = cachedTypes;\n");
         builder.append("    }\n\n");
-        
+
         builder.append("    @Override\n");
         builder.append("    public HollowAPI createAPI(HollowDataAccess dataAccess) {\n");
         builder.append("        return new ").append(apiClassname).append("(dataAccess, cachedTypes);\n");
         builder.append("    }\n\n");
-        
+
         builder.append("    @Override\n");
         builder.append("    public HollowAPI createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {\n");
         builder.append("        return new ").append(apiClassname).append("(dataAccess, cachedTypes, Collections.<String, HollowFactory<?>>emptyMap(), (").append(apiClassname).append(") previousCycleAPI);\n");
         builder.append("    }\n\n");
 
         builder.append("}");
-        
+
         return builder.toString();
     }
 

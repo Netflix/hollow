@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -29,8 +30,9 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class LegacyHollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
 
-    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, schema, usePackageGrouping, useHollowPrimitiveTypes);
+    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, config);
+
         isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = true;
         isAutoListenToDataRefresh = true;

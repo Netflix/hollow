@@ -17,8 +17,7 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
-
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -35,20 +34,16 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "accessor";
-    
+
     protected final String apiclassName;
-    protected final String classPostfix;
     protected final String type;
-    protected final boolean useAggressiveSubstitutions;
     protected final HollowObjectSchema schema;
 
-    public HollowDataAccessorGenerator(String packageName, String apiclassName, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowDataAccessorGenerator(String packageName, String apiclassName, HollowObjectSchema schema, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
         this.className = getclassName(schema);
         this.apiclassName = apiclassName;
-        this.classPostfix = classPostfix;
-        this.type =  hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
+        this.type =  hollowImplClassname(schema.getName());
         this.schema = schema;
     }
 

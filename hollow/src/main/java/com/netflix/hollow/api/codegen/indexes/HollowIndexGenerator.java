@@ -15,19 +15,16 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 
 public abstract class HollowIndexGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "index";
 
     protected final String apiClassname;
-    protected final String classPostfix;
-    protected final boolean useAggressiveSubstitutions;
 
-    public HollowIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowIndexGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
         this.apiClassname = apiClassname;
-        this.classPostfix = classPostfix;
-        this.useAggressiveSubstitutions = useAggressiveSubstitutions;
     }
 }

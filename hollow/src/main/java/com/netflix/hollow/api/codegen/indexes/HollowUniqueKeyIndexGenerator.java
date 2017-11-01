@@ -17,8 +17,7 @@
  */
 package com.netflix.hollow.api.codegen.indexes;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
-
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
@@ -39,8 +38,8 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     protected boolean isParameterizedConstructorPublic = true;
     protected boolean isAutoListenToDataRefresh = false;
 
-    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, String classPostfix, boolean useAggressiveSubstitutions, HollowObjectSchema schema, boolean usePackageGrouping, boolean useHollowPrimitiveTypes) {
-        super(packageName, apiClassname, classPostfix, useAggressiveSubstitutions, usePackageGrouping, useHollowPrimitiveTypes);
+    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, config);
 
         this.type = schema.getName();
         this.className = getClassName(schema);
@@ -62,7 +61,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type, classPostfix, useAggressiveSubstitutions) + "> {\n\n");
+        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> {\n\n");
         {
             genConstructors(builder);
             genPublicAPIs(builder);
@@ -88,7 +87,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
     protected void genParameterizedConstructor(StringBuilder builder) {
         builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, String... fieldPaths) {\n");
-        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ", fieldPaths);\n"); 
+        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ", fieldPaths);\n");
         builder.append("    }\n\n");
 
         builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {\n");
@@ -102,11 +101,11 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     }
 
     protected void genFindMatchAPI(StringBuilder builder) {
-        builder.append("    public " + hollowImplClassname(type, classPostfix, useAggressiveSubstitutions) + " findMatch(Object... keys) {\n");
+        builder.append("    public " + hollowImplClassname(type) + " findMatch(Object... keys) {\n");
         builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
-        builder.append("        return api.get" + hollowImplClassname(type, classPostfix, useAggressiveSubstitutions) + "(ordinal);\n");
+        builder.append("        return api.get" + hollowImplClassname(type) + "(ordinal);\n");
         builder.append("    }\n\n");
     }
 }

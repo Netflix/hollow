@@ -69,7 +69,7 @@ public class HollowCodeGenerationCompileUtil {
             }
         }
     }
-    
+
     /**
      * Cleanup specified folder based on file older than specified timestamp
      *
@@ -88,6 +88,7 @@ public class HollowCodeGenerationCompileUtil {
                     file.delete();
                 }
             }
+            folder.delete();
         }
     }
 }
