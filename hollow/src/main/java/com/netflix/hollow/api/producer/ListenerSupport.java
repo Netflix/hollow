@@ -19,11 +19,14 @@ package com.netflix.hollow.api.producer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
+import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+import com.netflix.hollow.api.producer.validation.OverallValidationStatus;
 
 /**
  * Beta API subject to change.
@@ -32,13 +35,19 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 final class ListenerSupport {
     private final Set<HollowProducerListener> listeners;
+    private final Set<HollowValidationListener> validationListeners;
 
     ListenerSupport() {
         listeners = new CopyOnWriteArraySet<>();
+        validationListeners = new CopyOnWriteArraySet<>();
     }
 
     void add(HollowProducerListener listener) {
         listeners.add(listener);
+    }
+    
+    void add(HollowValidationListener listener) {
+    	validationListeners.add(listener);
     }
 
     void remove(HollowProducerListener listener) {
@@ -117,12 +126,21 @@ final class ListenerSupport {
     ProducerStatus.Builder fireValidationStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
         for(final HollowProducerListener l : listeners) l.onValidationStart(psb.version());
+        
+        long version = readState.getVersion();
+        for(final HollowValidationListener vl: validationListeners){
+			vl.onValidationStart(version);
+        }
+        
         return psb;
     }
 
-    void fireValidationComplete(ProducerStatus.Builder psb) {
+    void fireValidationComplete(ProducerStatus.Builder psb, OverallValidationStatus.OverallValidationBuilder validationStatusBuilder) {
         ProducerStatus st = psb.build();
+        OverallValidationStatus vst = validationStatusBuilder.build();
         for(final HollowProducerListener l : listeners) l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
+        
+        for(final HollowValidationListener vl : validationListeners) vl.onValidationComplete(vst, psb.elapsed(), MILLISECONDS);
     }
 
     ProducerStatus.Builder fireAnnouncementStart(HollowProducer.ReadState readState) {
