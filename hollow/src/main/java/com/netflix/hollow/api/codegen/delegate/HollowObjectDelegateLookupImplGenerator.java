@@ -23,6 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
@@ -33,14 +34,14 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, boolean usePackageGrouping) {
-        super(packageName, schema, ergonomicShortcuts, usePackageGrouping);
+    public HollowObjectDelegateLookupImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, CodeGeneratorConfig config) {
+        super(packageName, schema, ergonomicShortcuts, config);
         this.className = delegateLookupImplName(schema.getName());
     }
 
@@ -124,7 +125,7 @@ public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegat
                 if(shortcut != null) {
                     addShortcutAccessMethod(builder, methodFieldName, shortcut);
                 }
-                
+
                 builder.append("    public int get").append(methodFieldName).append("Ordinal(int ordinal) {\n");
                 builder.append("        return typeAPI.get").append(methodFieldName).append("Ordinal(ordinal);\n");
                 builder.append("    }\n\n");
@@ -155,7 +156,7 @@ public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegat
     private void addShortcutAccessMethod(StringBuilder builder, String methodFieldName, Shortcut shortcut) {
         String finalFieldName = substituteInvalidChars(uppercase(shortcut.getPath()[shortcut.getPath().length-1]));
         String finalTypeAPI = typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
-        
+
         switch(shortcut.getType()) {
         case BOOLEAN:
             builder.append("    public boolean get").append(methodFieldName).append("(int ordinal) {\n");
@@ -240,11 +241,11 @@ public class HollowObjectDelegateLookupImplGenerator extends HollowObjectDelegat
             throw new IllegalArgumentException();
         }
     }
-    
+
     private void addShortcutTraversal(StringBuilder builder, Shortcut shortcut) {
         for(int i=0;i<shortcut.getPath().length-1;i++) {
             String typeAPIClassname = typeAPIClassname(shortcut.getPathTypes()[i]);
-            builder.append("        if(ordinal != -1) ordinal = typeAPI.getAPI().get" + typeAPIClassname + "().get" + uppercase(shortcut.getPath()[i]) + "Ordinal(ordinal);\n"); 
+            builder.append("        if(ordinal != -1) ordinal = typeAPI.getAPI().get" + typeAPIClassname + "().get" + uppercase(shortcut.getPath()[i]) + "Ordinal(ordinal);\n");
         }
     }
 

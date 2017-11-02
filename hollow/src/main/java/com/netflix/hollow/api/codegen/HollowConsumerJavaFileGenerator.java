@@ -17,21 +17,27 @@ package com.netflix.hollow.api.codegen;
 
 /**
  * Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  * @author dsu
  */
 public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileGenerator {
-    private final boolean usePackageGrouping;
-    private final String packageName;
-    private final String subPackageName;
-    protected String className;
+    protected final String packageName;
+    protected final String subPackageName;
+    protected final CodeGeneratorConfig config;
 
-    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, boolean usePackageGrouping) {
+    protected String className;
+    protected boolean useCollectionsImport=false;
+
+    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, CodeGeneratorConfig config) {
         this.packageName = packageName;
         this.subPackageName = subPackageName;
-        this.usePackageGrouping = usePackageGrouping;
+        this.config = config;
+    }
+
+    protected String hollowImplClassname(String typeName) {
+        return  HollowCodeGenerationUtils.hollowImplClassname(typeName, config.getClassPostfix(), config.isUseAggressiveSubstitutions());
     }
 
     public String getSubPackageName() {
@@ -43,15 +49,23 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
         return className;
     }
 
+    public void useCollectionsImport() {
+        this.useCollectionsImport=true;
+    }
+
     protected void appendPackageAndCommonImports(StringBuilder builder) {
-        String fullPackageName = createFullPackageName(packageName, subPackageName, usePackageGrouping);
+        String fullPackageName = createFullPackageName(packageName, subPackageName, config.isUsePackageGrouping());
         if (!isEmpty(fullPackageName)) {
             builder.append("package ").append(fullPackageName).append(";\n\n");
 
-            if (usePackageGrouping) {
+            if (config.isUseHollowPrimitiveTypes()) {
+                builder.append("import com.netflix.hollow.core.type.*;\n");
+            }
+
+            if (config.isUsePackageGrouping()) {
                 builder.append("import ").append(packageName).append(".*;\n");
                 builder.append("import ").append(packageName).append(".core.*;\n");
-                builder.append("import ").append(packageName).append(".collections.*;\n\n");
+                if (useCollectionsImport) builder.append("import ").append(packageName).append(".collections.*;\n\n");
             }
         }
     }

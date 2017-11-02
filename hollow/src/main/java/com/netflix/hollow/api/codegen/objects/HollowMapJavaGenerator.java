@@ -17,9 +17,9 @@
  */
 package com.netflix.hollow.api.codegen.objects;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.custom.HollowAPI;
@@ -34,9 +34,9 @@ import java.util.Set;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  */
 public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
 
@@ -44,16 +44,17 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
     private final HollowDataset dataset;
     private final String keyClassName;
     private final String valueClassName;
-    
+
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, String classPostfix, boolean useAggressiveSubstitutions, boolean usePackageGrouping) {
-        super(packageName, apiClassname, schema, classPostfix, useAggressiveSubstitutions, usePackageGrouping);
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, config);
+
         this.schema = schema;
         this.dataset = dataset;
-        this.keyClassName = hollowImplClassname(schema.getKeyType(), classPostfix, useAggressiveSubstitutions);
-        this.valueClassName = hollowImplClassname(schema.getValueType(), classPostfix, useAggressiveSubstitutions);
+        this.keyClassName = hollowImplClassname(schema.getKeyType());
+        this.valueClassName = hollowImplClassname(schema.getValueType());
         this.parameterizeKey = parameterizeClassNames || parameterizedTypes.contains(schema.getKeyType());
         this.parameterizeValue = parameterizeClassNames || parameterizedTypes.contains(schema.getValueType());
     }
@@ -70,10 +71,10 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
         builder.append("import " + GenericHollowRecordHelper.class.getName() + ";\n\n");
 
         builder.append("@SuppressWarnings(\"all\")\n");
-        
+
         String keyGeneric = parameterizeKey ? "K" : keyClassName;
         String valueGeneric = parameterizeValue ? "V" : valueClassName;
-        
+
         String classGeneric = "";
         if(parameterizeKey && parameterizeValue)
             classGeneric = "<K, V>";
@@ -81,7 +82,7 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
             classGeneric = "<K>";
         else if(parameterizeValue)
             classGeneric = "<V>";
-        
+
         builder.append("public class " + className + classGeneric + " extends HollowMap<" + keyGeneric + ", " + valueGeneric + "> {\n\n");
 
         appendConstructor(builder);
@@ -117,11 +118,11 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
         classBuilder.append("        return (" + valueReturnType + ") api().get").append(valueClassName).append("(ordinal);\n");
         classBuilder.append("    }\n\n");
     }
-    
+
     private void appendGetByHashKeyMethod(StringBuilder classBuilder) {
         if(schema.getHashKey() != null) {
             String valueReturnType = parameterizeValue ? "V" : valueClassName;
-            
+
             classBuilder.append("    public " + valueReturnType + " get(");
             classBuilder.append(getKeyFieldType(schema.getHashKey().getFieldPath(0))).append(" k0");
             for(int i=1;i<schema.getHashKey().numFields();i++)
@@ -159,19 +160,19 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
         classBuilder.append("        return (").append(typeAPIClassname).append(") delegate.getTypeAPI();\n");
         classBuilder.append("    }\n\n");
     }
-    
+
     private String getKeyFieldType(String fieldPath) {
         try {
             HollowObjectSchema keySchema = (HollowObjectSchema)dataset.getSchema(schema.getKeyType());
-            
+
             String fieldPathElements[] = fieldPath.split("\\.");
             int idx = 0;
-            
+
             while(idx < fieldPathElements.length-1) {
                 keySchema = (HollowObjectSchema)dataset.getSchema(keySchema.getReferencedType(fieldPathElements[idx]));
                 idx++;
             }
-            
+
             FieldType fieldType = keySchema.getFieldType(keySchema.getPosition(fieldPathElements[idx]));
 
             return HollowCodeGenerationUtils.getJavaBoxedType(fieldType);

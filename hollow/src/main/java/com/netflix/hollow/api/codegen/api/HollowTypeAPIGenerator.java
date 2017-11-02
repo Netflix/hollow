@@ -17,6 +17,7 @@ package com.netflix.hollow.api.codegen.api;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.core.schema.HollowSchema;
 
@@ -25,8 +26,8 @@ public abstract class HollowTypeAPIGenerator extends HollowConsumerJavaFileGener
 
     protected final String apiClassname;
 
-    public HollowTypeAPIGenerator(String stateEngineClassname, String packageName, HollowSchema schema, boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowTypeAPIGenerator(String stateEngineClassname, String packageName, HollowSchema schema, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
         this.apiClassname = stateEngineClassname;
         this.className = typeAPIClassname(schema.getName());
     }

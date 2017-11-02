@@ -36,19 +36,21 @@ public abstract class AbstractHollowDataAccessor<T> {
     protected final PrimaryKey primaryKey;
     protected final HollowReadStateEngine rStateEngine;
 
-    private List<T> removedRecords;
-    private List<T> addedRecords;
-    private List<UpdatedRecord<T>> updatedRecords;
+    private List<T> removedRecords = Collections.emptyList();
+    private List<T> addedRecords = Collections.emptyList();
+    private List<UpdatedRecord<T>> updatedRecords = Collections.emptyList();
+
+    private boolean isDataChangeComputed = false;
 
     public AbstractHollowDataAccessor(HollowConsumer consumer, String type) {
         this(consumer.getStateEngine(), type);
     }
 
     public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type) {
-        this(rStateEngine, type, (PrimaryKey)null);
+        this(rStateEngine, type, (PrimaryKey) null);
     }
 
-    public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, String ... fieldPaths) {
+    public AbstractHollowDataAccessor(HollowReadStateEngine rStateEngine, String type, String... fieldPaths) {
         this(rStateEngine, type, new PrimaryKey(type, fieldPaths));
     }
 
@@ -70,8 +72,23 @@ public abstract class AbstractHollowDataAccessor<T> {
         } else {
             throw new RuntimeException(String.format("Unsupported DataType=%s with SchemaType=%s : %s", type, schema.getSchemaType(), "Only supported type=" + SchemaType.OBJECT));
         }
+    }
 
-        computeDataChange(type, rStateEngine, this.primaryKey);
+    /**
+     * Compute Data Change
+     */
+    public synchronized void computeDataChange() {
+        if (isDataChangeComputed) return;
+
+        computeDataChange(type, rStateEngine, primaryKey);
+        isDataChangeComputed = true;
+    }
+
+    /**
+     * Return true if data change has been computed
+     */
+    public boolean isDataChangeComputed() {
+        return isDataChangeComputed;
     }
 
     protected void computeDataChange(String type, HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
@@ -170,6 +187,7 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @See {@link #getUpdatedRecords()}
      */
     public Collection<T> getAddedRecords() {
+        if (!isDataChangeComputed) computeDataChange();
         return addedRecords;
     }
 
@@ -179,6 +197,7 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @See {@link #getUpdatedRecords()}
      */
     public Collection<T> getRemovedRecords() {
+        if (!isDataChangeComputed) computeDataChange();
         return removedRecords;
     }
 
@@ -188,11 +207,12 @@ public abstract class AbstractHollowDataAccessor<T> {
      * @see UpdatedRecord
      */
     public Collection<UpdatedRecord<T>> getUpdatedRecords() {
+        if (!isDataChangeComputed) computeDataChange();
         return updatedRecords;
     }
 
     /**
-     * Keeps track of record before and after Update  
+     * Keeps track of record before and after Update
      */
     public static class UpdatedRecord<T> {
         private final T before;

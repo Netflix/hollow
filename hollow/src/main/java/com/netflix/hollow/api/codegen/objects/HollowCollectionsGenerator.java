@@ -15,8 +15,7 @@
  */
 package com.netflix.hollow.api.codegen.objects;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImplClassname;
-
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.core.schema.HollowSchema;
 
@@ -25,9 +24,10 @@ public abstract class HollowCollectionsGenerator extends HollowConsumerJavaFileG
 
     protected final String apiClassname;
 
-    public HollowCollectionsGenerator(String packageName, String apiClassname, HollowSchema schema, String classPostfix, boolean useAggressiveSubstitutions,  boolean usePackageGrouping) {
-        super(packageName, SUB_PACKAGE_NAME, usePackageGrouping);
+    public HollowCollectionsGenerator(String packageName, String apiClassname, HollowSchema schema, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, config);
+
         this.apiClassname = apiClassname;
-        this.className = hollowImplClassname(schema.getName(), classPostfix, useAggressiveSubstitutions);
+        this.className = hollowImplClassname(schema.getName());
     }
 }

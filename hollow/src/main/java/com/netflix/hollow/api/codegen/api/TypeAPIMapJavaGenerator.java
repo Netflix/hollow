@@ -20,27 +20,27 @@ package com.netflix.hollow.api.codegen.api;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
+import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
+import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowMapTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
- * 
+ *
  * @see HollowAPIGenerator
- * 
+ *
  * @author dkoszewnik
  *
  */
 public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowMapSchema schema;
 
-    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema, boolean usePackageGrouping) {
-        super(apiClassname, packageName, schema, usePackageGrouping);
+    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, config);
         this.schema = schema;
     }
 
