@@ -56,8 +56,11 @@ public class LanguageRightsModule extends AbstractTransformModule {
             List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
             RightsHollow rightsHollow = status._getRights();
             List<RightsWindowHollow> windows = rightsHollow._getWindows();
-            for (RightsWindowHollow windowHollow : windows)
-                windowContracts.addAll(windowHollow._getContractIdsExt().stream().collect(Collectors.toList()));
+            for (RightsWindowHollow windowHollow : windows) {
+                if (windowHollow._getContractIdsExt() != null && !windowHollow._getContractIdsExt().isEmpty()) {
+                    windowContracts.addAll(windowHollow._getContractIdsExt().stream().collect(Collectors.toList()));
+                }
+            }
 
             for (RightsWindowContractHollow windowContract : windowContracts) {
                 int contractId = (int) windowContract._getContractId();
