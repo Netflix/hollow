@@ -474,9 +474,11 @@ public class VMSAvailabilityWindowModule {
                 if (startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
 
-                for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                    if ((int) rightsWindowContract._getContractId() > maxContractId)
-                        maxContractId = (int) rightsWindowContract._getContractId();
+                if (window._getContractIdsExt() != null) {
+                    for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
+                        if ((int) rightsWindowContract._getContractId() > maxContractId)
+                            maxContractId = (int) rightsWindowContract._getContractId();
+                    }
                 }
 
                 if (isMulticatalogRollup) {
