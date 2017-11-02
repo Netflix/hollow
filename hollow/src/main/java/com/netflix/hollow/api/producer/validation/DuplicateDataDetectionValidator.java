@@ -23,7 +23,7 @@ import java.util.Collection;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.Builder;
+import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.IndividualValidationStatusBuilder;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -74,7 +74,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		Builder statusBuilder = initializeForValidation(readState);
+		IndividualValidationStatusBuilder statusBuilder = initializeForValidation(readState);
 		
 		PrimaryKey primaryKey = getPrimaryKey(readState, statusBuilder);
 		String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
@@ -95,9 +95,9 @@ public class DuplicateDataDetectionValidator implements Validator {
 		return hollowPrimaryKeyIndex.getDuplicateKeys();
 	}
 
-	private Builder initializeForValidation(ReadState readState) {
+	private IndividualValidationStatusBuilder initializeForValidation(ReadState readState) {
 		status = null;
-		Builder statusBuilder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
+		IndividualValidationStatusBuilder statusBuilder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
 		statusBuilder.addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
 		return statusBuilder;
 	}
@@ -117,7 +117,7 @@ public class DuplicateDataDetectionValidator implements Validator {
         return message.toString();
 	}
 
-	private PrimaryKey getPrimaryKey(ReadState readState, Builder statusBuilder) {
+	private PrimaryKey getPrimaryKey(ReadState readState, IndividualValidationStatusBuilder statusBuilder) {
 		PrimaryKey primaryKey = null;
 
 		if (fieldPathNames == null) {
@@ -136,7 +136,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 		return primaryKey;
 	}
 	
-	private void handleEndValidation(Builder statusBuilder, Status status, String message) {
+	private void handleEndValidation(IndividualValidationStatusBuilder statusBuilder, Status status, String message) {
 		statusBuilder.withStatus(status);
 		if(message != null && status == Status.FAIL){
 			ValidationException validationException = new ValidationException(message);

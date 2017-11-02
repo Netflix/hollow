@@ -39,7 +39,7 @@ class IndividualValidatorStatus {
     private final Throwable throwable;
     private final Map<String, String> additionalInfo;
 
-	private IndividualValidatorStatus(Builder builder) {
+	private IndividualValidatorStatus(IndividualValidationStatusBuilder builder) {
 		this.version = builder.version;
 		this.status = builder.status;
 		this.message = builder.message;
@@ -93,44 +93,44 @@ class IndividualValidatorStatus {
 	 * Creates builder to build {@link IndividualValidatorStatus}.
 	 * @return created builder
 	 */
-	public static Builder builder() {
-		return new Builder();
+	public static IndividualValidationStatusBuilder builder() {
+		return new IndividualValidationStatusBuilder();
 	}
 	/**
 	 * Builder to build {@link IndividualValidatorStatus}.
 	 */
-	public static final class Builder {
+	public static final class IndividualValidationStatusBuilder {
 		private long version;
 		private Status status;
 		private String message;
 		private Throwable throwable;
 		private Map<String, String> additionalInfo;
 
-		private Builder() {
+		private IndividualValidationStatusBuilder() {
 			additionalInfo = new HashMap<>();
 		}
 
-		public Builder withVersion(long version) {
+		public IndividualValidationStatusBuilder withVersion(long version) {
 			this.version = version;
 			return this;
 		}
 
-		public Builder withStatus(Status status) {
+		public IndividualValidationStatusBuilder withStatus(Status status) {
 			this.status = status;
 			return this;
 		}
 
-		public Builder withMessage(String message) {
+		public IndividualValidationStatusBuilder withMessage(String message) {
 			this.message = message;
 			return this;
 		}
 
-		public Builder withThrowable(Throwable throwable) {
+		public IndividualValidationStatusBuilder withThrowable(Throwable throwable) {
 			this.throwable = throwable;
 			return this;
 		}
 
-		public Builder addAdditionalInfo(String key, String value) {
+		public IndividualValidationStatusBuilder addAdditionalInfo(String key, String value) {
 			this.additionalInfo.put(key, value);
 			return this;
 		}

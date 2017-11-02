@@ -20,7 +20,7 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.Builder;
+import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.IndividualValidationStatusBuilder;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
 /**
@@ -56,7 +56,7 @@ public class RecordCountVarianceValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		Builder builder = initializeForValidation(readState);
+		IndividualValidationStatusBuilder builder = initializeForValidation(readState);
 		
 		HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
 		int latestCardinality = typeState.getPopulatedOrdinals().cardinality();
@@ -86,9 +86,9 @@ public class RecordCountVarianceValidator implements Validator {
 		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
 	}
 
-	private Builder initializeForValidation(ReadState readState) {
+	private IndividualValidationStatusBuilder initializeForValidation(ReadState readState) {
 		status = null;
-		Builder builder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
+		IndividualValidationStatusBuilder builder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
 		builder.addAdditionalInfo(ALLOWABLE_VARIANCE_PERCENT_NAME, String.valueOf(allowableVariancePercent));
 		builder.addAdditionalInfo(DATA_TYPE_NAME, typeName);
 		return builder;
@@ -100,7 +100,7 @@ public class RecordCountVarianceValidator implements Validator {
 		return changePercent;
 	}
 	
-	private void handleEndValidation(Builder builder, Status status, boolean throwException, String message){
+	private void handleEndValidation(IndividualValidationStatusBuilder builder, Status status, boolean throwException, String message){
 		ValidationException validationException = null;
 		builder.withStatus(status);
 		builder.withMessage(message);
