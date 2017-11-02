@@ -74,15 +74,20 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
     protected void genConstructors(StringBuilder builder) {
         if (isGenSimpleConstructor)
-            genDefaultConstructor(builder);
+            genSimpleConstructor(builder);
 
         genParameterizedConstructor(builder);
     }
 
-    protected void genDefaultConstructor(StringBuilder builder) {
+    protected void genSimpleConstructor(StringBuilder builder) {
         builder.append("    public " + className + "(HollowConsumer consumer) {\n");
-        builder.append("        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
+        builder.append("        this(consumer, false);");
         builder.append("    }\n\n");
+
+        builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefreah) {\n");
+        builder.append("        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
+        builder.append("    }\n\n");
+
     }
 
     protected void genParameterizedConstructor(StringBuilder builder) {
