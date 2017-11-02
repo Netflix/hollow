@@ -114,8 +114,10 @@ public class ContractRestrictionModule {
 
                     // create map of contractId to isAvailableForDownload
                     Map<Integer, Boolean> contractIds = new HashMap<>();
-                    for (RightsWindowContractHollow contract : window._getContractIdsExt()) {
-                        contractIds.put(Integer.valueOf((int) contract._getContractId()), Boolean.valueOf(contract._getDownload()));
+                    if (window._getContractIdsExt() != null) {
+                        for (RightsWindowContractHollow contract : window._getContractIdsExt()) {
+                            contractIds.put(Integer.valueOf((int) contract._getContractId()), Boolean.valueOf(contract._getDownload()));
+                        }
                     }
 
                     assetTypeIdx.resetMarks();

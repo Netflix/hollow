@@ -168,7 +168,7 @@ public class VMSAvailabilityWindowModule {
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
 
                 // check if there are any assets & packages associated with this contract
-                if (windowContractHollow._getPackageIdBoxed() != null || !windowContractHollow._getAssets().isEmpty() || !windowContractHollow._getPackages().isEmpty()) {
+                if (windowContractHollow._getPackageIdBoxed() != null || (windowContractHollow._getAssets() != null && !windowContractHollow._getAssets().isEmpty()) || (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty())) {
 
                     // get contract assets & and check the availability of assets in the given locale
                     List<RightsContractAssetHollow> contractAssets = new ArrayList<>();
