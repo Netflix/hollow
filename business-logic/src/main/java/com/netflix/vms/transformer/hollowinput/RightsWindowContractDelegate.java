@@ -14,7 +14,13 @@ public interface RightsWindowContractDelegate extends HollowObjectDelegate {
 
     public Boolean getDownloadBoxed(int ordinal);
 
-    public int getAssetSetIdOrdinal(int ordinal);
+    public long getPackageId(int ordinal);
+
+    public Long getPackageIdBoxed(int ordinal);
+
+    public int getAssetsOrdinal(int ordinal);
+
+    public int getPackagesOrdinal(int ordinal);
 
     public RightsWindowContractTypeAPI getTypeAPI();
 

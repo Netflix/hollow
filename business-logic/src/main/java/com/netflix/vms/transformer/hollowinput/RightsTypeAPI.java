@@ -10,8 +10,7 @@ public class RightsTypeAPI extends HollowObjectTypeAPI {
 
     public RightsTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
-            "windows",
-            "contracts"
+            "windows"
         });
         this.delegateLookupImpl = new RightsDelegateLookupImpl(this);
     }
@@ -24,16 +23,6 @@ public class RightsTypeAPI extends HollowObjectTypeAPI {
 
     public ListOfRightsWindowTypeAPI getWindowsTypeAPI() {
         return getAPI().getListOfRightsWindowTypeAPI();
-    }
-
-    public int getContractsOrdinal(int ordinal) {
-        if(fieldIndex[1] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Rights", ordinal, "contracts");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[1]);
-    }
-
-    public ListOfRightsContractTypeAPI getContractsTypeAPI() {
-        return getAPI().getListOfRightsContractTypeAPI();
     }
 
     public RightsDelegateLookupImpl getDelegateLookupImpl() {

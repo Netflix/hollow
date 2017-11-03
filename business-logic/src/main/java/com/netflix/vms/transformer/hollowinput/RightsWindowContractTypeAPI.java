@@ -12,7 +12,9 @@ public class RightsWindowContractTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "contractId",
             "download",
-            "assetSetId"
+            "packageId",
+            "assets",
+            "packages"
         });
         this.delegateLookupImpl = new RightsWindowContractDelegateLookupImpl(this);
     }
@@ -52,14 +54,45 @@ public class RightsWindowContractTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getAssetSetIdOrdinal(int ordinal) {
+    public long getPackageId(int ordinal) {
         if(fieldIndex[2] == -1)
-            return missingDataHandler().handleReferencedOrdinal("RightsWindowContract", ordinal, "assetSetId");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
+            return missingDataHandler().handleLong("RightsWindowContract", ordinal, "packageId");
+        return getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
     }
 
-    public RightsAssetSetIdTypeAPI getAssetSetIdTypeAPI() {
-        return getAPI().getRightsAssetSetIdTypeAPI();
+    public Long getPackageIdBoxed(int ordinal) {
+        long l;
+        if(fieldIndex[2] == -1) {
+            l = missingDataHandler().handleLong("RightsWindowContract", ordinal, "packageId");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[2]);
+            l = getTypeDataAccess().readLong(ordinal, fieldIndex[2]);
+        }
+        if(l == Long.MIN_VALUE)
+            return null;
+        return Long.valueOf(l);
+    }
+
+
+
+    public int getAssetsOrdinal(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleReferencedOrdinal("RightsWindowContract", ordinal, "assets");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
+    }
+
+    public ListOfRightsContractAssetTypeAPI getAssetsTypeAPI() {
+        return getAPI().getListOfRightsContractAssetTypeAPI();
+    }
+
+    public int getPackagesOrdinal(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleReferencedOrdinal("RightsWindowContract", ordinal, "packages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[4]);
+    }
+
+    public ListOfRightsContractPackageTypeAPI getPackagesTypeAPI() {
+        return getAPI().getListOfRightsContractPackageTypeAPI();
     }
 
     public RightsWindowContractDelegateLookupImpl getDelegateLookupImpl() {
