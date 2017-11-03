@@ -134,7 +134,7 @@ public class VideoMetaDataModule {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
                         convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoDataCollection, rollup, rolldown);
-                        populateEpisodeMerchingBehaviour(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i , j);
+                        populateEpisodeMerchingBehaviour(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i, j);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
@@ -311,30 +311,39 @@ public class VideoMetaDataModule {
     }
 
     private void populateShowMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd) {
-        vmd.merchingBehaviour = new MerchingBehaviour();
+
         VideoHierarchy.ShowMerchingBehaviour merchingBehaviour = hierarchy.getShowMerchingBehaviour();
-        vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
-        vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
-        vmd.merchingBehaviour.hideSeasonNumbers = merchingBehaviour.hideSeasonNumbers;
+        if (merchingBehaviour != null) {
+            vmd.merchingBehaviour = new MerchingBehaviour();
+            vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
+            vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchingBehaviour.hideSeasonNumbers = merchingBehaviour.hideSeasonNumbers;
+        }
     }
 
     private void populateSeasonMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum) {
-        vmd.merchingBehaviour = new MerchingBehaviour();
+
         VideoHierarchy.SeasonMerchingBehaviour merchingBehaviour = hierarchy.getSeasonMerchingBehaviour(seasonNum);
-        vmd.merchingBehaviour.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
-        vmd.merchingBehaviour.episodeSkipping = merchingBehaviour.episodeSkipping;
-        vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
-        vmd.merchingBehaviour.filterUnavailableEpisodes = merchingBehaviour.filterUnavailableEpisodes;
-        vmd.merchingBehaviour.useLatestEpisodeAsDefault = merchingBehaviour.useLatestEpisodeAsDefault;
-        vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
+        if (merchingBehaviour != null) {
+            vmd.merchingBehaviour = new MerchingBehaviour();
+            vmd.merchingBehaviour.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
+            vmd.merchingBehaviour.episodeSkipping = merchingBehaviour.episodeSkipping;
+            vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchingBehaviour.filterUnavailableEpisodes = merchingBehaviour.filterUnavailableEpisodes;
+            vmd.merchingBehaviour.useLatestEpisodeAsDefault = merchingBehaviour.useLatestEpisodeAsDefault;
+            vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
+        }
     }
 
     private void populateEpisodeMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum, int episodeNum) {
-        vmd.merchingBehaviour = new MerchingBehaviour();
+
         VideoHierarchy.EpisodeMerchingBehaviour merchingBehaviour = hierarchy.getEpisodeMerchingBehaviour(seasonNum, episodeNum);
-        vmd.merchingBehaviour.midSeason = merchingBehaviour.midSeason;
-        vmd.merchingBehaviour.seasonFinale = merchingBehaviour.seasonFinale;
-        vmd.merchingBehaviour.showFinale = merchingBehaviour.showFinale;
+        if (merchingBehaviour != null) {
+            vmd.merchingBehaviour = new MerchingBehaviour();
+            vmd.merchingBehaviour.midSeason = merchingBehaviour.midSeason;
+            vmd.merchingBehaviour.seasonFinale = merchingBehaviour.seasonFinale;
+            vmd.merchingBehaviour.showFinale = merchingBehaviour.showFinale;
+        }
     }
 
     private void populateSetTypes(Integer videoId, String countryCode, StatusHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
