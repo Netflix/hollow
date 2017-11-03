@@ -41,7 +41,6 @@ public enum IndexSpec {
     VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID(HASH, "VideoArtworkSource", "", "movieId"),
     ARTWORK_DERIVATIVE_SETS(HASH, "IPLDerivativeGroup", "", "externalId.value"),
     SHOW_SEASON_EPISODE(HASH, "ShowSeasonEpisode", "", "movieId"),
-    SHOW_SEASON_EPISODE_PRIMARY(PRIMARY_KEY, "ShowSeasonEpisode", "movieId", "countryCode.value"),
     VIDEO_DATE(HASH, "VideoDate", "window.element", "videoId", "window.element.countryCode.value"),
     PERSONS_BY_VIDEO_ID(HASH, "PersonVideo", "", "roles.element.videoId"),
     PERSON_ROLES_BY_VIDEO_ID(HASH, "PersonVideo", "roles.element", "personId", "roles.element.videoId"),
