@@ -7,6 +7,7 @@ import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +33,10 @@ public class VideoHierarchy {
     private final Set<Integer> droppedIds = new HashSet<>();
     private final Map<Integer, Integer> supplementalSeasonSeqNumMap = new HashMap<>();
 
+    private final ShowMerchingBehaviour showMerchingBehaviour;
+    private final SeasonMerchingBehaviour[] seasonMerchingBehaviour;
+    private final EpisodeMerchingBehaviour[][] episodeMerchingBehaviour;
+
     public VideoHierarchy(TransformerContext ctx, int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, VideoHierarchyInitializer initializer) {
         this.ctx = ctx;
         this.topNodeId = topNodeId;
@@ -43,30 +48,33 @@ public class VideoHierarchy {
 
         List<SeasonHollow> seasons = null;
 
-        if(set != null)
+        if (set != null)
             seasons = set._getSeasons();
 
-        if(seasons != null) {
+        if (seasons != null) {
             seasons = new ArrayList<SeasonHollow>(seasons);
             Collections.sort(seasons, new Comparator<SeasonHollow>() {
                 @Override
                 public int compare(SeasonHollow o1, SeasonHollow o2) {
-                    return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
+                    return (int) o1._getSequenceNumber() - (int) o2._getSequenceNumber();
                 }
             });
 
             int seasonIds[] = new int[seasons.size()];
             int seasonSequenceNumbers[] = new int[seasons.size()];
+            SeasonMerchingBehaviour[] seasonMerchingBehaviourAttributes = new SeasonMerchingBehaviour[seasons.size()];
+
             int episodeIds[][] = new int[seasons.size()][];
             int episodeSequenceNumbers[][] = new int[seasons.size()][];
+            EpisodeMerchingBehaviour[][] episodeMerchingBehaviourAttributes = new EpisodeMerchingBehaviour[seasons.size()][];
 
             int seasonCounter = 0;
 
-            for(int i=0;i<seasons.size();i++) {
+            for (int i = 0; i < seasons.size(); i++) {
                 SeasonHollow season = seasons.get(i);
 
-                int seasonId = (int)season._getMovieId();
-                if(!initializer.isChildNodeIncluded(seasonId, countryCode)) {
+                int seasonId = (int) season._getMovieId();
+                if (!initializer.isChildNodeIncluded(seasonId, countryCode)) {
                     initializer.addSeasonAndAllChildren(season, droppedIds);
                     continue;
                 }
@@ -77,6 +85,8 @@ public class VideoHierarchy {
 
                 seasonIds[seasonCounter] = seasonId;
                 seasonSequenceNumbers[seasonCounter] = seasonSequenceNumber;
+                seasonMerchingBehaviourAttributes[seasonCounter] = getMerchingBehaviour(season);
+
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
 
@@ -84,16 +94,17 @@ public class VideoHierarchy {
                 Collections.sort(episodes, new Comparator<EpisodeHollow>() {
                     @Override
                     public int compare(EpisodeHollow o1, EpisodeHollow o2) {
-                        return (int)o1._getSequenceNumber() - (int)o2._getSequenceNumber();
+                        return (int) o1._getSequenceNumber() - (int) o2._getSequenceNumber();
                     }
                 });
 
                 episodeIds[seasonCounter] = new int[episodes.size()];
                 episodeSequenceNumbers[seasonCounter] = new int[episodes.size()];
+                episodeMerchingBehaviourAttributes[seasonCounter] = new EpisodeMerchingBehaviour[episodes.size()];
 
                 int episodeCounter = 0;
 
-                for(int j=0;j<episodes.size();j++) {
+                for (int j = 0; j < episodes.size(); j++) {
                     EpisodeHollow episode = episodes.get(j);
 
                     int episodeId = (int) episode._getMovieId();
@@ -105,29 +116,40 @@ public class VideoHierarchy {
                     Set<Integer> addedEpisodeSupplementals = initializer.addSupplementalVideos(episode._getMovieId(), countryCode, supplementalIds, droppedIds);
                     addToSupplementalSeasonSeqNumMap(topNodeId, seasonId, episodeId, seasonSequenceNumber, addedEpisodeSupplementals);
 
-                    episodeIds[seasonCounter][episodeCounter] = (int)episode._getMovieId();
-                    episodeSequenceNumbers[seasonCounter][episodeCounter] = (int)episode._getSequenceNumber();
+                    episodeIds[seasonCounter][episodeCounter] = (int) episode._getMovieId();
+                    episodeSequenceNumbers[seasonCounter][episodeCounter] = (int) episode._getSequenceNumber();
+                    episodeMerchingBehaviourAttributes[seasonCounter][episodeCounter] = getMerchingBehaviour(episode);
+
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
                     hashCode = HashCodes.hashInt(hashCode);
                     episodeCounter++;
                 }
 
-                if(episodeCounter != episodeIds[seasonCounter].length)
+                if (episodeCounter != episodeIds[seasonCounter].length)
                     episodeIds[seasonCounter] = Arrays.copyOf(episodeIds[seasonCounter], episodeCounter);
 
                 seasonCounter++;
             }
 
-            if(seasonCounter != seasonIds.length) {
+            if (seasonCounter != seasonIds.length) {
                 seasonIds = Arrays.copyOf(seasonIds, seasonCounter);
                 episodeIds = Arrays.copyOf(episodeIds, seasonCounter);
             }
+
+            this.seasonMerchingBehaviour = seasonMerchingBehaviourAttributes;
+            this.episodeMerchingBehaviour = episodeMerchingBehaviourAttributes;
+            this.showMerchingBehaviour = getMerchingBehaviour(set);
 
             this.seasonIds = seasonIds;
             this.episodeIds = episodeIds;
             this.seasonSequenceNumbers = seasonSequenceNumbers;
             this.episodeSequenceNumbers = episodeSequenceNumbers;
         } else {
+
+            this.seasonMerchingBehaviour = new SeasonMerchingBehaviour[0];
+            this.episodeMerchingBehaviour = new EpisodeMerchingBehaviour[0][];
+            this.showMerchingBehaviour = null;
+
             this.seasonIds = new int[0];
             this.episodeIds = new int[0][];
             this.seasonSequenceNumbers = new int[0];
@@ -136,7 +158,7 @@ public class VideoHierarchy {
 
         this.supplementalIds = supplementalIds.arrayCopyOfRange(0, supplementalIds.size());
 
-        for(int i=0;i<supplementalIds.size();i++) {
+        for (int i = 0; i < supplementalIds.size(); i++) {
             hashCode ^= HashCodes.hashInt(supplementalIds.get(i));
         }
 
@@ -211,34 +233,51 @@ public class VideoHierarchy {
 
     public boolean includesSupplementalId(int id) {
         for (int supplementalId : supplementalIds)
-            if(supplementalId == id)
+            if (supplementalId == id)
                 return true;
         return false;
     }
 
+    public ShowMerchingBehaviour getShowMerchingBehaviour() {
+        return showMerchingBehaviour;
+    }
+
+    public EpisodeMerchingBehaviour getEpisodeMerchingBehaviour(int seasonNum, int episodeNum) {
+        if (seasonNum <= episodeMerchingBehaviour.length && episodeNum <= episodeMerchingBehaviour[seasonNum].length) {
+            return episodeMerchingBehaviour[seasonNum][episodeNum];
+        }
+        return null;
+    }
+
+    public SeasonMerchingBehaviour getSeasonMerchingBehaviour(int seasonNum) {
+        if (seasonNum <= seasonMerchingBehaviour.length)
+            return seasonMerchingBehaviour[seasonNum];
+        return null;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof VideoHierarchy))
+        if (!(obj instanceof VideoHierarchy))
             return false;
-        VideoHierarchy other = (VideoHierarchy)obj;
-        if(topNodeId != other.topNodeId)
+        VideoHierarchy other = (VideoHierarchy) obj;
+        if (topNodeId != other.topNodeId)
             return false;
-        if(!Arrays.equals(seasonIds, other.seasonIds))
+        if (!Arrays.equals(seasonIds, other.seasonIds))
             return false;
-        for(int i=0;i<seasonIds.length;i++) {
-            if(seasonSequenceNumbers[i] != other.seasonSequenceNumbers[i])
+        for (int i = 0; i < seasonIds.length; i++) {
+            if (seasonSequenceNumbers[i] != other.seasonSequenceNumbers[i])
                 return false;
         }
 
-        for(int i=0;i<episodeIds.length;i++) {
-            if(!Arrays.equals(episodeIds[i], other.episodeIds[i]))
+        for (int i = 0; i < episodeIds.length; i++) {
+            if (!Arrays.equals(episodeIds[i], other.episodeIds[i]))
                 return false;
-            for(int j=0;j<episodeIds[i].length;j++) {
-                if(episodeSequenceNumbers[i][j] != other.episodeSequenceNumbers[i][j])
+            for (int j = 0; j < episodeIds[i].length; j++) {
+                if (episodeSequenceNumbers[i][j] != other.episodeSequenceNumbers[i][j])
                     return false;
             }
         }
-        if(!Arrays.equals(supplementalIds, other.supplementalIds))
+        if (!Arrays.equals(supplementalIds, other.supplementalIds))
             return false;
         return true;
     }
@@ -267,5 +306,53 @@ public class VideoHierarchy {
         sb.append("\ndroppedIds=").append(droppedIds);
 
         return sb.toString();
+    }
+
+    private ShowMerchingBehaviour getMerchingBehaviour(ShowSeasonEpisodeHollow showSeasonEpisodeHollow) {
+        ShowMerchingBehaviour attributes = new ShowMerchingBehaviour();
+        attributes.hideSeasonNumbers = showSeasonEpisodeHollow._getHideSeasonNumbers();
+        attributes.episodicNewBadge = showSeasonEpisodeHollow._getEpisodicNewBadge();
+        attributes.merchOrder = showSeasonEpisodeHollow._getMerchOrder()._getValue();
+        return attributes;
+    }
+
+    private SeasonMerchingBehaviour getMerchingBehaviour(SeasonHollow seasonHollow) {
+        SeasonMerchingBehaviour attributes = new SeasonMerchingBehaviour();
+        attributes.hideEpisodeNumbers = seasonHollow._getHideEpisodeNumbers();
+        attributes.episodicNewBadge = seasonHollow._getEpisodicNewBadge();
+        attributes.episodeSkipping = seasonHollow._getEpisodeSkipping();
+        attributes.filterUnavailableEpisodes = seasonHollow._getFilterUnavailableEpisodes();
+        attributes.useLatestEpisodeAsDefault = seasonHollow._getUseLatestEpisodeAsDefault();
+        attributes.merchOrder = seasonHollow._getMerchOrder()._getValue();
+        return attributes;
+    }
+
+    private EpisodeMerchingBehaviour getMerchingBehaviour(EpisodeHollow episodeHollow) {
+        EpisodeMerchingBehaviour attributes = new EpisodeMerchingBehaviour();
+        attributes.midSeason = episodeHollow._getMidSeason();
+        attributes.seasonFinale = episodeHollow._getSeasonFinale();
+        attributes.showFinale = episodeHollow._getShowFinale();
+        return attributes;
+    }
+
+    public static class ShowMerchingBehaviour {
+        public boolean hideSeasonNumbers;
+        public boolean episodicNewBadge;
+        public String merchOrder;
+    }
+
+    public static class SeasonMerchingBehaviour {
+        public boolean hideEpisodeNumbers;
+        public boolean episodicNewBadge;
+        public int episodeSkipping;
+        public boolean filterUnavailableEpisodes;
+        public boolean useLatestEpisodeAsDefault;
+        public String merchOrder;
+    }
+
+    public static class EpisodeMerchingBehaviour {
+        public boolean midSeason;
+        public boolean seasonFinale;
+        public boolean showFinale;
     }
 }

@@ -34,7 +34,7 @@ public class VideoMetaData implements Cloneable {
     public int broadcastReleaseYear = java.lang.Integer.MIN_VALUE;
     public Strings broadcastDistributorName = null;
     public Integer metadataReleaseDays = null;
-    public MerchingBehaviour merchingBehaviour = new MerchingBehaviour();// all defaults are assigned.
+    public MerchingBehaviour merchingBehaviour = null;
 
     public boolean equals(Object other) {
         if (other == this) return true;

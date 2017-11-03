@@ -5,7 +5,7 @@ package com.netflix.vms.transformer.hollowoutput;
  */
 public class MerchingBehaviour {
 
-    String merchOrder = "regular";
+    public String merchOrder = "regular";
     public Boolean episodicNewBadge = false;
 
     // specific to show
