@@ -77,7 +77,8 @@ public class VMSCircuitBreakerRestApis {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String getCircuitBreakerStatus(@PathParam("cbname") String circuitBreakerName, 
 			@QueryParam("vip") String vipName, 
-			@QueryParam("cycleId") String cycleId) {
+			@QueryParam("cycleId") String cycleId,
+			@QueryParam("size") String sizeStr) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		Map<String, String> errorResponse = new HashMap<String, String>();
 		// We are only supporting playback monkey as of now
@@ -95,41 +96,68 @@ public class VMSCircuitBreakerRestApis {
 		if(esHostname == null)
 			return "{}";
 		
-		// Get the last cycle for this vip
-		// If cycle id is null, use the last comopleted cycle
-		if(cycleId == null)
-			cycleId = VMSElasticSearchDataFetcher.getLastCycle(esHostname, vipName);
-		String cycleStatus = VMSElasticSearchDataFetcher.getCycleStatus(esHostname, vipName, cycleId);
+		// Determine the size
+		int size = 1;
+		if(sizeStr != null)
+			size = Integer.parseInt(sizeStr);
+		System.out.println("SIZE === " + size);
 		
-		// get the pbmmessages and figure out if it failed etc
-		Map<String, List<String>> pbmMessages = VMSElasticSearchDataFetcher.getPlaybackMonkeyInfo(esHostname, vipName, cycleId);
+		// Determine the cycles
+		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostname, vipName, size);
+		
+		// If specific cycleId was specified, use it
+		if(cycleId != null) {
+			// Build the POJO
+			CircuitBreakerStatus status = getPbmStatus(esHostname, vipName, cycleId);
+			
+			return gson.toJson(status, CircuitBreakerStatus.class);			
+		} else {
+			if(cycles.size() == 1) {
+				CircuitBreakerStatus status = getPbmStatus(esHostname, vipName, cycles.get(0));
+				return gson.toJson(status, CircuitBreakerStatus.class);
+			} else {
+				List<CircuitBreakerStatus> statuses = new ArrayList<>();
+				for(String cycle : cycles) {
+					CircuitBreakerStatus status = getPbmStatus(esHostname, vipName, cycle);
+					statuses.add(status);
+				}
+				return gson.toJson(statuses);				
+			}
+		}
+	}
+	
+	private CircuitBreakerStatus getPbmStatus(String esHostName, String vipName, String cycleId) {
+		CircuitBreakerStatus status = new CircuitBreakerStatus();
+		status.setVipName(vipName);
+		status.setCycleId(cycleId);
+		status.setCircuitBreakerName("playbackmonkey");
+		
+		// Get cycle status
+		String cycleStatus = VMSElasticSearchDataFetcher.getCycleStatus(esHostName, vipName, cycleId);
+		status.setCycleSuccess(cycleStatus);
+		
+		// Get pbm messages
+		Map<String, List<String>> pbmMessages = VMSElasticSearchDataFetcher.getPlaybackMonkeyInfo(esHostName, vipName, cycleId);
+		if(pbmMessages.containsKey("ERROR") && pbmMessages.get("ERROR").size() > 0)
+			status.setCbSuccess(false);
+		else
+			status.setCbSuccess(true);
+		status.setErrors(pbmMessages.get("ERROR"));
+		status.setWarnings(pbmMessages.get("WARN"));
+		
+		// Extract failed videos
 		Map<String, List<Integer>> failedVideos = new LinkedHashMap<String, List<Integer>>();
 		if(pbmMessages.get("ERROR") != null && pbmMessages.get("ERROR").size() > 0) {
 			for(String errorMessage : pbmMessages.get("ERROR")) {
 				if(errorMessage.contains("FailedIds")) {
 					failedVideos = getFailedVideoIds(errorMessage);
-					gson = new GsonBuilder().setPrettyPrinting().create();
 				}
 			}
 		}
-		
-		// Build the POJO
-		CircuitBreakerStatus status = new CircuitBreakerStatus();
-		status.setVipName(vipName);
-		status.setCycleId(cycleId);
-		status.setCircuitBreakerName(circuitBreakerName);
-		status.setCycleSuccess(cycleStatus);
-		if(pbmMessages.containsKey("ERROR") && pbmMessages.get("ERROR").size() > 0)
-			status.setCbSuccess(false);
-		else
-			status.setCbSuccess(true);
 		status.setFailedVideos(failedVideos);
-		status.setErrors(pbmMessages.get("ERROR"));
-		status.setWarnings(pbmMessages.get("WARN"));
+
 		
-		return gson.toJson(status, CircuitBreakerStatus.class);
-
-
+		return status;
 	}
 	
 	@GET
