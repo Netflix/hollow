@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import java.io.File;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class HollowBlobFileNamer {
     private static final String VMS_PREFIX = "vms.";
@@ -14,7 +15,7 @@ public class HollowBlobFileNamer {
     public String getDeltaFileName(long previousVersion, long nextVersion) {
         return FILENAME_PREFIX + vip + "-delta-" + previousVersion + "-" + nextVersion;
     }
-    
+
     public String getNostreamsDeltaFileName(long previousVersion, long nextVersion) {
         return FILENAME_PREFIX + vip + "_nostreams-delta-" + previousVersion + "-" + nextVersion;
     }
@@ -22,11 +23,11 @@ public class HollowBlobFileNamer {
     public String getReverseDeltaFileName(long nextVersion, long previousVersion) {
         return FILENAME_PREFIX + vip + "-reversedelta-" + nextVersion + "-" + previousVersion;
     }
-    
+
     public String getNostreamsReverseDeltaFileName(long nextVersion, long previousVersion) {
         return FILENAME_PREFIX + vip + "_nostreams-reversedelta-" + nextVersion + "-" + previousVersion;
     }
-    
+
     public String getSnapshotFileName(long nextVersion) {
         return FILENAME_PREFIX + vip + "-snapshot-" + nextVersion;
     }
@@ -34,12 +35,22 @@ public class HollowBlobFileNamer {
     public String getNostreamsSnapshotFileName(long nextVersion) {
         return FILENAME_PREFIX + vip + "_nostreams-snapshot-" + nextVersion;
     }
-    
+
     public String getPinTitleFileName(long version, boolean includeFullPath, int ... topNodes) {
         String suffix = vip + "-pinnedtitle-" + version + "-";
+
+        StringBuilder firstSetSB = new StringBuilder();
+        StringBuilder restSb = new StringBuilder();
         for (int i = 0; i < topNodes.length; i++) {
-            if (i > 0) suffix += "_";
-            suffix += topNodes[i];
+            StringBuilder sb = i < 5 ? firstSetSB : restSb;
+
+            if (i > 0) sb.append("_");
+            sb.append(topNodes[i]);
+        }
+
+        suffix += firstSetSB.toString();
+        if (restSb.length() > 0) { // Make sure the generated String does not exceed filename limit
+            suffix += "_" + DigestUtils.md5Hex(restSb.toString());
         }
 
         if (includeFullPath) {
