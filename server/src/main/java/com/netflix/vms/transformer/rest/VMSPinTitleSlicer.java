@@ -30,6 +30,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,11 +64,13 @@ public class VMSPinTitleSlicer {
         // Validate Requirement
         EnvironmentEnum envEnum = NetflixConfiguration.getEnvironmentEnum();
         if (!supportedEnvs.contains(envEnum)) {
-            return Response.ok(String.format("ERROR: Feature is not supported in %s - Supported envs:%s.  Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s",
-                    envEnum, supportedEnvs, isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore), MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Status.BAD_REQUEST)
+                    .entity(String.format("ERROR: Feature is not supported in %s - Supported envs:%s.  Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s", envEnum, supportedEnvs, isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore))
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         } else if (StringUtils.isEmpty(vip) || StringUtils.isEmpty(topNodesStr) || versionStr == null) {
-            return Response.ok(String.format("ERROR: vip, topnodes and version parameters are required. Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s",
-                    isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore), MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Status.BAD_REQUEST)
+                    .entity(String.format("ERROR: vip, topnodes and version parameters are required. Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s", isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore))
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
 
         try {
@@ -92,8 +95,9 @@ public class VMSPinTitleSlicer {
             return Response.ok(new FileStreamingOutput(slicedFile), MediaType.APPLICATION_OCTET_STREAM_TYPE)
                     .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
         } catch (Exception ex) {
-            return Response.ok(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s",
-                    isProd, isOutput, vip, versionStr, topNodesStr, ex), MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR)
+                    .entity(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s", isProd, isOutput, vip, versionStr, topNodesStr, ex))
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
     }
 

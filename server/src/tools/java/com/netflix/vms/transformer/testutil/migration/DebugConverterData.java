@@ -20,6 +20,9 @@ import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirecto
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
+import com.netflix.vms.transformer.hollowinput.ContractHollow;
+import com.netflix.vms.transformer.hollowinput.ContractsHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfContractHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
@@ -74,6 +77,34 @@ public class DebugConverterData {
             File workingDir = new File(folder);
             if (!workingDir.exists()) workingDir.mkdirs();
         }
+    }
+
+    @Test
+    public void show_DABorDOB_ConverterData() {
+        long version = 20171016204226094L;
+        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.TEST_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
+        inputClient.triggerRefreshTo(version);
+
+        Set<Long> newHasRollingEpisodes = new HashSet<>();
+        VMSHollowInputAPI api = inputClient.getAPI();
+        for (ContractsHollow contracts : api.getAllContractsHollow()) {
+            long videoId = contracts._getMovieId();
+            String countryCode = contracts._getCountryCode()._getValue();
+
+            ListOfContractHollow listOfContract = contracts._getContracts();
+            for (ContractHollow contract : listOfContract) {
+                boolean dob = contract._getDayOfBroadcast();
+                boolean dab = contract._getDayAfterBroadcast();
+                if (dob) {
+                    System.out.printf("videoId=%s, countryCode=%s, dob=%s, dab=%s\n", videoId, countryCode, dob, dab);
+                    if (!dab) {
+                        newHasRollingEpisodes.add(videoId);
+                    }
+                }
+            }
+        }
+
+        System.out.printf("NEW hasRollingEpisodes=%d : %s\n", newHasRollingEpisodes.size(), newHasRollingEpisodes);
     }
 
     @Test

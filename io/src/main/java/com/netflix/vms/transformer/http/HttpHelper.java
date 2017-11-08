@@ -7,9 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class HttpHelper {
-
-    public static String getStringResponse(String url) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(getInputStream(url)));
+    public static String readString(InputStream input) {
+        if (input == null) return "";
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 
         StringBuilder builder = new StringBuilder();
 
@@ -28,6 +28,10 @@ public class HttpHelper {
         return builder.toString();
     }
 
+    public static String getStringResponse(String url) {
+        return readString(getInputStream(url));
+    }
+
     public static InputStream getInputStream(String url) {
         return getInputStream(url, true);
     }
@@ -41,7 +45,6 @@ public class HttpHelper {
                 HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
 
                 int responseCode = conn.getResponseCode();
-
                 while(responseCode != HttpURLConnection.HTTP_OK) {
                     switch(responseCode) {
                         case HttpURLConnection.HTTP_MOVED_PERM:
@@ -50,8 +53,10 @@ public class HttpHelper {
                             urlObj = new URL(conn.getHeaderField("Location"));
                             conn = (HttpURLConnection) urlObj.openConnection();
                             responseCode = conn.getResponseCode();
+                            //$FALL-THROUGH$
                         default:
-                            throw new Exception("Received response " + responseCode + " from proxy server");
+                            String error = readString(conn.getErrorStream());
+                            throw new Exception("Received response " + responseCode + " from server: " + error);
                     }
                 }
 
