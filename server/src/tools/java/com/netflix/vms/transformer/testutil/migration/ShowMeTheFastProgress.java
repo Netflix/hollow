@@ -34,22 +34,37 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = false;
-    private static final boolean isPerformDiff = false;
+    private static final boolean isProd = true;
+    private static final boolean isPerformDiff = true;
     private static final boolean isPublishPinnedData = false;
     private static final boolean isUseRemotePinTitleSlicer = true;
+    private static final boolean isFallBackToLocalSlicer = false;
 
     private static final String VIP_NAME = "feather";
     private static final String CONVERTER_VIP_NAME = "muon";
+    private static final String VMSSLICER_INSTANCE = "vmstransformer-feather_override-muon";
+
     private static final String WORKING_DIR = "/space/transformer-data/fast";
     private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
-    private static final String REMOTE_SLICER_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmstransformer-" + VIP_NAME + "_override-" + CONVERTER_VIP_NAME + ":7101/REST/vms/pintitleslicer";
+    private static final String REMOTE_SLICER_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/" + VMSSLICER_INSTANCE + ":7101/REST/vms/pintitleslicer"; // NOTE: SLICER must be in TEST env hence cloudqa
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
     private FileStore pinTitleFileStore;
+
+    @Before
+    public void setup() throws Exception {
+        File workingDir = new File(WORKING_DIR);
+        if (!workingDir.exists()) workingDir.mkdirs();
+
+        if (isPublishPinnedData) {
+            LifecycleInjector lInjector = InjectorBuilder.fromModules(new RuntimeCoreModule()).createInjector();
+            pinTitleFileStore = lInjector.getInstance(FileStore.class);
+        }
+    }
 
     @Test
     public void getLatestTransformerVersion() {
@@ -64,13 +79,33 @@ public class ShowMeTheFastProgress {
     }
 
     @Test
-    public void runFastLaneAndDiff() throws Throwable {
+    public void diffTwoVips() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20170516184232009L;
-        int[] topNodes = { 70084180 };
+        String FROM_VIP = "feather";
+        String TO_VIP = "whiplash";
+
+        long FROM_VER = 20171106215605001L;
+        long TO_VER = 20171106191033375L;
+        int[] topNodes = { 80126024 };
 
         long start = System.currentTimeMillis();
-        setup();
+        try {
+            SimpleTransformerContext ctx = new SimpleTransformerContext();
+            HollowReadStateEngine from_ReadStateEngine = loadTransformerEngine(ctx, FROM_VIP, FROM_VER, topNodes);
+            HollowReadStateEngine to_ReadStateEngine = loadTransformerEngine(ctx, TO_VIP, TO_VER, topNodes);
+            ShowMeTheProgressDiffTool.startTheDiff(to_ReadStateEngine, from_ReadStateEngine);
+        } finally {
+            trackDuration(start, "diffTwoVips: %s:%s vs %s:%s - topNodes=%s", FROM_VIP, FROM_VER, TO_VIP, TO_VER, toString(topNodes));
+        }
+    }
+
+    @Test
+    public void runFastLaneAndDiff() throws Throwable {
+        // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
+        long transformerVersion = 20171106191033375L;
+        int[] topNodes = { 80126024 };
+
+        long start = System.currentTimeMillis();
 
         // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
@@ -111,8 +146,6 @@ public class ShowMeTheFastProgress {
         int[] topNodes = { 80063535 };
         long converterVersion = 20170629171458752L;
 
-        setup();
-
         // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         //ctx.overrideSupportedCountries("US");
@@ -132,16 +165,6 @@ public class ShowMeTheFastProgress {
         System.out.println(actualOutputReadStateEngine.getHeaderTags());
     }
 
-    public void setup() throws Exception {
-        File workingDir = new File(WORKING_DIR);
-        if (!workingDir.exists()) workingDir.mkdirs();
-
-        if (isPublishPinnedData) {
-            LifecycleInjector lInjector = InjectorBuilder.fromModules(new RuntimeCoreModule()).createInjector();
-            pinTitleFileStore = lInjector.getInstance(FileStore.class);
-        }
-    }
-
     private static long getLatestVersion(String keybase) {
         String proxyUrl = PROXY + "/filestore-version?keybase=" + keybase;
         String version = HttpHelper.getStringResponse(proxyUrl);
@@ -149,7 +172,7 @@ public class ShowMeTheFastProgress {
         return Long.parseLong(version);
     }
 
-    private static void downloadSlice(File downloadTo, String baseURL, boolean isProd, boolean isOutput, String vipName, long version, int... topNodes) {
+    private static void downloadSlice(File downloadTo, String baseURL, boolean isProd, boolean isOutput, String vipName, long version, int... topNodes) throws Exception {
         InputStream is = null;
         OutputStream os = null;
         String proxyURL = String.format("%s?prod=%s&output=%s&vip=%s&version=%s&topnodes=%s", baseURL, isProd, isOutput, vipName, version, toString(topNodes));
@@ -159,8 +182,6 @@ public class ShowMeTheFastProgress {
             os = new FileOutputStream(downloadTo);
             IOUtils.copy(is, os);
             System.out.println(">>> Done downloading from: " + proxyURL + " to: " + downloadTo);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to download file " + downloadTo.getAbsolutePath() + " from location " + proxyURL, e);
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(os);
@@ -180,7 +201,8 @@ public class ShowMeTheFastProgress {
                     downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, vipName, version, topNodes);
                     return processor.readStateEngine(slicedFile);
                 } catch (Exception ex) {
-                    System.out.println("WARN: Remote Slicer failure - " + ex.toString() + ". Falling back to local slicer.");
+                    System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
+                    if (isFallBackToLocalSlicer) System.out.println("Failling back to local slicer."); else throw ex;
                 }
             }
             return processor.process(version, topNodes);
@@ -204,7 +226,8 @@ public class ShowMeTheFastProgress {
                     try {
                         downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, vipName, version, topNodes);
                     } catch (Exception ex) {
-                        System.out.println("WARN: Remote Slicer failure - " + ex.toString() + ". Falling back to local slicer.");
+                        System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
+                        if (isFallBackToLocalSlicer) System.out.println("Failling back to local slicer."); else throw ex;
                     }
                 }
 
