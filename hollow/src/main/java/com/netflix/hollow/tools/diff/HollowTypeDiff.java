@@ -34,22 +34,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states. 
+ * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states.
  */
 public class HollowTypeDiff {
-
     private final HollowDiff rootDiff;
-
     private final HollowObjectTypeReadState from;
     private final HollowObjectTypeReadState to;
 
     private final HollowDiffMatcher matcher;
-
     private final String type;
-    private List<HollowFieldDiff> calculatedFieldDiffs;
-    
     private final Set<String> shortcutTypes;
-    
+
+    private List<HollowFieldDiff> calculatedFieldDiffs;
+
     HollowTypeDiff(HollowDiff rootDiff, String type, String... matchPaths) {
         this.rootDiff = rootDiff;
         this.type = type;
@@ -57,7 +54,7 @@ public class HollowTypeDiff {
         this.to = (HollowObjectTypeReadState) rootDiff.getToStateEngine().getTypeState(type);
         this.matcher = new HollowDiffMatcher(this.from, this.to);
         this.shortcutTypes = new HashSet<String>();
-        
+
         for(String matchPath : matchPaths) {
             addMatchPath(matchPath);
         }
@@ -77,20 +74,20 @@ public class HollowTypeDiff {
     public void addMatchPath(String path) {
         matcher.addMatchPath(path);
     }
-    
+
     /**
      * Shortcut the diff detail when encountering a specific type.  This can be done to improve the performance
      * of diff calculation -- at the expense of some detail.
-     * 
+     *
      * @param type
      */
     public void addShortcutType(String type) {
         shortcutTypes.add(type);
     }
-    
+
     /**
      * Returns whether or not this type diff will shortcut at the specified type.
-     * 
+     *
      * @param type
      * @return
      */
@@ -100,7 +97,7 @@ public class HollowTypeDiff {
 
     /**
      * Get the differences broken down by specific field paths
-     * 
+     *
      * @return
      */
     public List<HollowFieldDiff> getFieldDiffs() {
@@ -115,7 +112,7 @@ public class HollowTypeDiff {
     }
 
     /**
-     * @return A list of the record ordinals in the from state which did not have a corresponding match (based on primary key) in the to state. 
+     * @return A list of the record ordinals in the from state which did not have a corresponding match (based on primary key) in the to state.
      */
     public IntList getUnmatchedOrdinalsInFrom() {
         return matcher.getExtraInFrom();
@@ -183,12 +180,13 @@ public class HollowTypeDiff {
 
         final int numThreads = executor.getCorePoolSize();
 
-        final List<HollowFieldDiff>results[] = (List<HollowFieldDiff>[]) new List[numThreads];
+        final List<HollowFieldDiff>results[] = new List[numThreads];
 
         for(int i=0;i<numThreads;i++) {
             final int threadId = i;
 
             executor.execute(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();

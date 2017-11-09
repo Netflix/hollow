@@ -15,8 +15,6 @@
  */
 package com.netflix.hollow.api.codegen;
 
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import org.junit.After;
@@ -42,13 +40,8 @@ public class AbstractHollowAPIGeneratorTest {
             HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
         }
 
-        // Init ObjectMapper
-        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
-        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
-        mapper.initializeTypeState(clazz);
-
         // Run Generator
-        HollowAPIGenerator generator = initGenerator(new HollowAPIGenerator.Builder().withDataModel(writeEngine).withAPIClassname(apiClassName).withPackageName(packageName));
+        HollowAPIGenerator generator = initGenerator(new HollowAPIGenerator.Builder().withDataModel(clazz).withAPIClassname(apiClassName).withPackageName(packageName));
         generator.generateFiles(sourceFolder);
 
         // Compile to validate generated files
