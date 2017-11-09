@@ -171,19 +171,6 @@ function Dashboard() {
                  mutationsFrame.initialize();
             }
         });
-
-        $("#data-dashboard-tab").on("tabsbeforeactivate", function(e, ui) {
-            var id = ui.newPanel.attr('id');
-            if (id == "stats-titles") {
-                wave2frame.initialize();
-            }
-        });
-        $("#data-dashboard-tab").on("tabsbeforeactivate", function(e, ui) {
-            var id = ui.newPanel.attr('id');
-            if (id == "stats-dataval") {
-                dataValFrame.initialize();
-            }
-        });
     };
 
     // --------------------------------------------------------------------
