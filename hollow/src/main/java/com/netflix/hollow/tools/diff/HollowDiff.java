@@ -24,7 +24,9 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -46,26 +48,26 @@ public class HollowDiff {
 
     private final DiffEqualityMapping equalityMapping;
 
-    private final List<HollowTypeDiff> typeDiffs;
-    
+    private final Map<String, HollowTypeDiff> typeDiffs = new LinkedHashMap<>();
+
     /**
      * Instantiate a HollowDiff.  By default, all OBJECT types with a defined PrimaryKey will be
      * configured to be diffed.
      * <p>
      * To calculate the diff, call calculateDiff().
-     * 
+     *
      * @param from the "from" state
-     * @param to the "to" state 
+     * @param to the "to" state
      */
     public HollowDiff(HollowReadStateEngine from, HollowReadStateEngine to) {
         this(from, to, true);
     }
 
     /**
-     * Instantiate a HollowDiff.  
+     * Instantiate a HollowDiff.
      * <p>
      * To calculate the diff, call calculateDiff().
-     * 
+     *
      * @param from the "from" state
      * @param to the "to" state
      * @param isAutoDiscoverTypeDiff If true, all OBJECT types with a defined PrimaryKey will be configured to be diffed.
@@ -74,7 +76,6 @@ public class HollowDiff {
         this.fromStateEngine = from;
         this.toStateEngine = to;
         this.equalityMapping = new DiffEqualityMapping(from, to);
-        this.typeDiffs = new ArrayList<HollowTypeDiff>();
 
         if (isAutoDiscoverTypeDiff) {
             for(HollowSchema schema : from.getSchemas()) {
@@ -98,12 +99,12 @@ public class HollowDiff {
     public HollowTypeDiff addTypeDiff(String type, String... primaryKeyPaths) {
         HollowTypeDiff typeDiff = new HollowTypeDiff(this, type, primaryKeyPaths);
         if(typeDiff.hasAnyData())
-            typeDiffs.add(typeDiff);
+            typeDiffs.put(type, typeDiff);
         return typeDiff;
     }
 
     public List<HollowTypeDiff> getTypeDiffs() {
-        return typeDiffs;
+        return new ArrayList<>(typeDiffs.values());
     }
 
     /**
@@ -112,11 +113,7 @@ public class HollowDiff {
      * @return
      */
     public HollowTypeDiff getTypeDiff(String type) {
-        for(HollowTypeDiff typeDiff : typeDiffs) {
-            if(typeDiff.getTypeName().equals(type))
-                return typeDiff;
-        }
-        return null;
+        return typeDiffs.get(type);
     }
 
     public HollowReadStateEngine getFromStateEngine() {
@@ -139,7 +136,7 @@ public class HollowDiff {
 
         log.info("PREPARED IN " + (endTime - startTime) + "ms");
 
-        for(HollowTypeDiff typeDiff : typeDiffs) {
+        for(HollowTypeDiff typeDiff : typeDiffs.values()) {
             typeDiff.calculateDiffs();
         }
     }
@@ -154,13 +151,13 @@ public class HollowDiff {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                for(HollowTypeDiff typeDiff : typeDiffs) {
+                for(HollowTypeDiff typeDiff : typeDiffs.values()) {
                     equalityMapping.getEqualOrdinalMap(typeDiff.getTypeName());
                 }
             }
         });
 
-        for(final HollowTypeDiff typeDiff : typeDiffs) {
+        for(final HollowTypeDiff typeDiff : typeDiffs.values()) {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -170,7 +167,7 @@ public class HollowDiff {
         }
 
         executor.awaitUninterruptibly();
-        
+
         equalityMapping.markPrepared();
     }
 
