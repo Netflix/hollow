@@ -206,6 +206,12 @@ public class HollowAPIGenerator {
      * Generate files under the specified directory
      */
     public void generateFiles(File directory) throws IOException {
+        if (packageName != null && !packageName.trim().isEmpty()) {
+            String packageDir = packageName.replace(".", File.separator);
+            if (!directory.getAbsolutePath().endsWith(packageDir)) {
+                directory = new File(directory, packageDir);
+            }
+        }
         directory.mkdirs();
 
         HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, config);
