@@ -148,7 +148,7 @@ public class VMSAvailabilityWindowModule {
                 outputWindow.onHold = true;
             }
 
-            // collect all contractId for the window
+            // collect all contractId for the window -> A window could have multiple contracts.
             List<Long> contractIds = new ArrayList<>();
             if (window._getContractIdsExt() != null)
                 contractIds = window._getContractIdsExt().stream().map(c -> c._getContractId()).collect(Collectors.toList());
@@ -159,10 +159,12 @@ public class VMSAvailabilityWindowModule {
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
 
 
+            // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
+                // get contract id from window contract and contract data from VideoContract feed.
                 long contractId = windowContractHollow._getContractId();
                 ContractHollow contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
@@ -170,7 +172,7 @@ public class VMSAvailabilityWindowModule {
                 // check if there are any assets & packages associated with this contract
                 if (windowContractHollow._getPackageIdBoxed() != null || (windowContractHollow._getAssets() != null && !windowContractHollow._getAssets().isEmpty()) || (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty())) {
 
-                    // get contract assets & and check the availability of assets in the given locale
+                    // get contract assets rights & and check the availability of assets in the given locale
                     List<RightsContractAssetHollow> contractAssets = new ArrayList<>();
                     if (windowContractHollow._getAssets() != null)
                         contractAssets = windowContractHollow._getAssets().stream().collect(Collectors.toList());
@@ -179,7 +181,7 @@ public class VMSAvailabilityWindowModule {
                     // check if package list in the contract is not null or empty
                     if (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty()) {
 
-                        // collect all the contract packages
+                        // collect all the contract packages -> A contract could have multiple packages
                         List<RightsContractPackageHollow> contractPackages = windowContractHollow._getPackages().stream().collect(Collectors.toList());
                         for (RightsContractPackageHollow contractPackageHollow : contractPackages) {
 
@@ -219,21 +221,34 @@ public class VMSAvailabilityWindowModule {
                             // get windowPackageContractInfo for the given packageId
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
                             if (windowPackageContractInfo != null) {
-                                // For existing windowPackageContractInfo object
 
-                                // check if this window should be filtered
+                                // For existing windowPackageContractInfo object
+                                // check if this window data should be filtered
                                 if (shouldFilterOutWindowInfo) {
+                                    // if contract is greater than previous contract for this package id then update the windowContractInfo.contractId to use higher value for contractId
                                     if (contractId > windowPackageContractInfo.videoContractInfo.contractId) {
+                                        // update contract id, since it is higher value.
                                         windowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
+
+                                        // if the current package id is the highest package id, then update the contract id for max package id.
                                         if (packageId.val == maxPackageId)
                                             contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
+                                        // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
                                         if (packageId.val == packageIdForWindow)
                                             thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                     }
 
                                 } else {
 
-                                    // if window is not meant for filtering then merge cup tokens
+                                    // if existing windowPackageContractInfo is present and window data is not to be filtered, then do the following
+                                    // 1. merge cup token values
+                                    // 2. merge bcp47 code values
+                                    // 3. clone the exiting contract info, and assign all new values
+                                    // 4. update the map windowInfoByPackageId with current packageId with cloned windowPackageContractInfo
+                                    // 5. the primary package id for the contractInfo is the max packageId for previous and current packageId
+                                    // 6. the contract id for the contractInfo, is the max contractId from the previous and current contractId
+
+                                    // merge cup tokens
                                     List<Strings> cupTokens = new ArrayList<>();
                                     Strings contractCupToken = contractData == null ? DEFAULT_CUP_TOKEN : new Strings(contractData._getCupToken()._getValue());
                                     if (windowPackageContractInfo.videoContractInfo.contractId > contractId) {
@@ -247,13 +262,12 @@ public class VMSAvailabilityWindowModule {
                                                 cupTokens.add(cupToken);
                                         }
                                     }
-
-                                    ///merge bcp47 codes
+                                    // merge bcp47 codes
                                     Set<Strings> bcp47Codes = new HashSet<>(windowPackageContractInfo.videoContractInfo.assetBcp47Codes);
                                     for (RightsContractAssetHollow asset : contractAssets) {
                                         bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
                                     }
-
+                                    // clone the contract info
                                     windowPackageContractInfo = windowPackageContractInfo.clone();
                                     windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
                                     windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
@@ -261,33 +275,42 @@ public class VMSAvailabilityWindowModule {
                                     windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int) contractId);
                                     windowPackageContractInfo.videoContractInfo.isAvailableForDownload = windowPackageContractInfo.videoContractInfo.isAvailableForDownload || isAvailableForDownload;
                                     windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, contractPackageHollow._getPackageId());
-
+                                    // update the package window package contract info
                                     outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
+                                    // if the current package id is the highest package id, then update the contract id for max package id.
                                     if (packageId.val == maxPackageId)
                                         contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
+                                    // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
                                     if (packageId.val == packageIdForWindow)
                                         thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                 }
                             } else {
 
                                 // if windowPackageContractInfo is not present in outputWindow.windowInfosByPackageId for the given packageId
+                                // then create a new one
 
                                 if (shouldFilterOutWindowInfo) {
+                                    // if previously filtered window package contract info exists the update the contract id in that to use higher value
                                     WindowPackageContractInfo alreadyFilteredWindowPackageContractInfo = outputWindow.windowInfosByPackageId.get(ZERO);
                                     if (alreadyFilteredWindowPackageContractInfo != null) {
                                         if (alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId < (int) contractId)
                                             alreadyFilteredWindowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
                                     } else {
+                                        // if previously filtered window package contract info does not exists then create new filtered window package contract info.
                                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
                                     }
 
+                                    // current package id is the first one and window data needs to be filtered, then update contract id for max package id.
                                     if (maxPackageId == 0)
                                         contractIdForMaxPackageId = Math.max(contractIdForMaxPackageId, (int) contractId);
 
+                                    // current package id is the fist one and window data needs to be filtered, then update the window assets group id, max contract id for the current window.
                                     if (packageIdForWindow == 0)
                                         thisWindowBundledAssetsGroupId = Math.max(thisWindowBundledAssetsGroupId, (int) contractId);
                                 } else {
+
+                                    // if windowPackageContractInfo is not present in outputWindow.windowInfosByPackageId for the given packageId and window data is not to be filtered
                                     includedWindowPackageData = true;
 
                                     if (packageData != null) {
@@ -301,11 +324,14 @@ public class VMSAvailabilityWindowModule {
                                         }
                                         if (considerForPackageSelection) {
 
+                                            // if package is default package or the only package in contract packages list
+                                            // update max package Id and contract id for max package id.
                                             if (packageData.id > maxPackageId) {
                                                 maxPackageId = packageData.id;
                                                 contractIdForMaxPackageId = (int) contractId;
                                             }
 
+                                            // update max package Id for current window and max contract id for the current window.
                                             if (packageData.id > packageIdForWindow) {
                                                 packageIdForWindow = packageData.id;
                                                 thisWindowBundledAssetsGroupId = (int) contractId;
@@ -317,8 +343,10 @@ public class VMSAvailabilityWindowModule {
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractData, videoId);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
+                                        // if fist package, then update contract id for the current window
                                         if (packageIdForWindow == 0)
                                             thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+                                        // update contract id for the max package id
                                         if (maxPackageId == 0)
                                             contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
                                     }
@@ -326,11 +354,14 @@ public class VMSAvailabilityWindowModule {
 
                                 long windowEndDate = window._getEndDate();
                                 long windowStartDate = window._getStartDate();
+                                // if window is open then rollup the start window availability date and update the flag isInWindow
                                 if (isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
                                     rollup.newInWindowAvailabilityDate(windowStartDate);
                                     isInWindow = true;
                                 }
 
+                                // keep track if minimum window start date, only for windows where end date is greater than now
+                                // also update currentOrFutureWindow and local audio/text values
                                 if (windowEndDate > ctx.getNowMillis() && windowStartDate < minWindowStartDate) {
                                     minWindowStartDate = windowStartDate;
                                     currentOrFirstFutureWindow = outputWindow;
@@ -343,7 +374,7 @@ public class VMSAvailabilityWindowModule {
 
 
                     } else {
-                        // package list is empty for the given contract -- use the contract only
+                        // package list is empty for the given contract -- use the contract only. Applicable only for non multi-locale country that is if locale is not passed
 
                         if (locale == null) {
                             // build info without package data, Use the assets and contract data though
@@ -370,11 +401,17 @@ public class VMSAvailabilityWindowModule {
 
             } // end of for loop for iterating through contracts in a window
 
+            // assign the highest contract Id recorded for the highest package Id in the current window
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {  /// do not add if all windows were filtered out for multicatalog country
+            // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
+            // Basically - Do not add: if all windows were filtered out for multicatalog country
+            if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
                 availabilityWindows.add(outputWindow);
+
+                // if evaluating episode and isGoLive is true, then roll up the windows to season.
                 if (rollup.doEpisode()) {
+
                     if (isMulticatalogRollup)
                         rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
                     if (isGoLive)
@@ -389,6 +426,8 @@ public class VMSAvailabilityWindowModule {
 
 
         if (currentOrFirstFutureWindow != null) {
+
+            // this basically gets the following data from max packageId across windows
             maxPackageId = Integer.MIN_VALUE;
             Set<Strings> assetBcp47CodesFromMaxPackageId = null;
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
@@ -417,6 +456,8 @@ public class VMSAvailabilityWindowModule {
                 }
             }
 
+            // once all the data is available then rollup the asset bcp 47 codes and pre-promo days.
+
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
 
@@ -432,6 +473,7 @@ public class VMSAvailabilityWindowModule {
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
 
+            // for multi-catalog country, rollup the local audio and text values
             if (locale != null) {
                 if (currentOrFirstFutureWindowFoundLocalAudio)
                     rollup.foundLocalAudio();
@@ -440,6 +482,7 @@ public class VMSAvailabilityWindowModule {
             }
 
         } else if (locale == null) {
+            // if no current or future window found, then do this, but why?
             rollup.newEpisodeData(isGoLive, contractIdForMaxPackageId);
             if (rollup.doEpisode())
                 rollup.newPrePromoDays(0);
@@ -554,6 +597,22 @@ public class VMSAvailabilityWindowModule {
 
     private static final long FUTURE_CUTOFF_IN_MILLIS = 360L * 24L * 60L * 60L * 1000L;
 
+    /**
+     * This function checks if the given window should be filtered.
+     * - If the window end data is less than now, meaning window has already passed, then answer is yes.
+     * - if isGoLive flag is false, then check if window data is needed. This is mainly for video (check all contracts) that are in pre-promotion stage or in days after broadcast.
+     * - if isGoLive is true, then check if window is open, endDate is greater than now
+     * - if isGoLive is true and endDate is > now, then check is window start is not in future.
+     *
+     * @param videoId
+     * @param countryCode
+     * @param isGoLive
+     * @param contractIds
+     * @param unfilteredCount
+     * @param startDate
+     * @param endDate
+     * @return if window data should be filtered.
+     */
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
         if (endDate < ctx.getNowMillis())
             return true;
