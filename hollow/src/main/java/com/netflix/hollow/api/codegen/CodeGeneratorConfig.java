@@ -18,20 +18,31 @@ package com.netflix.hollow.api.codegen;
 public class CodeGeneratorConfig {
     private String classPostfix = "";
     private String getterPrefix = "";
+    private boolean useAggressiveSubstitutions = false;
 
     // @TODO: Need to default this to be true in next major version of Hollow
     private boolean usePackageGrouping = false;
-    private boolean useAggressiveSubstitutions = false;
     private boolean useBooleanFieldErgonomics = false;
     private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
     private boolean useHollowPrimitiveTypes = false;
     private boolean restrictApiToFieldType = false;
+    private boolean useVerboseToString = false;
 
     public CodeGeneratorConfig() {}
 
     public CodeGeneratorConfig(String classPostfix, String getterPrefix) {
         this.classPostfix = classPostfix;
         this.getterPrefix = getterPrefix;
+    }
+
+    // Make it easier to automatically use defaults for next major version
+    public void initWithNextMajorVersionDefaults_V3() {
+        usePackageGrouping = true;
+        useBooleanFieldErgonomics = true;
+        reservePrimaryKeyIndexForTypeWithPrimaryKey = true;
+        useHollowPrimitiveTypes = true;
+        restrictApiToFieldType = true;
+        useVerboseToString = true;
     }
 
     public String getClassPostfix() {
@@ -102,6 +113,14 @@ public class CodeGeneratorConfig {
         this.restrictApiToFieldType = restrictApiToFieldType;
     }
 
+    public boolean isUseVerboseToString() {
+        return useVerboseToString;
+    }
+
+    public void setUseVerboseToString(boolean useVerboseToString) {
+        this.useVerboseToString = useVerboseToString;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -114,6 +133,7 @@ public class CodeGeneratorConfig {
         result = prime * result + (useBooleanFieldErgonomics ? 1231 : 1237);
         result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
         result = prime * result + (usePackageGrouping ? 1231 : 1237);
+        result = prime * result + (useVerboseToString ? 1231 : 1237);
         return result;
     }
 
@@ -148,6 +168,8 @@ public class CodeGeneratorConfig {
             return false;
         if (usePackageGrouping != other.usePackageGrouping)
             return false;
+        if (useVerboseToString != other.useVerboseToString)
+            return false;
         return true;
     }
 
@@ -170,6 +192,8 @@ public class CodeGeneratorConfig {
         builder.append(useHollowPrimitiveTypes);
         builder.append(", restrictApiToFieldType=");
         builder.append(restrictApiToFieldType);
+        builder.append(", useVerboseToString=");
+        builder.append(useVerboseToString);
         builder.append("]");
         return builder.toString();
     }
