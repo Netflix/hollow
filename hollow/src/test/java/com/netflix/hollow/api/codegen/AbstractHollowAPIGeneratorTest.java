@@ -49,7 +49,7 @@ public class AbstractHollowAPIGeneratorTest {
 
         // Run Generator
         HollowAPIGenerator generator = initGenerator(new HollowAPIGenerator.Builder().withDataModel(writeEngine).withAPIClassname(apiClassName).withPackageName(packageName));
-        generator.generateFiles(sourceFolder + "/" + packageName.replace('.', '/'));
+        generator.generateFiles(sourceFolder);
 
         // Compile to validate generated files
         HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
