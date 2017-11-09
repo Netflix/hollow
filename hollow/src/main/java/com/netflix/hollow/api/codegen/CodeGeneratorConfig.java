@@ -26,6 +26,7 @@ public class CodeGeneratorConfig {
     private boolean reservePrimaryKeyIndexForTypeWithPrimaryKey = false;
     private boolean useHollowPrimitiveTypes = false;
     private boolean restrictApiToFieldType = false;
+    private boolean useVerboseToString = false;
 
     public CodeGeneratorConfig() {}
 
@@ -102,6 +103,14 @@ public class CodeGeneratorConfig {
         this.restrictApiToFieldType = restrictApiToFieldType;
     }
 
+    public boolean isUseVerboseToString() {
+        return useVerboseToString;
+    }
+
+    public void setUseVerboseToString(boolean useVerboseToString) {
+        this.useVerboseToString = useVerboseToString;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -114,6 +123,7 @@ public class CodeGeneratorConfig {
         result = prime * result + (useBooleanFieldErgonomics ? 1231 : 1237);
         result = prime * result + (useHollowPrimitiveTypes ? 1231 : 1237);
         result = prime * result + (usePackageGrouping ? 1231 : 1237);
+        result = prime * result + (useVerboseToString ? 1231 : 1237);
         return result;
     }
 
@@ -148,6 +158,8 @@ public class CodeGeneratorConfig {
             return false;
         if (usePackageGrouping != other.usePackageGrouping)
             return false;
+        if (useVerboseToString != other.useVerboseToString)
+            return false;
         return true;
     }
 
@@ -170,6 +182,8 @@ public class CodeGeneratorConfig {
         builder.append(useHollowPrimitiveTypes);
         builder.append(", restrictApiToFieldType=");
         builder.append(restrictApiToFieldType);
+        builder.append(", useVerboseToString=");
+        builder.append(useVerboseToString);
         builder.append("]");
         return builder.toString();
     }

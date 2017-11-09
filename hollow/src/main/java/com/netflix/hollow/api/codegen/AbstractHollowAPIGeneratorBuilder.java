@@ -106,9 +106,13 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         return getBuilder();
     }
 
-
     public B withHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
         config.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
+        return getBuilder();
+    }
+
+    public B withVerboseToString(boolean useVerboseToString) {
+        config.setUseVerboseToString(useVerboseToString);
         return getBuilder();
     }
 
