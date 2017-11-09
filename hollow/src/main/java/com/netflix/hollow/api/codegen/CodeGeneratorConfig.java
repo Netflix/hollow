@@ -35,6 +35,7 @@ public class CodeGeneratorConfig {
         this.getterPrefix = getterPrefix;
     }
 
+    // Make it easier to automatically use defaults for next major version
     public void initWithNextMajorVersionDefaults_V3() {
         usePackageGrouping = true;
         useBooleanFieldErgonomics = true;
