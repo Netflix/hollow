@@ -25,8 +25,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.validation.AllValidationStatus;
+import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
-import com.netflix.hollow.api.producer.validation.OverallValidationStatus;
 
 /**
  * Beta API subject to change.
@@ -135,12 +136,12 @@ final class ListenerSupport {
         return psb;
     }
 
-    void fireValidationComplete(ProducerStatus.Builder psb, OverallValidationStatus.OverallValidationBuilder validationStatusBuilder) {
+    void fireValidationComplete(ProducerStatus.Builder psb, AllValidationStatusBuilder valStatusBuilder) {
         ProducerStatus st = psb.build();
-        OverallValidationStatus vst = validationStatusBuilder.build();
         for(final HollowProducerListener l : listeners) l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
         
-        for(final HollowValidationListener vl : validationListeners) vl.onValidationComplete(vst, psb.elapsed(), MILLISECONDS);
+        AllValidationStatus valStatus = valStatusBuilder.build();
+        for(final HollowValidationListener vl : validationListeners) vl.onValidationComplete(valStatus, psb.elapsed(), MILLISECONDS);
     }
 
     ProducerStatus.Builder fireAnnouncementStart(HollowProducer.ReadState readState) {

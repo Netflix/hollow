@@ -78,7 +78,7 @@ public class HollowProducerValidationListenerTest {
 		createHollowProducerAndRunCycle("MovieWithPrimaryKey", false);
 		assertOnValidationStatus(1, Status.SUCCESS, true, validationListener.getVersion());
 		// Expecting only record count validator status
-		IndividualValidatorStatus validatorStatus = validationListener.getStatus().getValidatorStatusList().get(0);
+		SingleValidationStatus validatorStatus = validationListener.getStatus().getValidationStatusList().get(0);
 		Assert.assertNotNull(validatorStatus);
 		// ValidationStatus builds record validator status based toString of RecordCountValidatorStatus for now.
 		Assert.assertEquals(Status.SUCCESS, validatorStatus.getStatus());
@@ -122,11 +122,10 @@ public class HollowProducerValidationListenerTest {
 	}
 
 	private void assertOnValidationStatus(int size, Status result, boolean isThrowableNull, long version) {
-		OverallValidationStatus status = validationListener.getStatus();
+		AllValidationStatus status = validationListener.getStatus();
 		Assert.assertNotNull("Stats null indicates HollowValidationFakeListener.onValidationComplete() was not called on runCycle.", status);
-		Assert.assertEquals(size, status.getValidatorStatusList().size());
+		Assert.assertEquals(size, status.getValidationStatusList().size());
 		Assert.assertEquals(result, status.getStatus());
-		Assert.assertEquals(isThrowableNull, status.getThrowable() == null);
 		Assert.assertEquals(version, status.getVersion());
 	}
 }
@@ -165,14 +164,14 @@ class MovieWithoutPrimaryKey{
 
 class HollowValidationFakeListener implements HollowValidationListener {
 	private long version;
-	private OverallValidationStatus status;
+	private AllValidationStatus status;
 	@Override
 	public void onValidationStart(long version) {
 		this.version = version;
 	}
 
 	@Override
-	public void onValidationComplete(OverallValidationStatus status, long elapsed, TimeUnit unit) {
+	public void onValidationComplete(AllValidationStatus status, long elapsed, TimeUnit unit) {
 		this.status = status;
 	}
 
@@ -180,7 +179,7 @@ class HollowValidationFakeListener implements HollowValidationListener {
 		return version;
 	}
 
-	public OverallValidationStatus getStatus() {
+	public AllValidationStatus getStatus() {
 		return status;
 	}
 	public void reset(){

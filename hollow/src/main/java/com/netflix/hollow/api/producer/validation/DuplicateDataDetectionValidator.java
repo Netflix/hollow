@@ -23,7 +23,7 @@ import java.util.Collection;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.IndividualValidationStatusBuilder;
+import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -48,7 +48,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 	private final String dataTypeName;
 	private final String[] fieldPathNames;
 	// Status is used to track validation details. Helps surface information.
-	private IndividualValidatorStatus status = null;
+	private SingleValidationStatus lastRunStatus = null;
 	
 	/**
 	 * @param dataTypeName for which this duplicate data detection is needed.
@@ -74,7 +74,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		IndividualValidationStatusBuilder statusBuilder = initializeForValidation(readState);
+		SingleValidationStatusBuilder statusBuilder = initializeForValidation(readState);
 		
 		PrimaryKey primaryKey = getPrimaryKey(readState, statusBuilder);
 		String fieldPaths = Arrays.toString(primaryKey.getFieldPaths());
@@ -95,17 +95,16 @@ public class DuplicateDataDetectionValidator implements Validator {
 		return hollowPrimaryKeyIndex.getDuplicateKeys();
 	}
 
-	private IndividualValidationStatusBuilder initializeForValidation(ReadState readState) {
-		status = null;
-		IndividualValidationStatusBuilder statusBuilder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
-		statusBuilder.addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
+	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
+		lastRunStatus = null;
+		SingleValidationStatusBuilder statusBuilder = SingleValidationStatus.builder(readState.getVersion()).addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
 		return statusBuilder;
 	}
 	
 	@Override
 	public String toString(){
-		if(status != null)
-			return status.toString();
+		if(lastRunStatus != null)
+			return lastRunStatus.toString();
 		return("DuplicateDataDetectionValidator status for "+dataTypeName+" is null. This is unexpected. Please check validator definition.");
 	}
 	
@@ -117,7 +116,7 @@ public class DuplicateDataDetectionValidator implements Validator {
         return message.toString();
 	}
 
-	private PrimaryKey getPrimaryKey(ReadState readState, IndividualValidationStatusBuilder statusBuilder) {
+	private PrimaryKey getPrimaryKey(ReadState readState, SingleValidationStatusBuilder statusBuilder) {
 		PrimaryKey primaryKey = null;
 
 		if (fieldPathNames == null) {
@@ -136,15 +135,14 @@ public class DuplicateDataDetectionValidator implements Validator {
 		return primaryKey;
 	}
 	
-	private void handleEndValidation(IndividualValidationStatusBuilder statusBuilder, Status status, String message) {
-		statusBuilder.withStatus(status);
-		if(message != null && status == Status.FAIL){
-			ValidationException validationException = new ValidationException(message);
-			statusBuilder.withThrowable(validationException);
-			this.status = statusBuilder.build();
-			throw validationException;
+	private void handleEndValidation(SingleValidationStatusBuilder statusBuilder, Status status, String message) {
+		statusBuilder.withMessage(message);
+		if(status == Status.FAIL){
+			ValidationException ex = new ValidationException(message);
+			this.lastRunStatus = statusBuilder.fail(ex).build();
+			throw ex;
 		}
-		this.status = statusBuilder.build();
+		this.lastRunStatus = statusBuilder.success().build();
 	}
 	
 	private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT = "Duplicate keys found for type %s. Unique key is defined as %s. "

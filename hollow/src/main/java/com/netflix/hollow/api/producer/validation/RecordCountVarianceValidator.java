@@ -20,7 +20,7 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
-import com.netflix.hollow.api.producer.validation.IndividualValidatorStatus.IndividualValidationStatusBuilder;
+import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 
 /**
@@ -35,7 +35,7 @@ public class RecordCountVarianceValidator implements Validator {
 	private final String typeName;
 	private final float allowableVariancePercent;
 	// status is used to capture details about validation. Helps surface information.
-	private IndividualValidatorStatus status = null;
+	private SingleValidationStatus status = null;
 	
 	/**
 	 * 
@@ -56,7 +56,7 @@ public class RecordCountVarianceValidator implements Validator {
 	 */
 	@Override
 	public void validate(ReadState readState) {
-		IndividualValidationStatusBuilder builder = initializeForValidation(readState);
+		SingleValidationStatusBuilder builder = initializeForValidation(readState);
 		
 		HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
 		int latestCardinality = typeState.getPopulatedOrdinals().cardinality();
@@ -65,7 +65,7 @@ public class RecordCountVarianceValidator implements Validator {
 		builder.addAdditionalInfo(PREVIOUS_CARDINALITY_NAME, String.valueOf(previousCardinality));
 		
 		if(previousCardinality  == 0){
-			handleEndValidation(builder, Status.SKIP, false, String.format(ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT, typeName));
+			handleEndValidation(builder, Status.SKIP, String.format(ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT, typeName));
 			return;
 		}
 
@@ -74,9 +74,9 @@ public class RecordCountVarianceValidator implements Validator {
 		
 		if (Float.compare(actualChangePercent , allowableVariancePercent) > 0) {
 			String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent, allowableVariancePercent);
-			handleEndValidation(builder, Status.FAIL, true, message);
+			handleEndValidation(builder, Status.FAIL, message);
 		}
-		handleEndValidation(builder, Status.SUCCESS, false, null);
+		handleEndValidation(builder, Status.SUCCESS, null);
 	}
 	
 	@Override
@@ -86,9 +86,9 @@ public class RecordCountVarianceValidator implements Validator {
 		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
 	}
 
-	private IndividualValidationStatusBuilder initializeForValidation(ReadState readState) {
+	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
 		status = null;
-		IndividualValidationStatusBuilder builder = IndividualValidatorStatus.builder().withVersion(readState.getVersion());
+		SingleValidationStatusBuilder builder = SingleValidationStatus.builder(readState.getVersion());
 		builder.addAdditionalInfo(ALLOWABLE_VARIANCE_PERCENT_NAME, String.valueOf(allowableVariancePercent));
 		builder.addAdditionalInfo(DATA_TYPE_NAME, typeName);
 		return builder;
@@ -100,17 +100,14 @@ public class RecordCountVarianceValidator implements Validator {
 		return changePercent;
 	}
 	
-	private void handleEndValidation(IndividualValidationStatusBuilder builder, Status status, boolean throwException, String message){
-		ValidationException validationException = null;
-		builder.withStatus(status);
+	private void handleEndValidation(SingleValidationStatusBuilder builder, Status status, String message){
 		builder.withMessage(message);
-		if(throwException){
-			validationException = new ValidationException(message);
-			builder.withThrowable(validationException);
-			this.status = builder.build();
-			throw validationException;
+		if(Status.FAIL == status){
+			ValidationException ex = new ValidationException(message);
+			this.status = builder.fail(ex).build();
+			throw ex;
 		}
-		this.status = builder.build();
+		this.status = builder.withStatus(status).build();
 	}
 	
 	private static final String DATA_TYPE_NAME = "Typename";

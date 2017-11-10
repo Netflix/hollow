@@ -28,39 +28,42 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  * 
  * @author lkanchanapalli {@literal<lavanya65@yahoo.com>}
  * 
- * ValidationStatus has one instance per each validator that ran. 
+ * SingleValidationStatus has one instance per each validator that ran. 
  * For now ValidationStatus builds these and sets toString on validator as the message (where validators provide any details).
  * In next iteration this might be directly returned by validators.
  */
-class IndividualValidatorStatus {
+public class SingleValidationStatus {
     private final long version;
     private final Status status;
     private final String message;
     private final Throwable throwable;
     private final Map<String, String> additionalInfo;
 
-	private IndividualValidatorStatus(IndividualValidationStatusBuilder builder) {
+	private SingleValidationStatus(SingleValidationStatusBuilder builder) {
 		this.version = builder.version;
 		this.status = builder.status;
 		this.message = builder.message;
 		this.throwable = builder.throwable;
 		this.additionalInfo = builder.additionalInfo;
 	}
-
-	public IndividualValidatorStatus(long version, Status status, String message,Throwable throwable, Map<String,String> additionalInfo) {
-		super();
+    
+	public SingleValidationStatus(long version, Status status, String message, Throwable throwable,
+			Map<String, String> additionalInfo) {
 		this.version = version;
 		this.status = status;
 		this.message = message;
 		this.throwable = throwable;
 		this.additionalInfo = additionalInfo;
 	}
+
 	public long getVersion() {
 		return version;
 	}
+
 	public Status getStatus() {
 		return status;
 	}
+
 	public String getMessage() {
 		return message;
 	}
@@ -68,75 +71,83 @@ class IndividualValidatorStatus {
 	public Throwable getThrowable() {
 		return throwable;
 	}
+
 	public Map<String, String> getAdditionalInfo() {
 		return additionalInfo;
 	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ValidatorStatus [version=");
+		builder.append("IndividualValidatorStatus [version=");
 		builder.append(version);
 		builder.append(", status=");
 		builder.append(status);
-		if(message != null && !message.isEmpty()){
-			builder.append(", message=");
-			builder.append(message);
-		}
-		if(additionalInfo != null && !additionalInfo.isEmpty()){
-			builder.append(", additionalInfo=");
-			builder.append(additionalInfo);
-		}
+		builder.append(", message=");
+		builder.append(message);
+		builder.append(", throwable=");
+		builder.append(throwable);
+		builder.append(", additionalInfo=");
+		builder.append(additionalInfo);
 		builder.append("]");
 		return builder.toString();
 	}
+
 	/**
-	 * Creates builder to build {@link IndividualValidatorStatus}.
+	 * Creates builder to build {@link SingleValidationStatus}.
 	 * @return created builder
 	 */
-	public static IndividualValidationStatusBuilder builder() {
-		return new IndividualValidationStatusBuilder();
+	public static SingleValidationStatusBuilder builder(long version) {
+		return new SingleValidationStatusBuilder(version);
 	}
+
 	/**
-	 * Builder to build {@link IndividualValidatorStatus}.
+	 * Builder to build {@link SingleValidationStatus}.
 	 */
-	public static final class IndividualValidationStatusBuilder {
+	public static final class SingleValidationStatusBuilder {
 		private long version;
 		private Status status;
 		private String message;
 		private Throwable throwable;
 		private Map<String, String> additionalInfo;
 
-		private IndividualValidationStatusBuilder() {
-			additionalInfo = new HashMap<>();
-		}
-
-		public IndividualValidationStatusBuilder withVersion(long version) {
+		private SingleValidationStatusBuilder(long version) {
 			this.version = version;
-			return this;
 		}
 
-		public IndividualValidationStatusBuilder withStatus(Status status) {
-			this.status = status;
-			return this;
-		}
 
-		public IndividualValidationStatusBuilder withMessage(String message) {
+		public SingleValidationStatusBuilder withMessage(String message) {
 			this.message = message;
 			return this;
 		}
 
-		public IndividualValidationStatusBuilder withThrowable(Throwable throwable) {
-			this.throwable = throwable;
+		public SingleValidationStatusBuilder fail(Throwable th) {
+			this.throwable = th;
+			this.status = Status.FAIL;
 			return this;
 		}
-
-		public IndividualValidationStatusBuilder addAdditionalInfo(String key, String value) {
+		
+		public SingleValidationStatusBuilder success() {
+			this.status = Status.SUCCESS;
+			return this;
+		}
+		
+		public SingleValidationStatusBuilder withStatus(Status status) {
+			this.status = status;
+			return this;
+		}
+		
+		public SingleValidationStatusBuilder addAdditionalInfo(String key, String value) {
+			if(this.additionalInfo == null) 
+				this.additionalInfo = new HashMap<>();
 			this.additionalInfo.put(key, value);
 			return this;
 		}
 
-		public IndividualValidatorStatus build() {
-			return new IndividualValidatorStatus(this);
+		public SingleValidationStatus build() {
+			return new SingleValidationStatus(this);
 		}
 	}
+	
+	
 }

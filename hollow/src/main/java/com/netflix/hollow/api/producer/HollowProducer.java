@@ -43,8 +43,11 @@ import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
+import com.netflix.hollow.api.producer.validation.AllValidationStatus;
+import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
-import com.netflix.hollow.api.producer.validation.OverallValidationStatus;
+import com.netflix.hollow.api.producer.validation.SingleValidationStatus;
+import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -656,37 +659,43 @@ public class HollowProducer {
     }
 
     private void validate(HollowProducer.ReadState readState) {
-        ProducerStatus.Builder status = listeners.fireValidationStart(readState);
-        OverallValidationStatus.OverallValidationBuilder valStatus = OverallValidationStatus.builder().withReadState(readState).withVersion(readState.getVersion());
-        try {
-            List<Throwable> validationFailures = new ArrayList<Throwable>();
-            
-            for(Validator validator : validators) {
-            	Throwable throwable = null;
-                try {
-                    validator.validate(readState);
-                } catch(Throwable th) {
-                    validationFailures.add(th);
-                }
-                valStatus.addIndividualValidatorStatus(throwable, validator.toString());
-            }
-            
-            if(!validationFailures.isEmpty()) {
-                ValidationException ex = new ValidationException("Validation Failed", validationFailures.get(0));
-                ex.setIndividualFailures(validationFailures);
-                throw ex;
-            }
-            
-            status.success();
-            valStatus.success();
-        } catch (Throwable th) {
-            status.fail(th);
-            valStatus.fail(th);
-            throw th;
-        } finally {
-            listeners.fireValidationComplete(status, valStatus);
-        }
+    	com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus.Builder psb = listeners.fireValidationStart(readState);
+    	List<Throwable> exceptions = new ArrayList<>();
+    	AllValidationStatusBuilder valStatus = AllValidationStatus.builder(readState.getVersion());
+    	
+    	try {
+    		for(Validator validator: validators) {
+    			Throwable throwable = null;
+    			try {
+    				validator.validate(readState);
+	    		} catch (Throwable th) {
+	    			throwable = th;
+	    			exceptions.add(th);
+	    		}
+    			valStatus.addSingelValidationStatus(getValidationStatus(readState, validator, throwable));
+    		}
+	    	
+	    	if(!exceptions.isEmpty()) {
+	    		ValidationException valEx = new ValidationException("One or more validations failed. Please check individual failures.", exceptions);
+	    		psb.fail(valEx);
+	    		valStatus.fail();
+	    		throw valEx;
+	    	}
+	    	psb.success();
+	    	valStatus.success();
+    	} finally {
+    		listeners.fireValidationComplete(psb, valStatus);
+    	}
     }
+
+	private SingleValidationStatus getValidationStatus(HollowProducer.ReadState readState, Validator validator, Throwable throwable) {
+		SingleValidationStatusBuilder status = SingleValidationStatus.builder(readState.getVersion()).withMessage(validator.toString());
+		if(throwable != null) {
+			status.fail(throwable);
+		} else
+			status.success();
+		return status.build();
+	}
     
 
     private void announce(HollowProducer.ReadState readState) {
@@ -888,10 +897,14 @@ public class HollowProducer {
                 super(msg, cause);
             }
             
-            public void setIndividualFailures(List<Throwable> individualFailures) {
+            public ValidationException(String msg, List<Throwable> individualFailures) {
+            	super(msg);
+            	this.individualFailures = individualFailures;
+			}
+
+			public void setIndividualFailures(List<Throwable> individualFailures) {
                 this.individualFailures = individualFailures;
             }
-            
             public List<Throwable> getIndividualFailures() {
                 return individualFailures;
             }
