@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
+import java.util.List;
+
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import java.util.List;
 
 public class TopNViewShareAvailabilityCircuitBreaker extends HollowPerCountryTopNVideoScoringCircuitBreaker {
 
@@ -35,7 +36,7 @@ public class TopNViewShareAvailabilityCircuitBreaker extends HollowPerCountryTop
 
 	@Override
 	public String getRuleName() {
-		return "TopNViewShare";
+		return "TopNMissingViewShare";
 	}
 
 }
