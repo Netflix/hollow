@@ -3,16 +3,17 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.CIRCUITBREAKER_STATS;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 
-import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
+import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 public abstract class HollowCircuitBreaker {
 
@@ -63,7 +64,7 @@ public abstract class HollowCircuitBreaker {
                 return new CircuitBreakerResults(false, getFailedCBMessage(metricName, currentValue, changeThresholdPercent, baseLine));
             }
 
-            return new CircuitBreakerResults(true, "Metric \"" + metricName + "\" current value: " + currentValue + " expected value: " + baseLine + " threshold: " + changeThresholdPercent);
+            return new CircuitBreakerResults(true, getSuccessMessage(metricName, currentValue, changeThresholdPercent, baseLine));
         
         } catch(Exception e) {
             ctx.getLogger().info(CircuitBreaker, "Metric \"{}\" current value: {}", metricName, currentValue);
@@ -76,6 +77,10 @@ public abstract class HollowCircuitBreaker {
             }
         }
     }
+
+	protected String getSuccessMessage(String metricName, double currentValue, double changeThresholdPercent, double baseLine) {
+		return "Metric \"" + metricName + "\" current value: " + currentValue + " expected value: " + baseLine + " threshold: " + changeThresholdPercent;
+	}
 
     protected String getFailedCBMessage(String metricName, double currentValue, double changeThresholdPercent, double baseLine) {
     	String changeType = (currentValue < baseLine) ? "drop" : "addition";
