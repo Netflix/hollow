@@ -25,4 +25,14 @@ public abstract class HollowFixedBaseLineCountrySpecificCircuitBreaker extends H
 		        + "This will result failure of announcement of data to clients."
 		        + "Observed a value of  " + currentValue + " percent which is more than threshold: " + changeThresholdPercent+" percentage.";
 	}
+    
+    @Override
+    public void saveSuccessSizesForCycle(long cycleVersion) {
+    	// Do nothing. Since baseline is not used, the success counts per cycle need not be saved.  
+    }
+    
+    @Override
+	protected String getSuccessMessage(String metricName, double currentValue, double changeThresholdPercent, double baseLine) {
+		return "Metric \"" + metricName + "\" current value: " + currentValue + " threshold: " + changeThresholdPercent;
+	}
 }
