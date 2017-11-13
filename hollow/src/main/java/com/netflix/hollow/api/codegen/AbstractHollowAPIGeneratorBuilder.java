@@ -16,6 +16,8 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.util.Collections;
 import java.util.Set;
 
@@ -51,6 +53,16 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     public B withDataModel(HollowDataset dataset) {
         this.dataset = dataset;
         return getBuilder();
+    }
+
+    public B withDataModel(Class<?> ... classes) {
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        for(Class<?> clazz : classes) {
+            mapper.initializeTypeState(clazz);
+        }
+
+        return withDataModel(writeEngine);
     }
 
     public B withParameterizedTypes(Set<String> parameterizedTypes) {
@@ -106,9 +118,13 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         return getBuilder();
     }
 
-
     public B withHollowPrimitiveTypes(boolean useHollowPrimitiveTypes) {
         config.setUseHollowPrimitiveTypes(useHollowPrimitiveTypes);
+        return getBuilder();
+    }
+
+    public B withVerboseToString(boolean useVerboseToString) {
+        config.setUseVerboseToString(useVerboseToString);
         return getBuilder();
     }
 

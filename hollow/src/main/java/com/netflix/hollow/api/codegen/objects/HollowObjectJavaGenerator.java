@@ -34,6 +34,7 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import java.util.Set;
 
 /**
@@ -83,6 +84,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n\n");
+        classBuilder.append("import " + HollowRecordStringifier.class.getName() + ";\n\n");
 
 
         classBuilder.append("@SuppressWarnings(\"all\")\n");
@@ -95,6 +97,10 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         appendAPIAccessor(classBuilder);
         appendTypeAPIAccessor(classBuilder);
         appendDelegateAccessor(classBuilder);
+
+        if (config.isUseVerboseToString()) {
+            appendToString(classBuilder);
+        }
 
         classBuilder.append("}");
 
@@ -346,6 +352,12 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private void appendDelegateAccessor(StringBuilder classBuilder) {
         classBuilder.append("    protected ").append(delegateInterfaceName(schema.getName())).append(" delegate() {\n");
         classBuilder.append("        return (").append(delegateInterfaceName(schema.getName())).append(")delegate;\n");
+        classBuilder.append("    }\n\n");
+    }
+
+    private void appendToString(StringBuilder classBuilder) {
+        classBuilder.append("    public String toString() {\n");
+        classBuilder.append("        return new HollowRecordStringifier().stringify(this);\n");
         classBuilder.append("    }\n\n");
     }
 
