@@ -100,10 +100,16 @@ public class VMSCircuitBreakerRestApis {
 		int size = 1;
 		if(sizeStr != null)
 			size = Integer.parseInt(sizeStr);
-		System.out.println("SIZE === " + size);
+		
+		// If the size is greater than 5, defayult it to 5
+		if(size > 5)
+			size = 5;
 		
 		// Determine the cycles
-		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostname, vipName, size);
+		List<String> cycles = VMSElasticSearchDataFetcher.getCycles(esHostname, vipName, size + 1);
+		
+		// Ignore the first cycle
+		cycles = cycles.subList(1, cycles.size());
 		
 		// If specific cycleId was specified, use it
 		if(cycleId != null) {
