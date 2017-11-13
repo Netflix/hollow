@@ -2367,14 +2367,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -5872,14 +5872,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -9377,14 +9377,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -12971,14 +12971,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -18216,14 +18216,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -21721,14 +21721,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -25230,14 +25230,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -28763,14 +28763,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -32376,14 +32376,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -35989,14 +35989,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -39602,14 +39602,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -43215,14 +43215,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -46828,14 +46828,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -50441,14 +50441,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -54054,14 +54054,14 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-mutation-stream",
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.2",
+            "locked": "3.1.3",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
