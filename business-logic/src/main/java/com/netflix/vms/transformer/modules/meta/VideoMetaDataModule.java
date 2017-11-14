@@ -31,7 +31,7 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Hook;
 import com.netflix.vms.transformer.hollowoutput.HookType;
-import com.netflix.vms.transformer.hollowoutput.MerchingBehaviour;
+import com.netflix.vms.transformer.hollowoutput.MerchBehavior;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
@@ -134,7 +134,7 @@ public class VideoMetaDataModule {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
                         convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoDataCollection, rollup, rolldown);
-                        populateEpisodeMerchingBehaviour(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i, j);
+                        populateEpisodeMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i, j);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
@@ -142,7 +142,7 @@ public class VideoMetaDataModule {
                     rollup.setDoSeason(true);
                     rolldown.setDoSeason(true);
                     convert(hierarchy.getSeasonIds()[i], countryCode, videoDataCollection, rollup, rolldown);
-                    populateSeasonMerchingBehaviour(hierarchy, countryAgnosticMap.get(hierarchy.getSeasonIds()[i]), i);
+                    populateSeasonMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getSeasonIds()[i]), i);
                     rollup.setDoSeason(false);
                     rolldown.setDoSeason(false);
                 }
@@ -150,7 +150,7 @@ public class VideoMetaDataModule {
                 rollup.setDoShow(true);
                 rolldown.setDoShow(true);
                 convert(hierarchy.getTopNodeId(), countryCode, videoDataCollection, rollup, rolldown);
-                populateShowMerchingBehaviour(hierarchy, countryAgnosticMap.get(hierarchy.getTopNodeId()));
+                populateShowMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getTopNodeId()));
                 rollup.setDoShow(false);
                 rolldown.setDoShow(false);
 
@@ -310,39 +310,39 @@ public class VideoMetaDataModule {
         return DEFAULT_SHOW_MEMBER_TYPE_ID;
     }
 
-    private void populateShowMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd) {
+    private void populateShowMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd) {
 
-        VideoHierarchy.ShowMerchingBehaviour merchingBehaviour = hierarchy.getShowMerchingBehaviour();
+        VideoHierarchy.ShowMerchBehavior merchingBehaviour = hierarchy.getShowMerchBehavior();
         if (merchingBehaviour != null) {
-            vmd.merchingBehaviour = new MerchingBehaviour();
-            vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
-            vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
-            vmd.merchingBehaviour.hideSeasonNumbers = merchingBehaviour.hideSeasonNumbers;
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.merchOrder = merchingBehaviour.merchOrder;
+            vmd.merchBehavior.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchBehavior.hideSeasonNumbers = merchingBehaviour.hideSeasonNumbers;
         }
     }
 
-    private void populateSeasonMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum) {
+    private void populateSeasonMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum) {
 
-        VideoHierarchy.SeasonMerchingBehaviour merchingBehaviour = hierarchy.getSeasonMerchingBehaviour(seasonNum);
+        VideoHierarchy.SeasonMerchBehavior merchingBehaviour = hierarchy.getSeasonMerchingBehaviour(seasonNum);
         if (merchingBehaviour != null) {
-            vmd.merchingBehaviour = new MerchingBehaviour();
-            vmd.merchingBehaviour.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
-            vmd.merchingBehaviour.episodeSkipping = merchingBehaviour.episodeSkipping;
-            vmd.merchingBehaviour.episodicNewBadge = merchingBehaviour.episodicNewBadge;
-            vmd.merchingBehaviour.filterUnavailableEpisodes = merchingBehaviour.filterUnavailableEpisodes;
-            vmd.merchingBehaviour.useLatestEpisodeAsDefault = merchingBehaviour.useLatestEpisodeAsDefault;
-            vmd.merchingBehaviour.merchOrder = merchingBehaviour.merchOrder;
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
+            vmd.merchBehavior.episodeSkipping = merchingBehaviour.episodeSkipping;
+            vmd.merchBehavior.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchBehavior.filterUnavailableEpisodes = merchingBehaviour.filterUnavailableEpisodes;
+            vmd.merchBehavior.useLatestEpisodeAsDefault = merchingBehaviour.useLatestEpisodeAsDefault;
+            vmd.merchBehavior.merchOrder = merchingBehaviour.merchOrder;
         }
     }
 
-    private void populateEpisodeMerchingBehaviour(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum, int episodeNum) {
+    private void populateEpisodeMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum, int episodeNum) {
 
-        VideoHierarchy.EpisodeMerchingBehaviour merchingBehaviour = hierarchy.getEpisodeMerchingBehaviour(seasonNum, episodeNum);
+        VideoHierarchy.EpisodeMerchBehavior merchingBehaviour = hierarchy.getEpisodeMerchingBehaviour(seasonNum, episodeNum);
         if (merchingBehaviour != null) {
-            vmd.merchingBehaviour = new MerchingBehaviour();
-            vmd.merchingBehaviour.midSeason = merchingBehaviour.midSeason;
-            vmd.merchingBehaviour.seasonFinale = merchingBehaviour.seasonFinale;
-            vmd.merchingBehaviour.showFinale = merchingBehaviour.showFinale;
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.midSeason = merchingBehaviour.midSeason;
+            vmd.merchBehavior.seasonFinale = merchingBehaviour.seasonFinale;
+            vmd.merchBehavior.showFinale = merchingBehaviour.showFinale;
         }
     }
 

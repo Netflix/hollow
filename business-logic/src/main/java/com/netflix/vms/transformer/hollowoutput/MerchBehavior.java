@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.hollowoutput;
 /**
  * This class contains flags that contain information on merching/display order for a video.
  */
-public class MerchingBehaviour {
+public class MerchBehavior {
 
     public String merchOrder = "regular";
     public Boolean episodicNewBadge = false;
@@ -28,9 +28,9 @@ public class MerchingBehaviour {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MerchingBehaviour)) return false;
+        if (!(o instanceof MerchBehavior)) return false;
 
-        MerchingBehaviour that = (MerchingBehaviour) o;
+        MerchBehavior that = (MerchBehavior) o;
 
         if (episodeSkipping != that.episodeSkipping) return false;
         if (merchOrder != null ? !merchOrder.equals(that.merchOrder) : that.merchOrder != null) return false;
@@ -66,7 +66,7 @@ public class MerchingBehaviour {
 
     public String toString() {
 
-        StringBuilder builder = new StringBuilder("MerchingBehaviour{");
+        StringBuilder builder = new StringBuilder("MerchBehavior{");
         builder.append("merchOrder=").append(merchOrder);
         builder.append(",episodicNewBadge=").append(episodicNewBadge);
         builder.append(",hideSeasonNumbers=").append(hideSeasonNumbers);

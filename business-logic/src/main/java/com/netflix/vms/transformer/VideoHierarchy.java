@@ -33,9 +33,9 @@ public class VideoHierarchy {
     private final Set<Integer> droppedIds = new HashSet<>();
     private final Map<Integer, Integer> supplementalSeasonSeqNumMap = new HashMap<>();
 
-    private final ShowMerchingBehaviour showMerchingBehaviour;
-    private final SeasonMerchingBehaviour[] seasonMerchingBehaviour;
-    private final EpisodeMerchingBehaviour[][] episodeMerchingBehaviour;
+    private final ShowMerchBehavior showMerchBehavior;
+    private final SeasonMerchBehavior[] seasonMerchBehavior;
+    private final EpisodeMerchBehavior[][] episodeMerchBehavior;
 
     public VideoHierarchy(TransformerContext ctx, int topNodeId, boolean isStandalone, ShowSeasonEpisodeHollow set, String countryCode, VideoHierarchyInitializer initializer) {
         this.ctx = ctx;
@@ -62,11 +62,11 @@ public class VideoHierarchy {
 
             int seasonIds[] = new int[seasons.size()];
             int seasonSequenceNumbers[] = new int[seasons.size()];
-            SeasonMerchingBehaviour[] seasonMerchingBehaviourAttributes = new SeasonMerchingBehaviour[seasons.size()];
+            SeasonMerchBehavior[] seasonMerchBehaviorAttributes = new SeasonMerchBehavior[seasons.size()];
 
             int episodeIds[][] = new int[seasons.size()][];
             int episodeSequenceNumbers[][] = new int[seasons.size()][];
-            EpisodeMerchingBehaviour[][] episodeMerchingBehaviourAttributes = new EpisodeMerchingBehaviour[seasons.size()][];
+            EpisodeMerchBehavior[][] episodeMerchBehaviorAttributes = new EpisodeMerchBehavior[seasons.size()][];
 
             int seasonCounter = 0;
 
@@ -85,7 +85,7 @@ public class VideoHierarchy {
 
                 seasonIds[seasonCounter] = seasonId;
                 seasonSequenceNumbers[seasonCounter] = seasonSequenceNumber;
-                seasonMerchingBehaviourAttributes[seasonCounter] = getMerchingBehaviour(season);
+                seasonMerchBehaviorAttributes[seasonCounter] = getMerchBehavior(season);
 
                 hashCode ^= seasonIds[i];
                 hashCode = HashCodes.hashInt(hashCode);
@@ -100,7 +100,7 @@ public class VideoHierarchy {
 
                 episodeIds[seasonCounter] = new int[episodes.size()];
                 episodeSequenceNumbers[seasonCounter] = new int[episodes.size()];
-                episodeMerchingBehaviourAttributes[seasonCounter] = new EpisodeMerchingBehaviour[episodes.size()];
+                episodeMerchBehaviorAttributes[seasonCounter] = new EpisodeMerchBehavior[episodes.size()];
 
                 int episodeCounter = 0;
 
@@ -118,7 +118,7 @@ public class VideoHierarchy {
 
                     episodeIds[seasonCounter][episodeCounter] = (int) episode._getMovieId();
                     episodeSequenceNumbers[seasonCounter][episodeCounter] = (int) episode._getSequenceNumber();
-                    episodeMerchingBehaviourAttributes[seasonCounter][episodeCounter] = getMerchingBehaviour(episode);
+                    episodeMerchBehaviorAttributes[seasonCounter][episodeCounter] = getMerchBehavior(episode);
 
                     hashCode ^= episodeIds[seasonCounter][episodeCounter];
                     hashCode = HashCodes.hashInt(hashCode);
@@ -136,9 +136,9 @@ public class VideoHierarchy {
                 episodeIds = Arrays.copyOf(episodeIds, seasonCounter);
             }
 
-            this.seasonMerchingBehaviour = seasonMerchingBehaviourAttributes;
-            this.episodeMerchingBehaviour = episodeMerchingBehaviourAttributes;
-            this.showMerchingBehaviour = getMerchingBehaviour(set);
+            this.seasonMerchBehavior = seasonMerchBehaviorAttributes;
+            this.episodeMerchBehavior = episodeMerchBehaviorAttributes;
+            this.showMerchBehavior = getMerchBehavior(set);
 
             this.seasonIds = seasonIds;
             this.episodeIds = episodeIds;
@@ -146,9 +146,9 @@ public class VideoHierarchy {
             this.episodeSequenceNumbers = episodeSequenceNumbers;
         } else {
 
-            this.seasonMerchingBehaviour = new SeasonMerchingBehaviour[0];
-            this.episodeMerchingBehaviour = new EpisodeMerchingBehaviour[0][];
-            this.showMerchingBehaviour = null;
+            this.seasonMerchBehavior = new SeasonMerchBehavior[0];
+            this.episodeMerchBehavior = new EpisodeMerchBehavior[0][];
+            this.showMerchBehavior = null;
 
             this.seasonIds = new int[0];
             this.episodeIds = new int[0][];
@@ -238,20 +238,20 @@ public class VideoHierarchy {
         return false;
     }
 
-    public ShowMerchingBehaviour getShowMerchingBehaviour() {
-        return showMerchingBehaviour;
+    public ShowMerchBehavior getShowMerchBehavior() {
+        return showMerchBehavior;
     }
 
-    public EpisodeMerchingBehaviour getEpisodeMerchingBehaviour(int seasonNum, int episodeNum) {
-        if (seasonNum <= episodeMerchingBehaviour.length && episodeNum <= episodeMerchingBehaviour[seasonNum].length) {
-            return episodeMerchingBehaviour[seasonNum][episodeNum];
+    public EpisodeMerchBehavior getEpisodeMerchingBehaviour(int seasonNum, int episodeNum) {
+        if (seasonNum <= episodeMerchBehavior.length && episodeNum <= episodeMerchBehavior[seasonNum].length) {
+            return episodeMerchBehavior[seasonNum][episodeNum];
         }
         return null;
     }
 
-    public SeasonMerchingBehaviour getSeasonMerchingBehaviour(int seasonNum) {
-        if (seasonNum <= seasonMerchingBehaviour.length)
-            return seasonMerchingBehaviour[seasonNum];
+    public SeasonMerchBehavior getSeasonMerchingBehaviour(int seasonNum) {
+        if (seasonNum <= seasonMerchBehavior.length)
+            return seasonMerchBehavior[seasonNum];
         return null;
     }
 
@@ -308,16 +308,16 @@ public class VideoHierarchy {
         return sb.toString();
     }
 
-    private ShowMerchingBehaviour getMerchingBehaviour(ShowSeasonEpisodeHollow showSeasonEpisodeHollow) {
-        ShowMerchingBehaviour attributes = new ShowMerchingBehaviour();
+    private ShowMerchBehavior getMerchBehavior(ShowSeasonEpisodeHollow showSeasonEpisodeHollow) {
+        ShowMerchBehavior attributes = new ShowMerchBehavior();
         attributes.hideSeasonNumbers = showSeasonEpisodeHollow._getHideSeasonNumbers();
         attributes.episodicNewBadge = showSeasonEpisodeHollow._getEpisodicNewBadge();
         attributes.merchOrder = showSeasonEpisodeHollow._getMerchOrder()._getValue();
         return attributes;
     }
 
-    private SeasonMerchingBehaviour getMerchingBehaviour(SeasonHollow seasonHollow) {
-        SeasonMerchingBehaviour attributes = new SeasonMerchingBehaviour();
+    private SeasonMerchBehavior getMerchBehavior(SeasonHollow seasonHollow) {
+        SeasonMerchBehavior attributes = new SeasonMerchBehavior();
         attributes.hideEpisodeNumbers = seasonHollow._getHideEpisodeNumbers();
         attributes.episodicNewBadge = seasonHollow._getEpisodicNewBadge();
         attributes.episodeSkipping = seasonHollow._getEpisodeSkipping();
@@ -327,21 +327,21 @@ public class VideoHierarchy {
         return attributes;
     }
 
-    private EpisodeMerchingBehaviour getMerchingBehaviour(EpisodeHollow episodeHollow) {
-        EpisodeMerchingBehaviour attributes = new EpisodeMerchingBehaviour();
+    private EpisodeMerchBehavior getMerchBehavior(EpisodeHollow episodeHollow) {
+        EpisodeMerchBehavior attributes = new EpisodeMerchBehavior();
         attributes.midSeason = episodeHollow._getMidSeason();
         attributes.seasonFinale = episodeHollow._getSeasonFinale();
         attributes.showFinale = episodeHollow._getShowFinale();
         return attributes;
     }
 
-    public static class ShowMerchingBehaviour {
+    public static class ShowMerchBehavior {
         public boolean hideSeasonNumbers;
         public boolean episodicNewBadge;
         public String merchOrder;
     }
 
-    public static class SeasonMerchingBehaviour {
+    public static class SeasonMerchBehavior {
         public boolean hideEpisodeNumbers;
         public boolean episodicNewBadge;
         public int episodeSkipping;
@@ -350,7 +350,7 @@ public class VideoHierarchy {
         public String merchOrder;
     }
 
-    public static class EpisodeMerchingBehaviour {
+    public static class EpisodeMerchBehavior {
         public boolean midSeason;
         public boolean seasonFinale;
         public boolean showFinale;

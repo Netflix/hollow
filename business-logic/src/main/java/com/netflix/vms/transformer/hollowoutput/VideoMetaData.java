@@ -34,7 +34,7 @@ public class VideoMetaData implements Cloneable {
     public int broadcastReleaseYear = java.lang.Integer.MIN_VALUE;
     public Strings broadcastDistributorName = null;
     public Integer metadataReleaseDays = null;
-    public MerchingBehaviour merchingBehaviour = null;
+    public MerchBehavior merchBehavior = null;
 
     public boolean equals(Object other) {
         if (other == this) return true;
@@ -174,7 +174,7 @@ public class VideoMetaData implements Cloneable {
         builder.append(",broadcastReleaseYear=").append(broadcastReleaseYear);
         builder.append(",broadcastDistributorName=").append(broadcastDistributorName);
         builder.append(",metadataReleaseDays=").append(metadataReleaseDays);
-        builder.append(",merchingBehaviour=").append(merchingBehaviour);
+        builder.append(",merchBehavior=").append(merchBehavior);
         builder.append("}");
         return builder.toString();
     }
