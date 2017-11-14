@@ -37,6 +37,26 @@ public class ShowSeasonEpisodeDelegateLookupImpl extends HollowObjectAbstractDel
         return typeAPI.getSeasonsOrdinal(ordinal);
     }
 
+    public boolean getHideSeasonNumbers(int ordinal) {
+        return typeAPI.getHideSeasonNumbers(ordinal);
+    }
+
+    public Boolean getHideSeasonNumbersBoxed(int ordinal) {
+        return typeAPI.getHideSeasonNumbersBoxed(ordinal);
+    }
+
+    public boolean getEpisodicNewBadge(int ordinal) {
+        return typeAPI.getEpisodicNewBadge(ordinal);
+    }
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal) {
+        return typeAPI.getEpisodicNewBadgeBoxed(ordinal);
+    }
+
+    public int getMerchOrderOrdinal(int ordinal) {
+        return typeAPI.getMerchOrderOrdinal(ordinal);
+    }
+
     public ShowSeasonEpisodeTypeAPI getTypeAPI() {
         return typeAPI;
     }

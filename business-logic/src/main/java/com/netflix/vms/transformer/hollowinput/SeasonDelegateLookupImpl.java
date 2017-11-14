@@ -33,6 +33,50 @@ public class SeasonDelegateLookupImpl extends HollowObjectAbstractDelegate imple
         return typeAPI.getEpisodesOrdinal(ordinal);
     }
 
+    public boolean getHideEpisodeNumbers(int ordinal) {
+        return typeAPI.getHideEpisodeNumbers(ordinal);
+    }
+
+    public Boolean getHideEpisodeNumbersBoxed(int ordinal) {
+        return typeAPI.getHideEpisodeNumbersBoxed(ordinal);
+    }
+
+    public boolean getEpisodicNewBadge(int ordinal) {
+        return typeAPI.getEpisodicNewBadge(ordinal);
+    }
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal) {
+        return typeAPI.getEpisodicNewBadgeBoxed(ordinal);
+    }
+
+    public int getEpisodeSkipping(int ordinal) {
+        return typeAPI.getEpisodeSkipping(ordinal);
+    }
+
+    public Integer getEpisodeSkippingBoxed(int ordinal) {
+        return typeAPI.getEpisodeSkippingBoxed(ordinal);
+    }
+
+    public boolean getFilterUnavailableEpisodes(int ordinal) {
+        return typeAPI.getFilterUnavailableEpisodes(ordinal);
+    }
+
+    public Boolean getFilterUnavailableEpisodesBoxed(int ordinal) {
+        return typeAPI.getFilterUnavailableEpisodesBoxed(ordinal);
+    }
+
+    public boolean getUseLatestEpisodeAsDefault(int ordinal) {
+        return typeAPI.getUseLatestEpisodeAsDefault(ordinal);
+    }
+
+    public Boolean getUseLatestEpisodeAsDefaultBoxed(int ordinal) {
+        return typeAPI.getUseLatestEpisodeAsDefaultBoxed(ordinal);
+    }
+
+    public int getMerchOrderOrdinal(int ordinal) {
+        return typeAPI.getMerchOrderOrdinal(ordinal);
+    }
+
     public SeasonTypeAPI getTypeAPI() {
         return typeAPI;
     }

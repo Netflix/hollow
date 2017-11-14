@@ -349,28 +349,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
-    public Iterable<SeasonHollow> findSeasonMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<SeasonHollow>(matches.iterator()) {
-            public SeasonHollow getData(int ordinal) {
-                return api.getSeasonHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<SeasonListHollow> findSeasonListMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<SeasonListHollow>(matches.iterator()) {
-            public SeasonListHollow getData(int ordinal) {
-                return api.getSeasonListHollow(ordinal);
-            }
-        };
-    }
-
     public Iterable<ShowMemberTypeHollow> findShowMemberTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -400,17 +378,6 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<ShowCountryLabelHollow>(matches.iterator()) {
             public ShowCountryLabelHollow getData(int ordinal) {
                 return api.getShowCountryLabelHollow(ordinal);
-            }
-        };
-    }
-
-    public Iterable<ShowSeasonEpisodeHollow> findShowSeasonEpisodeMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<ShowSeasonEpisodeHollow>(matches.iterator()) {
-            public ShowSeasonEpisodeHollow getData(int ordinal) {
-                return api.getShowSeasonEpisodeHollow(ordinal);
             }
         };
     }
@@ -1240,6 +1207,28 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
+    public Iterable<SeasonHollow> findSeasonMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<SeasonHollow>(matches.iterator()) {
+            public SeasonHollow getData(int ordinal) {
+                return api.getSeasonHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<SeasonListHollow> findSeasonListMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<SeasonListHollow>(matches.iterator()) {
+            public SeasonListHollow getData(int ordinal) {
+                return api.getSeasonListHollow(ordinal);
+            }
+        };
+    }
+
     public Iterable<SetOfStringHollow> findSetOfStringMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -1258,6 +1247,17 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<FlagsHollow>(matches.iterator()) {
             public FlagsHollow getData(int ordinal) {
                 return api.getFlagsHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ShowSeasonEpisodeHollow> findShowSeasonEpisodeMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ShowSeasonEpisodeHollow>(matches.iterator()) {
+            public ShowSeasonEpisodeHollow getData(int ordinal) {
+                return api.getShowSeasonEpisodeHollow(ordinal);
             }
         };
     }

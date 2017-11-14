@@ -18,6 +18,16 @@ public interface ShowSeasonEpisodeDelegate extends HollowObjectDelegate {
 
     public int getSeasonsOrdinal(int ordinal);
 
+    public boolean getHideSeasonNumbers(int ordinal);
+
+    public Boolean getHideSeasonNumbersBoxed(int ordinal);
+
+    public boolean getEpisodicNewBadge(int ordinal);
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal);
+
+    public int getMerchOrderOrdinal(int ordinal);
+
     public ShowSeasonEpisodeTypeAPI getTypeAPI();
 
 }

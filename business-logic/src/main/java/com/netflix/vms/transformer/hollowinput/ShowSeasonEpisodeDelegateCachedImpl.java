@@ -13,6 +13,9 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
     private final Long displaySetId;
     private final int countryCodesOrdinal;
     private final int seasonsOrdinal;
+    private final Boolean hideSeasonNumbers;
+    private final Boolean episodicNewBadge;
+    private final int merchOrderOrdinal;
     private ShowSeasonEpisodeTypeAPI typeAPI;
 
     public ShowSeasonEpisodeDelegateCachedImpl(ShowSeasonEpisodeTypeAPI typeAPI, int ordinal) {
@@ -20,6 +23,9 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
         this.displaySetId = typeAPI.getDisplaySetIdBoxed(ordinal);
         this.countryCodesOrdinal = typeAPI.getCountryCodesOrdinal(ordinal);
         this.seasonsOrdinal = typeAPI.getSeasonsOrdinal(ordinal);
+        this.hideSeasonNumbers = typeAPI.getHideSeasonNumbersBoxed(ordinal);
+        this.episodicNewBadge = typeAPI.getEpisodicNewBadgeBoxed(ordinal);
+        this.merchOrderOrdinal = typeAPI.getMerchOrderOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -49,6 +55,30 @@ public class ShowSeasonEpisodeDelegateCachedImpl extends HollowObjectAbstractDel
 
     public int getSeasonsOrdinal(int ordinal) {
         return seasonsOrdinal;
+    }
+
+    public boolean getHideSeasonNumbers(int ordinal) {
+        if(hideSeasonNumbers == null)
+            return false;
+        return hideSeasonNumbers.booleanValue();
+    }
+
+    public Boolean getHideSeasonNumbersBoxed(int ordinal) {
+        return hideSeasonNumbers;
+    }
+
+    public boolean getEpisodicNewBadge(int ordinal) {
+        if(episodicNewBadge == null)
+            return false;
+        return episodicNewBadge.booleanValue();
+    }
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal) {
+        return episodicNewBadge;
+    }
+
+    public int getMerchOrderOrdinal(int ordinal) {
+        return merchOrderOrdinal;
     }
 
     @Override

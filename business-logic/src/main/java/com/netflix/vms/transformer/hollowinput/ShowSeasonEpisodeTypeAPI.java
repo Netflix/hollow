@@ -13,7 +13,10 @@ public class ShowSeasonEpisodeTypeAPI extends HollowObjectTypeAPI {
             "movieId",
             "displaySetId",
             "countryCodes",
-            "seasons"
+            "seasons",
+            "hideSeasonNumbers",
+            "episodicNewBadge",
+            "merchOrder"
         });
         this.delegateLookupImpl = new ShowSeasonEpisodeDelegateLookupImpl(this);
     }
@@ -78,6 +81,44 @@ public class ShowSeasonEpisodeTypeAPI extends HollowObjectTypeAPI {
 
     public SeasonListTypeAPI getSeasonsTypeAPI() {
         return getAPI().getSeasonListTypeAPI();
+    }
+
+    public boolean getHideSeasonNumbers(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("ShowSeasonEpisode", ordinal, "hideSeasonNumbers") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]) == Boolean.TRUE;
+    }
+
+    public Boolean getHideSeasonNumbersBoxed(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("ShowSeasonEpisode", ordinal, "hideSeasonNumbers");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]);
+    }
+
+
+
+    public boolean getEpisodicNewBadge(int ordinal) {
+        if(fieldIndex[5] == -1)
+            return missingDataHandler().handleBoolean("ShowSeasonEpisode", ordinal, "episodicNewBadge") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]) == Boolean.TRUE;
+    }
+
+    public Boolean getEpisodicNewBadgeBoxed(int ordinal) {
+        if(fieldIndex[5] == -1)
+            return missingDataHandler().handleBoolean("ShowSeasonEpisode", ordinal, "episodicNewBadge");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[5]);
+    }
+
+
+
+    public int getMerchOrderOrdinal(int ordinal) {
+        if(fieldIndex[6] == -1)
+            return missingDataHandler().handleReferencedOrdinal("ShowSeasonEpisode", ordinal, "merchOrder");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+    }
+
+    public StringTypeAPI getMerchOrderTypeAPI() {
+        return getAPI().getStringTypeAPI();
     }
 
     public ShowSeasonEpisodeDelegateLookupImpl getDelegateLookupImpl() {

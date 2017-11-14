@@ -11,7 +11,10 @@ public class EpisodeTypeAPI extends HollowObjectTypeAPI {
     public EpisodeTypeAPI(VMSHollowInputAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(api, typeDataAccess, new String[] {
             "sequenceNumber",
-            "movieId"
+            "movieId",
+            "midSeason",
+            "seasonFinale",
+            "showFinale"
         });
         this.delegateLookupImpl = new EpisodeDelegateLookupImpl(this);
     }
@@ -54,6 +57,48 @@ public class EpisodeTypeAPI extends HollowObjectTypeAPI {
         if(l == Long.MIN_VALUE)
             return null;
         return Long.valueOf(l);
+    }
+
+
+
+    public boolean getMidSeason(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "midSeason") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[2]) == Boolean.TRUE;
+    }
+
+    public Boolean getMidSeasonBoxed(int ordinal) {
+        if(fieldIndex[2] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "midSeason");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[2]);
+    }
+
+
+
+    public boolean getSeasonFinale(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "seasonFinale") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[3]) == Boolean.TRUE;
+    }
+
+    public Boolean getSeasonFinaleBoxed(int ordinal) {
+        if(fieldIndex[3] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "seasonFinale");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[3]);
+    }
+
+
+
+    public boolean getShowFinale(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "showFinale") == Boolean.TRUE;
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]) == Boolean.TRUE;
+    }
+
+    public Boolean getShowFinaleBoxed(int ordinal) {
+        if(fieldIndex[4] == -1)
+            return missingDataHandler().handleBoolean("Episode", ordinal, "showFinale");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[4]);
     }
 
 

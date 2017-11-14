@@ -7,9 +7,9 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
-import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
@@ -31,6 +31,7 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Hook;
 import com.netflix.vms.transformer.hollowoutput.HookType;
+import com.netflix.vms.transformer.hollowoutput.MerchBehavior;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
@@ -133,6 +134,7 @@ public class VideoMetaDataModule {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
                         convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoDataCollection, rollup, rolldown);
+                        populateEpisodeMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i, j);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
@@ -140,6 +142,7 @@ public class VideoMetaDataModule {
                     rollup.setDoSeason(true);
                     rolldown.setDoSeason(true);
                     convert(hierarchy.getSeasonIds()[i], countryCode, videoDataCollection, rollup, rolldown);
+                    populateSeasonMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getSeasonIds()[i]), i);
                     rollup.setDoSeason(false);
                     rolldown.setDoSeason(false);
                 }
@@ -147,6 +150,7 @@ public class VideoMetaDataModule {
                 rollup.setDoShow(true);
                 rolldown.setDoShow(true);
                 convert(hierarchy.getTopNodeId(), countryCode, videoDataCollection, rollup, rolldown);
+                populateShowMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getTopNodeId()));
                 rollup.setDoShow(false);
                 rolldown.setDoShow(false);
 
@@ -304,6 +308,42 @@ public class VideoMetaDataModule {
         }
 
         return DEFAULT_SHOW_MEMBER_TYPE_ID;
+    }
+
+    private void populateShowMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd) {
+
+        VideoHierarchy.ShowMerchBehavior merchingBehaviour = hierarchy.getShowMerchBehavior();
+        if (merchingBehaviour != null) {
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.merchOrder = merchingBehaviour.merchOrder;
+            vmd.merchBehavior.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchBehavior.hideSeasonNumbers = merchingBehaviour.hideSeasonNumbers;
+        }
+    }
+
+    private void populateSeasonMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum) {
+
+        VideoHierarchy.SeasonMerchBehavior merchingBehaviour = hierarchy.getSeasonMerchingBehaviour(seasonNum);
+        if (merchingBehaviour != null) {
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
+            vmd.merchBehavior.episodeSkipping = merchingBehaviour.episodeSkipping;
+            vmd.merchBehavior.episodicNewBadge = merchingBehaviour.episodicNewBadge;
+            vmd.merchBehavior.filterUnavailableEpisodes = merchingBehaviour.filterUnavailableEpisodes;
+            vmd.merchBehavior.useLatestEpisodeAsDefault = merchingBehaviour.useLatestEpisodeAsDefault;
+            vmd.merchBehavior.merchOrder = merchingBehaviour.merchOrder;
+        }
+    }
+
+    private void populateEpisodeMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum, int episodeNum) {
+
+        VideoHierarchy.EpisodeMerchBehavior merchingBehaviour = hierarchy.getEpisodeMerchingBehaviour(seasonNum, episodeNum);
+        if (merchingBehaviour != null) {
+            vmd.merchBehavior = new MerchBehavior();
+            vmd.merchBehavior.midSeason = merchingBehaviour.midSeason;
+            vmd.merchBehavior.seasonFinale = merchingBehaviour.seasonFinale;
+            vmd.merchBehavior.showFinale = merchingBehaviour.showFinale;
+        }
     }
 
     private void populateSetTypes(Integer videoId, String countryCode, StatusHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
