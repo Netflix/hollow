@@ -187,6 +187,23 @@ public class HollowProducer {
         this(blobStager, publisher, announcer, validators, listeners, Collections.<HollowValidationListener>emptyList(), versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer());
     }
 
+    @Deprecated // TOBE cleaned up on Hollow 3
+    protected HollowProducer(BlobStager blobStager,
+            Publisher publisher,
+            Announcer announcer,
+            List<Validator> validators,
+            List<HollowProducerListener> listeners,
+            VersionMinter versionMinter,
+            Executor snapshotPublishExecutor,
+            int numStatesBetweenSnapshots,
+            long targetMaxTypeShardSize,
+            HollowMetricsCollector<HollowProducerMetrics> metricsCollector, 
+            BlobStorageCleaner blobStorageCleaner, 
+            SingleProducerEnforcer singleProducerEnforcer) {
+    	this(blobStager, publisher, announcer, validators, listeners, Collections.<HollowValidationListener>emptyList(), versionMinter, snapshotPublishExecutor, 
+    			numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner, singleProducerEnforcer);
+    }
+    
     protected HollowProducer(BlobStager blobStager,
                              Publisher publisher,
                              Announcer announcer,
