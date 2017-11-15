@@ -134,6 +134,8 @@ public class DiffTypePage extends DiffPage {
     }
 
     private List<HollowObjectPairDiffScore> aggregateFieldDiffScores(HollowTypeDiff typeDiff) {
+        if (typeDiff.getFromTypeState()==null) return Collections.emptyList();
+
         List<HollowObjectPairDiffScore> scores;
         int maxFromOrdinal = typeDiff.getFromTypeState().maxOrdinal();
         HollowObjectPairDiffScore[] allDiffPairsIndexedByFromOrdinal = new HollowObjectPairDiffScore[maxFromOrdinal + 1];
