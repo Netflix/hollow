@@ -175,6 +175,7 @@ public class DiffTypePage extends DiffPage {
             HollowTypeDiff typeDiff,
             HollowObjectTypeReadState typeState,
             IntList unmatchedOrdinals) {
+        if (typeState==null) return Collections.emptyList();
 
         List<HollowUnmatchedObject> list = cache.get(typeDiff.getTypeName());
         if(list != null)
