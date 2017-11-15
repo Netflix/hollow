@@ -77,7 +77,7 @@ public class HollowDiff {
         this.toStateEngine = to;
         this.equalityMapping = new DiffEqualityMapping(from, to);
 
-        if (isAutoDiscoverTypeDiff) {
+        if (isAutoDiscoverTypeDiff) { // Auto Discover TypeDiff from both from and to StateEngine
             List<HollowSchema> schemas = new ArrayList<>();
             schemas.addAll(fromStateEngine.getSchemas());
             schemas.addAll(toStateEngine.getSchemas());

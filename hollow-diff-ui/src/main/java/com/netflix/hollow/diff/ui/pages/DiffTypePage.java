@@ -134,6 +134,7 @@ public class DiffTypePage extends DiffPage {
     }
 
     private List<HollowObjectPairDiffScore> aggregateFieldDiffScores(HollowTypeDiff typeDiff) {
+        // Handle from State missing Type
         if (typeDiff.getFromTypeState()==null) return Collections.emptyList();
 
         List<HollowObjectPairDiffScore> scores;
@@ -177,6 +178,7 @@ public class DiffTypePage extends DiffPage {
             HollowTypeDiff typeDiff,
             HollowObjectTypeReadState typeState,
             IntList unmatchedOrdinals) {
+        // Handle typeState missing from either from or to
         if (typeState==null) return Collections.emptyList();
 
         List<HollowUnmatchedObject> list = cache.get(typeDiff.getTypeName());
