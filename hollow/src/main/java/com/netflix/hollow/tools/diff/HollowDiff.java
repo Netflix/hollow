@@ -78,9 +78,12 @@ public class HollowDiff {
         this.equalityMapping = new DiffEqualityMapping(from, to);
 
         if (isAutoDiscoverTypeDiff) {
-            for(HollowSchema schema : from.getSchemas()) {
+            List<HollowSchema> schemas = new ArrayList<>();
+            schemas.addAll(fromStateEngine.getSchemas());
+            schemas.addAll(toStateEngine.getSchemas());
+            for (HollowSchema schema : schemas) {
                 if (schema instanceof HollowObjectSchema) {
-                    PrimaryKey pKey = ((HollowObjectSchema)schema).getPrimaryKey();
+                    PrimaryKey pKey = ((HollowObjectSchema) schema).getPrimaryKey();
                     if (pKey == null) continue;
 
                     addTypeDiff(schema.getName(), pKey.getFieldPaths());
