@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = true;
+    private static final boolean isProd = false;
     private static final boolean isPerformDiff = true;
     private static final boolean isPublishPinnedData = false;
     private static final boolean isUseRemotePinTitleSlicer = true;
@@ -143,8 +143,8 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneWithConverterData() throws Throwable {
         // NOTE: the specified converterVersion must be valid or already in local HD; otherwise, run  getLatestConverterVersion();
-        int[] topNodes = { 80063535 };
-        long converterVersion = 20170629171458752L;
+        int[] topNodes = { 70253240 };
+        long converterVersion = 20171115044410018L;
 
         // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
