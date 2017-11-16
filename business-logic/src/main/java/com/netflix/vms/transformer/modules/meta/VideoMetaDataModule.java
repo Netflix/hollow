@@ -134,7 +134,7 @@ public class VideoMetaDataModule {
                         rollup.setDoEpisode(true);
                         rolldown.setDoEpisode(true);
                         convert(hierarchy.getEpisodeIds()[i][j], countryCode, videoDataCollection, rollup, rolldown);
-                        populateEpisodeMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getEpisodeIds()[i][j]), i, j);
+                        populateEpisodeMerchBehavior(hierarchy.getEpisodeIds()[i][j], i, j, hierarchy, videoDataCollection);
                         rollup.setDoEpisode(false);
                         rolldown.setDoEpisode(false);
                     }
@@ -142,7 +142,7 @@ public class VideoMetaDataModule {
                     rollup.setDoSeason(true);
                     rolldown.setDoSeason(true);
                     convert(hierarchy.getSeasonIds()[i], countryCode, videoDataCollection, rollup, rolldown);
-                    populateSeasonMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getSeasonIds()[i]), i);
+                    populateSeasonMerchBehavior(hierarchy.getSeasonIds()[i], i, hierarchy, videoDataCollection);
                     rollup.setDoSeason(false);
                     rolldown.setDoSeason(false);
                 }
@@ -150,7 +150,7 @@ public class VideoMetaDataModule {
                 rollup.setDoShow(true);
                 rolldown.setDoShow(true);
                 convert(hierarchy.getTopNodeId(), countryCode, videoDataCollection, rollup, rolldown);
-                populateShowMerchBehavior(hierarchy, countryAgnosticMap.get(hierarchy.getTopNodeId()));
+                populateShowMerchBehavior(hierarchy.getTopNodeId(), hierarchy, videoDataCollection);
                 rollup.setDoShow(false);
                 rolldown.setDoShow(false);
 
@@ -310,10 +310,10 @@ public class VideoMetaDataModule {
         return DEFAULT_SHOW_MEMBER_TYPE_ID;
     }
 
-    private void populateShowMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd) {
-
+    private void populateShowMerchBehavior(int videoId, VideoHierarchy hierarchy, VideoDataCollection videoDataCollection) {
         VideoHierarchy.ShowMerchBehavior merchingBehaviour = hierarchy.getShowMerchBehavior();
         if (merchingBehaviour != null) {
+            VideoMetaData vmd = videoDataCollection.getVideoMetaData(videoId);
             vmd.merchBehavior = new MerchBehavior();
             vmd.merchBehavior.merchOrder = merchingBehaviour.merchOrder;
             vmd.merchBehavior.episodicNewBadge = merchingBehaviour.episodicNewBadge;
@@ -321,10 +321,11 @@ public class VideoMetaDataModule {
         }
     }
 
-    private void populateSeasonMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum) {
+    private void populateSeasonMerchBehavior(int videoId, int seasonNum, VideoHierarchy hierarchy, VideoDataCollection videoDataCollection) {
 
         VideoHierarchy.SeasonMerchBehavior merchingBehaviour = hierarchy.getSeasonMerchingBehaviour(seasonNum);
         if (merchingBehaviour != null) {
+            VideoMetaData vmd = videoDataCollection.getVideoMetaData(videoId);
             vmd.merchBehavior = new MerchBehavior();
             vmd.merchBehavior.hideEpisodeNumbers = merchingBehaviour.hideEpisodeNumbers;
             vmd.merchBehavior.episodeSkipping = merchingBehaviour.episodeSkipping;
@@ -335,10 +336,11 @@ public class VideoMetaDataModule {
         }
     }
 
-    private void populateEpisodeMerchBehavior(VideoHierarchy hierarchy, VideoMetaData vmd, int seasonNum, int episodeNum) {
+    private void populateEpisodeMerchBehavior(int videoId, int seasonNum, int episodeNum, VideoHierarchy hierarchy, VideoDataCollection videoDataCollection) {
 
         VideoHierarchy.EpisodeMerchBehavior merchingBehaviour = hierarchy.getEpisodeMerchingBehaviour(seasonNum, episodeNum);
         if (merchingBehaviour != null) {
+            VideoMetaData vmd = videoDataCollection.getVideoMetaData(videoId);
             vmd.merchBehavior = new MerchBehavior();
             vmd.merchBehavior.midSeason = merchingBehaviour.midSeason;
             vmd.merchBehavior.seasonFinale = merchingBehaviour.seasonFinale;
