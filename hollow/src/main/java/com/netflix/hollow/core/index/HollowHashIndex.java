@@ -158,6 +158,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
                 HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                 int fieldIdx = fieldPath[fieldPath.length-1];
+                if(hashOrdinal == -1 && query[i] == null)
+                    continue;
                 if(!HollowReadFieldUtils.fieldValueEquals(objectAccess, hashOrdinal, fieldIdx, query[i]))
                     return false;
             }

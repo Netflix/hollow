@@ -395,7 +395,7 @@ public class HollowHashIndexBuilder {
                     ordinal = objectAccess.readOrdinal(ordinal, fieldPath[j]);
                 }
 
-                int fieldHashCode = HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
+                int fieldHashCode = ordinal == -1 ? -1 : HollowReadFieldUtils.fieldHashCode((HollowObjectTypeDataAccess) readState, ordinal, fieldPath[fieldPath.length-1]);
                 matchHash ^= HashCodes.hashInt(fieldHashCode);
             }
         }
