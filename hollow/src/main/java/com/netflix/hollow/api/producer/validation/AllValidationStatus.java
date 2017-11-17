@@ -88,15 +88,13 @@ public class AllValidationStatus {
 	public static final class AllValidationStatusBuilder {
 		private long version;
 		private Status status;
-		private List<SingleValidationStatus> validationStatusList;
+		private List<SingleValidationStatus> validationStatusList = new ArrayList<>();
 
 		private AllValidationStatusBuilder(long version) {
 			this.version = version;
 		}
 		
 		public void addSingelValidationStatus(SingleValidationStatus validationStatus) {
-			if(validationStatusList == null)
-				validationStatusList = new ArrayList<>();
 			validationStatusList.add(validationStatus);
 		}
 
