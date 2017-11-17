@@ -68,6 +68,10 @@ public class SingleValidationStatus {
 		return message;
 	}
 
+	/**
+	 * 
+	 * @return: could be null, if no exceptions.
+	 */
 	public Throwable getThrowable() {
 		return throwable;
 	}
@@ -107,9 +111,9 @@ public class SingleValidationStatus {
 	public static final class SingleValidationStatusBuilder {
 		private long version;
 		private Status status;
-		private String message;
-		private Throwable throwable;
-		private Map<String, String> additionalInfo;
+		private String message = "";
+		private Throwable throwable = null;
+		private Map<String, String> additionalInfo = new HashMap<>();
 
 		private SingleValidationStatusBuilder(long version) {
 			this.version = version;
@@ -138,8 +142,6 @@ public class SingleValidationStatus {
 		}
 		
 		public SingleValidationStatusBuilder addAdditionalInfo(String key, String value) {
-			if(this.additionalInfo == null) 
-				this.additionalInfo = new HashMap<>();
 			this.additionalInfo.put(key, value);
 			return this;
 		}
