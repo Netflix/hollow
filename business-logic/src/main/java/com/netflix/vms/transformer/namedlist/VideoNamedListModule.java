@@ -198,6 +198,7 @@ public class VideoNamedListModule {
             final boolean isRecentlyAdded = video.data.countrySpecificData.firstDisplayDate != null && video.data.countrySpecificData.firstDisplayDate.val > (ctx.getNowMillis() - (MS_IN_DAY * 30));
             boolean isTV = (nodeType == constants.SHOW || nodeType == constants.SEASON || nodeType == constants.EPISODE);
 
+            // first check availability to make sure only videos that have availability windows make it through
             if (isAvailableForED) {
                 long theatricalReleaseDate = video.data.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.data.facetData.videoMetaData.theatricalReleaseDate.val;
                 long dvdReleaseDate = video.data.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.data.facetData.videoMediaData.dvdReleaseDate.val;
@@ -214,9 +215,8 @@ public class VideoNamedListModule {
                 long dvdReleaseDaysAgo = (ctx.getNowMillis() - dvdReleaseDate) / MS_IN_DAY;
                 long currentAvailabilityDaysAgo = (ctx.getNowMillis() - currentAvailabilityDate) / MS_IN_DAY;
 
-                LocalDate today = LocalDate.now();
-                int currentYear = today.getYear();
-                int boardcastReleaseDaysAgoBasedOnYear = getReleaseDaysAgoBasedOnYear(broadcastReleaseYear, currentYear, today);
+                int currentYear = LocalDate.now().getYear();
+                int pastYear = currentYear - 1;
 
 
                 if (dvdReleaseDaysAgo <= -1000)
@@ -238,12 +238,13 @@ public class VideoNamedListModule {
                     }
                 }
 
+
                 if (currentAvailabilityDaysAgo < 1000) {
                     if (isTV && theatricalReleaseDaysAgo < (9 * 30)) {
                         addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_SHORTEN);
                     }
 
-                    if (isTV && boardcastReleaseDaysAgoBasedOnYear < (9 * 30)) {
+                    if (isTV && (broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear)) {
                         addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_SHORTEN_V2);
                     }
 
@@ -257,7 +258,7 @@ public class VideoNamedListModule {
                         }
                     }
 
-                    if (boardcastReleaseDaysAgoBasedOnYear < (16 * 30)) {
+                    if ((broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear)) {
                         if (isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_EXTENDED_V2);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED_V2);
@@ -274,6 +275,7 @@ public class VideoNamedListModule {
                         }
                     }
 
+                    // no value present for broadcast year, then check dvdReleaseDaysAgo
                     if (video.data.facetData.videoMetaData.broadcastReleaseYear == Integer.MIN_VALUE) {
                         if (dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_DIRECT_TO_DVD_EXTENDED_V2);
@@ -298,19 +300,6 @@ public class VideoNamedListModule {
                     int episodeOrdinal = videoOrdinalTracker.getVideoOrdinal(ep.deliverableVideo);
                     episodeList.set(episodeOrdinal);
                 }
-            }
-        }
-
-        private int getReleaseDaysAgoBasedOnYear(int broadcastReleaseYear, int currentYear, LocalDate today) {
-
-            if (broadcastReleaseYear <= currentYear) {
-
-                LocalDate firstDateOfYear = LocalDate.of(broadcastReleaseYear, 1, 1);
-                return Period.between(firstDateOfYear, today).getDays();
-
-            } else {
-                // if broadcastReleaseYear is in future
-                return Integer.MAX_VALUE;
             }
         }
 
