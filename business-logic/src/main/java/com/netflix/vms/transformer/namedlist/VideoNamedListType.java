@@ -27,6 +27,7 @@ public enum VideoNamedListType {
     ED_ATMOS_VIDEOS,
 
     ED_NEW_RELEASES,
+    ED_NEW_RELEASES_V2,
 
     // based on theatrical release days ago (or dvdReleaseDaysAgo)
     ED_NEW_RELEASES_HOLLYWOOD_EXTENDED,

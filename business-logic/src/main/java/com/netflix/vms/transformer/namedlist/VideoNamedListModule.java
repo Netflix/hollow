@@ -231,9 +231,25 @@ public class VideoNamedListModule {
                         }
                     }
 
+                    if (broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear) {
+                        if (isTV) {
+                            addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_V2);
+                        } else {
+                            addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_V2);
+                        }
+                    }
+
+
+
                     if (video.data.facetData.videoMetaData.theatricalReleaseDate == null) {
                         if (dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES);
+                        }
+                    }
+
+                    if (video.data.facetData.videoMetaData.broadcastReleaseYear == Integer.MIN_VALUE) {
+                        if (dvdReleaseDaysAgo < (6 * 30) && !isTV) {
+                            addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_V2);
                         }
                     }
                 }
