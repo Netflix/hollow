@@ -72,7 +72,13 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
 
         assertIteratorContainsAll(index.findMatches("one").iterator(), 0);
-        assertIteratorContainsAll(index.findMatches(new Object[] { null }).iterator(), 1);
+
+        try {
+            index.findMatches(new Object[] { null });
+            Assert.fail("exception expected");
+        } catch(IllegalArgumentException ex) {
+            Assert.assertEquals("querying by null unsupported; i=0", ex.getMessage());
+        }
     }
 
     @Test

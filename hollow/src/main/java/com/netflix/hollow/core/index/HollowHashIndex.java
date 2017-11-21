@@ -86,6 +86,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
         int hashCode = 0;
 
         for(int i=0;i<query.length;i++) {
+            if(query[i] == null)
+                throw new IllegalArgumentException("querying by null unsupported; i=" + i);
             hashCode ^= HashCodes.hashInt(keyHashCode(query[i], i));
         }
 
