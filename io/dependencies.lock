@@ -1707,7 +1707,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -1807,7 +1807,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -4217,7 +4217,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -4317,7 +4317,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -6727,7 +6727,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -6827,7 +6827,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -9359,7 +9359,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -9459,7 +9459,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -11869,7 +11869,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -11969,7 +11969,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -14379,7 +14379,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -14479,7 +14479,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -16898,7 +16898,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -16998,7 +16998,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -19417,7 +19417,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -19517,7 +19517,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -21936,7 +21936,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "39.4",
+            "locked": "40.58",
             "requested": "latest.release"
         },
         "netflix:eventbus": {
@@ -22036,7 +22036,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.87",
+            "locked": "2.104",
             "transitive": [
                 "netflix:country-launch"
             ]
