@@ -138,7 +138,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -597,7 +597,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -1876,7 +1876,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -3354,6 +3354,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -3643,7 +3644,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -4102,7 +4103,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -5381,7 +5382,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -6859,6 +6860,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -7148,7 +7150,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -7607,7 +7609,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -8886,7 +8888,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -10364,6 +10366,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -10737,7 +10740,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -11200,7 +11203,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -12479,7 +12482,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -13946,6 +13949,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -15987,7 +15991,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -16446,7 +16450,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -17725,7 +17729,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -19203,6 +19207,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -19492,7 +19497,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -19951,7 +19956,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -21230,7 +21235,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -22708,6 +22713,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -22997,7 +23003,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.astyanax:astyanax-cql"
@@ -23460,7 +23466,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -24739,7 +24745,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core"
@@ -26172,6 +26178,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -26473,7 +26480,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -26944,7 +26951,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -26952,13 +26959,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28253,7 +28260,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -29782,6 +29789,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -30086,7 +30094,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -30557,7 +30565,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -30565,13 +30573,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -31866,7 +31874,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -33395,6 +33403,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -33699,7 +33708,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -34170,7 +34179,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -34178,13 +34187,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35479,7 +35488,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -37008,6 +37017,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -37312,7 +37322,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -37783,7 +37793,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -37791,13 +37801,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -39092,7 +39102,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -40621,6 +40631,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -40925,7 +40936,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -41396,7 +41407,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -41404,13 +41415,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -42705,7 +42716,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -44234,6 +44245,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -44538,7 +44550,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -45009,7 +45021,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -45017,13 +45029,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -46318,7 +46330,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -47847,6 +47859,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -48151,7 +48164,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -48622,7 +48635,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -48630,13 +48643,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -49931,7 +49944,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -51460,6 +51473,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -51764,7 +51778,7 @@
             ]
         },
         "com.datastax.cassandra:cassandra-driver-core": {
-            "locked": "3.2.0",
+            "locked": "3.3.2",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.aeneas:aeneas-test",
@@ -52235,7 +52249,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -52243,13 +52257,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.38",
+            "locked": "1.49.0",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.49",
+            "locked": "1.49.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -53544,7 +53558,7 @@
             ]
         },
         "io.dropwizard.metrics:metrics-core": {
-            "locked": "3.1.2",
+            "locked": "3.2.2",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.aeneas:aeneas-core",
@@ -55073,6 +55087,7 @@
             "transitive": [
                 "com.addthis.metrics:reporter-config",
                 "com.codahale.metrics:metrics-core",
+                "com.datastax.cassandra:cassandra-driver-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.archaius:archaius2-core",
                 "com.netflix.astyanax:astyanax-cassandra",
