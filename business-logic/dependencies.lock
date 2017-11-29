@@ -54,19 +54,19 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.105",
+            "locked": "1.11.185",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.49",
+            "locked": "1.11.185",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.105",
+            "locked": "1.11.185",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -123,7 +123,7 @@
             ]
         },
         "com.fasterxml.jackson.core:jackson-annotations": {
-            "locked": "2.9.0",
+            "locked": "2.9.1",
             "transitive": [
                 "com.fasterxml.jackson.core:jackson-databind",
                 "com.fasterxml.jackson.module:jackson-module-jaxb-annotations",
@@ -175,13 +175,13 @@
             ]
         },
         "com.fasterxml.jackson.dataformat:jackson-dataformat-cbor": {
-            "locked": "2.6.7",
+            "locked": "2.9.1",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core"
             ]
         },
         "com.fasterxml.jackson.datatype:jackson-datatype-guava": {
-            "locked": "2.2.0",
+            "locked": "2.9.1",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -950,7 +950,7 @@
             ]
         },
         "com.sun.jersey.contribs:jersey-guice": {
-            "locked": "1.19",
+            "locked": "1.19.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
                 "com.netflix.pytheas:pytheas-api",
@@ -1169,6 +1169,7 @@
         "commons-logging:commons-logging": {
             "locked": "1.2",
             "transitive": [
+                "com.amazonaws:aws-java-sdk-core",
                 "com.google.code.typica:typica",
                 "commons-beanutils:commons-beanutils",
                 "commons-configuration:commons-configuration",
@@ -2033,7 +2034,7 @@
             ]
         },
         "org.slf4j:slf4j-log4j12": {
-            "locked": "1.7.21",
+            "locked": "1.7.25",
             "transitive": [
                 "com.netflix.photon:Photon",
                 "com.thinkaurelius.thrift:thrift-server",
