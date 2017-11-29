@@ -678,7 +678,7 @@ public class HollowProducer {
     private void validate(HollowProducer.ReadState readState) {
     	com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus.Builder psb = listeners.fireValidationStart(readState);
     	List<Throwable> exceptions = new ArrayList<>();
-    	AllValidationStatusBuilder valStatus = AllValidationStatus.builder(readState.getVersion());
+    	AllValidationStatusBuilder valStatus = AllValidationStatus.builder();
     	
     	try {
     		for(Validator validator: validators) {
@@ -706,7 +706,8 @@ public class HollowProducer {
     }
 
 	private SingleValidationStatus getValidationStatus(HollowProducer.ReadState readState, Validator validator, Throwable throwable) {
-		SingleValidationStatusBuilder status = SingleValidationStatus.builder(readState.getVersion()).withMessage(validator.toString());
+		String name = (validator instanceof Nameable)? ((Nameable)validator).getName():"";
+		SingleValidationStatusBuilder status = SingleValidationStatus.builder(name).withMessage(validator.toString());
 		if(throwable != null) {
 			status.fail(throwable);
 		} else
@@ -894,7 +895,18 @@ public class HollowProducer {
             }
         }
     }
-
+    
+    /**
+     * Can be used for implementations that have name.
+     * Beta: Could change any time
+     * Near future, might be removed.
+     * @author lkanchanapalli
+     *
+     */
+    public static interface Nameable {
+    	public String getName();
+    }
+    
     public static interface Validator {
         void validate(HollowProducer.ReadState readState);
     

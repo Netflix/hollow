@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
+import com.netflix.hollow.api.producer.HollowProducer.Nameable;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -31,7 +32,9 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
  * 10% allowableVariancePercent: from previous cycle any addition or removal within 10% cardinality is valid. 
  * Anything more results in failure of validation.
  */
-public class RecordCountVarianceValidator implements Validator {
+public class RecordCountVarianceValidator implements Nameable, Validator {
+	private final String NAME = "RecordCountVarianceValidator";
+	
 	private final String typeName;
 	private final float allowableVariancePercent;
 	// status is used to capture details about validation. Helps surface information.
@@ -88,7 +91,7 @@ public class RecordCountVarianceValidator implements Validator {
 
 	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
 		status = null;
-		SingleValidationStatusBuilder builder = SingleValidationStatus.builder(readState.getVersion());
+		SingleValidationStatusBuilder builder = SingleValidationStatus.builder(getName());
 		builder.addAdditionalInfo(ALLOWABLE_VARIANCE_PERCENT_NAME, String.valueOf(allowableVariancePercent));
 		builder.addAdditionalInfo(DATA_TYPE_NAME, typeName);
 		return builder;
@@ -119,5 +122,10 @@ public class RecordCountVarianceValidator implements Validator {
 																		+"This scenario is not expected except when starting a new namespace." ;
 	private static final String FAILED_RECORD_COUNT_VALIDATION = "Record count validation for type %s has failed as actual change percent %s "
 																	+ "is greater than allowed change percent %s.";
+
+	@Override
+	public String getName() {
+		return NAME+"_"+typeName;
+	}
 }
 	

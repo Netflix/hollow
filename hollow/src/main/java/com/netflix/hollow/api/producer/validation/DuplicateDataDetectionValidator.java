@@ -20,6 +20,7 @@ package com.netflix.hollow.api.producer.validation;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.netflix.hollow.api.producer.HollowProducer.Nameable;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -44,7 +45,9 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
  * this validator will not fail as the two objects are deduped.
  *
  */
-public class DuplicateDataDetectionValidator implements Validator {
+public class DuplicateDataDetectionValidator implements Nameable, Validator {
+	private final String NAME = "DuplicateDataDetectionValidator";
+	
 	private final String dataTypeName;
 	private final String[] fieldPathNames;
 	// Status is used to track validation details. Helps surface information.
@@ -97,7 +100,7 @@ public class DuplicateDataDetectionValidator implements Validator {
 
 	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
 		lastRunStatus = null;
-		SingleValidationStatusBuilder statusBuilder = SingleValidationStatus.builder(readState.getVersion()).addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
+		SingleValidationStatusBuilder statusBuilder = SingleValidationStatus.builder(getName()).addAdditionalInfo(DATA_TYPE_NAME, dataTypeName);
 		return statusBuilder;
 	}
 	
@@ -153,4 +156,9 @@ public class DuplicateDataDetectionValidator implements Validator {
 				+ "is not Object. This validation cannot be done.";
 	private static final String FIELD_PATH_NAME = "FieldPaths";
 	private static final String DATA_TYPE_NAME = "Typename";
+
+	@Override
+	public String getName() {
+		return NAME+"_"+dataTypeName;
+	}
 }

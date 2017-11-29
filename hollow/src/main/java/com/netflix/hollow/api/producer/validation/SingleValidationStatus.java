@@ -2,7 +2,7 @@
  *
  *  Copyright 2017 Netflix, Inc.
  *
- *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     Licensed under the Apache License, name 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
@@ -33,31 +33,31 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  * In next iteration this might be directly returned by validators.
  */
 public class SingleValidationStatus {
-    private final long version;
+    private final String name;
     private final Status status;
     private final String message;
     private final Throwable throwable;
     private final Map<String, String> additionalInfo;
 
 	private SingleValidationStatus(SingleValidationStatusBuilder builder) {
-		this.version = builder.version;
+		this.name = builder.name;
 		this.status = builder.status;
 		this.message = builder.message;
 		this.throwable = builder.throwable;
 		this.additionalInfo = builder.additionalInfo;
 	}
     
-	public SingleValidationStatus(long version, Status status, String message, Throwable throwable,
+	private SingleValidationStatus(String name, Status status, String message, Throwable throwable,
 			Map<String, String> additionalInfo) {
-		this.version = version;
+		this.name = name;
 		this.status = status;
 		this.message = message;
 		this.throwable = throwable;
 		this.additionalInfo = additionalInfo;
 	}
 
-	public long getVersion() {
-		return version;
+	public String getName() {
+		return name;
 	}
 
 	public Status getStatus() {
@@ -83,16 +83,19 @@ public class SingleValidationStatus {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("IndividualValidatorStatus [version=");
-		builder.append(version);
-		builder.append(", status=");
+		builder.append(name);
+		builder.append("[ status=");
 		builder.append(status);
 		builder.append(", message=");
 		builder.append(message);
-		builder.append(", throwable=");
-		builder.append(throwable);
-		builder.append(", additionalInfo=");
-		builder.append(additionalInfo);
+		if(additionalInfo != null) {
+			builder.append(", ");
+			builder.append(additionalInfo);
+		}
+		if(throwable != null) {
+			builder.append(", throwable=");
+			builder.append(throwable.getStackTrace());
+		}
 		builder.append("]");
 		return builder.toString();
 	}
@@ -101,22 +104,22 @@ public class SingleValidationStatus {
 	 * Creates builder to build {@link SingleValidationStatus}.
 	 * @return created builder
 	 */
-	public static SingleValidationStatusBuilder builder(long version) {
-		return new SingleValidationStatusBuilder(version);
+	public static SingleValidationStatusBuilder builder(String name) {
+		return new SingleValidationStatusBuilder(name);
 	}
 
 	/**
 	 * Builder to build {@link SingleValidationStatus}.
 	 */
 	public static final class SingleValidationStatusBuilder {
-		private long version;
+		private String name;
 		private Status status;
 		private String message = "";
 		private Throwable throwable = null;
 		private Map<String, String> additionalInfo = new HashMap<>();
 
-		private SingleValidationStatusBuilder(long version) {
-			this.version = version;
+		private SingleValidationStatusBuilder(String name) {
+			this.name = name;
 		}
 
 
