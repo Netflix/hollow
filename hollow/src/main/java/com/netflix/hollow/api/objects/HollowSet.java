@@ -27,8 +27,8 @@ import java.util.AbstractSet;
 import java.util.Iterator;
 
 /**
- * A HollowList provides an implementation of the {@link java.util.List} interface over
- * a LIST record in a Hollow dataset.
+ * A HollowSet provides an implementation of the {@link java.util.Set} interface over
+ * a SET record in a Hollow dataset.
  * 
  * Also provides the findElement() method, which allows for searching the set for elements with matching hash keys.
  */
