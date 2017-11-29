@@ -828,6 +828,7 @@ public class HollowConsumer {
                     @Override
                     public Thread newThread(Runnable r) {
                         Thread t = new Thread(r);
+                        t.setName("hollow-consumer-refresh");
                         t.setDaemon(true);
                         return t;
                     }
