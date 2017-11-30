@@ -151,7 +151,7 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 		this.lastRunStatus = statusBuilder.success().build();
 	}
 	
-	private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT = "Duplicate keys found for type %s. Unique key is defined as %s. "
+	private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT = "Duplicate keys found for type %s. Primarykey in schema is %s. "
 				+ "Duplicate IDs are: %s";
 	private static final String NO_PRIMARY_KEY_ERRRO_MSG_FORMAT = "DuplicateDataDetectionValidator defined but unable to find primary key "
 			+ "for data type %s. Please check schema definition.";
