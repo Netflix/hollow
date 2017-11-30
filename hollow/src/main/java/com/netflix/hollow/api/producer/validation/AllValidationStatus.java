@@ -32,24 +32,17 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  *
  */
 public class AllValidationStatus {
-    private final long version;
     private final Status status;
     private final List<SingleValidationStatus> validationStatusList;
 
 	private AllValidationStatus(AllValidationStatusBuilder builder) {
-		this.version = builder.version;
 		this.status = builder.status;
 		this.validationStatusList = builder.validationStatusList;
 	}
 
-	public AllValidationStatus(long version, Status status, List<SingleValidationStatus> validatorStatusList) {
-		this.version = version;
+	public AllValidationStatus(Status status, List<SingleValidationStatus> validatorStatusList) {
 		this.status = status;
 		this.validationStatusList = validatorStatusList;
-	}
-
-	public long getVersion() {
-		return version;
 	}
 
 	public Status getStatus() {
@@ -64,9 +57,8 @@ public class AllValidationStatus {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("OverallValidationStatus [version=");
-		sb.append(version);
-		sb.append(", status=");
+		sb.append("OverallValidationStatus [");
+		sb.append(" status=");
 		sb.append(status);
 		sb.append(", validationStatusList=");
 		sb.append(validationStatusList);
@@ -78,20 +70,18 @@ public class AllValidationStatus {
 	 * Creates builder to build {@link AllValidationStatus}.
 	 * @return created builder
 	 */
-	public static AllValidationStatusBuilder builder(long version) {
-		return new AllValidationStatusBuilder(version);
+	public static AllValidationStatusBuilder builder() {
+		return new AllValidationStatusBuilder();
 	}
 
 	/**
 	 * Builder to build {@link AllValidationStatus}.
 	 */
 	public static final class AllValidationStatusBuilder {
-		private long version;
 		private Status status;
 		private List<SingleValidationStatus> validationStatusList = new ArrayList<>();
 
-		private AllValidationStatusBuilder(long version) {
-			this.version = version;
+		private AllValidationStatusBuilder() {
 		}
 		
 		public void addSingelValidationStatus(SingleValidationStatus validationStatus) {

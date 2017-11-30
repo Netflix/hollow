@@ -82,11 +82,10 @@ public class HollowProducerValidationListenerTest {
 		Assert.assertNotNull(validatorStatus);
 		// ValidationStatus builds record validator status based toString of RecordCountValidatorStatus for now.
 		Assert.assertEquals(Status.SUCCESS, validatorStatus.getStatus());
-		Assert.assertEquals(validationListener.getVersion(), validatorStatus.getVersion());
 		Assert.assertNull(validatorStatus.getThrowable());
 		// Record count validator would have skipped validation because the previous record count is 0 in this test. 
 		// But that status for now is only passed as string through toString method of the validator. 
-		Assert.assertTrue(validatorStatus.getMessage().contains(Status.SKIP.name()));
+		Assert.assertTrue(validatorStatus.getMessage().contains("MovieWithPrimaryKey"));
 		Assert.assertTrue(validatorStatus.getMessage().contains("Previous record count is 0"));
 	}
 
@@ -126,7 +125,6 @@ public class HollowProducerValidationListenerTest {
 		Assert.assertNotNull("Stats null indicates HollowValidationFakeListener.onValidationComplete() was not called on runCycle.", status);
 		Assert.assertEquals(size, status.getValidationStatusList().size());
 		Assert.assertEquals(result, status.getStatus());
-		Assert.assertEquals(version, status.getVersion());
 	}
 }
 
