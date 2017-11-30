@@ -86,6 +86,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
         int hashCode = 0;
 
         for(int i=0;i<query.length;i++) {
+            if(query[i] == null)
+                throw new IllegalArgumentException("querying by null unsupported; i=" + i);
             hashCode ^= HashCodes.hashInt(keyHashCode(query[i], i));
         }
 
@@ -158,6 +160,8 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
                 HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                 int fieldIdx = fieldPath[fieldPath.length-1];
+                if(hashOrdinal == -1 && query[i] == null)
+                    continue;
                 if(!HollowReadFieldUtils.fieldValueEquals(objectAccess, hashOrdinal, fieldIdx, query[i]))
                     return false;
             }

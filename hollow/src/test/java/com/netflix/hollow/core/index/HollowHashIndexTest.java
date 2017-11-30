@@ -61,6 +61,27 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
     }
 
     @Test
+    public void testIndexingNullFieldValues() throws Exception {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        mapper.add(new TypeB("one"));
+        mapper.add(new TypeB(null));
+
+        roundTripSnapshot();
+
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
+
+        assertIteratorContainsAll(index.findMatches("one").iterator(), 0);
+
+        try {
+            index.findMatches(new Object[] { null });
+            Assert.fail("exception expected");
+        } catch(IllegalArgumentException ex) {
+            Assert.assertEquals("querying by null unsupported; i=0", ex.getMessage());
+        }
+    }
+
+    @Test
     public void testUpdateListener() throws Exception {
         HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
 
