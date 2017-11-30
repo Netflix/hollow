@@ -46,7 +46,7 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
  *
  */
 public class DuplicateDataDetectionValidator implements Nameable, Validator {
-	private final String NAME = "DuplicateDataDetectionValidator";
+	private final static String NAME = "DuplicateDataDetectionValidator";
 	
 	private final String dataTypeName;
 	private final String[] fieldPathNames;
@@ -111,7 +111,7 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 			StringBuffer msg = new StringBuffer(lastRunStatus.getMessage());
 			return  msg.append(lastRunStatus.getAdditionalInfo()).toString();
 		}
-		return("DuplicateDataDetectionValidator status for "+dataTypeName+" is null. This is unexpected. Please check validator definition.");
+		return(NAME+"  status for "+dataTypeName+" is null. This is unexpected. Please check validator definition.");
 	}
 	
 	private String getDuplicateIDsString(Collection<Object[]> dupKeysCollection) {
@@ -153,9 +153,9 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 	
 	private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT = "Duplicate keys found for type %s. Primarykey in schema is %s. "
 				+ "Duplicate IDs are: %s";
-	private static final String NO_PRIMARY_KEY_ERRRO_MSG_FORMAT = "DuplicateDataDetectionValidator defined but unable to find primary key "
+	private static final String NO_PRIMARY_KEY_ERRRO_MSG_FORMAT = NAME+" defined but unable to find primary key "
 			+ "for data type %s. Please check schema definition.";
-	private static final String NOT_AN_OBJECT_ERROR_MSGR_FORMAT = "DuplicateDataDetectionValidator is defined but schema type of %s "
+	private static final String NOT_AN_OBJECT_ERROR_MSGR_FORMAT = NAME+" is defined but schema type of %s "
 				+ "is not Object. This validation cannot be done.";
 	private static final String FIELD_PATH_NAME = "FieldPaths";
 	private static final String DATA_TYPE_NAME = "Typename";

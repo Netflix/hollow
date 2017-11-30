@@ -52,5 +52,5 @@ public interface HollowValidationListener extends EventListener{
      * @param elapsed duration of the validation stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onValidationComplete(AllValidationStatus status, long elapsed, TimeUnit unit);
+    public void onValidationComplete(OverAllValidationStatus status, long elapsed, TimeUnit unit);
 }

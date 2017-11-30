@@ -86,7 +86,7 @@ public class HollowProducerValidationListenerTest {
 		// Record count validator would have skipped validation because the previous record count is 0 in this test. 
 		// But that status for now is only passed as string through toString method of the validator. 
 		Assert.assertTrue(validatorStatus.getMessage().contains("MovieWithPrimaryKey"));
-		Assert.assertTrue(validatorStatus.getMessage().contains("Previous record count is 0"));
+		Assert.assertTrue(validatorStatus.getMessage().contains("Not running"));
 	}
 
 	private void createHollowProducerAndRunCycle(final String typeName, boolean addPrimaryKeyValidator) {
@@ -121,7 +121,7 @@ public class HollowProducerValidationListenerTest {
 	}
 
 	private void assertOnValidationStatus(int size, Status result, boolean isThrowableNull, long version) {
-		AllValidationStatus status = validationListener.getStatus();
+		OverAllValidationStatus status = validationListener.getStatus();
 		Assert.assertNotNull("Stats null indicates HollowValidationFakeListener.onValidationComplete() was not called on runCycle.", status);
 		Assert.assertEquals(size, status.getValidationStatusList().size());
 		Assert.assertEquals(result, status.getStatus());
@@ -162,14 +162,14 @@ class MovieWithoutPrimaryKey{
 
 class HollowValidationFakeListener implements HollowValidationListener {
 	private long version;
-	private AllValidationStatus status;
+	private OverAllValidationStatus status;
 	@Override
 	public void onValidationStart(long version) {
 		this.version = version;
 	}
 
 	@Override
-	public void onValidationComplete(AllValidationStatus status, long elapsed, TimeUnit unit) {
+	public void onValidationComplete(OverAllValidationStatus status, long elapsed, TimeUnit unit) {
 		this.status = status;
 	}
 
@@ -177,7 +177,7 @@ class HollowValidationFakeListener implements HollowValidationListener {
 		return version;
 	}
 
-	public AllValidationStatus getStatus() {
+	public OverAllValidationStatus getStatus() {
 		return status;
 	}
 	public void reset(){
