@@ -79,7 +79,7 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 			String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent, allowableVariancePercent);
 			handleEndValidation(builder, Status.FAIL, message);
 		}
-		handleEndValidation(builder, Status.SUCCESS, null);
+		handleEndValidation(builder, Status.SUCCESS, "");
 	}
 	
 	@Override
@@ -107,7 +107,7 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	}
 	
 	private void handleEndValidation(SingleValidationStatusBuilder builder, Status status, String message){
-		builder.withMessage(message);
+		builder.withMessage((message == null)?"":message);
 		if(Status.FAIL == status){
 			ValidationException ex = new ValidationException(message);
 			this.status = builder.fail(ex).build();

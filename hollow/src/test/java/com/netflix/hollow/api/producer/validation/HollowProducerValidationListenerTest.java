@@ -85,7 +85,7 @@ public class HollowProducerValidationListenerTest {
 		Assert.assertNull(validatorStatus.getThrowable());
 		// Record count validator would have skipped validation because the previous record count is 0 in this test. 
 		// But that status for now is only passed as string through toString method of the validator. 
-		Assert.assertTrue(validatorStatus.getMessage().contains(Status.SKIP.name()));
+		Assert.assertTrue(validatorStatus.getMessage().contains("MovieWithPrimaryKey"));
 		Assert.assertTrue(validatorStatus.getMessage().contains("Previous record count is 0"));
 	}
 

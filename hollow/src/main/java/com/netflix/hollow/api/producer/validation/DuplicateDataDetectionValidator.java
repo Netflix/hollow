@@ -87,7 +87,7 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 		if(duplicateKeys != null && !duplicateKeys.isEmpty()){
 			handleEndValidation(statusBuilder, Status.FAIL, String.format(DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT, dataTypeName, fieldPaths, getDuplicateIDsString(duplicateKeys)));
 		}
-		handleEndValidation(statusBuilder, Status.SUCCESS, null);
+		handleEndValidation(statusBuilder, Status.SUCCESS, "");
 	}
 
 	private Collection<Object[]> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
@@ -142,7 +142,7 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 	}
 	
 	private void handleEndValidation(SingleValidationStatusBuilder statusBuilder, Status status, String message) {
-		statusBuilder.withMessage(message);
+		statusBuilder.withMessage((message == null)?"":message);
 		if(status == Status.FAIL){
 			ValidationException ex = new ValidationException(message);
 			this.lastRunStatus = statusBuilder.fail(ex).build();
