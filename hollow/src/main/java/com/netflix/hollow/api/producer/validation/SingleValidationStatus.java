@@ -88,13 +88,9 @@ public class SingleValidationStatus {
 		builder.append(status);
 		builder.append(", message=");
 		builder.append(message);
-		if(additionalInfo != null) {
+		if(additionalInfo != null && !additionalInfo.isEmpty()) {
 			builder.append(", ");
 			builder.append(additionalInfo);
-		}
-		if(throwable != null) {
-			builder.append(", throwable=");
-			builder.append(throwable.getStackTrace());
 		}
 		builder.append("]");
 		return builder.toString();

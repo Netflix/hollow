@@ -106,8 +106,11 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 	
 	@Override
 	public String toString(){
-		if(lastRunStatus != null)
-			return lastRunStatus.toString();
+		if(lastRunStatus != null) {
+			// For now only return message and additional data
+			StringBuffer msg = new StringBuffer(lastRunStatus.getMessage());
+			return  msg.append(lastRunStatus.getAdditionalInfo()).toString();
+		}
 		return("DuplicateDataDetectionValidator status for "+dataTypeName+" is null. This is unexpected. Please check validator definition.");
 	}
 	

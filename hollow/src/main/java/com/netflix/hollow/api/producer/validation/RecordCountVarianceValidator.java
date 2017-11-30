@@ -84,8 +84,11 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	
 	@Override
 	public String toString(){
-		if(status != null)
-			return status.toString();
+		if(status != null) {
+			// For now only return message and additional data
+			StringBuffer msg = new StringBuffer(status.getMessage());
+			return  msg.append(status.getAdditionalInfo()).toString();
+		}
 		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
 	}
 
