@@ -203,9 +203,9 @@ public class VideoNamedListModule {
                 long theatricalReleaseDate = video.data.facetData.videoMetaData.theatricalReleaseDate == null ? 0 : video.data.facetData.videoMetaData.theatricalReleaseDate.val;
                 long dvdReleaseDate = video.data.facetData.videoMediaData.dvdReleaseDate == null ? 0 : video.data.facetData.videoMediaData.dvdReleaseDate.val;
                 long broadcastReleaseDate = video.data.facetData.videoMetaData.broadcastReleaseDate == null ? 0 : video.data.facetData.videoMetaData.broadcastReleaseDate.val;
-                int broadcastReleaseYear = video.data.facetData.videoMetaData.broadcastReleaseYear;
-                if (broadcastReleaseYear == Integer.MIN_VALUE) {
-                    broadcastReleaseYear = 0;
+                int firstReleaseYear = video.data.facetData.videoMetaData.year;
+                if (firstReleaseYear == Integer.MIN_VALUE) {
+                    firstReleaseYear = 0;
                 }
 
                 if (video.data.facetData.videoMetaData.broadcastReleaseDate != null)
@@ -231,7 +231,7 @@ public class VideoNamedListModule {
                         }
                     }
 
-                    if (broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear) {
+                    if (firstReleaseYear == currentYear || firstReleaseYear == pastYear) {
                         if (isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_V2);
                         } else {
@@ -247,7 +247,7 @@ public class VideoNamedListModule {
                         }
                     }
 
-                    if (video.data.facetData.videoMetaData.broadcastReleaseYear == Integer.MIN_VALUE) {
+                    if (video.data.facetData.videoMetaData.year == Integer.MIN_VALUE) {
                         if (dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_V2);
                         }
@@ -260,7 +260,7 @@ public class VideoNamedListModule {
                         addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_SHORTEN);
                     }
 
-                    if (isTV && (broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear)) {
+                    if (isTV && (firstReleaseYear == currentYear || firstReleaseYear == pastYear)) {
                         addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_SHORTEN_V2);
                     }
 
@@ -274,7 +274,7 @@ public class VideoNamedListModule {
                         }
                     }
 
-                    if ((broadcastReleaseYear == currentYear || broadcastReleaseYear == pastYear)) {
+                    if ((firstReleaseYear == currentYear || firstReleaseYear == pastYear)) {
                         if (isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_TV_EPISODES_EXTENDED_V2);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED_V2);
@@ -291,8 +291,8 @@ public class VideoNamedListModule {
                         }
                     }
 
-                    // no value present for broadcast year, then check dvdReleaseDaysAgo
-                    if (video.data.facetData.videoMetaData.broadcastReleaseYear == Integer.MIN_VALUE) {
+                    // no value present for year, then check dvdReleaseDaysAgo
+                    if (video.data.facetData.videoMetaData.year == Integer.MIN_VALUE) {
                         if (dvdReleaseDaysAgo < (6 * 30) && !isTV) {
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_DIRECT_TO_DVD_EXTENDED_V2);
                             addTopNodeToList(VideoNamedListType.ED_NEW_RELEASES_EXTENDED_V2);
@@ -317,10 +317,6 @@ public class VideoNamedListModule {
                     episodeList.set(episodeOrdinal);
                 }
             }
-        }
-
-        private int getFirstReleaseYear(CompleteVideo completeVideo) {
-            return completeVideo.data.facetData.videoMetaData.broadcastReleaseYear;
         }
 
         private void addToList(VideoNamedListType type) {

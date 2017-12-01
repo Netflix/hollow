@@ -35,7 +35,6 @@ public class VideoMetaData implements Cloneable {
     public Strings broadcastDistributorName = null;
     public Integer metadataReleaseDays = null;
     public MerchBehavior merchBehavior = null;
-    public int firstReleaseYear = java.lang.Integer.MIN_VALUE;
 
     public boolean equals(Object other) {
         if (other == this) return true;
@@ -112,7 +111,6 @@ public class VideoMetaData implements Cloneable {
         if (o.merchBehavior == null) {
             if (merchBehavior != null) return false;
         } else if (!o.merchBehavior.equals(merchBehavior)) return false;
-        if (o.firstReleaseYear != firstReleaseYear) return false;
         return true;
     }
 
@@ -147,7 +145,6 @@ public class VideoMetaData implements Cloneable {
         hashCode = hashCode * 31 + (broadcastDistributorName == null ? 1237 : broadcastDistributorName.hashCode());
         hashCode = hashCode * 31 + (metadataReleaseDays == null ? 1237 : metadataReleaseDays.hashCode());
         hashCode = hashCode * 31 + (merchBehavior == null ? 1237 : merchBehavior.hashCode());
-        hashCode = hashCode * 31 + firstReleaseYear;
         return hashCode;
     }
 
@@ -182,7 +179,6 @@ public class VideoMetaData implements Cloneable {
         builder.append(",broadcastDistributorName=").append(broadcastDistributorName);
         builder.append(",metadataReleaseDays=").append(metadataReleaseDays);
         builder.append(",merchBehavior=").append(merchBehavior);
-        builder.append(",firstReleaseYear=").append(firstReleaseYear);
         builder.append("}");
         return builder.toString();
     }
