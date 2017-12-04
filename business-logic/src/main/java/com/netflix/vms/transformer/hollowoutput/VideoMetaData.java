@@ -108,6 +108,9 @@ public class VideoMetaData implements Cloneable {
         if (o.metadataReleaseDays == null) {
             if (metadataReleaseDays != null) return false;
         } else if (!o.metadataReleaseDays.equals(metadataReleaseDays)) return false;
+        if (o.merchBehavior == null) {
+            if (merchBehavior != null) return false;
+        } else if (!o.merchBehavior.equals(merchBehavior)) return false;
         return true;
     }
 
@@ -141,6 +144,7 @@ public class VideoMetaData implements Cloneable {
         hashCode = hashCode * 31 + broadcastReleaseYear;
         hashCode = hashCode * 31 + (broadcastDistributorName == null ? 1237 : broadcastDistributorName.hashCode());
         hashCode = hashCode * 31 + (metadataReleaseDays == null ? 1237 : metadataReleaseDays.hashCode());
+        hashCode = hashCode * 31 + (merchBehavior == null ? 1237 : merchBehavior.hashCode());
         return hashCode;
     }
 

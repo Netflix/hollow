@@ -39,7 +39,7 @@ import org.junit.Test;
 
 public class ShowMeTheFastProgress {
     private static final boolean isProd = false;
-    private static final boolean isPerformDiff = true;
+    private static final boolean isPerformDiff = false;
     private static final boolean isPublishPinnedData = false;
     private static final boolean isUseRemotePinTitleSlicer = true;
     private static final boolean isFallBackToLocalSlicer = false;
@@ -102,8 +102,8 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20171106191033375L;
-        int[] topNodes = { 80126024 };
+        long transformerVersion = 20171130221456004L;
+        int[] topNodes = { 80063599 };
 
         long start = System.currentTimeMillis();
 
@@ -143,7 +143,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneWithConverterData() throws Throwable {
         // NOTE: the specified converterVersion must be valid or already in local HD; otherwise, run  getLatestConverterVersion();
-        int[] topNodes = { 70253240 };
+        int[] topNodes = { 80104350 };
         long converterVersion = 20171115044410018L;
 
         // Setup Context
