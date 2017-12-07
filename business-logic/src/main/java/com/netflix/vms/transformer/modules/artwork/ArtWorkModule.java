@@ -365,6 +365,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         if(passThroughString != null) {
             getBasicPassthrough(artwork).group_id = passThroughString;
         }
+        
+        passThroughString = getPassThroughString("DESIGN_EFFORT", keyValues);
+        if(passThroughString != null) {
+            getBasicPassthrough(artwork).design_effort = passThroughString;
+        }
+        
         if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
             getBasicPassthrough(artwork).awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
         }
