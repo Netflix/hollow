@@ -99,7 +99,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         builder.append(",design_attribute=").append(design_attribute);
         builder.append(",focal_point=").append(focal_point);
         builder.append(",approval_source=").append(approval_source);
-        builder.append("design_effort=").append(design_effort);
+        builder.append(",design_effort=").append(design_effort);
         builder.append(",personIdStrs=").append(personIdStrs);
         builder.append(",approval_state=").append(approval_state);
         builder.append(",re_explore_timestamp=").append(reExploreLongTimestamp.toString());
