@@ -70,6 +70,7 @@ public class TransformerOutputBlobHeaderPopulator {
                                 + "AWARD_CAMPAIGNS:basic_passthrough(ArtworkBasicPassthrough).awardCampaigns(STRING[])\n"
                                 + "other_list_passthrough:basic_passthrough(ArtworkBasicPassthrough).lists(BasicPassthroughLists).floatList(FLOAT[SuperFloat])\n"
                                 + "PERSON_IDS:basic_passthrough(ArtworkBasicPassthrough).personIdStrs(STRING[])\n"
+                                + "DESIGN_EFFORT:basic_passthrough(ArtworkBasicPassthrough).design_effort(PassthroughString).value(STRING)\n"                                
                                 + "SOURCE_MOVIE_ID:source_movie_id(PassthroughVideo).id(INT)\n"
                                 + "IDENTIFIERS:basic_passthrough(ArtworkBasicPassthrough).identifiers(STRING[])\n"
                                 + "ACQUISITION_SOURCE:acquisitionSource(AcquisitionSource).value(STRING)\n"
