@@ -733,14 +733,4 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             modifiedImageTypeMap.put(new ModificationKey(fields[0], fields[1]), fields[2]);
         }
     }
-
-    public static void main(String[] args) {
-        String tagValue = "OVERLAY:";
-        if (tagValue == null || !tagValue.startsWith(OVERLAY_PREFIX)) {
-            System.out.println("NONO");
-            return;
-        }
-        String overlayType = tagValue.substring(OVERLAY_PREFIX.length());
-        System.out.println("OVERLAY:" + overlayType);
-    }
 }
