@@ -1720,7 +1720,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -3864,7 +3864,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -6008,7 +6008,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -8274,7 +8274,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -10418,7 +10418,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -12562,7 +12562,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -14715,7 +14715,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -16868,7 +16868,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -19021,7 +19021,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.206",
+            "locked": "100.0.207",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
