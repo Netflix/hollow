@@ -77,11 +77,11 @@ public class HollowIncrementalProducer {
         mutations.put(key, DELETE_RECORD);
     }
 
-    public void clearMutations() {
+    public void clearChanges() {
         this.mutations.clear();
     }
 
-    public boolean hasMutations() { return this.mutations.size() > 0; }
+    public boolean hasChanges() { return this.mutations.size() > 0; }
 
     public long runCycle() {
         return producer.runCycle(new Populator() {
@@ -89,7 +89,7 @@ public class HollowIncrementalProducer {
                 newState.getStateEngine().addAllObjectsFromPreviousCycle();
                 removeRecords(newState);
                 addRecords(newState);
-                clearMutations();
+                clearChanges();
             }
 
             private void removeRecords(WriteState newState) {
