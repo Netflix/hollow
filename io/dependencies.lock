@@ -280,7 +280,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -878,12 +877,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -1952,13 +1945,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -2409,7 +2403,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -2790,7 +2783,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -3388,12 +3380,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -4462,13 +4448,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -4919,7 +4906,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -5300,7 +5286,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -5898,12 +5883,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -6972,13 +6951,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -7429,7 +7409,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -7932,7 +7911,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -8530,12 +8508,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -9604,13 +9576,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -10061,7 +10034,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -10442,7 +10414,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -11040,12 +11011,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -12114,13 +12079,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -12571,7 +12537,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -12952,7 +12917,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -13550,12 +13514,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -14624,13 +14582,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -15090,7 +15049,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -15471,7 +15429,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -16069,12 +16026,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -17143,13 +17094,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -17609,7 +17561,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -17990,7 +17941,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -18588,12 +18538,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -19662,13 +19606,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -20128,7 +20073,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
@@ -20509,7 +20453,6 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-core",
                 "com.netflix.ribbon:ribbon-eureka",
@@ -21107,12 +21050,6 @@
             "locked": "0.3.0",
             "transitive": [
                 "com.netflix.netflix-commons:netflix-eventbus"
-            ]
-        },
-        "com.netflix.netflix-commons:netflix-statistics": {
-            "locked": "0.1.1",
-            "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
@@ -22181,13 +22118,14 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.214",
+            "locked": "100.0.215",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -22647,7 +22585,6 @@
                 "com.netflix.netflix-commons:netflix-commons-util",
                 "com.netflix.netflix-commons:netflix-eventbus",
                 "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.netflix-commons:netflix-statistics",
                 "com.netflix.photon:Photon",
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
