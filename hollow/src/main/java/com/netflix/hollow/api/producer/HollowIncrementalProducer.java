@@ -81,9 +81,7 @@ public class HollowIncrementalProducer {
         this.mutations.clear();
     }
 
-    protected ConcurrentHashMap<RecordPrimaryKey, Object> getMutations() {
-        return this.mutations;
-    }
+    public boolean hasMutations() { return this.mutations.size() > 0; }
 
     public long runCycle() {
         return producer.runCycle(new Populator() {

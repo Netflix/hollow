@@ -245,12 +245,12 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.addOrModify(new TypeB(5, "6"));
         incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
 
-        Assert.assertEquals(8, incrementalProducer.getMutations().size());
+        Assert.assertTrue(incrementalProducer.hasMutations());
 
         /// .runCycle() flushes the changes to a new data state.
-        long nextVersion = incrementalProducer.runCycle();
+        incrementalProducer.runCycle();
 
-        Assert.assertEquals(0, incrementalProducer.getMutations().size());
+        Assert.assertFalse(incrementalProducer.hasMutations());
     }
 
     private HollowProducer createInMemoryProducer() {
