@@ -68,6 +68,11 @@ public class HollowIncrementalProducer {
 
     public boolean hasChanges() { return this.mutations.size() > 0; }
 
+    /**
+     * Runs a Hollow Cycle, if successful, cleans the mutations map.
+     * @since 2.9.9
+     * @return
+     */
     public long runCycle() {
         long version = producer.runCycle(populator);
         clearChanges();

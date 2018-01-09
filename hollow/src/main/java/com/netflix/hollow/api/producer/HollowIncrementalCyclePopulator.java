@@ -14,6 +14,10 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Used by HollowIncrementalProducer for Delta-Based Producer Input
+ * @since 2.9.9
+ */
 public class HollowIncrementalCyclePopulator implements HollowProducer.Populator {
 
     public static final Object DELETE_RECORD = new Object();
