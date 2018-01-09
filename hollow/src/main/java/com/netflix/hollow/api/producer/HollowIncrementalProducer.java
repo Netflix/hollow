@@ -41,7 +41,7 @@ public class HollowIncrementalProducer {
     public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
-        this.populator = new HollowIncrementalCyclePopulator(this.mutations, threadsPerCpu);
+        this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
     }
 
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
