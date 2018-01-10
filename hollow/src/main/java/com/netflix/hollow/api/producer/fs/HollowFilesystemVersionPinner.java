@@ -25,7 +25,7 @@ import java.io.IOException;
 
 public class HollowFilesystemVersionPinner implements HollowProducer.VersionPinner {
 
-    public static final String VERSION_PINNED_FILENAME = "pinned.version";
+    public static final String VERSION_PIN_FILENAME = "pin.version";
 
     public static final long NO_VERSION_AVAILABLE = Long.MIN_VALUE;
 
@@ -36,8 +36,8 @@ public class HollowFilesystemVersionPinner implements HollowProducer.VersionPinn
     }
 
     @Override
-    public void pin(long pinnedVersion) {
-        writePinVersion(pinnedVersion);
+    public void pin(long pinVersion) {
+        writePinVersion(pinVersion);
     }
 
     @Override
@@ -45,13 +45,13 @@ public class HollowFilesystemVersionPinner implements HollowProducer.VersionPinn
         writePinVersion(NO_VERSION_AVAILABLE);
     }
 
-    private void writePinVersion(long pinnedVersion) {
-        File pinnedVersionFile = new File(publishDir, VERSION_PINNED_FILENAME);
+    private void writePinVersion(long pinVersion) {
+        File pinVersionFile = new File(publishDir, VERSION_PIN_FILENAME);
 
-        try (FileWriter writer = new FileWriter(pinnedVersionFile)){
-            writer.write(String.valueOf(pinnedVersion));
+        try (FileWriter writer = new FileWriter(pinVersionFile)){
+            writer.write(String.valueOf(pinVersion));
         } catch(IOException ex) {
-            throw new RuntimeException("Unable to write to pinned version file", ex);
+            throw new RuntimeException("Unable to write to pin version file", ex);
         }
     }
 }

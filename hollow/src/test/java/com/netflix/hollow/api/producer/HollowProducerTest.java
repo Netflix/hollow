@@ -50,7 +50,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner.VERSION_PINNED_FILENAME;
+import static com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner.VERSION_PIN_FILENAME;
 
 public class HollowProducerTest {
     private static final String namespace = "hollowProducerTest";
@@ -263,7 +263,7 @@ public class HollowProducerTest {
 
         producer.pinVersion(fakeVersion);
 
-        File pinnedVersionFile = new File(tmpFolder, VERSION_PINNED_FILENAME);
+        File pinnedVersionFile = new File(tmpFolder, VERSION_PIN_FILENAME);
 
         Assert.assertTrue(pinnedVersionFile.exists());
         Assert.assertEquals(fakeVersion, readFile(pinnedVersionFile.getPath()));
@@ -276,7 +276,7 @@ public class HollowProducerTest {
 
         producer.pinVersion(fakeVersion);
 
-        File pinnedVersionFile = new File(tmpFolder, VERSION_PINNED_FILENAME);
+        File pinnedVersionFile = new File(tmpFolder, VERSION_PIN_FILENAME);
 
         Assert.assertEquals(fakeVersion, readFile(pinnedVersionFile.getPath()));
 

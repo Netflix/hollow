@@ -42,7 +42,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private final Path publishDir;
     private final Path announceFile;
-    private final Path pinnedVersionFile;
+    private final Path pinVersionFile;
 
     private final List<HollowConsumer> subscribedConsumers;
     private final ScheduledExecutorService executor;
@@ -50,7 +50,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     private boolean ownedExecutor;
 
     private long latestVersion;
-    private long pinnedVersion = NO_VERSION_AVAILABLE;
+    private long pinVersion = NO_VERSION_AVAILABLE;
 
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
         this(publishDir,
@@ -74,7 +74,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
         this.executor = executor;
 
         this.announceFile = this.publishDir.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
-        this.pinnedVersionFile = this.publishDir.resolve(HollowFilesystemVersionPinner.VERSION_PINNED_FILENAME);
+        this.pinVersionFile = this.publishDir.resolve(HollowFilesystemVersionPinner.VERSION_PIN_FILENAME);
         this.subscribedConsumers = new CopyOnWriteArrayList<>();
         this.latestVersion = readLatestVersion();
 
@@ -100,12 +100,19 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
             @Override
             public void run() {
                 try {
-                    if (!Files.isReadable(announceFile)) return;
+                    if (!Files.isReadable(announceFile) && !Files.isReadable(pinVersionFile)) return;
 
-                    FileTime lastModifiedTime = getLastModifiedTime(announceFile);
+                    long pinnedVersion = readVersion(pinVersionFile);
+                    FileTime lastModifiedTime;
+                    if(pinnedVersion != NO_VERSION_AVAILABLE) {
+                        lastModifiedTime = getLastModifiedTime(pinVersionFile);
+                        pinVersion = pinnedVersion;
+                    } else {
+                        lastModifiedTime = getLastModifiedTime(announceFile);
+                    }
+
                     if (lastModifiedTime.compareTo(previousFileTime) > 0) {
                         previousFileTime = lastModifiedTime;
-
                         long currentVersion = readLatestVersion();
                         if (latestVersion != currentVersion) {
                             latestVersion = currentVersion;
@@ -126,11 +133,11 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     @Override
-    public long getPinnedVersion() { return pinnedVersion; }
+    public long getPinVersion() { return pinVersion; }
 
     @Override
-    public boolean hasPinnedVersion() {
-        return pinnedVersion != NO_VERSION_AVAILABLE;
+    public boolean hasPinVersion() {
+        return pinVersion != NO_VERSION_AVAILABLE;
     }
 
     @Override
@@ -139,8 +146,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     private long readLatestVersion() {
-        long pinnedVersion = readVersion(pinnedVersionFile);
-        if(pinnedVersion != HollowFilesystemVersionPinner.NO_VERSION_AVAILABLE ) {
+        long pinnedVersion = readVersion(pinVersionFile);
+        if(pinnedVersion != NO_VERSION_AVAILABLE ) {
             return pinnedVersion;
         }
 
