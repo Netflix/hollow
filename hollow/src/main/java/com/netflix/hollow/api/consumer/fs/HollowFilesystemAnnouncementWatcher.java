@@ -146,9 +146,9 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     private long readLatestVersion() {
-        long pinnedVersion = readVersion(pinVersionFile);
-        if(pinnedVersion != NO_VERSION_AVAILABLE ) {
-            return pinnedVersion;
+        long pinVersion = readVersion(pinVersionFile);
+        if(pinVersion != NO_VERSION_AVAILABLE ) {
+            return pinVersion;
         }
 
         return readVersion(announceFile);
