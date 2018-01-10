@@ -27,6 +27,7 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -35,7 +36,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -46,6 +49,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner.VERSION_PINNED_FILENAME;
 
 public class HollowProducerTest {
     private static final String namespace = "hollowProducerTest";
@@ -72,6 +77,7 @@ public class HollowProducerTest {
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
                                                 .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
+                                                .withVersionPinner(new HollowFilesystemVersionPinner(tmpFolder))
                                                 .build();
                 
         producer.initializeDataModel(schemas);
@@ -250,11 +256,50 @@ public class HollowProducerTest {
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
     }
 
+    @Test
+    public void testPinVersion() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long fakeVersion = 101;
+
+        producer.pinVersion(fakeVersion);
+
+        File pinnedVersionFile = new File(tmpFolder, VERSION_PINNED_FILENAME);
+
+        Assert.assertTrue(pinnedVersionFile.exists());
+        Assert.assertEquals(fakeVersion, readFile(pinnedVersionFile.getPath()));
+    }
+
+    @Test
+    public void testUnpinVersion() {
+        HollowProducer producer = createProducer(tmpFolder, schema);
+        long fakeVersion = 101;
+
+        producer.pinVersion(fakeVersion);
+
+        File pinnedVersionFile = new File(tmpFolder, VERSION_PINNED_FILENAME);
+
+        Assert.assertEquals(fakeVersion, readFile(pinnedVersionFile.getPath()));
+
+        producer.unpinVersion();
+
+        Assert.assertEquals(HollowFilesystemVersionPinner.NO_VERSION_AVAILABLE, readFile(pinnedVersionFile.getPath()));
+    }
+
     @After
     public void tearDown() {
         for (File file : blobFileMap.values()) {
             System.out.println("\t deleting: " + file);
             file.delete();
+        }
+    }
+
+    private static long readFile(String path) {
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(path));
+            String content = new String(encoded, Charset.defaultCharset());
+            return Long.parseLong(content);
+        } catch (Exception e) {
+            return 0L;
         }
     }
 
