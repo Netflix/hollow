@@ -253,14 +253,6 @@ public class HollowConsumer {
         return updater.getCurrentVersionId();
     }
 
-    /**
-     * @return the pinned version of the announcement watcher.
-     */
-    public long getPinnedVersion() {
-        return announcementWatcher.getPinVersion();
-    }
-
-
     public boolean isPinned() {
         return announcementWatcher.hasPinVersion();
     }
@@ -423,11 +415,6 @@ public class HollowConsumer {
          * Returns the latest announced version.
          */
         public long getLatestVersion();
-
-        /**
-         * Returns the latest announced version.
-         */
-        public long getPinVersion();
 
 
         public boolean hasPinVersion();

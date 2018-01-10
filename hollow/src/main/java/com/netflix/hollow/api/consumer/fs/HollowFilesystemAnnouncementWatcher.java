@@ -133,9 +133,6 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     @Override
-    public long getPinVersion() { return pinVersion; }
-
-    @Override
     public boolean hasPinVersion() {
         return pinVersion != NO_VERSION_AVAILABLE;
     }

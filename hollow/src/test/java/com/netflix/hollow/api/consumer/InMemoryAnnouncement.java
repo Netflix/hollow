@@ -43,12 +43,7 @@ public class InMemoryAnnouncement implements VersionPinner, Announcer, Announcem
             return pinnedVersion;
         return latestAnnouncedVersion;
     }
-
-    @Override
-    public long getPinVersion() {
-        return pinnedVersion;
-    }
-
+    
     @Override
     public boolean hasPinVersion() {
         return pinnedVersion != NO_VERSION_AVAILABLE;

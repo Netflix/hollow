@@ -50,6 +50,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_VERSION_AVAILABLE;
 import static com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner.VERSION_PIN_FILENAME;
 
 public class HollowProducerTest {
@@ -282,7 +283,7 @@ public class HollowProducerTest {
 
         producer.unpinVersion();
 
-        Assert.assertEquals(HollowFilesystemVersionPinner.NO_VERSION_AVAILABLE, readFile(pinnedVersionFile.getPath()));
+        Assert.assertEquals(NO_VERSION_AVAILABLE, readFile(pinnedVersionFile.getPath()));
     }
 
     @After
