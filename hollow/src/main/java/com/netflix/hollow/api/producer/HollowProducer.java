@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
+import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_VERSION_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.File;
@@ -43,7 +43,6 @@ import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
-import com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
@@ -444,7 +443,7 @@ public class HollowProducer {
      * at an optimal state.
      * 
      * @param config specifies what criteria to use to determine whether a compaction is necessary
-     * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
+     * @return the version identifier of the produced state, or AnnouncementWatcher.NO_VERSION_AVAILABLE if compaction was unnecessary.
      */
     public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
         if(config != null && readStates.hasCurrent()) {
@@ -459,7 +458,7 @@ public class HollowProducer {
             }
         }
         
-        return NO_ANNOUNCEMENT_AVAILABLE;
+        return NO_VERSION_AVAILABLE;
     }
 
     protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {

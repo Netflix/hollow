@@ -254,6 +254,18 @@ public class HollowConsumer {
     }
 
     /**
+     * @return the pinned version of the announcement watcher.
+     */
+    public long getPinnedVersion() {
+        return announcementWatcher.getPinnedVersion();
+    }
+
+
+    public boolean isPinned() {
+        return announcementWatcher.hasPinnedVersion();
+    }
+
+    /**
      * @return the api which wraps the underlying dataset.
      */
     public HollowAPI getAPI() {
@@ -405,14 +417,20 @@ public class HollowConsumer {
      */
     public static interface AnnouncementWatcher {
 
-        public static final long NO_ANNOUNCEMENT_AVAILABLE = Long.MIN_VALUE;
+        public static final long NO_VERSION_AVAILABLE = Long.MIN_VALUE;
 
         /**
-         * Return the latest announced version.
-         *
-         * @return
+         * Returns the latest announced version.
          */
         public long getLatestVersion();
+
+        /**
+         * Returns the latest announced version.
+         */
+        public long getPinnedVersion();
+
+
+        public boolean hasPinnedVersion();
 
         /**
          * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
