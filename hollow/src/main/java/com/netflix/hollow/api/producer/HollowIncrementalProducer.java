@@ -18,22 +18,7 @@
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
-import com.netflix.hollow.api.producer.HollowProducer.Populator;
-import com.netflix.hollow.api.producer.HollowProducer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
-import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,18 +32,18 @@ public class HollowIncrementalProducer {
 
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
-    private final double threadsPerCpu;
+    private final HollowProducer.Populator populator;
     
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d);
     }
-    
+
     public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
         this.producer = producer;
-        this.threadsPerCpu = threadsPerCpu;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
+        this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
     }
-    
+
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
         producer.hardRestore(versionDesired, blobRetriever);
     }
@@ -83,95 +68,14 @@ public class HollowIncrementalProducer {
 
     public boolean hasChanges() { return this.mutations.size() > 0; }
 
+    /**
+     * Runs a Hollow Cycle, if successful, cleans the mutations map.
+     * @since 2.9.9
+     * @return
+     */
     public long runCycle() {
-        return producer.runCycle(new Populator() {
-            public void populate(WriteState newState) throws Exception {
-                newState.getStateEngine().addAllObjectsFromPreviousCycle();
-                removeRecords(newState);
-                addRecords(newState);
-                clearChanges();
-            }
-
-            private void removeRecords(WriteState newState) {
-                Map<String, BitSet> recordsToRemove = findTypesWithRemovedRecords(newState.getPriorState());
-                markRecordsToRemove(newState.getPriorState(), recordsToRemove);
-                removeRecordsFromNewState(newState, recordsToRemove);
-            }
-
-            private Map<String, BitSet> findTypesWithRemovedRecords(ReadState readState) {
-                Map<String, BitSet> recordsToRemove = new HashMap<String, BitSet>();
-                for(RecordPrimaryKey key : mutations.keySet()) {
-                    if(!recordsToRemove.containsKey(key.getType())) {
-                        HollowTypeReadState typeState = readState.getStateEngine().getTypeState(key.getType());
-                        if(typeState != null) {
-                            BitSet bs = new BitSet(typeState.getPopulatedOrdinals().length());
-                            recordsToRemove.put(key.getType(), bs);
-                        }
-                    }
-                }
-                return recordsToRemove;
-            }
-
-            private void markRecordsToRemove(ReadState priorState, Map<String, BitSet> recordsToRemove) {
-                HollowReadStateEngine priorStateEngine = priorState.getStateEngine();
-                
-                for(Map.Entry<String, BitSet> removalEntry : recordsToRemove.entrySet()) {
-                    markTypeRecordsToRemove(priorStateEngine, removalEntry.getKey(), removalEntry.getValue());
-                }
-                
-                TransitiveSetTraverser.addTransitiveMatches(priorStateEngine, recordsToRemove);
-                TransitiveSetTraverser.removeReferencedOutsideClosure(priorStateEngine, recordsToRemove);
-            }
-
-            private void markTypeRecordsToRemove(HollowReadStateEngine priorStateEngine, String type, BitSet typeRecordsToRemove) {
-                HollowTypeReadState priorReadState = priorStateEngine.getTypeState(type);
-                HollowSchema schema = priorReadState.getSchema();
-                if(schema.getSchemaType() == SchemaType.OBJECT) {
-                    HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
-                    
-                    for(Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                        if(entry.getKey().getType().equals(type)) {
-                            int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
-                            
-                            if(priorOrdinal != -1)
-                                typeRecordsToRemove.set(priorOrdinal);
-                        }
-                    }
-                }
-            }
-            
-            private void removeRecordsFromNewState(WriteState newState, Map<String, BitSet> recordsToRemove) {
-                for(Map.Entry<String, BitSet> removalEntry : recordsToRemove.entrySet()) {
-                    HollowTypeWriteState writeState = newState.getStateEngine().getTypeState(removalEntry.getKey());
-                    BitSet typeRecordsToRemove = removalEntry.getValue();
-                    
-                    int ordinalToRemove = typeRecordsToRemove.nextSetBit(0);
-                    while(ordinalToRemove != -1) {
-                        writeState.removeOrdinalFromThisCycle(ordinalToRemove);
-                        ordinalToRemove = typeRecordsToRemove.nextSetBit(ordinalToRemove+1);
-                    }
-                }
-            }
-            
-            private void addRecords(final WriteState newState) {
-                SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
-                for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                    executor.execute(new Runnable() {
-                        public void run() {
-                            if(entry.getValue() != DELETE_RECORD)
-                                newState.add(entry.getValue());
-                        }
-                    });
-                }
-
-                try {
-                    executor.awaitSuccessfulCompletion();
-                } catch(Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        });
+        long version = producer.runCycle(populator);
+        clearChanges();
+        return version;
     }
-
 }
