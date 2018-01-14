@@ -57,9 +57,18 @@ public class HollowIncrementalProducer {
         RecordPrimaryKey pk = producer.getObjectMapper().extractPrimaryKey(obj);
         delete(pk);
     }
+
+    public void discard(Object obj) {
+        RecordPrimaryKey pk = producer.getObjectMapper().extractPrimaryKey(obj);
+        discard(pk);
+    }
     
     public void delete(RecordPrimaryKey key) {
         mutations.put(key, DELETE_RECORD);
+    }
+
+    public void discard(RecordPrimaryKey key) {
+        mutations.remove(key);
     }
 
     public void clearChanges() {

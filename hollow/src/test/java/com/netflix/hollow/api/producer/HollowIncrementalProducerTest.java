@@ -224,6 +224,59 @@ public class HollowIncrementalProducerTest {
     }
 
     @Test
+    public void discardChanges() {
+        HollowProducer producer = createInMemoryProducer();
+
+        initializeData(producer);
+
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        incrementalProducer.addOrModify(new TypeB(1, "one"));
+
+        long nextVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+
+        assertTypeB(idx, 1, "one");
+
+        incrementalProducer.delete(new TypeB(1, "one"));
+
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        //Discard with an object
+        incrementalProducer.discard(new TypeB(1, "one"));
+
+        Assert.assertFalse(incrementalProducer.hasChanges());
+
+        long version = incrementalProducer.runCycle();
+
+        consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+
+        assertTypeB(idx, 1, "one");
+
+        incrementalProducer.delete(new TypeB(1, "one"));
+
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        //Discard with a PrimaryKey
+        incrementalProducer.discard(new RecordPrimaryKey("TypeB", new Object[]{ 1 }));
+
+        Assert.assertFalse(incrementalProducer.hasChanges());
+
+        long finalVersion = incrementalProducer.runCycle();
+
+        consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(finalVersion);
+
+        assertTypeB(idx, 1, "one");
+    }
+
+    @Test
     public void clearMutations() {
         HollowProducer producer = createInMemoryProducer();
 
