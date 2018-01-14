@@ -49,17 +49,17 @@ public class HollowIncrementalProducer {
     }
     
     public void addOrModify(Object obj) {
-        RecordPrimaryKey pk = producer.getObjectMapper().extractPrimaryKey(obj);
+        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         mutations.put(pk, obj);
     }
     
     public void delete(Object obj) {
-        RecordPrimaryKey pk = producer.getObjectMapper().extractPrimaryKey(obj);
+        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         delete(pk);
     }
 
     public void discard(Object obj) {
-        RecordPrimaryKey pk = producer.getObjectMapper().extractPrimaryKey(obj);
+        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         discard(pk);
     }
     
@@ -86,5 +86,9 @@ public class HollowIncrementalProducer {
         long version = producer.runCycle(populator);
         clearChanges();
         return version;
+    }
+
+    private RecordPrimaryKey extractRecordPrimaryKey(Object obj) {
+        return producer.getObjectMapper().extractPrimaryKey(obj);
     }
 }
