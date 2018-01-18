@@ -84,8 +84,8 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("        this(consumer, false);");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefreah) {\n");
-        builder.append("        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
+        builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh) {\n");
+        builder.append("        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
         builder.append("    }\n\n");
 
     }
@@ -95,8 +95,8 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ", fieldPaths);\n");
         builder.append("    }\n\n");
 
-        builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {\n");
-        builder.append("        super(consumer, \"" + type + "\", isListenToDataRefreah, fieldPaths);\n");
+        builder.append("    " + (isParameterizedConstructorPublic ? "public " : "private ") + className + "(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {\n");
+        builder.append("        super(consumer, \"" + type + "\", isListenToDataRefresh, fieldPaths);\n");
         builder.append("    }\n\n");
 
     }

@@ -29,10 +29,10 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
     protected final HollowConsumer consumer;
     protected HollowPrimaryKeyIndex idx;
     protected API api;
-    protected boolean isListenToDataRefreah;
+    protected boolean isListenToDataRefresh;
     protected RefreshListener refreshListener;
 
-    public AbstractHollowUniqueKeyIndex(HollowConsumer consumer, String type, boolean isListenToDataRefreah, String... fieldPaths) {
+    public AbstractHollowUniqueKeyIndex(HollowConsumer consumer, String type, boolean isListenToDataRefresh, String... fieldPaths) {
         consumer.getRefreshLock().lock();
         try {
             this.consumer = consumer;
@@ -41,7 +41,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
 
             this.refreshListener = new RefreshListener();
 
-            if (isListenToDataRefreah) {
+            if (isListenToDataRefresh) {
                 listenToDataRefresh();
             }
         } catch (ClassCastException cce) {
@@ -56,20 +56,30 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
         return (API) api;
     }
 
+    @Deprecated
     public boolean isListenToDataRefreah() {
-        return isListenToDataRefreah;
+        return isListenToDataRefresh;
+    }
+
+    @Deprecated
+    public void listenToDataRefreah() {
+        listenToDataRefresh();
+    }
+
+    public boolean isListenToDataRefresh() {
+        return isListenToDataRefresh;
     }
 
     public void listenToDataRefresh() {
-        if (isListenToDataRefreah) return;
+        if (isListenToDataRefresh) return;
 
-        isListenToDataRefreah = true;
+        isListenToDataRefresh = true;
         idx.listenForDeltaUpdates();
         consumer.addRefreshListener(refreshListener);
     }
 
     public void detachFromDataRefresh() {
-        isListenToDataRefreah = false;
+        isListenToDataRefresh = false;
         idx.detachFromDeltaUpdates();
         consumer.removeRefreshListener(refreshListener);
     }
