@@ -72,8 +72,8 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("        super(consumer, " + isListenToDataRefreah +", queryType, selectFieldPath, matchFieldPaths);\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefreah, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
-        builder.append("        super(consumer, isListenToDataRefreah, queryType, selectFieldPath, matchFieldPaths);\n");
+        builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
+        builder.append("        super(consumer, isListenToDataRefresh, queryType, selectFieldPath, matchFieldPaths);\n");
         builder.append("    }\n\n");
 
         for(HollowSchema schema : schemaList) {

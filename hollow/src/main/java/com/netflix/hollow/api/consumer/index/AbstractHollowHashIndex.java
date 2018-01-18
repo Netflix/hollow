@@ -33,7 +33,7 @@ public abstract class AbstractHollowHashIndex<API> {
 
     protected HollowHashIndex idx;
     protected API api;
-    protected boolean isListenToDataRefreah;
+    protected boolean isListenToDataRefresh;
     protected RefreshListener refreshListener;
 
     public AbstractHollowHashIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String queryType, String selectFieldPath, String... matchFieldPaths) {
@@ -63,20 +63,20 @@ public abstract class AbstractHollowHashIndex<API> {
         return (API) api;
     }
 
-    public boolean isListenToDataRefreah() {
-        return isListenToDataRefreah;
+    public boolean isListenToDataRefresh() {
+        return isListenToDataRefresh;
     }
 
     public void listenToDataRefresh() {
-        if (isListenToDataRefreah) return;
+        if (isListenToDataRefresh) return;
 
-        isListenToDataRefreah = true;
+        isListenToDataRefresh = true;
         idx.listenForDeltaUpdates();
         consumer.addRefreshListener(refreshListener);
     }
 
     public void detachFromDataRefresh() {
-        isListenToDataRefreah = false;
+        isListenToDataRefresh = false;
         idx.detachFromDeltaUpdates();
         consumer.removeRefreshListener(refreshListener);
     }
