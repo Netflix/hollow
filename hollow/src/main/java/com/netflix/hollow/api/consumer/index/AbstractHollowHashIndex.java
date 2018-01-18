@@ -72,6 +72,7 @@ public abstract class AbstractHollowHashIndex<API> {
     public void listenToDataRefreah() {
         listenToDataRefresh();
     }
+
     public boolean isListenToDataRefresh() {
         return isListenToDataRefresh;
     }
