@@ -63,6 +63,15 @@ public abstract class AbstractHollowHashIndex<API> {
         return (API) api;
     }
 
+    @Deprecated
+    public boolean isListenToDataRefreah() {
+        return isListenToDataRefresh;
+    }
+
+    @Deprecated
+    public void listenToDataRefreah() {
+        listenToDataRefresh();
+    }
     public boolean isListenToDataRefresh() {
         return isListenToDataRefresh;
     }
