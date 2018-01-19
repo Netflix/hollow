@@ -91,4 +91,34 @@ public class HollowIncrementalProducer {
     private RecordPrimaryKey extractRecordPrimaryKey(Object obj) {
         return producer.getObjectMapper().extractPrimaryKey(obj);
     }
+
+    public static HollowIncrementalProducer.Builder withHollowProducer(HollowProducer hollowProducer) {
+        Builder builder = new Builder();
+        return builder.withHollowProducer(hollowProducer);
+    }
+
+    public static class Builder {
+        protected HollowProducer hollowProducer;
+        protected double threadsPerCpu = 1.0d;
+
+        public Builder withHollowProducer(HollowProducer hollowProducer) {
+            this.hollowProducer = hollowProducer;
+            return this;
+        }
+
+        public Builder withThreadsPerCpu(double threadsPerCpu) {
+            this.threadsPerCpu = threadsPerCpu;
+            return this;
+        }
+
+        protected void checkArguments() {
+            if(hollowProducer == null)
+                throw new RuntimeException("HollowProducer should be specified.");
+        }
+
+        public HollowIncrementalProducer build() {
+            checkArguments();
+            return new HollowIncrementalProducer(hollowProducer, threadsPerCpu);
+        }
+    }
 }
