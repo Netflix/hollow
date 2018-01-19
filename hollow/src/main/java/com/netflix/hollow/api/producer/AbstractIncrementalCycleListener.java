@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Beta API subject to change.
- *
- * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
 public class AbstractIncrementalCycleListener implements IncrementalCycleListener {
     @Override
