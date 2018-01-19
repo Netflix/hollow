@@ -117,16 +117,20 @@ public class VMSAvailabilityWindowModule {
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null, getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()));
-            if (locale != null && windows.isEmpty() && isLanguageOverride(statusHollow))
-                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null, getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()));
+            // if this flag is true, then skip the local asset availability check.
+            boolean skipLocalAssetAvailabilityCheck = isLanguageOverride(statusHollow);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null,
+                    getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()), skipLocalAssetAvailabilityCheck);
+
+//            if (locale != null && windows.isEmpty() && isLanguageOverride(statusHollow))
+//                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null, getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()), skipLocalAssetAvailabilityCheck);
         }
         return windows;
     }
 
     // todo requires splitting this long method into its own class
     private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive,
-                                                                              RightsHollow rights, boolean isMulticatalogRollup, Set<String> subsRequiredLocales, Set<String> dubsRequiredLocale) {
+                                                                              RightsHollow rights, boolean isMulticatalogRollup, Set<String> subsRequiredLocales, Set<String> dubsRequiredLocale, boolean skipLocalAssetAvailabilityCheck) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
@@ -209,7 +213,8 @@ public class VMSAvailabilityWindowModule {
                                 packageData = packageDataCollection.getPackageData();
 
 
-                            if (locale != null) {
+
+                            if (locale != null && !skipLocalAssetAvailabilityCheck) {
 
                                 boolean shouldCheckAudio = dubsRequiredLocale.contains(locale.toLowerCase());
                                 boolean shouldCheckSubtitles = subsRequiredLocales.contains(locale.toLowerCase());
@@ -238,7 +243,7 @@ public class VMSAvailabilityWindowModule {
                                         currentOrFirstFutureWindowFoundLocalText = true;
                                 }
 
-                                // make sure the localized assets availability criteria is met if not then skip this contract
+                                // make sure the localized assets availability criteria is met if not then skip this contract package
                                 boolean localAssetAvailabilityCheck = true;
                                 if (shouldCheckAudio && !thisWindowFoundLocalAudio) localAssetAvailabilityCheck = false;
                                 if (shouldCheckSubtitles && !thisWindowFoundLocalText) localAssetAvailabilityCheck = false;
