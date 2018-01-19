@@ -161,6 +161,15 @@ public class VMSAvailabilityWindowModule {
 
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
+            boolean inPrePromotionPhase = false;
+            if (!isGoLive) {
+                for (long contractId : contractIds) {
+                    ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true;
+                }
+                if (!isGoLive && inPrePromotionPhase)
+                    ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
+            }
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
@@ -198,8 +207,12 @@ public class VMSAvailabilityWindowModule {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                if (packageAvailability == 0)
+                                // if no assets and the the title is not in prePromotionPhase the skip this contract
+                                // if no assets and the title is in prePromotionPhase then do not skip this contract, since isGoLive is false, adding windows will prevent artwork graying out in multi-Locale catalog.
+                                if (packageAvailability == 0 && !inPrePromotionPhase) {
+                                    ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
+                                }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
                                 if (!considerPackageForLang && contractPackages.size() == 1) {
@@ -487,6 +500,9 @@ public class VMSAvailabilityWindowModule {
             if (rollup.doEpisode())
                 rollup.newPrePromoDays(0);
         }
+
+        if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty()))
+            ctx.getLogger().info(TransformerLogTag.LocaleMerching,"VideoId={} not merched in country={} locale={}", videoId, country, locale);
 
         return availabilityWindows;
     }
