@@ -1,27 +1,37 @@
 package com.netflix.vms.transformer.octobersky;
 
-import com.netflix.launch.common.Catalog;
-import java.util.HashMap;
-import java.util.Map;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-import java.util.HashSet;
-import com.netflix.launch.common.NamespaceLaunchConfiguration;
-import com.netflix.launch.common.Country;
-import com.netflix.launch.common.LaunchConfiguration;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Set;
+import com.netflix.launch.common.Country;
+import com.netflix.launch.common.LaunchConfiguration;
+import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Singleton
 public class OctoberSkyDataImpl implements OctoberSkyData {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OctoberSkyDataImpl.class);
+
+//    private static final String CROSS_PLATFORM_NAMESPACE = "cross-platform-ui";
+//    private static final String SUPPORTED_LOCALE_PROPERTY = "productPreferredLanguages_catalog";
+
     private static final String BEEHIVE_NAMESPACE = "beehive";
     private static final String IS_MIN_METADATA_PRESENT = "isMinMetadataPresent";
+    private static final String SUPPORTED_LOCALE_PROPERTY = "supportedLanguages";
 
     private final LaunchConfiguration octoberSky;
     private final TransformerConfig config;
-    
+
     private Set<String> supportedCountries;
     private Map<String, Set<String>> multilanguageCountryCatalogLocales;
 
@@ -36,16 +46,16 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     public Set<String> getSupportedCountries() {
         return supportedCountries;
     }
-    
+
     @Override
     public Set<String> getCatalogLanguages(String country) {
-        return multilanguageCountryCatalogLocales.get(country);
+        return multilanguageCountryCatalogLocales.get(country.toUpperCase());
     }
-    
+
     @Override
     public void refresh() {
         this.supportedCountries = findCountriesWithMinMetadata(octoberSky);
-        this.multilanguageCountryCatalogLocales = findMultilanguageCountryCatalogLocales(config, octoberSky);
+        this.multilanguageCountryCatalogLocales = findMultilanguageCountryCatalogLocales(octoberSky);
     }
 
     private static Set<String> findCountriesWithMinMetadata(LaunchConfiguration octoberSky) {
@@ -60,28 +70,37 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         }
         return minMetadataCountries;
     }
-    
-    private static Map<String, Set<String>> findMultilanguageCountryCatalogLocales(TransformerConfig config, LaunchConfiguration octoberSky) {
-        String multilangCountries[] = config.getMultilanguageCatalogCountries().split(",");
+
+    private static Map<String, Set<String>> findMultilanguageCountryCatalogLocales(LaunchConfiguration octoberSky) {
+
         Map<String, Set<String>> multilanguageCountryCatalogLocales = new HashMap<>();
-        NamespaceLaunchConfiguration beehiveNamespace = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
-        
-        for(String country : multilangCountries) {
-            Country octoberSkyCountry = beehiveNamespace.getCountry(country);
-            for(Catalog catalog : octoberSkyCountry.getCatalogs()) {
-                
-                if(catalog.hasLanguage()) {
-                    Set<String> set = multilanguageCountryCatalogLocales.get(country);
-                    if(set == null) {
-                        set = new HashSet<>();
-                        multilanguageCountryCatalogLocales.put(country, set);
-                    }
-                    set.add(catalog.getLanguage().getLanguage());
-                }
+
+        NamespaceLaunchConfiguration namespaceLaunchConfiguration = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
+        List<Country> countries = namespaceLaunchConfiguration.getCountries();
+        for (Country country : countries) {
+
+            String supportedLocales = country.fetchProperty(SUPPORTED_LOCALE_PROPERTY);
+            if (supportedLocales.contains("["))
+                supportedLocales = supportedLocales.replace("[", "");
+
+            if (supportedLocales.contains("]"))
+                supportedLocales = supportedLocales.replace("]", "");
+
+            if (supportedLocales.contains("\""))
+                supportedLocales = supportedLocales.replace("\"", "");
+
+            String[] locales = supportedLocales.split(",");
+            Set<String> countryLocales = multilanguageCountryCatalogLocales.get(country.getCode());
+            if (countryLocales == null) {
+                countryLocales = new HashSet<>();
+                multilanguageCountryCatalogLocales.put(country.getCode(), countryLocales);
             }
+            for (String locale : locales)
+                countryLocales.add(locale);
+            LOGGER.info("Country={} supportedLocales={}", country.getCode(), Arrays.deepToString(countryLocales.toArray()));
         }
-        
+
         return multilanguageCountryCatalogLocales;
     }
-    
+
 }

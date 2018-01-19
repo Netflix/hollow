@@ -13,7 +13,9 @@ import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
+import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -40,6 +42,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +99,17 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
+    private Set<String> getAsSet(SetOfStringHollow setOfStringHollow) {
+        Set<String> setAsString = new HashSet<>();
+        if (setOfStringHollow != null) {
+            Iterator<StringHollow> it = setOfStringHollow.iterator();
+            while (it.hasNext()) {
+                setAsString.add(it.next()._getValue().toLowerCase());
+            }
+        }
+        return setAsString;
+    }
+
     List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow statusHollow, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
 
@@ -103,14 +117,16 @@ public class VMSAvailabilityWindowModule {
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null, getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()));
             if (locale != null && windows.isEmpty() && isLanguageOverride(statusHollow))
-                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null);
+                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null, getAsSet(statusHollow._getFlags()._getSubsRequired()), getAsSet(statusHollow._getFlags()._getDubsRequired()));
         }
         return windows;
     }
 
-    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup) {
+    // todo requires splitting this long method into its own class
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive,
+                                                                              RightsHollow rights, boolean isMulticatalogRollup, Set<String> subsRequiredLocales, Set<String> dubsRequiredLocale) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
@@ -195,11 +211,16 @@ public class VMSAvailabilityWindowModule {
 
                             if (locale != null) {
 
+                                boolean shouldCheckAudio = dubsRequiredLocale.contains(locale.toLowerCase());
+                                boolean shouldCheckSubtitles = subsRequiredLocales.contains(locale.toLowerCase());
+
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                if (packageAvailability == 0)
+                                if (packageAvailability == 0) {
                                     continue;
+                                }
+
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
                                 if (!considerPackageForLang && contractPackages.size() == 1) {
@@ -215,6 +236,14 @@ public class VMSAvailabilityWindowModule {
                                     thisWindowFoundLocalText = true; //rollup.foundLocalText();
                                     if (currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalText = true;
+                                }
+
+                                // make sure the localized assets availability criteria is met if not then skip this contract
+                                boolean localAssetAvailabilityCheck = true;
+                                if (shouldCheckAudio && !thisWindowFoundLocalAudio) localAssetAvailabilityCheck = false;
+                                if (shouldCheckSubtitles && !thisWindowFoundLocalText) localAssetAvailabilityCheck = false;
+                                if (!localAssetAvailabilityCheck) {
+                                    continue;
                                 }
                             }
 

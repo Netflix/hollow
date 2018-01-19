@@ -11,6 +11,9 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.reflections:reflections'
+    testCompile 'com.netflix.runtime:runtime-lifecycle'
+    testCompile 'netflix:netflix-config'
+    testCompile "netflix:videoresolutiontypelibrary:latest.release"
 }
 
 configurations.all {
