@@ -27,6 +27,7 @@ import com.netflix.vms.transformer.hollowoutput.FallbackUSArtwork;
 import com.netflix.vms.transformer.hollowoutput.GlobalVideo;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.MoviePersonCharacter;
+import com.netflix.vms.transformer.hollowoutput.MultiLocaleCatalogCountries;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
@@ -76,6 +77,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class SimpleTransformer {
 
@@ -237,6 +239,12 @@ public class SimpleTransformer {
 
             StreamDataModule.logVideoFormatDiffs(ctx);
             ctx.getLogger().info(TransformProgress, new ProgressMessage(processedCount.get()));
+        }
+
+        // add all the countries that has multi-locale catalog data in this cycle
+        if (!ctx.getCycleInterrupter().isCycleInterrupted()) {
+            Set<ISOCountry> countries = ctx.getOctoberSkyData().getMultiLingualCountries().stream().map(c -> cycleConstants.getISOCountry(c.toUpperCase())).collect(Collectors.toSet());
+            objectMapper.add(new MultiLocaleCatalogCountries(countries));
         }
 
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());

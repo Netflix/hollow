@@ -182,6 +182,15 @@ public class VMSAvailabilityWindowModule {
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
+            // find if any contract is in pre-promotion phase.
+            // If pre-promotion is true, and local assets are not available, its okay to populate the windows, since isGoLive flag will be false.
+            // this flag is at country level and applies to all multi-locale catalog as well.
+            boolean inPrePromotionPhase = false;
+            for (long contractId : contractIds) {
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                inPrePromotionPhase = contract._getPrePromotionDays() > 0;
+            }
+
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
                 // get contract id from window contract and contract data from VideoContract feed.
@@ -247,7 +256,9 @@ public class VMSAvailabilityWindowModule {
                                 boolean localAssetAvailabilityCheck = true;
                                 if (shouldCheckAudio && !thisWindowFoundLocalAudio) localAssetAvailabilityCheck = false;
                                 if (shouldCheckSubtitles && !thisWindowFoundLocalText) localAssetAvailabilityCheck = false;
-                                if (!localAssetAvailabilityCheck) {
+
+                                // if local assets availability check failed and the title is not in pre-promotion phase, then skip the contract.
+                                if (!localAssetAvailabilityCheck && !inPrePromotionPhase) {
                                     continue;
                                 }
                             }

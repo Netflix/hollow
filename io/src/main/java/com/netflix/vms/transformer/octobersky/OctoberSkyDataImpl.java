@@ -43,6 +43,11 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     }
 
     @Override
+    public Set<String> getMultiLingualCountries() {
+        return this.multilanguageCountryCatalogLocales.keySet();
+    }
+
+    @Override
     public Set<String> getSupportedCountries() {
         return supportedCountries;
     }
