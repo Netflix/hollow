@@ -162,7 +162,7 @@ public class VMSAvailabilityWindowModule {
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
             boolean inPrePromotionPhase = false;
-            if (!isGoLive) {
+            if (!isGoLive && locale != null) {
                 for (long contractId : contractIds) {
                     ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
                     if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true;
