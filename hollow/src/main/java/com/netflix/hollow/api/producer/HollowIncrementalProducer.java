@@ -19,6 +19,10 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -29,19 +33,27 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HollowIncrementalProducer {
     
     private static final Object DELETE_RECORD = new Object();
+    private static final long FAILED_VERSION = Long.MIN_VALUE;
 
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
-    
+    private final ListenerSupport listeners;
+
     public HollowIncrementalProducer(HollowProducer producer) {
-        this(producer, 1.0d);
+        this(producer, 1.0d, new ArrayList<IncrementalCycleListener>());
     }
 
-    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
+    public HollowIncrementalProducer(HollowProducer producer,
+                                     double threadsPerCpu,
+                                     List<IncrementalCycleListener> listeners) {
         this.producer = producer;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
         this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
+        this.listeners = new ListenerSupport();
+
+        for(IncrementalCycleListener listener : listeners)
+            this.listeners.add(listener);
     }
 
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
@@ -83,9 +95,26 @@ public class HollowIncrementalProducer {
      * @return
      */
     public long runCycle() {
-        long version = producer.runCycle(populator);
-        clearChanges();
-        return version;
+        long recordsRemoved = countRecordsToRemove();
+        long recordsAddedOrModified = this.mutations.values().size() - recordsRemoved;
+        try {
+            long version = producer.runCycle(populator);
+            listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved);
+            clearChanges();
+            return version;
+        } catch (Exception e) {
+            listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved);
+            return FAILED_VERSION;
+        }
+    }
+
+    private long countRecordsToRemove() {
+        long recordsToRemove = 0L;
+        Collection<Object> records = mutations.values();
+        for(Object record : records) {
+            if(record == DELETE_RECORD) recordsToRemove++;
+        }
+        return recordsToRemove;
     }
 
     private RecordPrimaryKey extractRecordPrimaryKey(Object obj) {
@@ -100,6 +129,7 @@ public class HollowIncrementalProducer {
     public static class Builder {
         protected HollowProducer hollowProducer;
         protected double threadsPerCpu = 1.0d;
+        protected List<IncrementalCycleListener> listeners = new ArrayList<IncrementalCycleListener>();
 
         public Builder withHollowProducer(HollowProducer hollowProducer) {
             this.hollowProducer = hollowProducer;
@@ -111,6 +141,17 @@ public class HollowIncrementalProducer {
             return this;
         }
 
+        public Builder withListener(IncrementalCycleListener listener) {
+            this.listeners.add(listener);
+            return this;
+        }
+
+        public Builder withListeners(IncrementalCycleListener... listeners) {
+            for(IncrementalCycleListener listener : listeners)
+                this.listeners.add(listener);
+            return this;
+        }
+
         protected void checkArguments() {
             if(hollowProducer == null)
                 throw new RuntimeException("HollowProducer should be specified.");
@@ -118,7 +159,7 @@ public class HollowIncrementalProducer {
 
         public HollowIncrementalProducer build() {
             checkArguments();
-            return new HollowIncrementalProducer(hollowProducer, threadsPerCpu);
+            return new HollowIncrementalProducer(hollowProducer, threadsPerCpu, listeners);
         }
     }
 }
