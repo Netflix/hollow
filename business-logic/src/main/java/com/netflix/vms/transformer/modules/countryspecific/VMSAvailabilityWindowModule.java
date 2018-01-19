@@ -161,6 +161,8 @@ public class VMSAvailabilityWindowModule {
 
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
+
+            // if multi-locale catalog processing, then check if title is in pre-promo phase.
             boolean inPrePromotionPhase = false;
             if (!isGoLive && locale != null) {
                 for (long contractId : contractIds) {
@@ -212,6 +214,8 @@ public class VMSAvailabilityWindowModule {
                                 if (packageAvailability == 0 && !inPrePromotionPhase) {
                                     ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
+                                } else if (packageAvailability == 0 && inPrePromotionPhase) {
+                                    ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                 }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
