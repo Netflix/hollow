@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DrmHeaderInfoPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DrmHeaderInfoHollow> {
 
     public DrmHeaderInfoPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmHeaderInfo")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public DrmHeaderInfoPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmHeaderInfo")).getPrimaryKey().getFieldPaths());
     }
 
     public DrmHeaderInfoPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

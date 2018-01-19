@@ -96,15 +96,15 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
-    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
+    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow statusHollow, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
 
-        RightsHollow rights = videoRights._getRights();
+        RightsHollow rights = statusHollow._getRights();
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
             windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null);
-            if (locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
+            if (locale != null && windows.isEmpty() && isLanguageOverride(statusHollow))
                 windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null);
         }
         return windows;

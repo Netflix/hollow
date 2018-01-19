@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TurboCollectionsPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TurboCollectionsHollow> {
 
     public TurboCollectionsPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TurboCollections")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public TurboCollectionsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TurboCollections")).getPrimaryKey().getFieldPaths());
     }
 
     public TurboCollectionsPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

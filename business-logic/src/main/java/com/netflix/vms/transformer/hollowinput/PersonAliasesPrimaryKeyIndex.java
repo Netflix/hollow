@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class PersonAliasesPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, PersonAliasesHollow> {
 
     public PersonAliasesPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonAliases")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public PersonAliasesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonAliases")).getPrimaryKey().getFieldPaths());
     }
 
     public PersonAliasesPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

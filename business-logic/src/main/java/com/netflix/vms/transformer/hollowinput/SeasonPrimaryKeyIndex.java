@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class SeasonPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, SeasonHollow> {
 
     public SeasonPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Season")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public SeasonPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Season")).getPrimaryKey().getFieldPaths());
     }
 
     public SeasonPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

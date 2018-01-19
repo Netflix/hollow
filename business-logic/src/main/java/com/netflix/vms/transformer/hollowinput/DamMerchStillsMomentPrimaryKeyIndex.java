@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DamMerchStillsMomentPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DamMerchStillsMomentHollow> {
 
     public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DamMerchStillsMoment")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DamMerchStillsMoment")).getPrimaryKey().getFieldPaths());
     }
 
     public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class CertificationSystemPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, CertificationSystemHollow> {
 
     public CertificationSystemPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CertificationSystem")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public CertificationSystemPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CertificationSystem")).getPrimaryKey().getFieldPaths());
     }
 
     public CertificationSystemPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

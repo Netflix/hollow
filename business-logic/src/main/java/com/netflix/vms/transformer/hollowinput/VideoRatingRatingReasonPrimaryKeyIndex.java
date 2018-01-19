@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoRatingRatingReasonPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoRatingRatingReasonHollow> {
 
     public VideoRatingRatingReasonPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoRatingRatingReason")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public VideoRatingRatingReasonPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoRatingRatingReason")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoRatingRatingReasonPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

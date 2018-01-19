@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DisallowedAssetBundlePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DisallowedAssetBundleHollow> {
 
     public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedAssetBundle")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedAssetBundle")).getPrimaryKey().getFieldPaths());
     }
 
     public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

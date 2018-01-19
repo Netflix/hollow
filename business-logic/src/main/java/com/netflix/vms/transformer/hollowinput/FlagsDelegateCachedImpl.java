@@ -30,6 +30,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean removeFromWebsiteOverride;
     private final int requiredLangsOrdinal;
     private final Boolean searchOnlyOverride;
+    private final int subsRequiredOrdinal;
+    private final int dubsRequiredOrdinal;
     private FlagsTypeAPI typeAPI;
 
     public FlagsDelegateCachedImpl(FlagsTypeAPI typeAPI, int ordinal) {
@@ -54,6 +56,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.removeFromWebsiteOverride = typeAPI.getRemoveFromWebsiteOverrideBoxed(ordinal);
         this.requiredLangsOrdinal = typeAPI.getRequiredLangsOrdinal(ordinal);
         this.searchOnlyOverride = typeAPI.getSearchOnlyOverrideBoxed(ordinal);
+        this.subsRequiredOrdinal = typeAPI.getSubsRequiredOrdinal(ordinal);
+        this.dubsRequiredOrdinal = typeAPI.getDubsRequiredOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -229,6 +233,14 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
 
     public Boolean getSearchOnlyOverrideBoxed(int ordinal) {
         return searchOnlyOverride;
+    }
+
+    public int getSubsRequiredOrdinal(int ordinal) {
+        return subsRequiredOrdinal;
+    }
+
+    public int getDubsRequiredOrdinal(int ordinal) {
+        return dubsRequiredOrdinal;
     }
 
     @Override

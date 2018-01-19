@@ -30,7 +30,9 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "removeAsset",
             "removeFromWebsiteOverride",
             "requiredLangs",
-            "searchOnlyOverride"
+            "searchOnlyOverride",
+            "subsRequired",
+            "dubsRequired"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
     }
@@ -304,6 +306,26 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getSubsRequiredOrdinal(int ordinal) {
+        if(fieldIndex[21] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "subsRequired");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[21]);
+    }
+
+    public SetOfStringTypeAPI getSubsRequiredTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public int getDubsRequiredOrdinal(int ordinal) {
+        if(fieldIndex[22] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "dubsRequired");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[22]);
+    }
+
+    public SetOfStringTypeAPI getDubsRequiredTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
 
     public FlagsDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

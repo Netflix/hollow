@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ChunkDurationsStringPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ChunkDurationsStringHollow> {
 
     public ChunkDurationsStringPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ChunkDurationsString")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public ChunkDurationsStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ChunkDurationsString")).getPrimaryKey().getFieldPaths());
     }
 
     public ChunkDurationsStringPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

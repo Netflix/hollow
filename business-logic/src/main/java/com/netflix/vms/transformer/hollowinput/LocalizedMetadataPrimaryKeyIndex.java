@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class LocalizedMetadataPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, LocalizedMetadataHollow> {
 
     public LocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocalizedMetadata")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public LocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocalizedMetadata")).getPrimaryKey().getFieldPaths());
     }
 
     public LocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

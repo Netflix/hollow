@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TimecodedMomentAnnotationPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TimecodedMomentAnnotationHollow> {
 
     public TimecodedMomentAnnotationPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TimecodedMomentAnnotation")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public TimecodedMomentAnnotationPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TimecodedMomentAnnotation")).getPrimaryKey().getFieldPaths());
     }
 
     public TimecodedMomentAnnotationPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

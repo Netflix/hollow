@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class AbsoluteSchedulePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, AbsoluteScheduleHollow> {
 
     public AbsoluteSchedulePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AbsoluteSchedule")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public AbsoluteSchedulePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AbsoluteSchedule")).getPrimaryKey().getFieldPaths());
     }
 
     public AbsoluteSchedulePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
