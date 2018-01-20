@@ -33,7 +33,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
  * Anything more results in failure of validation.
  */
 public class RecordCountVarianceValidator implements Nameable, Validator {
-	private final String NAME = "RecordCountVarianceValidator";
+	private final static String NAME = "RecordCountVarianceValidator";
 	
 	private final String typeName;
 	private final float allowableVariancePercent;
@@ -50,7 +50,7 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	public RecordCountVarianceValidator(String typeName, float allowableVariancePercent) {
 		this.typeName = typeName;
 		if(allowableVariancePercent < 0)
-			throw new IllegalArgumentException("RecordCountVarianceValidator for type "+typeName+": cannot have allowableVariancePercent less than 0. Value provided: "+allowableVariancePercent);
+			throw new IllegalArgumentException(NAME+" for type "+typeName+": cannot have allowableVariancePercent less than 0. Value provided: "+allowableVariancePercent);
 		this.allowableVariancePercent = allowableVariancePercent;
 	}
 	
@@ -89,7 +89,7 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 			StringBuffer msg = new StringBuffer(status.getMessage());
 			return  msg.append(status.getAdditionalInfo()).toString();
 		}
-		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
+		return(NAME+" status for "+typeName+" is null. This is unexpected. Please check validator definition.");
 	}
 
 	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
@@ -121,9 +121,9 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	private static final String LATEST_CARDINALITY_NAME = "LatestRecordCount";
 	private static final String PREVIOUS_CARDINALITY_NAME = "PreviousRecordCount";
 	private static final String ACTUAL_CHANGE_PERCENT_NAME = "ActualChangePercent";
-	private static final String ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT = "Previous record count is 0. Not running RecordCountVarianceValidator for type %s. "
+	private static final String ZERO_PREVIOUS_COUNT_WARN_MSG_FORMAT = "Not running "+NAME+" for type %s as previos record count is 0. "
 																		+"This scenario is not expected except when starting a new namespace." ;
-	private static final String FAILED_RECORD_COUNT_VALIDATION = "Record count validation for type %s has failed as actual change percent %s "
+	private static final String FAILED_RECORD_COUNT_VALIDATION = NAME+" for type %s has failed as actual change percent %s "
 																	+ "is greater than allowed change percent %s.";
 
 	@Override

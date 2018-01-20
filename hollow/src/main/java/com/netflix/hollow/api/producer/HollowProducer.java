@@ -43,8 +43,8 @@ import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
-import com.netflix.hollow.api.producer.validation.AllValidationStatus;
-import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
+import com.netflix.hollow.api.producer.validation.OverAllValidationStatus;
+import com.netflix.hollow.api.producer.validation.OverAllValidationStatus.OverAllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
@@ -678,7 +678,7 @@ public class HollowProducer {
     private void validate(HollowProducer.ReadState readState) {
     	com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus.Builder psb = listeners.fireValidationStart(readState);
     	List<Throwable> exceptions = new ArrayList<>();
-    	AllValidationStatusBuilder valStatus = AllValidationStatus.builder();
+    	OverAllValidationStatusBuilder valStatus = OverAllValidationStatus.builder();
     	
     	try {
     		for(Validator validator: validators) {

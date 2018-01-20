@@ -31,16 +31,16 @@ import com.netflix.hollow.api.producer.HollowProducerListener.Status;
  * This aggregates information across multiple validators per run.
  *
  */
-public class AllValidationStatus {
+public class OverAllValidationStatus {
     private final Status status;
     private final List<SingleValidationStatus> validationStatusList;
 
-	private AllValidationStatus(AllValidationStatusBuilder builder) {
+	private OverAllValidationStatus(OverAllValidationStatusBuilder builder) {
 		this.status = builder.status;
 		this.validationStatusList = builder.validationStatusList;
 	}
 
-	public AllValidationStatus(Status status, List<SingleValidationStatus> validatorStatusList) {
+	public OverAllValidationStatus(Status status, List<SingleValidationStatus> validatorStatusList) {
 		this.status = status;
 		this.validationStatusList = validatorStatusList;
 	}
@@ -67,38 +67,38 @@ public class AllValidationStatus {
 	}
 
 	/**
-	 * Creates builder to build {@link AllValidationStatus}.
+	 * Creates builder to build {@link OverAllValidationStatus}.
 	 * @return created builder
 	 */
-	public static AllValidationStatusBuilder builder() {
-		return new AllValidationStatusBuilder();
+	public static OverAllValidationStatusBuilder builder() {
+		return new OverAllValidationStatusBuilder();
 	}
 
 	/**
-	 * Builder to build {@link AllValidationStatus}.
+	 * Builder to build {@link OverAllValidationStatus}.
 	 */
-	public static final class AllValidationStatusBuilder {
+	public static final class OverAllValidationStatusBuilder {
 		private Status status;
 		private List<SingleValidationStatus> validationStatusList = new ArrayList<>();
 
-		private AllValidationStatusBuilder() {
+		private OverAllValidationStatusBuilder() {
 		}
 		
 		public void addSingelValidationStatus(SingleValidationStatus validationStatus) {
 			validationStatusList.add(validationStatus);
 		}
 
-		public AllValidationStatusBuilder fail() {
+		public OverAllValidationStatusBuilder fail() {
 			this.status = Status.FAIL;
 			return this;
 		}
 		
-		public AllValidationStatusBuilder success() {
+		public OverAllValidationStatusBuilder success() {
 			this.status = Status.SUCCESS;
 			return this;
 		}
-		public AllValidationStatus build() {
-			return new AllValidationStatus(this);
+		public OverAllValidationStatus build() {
+			return new OverAllValidationStatus(this);
 		}
 
 	}
