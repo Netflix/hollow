@@ -214,7 +214,7 @@ public class VMSAvailabilityWindowModule {
                                 // if no assets and the the title is not in prePromotionPhase the skip this contract
                                 // if no assets and the title is in prePromotionPhase then do not skip this contract, since isGoLive is false, adding windows will prevent artwork graying out in multi-Locale catalog.
                                 boolean skipChecking = ENABLE_LOCALE_PROMOTION.get() && inPrePromotionPhase;
-                                if (!skipChecking && packageAvailability == 0) {
+                                if (skipChecking && packageAvailability == 0) {
                                     ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
