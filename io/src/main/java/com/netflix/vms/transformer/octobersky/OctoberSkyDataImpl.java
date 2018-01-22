@@ -6,7 +6,6 @@ import com.netflix.launch.common.Country;
 import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,15 +21,13 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     private static final String CATALOG_LANGUAGES_COLUMN = "catalogLanguages";
 
     private final LaunchConfiguration octoberSky;
-    private final TransformerConfig config;
 
     private Set<String> supportedCountries;
     private Map<String, Set<String>> multilanguageCountryCatalogLocales;
 
     @Inject
-    public OctoberSkyDataImpl(LaunchConfiguration octoberSky, TransformerConfig config) {
+    public OctoberSkyDataImpl(LaunchConfiguration octoberSky) {
         this.octoberSky = octoberSky;
-        this.config = config;
         refresh();
     }
 
