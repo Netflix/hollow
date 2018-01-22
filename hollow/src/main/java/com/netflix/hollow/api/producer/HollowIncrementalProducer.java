@@ -17,78 +17,62 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 
  * Warning: This is a BETA API and is subject to breaking changes.
- * 
  */
 public class HollowIncrementalProducer {
-    
-    private static final Object DELETE_RECORD = new Object();
 
-    private final HollowProducer producer;
-    private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
-    private final HollowProducer.Populator populator;
-    
-    public HollowIncrementalProducer(HollowProducer producer) {
-        this(producer, 1.0d);
+    private final HollowProducer hollowProducer;
+
+    public HollowIncrementalProducer(HollowProducer hollowProducer) {
+        this.hollowProducer = hollowProducer;
     }
 
-    public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
-        this.producer = producer;
-        this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
-        this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
+    public HollowProducer getHollowProducer() {
+        return hollowProducer;
     }
 
-    public void restore(long versionDesired, BlobRetriever blobRetriever) {
-        producer.hardRestore(versionDesired, blobRetriever);
-    }
-    
-    public void addOrModify(Object obj) {
-        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
-        mutations.put(pk, obj);
-    }
-    
-    public void delete(Object obj) {
-        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
-        delete(pk);
+    public HollowProducer.ReadState restore(long version, HollowConsumer.BlobRetriever blobRetriever) {
+        return hollowProducer.hardRestore(version, blobRetriever);
     }
 
-    public void discard(Object obj) {
-        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
-        discard(pk);
-    }
-    
-    public void delete(RecordPrimaryKey key) {
-        mutations.put(key, DELETE_RECORD);
-    }
-
-    public void discard(RecordPrimaryKey key) {
-        mutations.remove(key);
+    public long runCycle(final IncrementalPopulator incrementalPopulator) {
+        return getHollowProducer().runCycle(new HollowProducer.Populator() {
+            @Override
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                newState.getStateEngine().addAllObjectsFromPreviousCycle();
+                IncrementalWriteState incrementalWriteState = new IncrementalWriteStateImpl(newState);
+                incrementalPopulator.populate(incrementalWriteState);
+            }
+        });
     }
 
-    public void clearChanges() {
-        this.mutations.clear();
+    public interface IncrementalPopulator {
+        void populate(IncrementalWriteState newState) throws Exception;
     }
 
-    public boolean hasChanges() { return this.mutations.size() > 0; }
+    public interface IncrementalWriteState {
+        int addOrModify(Object o);
 
-    /**
-     * Runs a Hollow Cycle, if successful, cleans the mutations map.
-     * @since 2.9.9
-     * @return
-     */
-    public long runCycle() {
-        long version = producer.runCycle(populator);
-        clearChanges();
-        return version;
+        int delete(Object o);
+
+        int deleteByPrimaryKey(String typeName, Object... id);
+
+        int deleteByPrimaryKey(RecordPrimaryKey recordPrimaryKey);
+
+        HollowObjectMapper getObjectMapper();
+
+        HollowWriteStateEngine getStateEngine();
+
+        ReadState getPriorState();
+
+        long getVersion();
     }
 
-    private RecordPrimaryKey extractRecordPrimaryKey(Object obj) {
-        return producer.getObjectMapper().extractPrimaryKey(obj);
-    }
 }
