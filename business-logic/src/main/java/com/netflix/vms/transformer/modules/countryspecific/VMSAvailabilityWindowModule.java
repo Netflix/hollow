@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
+    private static final FastProperty.BooleanProperty ENABLE_LOCALE_PROMOTION = new FastProperty.BooleanProperty("netflix.vms.transformer.enable.prepromotion.multilocale", false);
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -211,7 +213,8 @@ public class VMSAvailabilityWindowModule {
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
                                 // if no assets and the the title is not in prePromotionPhase the skip this contract
                                 // if no assets and the title is in prePromotionPhase then do not skip this contract, since isGoLive is false, adding windows will prevent artwork graying out in multi-Locale catalog.
-                                if (packageAvailability == 0 && !inPrePromotionPhase) {
+                                boolean skipChecking = ENABLE_LOCALE_PROMOTION.get() && inPrePromotionPhase;
+                                if (!skipChecking && packageAvailability == 0) {
                                     ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
