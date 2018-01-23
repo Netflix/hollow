@@ -211,14 +211,18 @@ public class VMSAvailabilityWindowModule {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                // if no assets and the the title is not in prePromotionPhase the skip this contract
-                                // if no assets and the title is in prePromotionPhase then do not skip this contract, since isGoLive is false, adding windows will prevent artwork graying out in multi-Locale catalog.
-                                boolean skipChecking = ENABLE_LOCALE_PROMOTION.get() && inPrePromotionPhase;
-                                if (skipChecking && packageAvailability == 0) {
+                                // if no assets and the the title is not in prePromotionPhase then skip this contract
+                                if (packageAvailability == 0 && !inPrePromotionPhase) {
                                     ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
-                                    ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
+                                    // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
+                                    if (ENABLE_LOCALE_PROMOTION.get()) {
+                                        ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
+                                    } else {
+                                        // if feature not enabled, and assets are missing, skip the contract
+                                        continue;
+                                    }
                                 }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
