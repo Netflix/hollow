@@ -341,7 +341,7 @@ public class HollowIncrementalProducerTest {
         Collection<HollowObject> allHollowObjectsTypeD =  getAllHollowObjects(consumer, "TypeD");
         List<String> typeDNames = new ArrayList<>();
         for(HollowObject hollowObject : allHollowObjectsTypeD) {
-            typeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+            typeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
         Assert.assertTrue(typeDNames.contains("two"));
@@ -359,11 +359,10 @@ public class HollowIncrementalProducerTest {
         allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
         for(HollowObject hollowObject : allHollowObjectsTypeD) {
-            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
         Assert.assertFalse(finalTypeDNames.contains("two"));
-
     }
 
     @Test
@@ -401,7 +400,7 @@ public class HollowIncrementalProducerTest {
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
         for(HollowObject hollowObject : allHollowObjectsTypeD) {
-            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
         Assert.assertFalse(finalTypeDNames.contains("two"));
@@ -501,11 +500,11 @@ public class HollowIncrementalProducerTest {
     @SuppressWarnings("unused")
     private static class TypeD {
         int id;
-        String name;
+        String value;
 
         public TypeD(int id, String name) {
             this.id = id;
-            this.name = name;
+            this.value = name;
         }
     }
 
