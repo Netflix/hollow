@@ -50,11 +50,6 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
     }
 
     @Override
-    public Set<String> getMultiLingualCountries() {
-        return countrySet;
-    }
-
-    @Override
     public Set<String> getSupportedCountries() {
         return countrySet;
     }
