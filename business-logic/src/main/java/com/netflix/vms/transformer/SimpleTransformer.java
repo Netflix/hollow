@@ -3,6 +3,7 @@ package com.netflix.vms.transformer;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
@@ -116,6 +117,10 @@ public class SimpleTransformer {
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
         objectMapper.doNotUseDefaultHashKeys();
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
+
+        // print multiLanguageCatalog countries
+        Set<String> multiLanguageCatalogCountries = ctx.getOctoberSkyData().getMultiLanguageCatalogCountries();
+        ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {}", Arrays.toString(multiLanguageCatalogCountries.toArray()));
 
         long startTime = System.currentTimeMillis();
 

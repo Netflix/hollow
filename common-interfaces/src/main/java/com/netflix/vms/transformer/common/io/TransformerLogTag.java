@@ -73,4 +73,5 @@ public enum TransformerLogTag implements LogTag {
     /// Multi-Locale Catalog ///
     PrePromotion,
     LocaleMerching,
+    MultiLocaleCountries,
 }

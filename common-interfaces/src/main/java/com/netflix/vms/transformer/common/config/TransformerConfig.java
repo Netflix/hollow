@@ -193,6 +193,9 @@ public interface TransformerConfig {
     String getMultilanguageCatalogCountries();
 
     @DefaultValue("true")
+    boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
+
+    @DefaultValue("true")
     public boolean isRollupImagesForArtworkScheduling();
 
     @DefaultValue("true")
