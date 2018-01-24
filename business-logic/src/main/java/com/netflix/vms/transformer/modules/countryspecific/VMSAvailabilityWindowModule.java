@@ -113,6 +113,7 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
+    // todo need to split this out in a separate class. It's humongous. Not good.
     private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
@@ -123,10 +124,16 @@ public class VMSAvailabilityWindowModule {
         boolean mustHaveDubs = false;// local audio
         boolean mustHaveLocalizedData = false;// local synopsis
         if (locale != null) {
+            Set<String> subsRequirement = new HashSet<>();
+            Set<String> dubsRequirement = new HashSet<>();
+            Set<String> localizedDataRequirement = new HashSet<>();
 
-            Set<String> subsRequirement = statusHollow._getFlags()._getSubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            Set<String> dubsRequirement = statusHollow._getFlags()._getDubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            Set<String> localizedDataRequirement = statusHollow._getFlags()._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (statusHollow._getFlags()._getSubsRequiredLanguages() != null)
+                subsRequirement = statusHollow._getFlags()._getSubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (statusHollow._getFlags()._getDubsRequiredLanguages() != null)
+                dubsRequirement = statusHollow._getFlags()._getDubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (statusHollow._getFlags()._getLocalizationRequiredLanguages() != null)
+                localizedDataRequirement = statusHollow._getFlags()._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
 
             if (subsRequirement.contains(locale.toLowerCase())) mustHaveSubs = true;
             if (dubsRequirement.contains(locale.toLowerCase())) mustHaveDubs = true;
@@ -236,7 +243,7 @@ public class VMSAvailabilityWindowModule {
                                     if (ENABLE_LOCALE_PROMOTION.get()) {
                                         ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                     } else {
-                                        // if feature not enabled, and assets are missing, skip the contract
+                                        // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
                                         continue;
                                     }
                                 }
