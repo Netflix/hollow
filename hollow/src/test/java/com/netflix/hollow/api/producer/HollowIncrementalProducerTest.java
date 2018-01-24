@@ -19,17 +19,27 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
+import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.tools.compact.HollowCompactor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class HollowIncrementalProducerTest {
 
@@ -306,6 +316,56 @@ public class HollowIncrementalProducerTest {
         Assert.assertFalse(incrementalProducer.hasChanges());
     }
 
+    @Test
+    public void removeOrphanObjects() {
+        HollowProducer producer = createInMemoryProducer();
+
+        producer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeC(1, new TypeD(1, "one")));
+            }
+        });
+
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, 2.0d);
+
+        TypeD typeD2 = new TypeD(2, "two");
+        TypeC typeC2 = new TypeC(2, typeD2);
+        incrementalProducer.addOrModify(typeC2);
+
+        long nextVersion = incrementalProducer.runCycle();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+
+        Collection<HollowObject> allHollowObjectsTypeD =  getAllHollowObjects(consumer, "TypeD");
+        List<String> typeDNames = new ArrayList<>();
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+            typeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+        }
+
+        Assert.assertTrue(typeDNames.contains("two"));
+
+        TypeD typeD3 = new TypeD(3, "three");
+        typeC2 = new TypeC(2, typeD3);
+
+        incrementalProducer.addOrModify(typeC2);
+        long finalVersion = incrementalProducer.runCycle();
+
+        consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(finalVersion);
+
+
+        allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
+        List<String> finalTypeDNames = new ArrayList<>();
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+        }
+
+        Assert.assertFalse(finalTypeDNames.contains("two"));
+
+    }
+
     private HollowProducer createInMemoryProducer() {
         return HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -325,6 +385,7 @@ public class HollowIncrementalProducerTest {
                 state.add(new TypeB(2, "2"));
                 state.add(new TypeB(3, "3"));
                 state.add(new TypeB(4, "4"));
+                state.add(new TypeC(101,new TypeD(101, "Manny")));
             }
         });
     }
@@ -384,4 +445,40 @@ public class HollowIncrementalProducerTest {
             this.value = value;
         }
     }
+
+    @SuppressWarnings("unused")
+    @HollowPrimaryKey(fields = "id")
+    private static class TypeC {
+        int id;
+        TypeD typeD;
+
+        public TypeC(int id, TypeD typeD) {
+            this.id = id;
+            this.typeD = typeD;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeD {
+        int id;
+        String name;
+
+        public TypeD(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    private Collection<HollowObject> getAllHollowObjects(HollowConsumer hollowConsumer, final String type) {
+        final HollowReadStateEngine readStateEngine = hollowConsumer.getStateEngine();
+        final HollowTypeDataAccess typeDataAccess = readStateEngine.getTypeDataAccess(type);
+        final HollowTypeReadState typeState = typeDataAccess.getTypeState();
+        return new AllHollowRecordCollection<HollowObject>(typeState) {
+            @Override
+            protected HollowObject getForOrdinal(int ordinal) {
+                return new GenericHollowObject(readStateEngine, type, ordinal);
+            }
+        };
+    }
+
 }
