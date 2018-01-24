@@ -316,7 +316,7 @@ public class HollowIncrementalProducerTest {
     }
 
     @Test
-    public void removeOrphanObjects() {
+    public void removeOrphanObjectsWithTypeInSnapshot() {
         HollowProducer producer = createInMemoryProducer();
 
         producer.runCycle(new Populator() {
@@ -364,6 +364,61 @@ public class HollowIncrementalProducerTest {
         Assert.assertFalse(finalTypeDNames.contains("two"));
 
     }
+
+    @Test
+    public void removeOrphanObjectsWithoutTypeInDelta() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withNumStatesBetweenSnapshots(5)
+                .build();
+
+        producer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeA(1, "one", 1));
+            }
+        });
+
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        TypeD typeD2 = new TypeD(2, "two");
+        TypeC typeC2 = new TypeC(2, typeD2);
+        incrementalProducer.addOrModify(typeC2);
+
+        incrementalProducer.runCycle();
+
+        TypeD typeD3 = new TypeD(3, "three");
+        typeC2 = new TypeC(2, typeD3);
+
+        //Modify typeC2 to point to a new TypeD object
+        incrementalProducer.addOrModify(typeC2);
+
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.runCycle();
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.runCycle();
+        incrementalProducer.addOrModify(new TypeA(4, "four", 4));
+        incrementalProducer.runCycle();
+        incrementalProducer.addOrModify(new TypeA(5, "five", 5));
+        incrementalProducer.runCycle();
+        incrementalProducer.addOrModify(new TypeA(6, "six", 6));
+        incrementalProducer.runCycle();
+
+        //Cycle writes a snapshot
+        long finalVersion = incrementalProducer.runCycle();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(finalVersion);
+
+
+        Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
+        List<String> finalTypeDNames = new ArrayList<>();
+        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+            finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
+        }
+
+        Assert.assertTrue(finalTypeDNames.contains("two"));
+    }
+
 
     private HollowProducer createInMemoryProducer() {
         return HollowProducer.withPublisher(blobStore)
