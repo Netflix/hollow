@@ -205,7 +205,6 @@ public class HollowBlobReader {
 
         HollowTypeReadState typeState = stateEngine.getTypeState(schema.getName());
         if(typeState != null) {
-            stateEngine.addTypeState(typeState);
             typeState.applyDelta(is, schema, stateEngine.getMemoryRecycler());
         } else {
             discardDelta(is, schema, numShards);

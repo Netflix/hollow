@@ -320,7 +320,6 @@ public class HollowIncrementalProducerTest {
     @Test
     public void removeOrphanObjectsWithTypeInSnapshot() {
         HollowProducer producer = createInMemoryProducer();
-
         producer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeC(1, new TypeD(1, "one")));
@@ -376,6 +375,8 @@ public class HollowIncrementalProducerTest {
                 .withNumStatesBetweenSnapshots(5)
                 .build();
 
+        producer.initializeDataModel(TypeC.class);
+
         producer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeA(1, "one", 1));
@@ -396,22 +397,11 @@ public class HollowIncrementalProducerTest {
         //Modify typeC2 to point to a new TypeD object
         incrementalProducer.addOrModify(typeC2);
 
-        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(4, "four", 4));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(5, "five", 5));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(6, "six", 6));
-        incrementalProducer.runCycle();
-
         //Cycle writes a snapshot
         long finalVersion = incrementalProducer.runCycle();
 
         //We have 2 snapshots already
-        Assert.assertEquals(2, metricsCollector.snapshotsCompleted);
+        Assert.assertEquals(1, metricsCollector.snapshotsCompleted);
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(finalVersion);

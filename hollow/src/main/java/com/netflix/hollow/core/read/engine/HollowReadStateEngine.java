@@ -94,10 +94,6 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     }
 
     protected void addTypeState(HollowTypeReadState typeState) {
-        if(typeStates.containsKey(typeState.getSchema().getName())){
-            return;
-        }
-
         typeStates.put(typeState.getSchema().getName(), typeState);
 
         if(listenToAllPopulatedOrdinals) {
