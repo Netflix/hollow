@@ -721,7 +721,7 @@ public class HollowConsumer {
         }
     }
 
-    public static HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+    public static <B extends HollowConsumer.Builder<B>> HollowConsumer.Builder<B> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
         HollowConsumer.Builder builder = new Builder();
         return builder.withBlobRetriever(blobRetriever);
     }
@@ -731,7 +731,7 @@ public class HollowConsumer {
         return builder.withLocalBlobStore(localBlobStoreDir);
     }
 
-    public static class Builder {
+    public static class Builder<B extends HollowConsumer.Builder> {
 
         protected HollowConsumer.BlobRetriever blobRetriever = null;
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
@@ -746,71 +746,71 @@ public class HollowConsumer {
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
-        public HollowConsumer.Builder withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+        public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withLocalBlobStore(File localBlobStoreDir) {
+        public B withLocalBlobStore(File localBlobStoreDir) {
             this.localBlobStoreDir = localBlobStoreDir;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withAnnouncementWatcher(HollowConsumer.AnnouncementWatcher announcementWatcher) {
+        public B withAnnouncementWatcher(HollowConsumer.AnnouncementWatcher announcementWatcher) {
             this.announcementWatcher = announcementWatcher;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withRefreshListener(HollowConsumer.RefreshListener refreshListener) {
+        public B withRefreshListener(HollowConsumer.RefreshListener refreshListener) {
             refreshListeners.add(refreshListener);
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withRefreshListeners(HollowConsumer.RefreshListener... refreshListeners) {
+        public B withRefreshListeners(HollowConsumer.RefreshListener... refreshListeners) {
             for (HollowConsumer.RefreshListener refreshListener : refreshListeners)
                 this.refreshListeners.add(refreshListener);
-            return this;
+            return (B)this;
         }
 
-        public <T extends HollowAPI> HollowConsumer.Builder withGeneratedAPIClass(Class<T> generatedAPIClass) {
+        public <T extends HollowAPI> B withGeneratedAPIClass(Class<T> generatedAPIClass) {
             this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<T>(generatedAPIClass);
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withFilterConfig(HollowFilterConfig filterConfig) {
+        public B withFilterConfig(HollowFilterConfig filterConfig) {
             this.filterConfig = filterConfig;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withDoubleSnapshotConfig(HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig) {
+        public B withDoubleSnapshotConfig(HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig) {
             this.doubleSnapshotConfig = doubleSnapshotConfig;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withObjectLongevityConfig(HollowConsumer.ObjectLongevityConfig objectLongevityConfig) {
+        public B withObjectLongevityConfig(HollowConsumer.ObjectLongevityConfig objectLongevityConfig) {
             this.objectLongevityConfig = objectLongevityConfig;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withObjectLongevityDetector(HollowConsumer.ObjectLongevityDetector objectLongevityDetector) {
+        public B withObjectLongevityDetector(HollowConsumer.ObjectLongevityDetector objectLongevityDetector) {
             this.objectLongevityDetector = objectLongevityDetector;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withRefreshExecutor(Executor refreshExecutor) {
+        public B withRefreshExecutor(Executor refreshExecutor) {
             this.refreshExecutor = refreshExecutor;
-            return this;
+            return (B)this;
         }
 
-        public HollowConsumer.Builder withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
+        public B withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
-            return this;
+            return (B)this;
         }
 
         @Deprecated
-        public HollowConsumer.Builder withHashCodeFinder(HollowObjectHashCodeFinder hashCodeFinder) {
+        public B withHashCodeFinder(HollowObjectHashCodeFinder hashCodeFinder) {
             this.hashCodeFinder = hashCodeFinder;
-            return this;
+            return (B)this;
         }
 
         protected void checkArguments() {
