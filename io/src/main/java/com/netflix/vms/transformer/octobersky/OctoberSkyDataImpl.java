@@ -2,13 +2,12 @@ package com.netflix.vms.transformer.octobersky;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.netflix.launch.common.Catalog;
 import com.netflix.launch.common.Country;
 import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,18 +15,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OctoberSkyDataImpl implements OctoberSkyData {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OctoberSkyDataImpl.class);
-
-//    private static final String CROSS_PLATFORM_NAMESPACE = "cross-platform-ui";
-//    private static final String SUPPORTED_LOCALE_PROPERTY = "productPreferredLanguages_catalog";
-
     private static final String BEEHIVE_NAMESPACE = "beehive";
     private static final String IS_MIN_METADATA_PRESENT = "isMinMetadataPresent";
-    private static final String SUPPORTED_LOCALE_PROPERTY = "supportedLanguages";
 
     private final LaunchConfiguration octoberSky;
     private final TransformerConfig config;
@@ -43,24 +37,25 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     }
 
     @Override
-    public Set<String> getMultiLingualCountries() {
-        return this.multilanguageCountryCatalogLocales.keySet();
-    }
-
-    @Override
     public Set<String> getSupportedCountries() {
         return supportedCountries;
     }
 
     @Override
     public Set<String> getCatalogLanguages(String country) {
-        return multilanguageCountryCatalogLocales.get(country.toUpperCase());
+        return multilanguageCountryCatalogLocales.get(country);
     }
 
     @Override
+    public Set<String> getMultiLanguageCatalogCountries() {
+        return multilanguageCountryCatalogLocales.keySet();
+    }
+
+    // refresh is called every cycle begin, so each cycle has a consistent view of data
+    @Override
     public void refresh() {
         this.supportedCountries = findCountriesWithMinMetadata(octoberSky);
-        this.multilanguageCountryCatalogLocales = findMultilanguageCountryCatalogLocales(octoberSky);
+        this.multilanguageCountryCatalogLocales = findMultilanguageCountryCatalogLocales(config, octoberSky);
     }
 
     private static Set<String> findCountriesWithMinMetadata(LaunchConfiguration octoberSky) {
@@ -76,33 +71,31 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         return minMetadataCountries;
     }
 
-    private static Map<String, Set<String>> findMultilanguageCountryCatalogLocales(LaunchConfiguration octoberSky) {
+    private static Map<String, Set<String>> findMultilanguageCountryCatalogLocales(TransformerConfig config, LaunchConfiguration octoberSky) {
+
+        // use default october sky namespace to check for countries that uses multi-lingual catalogs
+        List<String> countries;
+        if (config.isUseOctoberSkyForMultiLanguageCatalogCountries()) {
+            countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+        } else {
+            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(",")).collect(Collectors.toList());
+        }
 
         Map<String, Set<String>> multilanguageCountryCatalogLocales = new HashMap<>();
 
-        NamespaceLaunchConfiguration namespaceLaunchConfiguration = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
-        List<Country> countries = namespaceLaunchConfiguration.getCountries();
-        for (Country country : countries) {
+        for (String country : countries) {
+            Country octoberSkyCountry = octoberSky.getCountry(country);
+            for (Catalog catalog : octoberSkyCountry.getCatalogs()) {
 
-            String supportedLocales = country.fetchProperty(SUPPORTED_LOCALE_PROPERTY);
-            if (supportedLocales.contains("["))
-                supportedLocales = supportedLocales.replace("[", "");
-
-            if (supportedLocales.contains("]"))
-                supportedLocales = supportedLocales.replace("]", "");
-
-            if (supportedLocales.contains("\""))
-                supportedLocales = supportedLocales.replace("\"", "");
-
-            String[] locales = supportedLocales.split(",");
-            Set<String> countryLocales = multilanguageCountryCatalogLocales.get(country.getCode());
-            if (countryLocales == null) {
-                countryLocales = new HashSet<>();
-                multilanguageCountryCatalogLocales.put(country.getCode(), countryLocales);
+                if (catalog.hasLanguage()) {
+                    Set<String> set = multilanguageCountryCatalogLocales.get(country);
+                    if (set == null) {
+                        set = new HashSet<>();
+                        multilanguageCountryCatalogLocales.put(country, set);
+                    }
+                    set.add(catalog.getLanguage().getLanguage());
+                }
             }
-            for (String locale : locales)
-                countryLocales.add(locale);
-            LOGGER.info("Country={} supportedLocales={}", country.getCode(), Arrays.deepToString(countryLocales.toArray()));
         }
 
         return multilanguageCountryCatalogLocales;

@@ -69,5 +69,9 @@ public enum TransformerLogTag implements LogTag {
 
     //// Debug /////
     ReexploreTags,
-    SupportedLocale,
+
+    /// Multi-Locale Catalog ///
+    PrePromotion,
+    LocaleMerching,
+    MultiLocaleCountries,
 }

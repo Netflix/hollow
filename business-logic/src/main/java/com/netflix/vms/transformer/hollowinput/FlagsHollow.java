@@ -174,15 +174,22 @@ public class FlagsHollow extends HollowObject {
         return delegate().getSearchOnlyOverrideBoxed(ordinal);
     }
 
-    public SetOfStringHollow _getSubsRequired() {
-        int refOrdinal = delegate().getSubsRequiredOrdinal(ordinal);
+    public SetOfStringHollow _getSubsRequiredLanguages() {
+        int refOrdinal = delegate().getSubsRequiredLanguagesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getSetOfStringHollow(refOrdinal);
     }
 
-    public SetOfStringHollow _getDubsRequired() {
-        int refOrdinal = delegate().getDubsRequiredOrdinal(ordinal);
+    public SetOfStringHollow _getDubsRequiredLanguages() {
+        int refOrdinal = delegate().getDubsRequiredLanguagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getSetOfStringHollow(refOrdinal);
+    }
+
+    public SetOfStringHollow _getLocalizationRequiredLanguages() {
+        int refOrdinal = delegate().getLocalizationRequiredLanguagesOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
         return  api().getSetOfStringHollow(refOrdinal);

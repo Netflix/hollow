@@ -30,8 +30,9 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean removeFromWebsiteOverride;
     private final int requiredLangsOrdinal;
     private final Boolean searchOnlyOverride;
-    private final int subsRequiredOrdinal;
-    private final int dubsRequiredOrdinal;
+    private final int subsRequiredLanguagesOrdinal;
+    private final int dubsRequiredLanguagesOrdinal;
+    private final int localizationRequiredLanguagesOrdinal;
     private FlagsTypeAPI typeAPI;
 
     public FlagsDelegateCachedImpl(FlagsTypeAPI typeAPI, int ordinal) {
@@ -56,8 +57,9 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.removeFromWebsiteOverride = typeAPI.getRemoveFromWebsiteOverrideBoxed(ordinal);
         this.requiredLangsOrdinal = typeAPI.getRequiredLangsOrdinal(ordinal);
         this.searchOnlyOverride = typeAPI.getSearchOnlyOverrideBoxed(ordinal);
-        this.subsRequiredOrdinal = typeAPI.getSubsRequiredOrdinal(ordinal);
-        this.dubsRequiredOrdinal = typeAPI.getDubsRequiredOrdinal(ordinal);
+        this.subsRequiredLanguagesOrdinal = typeAPI.getSubsRequiredLanguagesOrdinal(ordinal);
+        this.dubsRequiredLanguagesOrdinal = typeAPI.getDubsRequiredLanguagesOrdinal(ordinal);
+        this.localizationRequiredLanguagesOrdinal = typeAPI.getLocalizationRequiredLanguagesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -235,12 +237,16 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         return searchOnlyOverride;
     }
 
-    public int getSubsRequiredOrdinal(int ordinal) {
-        return subsRequiredOrdinal;
+    public int getSubsRequiredLanguagesOrdinal(int ordinal) {
+        return subsRequiredLanguagesOrdinal;
     }
 
-    public int getDubsRequiredOrdinal(int ordinal) {
-        return dubsRequiredOrdinal;
+    public int getDubsRequiredLanguagesOrdinal(int ordinal) {
+        return dubsRequiredLanguagesOrdinal;
+    }
+
+    public int getLocalizationRequiredLanguagesOrdinal(int ordinal) {
+        return localizationRequiredLanguagesOrdinal;
     }
 
     @Override

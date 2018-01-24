@@ -157,12 +157,16 @@ public class FlagsDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getSearchOnlyOverrideBoxed(ordinal);
     }
 
-    public int getSubsRequiredOrdinal(int ordinal) {
-        return typeAPI.getSubsRequiredOrdinal(ordinal);
+    public int getSubsRequiredLanguagesOrdinal(int ordinal) {
+        return typeAPI.getSubsRequiredLanguagesOrdinal(ordinal);
     }
 
-    public int getDubsRequiredOrdinal(int ordinal) {
-        return typeAPI.getDubsRequiredOrdinal(ordinal);
+    public int getDubsRequiredLanguagesOrdinal(int ordinal) {
+        return typeAPI.getDubsRequiredLanguagesOrdinal(ordinal);
+    }
+
+    public int getLocalizationRequiredLanguagesOrdinal(int ordinal) {
+        return typeAPI.getLocalizationRequiredLanguagesOrdinal(ordinal);
     }
 
     public FlagsTypeAPI getTypeAPI() {

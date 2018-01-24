@@ -78,9 +78,11 @@ public interface FlagsDelegate extends HollowObjectDelegate {
 
     public Boolean getSearchOnlyOverrideBoxed(int ordinal);
 
-    public int getSubsRequiredOrdinal(int ordinal);
+    public int getSubsRequiredLanguagesOrdinal(int ordinal);
 
-    public int getDubsRequiredOrdinal(int ordinal);
+    public int getDubsRequiredLanguagesOrdinal(int ordinal);
+
+    public int getLocalizationRequiredLanguagesOrdinal(int ordinal);
 
     public FlagsTypeAPI getTypeAPI();
 

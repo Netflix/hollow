@@ -31,8 +31,9 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "removeFromWebsiteOverride",
             "requiredLangs",
             "searchOnlyOverride",
-            "subsRequired",
-            "dubsRequired"
+            "subsRequiredLanguages",
+            "dubsRequiredLanguages",
+            "localizationRequiredLanguages"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
     }
@@ -307,23 +308,33 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getSubsRequiredOrdinal(int ordinal) {
+    public int getSubsRequiredLanguagesOrdinal(int ordinal) {
         if(fieldIndex[21] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "subsRequired");
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "subsRequiredLanguages");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[21]);
     }
 
-    public SetOfStringTypeAPI getSubsRequiredTypeAPI() {
+    public SetOfStringTypeAPI getSubsRequiredLanguagesTypeAPI() {
         return getAPI().getSetOfStringTypeAPI();
     }
 
-    public int getDubsRequiredOrdinal(int ordinal) {
+    public int getDubsRequiredLanguagesOrdinal(int ordinal) {
         if(fieldIndex[22] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "dubsRequired");
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "dubsRequiredLanguages");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[22]);
     }
 
-    public SetOfStringTypeAPI getDubsRequiredTypeAPI() {
+    public SetOfStringTypeAPI getDubsRequiredLanguagesTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public int getLocalizationRequiredLanguagesOrdinal(int ordinal) {
+        if(fieldIndex[23] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "localizationRequiredLanguages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[23]);
+    }
+
+    public SetOfStringTypeAPI getLocalizationRequiredLanguagesTypeAPI() {
         return getAPI().getSetOfStringTypeAPI();
     }
 
