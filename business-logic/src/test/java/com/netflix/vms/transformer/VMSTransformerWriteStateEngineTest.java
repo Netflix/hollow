@@ -40,15 +40,4 @@ public class VMSTransformerWriteStateEngineTest {
         if (!missingSet.isEmpty()) System.out.println("\n *** \t" + msg);
         Assert.assertTrue(msg, missingSet.isEmpty());
     }
-
-    @Test
-    public void testString() {
-        String preferredLocales = "[\"pl\",\"en\"]";
-        if (preferredLocales.contains("[") && preferredLocales.contains("]")) {
-            preferredLocales = preferredLocales.replace("[", "");
-            preferredLocales = preferredLocales.replace("]", "");
-            preferredLocales = preferredLocales.replace("\"", "");
-        }
-        System.out.println(preferredLocales);
-    }
 }
