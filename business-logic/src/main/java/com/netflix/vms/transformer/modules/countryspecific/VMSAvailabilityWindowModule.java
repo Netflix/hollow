@@ -257,9 +257,9 @@ public class VMSAvailabilityWindowModule {
                                         currentOrFirstFutureWindowFoundLocalText = true;
                                 }
 
-                                // only check subs/dubs requirement if feature is enabled.
+                                // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                 // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window. So if any contract has the assets, then it passes the requirement check.
-                                if (USE_SUBS_DUBS_REQUIREMENT.get()) {
+                                if (USE_SUBS_DUBS_REQUIREMENT.get() && !inPrePromotionPhase) {
 
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
@@ -269,6 +269,8 @@ public class VMSAvailabilityWindowModule {
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio)
                                         continue;
+
+                                    // todo check local synopsis. Can be deffered for now.
                                 }
                             }
 
