@@ -27317,6 +27317,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -27335,6 +27336,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -27343,6 +27345,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -27513,6 +27521,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -27532,6 +27541,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -27555,6 +27565,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -27578,6 +27589,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -28773,6 +28793,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -29477,6 +29498,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -30020,6 +30042,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -30970,6 +30993,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -30988,6 +31012,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -30996,6 +31021,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -31166,6 +31197,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -31185,6 +31217,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -31208,6 +31241,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -31231,6 +31265,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -32426,6 +32469,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -33130,6 +33174,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -33673,6 +33718,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -34623,6 +34669,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -34641,6 +34688,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -34649,6 +34697,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -34819,6 +34873,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -34838,6 +34893,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -34861,6 +34917,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -34884,6 +34941,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -36079,6 +36145,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -36783,6 +36850,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -37326,6 +37394,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -38276,6 +38345,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -38294,6 +38364,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -38302,6 +38373,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -38472,6 +38549,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -38491,6 +38569,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -38514,6 +38593,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -38537,6 +38617,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -39732,6 +39821,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -40436,6 +40526,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -40979,6 +41070,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -41929,6 +42021,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -41947,6 +42040,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -41955,6 +42049,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -42125,6 +42225,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -42144,6 +42245,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -42167,6 +42269,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -42190,6 +42293,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -43385,6 +43497,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -44089,6 +44202,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -44632,6 +44746,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -45582,6 +45697,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -45600,6 +45716,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -45608,6 +45725,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -45778,6 +45901,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -45797,6 +45921,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -45820,6 +45945,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -45843,6 +45969,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -47038,6 +47173,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -47742,6 +47878,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -48285,6 +48422,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -49235,6 +49373,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -49253,6 +49392,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -49261,6 +49401,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -49431,6 +49577,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -49450,6 +49597,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -49473,6 +49621,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -49496,6 +49645,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -50691,6 +50849,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -51395,6 +51554,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -51938,6 +52098,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
@@ -52888,6 +53049,7 @@
                 "com.netflix.archaius:archaius2-commons-configuration",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.archaius:archaius2-persisted2",
+                "com.netflix.archaius:archaius2-test",
                 "com.netflix.eureka:eureka-client-archaius2",
                 "com.netflix.iep-shadow:iepshadow-iep-rxhttp",
                 "com.netflix.ksclient:ksclient-lifecycle",
@@ -52906,6 +53068,7 @@
             "locked": "2.2.0",
             "transitive": [
                 "com.netflix.archaius:archaius2-archaius1-bridge",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "netflix:nf-archaius2"
             ]
@@ -52914,6 +53077,12 @@
             "locked": "2.2.0",
             "transitive": [
                 "netflix:nf-archaius2"
+            ]
+        },
+        "com.netflix.archaius:archaius2-test": {
+            "locked": "2.2.0",
+            "transitive": [
+                "com.netflix.governator:governator-test"
             ]
         },
         "com.netflix.astyanax:astyanax": {
@@ -53084,6 +53253,7 @@
             "locked": "1.17.4",
             "transitive": [
                 "com.netflix.governator:governator-archaius",
+                "com.netflix.governator:governator-test",
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -53103,6 +53273,7 @@
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-core",
+                "com.netflix.governator:governator-test",
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.nflxssofilter:nflx-sso-filter-lifecycle",
@@ -53126,6 +53297,7 @@
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
                 "com.netflix.governator:governator-servlet",
+                "com.netflix.governator:governator-test",
                 "com.netflix.runtime:health-guice",
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:nf-archaius2",
@@ -53149,6 +53321,15 @@
             ]
         },
         "com.netflix.governator:governator-servlet": {
+            "locked": "1.17.4"
+        },
+        "com.netflix.governator:governator-test": {
+            "locked": "1.17.4",
+            "transitive": [
+                "com.netflix.governator:governator-test-junit"
+            ]
+        },
+        "com.netflix.governator:governator-test-junit": {
             "locked": "1.17.4"
         },
         "com.netflix.hollow:hollow": {
@@ -54344,6 +54525,7 @@
         "junit:junit": {
             "locked": "4.12",
             "transitive": [
+                "com.netflix.governator:governator-test-junit",
                 "com.thinkaurelius.thrift:thrift-server",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -55048,6 +55230,7 @@
         },
         "netflix:videoresolutiontypelibrary": {
             "locked": "100.0.231",
+            "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -55591,6 +55774,7 @@
         "org.mockito:mockito-core": {
             "locked": "1.10.19",
             "transitive": [
+                "com.netflix.governator:governator-test",
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
