@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
@@ -367,8 +369,10 @@ public class HollowIncrementalProducerTest {
 
     @Test
     public void removeOrphanObjectsWithoutTypeInDelta() {
+        TestMetricsCollector metricsCollector = new TestMetricsCollector();
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
+                .withMetricsCollector(metricsCollector)
                 .withNumStatesBetweenSnapshots(5)
                 .build();
 
@@ -406,9 +410,11 @@ public class HollowIncrementalProducerTest {
         //Cycle writes a snapshot
         long finalVersion = incrementalProducer.runCycle();
 
+        //We have 2 snapshots already
+        Assert.assertEquals(2, metricsCollector.snapshotsCompleted);
+
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(finalVersion);
-
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
@@ -416,9 +422,17 @@ public class HollowIncrementalProducerTest {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("name").toString());
         }
 
-        Assert.assertTrue(finalTypeDNames.contains("two"));
+        Assert.assertFalse(finalTypeDNames.contains("two"));
     }
 
+
+    private static class TestMetricsCollector extends HollowMetricsCollector<HollowProducerMetrics> {
+        int snapshotsCompleted = 0;
+        @Override
+        public void collect(HollowProducerMetrics metrics) {
+            snapshotsCompleted = metrics.getSnapshotsCompleted();
+        }
+    }
 
     private HollowProducer createInMemoryProducer() {
         return HollowProducer.withPublisher(blobStore)
