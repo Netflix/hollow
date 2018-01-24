@@ -326,7 +326,7 @@ public class HollowIncrementalProducerTest {
             }
         });
 
-        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, 2.0d);
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
         TypeD typeD2 = new TypeD(2, "two");
         TypeC typeC2 = new TypeC(2, typeD2);
