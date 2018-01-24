@@ -368,12 +368,7 @@ public class HollowIncrementalProducerTest {
 
     @Test
     public void removeOrphanObjectsWithoutTypeInDelta() {
-        TestMetricsCollector metricsCollector = new TestMetricsCollector();
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .withMetricsCollector(metricsCollector)
-                .withNumStatesBetweenSnapshots(5)
-                .build();
+        HollowProducer producer = createInMemoryProducer();
 
         producer.initializeDataModel(TypeC.class);
 
@@ -400,9 +395,6 @@ public class HollowIncrementalProducerTest {
         //Cycle writes a snapshot
         long finalVersion = incrementalProducer.runCycle();
 
-        //We have 2 snapshots already
-        Assert.assertEquals(1, metricsCollector.snapshotsCompleted);
-
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(finalVersion);
 
@@ -413,15 +405,6 @@ public class HollowIncrementalProducerTest {
         }
 
         Assert.assertFalse(finalTypeDNames.contains("two"));
-    }
-
-
-    private static class TestMetricsCollector extends HollowMetricsCollector<HollowProducerMetrics> {
-        int snapshotsCompleted = 0;
-        @Override
-        public void collect(HollowProducerMetrics metrics) {
-            snapshotsCompleted = metrics.getSnapshotsCompleted();
-        }
     }
 
     private HollowProducer createInMemoryProducer() {
