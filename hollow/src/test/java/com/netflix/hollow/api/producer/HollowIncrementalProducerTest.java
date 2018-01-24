@@ -426,7 +426,6 @@ public class HollowIncrementalProducerTest {
                 state.add(new TypeB(2, "2"));
                 state.add(new TypeB(3, "3"));
                 state.add(new TypeB(4, "4"));
-                state.add(new TypeC(101,new TypeD(101, "Manny")));
             }
         });
     }
