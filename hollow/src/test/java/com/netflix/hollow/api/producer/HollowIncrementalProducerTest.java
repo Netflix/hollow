@@ -32,7 +32,6 @@ import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
-import com.netflix.hollow.tools.compact.HollowCompactor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
