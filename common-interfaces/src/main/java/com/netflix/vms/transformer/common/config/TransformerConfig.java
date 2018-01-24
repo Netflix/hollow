@@ -60,7 +60,7 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean useVideoResolutionType();
 
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean isRestoreFromPreviousStateEngine();
 
     @DefaultValue("true")
