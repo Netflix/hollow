@@ -2482,7 +2482,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -5661,7 +5661,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -8840,7 +8840,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -12141,7 +12141,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -15320,7 +15320,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -18531,7 +18531,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21783,7 +21783,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -25035,7 +25035,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -28287,7 +28287,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
