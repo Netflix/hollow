@@ -868,7 +868,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2482,7 +2482,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -2546,7 +2546,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -2557,7 +2557,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -4047,7 +4047,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5661,7 +5661,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -5725,7 +5725,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -5736,7 +5736,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -7226,7 +7226,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -8840,7 +8840,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -8904,7 +8904,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -8915,7 +8915,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -10527,7 +10527,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12141,7 +12141,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -12205,7 +12205,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -12216,7 +12216,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -13706,7 +13706,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -15320,7 +15320,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -15384,7 +15384,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -15395,7 +15395,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16909,7 +16909,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -18531,7 +18531,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -18607,7 +18607,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -18618,7 +18618,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -20161,7 +20161,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -21783,7 +21783,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -21859,7 +21859,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -21870,7 +21870,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -23413,7 +23413,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -25035,7 +25035,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -25111,7 +25111,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25122,7 +25122,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -26665,7 +26665,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.9.9",
+            "locked": "2.10.0",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -28287,7 +28287,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.89",
+            "locked": "2.90",
             "requested": "latest.candidate"
         },
         "netflix:request-expiry": {
@@ -28363,7 +28363,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.231",
+            "locked": "100.0.243",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -28374,7 +28374,7 @@
             "requested": "56.1076"
         },
         "netflix:vms-utils": {
-            "locked": "60.54",
+            "locked": "60.57",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
