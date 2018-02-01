@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class StreamBoxInfoPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, StreamBoxInfoHollow> {
 
     public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("StreamBoxInfo")).getPrimaryKey().getFieldPaths());
+    public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("StreamBoxInfo")).getPrimaryKey().getFieldPaths());
     }
 
     public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "StreamBoxInfo", isListenToDataRefreah, fieldPaths);
+    public StreamBoxInfoPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "StreamBoxInfo", isListenToDataRefresh, fieldPaths);
     }
 
     public StreamBoxInfoHollow findMatch(Object... keys) {

@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ShowMemberTypesPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ShowMemberTypesHollow> {
 
     public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowMemberTypes")).getPrimaryKey().getFieldPaths());
+    public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowMemberTypes")).getPrimaryKey().getFieldPaths());
     }
 
     public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "ShowMemberTypes", isListenToDataRefreah, fieldPaths);
+    public ShowMemberTypesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "ShowMemberTypes", isListenToDataRefresh, fieldPaths);
     }
 
     public ShowMemberTypesHollow findMatch(Object... keys) {

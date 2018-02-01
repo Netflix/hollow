@@ -15,8 +15,8 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         super(consumer, true, queryType, selectFieldPath, matchFieldPaths);
     }
 
-    public VMSHollowInputAPIHashIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String queryType, String selectFieldPath, String... matchFieldPaths) {
-        super(consumer, isListenToDataRefreah, queryType, selectFieldPath, matchFieldPaths);
+    public VMSHollowInputAPIHashIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String queryType, String selectFieldPath, String... matchFieldPaths) {
+        super(consumer, isListenToDataRefresh, queryType, selectFieldPath, matchFieldPaths);
     }
 
     public Iterable<CharacterQuoteHollow> findCharacterQuoteMatches(Object... keys) {
