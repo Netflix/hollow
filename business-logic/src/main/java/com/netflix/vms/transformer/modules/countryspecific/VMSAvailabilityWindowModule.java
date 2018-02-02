@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
+
 import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
@@ -32,9 +34,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +49,9 @@ import java.util.stream.Collectors;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
+
+    // @TODO: Should this be in TransformerConfig ???
     private static final FastProperty.BooleanProperty ENABLE_LOCALE_PROMOTION = new FastProperty.BooleanProperty("netflix.vms.transformer.enable.prepromotion.multilocale", false);
-    private static final FastProperty.BooleanProperty USE_SUBS_DUBS_REQUIREMENT = new FastProperty.BooleanProperty("vms.use.subs.dubs.requirement", false);
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -123,21 +124,24 @@ public class VMSAvailabilityWindowModule {
         boolean mustHaveSubs = false;// local subtitles
         boolean mustHaveDubs = false;// local audio
         boolean mustHaveLocalizedData = false;// local synopsis
-        if (locale != null) {
+
+        FlagsHollow flags = statusHollow._getFlags();
+        if (locale != null && flags != null) {
             Set<String> subsRequirement = new HashSet<>();
             Set<String> dubsRequirement = new HashSet<>();
             Set<String> localizedDataRequirement = new HashSet<>();
 
-            if (statusHollow._getFlags()._getSubsRequiredLanguages() != null)
-                subsRequirement = statusHollow._getFlags()._getSubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            if (statusHollow._getFlags()._getDubsRequiredLanguages() != null)
-                dubsRequirement = statusHollow._getFlags()._getDubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            if (statusHollow._getFlags()._getLocalizationRequiredLanguages() != null)
-                localizedDataRequirement = statusHollow._getFlags()._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getSubsRequiredLanguages() != null)
+                subsRequirement = flags._getSubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getDubsRequiredLanguages() != null)
+                dubsRequirement = flags._getDubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getLocalizationRequiredLanguages() != null)
+                localizedDataRequirement = flags._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
 
-            if (subsRequirement.contains(locale.toLowerCase())) mustHaveSubs = true;
-            if (dubsRequirement.contains(locale.toLowerCase())) mustHaveDubs = true;
-            if (localizedDataRequirement.contains(locale.toLowerCase())) mustHaveLocalizedData = true;
+            String localeStr = locale.toLowerCase();
+            if (subsRequirement.contains(localeStr)) mustHaveSubs = true;
+            if (dubsRequirement.contains(localeStr)) mustHaveDubs = true;
+            if (localizedDataRequirement.contains(localeStr)) mustHaveLocalizedData = true;
         }
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -192,7 +196,7 @@ public class VMSAvailabilityWindowModule {
             if (!isGoLive && locale != null) {
                 for (long contractId : contractIds) {
                     ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true;
+                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true; // @TODO: This is a bit fishy - don't we need to check for contract window?
                 }
                 if (!isGoLive && inPrePromotionPhase)
                     ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
@@ -266,16 +270,19 @@ public class VMSAvailabilityWindowModule {
 
                                 // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                 // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window. So if any contract has the assets, then it passes the requirement check.
-                                if (USE_SUBS_DUBS_REQUIREMENT.get() && !inPrePromotionPhase) {
+                                if (ctx.getConfig().isSubsDubsRequirementEnforced() && !inPrePromotionPhase) {
 
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
-
-                                    if (mustHaveSubs && !thisWindowFoundLocalText)
+                                    if (mustHaveSubs && !thisWindowFoundLocalText) {
+                                        ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Missing Subs - VideoId={} not merched in country={} locale={}", videoId, country, locale);
                                         continue;
+                                    }
 
-                                    if (mustHaveDubs && !thisWindowFoundLocalAudio)
+                                    if (mustHaveDubs && !thisWindowFoundLocalAudio) {
+                                        ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Missing Dubs - VideoId={} not merched in country={} locale={}", videoId, country, locale);
                                         continue;
+                                    }
 
                                     // todo check local synopsis. Can be deffered for now.
                                 }
