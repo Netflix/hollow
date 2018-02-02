@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
+import static java.util.Arrays.asList;
 
 import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -121,6 +122,7 @@ public class VMSAvailabilityWindowModule {
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
 
         // for multi-language catalog processing only
+        boolean isSubsDubsRequirementEnforced = ctx.getConfig().isSubsDubsRequirementEnforced();
         boolean mustHaveSubs = false;// local subtitles
         boolean mustHaveDubs = false;// local audio
         boolean mustHaveLocalizedData = false;// local synopsis
@@ -234,7 +236,6 @@ public class VMSAvailabilityWindowModule {
 
 
                             if (locale != null) {
-
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
@@ -270,21 +271,20 @@ public class VMSAvailabilityWindowModule {
 
                                 // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                 // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window. So if any contract has the assets, then it passes the requirement check.
-                                if (ctx.getConfig().isSubsDubsRequirementEnforced() && !inPrePromotionPhase) {
-
+                                if (isSubsDubsRequirementEnforced && !inPrePromotionPhase) {
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
                                     if (mustHaveSubs && !thisWindowFoundLocalText) {
-                                        ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Missing Subs - VideoId={} not merched in country={} locale={}", videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={} - ", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio) {
-                                        ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Missing Dubs - VideoId={} not merched in country={} locale={}", videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={} - ", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
-                                    // todo check local synopsis. Can be deffered for now.
+                                    // @TODO check local synopsis. Can be deferred for now.
                                 }
                             }
 
