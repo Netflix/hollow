@@ -377,8 +377,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -535,7 +534,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -889,7 +887,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -2870,8 +2868,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -3028,7 +3025,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -3382,7 +3378,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -5363,8 +5359,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -5521,7 +5516,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -5875,7 +5869,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -7978,8 +7972,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -8136,7 +8129,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -8490,7 +8482,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -10471,8 +10463,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -10629,7 +10620,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -10983,7 +10973,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -12964,8 +12954,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -13122,7 +13111,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -13476,7 +13464,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -15466,8 +15454,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -15624,7 +15611,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -15978,7 +15964,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -17968,8 +17954,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -18126,7 +18111,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -18480,7 +18464,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -20470,8 +20454,7 @@
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
-                "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer"
+                "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -20628,7 +20611,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:nf-archaius2-platform-bridge"
             ]
         },
@@ -20982,7 +20964,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]

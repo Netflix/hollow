@@ -427,7 +427,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -611,7 +610,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -1113,7 +1111,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -3606,7 +3604,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -3790,7 +3787,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -4292,7 +4288,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -6785,7 +6781,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -6969,7 +6964,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -7471,7 +7465,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -10086,7 +10080,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -10270,7 +10263,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -10772,7 +10764,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -13265,7 +13257,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -13449,7 +13440,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -13951,7 +13941,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -16445,7 +16435,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -16629,7 +16618,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -17154,7 +17142,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -19697,7 +19685,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -19881,7 +19868,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -20406,7 +20392,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -22949,7 +22935,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -23133,7 +23118,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -23658,7 +23642,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -26201,7 +26185,6 @@
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
                 "netflix:platform-core"
             ]
@@ -26385,7 +26368,6 @@
         "com.netflix.archaius:archaius2-archaius1-bridge": {
             "locked": "2.2.13",
             "transitive": [
-                "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge"
             ]
@@ -26910,7 +26892,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "0.1.1",
+            "locked": "0.5.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
