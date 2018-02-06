@@ -481,7 +481,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -711,7 +712,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -1266,8 +1268,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -1978,6 +1979,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -2448,7 +2450,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2976,13 +2978,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -4249,7 +4251,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -4479,7 +4482,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -5034,8 +5038,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -5746,6 +5749,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -6216,7 +6220,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -6744,13 +6748,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -8017,7 +8021,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -8247,7 +8252,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -8802,8 +8808,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -9514,6 +9519,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -9984,7 +9990,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -10512,13 +10518,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -11870,11 +11876,13 @@
                 "com.netflix.fabricator:fabricator-core",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
+                "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-consumer-kafka_0.10",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.nfkafka:nfkafka-producer-kafka_0.10",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -12106,7 +12114,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -12662,8 +12671,7 @@
             "locked": "1.0.3",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common-kafka_0.10": {
@@ -12675,7 +12683,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "0.5.2",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -13395,6 +13403,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -13866,7 +13875,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -14394,13 +14403,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -17415,7 +17424,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -17645,7 +17655,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -18200,8 +18211,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -18912,6 +18922,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -19382,7 +19393,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19910,13 +19921,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -21183,7 +21194,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -21413,7 +21425,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -21968,8 +21981,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -22680,6 +22692,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -23150,7 +23163,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23678,13 +23691,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -24952,11 +24965,13 @@
                 "com.netflix.fabricator:fabricator-core",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
+                "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-consumer-kafka_0.10",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "com.netflix.nfkafka:nfkafka-producer-kafka_0.10",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -25188,7 +25203,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -25744,8 +25760,7 @@
             "locked": "1.0.3",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-common-kafka_0.10": {
@@ -25757,7 +25772,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "0.5.2",
+            "locked": "1.0.2",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -26477,6 +26492,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -26947,7 +26963,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -27475,13 +27491,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -28732,7 +28748,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -28980,7 +28997,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -29561,8 +29579,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -30282,6 +30299,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -30772,7 +30790,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -31301,13 +31319,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -32631,7 +32649,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -32879,7 +32898,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -33460,8 +33480,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -34181,6 +34200,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -34671,7 +34691,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -35200,13 +35220,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -36530,7 +36550,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -36778,7 +36799,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -37359,8 +37381,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -38080,6 +38101,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -38570,7 +38592,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -39099,13 +39121,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -40429,7 +40451,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -40677,7 +40700,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -41258,8 +41282,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -41979,6 +42002,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -42469,7 +42493,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -42998,13 +43022,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -44328,7 +44352,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -44576,7 +44601,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -45157,8 +45183,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -45878,6 +45903,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -46368,7 +46394,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -46897,13 +46923,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -48227,7 +48253,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -48475,7 +48502,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -49056,8 +49084,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -49777,6 +49804,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -50267,7 +50295,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -50796,13 +50824,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -52126,7 +52154,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -52374,7 +52403,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -52955,8 +52985,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -53676,6 +53705,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -54166,7 +54196,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -54695,13 +54725,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
@@ -56025,7 +56055,8 @@
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
                 "netflix:base-server",
-                "netflix:platform-core"
+                "netflix:platform-core",
+                "netflix:simone-common"
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
@@ -56273,7 +56304,8 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
-                "netflix:nimble-int-java"
+                "netflix:nimble-int-java",
+                "netflix:simone-common"
             ]
         },
         "com.netflix.archaius:archaius2-guice": {
@@ -56854,8 +56886,7 @@
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
-                "com.netflix.nfkafka:nfkafka-producer",
-                "netflix:simone-client"
+                "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
@@ -57575,6 +57606,7 @@
                 "netflix:platform-ipc",
                 "netflix:platform-management",
                 "netflix:platform-utils",
+                "netflix:simone-common",
                 "org.apache.velocity:velocity"
             ]
         },
@@ -58065,7 +58097,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.47",
+            "locked": "4.48",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -58594,13 +58626,13 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.0.20",
+            "locked": "2.1.2",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:simone-common": {
-            "locked": "1.53",
+            "locked": "1.56",
             "transitive": [
                 "netflix:simone-client"
             ]
