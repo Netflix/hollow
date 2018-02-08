@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import com.netflix.hollow.api.fs.FileManipulator;
 import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
@@ -35,8 +35,18 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         this(blobStoreDir.toPath());
     }
 
+    /**
+     * @since 3.0.0
+     */
     public HollowFilesystemPublisher(Path blobStoreDir) {
-        this.blobStoreDir = FileManipulator.createDir(blobStoreDir);
+        this.blobStoreDir = blobStoreDir;
+        try {
+            if(!Files.exists(this.blobStoreDir)){
+                Files.createDirectories(this.blobStoreDir);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create folder for publisher", e);
+        }
     }
 
     @Override
@@ -45,11 +55,11 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         
         switch(blob.getType()) {
         case SNAPSHOT:
-            destination = FileManipulator.createFile(blobStoreDir,  String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+            destination = Paths.get(blobStoreDir.toString(),  String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
         case REVERSE_DELTA:
-            destination = FileManipulator.createFile(blobStoreDir,  String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+            destination = Paths.get(blobStoreDir.toString(),  String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
             break;
         }
             

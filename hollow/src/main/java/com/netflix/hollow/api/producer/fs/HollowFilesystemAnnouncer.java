@@ -17,12 +17,12 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import com.netflix.hollow.api.fs.FileManipulator;
 import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     
@@ -37,7 +37,6 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
 
     /**
      * @since 3.0.0
-     * @param publishDir
      */
     public HollowFilesystemAnnouncer(Path publishDir) {
         this.publishDir = publishDir;
@@ -45,7 +44,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
 
     @Override
     public void announce(long stateVersion) {
-        Path announceFile = FileManipulator.createFile(publishDir, ANNOUNCEMENT_FILENAME);
+        Path announceFile = Paths.get(publishDir.toString(), ANNOUNCEMENT_FILENAME);
         try {
             Files.write(announceFile, String.valueOf(stateVersion).getBytes());
         } catch(IOException ex) {

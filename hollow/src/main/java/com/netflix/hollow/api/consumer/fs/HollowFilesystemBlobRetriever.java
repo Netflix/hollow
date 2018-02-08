@@ -18,18 +18,16 @@
 package com.netflix.hollow.api.consumer.fs;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.fs.FileManipulator;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriever {
     
@@ -66,15 +64,23 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
      * @since 3.0.0
      */
     public HollowFilesystemBlobRetriever(Path blobStoreDir, HollowConsumer.BlobRetriever fallbackBlobRetriever) {
-        this.blobStoreDir = FileManipulator.createDir(blobStoreDir);
+        this.blobStoreDir = blobStoreDir;
         this.fallbackBlobRetriever = fallbackBlobRetriever;
+
+        try {
+            if(!Files.exists(this.blobStoreDir)){
+                Files.createDirectories(this.blobStoreDir);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create folder for blobRetriever", e);
+        }
     }
 
     @Override
     public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
-        Path exactFile = FileManipulator.getFile(blobStoreDir, "snapshot-" + desiredVersion);
+        Path exactFile = Paths.get(blobStoreDir.toString(), "snapshot-" + desiredVersion);
 
-        if(FileManipulator.exists(exactFile))
+        if(Files.exists(exactFile))
             return new FilesystemBlob(exactFile, desiredVersion);
         
         long maxVersionBeforeDesired = Long.MIN_VALUE;
@@ -97,12 +103,12 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
         HollowConsumer.Blob filesystemBlob = null;
         if(maxVersionBeforeDesired > Long.MIN_VALUE)
-            filesystemBlob = new FilesystemBlob(FileManipulator.createFile(blobStoreDir, maxVersionBeforeDesiredFilename), maxVersionBeforeDesired);
+            filesystemBlob = new FilesystemBlob(Paths.get(blobStoreDir.toString(), maxVersionBeforeDesiredFilename), maxVersionBeforeDesired);
         
         if(fallbackBlobRetriever != null) {
             HollowConsumer.Blob remoteBlob = fallbackBlobRetriever.retrieveSnapshotBlob(desiredVersion);
             if(remoteBlob != null && (filesystemBlob == null || remoteBlob.getToVersion() != filesystemBlob.getToVersion()))
-                return new BlobForBackupToFilesystem(remoteBlob, FileManipulator.createFile(blobStoreDir, "snapshot-" + remoteBlob.getToVersion()));
+                return new BlobForBackupToFilesystem(remoteBlob, Paths.get(blobStoreDir.toString(), "snapshot-" + remoteBlob.getToVersion()));
         }
         
         return filesystemBlob;
@@ -116,7 +122,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = file.getFileName().toString();
                 if(filename.startsWith("delta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return new FilesystemBlob(FileManipulator.createFile(blobStoreDir, filename), currentVersion, destinationVersion);
+                    return new FilesystemBlob(Paths.get(blobStoreDir.toString(), filename), currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -126,7 +132,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         if(fallbackBlobRetriever != null) {
             HollowConsumer.Blob remoteBlob = fallbackBlobRetriever.retrieveDeltaBlob(currentVersion);
             if(remoteBlob != null)
-                return new BlobForBackupToFilesystem(remoteBlob, FileManipulator.createFile(blobStoreDir, "delta-" + remoteBlob.getFromVersion() + "-" + remoteBlob.getToVersion()));
+                return new BlobForBackupToFilesystem(remoteBlob, Paths.get(blobStoreDir.toString(), "delta-" + remoteBlob.getFromVersion() + "-" + remoteBlob.getToVersion()));
         }
         
         return null;
@@ -139,7 +145,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = file.getFileName().toString();
                 if(filename.startsWith("reversedelta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return new FilesystemBlob(FileManipulator.createFile(blobStoreDir, filename), currentVersion, destinationVersion);
+                    return new FilesystemBlob(Paths.get(blobStoreDir.toString(), filename), currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {
@@ -149,7 +155,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         if(fallbackBlobRetriever != null) {
             HollowConsumer.Blob remoteBlob = fallbackBlobRetriever.retrieveReverseDeltaBlob(currentVersion);
             if(remoteBlob != null)
-                return new BlobForBackupToFilesystem(remoteBlob, FileManipulator.createFile(blobStoreDir, "reversedelta-" + remoteBlob.getFromVersion() + "-" + remoteBlob.getToVersion()));
+                return new BlobForBackupToFilesystem(remoteBlob, Paths.get(blobStoreDir.toString(), "reversedelta-" + remoteBlob.getFromVersion() + "-" + remoteBlob.getToVersion()));
         }
         
         return null;
