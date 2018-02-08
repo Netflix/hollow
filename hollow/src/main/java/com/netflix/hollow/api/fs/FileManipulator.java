@@ -25,7 +25,11 @@ import java.nio.file.Paths;
 public class FileManipulator {
 
     public static Path createFile(Path dir, String fileName) {
-        Path path = Paths.get(dir.toString(), fileName);
+        return createFile(dir.toString(), fileName);
+    }
+
+    public static Path createFile(String dir, String fileName) {
+        Path path = Paths.get(dir, fileName);
         try {
             if(!Files.exists(path)){
                 Files.createFile(path);

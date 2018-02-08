@@ -49,25 +49,44 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private long latestVersion;
 
+    @Deprecated
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
+        this(publishDir.toPath());
+    }
+
+    /**
+     * since 3.0.0
+     *
+     * @param publishDir
+     */
+    public HollowFilesystemAnnouncementWatcher(Path publishDir) {
         this(publishDir,
-             newScheduledThreadPool(
-                     1 /*corePoolSize*/,
-                     new ThreadFactory() {
-                         @Override
-                         public Thread newThread(Runnable r) {
-                             Thread t = new Thread(r);
-                             t.setDaemon(true);
-                             return t;
-                         }
-                     })
-           );
+                newScheduledThreadPool(
+                        1 /*corePoolSize*/,
+                        new ThreadFactory() {
+                            @Override
+                            public Thread newThread(Runnable r) {
+                                Thread t = new Thread(r);
+                                t.setDaemon(true);
+                                return t;
+                            }
+                        })
+        );
 
         ownedExecutor = true;
     }
 
+    @Deprecated
     public HollowFilesystemAnnouncementWatcher(File publishDir, ScheduledExecutorService executor) {
-        this.publishDir = publishDir.toPath();
+        this(publishDir.toPath(), executor);
+    }
+
+    /**
+     * since 3.0.0
+     * @param publishDir
+     */
+    public HollowFilesystemAnnouncementWatcher(Path publishDir, ScheduledExecutorService executor) {
+        this.publishDir = publishDir;
         this.executor = executor;
 
         this.announceFile = this.publishDir.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
