@@ -21,6 +21,7 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
+import com.netflix.hollow.api.fs.FileManipulator;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
 
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -112,21 +113,14 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
             switch (type) {
                 case SNAPSHOT:
-                    this.path = Paths.get(dir.toString(), String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
+                    this.path = FileManipulator.createFile(dir, String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
                     break;
                 case DELTA:
                 case REVERSE_DELTA:
-                    this.path = Paths.get(dir.toString(), String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                    this.path = FileManipulator.createFile(dir, String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
                     break;
                 default:
                     throw new IllegalStateException("unknown blob type, type=" + type);
-            }
-
-            try {
-                if(!Files.exists(this.path))
-                    Files.createFile(this.path);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not create file: " + this.path.toString(), e);
             }
         }
         
