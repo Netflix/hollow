@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2017 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -38,6 +38,18 @@ public class FileManipulator {
         } catch (IOException e) {
             throw new RuntimeException("Could not create file: " + path.toString(), e);
         }
+    }
+
+    public static Path getFile(Path dir, String fileName) {
+        return getFile(dir.toString(), fileName);
+    }
+
+    public static Path getFile(String dir, String fileName) {
+        return Paths.get(dir, fileName);
+    }
+
+    public static boolean exists(Path file) {
+        return Files.exists(file);
     }
 
     public static Path createDir(Path dir) {
