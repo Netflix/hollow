@@ -17,40 +17,45 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
+import com.netflix.hollow.api.fs.FileManipulator;
 import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
-    private final File blobStoreDir;
+    private final Path blobStoreDir;
 
+    @Deprecated
     public HollowFilesystemPublisher(File blobStoreDir) {
-        this.blobStoreDir = blobStoreDir;
-        
-        blobStoreDir.mkdirs();
+        this(blobStoreDir.toPath());
+    }
+
+    public HollowFilesystemPublisher(Path blobStoreDir) {
+        this.blobStoreDir = FileManipulator.createDir(blobStoreDir);
     }
 
     @Override
     public void publish(HollowProducer.Blob blob) {
-        File destination = null;
+        Path destination = null;
         
         switch(blob.getType()) {
         case SNAPSHOT:
-            destination = new File(blobStoreDir, String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+            destination = FileManipulator.createFile(blobStoreDir,  String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
         case REVERSE_DELTA:
-            destination = new File(blobStoreDir, String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+            destination = FileManipulator.createFile(blobStoreDir,  String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
             break;
         }
             
         try(
                 InputStream is = blob.newInputStream();
-                OutputStream os = new FileOutputStream(destination);
+                OutputStream os = Files.newOutputStream(destination);
         ) {
             byte buf[] = new byte[4096];
             int n = 0;
