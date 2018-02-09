@@ -18,24 +18,42 @@
 package com.netflix.hollow.tools.stringifier;
 
 import com.netflix.hollow.api.objects.HollowRecord;
-
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import java.io.IOException;
+import java.io.Writer;
 
 @SuppressWarnings("rawtypes")
 public interface HollowStringifier<T extends HollowStringifier> {
+    String NEWLINE = "\n";
+    String INDENT = "  ";
 
     /**
-     * Exclude specified object types (replace output with null)
+     * Exclude specified object types (replace output with null).
      */
     public T addExcludeObjectTypes(String... types);
 
     /**
-     * create a String representation of the specified {@link HollowRecord}.
+     * Create a String representation of the specified {@link HollowRecord}.
      */
     public String stringify(HollowRecord record);
 
     /**
-     * create a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
+     * Writes a String representation of the specified {@link HollowRecord} to the provided Writer.
+     *
+     * @throws IOException thrown if there is an error writing to the Writer
+     */
+    public void stringify(Writer writer, HollowRecord record) throws IOException;
+
+    /**
+     * Create a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
      */
     public String stringify(HollowDataAccess dataAccess, String type, int ordinal);
+
+    /**
+     * Writes a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
+     *
+     * @throws IOException thrown if there is an error writing to the Writer
+     */
+    public void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal)
+        throws IOException;
 }
