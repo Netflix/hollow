@@ -502,6 +502,7 @@ public class VMSAvailabilityWindowModule {
             Set<Strings> assetBcp47CodesFromMaxPackageId = null;
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
             int prePromoDays = 0;
+            boolean isDayOfBroadcast = false;
             boolean hasRollingEpisodes = false;
             boolean isAvailableForDownload = false;
             LinkedHashSetOfStrings cupTokens = null;
@@ -520,6 +521,7 @@ public class VMSAvailabilityWindowModule {
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
                     prePromoDays = minValueToZero(entry.getValue().videoContractInfo.prePromotionDays);
+                    isDayOfBroadcast = entry.getValue().videoContractInfo.isDayOfBroadcast;
                     hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
                     isAvailableForDownload = entry.getValue().videoContractInfo.isAvailableForDownload;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
@@ -531,6 +533,8 @@ public class VMSAvailabilityWindowModule {
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
 
+            if (isDayOfBroadcast)
+                rollup.foundDayOfBroadcast();
             if (hasRollingEpisodes)
                 rollup.foundRollingEpisodes();
             if (isAvailableForDownload)
@@ -620,8 +624,9 @@ public class VMSAvailabilityWindowModule {
 
                 outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
                 outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+                outputContractInfo.videoContractInfo.isDayOfBroadcast = rollup.isDayOfBroadcast();
                 outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
-                outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+                outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes(); // NOTE: DAB and hasRollingEpisodes means the same
                 outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
                 outputContractInfo.videoContractInfo.postPromotionDays = 0;
                 outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
@@ -694,7 +699,7 @@ public class VMSAvailabilityWindowModule {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                if (contract != null && (contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
                     isWindowDataNeeded = true;
                 }
             }

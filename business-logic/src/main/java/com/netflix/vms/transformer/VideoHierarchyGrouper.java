@@ -163,7 +163,7 @@ public class VideoHierarchyGrouper {
                 potentialOrphans.add(videoId);
             }
         }
-        
+
         // If this is the fastlane, don't worry about orphans.
         if(fastlaneIds != null)
             return;
@@ -248,12 +248,12 @@ public class VideoHierarchyGrouper {
 
         return setOfIds;
     }
-    
+
     private Set<Integer> getTopNodesToDropOnFloor() {
         String csv = ctx.getConfig().getDropTopNodesOnFloor();
-        if(csv == null)
+        if (csv == null || csv.trim().isEmpty())
             return Collections.emptySet();
-        
+
         Set<Integer> set = new HashSet<Integer>();
         for(String id : csv.split(",")) {
             try {
@@ -262,7 +262,7 @@ public class VideoHierarchyGrouper {
                 ctx.getLogger().error(TransformerLogTag.DroppedTopNodeOnFloor, "Unable to parse top node ID: {}", id);
             }
         }
-        
+
         return set;
     }
 
