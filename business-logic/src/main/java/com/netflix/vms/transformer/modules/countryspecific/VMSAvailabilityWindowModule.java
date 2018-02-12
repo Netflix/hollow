@@ -275,12 +275,12 @@ public class VMSAvailabilityWindowModule {
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
                                     if (mustHaveSubs && !thisWindowFoundLocalText) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={} - ", contractId, packageId, videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={} - ", contractId, packageId, videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
