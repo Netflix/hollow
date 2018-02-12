@@ -2055,7 +2055,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -2135,7 +2135,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -2148,7 +2148,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -5236,7 +5236,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -5316,7 +5316,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -5329,7 +5329,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -8417,7 +8417,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -8497,7 +8497,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -8510,7 +8510,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -11720,7 +11720,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -11800,7 +11800,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -11813,7 +11813,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -14901,7 +14901,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -14981,7 +14981,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -14994,7 +14994,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -18109,7 +18109,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -18189,7 +18189,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -18202,7 +18202,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -21363,7 +21363,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -21443,7 +21443,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -21456,7 +21456,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -24617,7 +24617,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -24697,7 +24697,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -24710,7 +24710,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
@@ -27871,7 +27871,7 @@
             ]
         },
         "netflix:chronos-client": {
-            "locked": "1.1.52",
+            "locked": "1.1.53",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
@@ -27951,7 +27951,7 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
@@ -27964,7 +27964,7 @@
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "1.217",
+            "locked": "1.218",
             "transitive": [
                 "netflix:hermes"
             ]
