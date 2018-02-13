@@ -108,10 +108,10 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
         } catch(Exception ex) {
             ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
             pbmSuccess = false;
-        } finally {
-        	PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, pbmSuccess, vip);
         }
-        return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        boolean finalResultAferPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
+		return finalResultAferPBMOverride;
     }
 
 
