@@ -2,6 +2,11 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
@@ -10,10 +15,6 @@ import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
     private final PlaybackMonkeyTester dataTester;
@@ -58,6 +59,7 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
         } else {
             ctx.getLogger().error(PlaybackMonkey, "{}: success: {} finalResultAfterPBMOverride: {}", getJobName(), success, finalResultAferPBMOverride);
         }
+        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
 		return finalResultAferPBMOverride;
 	}
 

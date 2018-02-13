@@ -109,12 +109,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
             pbmSuccess = false;
         } finally {
-        	// Atlas metric: Report 1 for failure. Report 0 for success.
-        	// No data will be reported (equivalent to 0 in Atlas) if PBM validation job did not run (ex: topN CB fails and PBM does not run).
-        	if(!pbmSuccess)
-        		ctx.getMetricRecorder().recordMetric(Metric.PBMFailureCount, 1);
-        	else
-        		ctx.getMetricRecorder().recordMetric(Metric.PBMFailureCount, 0);
+        	PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, pbmSuccess, vip);
         }
         return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
     }
@@ -126,7 +121,6 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                 ctx.getLogger().error(PlaybackMonkey, getFailureReason(befTestResults, failedIDs));
 			else
                 ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true, "failedIds not empty", failedIDs));
-            ;
 		}
 	}
 
