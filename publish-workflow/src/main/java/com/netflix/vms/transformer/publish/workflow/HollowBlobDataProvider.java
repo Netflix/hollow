@@ -56,8 +56,9 @@ public class HollowBlobDataProvider {
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
         }
-        revertableStateEngine = null;
-        revertableNostreamsStateEngine = null;
+        // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
+        //revertableStateEngine = null;
+        //revertableNostreamsStateEngine = null;
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -106,10 +107,10 @@ public class HollowBlobDataProvider {
             initialNostreamsChecksumBeforeDelta = HollowChecksum.forStateEngineWithCommonSchemas(nostreamsStateEngine, anotherNostreamsStateEngine);
         }
 
-        // -------------------------------------------------------------------------------------------------------------------------------
-        // @TODO: Should these be set to current read state engine prior to applying the delta so it can revert back in case of issues ???
-        revertableStateEngine = null;
-        revertableNostreamsStateEngine = null;
+        // ------------------------------------------------------------------------------------------------
+        // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
+        //revertableStateEngine = null;
+        //revertableNostreamsStateEngine = null;
 
         // ---------------------------------------------------------------------------------------
         // Apply Delta to prior state and make sure its checksum is the same as new snapshot state
@@ -142,7 +143,7 @@ public class HollowBlobDataProvider {
         // Apply Reserve Delta to modified state to make sure it gets back to prior state
         {
             if (reverseDeltaFile.exists()) {
-                revertableStateEngine = processReverseDeltaFile(ctx, "REGULAR", hollowReadStateEngine, reverseDeltaFile, anotherStateEngine, anotherReader, initialChecksumBeforeDelta);
+                revertableStateEngine = processReverseDeltaFile(ctx, "", hollowReadStateEngine, reverseDeltaFile, anotherStateEngine, anotherReader, initialChecksumBeforeDelta);
             } else {
                 ctx.getLogger().warn(BlobChecksum, "Reserve Delta File does not exists: {}", reverseDeltaFile);
             }
