@@ -1489,7 +1489,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -3567,7 +3567,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -5645,7 +5645,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -7845,7 +7845,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -9923,7 +9923,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -11997,7 +11997,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -14085,7 +14085,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -16173,7 +16173,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
@@ -18261,7 +18261,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.113"
+            "locked": "2.108"
         },
         "netflix:nflibrary": {
             "locked": "4.5.32",
