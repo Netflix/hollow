@@ -159,11 +159,12 @@ public class HollowBlobDataProvider {
         anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
         HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
-        ctx.getLogger().info(BlobChecksum, "[{}] INITIAL STATE CHECKSUM: {}", prefix, initialChecksumBeforeDelta);
-        ctx.getLogger().info(BlobChecksum, "[{}] REVERSE DELTA STATE CHECKSUM: {}", prefix, reverseDeltaChecksum);
+        String context = prefix == null || prefix.trim().isEmpty() ? "" : prefix + " ";
+        ctx.getLogger().info(BlobChecksum, "{}INITIAL STATE CHECKSUM: {}", context, initialChecksumBeforeDelta);
+        ctx.getLogger().info(BlobChecksum, "{}REVERSE DELTA STATE CHECKSUM: {}", context, reverseDeltaChecksum);
 
         if (!initialChecksumBeforeDelta.equals(reverseDeltaChecksum))
-            throw new RuntimeException(prefix + "REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
+            throw new RuntimeException(context + "REVERSE DELTA CHECKSUM VALIDATION FAILURE!");
 
         return anotherStateEngine;
     }
