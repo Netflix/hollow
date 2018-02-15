@@ -92,7 +92,7 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean isCircuitBreakersEnabled();
 
-    @DefaultValue("true") // Keep it backwards compabitible by default
+    @DefaultValue("true") // Keep it backwards compatible by default
     public boolean isHollowBlobDataProviderResetStateEnabled();
 
     @DefaultValue("true")
