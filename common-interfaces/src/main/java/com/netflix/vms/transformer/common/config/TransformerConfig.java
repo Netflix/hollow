@@ -92,7 +92,8 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean isCircuitBreakersEnabled();
 
-    @DefaultValue("false")
+    @DefaultValue("false") // TEMP: Not sure of the impact so keeping config to easy switch back in case of emergency - need to set it to false to be
+                           // able to recover from failure
     public boolean isHollowBlobDataProviderResetStateEnabled();
 
     @DefaultValue("true")
