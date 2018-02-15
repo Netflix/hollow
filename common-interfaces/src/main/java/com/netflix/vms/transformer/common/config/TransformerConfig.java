@@ -92,6 +92,9 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean isCircuitBreakersEnabled();
 
+    @DefaultValue("false")
+    public boolean isHollowBlobDataProviderResetStateEnabled();
+
     @DefaultValue("true")
     @PropertyName(name="vms.circuitBreakerEnabled.${0}")
     public boolean isCircuitBreakerEnabled(String ruleName);

@@ -57,8 +57,10 @@ public class HollowBlobDataProvider {
             nostreamsStateEngine = revertableNostreamsStateEngine;
         }
         // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
-        //revertableStateEngine = null;
-        //revertableNostreamsStateEngine = null;
+        if (ctx.getConfig().isHollowBlobDataProviderResetStateEnabled()) { // Condition to be backwards compatible
+            revertableStateEngine = null;
+            revertableNostreamsStateEngine = null;
+        }
     }
 
     public HollowReadStateEngine getStateEngine() {
@@ -69,9 +71,9 @@ public class HollowBlobDataProvider {
         return hollowReadStateEngine.getTypeState(typeName).getPopulatedOrdinals().cardinality();
     }
 
-	public void updateData(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
-		if (deltaFile.exists() && snapshotFile.exists()) {
-		    validateChecksums(snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
+    public void updateData(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
+        if (deltaFile.exists() && snapshotFile.exists()) {
+            validateChecksums(snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         } else if (snapshotFile.exists()) {
             hollowReadStateEngine = new HollowReadStateEngine();
             nostreamsStateEngine = new HollowReadStateEngine();
@@ -109,8 +111,10 @@ public class HollowBlobDataProvider {
 
         // ------------------------------------------------------------------------------------------------
         // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
-        //revertableStateEngine = null;
-        //revertableNostreamsStateEngine = null;
+        if (ctx.getConfig().isHollowBlobDataProviderResetStateEnabled()) { // Condition to be backwards compatible
+            revertableStateEngine = null;
+            revertableNostreamsStateEngine = null;
+        }
 
         // ---------------------------------------------------------------------------------------
         // Apply Delta to prior state and make sure its checksum is the same as new snapshot state
@@ -207,7 +211,7 @@ public class HollowBlobDataProvider {
 
             Set<Integer> videoIds = modifiedIds.get(countryId);
             if(videoIds == null) {
-            	videoIds = new HashSet<>();
+                videoIds = new HashSet<>();
                 modifiedIds.put(countryId, videoIds);
             }
             videoIds.add(videoId);
@@ -218,97 +222,97 @@ public class HollowBlobDataProvider {
         return modifiedIds;
     }
 
- 	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
-		HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("PackageData");
-		PopulatedOrdinalListener packageListener = typeState.getListener(PopulatedOrdinalListener.class);
-		BitSet modifiedPackages = new BitSet(packageListener.getPopulatedOrdinals().length());
-		modifiedPackages.or(packageListener.getPopulatedOrdinals());
-		modifiedPackages.xor(packageListener.getPreviousOrdinals());
+    public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages() {
+        HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) hollowReadStateEngine.getTypeState("PackageData");
+        PopulatedOrdinalListener packageListener = typeState.getListener(PopulatedOrdinalListener.class);
+        BitSet modifiedPackages = new BitSet(packageListener.getPopulatedOrdinals().length());
+        modifiedPackages.or(packageListener.getPopulatedOrdinals());
+        modifiedPackages.xor(packageListener.getPreviousOrdinals());
 
-		if (modifiedPackages.cardinality() == 0|| modifiedPackages.cardinality() == packageListener.getPopulatedOrdinals().cardinality())
-			return Collections.emptyMap();
+        if (modifiedPackages.cardinality() == 0|| modifiedPackages.cardinality() == packageListener.getPopulatedOrdinals().cardinality())
+            return Collections.emptyMap();
 
-		Map<String, Set<Integer>> modifiedPackageVideoIds = new HashMap<>();
-		VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
+        Map<String, Set<Integer>> modifiedPackageVideoIds = new HashMap<>();
+        VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
 
-		int ordinal = modifiedPackages.nextSetBit(0);
-		while (ordinal != -1) {
-			PackageDataHollow packageData = api.getPackageDataHollow(ordinal);
-			Set<ISOCountryHollow> deployCountries = packageData._getAllDeployableCountries();
-			VideoHollow video = packageData._getVideo();
+        int ordinal = modifiedPackages.nextSetBit(0);
+        while (ordinal != -1) {
+            PackageDataHollow packageData = api.getPackageDataHollow(ordinal);
+            Set<ISOCountryHollow> deployCountries = packageData._getAllDeployableCountries();
+            VideoHollow video = packageData._getVideo();
 
-			if (deployCountries == null || video == null)
-				continue;
+            if (deployCountries == null || video == null)
+                continue;
 
-			Iterator<ISOCountryHollow> iterator = deployCountries.iterator();
-			while (iterator.hasNext()) {
-				String countryId = iterator.next()._getId();
-				Set<Integer> modIdsForCountry = modifiedPackageVideoIds.get(countryId);
-				if (modIdsForCountry == null) {
-					modIdsForCountry = new HashSet<Integer>();
-					modifiedPackageVideoIds.put(countryId, modIdsForCountry);
-				}
-				modIdsForCountry.add(video._getValue());
-			}
-			ordinal = modifiedPackages.nextSetBit(ordinal + 1);
-		}
-		return modifiedPackageVideoIds;
+            Iterator<ISOCountryHollow> iterator = deployCountries.iterator();
+            while (iterator.hasNext()) {
+                String countryId = iterator.next()._getId();
+                Set<Integer> modIdsForCountry = modifiedPackageVideoIds.get(countryId);
+                if (modIdsForCountry == null) {
+                    modIdsForCountry = new HashSet<Integer>();
+                    modifiedPackageVideoIds.put(countryId, modIdsForCountry);
+                }
+                modIdsForCountry.add(video._getValue());
+            }
+            ordinal = modifiedPackages.nextSetBit(ordinal + 1);
+        }
+        return modifiedPackageVideoIds;
     }
 
-	public static class VideoCountryKey {
-		private final String country;
-	    private final int videoId;
+    public static class VideoCountryKey {
+        private final String country;
+        private final int videoId;
 
-	    public VideoCountryKey(String country, int videoId) {
-	        this.country = country;
-	        this.videoId = videoId;
-	    }
+        public VideoCountryKey(String country, int videoId) {
+            this.country = country;
+            this.videoId = videoId;
+        }
 
         public String getCountry() {
             return country;
         }
 
-	    public int getVideoId() {
-	        return videoId;
-	    }
+        public int getVideoId() {
+            return videoId;
+        }
 
-	    @Override
-		public int hashCode() {
-	        return HashCodes.hashInt(country.hashCode()) ^ HashCodes.hashInt(videoId);
-	    }
+        @Override
+        public int hashCode() {
+            return HashCodes.hashInt(country.hashCode()) ^ HashCodes.hashInt(videoId);
+        }
 
-	    @Override
-		public boolean equals(Object other) {
-	        if(other instanceof VideoCountryKey) {
-	            return ((VideoCountryKey) other).getCountry().equals(country) && ((VideoCountryKey) other).getVideoId() == videoId;
-	        }
-	        return false;
-	    }
-	    @Override
-	    public String toString() {
-          return "VideoCountryKey [country=" + country + ", videoId="
-              + videoId + "]";
-	    }
+        @Override
+        public boolean equals(Object other) {
+            if(other instanceof VideoCountryKey) {
+                return ((VideoCountryKey) other).getCountry().equals(country) && ((VideoCountryKey) other).getVideoId() == videoId;
+            }
+            return false;
+        }
+        @Override
+        public String toString() {
+            return "VideoCountryKey [country=" + country + ", videoId="
+                    + videoId + "]";
+        }
 
-	    public String toShortString() {
-          return "["+country + ", "+ videoId + "]";
-	    }
-	}
+        public String toShortString() {
+            return "["+country + ", "+ videoId + "]";
+        }
+    }
 
     public Map<String, TopNVideoDataHollow> getTopNData() {
-		// Read from blob
-	    Map <String, TopNVideoDataHollow> result = new HashMap<>();
+        // Read from blob
+        Map <String, TopNVideoDataHollow> result = new HashMap<>();
 
-		VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
+        VMSRawHollowAPI api = new VMSRawHollowAPI(hollowReadStateEngine);
 
-		for(TopNVideoDataHollow topn: api.getAllTopNVideoDataHollow()){
+        for(TopNVideoDataHollow topn: api.getAllTopNVideoDataHollow()){
 
-			String countryId = topn._getCountryId();
+            String countryId = topn._getCountryId();
 
-			result.put(countryId, topn);
+            result.put(countryId, topn);
 
-		}
-		return result;
+        }
+        return result;
     }
 
 }
