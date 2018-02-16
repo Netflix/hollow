@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
+import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_VERSION_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
 import java.io.File;
@@ -134,6 +134,7 @@ public class HollowProducer {
     private final Publisher publisher;
     private final List<Validator> validators;
     private final Announcer announcer;
+    private final VersionPinner versionPinner;
     private final BlobStorageCleaner blobStorageCleaner;
     private HollowObjectMapper objectMapper;
     private final VersionMinter versionMinter;
@@ -203,7 +204,25 @@ public class HollowProducer {
     	this(blobStager, publisher, announcer, validators, listeners, Collections.<HollowValidationListener>emptyList(), versionMinter, snapshotPublishExecutor, 
     			numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner, singleProducerEnforcer);
     }
-    
+
+    protected HollowProducer(BlobStager blobStager,
+                             Publisher publisher,
+                             Announcer announcer,
+                             List<Validator> validators,
+                             List<HollowProducerListener> listeners,
+                             List<HollowValidationListener> validationListeners,
+                             VersionMinter versionMinter,
+                             Executor snapshotPublishExecutor,
+                             int numStatesBetweenSnapshots,
+                             long targetMaxTypeShardSize,
+                             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
+                             BlobStorageCleaner blobStorageCleaner,
+                             SingleProducerEnforcer singleProducerEnforcer) {
+        this(blobStager, publisher, announcer, validators, listeners, validationListeners, versionMinter, snapshotPublishExecutor,
+                numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner, singleProducerEnforcer, null);
+
+    }
+
     protected HollowProducer(BlobStager blobStager,
                              Publisher publisher,
                              Announcer announcer,
@@ -216,10 +235,12 @@ public class HollowProducer {
                              long targetMaxTypeShardSize,
                              HollowMetricsCollector<HollowProducerMetrics> metricsCollector, 
                              BlobStorageCleaner blobStorageCleaner, 
-                             SingleProducerEnforcer singleProducerEnforcer) {
+                             SingleProducerEnforcer singleProducerEnforcer,
+                             VersionPinner versionPinner) {
         this.publisher = publisher;
         this.validators = validators;
         this.announcer = announcer;
+        this.versionPinner = versionPinner;
         this.versionMinter = versionMinter;
         this.blobStager = blobStager;
         this.singleProducerEnforcer = singleProducerEnforcer;
@@ -367,6 +388,26 @@ public class HollowProducer {
     }
 
     /**
+     * Allows to pin a specific version, won't produce data, only modifies the pinned version file
+     *
+     */
+    public void pinVersion(long pinnedVersion) {
+        if(versionPinner != null) {
+            versionPinner.pin(pinnedVersion);
+        }
+    }
+
+    /**
+     * Allows to remove a pinned version, won't produce data, only modifies the pinned version file
+     *
+     */
+    public void unpinVersion() {
+        if(versionPinner != null) {
+            versionPinner.unpin();
+        }
+    }
+
+    /**
      * Each cycle produces a single data state.
      * 
      * @return the version identifier of the produced state.
@@ -402,7 +443,7 @@ public class HollowProducer {
      * at an optimal state.
      * 
      * @param config specifies what criteria to use to determine whether a compaction is necessary
-     * @return the version identifier of the produced state, or AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE if compaction was unnecessary.
+     * @return the version identifier of the produced state, or AnnouncementWatcher.NO_VERSION_AVAILABLE if compaction was unnecessary.
      */
     public long runCompactionCycle(HollowCompactor.CompactionConfig config) {
         if(config != null && readStates.hasCurrent()) {
@@ -417,7 +458,7 @@ public class HollowProducer {
             }
         }
         
-        return NO_ANNOUNCEMENT_AVAILABLE;
+        return NO_VERSION_AVAILABLE;
     }
 
     protected void runCycle(Populator task, ProducerStatus.Builder cycleStatus, long toVersion) {
@@ -944,6 +985,12 @@ public class HollowProducer {
         public void announce(long stateVersion);
     }
 
+    public static interface VersionPinner {
+        public void pin(long stateVersion);
+
+        public void unpin();
+    }
+
     private static final class Artifacts {
         Blob snapshot = null;
         Blob delta = null;
@@ -1000,6 +1047,7 @@ public class HollowProducer {
         protected File stagingDir;
         protected Publisher publisher;
         protected Announcer announcer;
+        protected VersionPinner versionPinner;
         protected List<Validator> validators = new ArrayList<Validator>();
         protected List<HollowProducerListener> listeners = new ArrayList<HollowProducerListener>();
         protected List<HollowValidationListener> validationListeners = new ArrayList<HollowValidationListener>();
@@ -1034,6 +1082,11 @@ public class HollowProducer {
         public B withAnnouncer(HollowProducer.Announcer announcer) {
             this.announcer = announcer;
             return (B)this;
+        }
+
+        public Builder withVersionPinner(HollowProducer.VersionPinner versionPinner) {
+            this.versionPinner = versionPinner;
+            return this;
         }
         
         public B withValidator(HollowProducer.Validator validator) {
@@ -1119,7 +1172,7 @@ public class HollowProducer {
         
         public HollowProducer build() {
             checkArguments();
-            return new HollowProducer(stager, publisher, announcer, validators, listeners, validationListeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner, singleProducerEnforcer);
+            return new HollowProducer(stager, publisher, announcer, validators, listeners, validationListeners, versionMinter, snapshotPublishExecutor, numStatesBetweenSnapshots, targetMaxTypeShardSize, metricsCollector, blobStorageCleaner, singleProducerEnforcer, versionPinner);
         }
     }
 

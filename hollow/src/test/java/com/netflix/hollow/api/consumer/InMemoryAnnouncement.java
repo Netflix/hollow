@@ -21,15 +21,16 @@ import java.util.ArrayList;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import com.netflix.hollow.api.producer.HollowProducer.VersionPinner;
 import java.util.List;
 
-/// This InMemoryAnnouncement is both a HollowProducer.Announcer and HollowConsumer.AnnouncementWatcher!
-public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
+/// This InMemoryAnnouncement is a HollowProducer.VersionPinner, HollowProducer.Announcer and HollowConsumer.AnnouncementWatcher!
+public class InMemoryAnnouncement implements VersionPinner, Announcer, AnnouncementWatcher {
     
     private final List<HollowConsumer> subscribedConsumers;
     
-    long latestAnnouncedVersion = NO_ANNOUNCEMENT_AVAILABLE;
-    long pinnedVersion = NO_ANNOUNCEMENT_AVAILABLE;
+    long latestAnnouncedVersion = NO_VERSION_AVAILABLE;
+    long pinnedVersion = NO_VERSION_AVAILABLE;
         
     
     public InMemoryAnnouncement() {
@@ -38,9 +39,14 @@ public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
             
     @Override
     public long getLatestVersion() {
-        if(pinnedVersion != NO_ANNOUNCEMENT_AVAILABLE)
+        if(pinnedVersion != NO_VERSION_AVAILABLE)
             return pinnedVersion;
         return latestAnnouncedVersion;
+    }
+    
+    @Override
+    public boolean hasPinVersion() {
+        return pinnedVersion != NO_VERSION_AVAILABLE;
     }
 
     @Override
@@ -54,13 +60,15 @@ public class InMemoryAnnouncement implements Announcer, AnnouncementWatcher {
         notifyConsumers();
     }
 
+    @Override
     public void pin(long stateVersion) {
         pinnedVersion = stateVersion;
         notifyConsumers();
     }
-    
+
+    @Override
     public void unpin() {
-        pinnedVersion = NO_ANNOUNCEMENT_AVAILABLE;
+        pinnedVersion = NO_VERSION_AVAILABLE;
         notifyConsumers();
     }
 

@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.consumer;
 
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
@@ -24,11 +26,22 @@ import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducer.VersionMinter;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
+import com.netflix.hollow.api.producer.fs.HollowFilesystemVersionPinner;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.compact.HollowCompactor.CompactionConfig;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.BitSet;
 import java.util.concurrent.Executor;
+
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,11 +50,14 @@ public class HollowProducerConsumerTests {
     
     private InMemoryBlobStore blobStore;
     private InMemoryAnnouncement announcement;
-    
+    private File tmpFolder;
+
+
     @Before
-    public void setUp() {
+    public void setUp()  throws IOException {
         blobStore = new InMemoryBlobStore();
         announcement = new InMemoryAnnouncement();
+        tmpFolder = Files.createTempDirectory(null).toFile();
     }
     
     @Test
@@ -158,7 +174,7 @@ public class HollowProducerConsumerTests {
         
         Assert.assertEquals(v4, consumer.getCurrentVersionId());
     }
-    
+
     @Test
     public void consumerFindsLatestPublishedVersionWithoutAnnouncementWatcher() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
@@ -335,7 +351,74 @@ public class HollowProducerConsumerTests {
         for(int i=10000;i<20000;i++)
             Assert.assertTrue(foundValues.get(i));
     }
-    
+
+    @Test
+    public void consumerRespondsToFilesystemPinnedAnnouncement() throws InterruptedException {
+        HollowObjectSchema schema = new HollowObjectSchema("TestPojo", 2, "id");
+        schema.addField("id", HollowObjectSchema.FieldType.INT);
+        schema.addField("v1", HollowObjectSchema.FieldType.INT);
+
+        HollowProducer producer = HollowProducer.withPublisher(new HollowFilesystemPublisher(tmpFolder))
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
+                .withVersionPinner(new HollowFilesystemVersionPinner(tmpFolder))
+                .build();
+
+        producer.initializeDataModel(schema);
+
+        long v1 = producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= 2; i++) {
+                    newState.add(new TestPojoV1(i, i * 10));
+                }
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(new HollowFilesystemBlobRetriever(tmpFolder))
+                .withAnnouncementWatcher(new HollowFilesystemAnnouncementWatcher(tmpFolder))
+                .build();
+
+        consumer.triggerRefresh();
+
+        Assert.assertFalse(consumer.isPinned());
+
+        Assert.assertEquals(v1, consumer.getCurrentVersionId());
+
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= 2; i++) {
+                    newState.add(new TestPojoV1(i, i * 50));
+                }
+            }
+        });
+
+        Thread.sleep(1000);
+
+        long v3 = producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= 2; i++) {
+                    newState.add(new TestPojoV1(i, i * 100));
+                }
+            }
+        });
+
+        Thread.sleep(1000);
+
+        Assert.assertEquals(v3, consumer.getCurrentVersionId());
+
+        producer.pinVersion(v1);
+
+        Thread.sleep(1000);
+
+        Assert.assertTrue(consumer.isPinned());
+        Assert.assertEquals(v1, consumer.getCurrentVersionId());
+    }
+
+    @After
+    public void tearDown() {
+        System.out.println("\t deleting: " + tmpFolder);
+        tmpFolder.delete();
+    }
+
     private long runCycle(HollowProducer producer, final int cycleNumber) {
         return producer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
@@ -343,4 +426,18 @@ public class HollowProducerConsumerTests {
             }
         });
     }
+
+    @SuppressWarnings("unused")
+    @HollowTypeName(name = "TestPojo")
+    private static class TestPojoV1 {
+        public int id;
+        public int v1;
+
+        public TestPojoV1(int id, int v1) {
+            super();
+            this.id = id;
+            this.v1 = v1;
+        }
+    }
+
 }

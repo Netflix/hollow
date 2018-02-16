@@ -253,6 +253,10 @@ public class HollowConsumer {
         return updater.getCurrentVersionId();
     }
 
+    public boolean isPinned() {
+        return announcementWatcher.hasPinVersion();
+    }
+
     /**
      * @return the api which wraps the underlying dataset.
      */
@@ -405,14 +409,15 @@ public class HollowConsumer {
      */
     public static interface AnnouncementWatcher {
 
-        public static final long NO_ANNOUNCEMENT_AVAILABLE = Long.MIN_VALUE;
+        public static final long NO_VERSION_AVAILABLE = Long.MIN_VALUE;
 
         /**
-         * Return the latest announced version.
-         *
-         * @return
+         * Returns the latest announced version.
          */
         public long getLatestVersion();
+
+
+        public boolean hasPinVersion();
 
         /**
          * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
