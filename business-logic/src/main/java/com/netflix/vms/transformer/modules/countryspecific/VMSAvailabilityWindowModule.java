@@ -193,12 +193,15 @@ public class VMSAvailabilityWindowModule {
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
-            // if multi-locale catalog processing, then check if title is in pre-promo phase.
+            // if multi-language catalog processing & isGoLive is false, then check if title is in pre-promo phase.
             boolean inPrePromotionPhase = false;
             if (!isGoLive && locale != null) {
+                // checking for all the contracts in the current window to determine if title is in pre-promo phase
                 for (long contractId : contractIds) {
                     ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true; // @TODO: This is a bit fishy - don't we need to check for contract window?
+                    // @TODO: This is a bit fishy - don't we need to check for contract window?. Follow up with Sampada to see how to correctly determine if a title is in pre-promo phase. Also, pre-promo is not country-language specific. This logic is on par with current logic for country specific catalogs.
+                    if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
+                        inPrePromotionPhase = true;
                 }
                 if (!isGoLive && inPrePromotionPhase)
                     ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
