@@ -51,9 +51,6 @@ public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
 
-    // @TODO: Should this be in TransformerConfig ???
-    private static final FastProperty.BooleanProperty ENABLE_LOCALE_PROMOTION = new FastProperty.BooleanProperty("netflix.vms.transformer.enable.prepromotion.multilocale", false);
-
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
@@ -248,7 +245,7 @@ public class VMSAvailabilityWindowModule {
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
                                     // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
-                                    if (ENABLE_LOCALE_PROMOTION.get()) {
+                                    if (ctx.getConfig().isPrePromoEnabledForMultiLanguageCatalog()) {
                                         ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                     } else {
                                         // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
@@ -278,12 +275,12 @@ public class VMSAvailabilityWindowModule {
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
                                     if (mustHaveSubs && !thisWindowFoundLocalText) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packgeId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
