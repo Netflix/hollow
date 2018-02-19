@@ -15,6 +15,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
@@ -119,8 +120,12 @@ public class SimpleTransformer {
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
 
         // print multiLanguageCatalog countries
-        Set<String> multiLanguageCatalogCountries = ctx.getOctoberSkyData().getMultiLanguageCatalogCountries();
-        ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {}", Arrays.toString(multiLanguageCatalogCountries.toArray()));
+        OctoberSkyData octoberSkyData = ctx.getOctoberSkyData();
+        Set<String> multiLanguageCatalogCountries = octoberSkyData.getMultiLanguageCatalogCountries();
+        ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {} out of all supported countries {}", multiLanguageCatalogCountries, octoberSkyData.getSupportedCountries());
+        for (String country : multiLanguageCatalogCountries) {
+            ctx.getLogger().info(MultiLocaleCountries, "Country {}: multi-language catalogs supported for locale={}", country, octoberSkyData.getCatalogLanguages(country));
+        }
 
         long startTime = System.currentTimeMillis();
 
