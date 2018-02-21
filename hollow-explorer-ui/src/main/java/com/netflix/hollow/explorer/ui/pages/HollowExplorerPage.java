@@ -17,26 +17,24 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.ui.HollowUISession;
-
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
-import java.io.Writer;
-import javax.servlet.http.HttpServletRequest;
+import com.netflix.hollow.ui.HollowUISession;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Writer;
 
 public abstract class HollowExplorerPage {
     
     protected final HollowExplorerUI ui;
     
-    protected final Template template;
-    protected final Template headerTemplate;
-    protected final Template footerTemplate;
+    private final Template headerTemplate;
+    private final Template footerTemplate;
 
     
-    public HollowExplorerPage(HollowExplorerUI ui, String templateName) {
+    public HollowExplorerPage(HollowExplorerUI ui) {
         this.ui = ui;
-        this.template = ui.getVelocityEngine().getTemplate(templateName);
         this.headerTemplate = ui.getVelocityEngine().getTemplate("explorer-header.vm");
         this.footerTemplate = ui.getVelocityEngine().getTemplate("explorer-footer.vm");
     }
@@ -55,10 +53,18 @@ public abstract class HollowExplorerPage {
         setUpContext(req, session, ctx);
 
         headerTemplate.merge(ctx, writer);
-        template.merge(ctx, writer);
+        renderPage(ctx, writer);
         footerTemplate.merge(ctx, writer);
     }
 
+    /**
+     * Renders the page to the provided Writer, using the provided VelocityContext.
+     */
+    protected abstract void renderPage(VelocityContext ctx, Writer writer);
+
+    /**
+     * Populates the provided VelocityContext.
+     */
     protected abstract void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx);
 
 }

@@ -25,17 +25,19 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.TypeOverview;
 import com.netflix.hollow.ui.HollowUISession;
+import org.apache.velocity.VelocityContext;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.velocity.VelocityContext;
 
 public class ShowAllTypesPage extends HollowExplorerPage {
 
     public ShowAllTypesPage(HollowExplorerUI ui) {
-        super(ui, "show-all-types.vm");
+        super(ui);
     }
 
     @Override
@@ -93,6 +95,11 @@ public class ShowAllTypesPage extends HollowExplorerPage {
         ctx.put("totalHeapFootprint", totalApproximateHeapFootprint(typeOverviews));
         ctx.put("typeOverviews", typeOverviews);
     }
+
+    @Override
+    protected void renderPage(VelocityContext ctx, Writer writer) {
+        ui.getVelocityEngine().getTemplate("show-all-types.vm").merge(ctx, writer);
+    }
     
     private String totalApproximateHeapFootprint(List<TypeOverview> allTypes) {
         long totalHeapFootprint = 0;
@@ -100,9 +107,4 @@ public class ShowAllTypesPage extends HollowExplorerPage {
             totalHeapFootprint += type.getApproxHeapFootprintLong();
         return TypeOverview.heapFootprintDisplayString(totalHeapFootprint);
     }
-    
-    
-    
-    
-
 }

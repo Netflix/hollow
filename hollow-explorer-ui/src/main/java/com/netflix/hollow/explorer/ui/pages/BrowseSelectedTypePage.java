@@ -32,16 +32,18 @@ import com.netflix.hollow.explorer.ui.model.TypeKey;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.ui.HollowUISession;
+import org.apache.velocity.VelocityContext;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.velocity.VelocityContext;
 
 public class BrowseSelectedTypePage extends HollowExplorerPage {
 
     public BrowseSelectedTypePage(HollowExplorerUI ui) {
-        super(ui, "browse-selected-type.vm");
+        super(ui);
     }
 
     @Override
@@ -137,6 +139,11 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ctx.put("key", key);
         ctx.put("ordinal", ordinal);
         ctx.put("display", displayFormat);
+    }
+
+    @Override
+    protected void renderPage(VelocityContext ctx, Writer writer) {
+        ui.getVelocityEngine().getTemplate("browse-selected-type.vm").merge(ctx, writer);
     }
 
     private void displayRecord(VelocityContext ctx, String displayFormat, HollowTypeReadState typeState, int ordinal) {
