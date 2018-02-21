@@ -97,7 +97,7 @@ public class ShowAllTypesPage extends HollowExplorerPage {
     }
 
     @Override
-    protected void renderPage(VelocityContext ctx, Writer writer) {
+    protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
         ui.getVelocityEngine().getTemplate("show-all-types.vm").merge(ctx, writer);
     }
     

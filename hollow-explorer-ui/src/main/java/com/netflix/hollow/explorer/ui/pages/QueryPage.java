@@ -84,7 +84,7 @@ public class QueryPage extends HollowExplorerPage {
     }
 
     @Override
-    protected void renderPage(VelocityContext ctx, Writer writer) {
+    protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
         ui.getVelocityEngine().getTemplate("query.vm").merge(ctx, writer);
     }
 }

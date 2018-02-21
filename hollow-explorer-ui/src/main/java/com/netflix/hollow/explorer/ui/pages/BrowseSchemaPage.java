@@ -55,7 +55,7 @@ public class BrowseSchemaPage extends HollowExplorerPage {
     }
 
     @Override
-    protected void renderPage(VelocityContext ctx, Writer writer) {
+    protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
         ui.getVelocityEngine().getTemplate("browse-schema.vm").merge(ctx, writer);
     }
     

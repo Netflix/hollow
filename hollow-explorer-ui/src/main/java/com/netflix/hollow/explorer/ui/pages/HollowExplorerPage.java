@@ -53,14 +53,14 @@ public abstract class HollowExplorerPage {
         setUpContext(req, session, ctx);
 
         headerTemplate.merge(ctx, writer);
-        renderPage(ctx, writer);
+        renderPage(req, ctx, writer);
         footerTemplate.merge(ctx, writer);
     }
 
     /**
      * Renders the page to the provided Writer, using the provided VelocityContext.
      */
-    protected abstract void renderPage(VelocityContext ctx, Writer writer);
+    protected abstract void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer);
 
     /**
      * Populates the provided VelocityContext.
