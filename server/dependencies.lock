@@ -617,7 +617,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -3001,7 +3001,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -4387,7 +4387,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -6771,7 +6771,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -8157,7 +8157,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -10541,7 +10541,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -12017,7 +12017,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -14426,7 +14426,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -17560,7 +17560,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -19944,7 +19944,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -21330,7 +21330,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -23714,7 +23714,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25106,7 +25106,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -27514,7 +27514,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -28887,7 +28887,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -28895,13 +28895,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -31342,7 +31342,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -32788,7 +32788,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -32796,13 +32796,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -35243,7 +35243,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -36689,7 +36689,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -36697,13 +36697,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -39144,7 +39144,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -40590,7 +40590,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -40598,13 +40598,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -43045,7 +43045,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -44491,7 +44491,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -44499,13 +44499,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -46946,7 +46946,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -48392,7 +48392,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -48400,13 +48400,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -50847,7 +50847,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -52293,7 +52293,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -52301,13 +52301,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -54748,7 +54748,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -56194,7 +56194,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-recipes",
@@ -56202,13 +56202,13 @@
             ]
         },
         "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.3",
+            "locked": "1.51.4",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -58649,7 +58649,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.255",
+            "locked": "100.0.256",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
