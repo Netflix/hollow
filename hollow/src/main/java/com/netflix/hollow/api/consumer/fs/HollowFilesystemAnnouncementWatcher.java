@@ -39,8 +39,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private final Logger log = Logger.getLogger(HollowFilesystemAnnouncementWatcher.class.getName());
 
-    private final Path publishDir;
-    private final Path announceFile;
+    private final Path publishPath;
+    private final Path announcePath;
 
     private final List<HollowConsumer> subscribedConsumers;
     private final ScheduledExecutorService executor;
@@ -49,7 +49,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private long latestVersion;
 
-    @Deprecated
+    // TODO: deprecate in Hollow 3.0.0
+    // @deprecated
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
         this(publishDir.toPath());
     }
@@ -82,14 +83,14 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     /**
-     * since 3.0.0
-     * @param publishDir
+     * since 2.12.0
+     * @param publishPath
      */
-    public HollowFilesystemAnnouncementWatcher(Path publishDir, ScheduledExecutorService executor) {
-        this.publishDir = publishDir;
+    public HollowFilesystemAnnouncementWatcher(Path publishPath, ScheduledExecutorService executor) {
+        this.publishPath = publishPath;
         this.executor = executor;
 
-        this.announceFile = this.publishDir.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
+        this.announcePath = this.publishPath.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
         this.subscribedConsumers = new CopyOnWriteArrayList<>();
         this.latestVersion = readLatestVersion();
 
@@ -115,9 +116,9 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
             @Override
             public void run() {
                 try {
-                    if (!Files.isReadable(announceFile)) return;
+                    if (!Files.isReadable(announcePath)) return;
 
-                    FileTime lastModifiedTime = getLastModifiedTime(announceFile);
+                    FileTime lastModifiedTime = getLastModifiedTime(announcePath);
                     if (lastModifiedTime.compareTo(previousFileTime) > 0) {
                         previousFileTime = lastModifiedTime;
 
@@ -146,10 +147,10 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     private long readLatestVersion() {
-        if (!Files.isReadable(announceFile))
+        if (!Files.isReadable(announcePath))
             return NO_ANNOUNCEMENT_AVAILABLE;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(announceFile.toFile()))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(announcePath.toFile()))) {
             return Long.parseLong(reader.readLine());
         } catch (IOException e) {
         	throw new RuntimeException(e);

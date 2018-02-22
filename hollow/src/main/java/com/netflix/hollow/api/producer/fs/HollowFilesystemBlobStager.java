@@ -65,7 +65,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
             if(!Files.exists(stagingPath))
                 Files.createDirectories(stagingPath);
         } catch (IOException e) {
-            throw new RuntimeException("Could not create folder: " + this.stagingPath.toString(), e);
+            throw new RuntimeException("Could not create folder; path=" + this.stagingPath, e);
         }
 
     }

@@ -30,7 +30,8 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     
     private final Path publishPath;
 
-    @Deprecated
+    // TODO: deprecate in Hollow 3.0.0
+    // @deprecated
     public HollowFilesystemAnnouncer(File publishDir) {
         this(publishDir.toPath());
     }

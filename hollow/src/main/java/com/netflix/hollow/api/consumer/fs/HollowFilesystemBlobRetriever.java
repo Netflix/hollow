@@ -33,8 +33,9 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final Path blobStorePath;
-    
-    @Deprecated
+
+    // TODO: deprecate in Hollow 3.0.0
+    // @deprecated
     public HollowFilesystemBlobRetriever(File blobStoreDir) {
         this(blobStoreDir.toPath());
     }

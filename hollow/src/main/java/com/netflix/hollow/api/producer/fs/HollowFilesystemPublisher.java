@@ -28,24 +28,25 @@ import java.nio.file.Paths;
 
 public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
-    private final Path blobStoreDir;
+    private final Path blobStorePath;
 
-    @Deprecated
+    // TODO: deprecate in Hollow 3.0.0
+    // @deprecated
     public HollowFilesystemPublisher(File blobStoreDir) {
         this(blobStoreDir.toPath());
     }
 
     /**
-     * @since 3.0.0
+     * @since 2.12.0
      */
-    public HollowFilesystemPublisher(Path blobStoreDir) {
-        this.blobStoreDir = blobStoreDir;
+    public HollowFilesystemPublisher(Path blobStorePath) {
+        this.blobStorePath = blobStorePath;
         try {
-            if(!Files.exists(this.blobStoreDir)){
-                Files.createDirectories(this.blobStoreDir);
+            if(!Files.exists(this.blobStorePath)){
+                Files.createDirectories(this.blobStorePath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Could not create folder for publisher", e);
+            throw new RuntimeException("Could not create folder for publisher; path=" + this.blobStorePath, e);
         }
     }
 
@@ -55,11 +56,11 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
         
         switch(blob.getType()) {
         case SNAPSHOT:
-            destination = Paths.get(blobStoreDir.toString(),  String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+            destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
         case REVERSE_DELTA:
-            destination = Paths.get(blobStoreDir.toString(),  String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+            destination = blobStorePath.resolve(String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
             break;
         }
             
