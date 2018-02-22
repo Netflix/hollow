@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -864,8 +865,13 @@ public class HollowProducer {
 
         public abstract void cleanup();
 
+        @Deprecated
         public File getFile() {
             throw new UnsupportedOperationException("File is not available");
+        }
+
+        public Path getPath() {
+            throw new UnsupportedOperationException("Path is not available");
         }
 
         public Type getType() {
