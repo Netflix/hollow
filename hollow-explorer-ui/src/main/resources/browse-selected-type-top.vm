@@ -14,7 +14,6 @@
  *     limitations under the License.
 *#
 
-
 #if($filteredByQuery)
 NOTE: Results are filtered by query <span style="font-family: monospace;">$filteredByQuery</span>.  <a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
 #end
@@ -38,7 +37,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
 			#end
 		</td>
-		#if($selectedRecordData)
+		#if($ordinal)
 			<td class="nav">
 				FORMAT: 
 				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
@@ -90,7 +89,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 						</form>
 					</td>
 				</tr>
-				#if($selectedRecordData)
+				#if($ordinal)
 					<tr valign=top>
 						<th align=right nowrap>Showing Record: </th>
 						<td id="recLink">
@@ -107,15 +106,4 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 					</th>
 					<td>
 						<div style="min-height:400px">
-							#if($selectedRecordData)
-								<pre>
-$selectedRecordData
-								</pre>
-							#end
-						</div>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-</table>
+							#if($ordinal)<pre>#end

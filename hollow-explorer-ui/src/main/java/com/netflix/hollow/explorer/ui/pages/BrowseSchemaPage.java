@@ -17,18 +17,19 @@
  */
 package com.netflix.hollow.explorer.ui.pages;
 
-import com.netflix.hollow.explorer.ui.model.SchemaDisplayField;
-
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.SchemaDisplay;
+import com.netflix.hollow.explorer.ui.model.SchemaDisplayField;
 import com.netflix.hollow.ui.HollowUISession;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Writer;
 
 public class BrowseSchemaPage extends HollowExplorerPage {
 
     public BrowseSchemaPage(HollowExplorerUI ui) {
-        super(ui, "browse-schema.vm");
+        super(ui);
     }
 
     @Override
@@ -52,6 +53,11 @@ public class BrowseSchemaPage extends HollowExplorerPage {
         ctx.put("schemaDisplay", schemaDisplay);
         ctx.put("type", type);
     }
+
+    @Override
+    protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
+        ui.getVelocityEngine().getTemplate("browse-schema.vm").merge(ctx, writer);
+    }
     
     private void expandOrCollapse(SchemaDisplay display, String fieldPaths[], int cursor, boolean isExpand) {
         if(display == null)
@@ -67,5 +73,4 @@ public class BrowseSchemaPage extends HollowExplorerPage {
                 expandOrCollapse(field.getReferencedType(), fieldPaths, cursor+1, isExpand);
         }
     }
-
 }
