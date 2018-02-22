@@ -31,7 +31,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     private final Path blobStorePath;
 
     // TODO: deprecate in Hollow 3.0.0
-    // @deprecated
+    // @Deprecated
     public HollowFilesystemPublisher(File blobStoreDir) {
         this(blobStoreDir.toPath());
     }

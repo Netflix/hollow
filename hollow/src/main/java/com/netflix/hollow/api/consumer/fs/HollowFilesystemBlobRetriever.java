@@ -35,7 +35,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     private final Path blobStorePath;
 
     // TODO: deprecate in Hollow 3.0.0
-    // @deprecated
+    // @Deprecated
     public HollowFilesystemBlobRetriever(File blobStoreDir) {
         this(blobStoreDir.toPath());
     }
@@ -79,7 +79,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
 
     @Override
     public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion) {
-        Path exactPath = Paths.get(blobStorePath.toString(), "snapshot-" + desiredVersion);
+        Path exactPath = blobStorePath.resolve("snapshot-" + desiredVersion);
 
         if(Files.exists(exactPath))
             return new FilesystemBlob(exactPath, desiredVersion);
@@ -123,7 +123,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                 String filename = path.getFileName().toString();
                 if(filename.startsWith("delta-" + currentVersion)) {
                     long destinationVersion = Long.parseLong(filename.substring(filename.lastIndexOf("-") + 1));
-                    return new FilesystemBlob(Paths.get(blobStorePath.toString(), filename), currentVersion, destinationVersion);
+                    return new FilesystemBlob(blobStorePath.resolve(filename), currentVersion, destinationVersion);
                 }
             }
         } catch(IOException ex) {

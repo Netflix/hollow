@@ -76,7 +76,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
      * @param stagingPath        directory to use to write hollow blob files.
      * @param compressor the {@link HollowProducer.BlobCompressor} to compress blob files with
      * @deprecated Use Path instead
-     * @since 3.0.0
+     * @since 2.12.0
      */
     @Deprecated
     public HollowFilesystemBlobStager(File stagingPath, BlobCompressor compressor) {
@@ -103,7 +103,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
         protected final Path path;
         private final BlobCompressor compressor;
         
-        private FilesystemBlob(long fromVersion, long toVersion, Type type, Path dir, BlobCompressor compressor) {
+        private FilesystemBlob(long fromVersion, long toVersion, Type type, Path dirPath, BlobCompressor compressor) {
             super(fromVersion, toVersion, type);
             
             this.compressor = compressor;
@@ -112,11 +112,11 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
             switch (type) {
                 case SNAPSHOT:
-                    this.path = Paths.get(dir.toString(), String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
+                    this.path = dirPath.resolve(String.format("%s-%d.%s", type.prefix, toVersion, Integer.toHexString(randomExtension)));
                     break;
                 case DELTA:
                 case REVERSE_DELTA:
-                    this.path = Paths.get(dir.toString(), String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
+                    this.path = dirPath.resolve(String.format("%s-%d-%d.%s", type.prefix, fromVersion, toVersion, Integer.toHexString(randomExtension)));
                     break;
                 default:
                     throw new IllegalStateException("unknown blob type, type=" + type);

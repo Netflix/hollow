@@ -50,7 +50,7 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     private long latestVersion;
 
     // TODO: deprecate in Hollow 3.0.0
-    // @deprecated
+    // @Deprecated
     public HollowFilesystemAnnouncementWatcher(File publishDir) {
         this(publishDir.toPath());
     }
