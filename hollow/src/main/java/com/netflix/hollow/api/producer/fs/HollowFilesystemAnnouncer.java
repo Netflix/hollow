@@ -28,7 +28,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     
     public static final String ANNOUNCEMENT_FILENAME = "announced.version";
     
-    private final Path publishDir;
+    private final Path publishPath;
 
     @Deprecated
     public HollowFilesystemAnnouncer(File publishDir) {
@@ -36,19 +36,19 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     }
 
     /**
-     * @since 3.0.0
+     * @since 2.12.0
      */
-    public HollowFilesystemAnnouncer(Path publishDir) {
-        this.publishDir = publishDir;
+    public HollowFilesystemAnnouncer(Path publishPath) {
+        this.publishPath = publishPath;
     }
 
     @Override
     public void announce(long stateVersion) {
-        Path announceFile = Paths.get(publishDir.toString(), ANNOUNCEMENT_FILENAME);
+        Path announcePath = publishPath.resolve(ANNOUNCEMENT_FILENAME);
         try {
-            Files.write(announceFile, String.valueOf(stateVersion).getBytes());
+            Files.write(announcePath, String.valueOf(stateVersion).getBytes());
         } catch(IOException ex) {
-            throw new RuntimeException("Unable to write to announcement file", ex);
+            throw new RuntimeException("Unable to write to announcement file; path=" + announcePath, ex);
         }
     }
 
