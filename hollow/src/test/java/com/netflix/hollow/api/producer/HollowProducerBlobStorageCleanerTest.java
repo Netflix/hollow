@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import com.netflix.hollow.api.producer.HollowIncrementalProducer.IncrementalPopulator;
+import com.netflix.hollow.api.producer.HollowIncrementalProducer.IncrementalWriteState;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStorageCleaner;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
@@ -64,23 +66,41 @@ public class HollowProducerBlobStorageCleanerTest {
         });
 
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
-        incrementalProducer.addOrModify(new TypeA(2, "two", 100));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(3, "three", 1000));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(4, "two", 100));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(5, "three", 1000));
-        incrementalProducer.runCycle();
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(2, "two", 100));
+            }
+        });
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(3, "three", 1000));
+            }
+        });
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(4, "two", 100));
+            }
+        });
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(5, "three", 1000));
+            }
+        });
 
         File[] files = listFiles(HollowProducer.Blob.Type.SNAPSHOT.prefix);
         List<String> fileNames = getFileNames(files);
         Assert.assertEquals(5, files.length);
 
-        incrementalProducer.addOrModify(new TypeA(6, "three", 1000));
-        incrementalProducer.runCycle();
-        incrementalProducer.addOrModify(new TypeA(7, "three", 1000));
-        incrementalProducer.runCycle();
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(6, "three", 1000));
+            }
+        });
+        incrementalProducer.runCycle(new IncrementalPopulator() {
+            public void populate(IncrementalWriteState newState) throws Exception {
+                newState.addOrModify(new TypeA(7, "three", 1000));
+            }
+        });
 
         File[] filesAfterCleanup = listFiles(HollowProducer.Blob.Type.SNAPSHOT.prefix);
         List<String> fileNamesAfterCleanup = getFileNames(filesAfterCleanup);
