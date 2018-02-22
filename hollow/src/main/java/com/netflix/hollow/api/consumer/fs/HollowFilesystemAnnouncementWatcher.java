@@ -55,12 +55,12 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     /**
-     * since 3.0.0
+     * since 2.12.0
      *
-     * @param publishDir
+     * @param publishPath
      */
-    public HollowFilesystemAnnouncementWatcher(Path publishDir) {
-        this(publishDir,
+    public HollowFilesystemAnnouncementWatcher(Path publishPath) {
+        this(publishPath,
                 newScheduledThreadPool(
                         1 /*corePoolSize*/,
                         new ThreadFactory() {
