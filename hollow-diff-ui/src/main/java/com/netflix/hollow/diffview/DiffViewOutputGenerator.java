@@ -17,11 +17,13 @@
  */
 package com.netflix.hollow.diffview;
 
+import com.netflix.hollow.diffview.effigy.HollowEffigy.Field;
 import com.netflix.hollow.ui.HollowUISession;
-import java.io.IOException;
-import java.io.Writer;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Writer;
 
 public class DiffViewOutputGenerator {
 
@@ -161,10 +163,8 @@ public class DiffViewOutputGenerator {
             return unpopulatedContent(moreRows);
 
         String fieldName = row.getFieldPair().getFrom().getFieldName();
-        String fieldValue = row.getFieldPair().isLeafNode() ?
-                row.getFieldPair().getFrom().getValue() == null ? "null" : row.getFieldPair().getFrom().getValue().toString().replace("|", "&#x2502")
-                : "(" + row.getFieldPair().getFrom().getTypeName() + ")";
-        return populatedContent(moreRows, row.getIndentation(), row.getFieldPair().isLeafNode(), fieldName, fieldValue);
+        return populatedContent(moreRows, row.getIndentation(),
+            row.getFieldPair().isLeafNode(), fieldName, getFieldValue(row, true));
     }
 
     private static String toContent(HollowDiffViewRow row) {
@@ -176,10 +176,24 @@ public class DiffViewOutputGenerator {
             return unpopulatedContent(moreRows);
 
         String fieldName = row.getFieldPair().getTo().getFieldName();
-        String fieldValue = row.getFieldPair().isLeafNode() ?
-                row.getFieldPair().getTo().getValue() == null ? "null" : row.getFieldPair().getTo().getValue().toString().replace("|", "&#x2502")
-                : "(" + row.getFieldPair().getTo().getTypeName() + ")";
-        return populatedContent(moreRows, row.getIndentation(), row.getFieldPair().isLeafNode(), fieldName, fieldValue);
+        return populatedContent(moreRows, row.getIndentation(), row.getFieldPair().isLeafNode(), fieldName,
+            getFieldValue(row, false));
+    }
+
+    /**
+     * Returns a String representation of the provided row's field value. If `useFrom` is
+     * true, this will use the `from` value from the pair, otherwise this will use the
+     * `to` value.
+     */
+    private static String getFieldValue(HollowDiffViewRow row, boolean useFrom) {
+        Field field = useFrom ? row.getFieldPair().getFrom() : row.getFieldPair().getTo();
+        if (row.getFieldPair().isLeafNode()) {
+          return field.getValue() == null ? "null"
+              : field.getValue().toString().replace("|", "&#x2502");
+        } else {
+            String suffix = field.getValue() == null ? " [null]" : "";
+            return "(" + field.getTypeName() + ")" + suffix;
+        }
     }
 
     private static String unpopulatedContent(boolean moreRows[]) {
