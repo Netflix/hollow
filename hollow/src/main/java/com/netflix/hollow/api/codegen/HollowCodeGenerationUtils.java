@@ -50,11 +50,12 @@ public class HollowCodeGenerationUtils {
     private static final Map<String,String> AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS = new HashMap<String,String>();
 
     static {
-        for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class)) {
+        for(Class<?> clzz : Arrays.asList(Boolean.class, Integer.class, Long.class, Float.class, Double.class, String.class, Byte.class)) {
             PRIMITIVE_TYPES.add(clzz.getSimpleName());
         }
 
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("String", "HString");
+        DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Byte", "HByte");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Integer", "HInteger");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Long", "HLong");
         DEFAULT_CLASS_NAME_SUBSTITUTIONS.put("Float", "HFloat");

@@ -16,6 +16,7 @@
 package com.netflix.hollow.api.consumer;
 
 import com.netflix.hollow.core.type.HBoolean;
+import com.netflix.hollow.core.type.HByte;
 import com.netflix.hollow.core.type.HDouble;
 import com.netflix.hollow.core.type.HFloat;
 import com.netflix.hollow.core.type.HInteger;
@@ -29,6 +30,12 @@ public interface HollowConsumerAPI {
         public Collection<HBoolean> getAllHBoolean();
 
         public HBoolean getHBoolean(int ordinal);
+    }
+
+    public interface ByteRetriever {
+        public Collection<HByte> getAllHByte();
+
+        public HByte getHByte(int ordinal);
     }
 
     public interface DoubleRetriever {

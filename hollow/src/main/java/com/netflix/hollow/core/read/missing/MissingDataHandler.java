@@ -36,6 +36,8 @@ public interface MissingDataHandler {
 
     public int handleReferencedOrdinal(String type, int ordinal, String field);
 
+    public byte handleByte(String type, int ordinal, String field);
+
     public int handleInt(String type, int ordinal, String field);
 
     public long handleLong(String type, int ordinal, String field);
