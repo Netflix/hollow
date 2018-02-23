@@ -18,6 +18,9 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 
@@ -33,6 +36,7 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     protected Set<String> parameterizedTypes = Collections.emptySet();
     protected boolean parameterizeAllClassnames = false;
     protected boolean useErgonomicShortcuts = false;
+    protected Path destinationPath;
 
     protected CodeGeneratorConfig config = new CodeGeneratorConfig();
 
@@ -125,6 +129,15 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
 
     public B withVerboseToString(boolean useVerboseToString) {
         config.setUseVerboseToString(useVerboseToString);
+        return getBuilder();
+    }
+
+    public B withDestination(String destinationPath) {
+        return withDestination(Paths.get(destinationPath));
+    }
+
+    public B withDestination(Path destinationPath) {
+        this.destinationPath = destinationPath;
         return getBuilder();
     }
 
