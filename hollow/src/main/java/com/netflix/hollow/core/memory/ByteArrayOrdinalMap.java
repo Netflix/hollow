@@ -433,7 +433,7 @@ public class ByteArrayOrdinalMap {
        populateNewHashArray(newKeys, valuesToAdd);
 
        /// 70% load factor
-       sizeBeforeGrow = (newKeys.length() * 7) / 10;
+       sizeBeforeGrow = (int)(((float)newKeys.length()) * 0.7);
        pointersAndOrdinals = newKeys;
    }
 
