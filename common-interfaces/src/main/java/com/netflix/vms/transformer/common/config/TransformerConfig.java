@@ -171,7 +171,7 @@ public interface TransformerConfig {
     @DefaultValue("50s")
     String getElasticSearchSamplerIntervalInSeconds();
 
-    @DefaultValue("25000")
+    @DefaultValue("50000")
     int getElasticSearchMaxQueueSize();
 
     @DefaultValue("6")
