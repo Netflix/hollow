@@ -45,6 +45,8 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 
@@ -57,6 +59,7 @@ import java.util.Set;
 public class HollowAPIGenerator {
     protected final String apiClassname;
     protected final String packageName;
+    protected final Path destinationPath;
     protected final HollowDataset dataset;
     protected final Set<String> parameterizedTypes;
     protected final boolean parameterizeClassNames;
@@ -69,6 +72,8 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
+     *
+     * @deprecated use {@link #HollowAPIGenerator(String, String, HollowDataset, Path)} and use {@link #generateSourceFiles()}
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset) {
         this(apiClassname, packageName, dataset, Collections.<String>emptySet(), false, false);
@@ -78,8 +83,20 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
+     * @param destinationPath the directory under which the source files will be generated
+     */
+    public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Path destinationPath) {
+        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), false, false, destinationPath);
+    }
+
+    /**
+     * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
+     * @param packageName the package name under which all generated classes will be placed
+     * @param dataset a HollowStateEngine containing the schemas which define the data model.
      * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when
      *                               alternate implementations are desired for some types.
+     *
+     * @deprecated use {@link #HollowAPIGenerator(String, String, HollowDataset, boolean, Path)} and use {@link #generateSourceFiles()}
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, boolean parameterizeAllClassNames) {
         this(apiClassname, packageName, dataset, Collections.<String>emptySet(), parameterizeAllClassNames, false);
@@ -89,14 +106,57 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
+     * @param parameterizeAllClassNames if true, all methods which return a Hollow Object will be parameterized.  This is useful when
+     *                               alternate implementations are desired for some types.
+     * @param destinationPath the directory under which the source files will be generated
+     */
+    public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, boolean parameterizeAllClassNames, Path destinationPath) {
+        this(apiClassname, packageName, dataset, Collections.<String>emptySet(), parameterizeAllClassNames, false, destinationPath);
+    }
+
+    /**
+     * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
+     * @param packageName the package name under which all generated classes will be placed
+     * @param dataset a HollowStateEngine containing the schemas which define the data model.
      * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when
      *                               alternate implementations are desired for some types.
+     *
+     * @deprecated use {@link #HollowAPIGenerator(String, String, HollowDataset, Set, Path)} and use {@link #generateSourceFiles()}
      */
     public HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizeSpecificTypeNames) {
         this(apiClassname, packageName, dataset, parameterizeSpecificTypeNames, false, false);
     }
 
+    /**
+     * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
+     * @param packageName the package name under which all generated classes will be placed
+     * @param dataset a HollowStateEngine containing the schemas which define the data model.
+     * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when
+     *                               alternate implementations are desired for some types.
+     * @param destinationPath the directory under which the source files will be generated
+     */
+    public HollowAPIGenerator(String apiClassname,
+                              String packageName,
+                              HollowDataset dataset,
+                              Set<String> parameterizedTypes,
+                              Path destinationPath) {
+        this(apiClassname, packageName, dataset, parameterizedTypes, false, false, destinationPath);
+    }
+
+    /**
+     * @deprecated construct with a {@code destinationPath} and use {@link #generateSourceFiles()}
+     */
     protected HollowAPIGenerator(String apiClassname, String packageName, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeAllClassNames, boolean useErgonomicShortcuts) {
+        this(apiClassname, packageName, dataset, parameterizedTypes, false, false, null);
+    }
+
+    protected HollowAPIGenerator(String apiClassname,
+                                 String packageName,
+                                 HollowDataset dataset,
+                                 Set<String> parameterizedTypes,
+                                 boolean parameterizeAllClassNames,
+                                 boolean useErgonomicShortcuts,
+                                 Path destinationPath) {
         this.apiClassname = apiClassname;
         this.packageName = packageName;
         this.dataset = dataset;
@@ -104,6 +164,14 @@ public class HollowAPIGenerator {
         this.parameterizedTypes = parameterizedTypes;
         this.parameterizeClassNames = parameterizeAllClassNames;
         this.ergonomicShortcuts = useErgonomicShortcuts ? new HollowErgonomicAPIShortcuts(dataset) : HollowErgonomicAPIShortcuts.NO_SHORTCUTS;
+
+        if (destinationPath != null && packageName != null && !packageName.trim().isEmpty()) {
+            Path packagePath = Paths.get(packageName.replace(".", File.separator));
+            if (!destinationPath.toAbsolutePath().endsWith(packagePath)) {
+                destinationPath = destinationPath.resolve(packagePath);
+            }
+        }
+        this.destinationPath = destinationPath;
     }
 
     /**
@@ -196,7 +264,16 @@ public class HollowAPIGenerator {
     }
 
     /**
+     * Generate all files under {@code destinationPath}
+     */
+    public void generateSourceFiles() throws IOException {
+        generateFiles(destinationPath.toFile());
+    }
+
+    /**
      * Generate files under the specified directory
+     *
+     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFiles()}
      */
     public void generateFiles(String directory) throws IOException {
         generateFiles(new File(directory));
@@ -204,6 +281,8 @@ public class HollowAPIGenerator {
 
     /**
      * Generate files under the specified directory
+     *
+     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFiles()}
      */
     public void generateFiles(File directory) throws IOException {
         if (packageName != null && !packageName.trim().isEmpty()) {
@@ -227,7 +306,16 @@ public class HollowAPIGenerator {
     }
 
     /**
+     * Generate files based on dataset schemas under {@code destinationPath}
+     */
+    protected void generateSourceFilesForHollowSchemas() throws IOException {
+        this.generateFilesForHollowSchemas(destinationPath.toFile());
+    }
+
+    /**
      * Generate files based on dataset schemas under the specified directory
+     *
+     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFilesForHollowSchemas(HollowJavaFileGenerator)}
      */
     protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
@@ -255,6 +343,13 @@ public class HollowAPIGenerator {
         }
     }
 
+    protected void generateSourceFile(HollowJavaFileGenerator generator) throws IOException {
+        this.generateFile(destinationPath.toFile(), generator);
+    }
+
+    /**
+     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFile(HollowJavaFileGenerator)}
+     */
     protected void generateFile(File directory, HollowJavaFileGenerator generator) throws IOException {
         // create sub folder if not using default package and sub packages are enabled
         if ((packageName!=null && !packageName.trim().isEmpty()) && config.isUsePackageGrouping() && (generator instanceof HollowConsumerJavaFileGenerator)) {
