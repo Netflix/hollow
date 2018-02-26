@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoTypePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoTypeHollow> {
 
     public VideoTypePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public VideoTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoType")).getPrimaryKey().getFieldPaths());
+    public VideoTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoType")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoTypePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public VideoTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "VideoType", isListenToDataRefresh, fieldPaths);
+    public VideoTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "VideoType", isListenToDataRefreah, fieldPaths);
     }
 
     public VideoTypeHollow findMatch(Object... keys) {

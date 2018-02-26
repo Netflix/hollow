@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class StringPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, StringHollow> {
 
     public StringPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public StringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("String")).getPrimaryKey().getFieldPaths());
+    public StringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("String")).getPrimaryKey().getFieldPaths());
     }
 
     public StringPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public StringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "String", isListenToDataRefresh, fieldPaths);
+    public StringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "String", isListenToDataRefreah, fieldPaths);
     }
 
     public StringHollow findMatch(Object... keys) {

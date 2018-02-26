@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoDateWindowPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoDateWindowHollow> {
 
     public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoDateWindow")).getPrimaryKey().getFieldPaths());
+    public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoDateWindow")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "VideoDateWindow", isListenToDataRefresh, fieldPaths);
+    public VideoDateWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "VideoDateWindow", isListenToDataRefreah, fieldPaths);
     }
 
     public VideoDateWindowHollow findMatch(Object... keys) {

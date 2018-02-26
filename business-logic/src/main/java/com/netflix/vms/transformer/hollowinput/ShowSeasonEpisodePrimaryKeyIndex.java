@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ShowSeasonEpisodePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ShowSeasonEpisodeHollow> {
 
     public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowSeasonEpisode")).getPrimaryKey().getFieldPaths());
+    public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowSeasonEpisode")).getPrimaryKey().getFieldPaths());
     }
 
     public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "ShowSeasonEpisode", isListenToDataRefresh, fieldPaths);
+    public ShowSeasonEpisodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "ShowSeasonEpisode", isListenToDataRefreah, fieldPaths);
     }
 
     public ShowSeasonEpisodeHollow findMatch(Object... keys) {

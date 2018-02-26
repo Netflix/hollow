@@ -130,10 +130,10 @@ public class VMSAvailabilityWindowModule {
             Set<String> dubsRequirement = new HashSet<>();
             Set<String> localizedDataRequirement = new HashSet<>();
 
-            if (flags._getSubsRequiredLanguages() != null)
-                subsRequirement = flags._getSubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            if (flags._getDubsRequiredLanguages() != null)
-                dubsRequirement = flags._getDubsRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getTextRequiredLanguages() != null)
+                subsRequirement = flags._getTextRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getAudioRequiredLanguages() != null)
+                dubsRequirement = flags._getAudioRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
             if (flags._getLocalizationRequiredLanguages() != null)
                 localizedDataRequirement = flags._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
 

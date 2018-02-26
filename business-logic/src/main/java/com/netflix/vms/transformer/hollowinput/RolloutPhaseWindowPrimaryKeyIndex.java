@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class RolloutPhaseWindowPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RolloutPhaseWindowHollow> {
 
     public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseWindow")).getPrimaryKey().getFieldPaths());
+    public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseWindow")).getPrimaryKey().getFieldPaths());
     }
 
     public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "RolloutPhaseWindow", isListenToDataRefresh, fieldPaths);
+    public RolloutPhaseWindowPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "RolloutPhaseWindow", isListenToDataRefreah, fieldPaths);
     }
 
     public RolloutPhaseWindowHollow findMatch(Object... keys) {

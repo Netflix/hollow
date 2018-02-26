@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TerritoryCountriesPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TerritoryCountriesHollow> {
 
     public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TerritoryCountries")).getPrimaryKey().getFieldPaths());
+    public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TerritoryCountries")).getPrimaryKey().getFieldPaths());
     }
 
     public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "TerritoryCountries", isListenToDataRefresh, fieldPaths);
+    public TerritoryCountriesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "TerritoryCountries", isListenToDataRefreah, fieldPaths);
     }
 
     public TerritoryCountriesHollow findMatch(Object... keys) {

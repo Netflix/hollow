@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class AwardsPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, AwardsHollow> {
 
     public AwardsPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public AwardsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Awards")).getPrimaryKey().getFieldPaths());
+    public AwardsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Awards")).getPrimaryKey().getFieldPaths());
     }
 
     public AwardsPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public AwardsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "Awards", isListenToDataRefresh, fieldPaths);
+    public AwardsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "Awards", isListenToDataRefreah, fieldPaths);
     }
 
     public AwardsHollow findMatch(Object... keys) {

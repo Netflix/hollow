@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class PersonCharacterResourcePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, PersonCharacterResourceHollow> {
 
     public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonCharacterResource")).getPrimaryKey().getFieldPaths());
+    public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonCharacterResource")).getPrimaryKey().getFieldPaths());
     }
 
     public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "PersonCharacterResource", isListenToDataRefresh, fieldPaths);
+    public PersonCharacterResourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "PersonCharacterResource", isListenToDataRefreah, fieldPaths);
     }
 
     public PersonCharacterResourceHollow findMatch(Object... keys) {

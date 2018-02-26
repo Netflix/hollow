@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoGeneralEpisodeTypePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoGeneralEpisodeTypeHollow> {
 
     public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoGeneralEpisodeType")).getPrimaryKey().getFieldPaths());
+    public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoGeneralEpisodeType")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "VideoGeneralEpisodeType", isListenToDataRefresh, fieldPaths);
+    public VideoGeneralEpisodeTypePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "VideoGeneralEpisodeType", isListenToDataRefreah, fieldPaths);
     }
 
     public VideoGeneralEpisodeTypeHollow findMatch(Object... keys) {

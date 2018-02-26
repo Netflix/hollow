@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class PersonArtworkSourcePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, PersonArtworkSourceHollow> {
 
     public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonArtworkSource")).getPrimaryKey().getFieldPaths());
+    public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PersonArtworkSource")).getPrimaryKey().getFieldPaths());
     }
 
     public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "PersonArtworkSource", isListenToDataRefresh, fieldPaths);
+    public PersonArtworkSourcePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "PersonArtworkSource", isListenToDataRefreah, fieldPaths);
     }
 
     public PersonArtworkSourceHollow findMatch(Object... keys) {

@@ -30,8 +30,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final Boolean removeFromWebsiteOverride;
     private final int requiredLangsOrdinal;
     private final Boolean searchOnlyOverride;
-    private final int subsRequiredLanguagesOrdinal;
-    private final int dubsRequiredLanguagesOrdinal;
+    private final int textRequiredLanguagesOrdinal;
+    private final int audioRequiredLanguagesOrdinal;
     private final int localizationRequiredLanguagesOrdinal;
     private FlagsTypeAPI typeAPI;
 
@@ -57,8 +57,8 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         this.removeFromWebsiteOverride = typeAPI.getRemoveFromWebsiteOverrideBoxed(ordinal);
         this.requiredLangsOrdinal = typeAPI.getRequiredLangsOrdinal(ordinal);
         this.searchOnlyOverride = typeAPI.getSearchOnlyOverrideBoxed(ordinal);
-        this.subsRequiredLanguagesOrdinal = typeAPI.getSubsRequiredLanguagesOrdinal(ordinal);
-        this.dubsRequiredLanguagesOrdinal = typeAPI.getDubsRequiredLanguagesOrdinal(ordinal);
+        this.textRequiredLanguagesOrdinal = typeAPI.getTextRequiredLanguagesOrdinal(ordinal);
+        this.audioRequiredLanguagesOrdinal = typeAPI.getAudioRequiredLanguagesOrdinal(ordinal);
         this.localizationRequiredLanguagesOrdinal = typeAPI.getLocalizationRequiredLanguagesOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
@@ -237,12 +237,12 @@ public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         return searchOnlyOverride;
     }
 
-    public int getSubsRequiredLanguagesOrdinal(int ordinal) {
-        return subsRequiredLanguagesOrdinal;
+    public int getTextRequiredLanguagesOrdinal(int ordinal) {
+        return textRequiredLanguagesOrdinal;
     }
 
-    public int getDubsRequiredLanguagesOrdinal(int ordinal) {
-        return dubsRequiredLanguagesOrdinal;
+    public int getAudioRequiredLanguagesOrdinal(int ordinal) {
+        return audioRequiredLanguagesOrdinal;
     }
 
     public int getLocalizationRequiredLanguagesOrdinal(int ordinal) {

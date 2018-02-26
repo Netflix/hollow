@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class IndividualSupplementalPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, IndividualSupplementalHollow> {
 
     public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IndividualSupplemental")).getPrimaryKey().getFieldPaths());
+    public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IndividualSupplemental")).getPrimaryKey().getFieldPaths());
     }
 
     public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "IndividualSupplemental", isListenToDataRefresh, fieldPaths);
+    public IndividualSupplementalPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "IndividualSupplemental", isListenToDataRefreah, fieldPaths);
     }
 
     public IndividualSupplementalHollow findMatch(Object... keys) {

@@ -31,8 +31,8 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "removeFromWebsiteOverride",
             "requiredLangs",
             "searchOnlyOverride",
-            "subsRequiredLanguages",
-            "dubsRequiredLanguages",
+            "textRequiredLanguages",
+            "audioRequiredLanguages",
             "localizationRequiredLanguages"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
@@ -308,23 +308,23 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getSubsRequiredLanguagesOrdinal(int ordinal) {
+    public int getTextRequiredLanguagesOrdinal(int ordinal) {
         if(fieldIndex[21] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "subsRequiredLanguages");
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "textRequiredLanguages");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[21]);
     }
 
-    public SetOfStringTypeAPI getSubsRequiredLanguagesTypeAPI() {
+    public SetOfStringTypeAPI getTextRequiredLanguagesTypeAPI() {
         return getAPI().getSetOfStringTypeAPI();
     }
 
-    public int getDubsRequiredLanguagesOrdinal(int ordinal) {
+    public int getAudioRequiredLanguagesOrdinal(int ordinal) {
         if(fieldIndex[22] == -1)
-            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "dubsRequiredLanguages");
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "audioRequiredLanguages");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[22]);
     }
 
-    public SetOfStringTypeAPI getDubsRequiredLanguagesTypeAPI() {
+    public SetOfStringTypeAPI getAudioRequiredLanguagesTypeAPI() {
         return getAPI().getSetOfStringTypeAPI();
     }
 

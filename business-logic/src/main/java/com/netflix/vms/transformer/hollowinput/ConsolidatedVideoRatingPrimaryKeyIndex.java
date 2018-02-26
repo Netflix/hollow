@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ConsolidatedVideoRatingPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ConsolidatedVideoRatingHollow> {
 
     public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedVideoRating")).getPrimaryKey().getFieldPaths());
+    public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedVideoRating")).getPrimaryKey().getFieldPaths());
     }
 
     public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "ConsolidatedVideoRating", isListenToDataRefresh, fieldPaths);
+    public ConsolidatedVideoRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "ConsolidatedVideoRating", isListenToDataRefreah, fieldPaths);
     }
 
     public ConsolidatedVideoRatingHollow findMatch(Object... keys) {

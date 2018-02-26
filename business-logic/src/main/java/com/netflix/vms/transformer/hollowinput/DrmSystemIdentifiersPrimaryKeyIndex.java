@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DrmSystemIdentifiersPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DrmSystemIdentifiersHollow> {
 
     public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmSystemIdentifiers")).getPrimaryKey().getFieldPaths());
+    public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmSystemIdentifiers")).getPrimaryKey().getFieldPaths());
     }
 
     public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "DrmSystemIdentifiers", isListenToDataRefresh, fieldPaths);
+    public DrmSystemIdentifiersPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "DrmSystemIdentifiers", isListenToDataRefreah, fieldPaths);
     }
 
     public DrmSystemIdentifiersHollow findMatch(Object... keys) {

@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class RolloutPhaseLocalizedMetadataPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RolloutPhaseLocalizedMetadataHollow> {
 
     public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseLocalizedMetadata")).getPrimaryKey().getFieldPaths());
+    public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseLocalizedMetadata")).getPrimaryKey().getFieldPaths());
     }
 
     public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "RolloutPhaseLocalizedMetadata", isListenToDataRefresh, fieldPaths);
+    public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "RolloutPhaseLocalizedMetadata", isListenToDataRefreah, fieldPaths);
     }
 
     public RolloutPhaseLocalizedMetadataHollow findMatch(Object... keys) {

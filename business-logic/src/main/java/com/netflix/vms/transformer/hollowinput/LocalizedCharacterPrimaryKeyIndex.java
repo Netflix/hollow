@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class LocalizedCharacterPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, LocalizedCharacterHollow> {
 
     public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, true);    }
+        this(consumer, false);    }
 
-    public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
-        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocalizedCharacter")).getPrimaryKey().getFieldPaths());
+    public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocalizedCharacter")).getPrimaryKey().getFieldPaths());
     }
 
     public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
-        super(consumer, "LocalizedCharacter", isListenToDataRefresh, fieldPaths);
+    public LocalizedCharacterPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
+        super(consumer, "LocalizedCharacter", isListenToDataRefreah, fieldPaths);
     }
 
     public LocalizedCharacterHollow findMatch(Object... keys) {
