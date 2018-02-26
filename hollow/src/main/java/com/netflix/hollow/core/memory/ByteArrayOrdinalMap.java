@@ -413,6 +413,12 @@ public class ByteArrayOrdinalMap {
     * Grow the key array.  All of the values in the current array must be re-hashed and added to the new array.
     */
    private void growKeyArray() {
+       int newSize = pointersAndOrdinals.length() * 2;
+       if (newSize < 0) {
+           throw new IllegalStateException("New size computed to grow the underlying array for the map is negative. " +
+                   "This is most likely due to the total number of keys added to map has exceeded the max capacity of the keys map can hold. " +
+                   "Current array size :" + pointersAndOrdinals.length() + " and size to grow :" + newSize);
+       }
        AtomicLongArray newKeys = emptyKeyArray(pointersAndOrdinals.length() * 2);
 
        long valuesToAdd[] = new long[size];
