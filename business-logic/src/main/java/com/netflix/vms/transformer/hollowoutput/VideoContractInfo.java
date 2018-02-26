@@ -9,11 +9,13 @@ public class VideoContractInfo implements Cloneable {
     public int primaryPackageId = java.lang.Integer.MIN_VALUE;
     public int prePromotionDays = java.lang.Integer.MIN_VALUE;
     public int postPromotionDays = java.lang.Integer.MIN_VALUE;
+    public boolean isDayOfBroadcast = false;
     public boolean isDayAfterBroadcast = false;
     public boolean hasRollingEpisodes = false;
     public LinkedHashSetOfStrings cupTokens = null;
     public Set<Strings> assetBcp47Codes = null;
 
+    @Override
     public boolean equals(Object other) {
         if(other == this)  return true;
         if(!(other instanceof VideoContractInfo))
@@ -25,6 +27,7 @@ public class VideoContractInfo implements Cloneable {
         if(o.primaryPackageId != primaryPackageId) return false;
         if(o.prePromotionDays != prePromotionDays) return false;
         if(o.postPromotionDays != postPromotionDays) return false;
+        if (o.isDayOfBroadcast != isDayOfBroadcast) return false;
         if(o.isDayAfterBroadcast != isDayAfterBroadcast) return false;
         if(o.hasRollingEpisodes != hasRollingEpisodes) return false;
         if(o.cupTokens == null) {
@@ -36,6 +39,7 @@ public class VideoContractInfo implements Cloneable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int hashCode = 1;
         hashCode = hashCode * 31 + contractId;
@@ -43,6 +47,7 @@ public class VideoContractInfo implements Cloneable {
         hashCode = hashCode * 31 + primaryPackageId;
         hashCode = hashCode * 31 + prePromotionDays;
         hashCode = hashCode * 31 + postPromotionDays;
+        hashCode = hashCode * 31 + (isDayOfBroadcast ? 1231 : 1237);
         hashCode = hashCode * 31 + (isDayAfterBroadcast? 1231 : 1237);
         hashCode = hashCode * 31 + (hasRollingEpisodes? 1231 : 1237);
         hashCode = hashCode * 31 + (cupTokens == null ? 1237 : cupTokens.hashCode());
@@ -50,6 +55,7 @@ public class VideoContractInfo implements Cloneable {
         return hashCode;
     }
 
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("VideoContractInfo{");
         builder.append("contractId=").append(contractId);
@@ -57,6 +63,7 @@ public class VideoContractInfo implements Cloneable {
         builder.append(",primaryPackageId=").append(primaryPackageId);
         builder.append(",prePromotionDays=").append(prePromotionDays);
         builder.append(",postPromotionDays=").append(postPromotionDays);
+        builder.append(",isDayOfBroadcast=").append(isDayOfBroadcast);
         builder.append(",isDayAfterBroadcast=").append(isDayAfterBroadcast);
         builder.append(",hasRollingEpisodes=").append(hasRollingEpisodes);
         builder.append(",cupTokens=").append(cupTokens);
@@ -65,6 +72,7 @@ public class VideoContractInfo implements Cloneable {
         return builder.toString();
     }
 
+    @Override
     public VideoContractInfo clone() {
         try {
             VideoContractInfo clone = (VideoContractInfo)super.clone();

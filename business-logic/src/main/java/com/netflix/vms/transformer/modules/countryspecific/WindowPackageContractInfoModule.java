@@ -18,7 +18,6 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
-
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -50,8 +49,8 @@ public class WindowPackageContractInfoModule {
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(PackageData packageData, RightsWindowContractHollow windowContractHollow, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
-        
-        
+
+
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
@@ -74,9 +73,9 @@ public class WindowPackageContractInfoModule {
         if(this.ctx.getConfig().isTimecodeAnnotationFeedEnabled()) {
             int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
             if(ordinal != -1)
-              inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));        	
+              inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));
         }
-        
+
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
@@ -106,8 +105,9 @@ public class WindowPackageContractInfoModule {
         if (contract != null) {
             if (contract._getPrePromotionDays() != Long.MIN_VALUE)
                 info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
+            info.videoContractInfo.isDayOfBroadcast = contract._getDayOfBroadcast();
             info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
-            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast();
+            info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast(); // NOTE: DAB and hasRollingEpisodes means the same
             info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(new Strings(contract._getCupToken()._getValue())));
         } else {
             info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.emptyList());

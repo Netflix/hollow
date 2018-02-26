@@ -1,17 +1,21 @@
 package com.netflix.vms.transformer.octobersky;
 
-import com.netflix.launch.common.Catalog;
-import java.util.HashMap;
-import java.util.Map;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
-import java.util.HashSet;
-import com.netflix.launch.common.NamespaceLaunchConfiguration;
-import com.netflix.launch.common.Country;
-import com.netflix.launch.common.LaunchConfiguration;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import java.util.Set;
+import com.netflix.launch.common.Catalog;
+import com.netflix.launch.common.Country;
+import com.netflix.launch.common.LaunchConfiguration;
+import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OctoberSkyDataImpl implements OctoberSkyData {
@@ -21,7 +25,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
 
     private final LaunchConfiguration octoberSky;
     private final TransformerConfig config;
-    
+
     private Set<String> supportedCountries;
     private Map<String, Set<String>> multilanguageCountryCatalogLocales;
 
@@ -36,12 +40,18 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     public Set<String> getSupportedCountries() {
         return supportedCountries;
     }
-    
+
     @Override
     public Set<String> getCatalogLanguages(String country) {
         return multilanguageCountryCatalogLocales.get(country);
     }
-    
+
+    @Override
+    public Set<String> getMultiLanguageCatalogCountries() {
+        return multilanguageCountryCatalogLocales.keySet();
+    }
+
+    // refresh is called every cycle begin, so each cycle has a consistent view of data
     @Override
     public void refresh() {
         this.supportedCountries = findCountriesWithMinMetadata(octoberSky);
@@ -60,19 +70,26 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         }
         return minMetadataCountries;
     }
-    
+
     private static Map<String, Set<String>> findMultilanguageCountryCatalogLocales(TransformerConfig config, LaunchConfiguration octoberSky) {
-        String multilangCountries[] = config.getMultilanguageCatalogCountries().split(",");
+
+        // use default october sky namespace to check for countries that uses multi-lingual catalogs
+        List<String> countries;
+        if (config.isUseOctoberSkyForMultiLanguageCatalogCountries()) {
+            countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+        } else {
+            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(",")).collect(Collectors.toList());
+        }
+
         Map<String, Set<String>> multilanguageCountryCatalogLocales = new HashMap<>();
-        NamespaceLaunchConfiguration beehiveNamespace = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
-        
-        for(String country : multilangCountries) {
-            Country octoberSkyCountry = beehiveNamespace.getCountry(country);
-            for(Catalog catalog : octoberSkyCountry.getCatalogs()) {
-                
-                if(catalog.hasLanguage()) {
+
+        for (String country : countries) {
+            Country octoberSkyCountry = octoberSky.getCountry(country);
+            for (Catalog catalog : octoberSkyCountry.getCatalogs()) {
+
+                if (catalog.hasLanguage()) {
                     Set<String> set = multilanguageCountryCatalogLocales.get(country);
-                    if(set == null) {
+                    if (set == null) {
                         set = new HashSet<>();
                         multilanguageCountryCatalogLocales.put(country, set);
                     }
@@ -80,8 +97,8 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
                 }
             }
         }
-        
+
         return multilanguageCountryCatalogLocales;
     }
-    
+
 }

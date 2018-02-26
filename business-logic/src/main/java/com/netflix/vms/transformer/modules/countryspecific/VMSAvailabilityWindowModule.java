@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
+
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -31,9 +34,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import java.util.stream.Collectors;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
+    private static final FastProperty.BooleanProperty ENABLE_LOCALE_PROMOTION = new FastProperty.BooleanProperty("netflix.vms.transformer.enable.prepromotion.multilocale", false);
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -162,6 +164,17 @@ public class VMSAvailabilityWindowModule {
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
+            // if multi-locale catalog processing, then check if title is in pre-promo phase.
+            boolean inPrePromotionPhase = false;
+            if (!isGoLive && locale != null) {
+                for (long contractId : contractIds) {
+                    ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true;
+                }
+                if (!isGoLive && inPrePromotionPhase)
+                    ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
+            }
+
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
                 // get contract id from window contract and contract data from VideoContract feed.
@@ -198,8 +211,19 @@ public class VMSAvailabilityWindowModule {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                if (packageAvailability == 0)
+                                // if no assets and the the title is not in prePromotionPhase then skip this contract
+                                if (packageAvailability == 0 && !inPrePromotionPhase) {
+                                    ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
+                                } else if (packageAvailability == 0 && inPrePromotionPhase) {
+                                    // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
+                                    if (ENABLE_LOCALE_PROMOTION.get()) {
+                                        ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
+                                    } else {
+                                        // if feature not enabled, and assets are missing, skip the contract
+                                        continue;
+                                    }
+                                }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
                                 if (!considerPackageForLang && contractPackages.size() == 1) {
@@ -432,6 +456,7 @@ public class VMSAvailabilityWindowModule {
             Set<Strings> assetBcp47CodesFromMaxPackageId = null;
             Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
             int prePromoDays = 0;
+            boolean isDayOfBroadcast = false;
             boolean hasRollingEpisodes = false;
             boolean isAvailableForDownload = false;
             LinkedHashSetOfStrings cupTokens = null;
@@ -450,6 +475,7 @@ public class VMSAvailabilityWindowModule {
                     assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
                     videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
                     prePromoDays = minValueToZero(entry.getValue().videoContractInfo.prePromotionDays);
+                    isDayOfBroadcast = entry.getValue().videoContractInfo.isDayOfBroadcast;
                     hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
                     isAvailableForDownload = entry.getValue().videoContractInfo.isAvailableForDownload;
                     cupTokens = entry.getValue().videoContractInfo.cupTokens;
@@ -461,6 +487,8 @@ public class VMSAvailabilityWindowModule {
             rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
             rollup.newPrePromoDays(prePromoDays);
 
+            if (isDayOfBroadcast)
+                rollup.foundDayOfBroadcast();
             if (hasRollingEpisodes)
                 rollup.foundRollingEpisodes();
             if (isAvailableForDownload)
@@ -487,6 +515,9 @@ public class VMSAvailabilityWindowModule {
             if (rollup.doEpisode())
                 rollup.newPrePromoDays(0);
         }
+
+        if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty()))
+            ctx.getLogger().info(TransformerLogTag.LocaleMerching,"VideoId={} not merched in country={} locale={}", videoId, country, locale);
 
         return availabilityWindows;
     }
@@ -547,8 +578,9 @@ public class VMSAvailabilityWindowModule {
 
                 outputContractInfo.videoContractInfo.assetBcp47Codes = rollup.getAssetBcp47Codes();
                 outputContractInfo.videoContractInfo.prePromotionDays = rollup.getPrePromoDays();
+                outputContractInfo.videoContractInfo.isDayOfBroadcast = rollup.isDayOfBroadcast();
                 outputContractInfo.videoContractInfo.isDayAfterBroadcast = rollup.hasRollingEpisodes();
-                outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes();
+                outputContractInfo.videoContractInfo.hasRollingEpisodes = rollup.hasRollingEpisodes(); // NOTE: DAB and hasRollingEpisodes means the same
                 outputContractInfo.videoContractInfo.isAvailableForDownload = rollup.isAvailableForDownload();
                 outputContractInfo.videoContractInfo.postPromotionDays = 0;
                 outputContractInfo.videoContractInfo.cupTokens = rollup.getCupTokens() != null ? rollup.getCupTokens() : DEFAULT_CUP_TOKENS;
@@ -621,7 +653,7 @@ public class VMSAvailabilityWindowModule {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
                 ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                if (contract != null && (contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
                     isWindowDataNeeded = true;
                 }
             }

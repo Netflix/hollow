@@ -71,20 +71,20 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final HollowPrimaryKeyIndex imageTypeIdx;
     protected final HollowPrimaryKeyIndex recipeIdx;
     protected final HollowPrimaryKeyIndex territoryIdx;
-    
+
     protected final HollowHashIndex artworkDerivativeSetIdx;
-    
+
     private final ArtWorkComparator artworkComparator;
 
     private final Map<String, ArtWorkImageTypeEntry> imageTypeEntryCache;
     private final Map<String, ArtWorkImageFormatEntry> imageFormatEntryCache;
     private final Map<String, ArtWorkImageRecipe> imageRecipeCache;
-    
+
     private final Set<String> unknownArtworkImageTypes = new HashSet<String>();
-    
+
     private final Set<String> variableSizeImageTypes = new HashSet<String>();
     private final List<String> newEpisodeOverlayTypes = new ArrayList<String>();
-    
+
     protected boolean allImagesAreVariableSize = false;
 
     public ArtWorkModule(String entityType, VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
@@ -98,7 +98,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         this.imageFormatEntryCache = new HashMap<String, ArtWorkImageFormatEntry>();
         this.imageTypeEntryCache = new HashMap<String, ArtWorkImageTypeEntry>();
         this.imageRecipeCache = new HashMap<String, ArtWorkImageRecipe>();
-        
+
         for(String type : ctx.getConfig().getVariableImageTypes().split(","))
             variableSizeImageTypes.add(type);
         for(String overlayType : ctx.getConfig().getNewEpisodeOverlayTypes().split(","))
@@ -109,7 +109,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         unknownArtworkImageTypes.clear();
 
         Artwork artwork = new Artwork();
-        
+
         // Process list of derivatives
         processCombinedDerivativesAndCdnList(entityId, sourceFileId, inputDerivativesMatches, artwork);
 
@@ -130,36 +130,36 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         HollowOrdinalIterator iterator = inputDerivativesMatches.iterator();
 
         Map<String, IPLDerivativeGroupHollow> groupByType = new HashMap<>();
-        
+
         int ordinal = iterator.next();
         while(ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
             IPLDerivativeGroupHollow inputDerivatives = api.getIPLDerivativeGroupHollow(ordinal);
             String type = inputDerivatives._getImageType()._getValue();
-            
+
             IPLDerivativeGroupHollow iplDerivativeGroupHollow = groupByType.get(type);
             if(iplDerivativeGroupHollow == null || iplDerivativeGroupHollow._getSubmission() < inputDerivatives._getSubmission()) {
                 groupByType.put(type, inputDerivatives);
             }
-            
+
             ordinal = iterator.next();
         }
-        
+
         for(Map.Entry<String, IPLDerivativeGroupHollow> entry : groupByType.entrySet()) {
             processDerivativesAndCdnList(entityId, sourceFileId, entry.getValue(), artwork);
         }
     }
-    
+
     // Process Derivatives
     protected void processDerivativesAndCdnList(int entityId, String sourceFileId, IPLDerivativeGroupHollow inputDerivatives, Artwork artwork) {
         IPLDerivativeSetHollow derivativeSet = inputDerivatives._getDerivatives();
 
         String imageType = inputDerivatives._getImageType()._getValue();
         ArtWorkImageTypeEntry typeEntry = getImageTypeEntry(imageType);
-        
+
         int inputDerivativeSetOrdinal = derivativeSet.getOrdinal();
-                
+
         ArtworkDerivatives outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
-        
+
         if(outputDerivatives == null) {
             buildAndCacheArtworkDerivatives(derivativeSet, imageType, typeEntry, inputDerivativeSetOrdinal);
             outputDerivatives = cycleConstants.artworkDerivativesCache.getResult(inputDerivativeSetOrdinal);
@@ -168,62 +168,87 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         /// combine multiple derivative lists where necessary
         if(artwork.derivatives != null) {
             ArtworkDerivativesListMerger merger = new ArtworkDerivativesListMerger(artwork.derivatives.list, outputDerivatives.list);
-            
+
             List<ArtworkDerivative> derivativeList = new ArrayList<>(merger.mergedSize());
-            
+
             while(merger.next()) {
                 derivativeList.add(merger.getNextArtworkDerivative());
             }
-            
+
             outputDerivatives = artworkDerivatives(derivativeList);
         }
-        
+
         artwork.derivatives = outputDerivatives;
     }
 
     private void buildAndCacheArtworkDerivatives(IPLDerivativeSetHollow derivativeSet, String imageType, ArtWorkImageTypeEntry typeEntry,int inputDerivativeSetOrdinal) {
         List<ArtworkDerivative> derivativeList = new ArrayList<>();
-                
+
         for (IPLArtworkDerivativeHollow derivativeHollow : derivativeSet) {
             int inputDerivativeOrdinal = derivativeHollow.getOrdinal();
-            
+
             ArtworkDerivative outputDerivative = cycleConstants.artworkDerivativeCache.getResult(inputDerivativeOrdinal);
-            
+
             if(outputDerivative == null) {
                 outputDerivative = new ArtworkDerivative();
-                        
+
                 ArtWorkImageTypeEntry derivativeTypeEntry = typeEntry;
                 ArtWorkImageFormatEntry formatEntry = getImageFormatEntry(imageType, derivativeHollow);
                 ArtWorkImageRecipe recipeEntry = getImageRecipe(derivativeHollow);
-                
+
                 derivativeTypeEntry = getModifiedImageTypeEntry(typeEntry, imageType, derivativeHollow);
-                
+
                 String recipeDescriptor = derivativeHollow._getRecipeDescriptor()._getValue();
-                
+
                 outputDerivative.format = formatEntry;
                 outputDerivative.type = derivativeTypeEntry;
                 outputDerivative.recipe = recipeEntry;
                 outputDerivative.recipeDesc = new Strings(recipeDescriptor);
                 outputDerivative.cdnId = java.lang.Integer.parseInt(derivativeHollow._getCdnId()._getValue()); // @TODO: Is it Integer or String
-                
+
                 outputDerivative = cycleConstants.artworkDerivativeCache.setResult(inputDerivativeOrdinal, outputDerivative);
-            } 
-            
+            }
+
             derivativeList.add(outputDerivative);
-            
+
         }
 
         Collections.sort(derivativeList, ArtworkDerivativesListMerger.DERIVATIVE_COMPARATOR);  /// cannot sort derivatives but not CDNs
 
         ArtworkDerivatives cacheDerivatives = artworkDerivatives(derivativeList);
-        
+
         cacheDerivatives = cycleConstants.artworkDerivativesCache.setResult(inputDerivativeSetOrdinal, cacheDerivatives);
+    }
+
+    private static final String NO_OVERLAY = "_NO_OVERLAY_";
+    private static final String OVERLAY_PREFIX = "OVERLAY:";
+    private String getOverlayType(ListOfDerivativeTagHollow overlayTypes) {
+        if (overlayTypes == null) return null;
+
+        String overlayType = cycleConstants.artworkDerivativeOverlayTypes.getResult(overlayTypes.getOrdinal());
+        if (overlayType == null) {
+            overlayType = NO_OVERLAY;
+            for (DerivativeTagHollow tag : overlayTypes) {
+                if (tag == null) continue;
+
+                String tagValue = tag._getValue();
+                if (tagValue == null || !tagValue.startsWith(OVERLAY_PREFIX)) continue;
+
+                // Extract overType from Tag.  For example: OVERLAY:NEW -> NEW
+                overlayType = tagValue.substring(OVERLAY_PREFIX.length());
+                break;
+            }
+
+            cycleConstants.artworkDerivativeOverlayTypes.setResult(overlayTypes.getOrdinal(), overlayType);
+        }
+
+        return NO_OVERLAY.equals(overlayType) ? null : overlayType;
     }
 
     private boolean determineIfNewEpisodeOverlayType(ListOfDerivativeTagHollow overlayTypes) {
         if(overlayTypes == null)
             return false;
-        
+
         Boolean isNewEpisodeOverlayType = cycleConstants.isNewEpisodeOverlayTypes.getResult(overlayTypes.getOrdinal());
         if(isNewEpisodeOverlayType == null) {
             isNewEpisodeOverlayType = Boolean.FALSE;
@@ -239,7 +264,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
             cycleConstants.isNewEpisodeOverlayTypes.setResult(overlayTypes.getOrdinal(), isNewEpisodeOverlayType);
         }
-        
+
         return isNewEpisodeOverlayType.booleanValue();
     }
 
@@ -351,7 +376,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         if(passThroughString != null) {
             getBasicPassthrough(artwork).design_attribute = passThroughString;
         }
-        
+
         passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
         if(passThroughString != null) {
             getBasicPassthrough(artwork).focal_point = passThroughString;
@@ -365,6 +390,12 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         if(passThroughString != null) {
             getBasicPassthrough(artwork).group_id = passThroughString;
         }
+
+        passThroughString = getPassThroughString("DESIGN_EFFORT", keyValues);
+        if(passThroughString != null) {
+            getBasicPassthrough(artwork).design_effort = passThroughString;
+        }
+
         if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
             getBasicPassthrough(artwork).awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
         }
@@ -378,7 +409,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             getBasicPassthrough(artwork).personIdStrs = keyListValues.get("PERSON_IDS");
         }
         applyLocaleOverridableAttributes(artwork, keyValues);
-        
+
         String startX = keyValues.get("SCREENSAVER_START_X");
         String endX = keyValues.get("SCREENSAVER_END_X");
         String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
@@ -389,7 +420,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                 if(endX != null)    screensaverPassthrough.endX = java.lang.Integer.parseInt(endX);
                 if(offsetY != null) screensaverPassthrough.offsetY = java.lang.Integer.parseInt(offsetY);
                 getBasicPassthrough(artwork).screensaverPassthrough = screensaverPassthrough;
-            } catch(NumberFormatException unexpected) { 
+            } catch(NumberFormatException unexpected) {
                 ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse artwork SCREENSAVER attributes", unexpected);
             }
         }
@@ -434,11 +465,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             }
             getBasicPassthrough(artwork).reExploreLongTimestamp = new ArtworkReExploreLongTimestamp(timestamp);
         }
-        
+
         if(keyValues.containsKey("file_seq") && keyValues.get("file_seq") != null)
             artwork.file_seq = java.lang.Integer.valueOf(keyValues.get("file_seq"));
     }
-    
+
     private ArtworkBasicPassthrough getBasicPassthrough(Artwork artwork) {
         if(artwork.basic_passthrough == null)
             artwork.basic_passthrough = new ArtworkBasicPassthrough();
@@ -503,37 +534,41 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
         return entry;
     }
-    
+
     protected final ArtWorkImageTypeEntry getModifiedImageTypeEntry(ArtWorkImageTypeEntry unmodifiedEntry, String typeName, IPLArtworkDerivativeHollow derivativeInput) {
         String originalTypeName = typeName;
-        
+
         ListOfDerivativeTagHollow modifications = derivativeInput._getModifications();
         ListOfDerivativeTagHollow overlayTypes = derivativeInput._getOverlayTypes();
-        
+
         if(modifications != null && !modifications.isEmpty()) {
             ModificationKey key = new ModificationKey(typeName, modifications.get(0)._getValue());
             String modifiedTypeName  = modifiedImageTypeMap.get(key);
             if(modifiedTypeName != null)
                 typeName = modifiedTypeName;
         }
-        
-        if(determineIfNewEpisodeOverlayType(overlayTypes)) {
-            if(isAllLowercase(typeName))
-                typeName += "_new_" + derivativeInput._getLanguageCode()._getValue().toLowerCase();
-            else
-                typeName += "_NEW_" + derivativeInput._getLanguageCode()._getValue().toUpperCase();
+
+        if (determineIfNewEpisodeOverlayType(overlayTypes)) { // Support existing TAG: NEW_EPISODE, NEW_EPISODE_V2, NEW_EPISODE_GLOBAL
+            String tmpTypeName = typeName + "_new_" + derivativeInput._getLanguageCode()._getValue();
+            typeName = isAllLowercase(typeName) ? tmpTypeName.toLowerCase() : tmpTypeName.toUpperCase();
+        } else { // Support new overlay data OVERLAY:[XYZ]
+            String overlay = getOverlayType(overlayTypes); // return [XYZ] value for the first derivative tag with OVERLAY:[XYZ]
+            if (overlay != null) {
+                String tmpTypeName = typeName + "_" + overlay + "_" + derivativeInput._getLanguageCode()._getValue();
+                typeName = isAllLowercase(typeName) ? tmpTypeName.toLowerCase() : tmpTypeName.toUpperCase();
+            }
         }
-        
+
         if(!typeName.equals(originalTypeName)) {
             ArtWorkImageTypeEntry entry = unmodifiedEntry.clone();
             entry.nameStr = typeName.toCharArray();
-            
+
             return entry;
         }
-        
+
         return unmodifiedEntry;
     }
-    
+
     private boolean isAllLowercase(String str) {
         for(int i=0;i<str.length();i++) {
             if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z')
@@ -544,7 +579,7 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     protected final ArtWorkImageFormatEntry getImageFormatEntry(String imageType, IPLArtworkDerivativeHollow derivative) {
         boolean isVariableSizeImage = allImagesAreVariableSize || variableSizeImageTypes.contains(imageType);
-        
+
         int width = isVariableSizeImage ? derivative._getWidthInPixels() : derivative._getTargetWidthInPixels();
         int height = isVariableSizeImage ? derivative._getHeightInPixels() : derivative._getTargetHeightInPixels();
         String formatName = width + "x" + height;
@@ -645,11 +680,11 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
                                                      + "CharacterStoryArt|right_gradient_kids|CHARACTERSTORYART_RIGHT_GRADIENT_KIDS\n"
                                                      + "BILLBOARD|bottom_gradient|BILLBOARD_BOTTOM_GRADIENT\n"
                                                      + "NEW_CONTENT_BADGE|autocrop|NEW_CONTENT_BADGE_CROPPED";
-    
+
     private static class ModificationKey {
         private final String imageType;
         private final String modification;
-        
+
         public ModificationKey(String imageType, String modification) {
             this.imageType = imageType;
             this.modification = modification;
@@ -688,15 +723,14 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             return true;
         }
     }
-    
+
     private static Map<ModificationKey, String> modifiedImageTypeMap = new HashMap<>();
-    
+
     static {
         for(String modifiedImageTypeRecord : IMAGE_TYPE_MODIFICATION_CONFIGS.split("\n")) {
             String fields[] = modifiedImageTypeRecord.split("\\|");
-            
+
             modifiedImageTypeMap.put(new ModificationKey(fields[0], fields[1]), fields[2]);
         }
     }
-    
 }
