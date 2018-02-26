@@ -306,6 +306,7 @@ public class TransformCycle {
         try(InputStream is = ctx.files().newBlobInputStream(new File(unfilteredFilename));
                 OutputStream os = ctx.files().newBlobOutputStream(new File(filteredFilename))) {
             writer.filter(!isSnapshot, is, os);
+            ctx.getLogger().info(WroteBlob, "Wrote NostreamsFilteredFile={}", filteredFilename);
         }
     }
 
