@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
@@ -69,6 +70,16 @@ final class ListenerSupport {
 
     void fireNewDeltaChain(long version) {
         for(final HollowProducerListener l : listeners) l.onNewDeltaChain(version);
+    }
+
+    ProducerStatus.Builder fireCycleSkipped(CycleSkipReason reason) {
+        ProducerStatus.Builder psb = new ProducerStatus.Builder();
+        for (final HollowProducerListener l : listeners) {
+            if (l instanceof HollowProducerListenerV2) {
+                ((HollowProducerListenerV2) l).onCycleSkip(reason);
+            }
+        }
+        return psb;
     }
 
     ProducerStatus.Builder fireCycleStart(long version) {

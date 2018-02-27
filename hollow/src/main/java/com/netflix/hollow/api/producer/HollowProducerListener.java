@@ -29,7 +29,7 @@ import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCC
 /**
  * A class should implement {@code HollowProducerListener}, if it wants to be notified on
  * start/completion of various stages of the {@link HollowProducer}.
- * Subclasses are encouraged to extend {@link NoOpHollowProducerListener}
+ * Subclasses are encouraged to extend {@link BaseHollowProducerListener}
  *
  * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}.
  */
