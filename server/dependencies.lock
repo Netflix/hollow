@@ -228,7 +228,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -378,7 +377,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -2933,7 +2933,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3998,7 +3998,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -4148,7 +4147,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -6703,7 +6703,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7768,7 +7768,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -7918,7 +7917,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -10473,7 +10473,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -11625,7 +11625,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -11776,7 +11775,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -14358,7 +14358,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -17171,7 +17171,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -17321,7 +17320,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -19876,7 +19876,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20941,7 +20941,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -21091,7 +21090,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -23646,7 +23646,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24714,7 +24714,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -24865,7 +24864,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -27446,7 +27446,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28489,7 +28489,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -28645,7 +28644,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -31274,7 +31274,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32390,7 +32390,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -32546,7 +32545,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -35175,7 +35175,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -36291,7 +36291,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -36447,7 +36446,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -39076,7 +39076,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -40192,7 +40192,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -40348,7 +40347,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -42977,7 +42977,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -44093,7 +44093,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -44249,7 +44248,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -46878,7 +46878,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47994,7 +47994,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -48150,7 +48149,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -50779,7 +50779,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51895,7 +51895,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -52051,7 +52050,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -54680,7 +54680,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -55796,7 +55796,6 @@
                 "netflix:atlas-plugin",
                 "netflix:chronos-client",
                 "netflix:country-launch",
-                "netflix:playback-monkey-model",
                 "netflix:simone-common"
             ]
         },
@@ -55952,7 +55951,8 @@
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix:common-data-format",
                 "netflix:fit-impl",
-                "netflix:nf-eventbus"
+                "netflix:nf-eventbus",
+                "netflix:playback-monkey-model"
             ]
         },
         "com.google.code.simplejpa:simplejpa": {
@@ -58581,7 +58581,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.100",
+            "locked": "2.101",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
