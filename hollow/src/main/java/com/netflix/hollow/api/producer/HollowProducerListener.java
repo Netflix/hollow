@@ -17,18 +17,19 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
-import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
-
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
+import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
+import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
+
 /**
- * Beta API subject to change.
- *
- * A class should implement {@code HollowProducerListener}, if it wants to be notified on start/completion of various stages of the {@link HollowProducer}.
+ * A class should implement {@code HollowProducerListener}, if it wants to be notified on
+ * start/completion of various stages of the {@link HollowProducer}.
+ * Subclasses are encouraged to extend {@link NoOpHollowProducerListener}
  *
  * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}.
  */
@@ -37,7 +38,7 @@ public interface HollowProducerListener extends EventListener {
     /**
      * Called after the {@code HollowProducer} has initialized its data model.
      */
-    public void onProducerInit(long elapsed, TimeUnit unit);
+    void onProducerInit(long elapsed, TimeUnit unit);
 
     /**
      * Called after the {@code HollowProducer} has restored its data state to the indicated version.
@@ -45,7 +46,7 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param restoreVersion Version from which the state for {@code HollowProducer} was restored.
      */
-    public void onProducerRestoreStart(long restoreVersion);
+    void onProducerRestoreStart(long restoreVersion);
 
     /**
      * Called after the {@code HollowProducer} has restored its data state to the indicated version.
@@ -56,7 +57,7 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the restore in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit);
+    void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Indicates that the next state produced will begin a new delta chain.
@@ -66,14 +67,14 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param version the version of the state that will become the first of a new delta chain
      */
-    public void onNewDeltaChain(long version);
+    void onNewDeltaChain(long version);
 
     /**
      * Called when the {@code HollowProducer} has begun a new cycle.
      *
      * @param version Version produced by the {@code HollowProducer} for new cycle about to start.
      */
-    public void onCycleStart(long version);
+    void onCycleStart(long version);
 
     /**
      * Called after {@code HollowProducer} has completed a cycle normally or abnormally. A {@code SUCCESS} status indicates that the
@@ -85,21 +86,21 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called after the new state has been populated if the {@code HollowProducer} detects that no data has changed, thus no snapshot nor delta should be produced.<p>
      *
      * @param version Current version of the cycle.
      */
-    public void onNoDeltaAvailable(long version);
+    void onNoDeltaAvailable(long version);
 
     /**
      * Called before starting to execute the task to populate data into Hollow.
      *
-     * @param version
+     * @param version Current version of the cycle
      */
-    public void onPopulateStart(long version);
+    void onPopulateStart(long version);
 
     /**
      * Called once populating task stage has finished successfully or failed. Use {@code ProducerStatus#getStatus()} to get status of the task.
@@ -108,14 +109,14 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed Time taken to populate hollow.
      * @param unit unit of {@code elapsed} duration.
      */
-    public void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun publishing the {@code HollowBlob}s produced this cycle.
      *
      * @param version Version to be published.
      */
-    public void onPublishStart(long version);
+    void onPublishStart(long version);
 
     /**
      * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
@@ -126,7 +127,7 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the publish stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
@@ -136,14 +137,14 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed       time taken to publish the blob
      * @param unit          unit of elapsed.
      */
-    public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
+    void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.
      *
      * @param version Version to be checked
      */
-    public void onIntegrityCheckStart(long version);
+    void onIntegrityCheckStart(long version);
 
     /**
      * Called after the integrity check stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
@@ -154,14 +155,14 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the integrity check stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun validating the new data state produced this cycle.
      *
      * @param version Version to be validated
      */
-    public void onValidationStart(long version);
+    void onValidationStart(long version);
 
     /**
      * Called after the validation stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
@@ -172,14 +173,14 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the validation stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
      *
      * @param version of {@code HollowBlob} that will be announced.
      */
-    public void onAnnouncementStart(long version);
+    void onAnnouncementStart(long version);
 
     /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
@@ -190,7 +191,7 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed duration of the announcement stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
     /**
      * This class represents information on details when {@link HollowProducer} has finished executing a particular stage.
@@ -198,7 +199,7 @@ public interface HollowProducerListener extends EventListener {
      *
      * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}
      */
-    public class ProducerStatus {
+    class ProducerStatus {
 
         private final long version;
         private final Status status;
@@ -405,7 +406,7 @@ public interface HollowProducerListener extends EventListener {
         }
     }
 
-    public class PublishStatus {
+    class PublishStatus {
         private final Status status;
         private final HollowProducer.Blob blob;
         private final Throwable throwable;
@@ -481,7 +482,7 @@ public interface HollowProducerListener extends EventListener {
 
     }
 
-    public enum Status {
+    enum Status {
         SUCCESS, FAIL, SKIP
     }
 }
