@@ -30,6 +30,9 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -63,7 +66,7 @@ public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiClassname, Arrays.<HollowSchema>asList(schema));
 
         builder.append("import " + HollowMap.class.getName() + ";\n");
         builder.append("import " + HollowMapSchema.class.getName() + ";\n");
