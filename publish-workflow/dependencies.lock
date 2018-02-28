@@ -317,6 +317,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -348,8 +349,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -408,22 +415,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -435,7 +441,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -445,7 +451,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -480,6 +486,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -2837,6 +2849,12 @@
                 "netflix:platform-core"
             ]
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -2913,6 +2931,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -3498,6 +3522,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -3529,8 +3554,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -3589,22 +3620,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -3616,7 +3646,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -3626,7 +3656,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -3661,6 +3691,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -6018,6 +6054,12 @@
                 "netflix:platform-core"
             ]
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -6094,6 +6136,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -6679,6 +6727,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -6710,8 +6759,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -6770,22 +6825,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -6797,7 +6851,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -6807,7 +6861,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -6842,6 +6896,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -9199,6 +9259,12 @@
                 "netflix:platform-core"
             ]
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -9275,6 +9341,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -9982,6 +10054,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -10013,8 +10086,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -10073,22 +10152,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -10100,7 +10178,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -10110,7 +10188,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -10145,6 +10223,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -12502,6 +12586,12 @@
                 "netflix:platform-core"
             ]
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -12578,6 +12668,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -13163,6 +13259,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -13194,8 +13291,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -13254,22 +13357,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -13281,7 +13383,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -13291,7 +13393,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -13326,6 +13428,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -15683,6 +15791,12 @@
                 "netflix:platform-core"
             ]
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -15759,6 +15873,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -16344,6 +16464,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -16375,8 +16496,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -16436,22 +16563,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -16463,7 +16589,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -16473,7 +16599,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -16508,6 +16634,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -18911,6 +19043,12 @@
         "org.assertj:assertj-core": {
             "locked": "3.9.1"
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -18987,6 +19125,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -19598,6 +19742,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -19629,8 +19774,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -19690,22 +19841,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -19717,7 +19867,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -19727,7 +19877,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -19762,6 +19912,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -22165,6 +22321,12 @@
         "org.assertj:assertj-core": {
             "locked": "3.9.1"
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -22241,6 +22403,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -22852,6 +23020,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -22883,8 +23052,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -22944,22 +23119,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -22971,7 +23145,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -22981,7 +23155,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -23016,6 +23190,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -25419,6 +25599,12 @@
         "org.assertj:assertj-core": {
             "locked": "3.9.1"
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -25495,6 +25681,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
@@ -26106,6 +26298,7 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.google.code.findbugs:annotations",
+                "com.google.guava:guava",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.netflix-commons:netflix-infix",
                 "com.netflix.photon:Photon",
@@ -26137,8 +26330,14 @@
                 "netflix:platform-management"
             ]
         },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "com.google.guava:guava": {
-            "locked": "19.0",
+            "locked": "23.6-android",
             "transitive": [
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
@@ -26198,22 +26397,21 @@
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-grapher",
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
         "com.google.inject.extensions:guice-grapher": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.governator:governator-core"
             ]
         },
         "com.google.inject.extensions:guice-multibindings": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
-                "com.google.inject.extensions:guice-grapher",
                 "com.netflix.archaius:archaius2-guice",
                 "com.netflix.governator:governator-core",
                 "com.netflix.ksclient:ksclient-core",
@@ -26225,7 +26423,7 @@
             ]
         },
         "com.google.inject.extensions:guice-servlet": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.karyon:karyon2-admin",
@@ -26235,7 +26433,7 @@
             ]
         },
         "com.google.inject:guice": {
-            "locked": "4.1.0",
+            "locked": "4.2.0",
             "transitive": [
                 "com.google.inject.extensions:guice-assistedinject",
                 "com.google.inject.extensions:guice-grapher",
@@ -26270,6 +26468,12 @@
                 "netflix:simone-common",
                 "netflix:whitecastle",
                 "netflix:whitecastle_v2"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "com.google.protobuf:protobuf-java": {
@@ -28673,6 +28877,12 @@
         "org.assertj:assertj-core": {
             "locked": "3.9.1"
         },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
         "org.codehaus.jackson:jackson-core-asl": {
             "locked": "1.9.13",
             "transitive": [
@@ -28749,6 +28959,12 @@
                 "netflix:base-server-plugins",
                 "netflix:cryptexclient-standalone",
                 "netflix:nsac-common"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
             ]
         },
         "org.codehaus.woodstox:wstx-asl": {
