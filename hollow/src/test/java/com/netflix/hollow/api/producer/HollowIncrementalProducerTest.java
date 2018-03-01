@@ -105,7 +105,73 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 4, "five", 6L);
         assertTypeA(idx, 5, "five", null);
     }
-    
+
+    @Test
+    public void publishAndLoadASnapshotDirectly() {
+        // Producer is created but not initialized IncrementalProducer will directly initialize the first snapshot
+        HollowProducer producer = createInMemoryProducer();
+
+        /// add/modify state of a producer with an empty previous state. delete requests for non-existent records will be ignored
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.addOrModify(new TypeA(4, "five", 6));
+        incrementalProducer.delete(new TypeA(5, "five", 5));
+
+        incrementalProducer.delete(new TypeB(2, "3"));
+        incrementalProducer.addOrModify(new TypeB(5, "5"));
+        incrementalProducer.addOrModify(new TypeB(5, "6"));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.addOrModify(new TypeA(4, "four", 4));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        /// another new state with a single change
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 100L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        // backing producer was never initialized, so only records added to the incremental producer are here
+        assertTypeB(idx, 1, null);
+        assertTypeB(idx, 2, null);
+        assertTypeB(idx, 3, null);
+        assertTypeB(idx, 4, null);
+        assertTypeB(idx, 5, "6");
+
+        consumer.triggerRefreshTo(finalVersion);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1000L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+    }
+
     @Test
     public void continuesARestoredState() {
         HollowProducer genesisProducer = createInMemoryProducer();
