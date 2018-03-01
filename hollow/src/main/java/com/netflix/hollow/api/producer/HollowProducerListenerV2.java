@@ -20,8 +20,8 @@ package com.netflix.hollow.api.producer;
 /**
  * An extension of {@link HollowProducerListener} to allow adding new methods without
  * breaking backwards compatability.
- * Subclasses should extend {@link BaseHollowProducerListener} to avoid having to override
- * every method in this interface.
+ * Subclasses should extend {@link AbstractHollowProducerListener} to avoid having to
+ * override every method in this interface.
  * TODO(hollow3): Collapse this into HollowProducerListener.
  */
 public interface HollowProducerListenerV2 extends HollowProducerListener {
