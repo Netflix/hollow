@@ -110,6 +110,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
             pbmSuccess = false;
         }
         boolean finalResultAferPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        // Send success or failure result from here. As this is the final PBM step.
         PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
 		return finalResultAferPBMOverride;
     }

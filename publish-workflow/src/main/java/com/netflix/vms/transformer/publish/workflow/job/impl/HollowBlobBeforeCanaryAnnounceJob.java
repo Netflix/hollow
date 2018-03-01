@@ -59,7 +59,9 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
         } else {
             ctx.getLogger().error(PlaybackMonkey, "{}: success: {} finalResultAfterPBMOverride: {}", getJobName(), success, finalResultAferPBMOverride);
         }
-        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
+        if(!finalResultAferPBMOverride)
+        	// Do not send success metric because, this step success does not mean it is successful. 
+        	PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
 		return finalResultAferPBMOverride;
 	}
 
