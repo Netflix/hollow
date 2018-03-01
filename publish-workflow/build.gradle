@@ -5,7 +5,7 @@ dependencies {
     compile 'com.netflix.hollow:hollow:2.+'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:56.1076'
-    compile 'netflix:playback-monkey-model:latest.candidate'
+    compile 'netflix:playback-monkey-model:latest.release'
     compile 'netflix:awsutils:latest.release'
     compile 'netflix:hermes:latest.release'
     compile 'netflix:vms-utils:latest.release'

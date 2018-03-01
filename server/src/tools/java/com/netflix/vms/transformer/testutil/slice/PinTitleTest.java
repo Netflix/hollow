@@ -44,15 +44,15 @@ import org.junit.Test;
 public class PinTitleTest {
     private static final String LOCAL_BLOB_STORE = "/space/title-pinning";
 
-    private Environment env = Environment.TEST;
+    private Environment env = Environment.PROD;
     private static boolean reuseSliceFiles = true;
 
     @Test
     public void testTitlePinning() throws Throwable {
         final String CONVERTER_VIP = "muon";
         final String TRANSFORMER_VIP = "feather";
-        final long version = 20170418172112078L;
-        final int PINTITLE_ID = 80099361;
+        final long version = 20180205231304559L;
+        final int PINTITLE_ID = 80167498;
         final int FASTLANE_ID = 80049872;
 
         int[] fastlaneIds = new int[] { FASTLANE_ID };
@@ -62,7 +62,7 @@ public class PinTitleTest {
         ctx.setPinTitleSpecs(pinTitleSpecs);
 
         // Fetch Input State Engine
-        HollowReadStateEngine inputStateEngine = fetchInputStateEngine(CONVERTER_VIP, 20170418172014204L, FASTLANE_ID, PINTITLE_ID);
+        HollowReadStateEngine inputStateEngine = fetchInputStateEngine(CONVERTER_VIP, 20180205231110642L, FASTLANE_ID, PINTITLE_ID);
         VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
         {
@@ -249,7 +249,7 @@ public class PinTitleTest {
     }
 
     private static enum Environment {
-        TEST("http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-test"), PROD("http://us-west-2.discoveryprod.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-west-prod");
+        TEST("http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-test"), PROD("http://discovery.cloud.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-prod");
 
         private final String proxyURL;
 

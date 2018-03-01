@@ -314,7 +314,7 @@ public class CountrySpecificDataModule {
     private Long getLaunchDateForLanguage(StatusHollow status, String locale) {
         FlagsHollow flags = status._getFlags();
         MapOfFlagsFirstDisplayDatesHollow firstDisplayDatesByLocale = flags._getFirstDisplayDates();
-        if (firstDisplayDatesByLocale != null) {
+        if (firstDisplayDatesByLocale != null && !firstDisplayDatesByLocale.isEmpty()) {
             for (Map.Entry<MapKeyHollow, DateHollow> entry : firstDisplayDatesByLocale.entrySet()) {
                 String loc = entry.getKey()._getValue();
                 if (loc.length() > 2)

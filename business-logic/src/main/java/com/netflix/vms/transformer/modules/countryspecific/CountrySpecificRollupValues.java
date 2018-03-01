@@ -5,7 +5,6 @@ import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.util.RollUpOrDownValues;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -39,28 +38,30 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
     private int showPrePromoDays = 0;
     private int seasonPrePromoDays = 0;
+    private boolean showIsDayOfBroadcast = false;;
+    private boolean seasonIsDayOfBroadcast = false;
     private boolean showHasRollingEpisodes = false;;
     private boolean seasonHasRollingEpisodes = false;
     private boolean showIsAvailableForDownload = false;
     private boolean seasonIsAvailableForDownload = false;
-    
+
     private DateWindowAggregator showWindowAggregator = new DateWindowAggregator();
     private DateWindowAggregator seasonWindowAggregator = new DateWindowAggregator();
-    
+
     private long maxInWindowLaunchDate = 0;
-    
+
     private boolean viewableFoundLocalAudio = false;
     private boolean seasonFoundLocalAudio = false;
     private boolean showFoundLocalAudio = false;
     private boolean showFoundLocalText = false;
     private boolean seasonFoundLocalText = false;
     private boolean viewableFoundLocalText = false;
-    
+
     private long episodeLaunchDate = -1L;
-    
+
     private long seasonEarliestSchedulePhaseDate = Long.MAX_VALUE;
     private long showEarliestSchedulePhaseDate = Long.MAX_VALUE;
-    
+
     public void setSeasonSequenceNumber(int seasonSequenceNumber) {
         this.seasonSequenceNumber = seasonSequenceNumber;
     }
@@ -79,6 +80,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         aggregatedSeasonAssetCodes = new HashSet<Strings>();
         seasonVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         seasonPrePromoDays = 0;
+        seasonIsDayOfBroadcast = false;
         seasonHasRollingEpisodes = false;
         seasonIsAvailableForDownload = false;
         seasonCupTokensFromFirstStreamableEpisode = null;
@@ -95,6 +97,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         aggregatedShowAssetCodes = new HashSet<Strings>();
         showVideoFormatDescriptors = new HashSet<VideoFormatDescriptor>();
         showPrePromoDays = 0;
+        showIsDayOfBroadcast = false;
         showHasRollingEpisodes = false;
         showIsAvailableForDownload = false;
         showCupTokensFromFirstStreamableEpisode = null;
@@ -107,7 +110,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showWindowAggregator.reset();
         showEarliestSchedulePhaseDate = Long.MAX_VALUE;
     }
-    
+
     public void resetViewable() {
         viewableFoundLocalAudio = false;
         viewableFoundLocalText = false;
@@ -118,7 +121,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         this.showEpisodeFound = true;
         this.seasonEpisodeFound = true;
     }
-    
+
     public boolean wasShowEpisodeFound() {
         return showEpisodeFound;
     }
@@ -126,17 +129,17 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     public boolean wasSeasonEpisodeFound() {
         return seasonEpisodeFound;
     }
-    
+
     public void windowFound(long startDate, long endDate) {
         showWindowAggregator.addDateWindow(startDate, endDate);
         seasonWindowAggregator.addDateWindow(startDate, endDate);
     }
-    
+
     public DateWindow getValidShowWindow(long startDate, long endDate) {
         showWindowAggregator.mergeDateWindows();
         return showWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
     }
-    
+
     public DateWindow getValidSeasonWindow(long startDate, long endDate) {
         seasonWindowAggregator.mergeDateWindows();
         return seasonWindowAggregator.matchDateWindowAgainstMergedDateWindows(startDate, endDate);
@@ -166,6 +169,11 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         }
     }
 
+    public void foundDayOfBroadcast() {
+        showIsDayOfBroadcast = true;
+        seasonIsDayOfBroadcast = true;
+    }
+
     public void foundRollingEpisodes() {
         showHasRollingEpisodes = true;
         seasonHasRollingEpisodes = true;
@@ -175,7 +183,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
         showIsAvailableForDownload = true;
         seasonIsAvailableForDownload = true;
     }
-    
+
     public void newPrePromoDays(int prePromoDays) {
         if (showPrePromoDays == 0 || prePromoDays < showPrePromoDays)
             showPrePromoDays = prePromoDays;
@@ -204,11 +212,11 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         seasonSeqNums.set(sequenceNumber);
     }
-    
+
     public void newEpisodeLaunchDate(long launchDate) {
         episodeLaunchDate = launchDate;
     }
-    
+
     public void newInWindowAvailabilityDate(long startDate) {
         if(episodeLaunchDate != -1L) {
             if(episodeLaunchDate > maxInWindowLaunchDate)
@@ -217,7 +225,7 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
             maxInWindowLaunchDate = startDate;
         }
     }
-    
+
     public long getMaxInWindowLaunchDate() {
         return maxInWindowLaunchDate;
     }
@@ -251,7 +259,13 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
             return seasonPrePromoDays;
         return showPrePromoDays;
     }
-    
+
+    public boolean isDayOfBroadcast() {
+        if (doSeason())
+            return seasonIsDayOfBroadcast;
+        return showIsDayOfBroadcast;
+    }
+
     public boolean hasRollingEpisodes() {
         if(doSeason())
             return seasonHasRollingEpisodes;
@@ -319,13 +333,13 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
 
         return mergedWindowSeqNumMap;
     }
-    
+
     public void foundLocalAudio() {
         showFoundLocalAudio = true;
         seasonFoundLocalAudio = true;
         viewableFoundLocalAudio = true;
     }
-    
+
     public void foundLocalText() {
         showFoundLocalText = true;
         seasonFoundLocalText = true;
@@ -355,14 +369,14 @@ public class CountrySpecificRollupValues extends RollUpOrDownValues {
     public boolean isEpisodeFoundLocalText() {
         return viewableFoundLocalText;
     }
-    
+
     public void newEarliestScheduledPhaseDate(long date) {
         if(date < seasonEarliestSchedulePhaseDate)
             seasonEarliestSchedulePhaseDate = date;
         if(date < showEarliestSchedulePhaseDate)
             showEarliestSchedulePhaseDate = date;
     }
-    
+
     public long getRolledUpEarliestScheduledPhaseDate() {
         if(doShow())
             return showEarliestSchedulePhaseDate;

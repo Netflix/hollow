@@ -92,6 +92,9 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean isCircuitBreakersEnabled();
 
+    @DefaultValue("true") // Keep it backwards compatible by default
+    public boolean isHollowBlobDataProviderResetStateEnabled();
+
     @DefaultValue("true")
     @PropertyName(name="vms.circuitBreakerEnabled.${0}")
     public boolean isCircuitBreakerEnabled(String ruleName);
@@ -191,6 +194,9 @@ public interface TransformerConfig {
 
     @DefaultValue("BE,CH,LU,TH,IL,GR,RO,CY,MD")
     String getMultilanguageCatalogCountries();
+
+    @DefaultValue("true")
+    boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
 
     @DefaultValue("true")
     public boolean isRollupImagesForArtworkScheduling();

@@ -1,11 +1,12 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
-import java.io.File;
-import java.util.List;
-
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
+import com.netflix.vms.transformer.publish.workflow.util.FileStatLogger;
+import java.io.File;
+import java.util.List;
 
 public class HollowBlobDeleteFileJob extends PublishWorkflowPublicationJob {
     private final List<PublicationJob> publishJobs;
@@ -22,6 +23,7 @@ public class HollowBlobDeleteFileJob extends PublishWorkflowPublicationJob {
         for(String filename : filesToDelete) {
             File f = new File(filename);
             if(f.exists()) {
+                FileStatLogger.logFileState(ctx.getLogger(), TransformerLogTag.DeletedTmpFile, "cleanup File", f);
                 f.delete();
             }
         }
