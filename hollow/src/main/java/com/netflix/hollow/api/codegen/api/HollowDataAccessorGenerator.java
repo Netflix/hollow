@@ -26,6 +26,9 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+
+import java.util.Arrays;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation. Not intended for external consumption.
@@ -54,7 +57,7 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiclassName, Arrays.<HollowSchema>asList(schema));
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + AbstractHollowDataAccessor.class.getName() + ";\n");

@@ -19,38 +19,54 @@ package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
-    private final File blobStoreDir;
+    private final Path blobStorePath;
 
+    // TODO: deprecate in Hollow 3.0.0
+    // @Deprecated
     public HollowFilesystemPublisher(File blobStoreDir) {
-        this.blobStoreDir = blobStoreDir;
-        
-        blobStoreDir.mkdirs();
+        this(blobStoreDir.toPath());
+    }
+
+    /**
+     * @since 2.12.0
+     */
+    public HollowFilesystemPublisher(Path blobStorePath) {
+        this.blobStorePath = blobStorePath;
+        try {
+            if(!Files.exists(this.blobStorePath)){
+                Files.createDirectories(this.blobStorePath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create folder for publisher; path=" + this.blobStorePath, e);
+        }
     }
 
     @Override
     public void publish(HollowProducer.Blob blob) {
-        File destination = null;
+        Path destination = null;
         
         switch(blob.getType()) {
         case SNAPSHOT:
-            destination = new File(blobStoreDir, String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
+            destination = blobStorePath.resolve(String.format("%s-%d", blob.getType().prefix, blob.getToVersion()));
             break;
         case DELTA:
         case REVERSE_DELTA:
-            destination = new File(blobStoreDir, String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
+            destination = blobStorePath.resolve(String.format("%s-%d-%d", blob.getType().prefix, blob.getFromVersion(), blob.getToVersion()));
             break;
         }
             
         try(
                 InputStream is = blob.newInputStream();
-                OutputStream os = new FileOutputStream(destination);
+                OutputStream os = Files.newOutputStream(destination);
         ) {
             byte buf[] = new byte[4096];
             int n = 0;

@@ -38,9 +38,11 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
     }
 
     private void removeRecords(HollowProducer.WriteState newState) {
-        Map<String, BitSet> recordsToRemove = findTypesWithRemovedRecords(newState.getPriorState());
-        markRecordsToRemove(newState.getPriorState(), recordsToRemove);
-        removeRecordsFromNewState(newState, recordsToRemove);
+        if (newState.getPriorState() != null) {
+            Map<String, BitSet> recordsToRemove = findTypesWithRemovedRecords(newState.getPriorState());
+            markRecordsToRemove(newState.getPriorState(), recordsToRemove);
+            removeRecordsFromNewState(newState, recordsToRemove);
+        }
     }
 
     private Map<String, BitSet> findTypesWithRemovedRecords(HollowProducer.ReadState readState) {

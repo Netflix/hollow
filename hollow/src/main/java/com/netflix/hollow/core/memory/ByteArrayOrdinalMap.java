@@ -37,21 +37,21 @@ package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
+
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
 *
-* This data structure maps byte sequences to ordinals.  This is a hash table.  
-* 
-* The <code>pointersAndOrdinals</code> AtomicLongArray contains keys, and the {@link ByteDataBuffer} 
-* contains values.  Each key has two components.  
-* 
-* The high 29 bits in the key represents the ordinal.  The low 35 bits represents the pointer to the start position 
-* of the byte sequence in the ByteDataBuffer.  Each byte sequence is preceded by a variable-length integer 
+* This data structure maps byte sequences to ordinals.  This is a hash table.
+*
+* The <code>pointersAndOrdinals</code> AtomicLongArray contains keys, and the {@link ByteDataBuffer}
+* contains values.  Each key has two components.
+*
+* The high 29 bits in the key represents the ordinal.  The low 35 bits represents the pointer to the start position
+* of the byte sequence in the ByteDataBuffer.  Each byte sequence is preceded by a variable-length integer
 * (see {@link VarInt}), indicating the length of the sequence.<p>
 *
 * @author dkoszewnik
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicLongArray;
 public class ByteArrayOrdinalMap {
 
    private static final long EMPTY_BUCKET_VALUE = -1L;
-   
+
    private static final int BITS_PER_ORDINAL = 29;
    private static final int BITS_PER_POINTER = Long.SIZE - BITS_PER_ORDINAL;
    private static final long POINTER_MASK = (1L << BITS_PER_POINTER) - 1;
@@ -201,10 +201,10 @@ public class ByteArrayOrdinalMap {
 
        pointersAndOrdinals.set(bucket, key);
    }
-   
+
    public void recalculateFreeOrdinals() {
        BitSet populatedOrdinals = new BitSet();
-       
+
        for(int i=0;i<pointersAndOrdinals.length();i++) {
            long key = pointersAndOrdinals.get(i);
            if(key != EMPTY_BUCKET_VALUE) {
@@ -212,30 +212,30 @@ public class ByteArrayOrdinalMap {
                populatedOrdinals.set(ordinal);
            }
        }
-       
+
        recalculateFreeOrdinals(populatedOrdinals);
    }
-   
+
    public void reservePreviouslyPopulatedOrdinals(BitSet populatedOrdinals) {
        unusedPreviousOrdinals = BitSet.valueOf(populatedOrdinals.toLongArray());
-       
+
        recalculateFreeOrdinals(populatedOrdinals);
    }
-   
+
    private void recalculateFreeOrdinals(BitSet populatedOrdinals) {
        freeOrdinalTracker.reset();
-       
+
        int length = populatedOrdinals.length();
        int ordinal = populatedOrdinals.nextClearBit(0);
-       
+
        while(ordinal < length) {
            freeOrdinalTracker.returnOrdinalToPool(ordinal);
            ordinal = populatedOrdinals.nextClearBit(ordinal + 1);
        }
-       
+
        freeOrdinalTracker.setNextEmptyOrdinal(length);
    }
-   
+
    public BitSet getUnusedPreviousOrdinals() {
        return unusedPreviousOrdinals;
    }
@@ -413,6 +413,12 @@ public class ByteArrayOrdinalMap {
     * Grow the key array.  All of the values in the current array must be re-hashed and added to the new array.
     */
    private void growKeyArray() {
+       int newSize = pointersAndOrdinals.length() * 2;
+       if (newSize < 0) {
+           throw new IllegalStateException("New size computed to grow the underlying array for the map is negative. " +
+                   "This is most likely due to the total number of keys added to map has exceeded the max capacity of the keys map can hold. " +
+                   "Current array size :" + pointersAndOrdinals.length() + " and size to grow :" + newSize);
+       }
        AtomicLongArray newKeys = emptyKeyArray(pointersAndOrdinals.length() * 2);
 
        long valuesToAdd[] = new long[size];
@@ -433,7 +439,7 @@ public class ByteArrayOrdinalMap {
        populateNewHashArray(newKeys, valuesToAdd);
 
        /// 70% load factor
-       sizeBeforeGrow = (newKeys.length() * 7) / 10;
+       sizeBeforeGrow = (int) (((float) newKeys.length()) * 0.7);
        pointersAndOrdinals = newKeys;
    }
 

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationExcept
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
@@ -375,6 +377,7 @@ public class HollowProducer {
         if(!singleProducerEnforcer.isPrimary()) {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary");
+            listeners.fireCycleSkipped(CycleSkipReason.NOT_PRIMARY_PRODUCER);
             return lastSucessfulCycle;
         }
 
@@ -864,8 +867,13 @@ public class HollowProducer {
 
         public abstract void cleanup();
 
+        @Deprecated
         public File getFile() {
             throw new UnsupportedOperationException("File is not available");
+        }
+
+        public Path getPath() {
+            throw new UnsupportedOperationException("Path is not available");
         }
 
         public Type getType() {
