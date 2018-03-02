@@ -20,17 +20,19 @@ package com.netflix.hollow.api.producer;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Beta API subject to change.
+ * A trivial implementation of {@link HollowProducerListenerV2} which does nothing.
+ * Implementations of HollowProducerListenerV2 should subclass this class for convenience.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class AbstractHollowProducerListener implements HollowProducerListener {
+public class AbstractHollowProducerListener implements HollowProducerListenerV2 {
     @Override public void onProducerInit(long elapsed, TimeUnit unit) {}
 
     @Override public void onProducerRestoreStart(long restoreVersion) {}
     @Override public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {}
     @Override public void onNewDeltaChain(long version) {}
 
+    @Override public void onCycleSkip(CycleSkipReason reason) {}
     @Override public void onCycleStart(long version) {}
     @Override public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
