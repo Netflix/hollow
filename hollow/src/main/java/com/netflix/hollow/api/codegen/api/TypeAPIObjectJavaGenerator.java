@@ -116,7 +116,7 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         classBodyBuilder.append("}");
 
         StringBuilder classBuilder = new StringBuilder();
-        appendPackageAndCommonImports(classBuilder);
+        appendPackageAndCommonImports(classBuilder, apiClassname);
 
         for(Class<?> clazz : importClasses) {
             classBuilder.append("import ").append(clazz.getName()).append(";\n");

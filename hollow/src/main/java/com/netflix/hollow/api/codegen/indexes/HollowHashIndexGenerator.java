@@ -21,6 +21,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
@@ -29,6 +30,8 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaSorter;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,7 +58,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
 
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiClassname, schemaList);
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + HollowHashIndexResult.class.getName() + ";\n");

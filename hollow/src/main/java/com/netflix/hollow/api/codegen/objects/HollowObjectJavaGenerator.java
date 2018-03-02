@@ -80,7 +80,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     @Override
     public String generate() {
         StringBuilder classBuilder = new StringBuilder();
-        appendPackageAndCommonImports(classBuilder);
+        appendPackageAndCommonImports(classBuilder, apiClassname);
 
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n\n");

@@ -23,6 +23,9 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+
+import java.util.Arrays;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
@@ -53,8 +56,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
-
+        appendPackageAndCommonImports(builder, apiClassname, Arrays.<HollowSchema>asList(schema));
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + AbstractHollowUniqueKeyIndex.class.getName() + ";\n");
         if (isGenSimpleConstructor)
