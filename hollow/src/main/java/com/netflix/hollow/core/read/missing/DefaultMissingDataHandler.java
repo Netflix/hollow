@@ -42,6 +42,11 @@ public class DefaultMissingDataHandler implements MissingDataHandler {
     }
 
     @Override
+    public byte handleByte(String type, int ordinal, String field) {
+        return Byte.MIN_VALUE;
+    }
+
+    @Override
     public int handleInt(String type, int ordinal, String field) {
         return Integer.MIN_VALUE;
     }
