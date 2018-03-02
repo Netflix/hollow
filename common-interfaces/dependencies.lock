@@ -683,7 +683,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -1726,7 +1726,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -2844,7 +2844,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -3887,7 +3887,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -5005,7 +5005,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -6048,7 +6048,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -7288,7 +7288,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -8331,7 +8331,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -9449,7 +9449,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -10492,7 +10492,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -11610,7 +11610,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -12653,7 +12653,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -13780,7 +13780,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -14823,7 +14823,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -15950,7 +15950,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -16993,7 +16993,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -18120,7 +18120,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.13.0",
+            "locked": "2.14.0",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -19163,7 +19163,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.265",
+            "locked": "100.0.266",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
