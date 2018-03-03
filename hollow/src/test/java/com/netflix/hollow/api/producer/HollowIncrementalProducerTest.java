@@ -19,8 +19,6 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
-import com.netflix.hollow.api.metrics.HollowMetricsCollector;
-import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
@@ -36,7 +34,9 @@ import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +50,9 @@ public class HollowIncrementalProducerTest {
     public void setUp() {
         blobStore = new InMemoryBlobStore();
     }
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void publishAndLoadASnapshot() {
@@ -71,7 +74,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.delete(new TypeB(2, "3"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
 
         /// .runCycle() flushes the changes to a new data state.
         long nextVersion = incrementalProducer.runCycle();
@@ -135,7 +138,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.delete(new TypeB(2, "3"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
         incrementalProducer.addOrModify(new TypeA(4, "four", 4));
 
         /// .runCycle() flushes the changes to a new data state.
@@ -193,24 +196,24 @@ public class HollowIncrementalProducerTest {
                 state.add(new TypeA(1, "one", 1));
             }
         });
-        
+
         /// now at some point in the future, we will start up and create a new classic producer 
         /// to back the HollowIncrementalProducer.
         HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
-                                                   .withBlobStager(new HollowInMemoryBlobStager())
-                                                   .build();
-        
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
         /// adding a new type this time (TypeB).
         backingProducer.initializeDataModel(TypeA.class, TypeB.class);
-         
+
         /// now create our HollowIncrementalProducer
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(backingProducer);
         incrementalProducer.restore(originalVersion, blobStore);
-        
+
         incrementalProducer.addOrModify(new TypeA(1, "one", 2));
         incrementalProducer.addOrModify(new TypeA(2, "two", 2));
         incrementalProducer.addOrModify(new TypeB(3, "three"));
-        
+
         long version = incrementalProducer.runCycle();
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
@@ -222,17 +225,104 @@ public class HollowIncrementalProducerTest {
 
         assertTypeA(idx, 1, "one", 2L);
         assertTypeA(idx, 2, "two", 2L);
-        
+
         /// consumers with established data models don't have visibility into new types.
         consumer = HollowConsumer.withBlobRetriever(blobStore).build();
         consumer.triggerRefreshTo(version);
-        
+
         idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
         Assert.assertFalse(idx.containsDuplicates());
-        
+
         assertTypeB(idx, 3, "three");
     }
 
+    @Test
+    public void continuesARestoredStateWithBuilder() {
+        HollowProducer genesisProducer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        long originalVersion = genesisProducer.runCycle(new Populator() {
+            public void populate(WriteState state) throws Exception {
+                state.add(new TypeA(1, "one", 1));
+            }
+        });
+
+        /// now at some point in the future, we will start up and create a new classic producer
+        /// to back the HollowIncrementalProducer.
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer.withProducer(backingProducer)
+                .withBlobRetriever(blobStore)
+                .withAnnouncementWatcher(new FakeAnnouncementWatcher(originalVersion))
+                .withDataModel(TypeA.class, TypeB.class)
+                .build();
+
+
+        incrementalProducer.restoreFromLastState();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 2));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeB(3, "three"));
+
+        long version = incrementalProducer.runCycle();
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(originalVersion);
+        consumer.triggerRefreshTo(version);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 2L);
+        assertTypeA(idx, 2, "two", 2L);
+
+        /// consumers with established data models don't have visibility into new types.
+        consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 3, "three");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void failsWhenLastStateIsNotAvailable() {
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer.withProducer(backingProducer)
+                .withBlobRetriever(blobStore)
+                .withAnnouncementWatcher(new FakeAnnouncementWatcher(0))
+                .withDataModel(TypeA.class, TypeB.class)
+                .build();
+
+        incrementalProducer.restoreFromLastState();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsWithNoProducer() {
+        //No Hollow Producer
+        HollowIncrementalProducer.withProducer(null)
+                .build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void failsWhenNotEnoughArgs() {
+
+        HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
+        //No AnnouncementWatcher, BlobRetriever and DataModel to restore
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer.withProducer(backingProducer)
+                .build();
+
+        incrementalProducer.restoreFromLastState();
+    }
 
     @Test
     public void publishUsingThreadConfig() {
@@ -254,7 +344,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.delete(new TypeB(2, "3"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
 
         /// .runCycle() flushes the changes to a new data state.
         long nextVersion = incrementalProducer.runCycle();
@@ -341,7 +431,7 @@ public class HollowIncrementalProducerTest {
         Assert.assertTrue(incrementalProducer.hasChanges());
 
         //Discard with a PrimaryKey
-        incrementalProducer.discard(new RecordPrimaryKey("TypeB", new Object[]{ 1 }));
+        incrementalProducer.discard(new RecordPrimaryKey("TypeB", new Object[]{1}));
 
         Assert.assertFalse(incrementalProducer.hasChanges());
 
@@ -373,7 +463,7 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.delete(new TypeB(2, "3"));
         incrementalProducer.addOrModify(new TypeB(5, "5"));
         incrementalProducer.addOrModify(new TypeB(5, "6"));
-        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[]{3}));
 
         Assert.assertTrue(incrementalProducer.hasChanges());
 
@@ -404,9 +494,9 @@ public class HollowIncrementalProducerTest {
         consumer.triggerRefreshTo(nextVersion);
 
 
-        Collection<HollowObject> allHollowObjectsTypeD =  getAllHollowObjects(consumer, "TypeD");
+        Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> typeDNames = new ArrayList<>();
-        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+        for (HollowObject hollowObject : allHollowObjectsTypeD) {
             typeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -424,7 +514,7 @@ public class HollowIncrementalProducerTest {
 
         allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+        for (HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -465,7 +555,7 @@ public class HollowIncrementalProducerTest {
 
         Collection<HollowObject> allHollowObjectsTypeD = getAllHollowObjects(consumer, "TypeD");
         List<String> finalTypeDNames = new ArrayList<>();
-        for(HollowObject hollowObject : allHollowObjectsTypeD) {
+        for (HollowObject hollowObject : allHollowObjectsTypeD) {
             finalTypeDNames.add(((GenericHollowObject) hollowObject).getObject("value").toString());
         }
 
@@ -496,7 +586,7 @@ public class HollowIncrementalProducerTest {
     }
 
     private void assertTypeA(HollowPrimaryKeyIndex typeAIdx, int id1,
-            String id2, Long expectedValue) {
+                             String id2, Long expectedValue) {
         int ordinal = typeAIdx.getMatchingOrdinal(id1, id2);
 
         if (expectedValue == null) {
@@ -510,7 +600,7 @@ public class HollowIncrementalProducerTest {
     }
 
     private void assertTypeB(HollowPrimaryKeyIndex typeBIdx, int id1,
-            String expectedValue) {
+                             String expectedValue) {
         int ordinal = typeBIdx.getMatchingOrdinal(id1);
 
         if (expectedValue == null) {
@@ -525,7 +615,7 @@ public class HollowIncrementalProducerTest {
     }
 
     @SuppressWarnings("unused")
-    @HollowPrimaryKey(fields = { "id1", "id2" })
+    @HollowPrimaryKey(fields = {"id1", "id2"})
     private static class TypeA {
         int id1;
         String id2;
@@ -586,4 +676,26 @@ public class HollowIncrementalProducerTest {
         };
     }
 
+    private static class FakeAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
+
+        private final long fakeVersion;
+
+        FakeAnnouncementWatcher(long fakeVersion) {
+            this.fakeVersion = fakeVersion;
+        }
+
+        @Override
+        public long getLatestVersion() {
+            return fakeVersion;
+        }
+
+        @Override
+        public void subscribeToUpdates(HollowConsumer consumer) {
+
+        }
+
+        public long getFakeVersion() {
+            return fakeVersion;
+        }
+    }
 }

@@ -17,7 +17,9 @@
  */
 package com.netflix.hollow.api.producer;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
+import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -33,15 +35,39 @@ public class HollowIncrementalProducer {
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
+    private final Class<?>[] dataModel;
+    private final HollowConsumer.AnnouncementWatcher announcementWatcher;
+    private final HollowConsumer.BlobRetriever blobRetriever;
     
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d);
     }
 
+    //For backwards compatible. TODO: @Deprecated ??
     public HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu) {
+        this(producer, threadsPerCpu, null, null, null);
+    }
+
+    protected HollowIncrementalProducer(HollowProducer producer, double threadsPerCpu, HollowConsumer.AnnouncementWatcher announcementWatcher, HollowConsumer.BlobRetriever blobRetriever, Class<?>...classes) {
         this.producer = producer;
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
         this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
+        this.dataModel = classes;
+        this.announcementWatcher = announcementWatcher;
+        this.blobRetriever = blobRetriever;
+    }
+
+    /**
+     * Initializes the data model and restores from existing state.
+     */
+    public void restoreFromLastState() {
+        producer.initializeDataModel(dataModel);
+        long latestAnnouncedVersion = announcementWatcher.getLatestVersion();
+        if(latestAnnouncedVersion == HollowFilesystemAnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE || latestAnnouncedVersion < 0) {
+            return;
+        }
+
+        restore(latestAnnouncedVersion, blobRetriever);
     }
 
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
@@ -91,4 +117,54 @@ public class HollowIncrementalProducer {
     private RecordPrimaryKey extractRecordPrimaryKey(Object obj) {
         return producer.getObjectMapper().extractPrimaryKey(obj);
     }
+
+    public static HollowIncrementalProducer.Builder withProducer(HollowProducer hollowProducer) {
+        Builder builder = new Builder();
+        return builder.withProducer(hollowProducer);
+    }
+
+    public static class Builder<B extends HollowIncrementalProducer.Builder<B>> {
+        protected HollowProducer producer;
+        protected double threadsPerCpu = 1.0d;
+        protected HollowConsumer.AnnouncementWatcher announcementWatcher;
+        protected HollowConsumer.BlobRetriever blobRetriever;
+        protected Class<?>[] dataModel;
+
+        public B withProducer(HollowProducer producer) {
+            this.producer = producer;
+            return (B)this;
+        }
+
+        public B withThreadsPerCpu(double threadsPerCpu) {
+            this.threadsPerCpu = threadsPerCpu;
+            return (B)this;
+        }
+
+        public B withAnnouncementWatcher(HollowConsumer.AnnouncementWatcher announcementWatcher) {
+            this.announcementWatcher = announcementWatcher;
+            return (B)this;
+        }
+
+        public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+            this.blobRetriever = blobRetriever;
+            return (B)this;
+        }
+
+        public B withDataModel(Class<?>...classes) {
+            this.dataModel = classes;
+            return (B)this;
+        }
+
+        protected void checkArguments() {
+            if(producer == null)
+                throw new IllegalArgumentException("HollowProducer must be specified.");
+
+        }
+
+        public HollowIncrementalProducer build() {
+            checkArguments();
+            return new HollowIncrementalProducer(producer, threadsPerCpu, announcementWatcher, blobRetriever, dataModel);
+        }
+    }
+
 }
