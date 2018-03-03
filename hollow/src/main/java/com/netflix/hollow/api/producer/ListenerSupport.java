@@ -19,6 +19,7 @@ package com.netflix.hollow.api.producer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -137,13 +138,17 @@ final class ListenerSupport {
 
     ProducerStatus.Builder fireValidationStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
-        for(final HollowProducerListener l : listeners) l.onValidationStart(psb.version());
-        
         long version = readState.getVersion();
-        for(final HollowValidationListener vl: validationListeners){
-			vl.onValidationStart(version);
+        Set<Object> firedListeners = new HashSet<>();
+        for (final HollowProducerListener l : listeners) {
+            l.onValidationStart(version);
+            firedListeners.add(l);
         }
-        
+        for (final HollowValidationListener vl: validationListeners){
+            if (!firedListeners.contains(vl)) {
+                vl.onValidationStart(version);
+            }
+        }
         return psb;
     }
 
