@@ -19,8 +19,6 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
-import com.netflix.hollow.api.metrics.HollowMetricsCollector;
-import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
@@ -37,6 +35,7 @@ import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -384,6 +383,58 @@ public class HollowIncrementalProducerTest {
     }
 
     @Test
+    public void resumeWorkAfterAnnouncementFail() {
+        FakeAnnouncer fakeAnnouncer = new FakeAnnouncer();
+        FakeAnnouncer fakeAnnouncerSpy = Mockito.spy(fakeAnnouncer);
+        HollowProducer producer =  HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withAnnouncer(fakeAnnouncerSpy)
+                .withVersionMinter(new HollowProducer.VersionMinter() {
+                    long counter = 0;
+                    public long mint() {
+                        return ++counter;
+                    }
+                })
+                .withNumStatesBetweenSnapshots(5)
+                .build();
+
+        initializeData(producer);
+
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+        incrementalProducer.addOrModify(new TypeA(11, "eleven", 11));
+        incrementalProducer.runCycle();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+
+        //Fail announcement on this cycle
+        Mockito.doThrow(new RuntimeException("oops")).when(fakeAnnouncerSpy).announce(3);
+
+        try {
+            incrementalProducer.runCycle();
+        } catch (RuntimeException e) {
+        }
+
+        //Incremental producer still has changes
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        incrementalProducer.addOrModify(new TypeA(10, "ten", 100));
+        long version = incrementalProducer.runCycle();
+
+        Assert.assertFalse(incrementalProducer.hasChanges());
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 10, "ten", 100L);
+    }
+
+
+    @Test
     public void removeOrphanObjectsWithTypeInSnapshot() {
         HollowProducer producer = createInMemoryProducer();
         producer.runCycle(new Populator() {
@@ -470,6 +521,12 @@ public class HollowIncrementalProducerTest {
         }
 
         Assert.assertFalse(finalTypeDNames.contains("two"));
+    }
+
+    private static class FakeAnnouncer implements HollowProducer.Announcer {
+        @Override
+        public void announce(long stateVersion) {
+        }
     }
 
     private HollowProducer createInMemoryProducer() {
