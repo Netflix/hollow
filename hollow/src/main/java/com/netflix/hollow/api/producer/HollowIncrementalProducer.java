@@ -33,7 +33,8 @@ public class HollowIncrementalProducer {
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
-    
+    private long lastSucessfulCycle;
+
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d);
     }
@@ -84,7 +85,12 @@ public class HollowIncrementalProducer {
      */
     public long runCycle() {
         long version = producer.runCycle(populator);
+        if(version == lastSucessfulCycle) {
+            return version;
+        }
+        //Only clean changes when the version is new.
         clearChanges();
+        lastSucessfulCycle = version;
         return version;
     }
 
