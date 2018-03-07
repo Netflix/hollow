@@ -4,6 +4,11 @@ import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraH
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.DataCanary;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
@@ -18,10 +23,6 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
 import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
@@ -51,64 +52,67 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
     private boolean getPlayBackMonkeyResult() {
         boolean pbmSuccess = true;
-        if (!ctx.getConfig().isPlaybackMonkeyEnabled())
-            return pbmSuccess;
-        try {
-            RegionEnum region = RegionEnum.US_EAST_1;
-            final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = beforeCanaryAnnounceJobs.get(region);
-            final AfterCanaryAnnounceJob afterCanaryAnnounceJob = afterCanaryAnnounceJobs.get(region);
-            final Map<VideoCountryKey, Boolean> befTestResults = beforeCanaryAnnounceJob.getTestResults();
-            final Map<VideoCountryKey, Boolean> aftTestResults = afterCanaryAnnounceJob.getTestResults();
-
-            List<VideoCountryKey> failedIDs = new ArrayList<>();
-            if (bothResultsAreNonEmpty(befTestResults, aftTestResults)) {
-            	List<VideoCountryKey> failedInBothBeforeAfter = new ArrayList<>();
-                for (final VideoCountryKey videoCountry: befTestResults.keySet()) {
-                    final Boolean afterTestSuccess = aftTestResults.get(videoCountry);
-                    final Boolean beforeTestSuccess = befTestResults.get(videoCountry);
-
-                    // If before passed and after failed, then fail the data version.
-                    if (videoFailedWithNewDataButPassedWithOld(beforeTestSuccess, afterTestSuccess)) {
-                        failedIDs.add(videoCountry);
-                    }
-                    // If before passed and after passed or if before failed and after passed, the data is good.
-                    // If before failed and after failed: if only a few videos are this way then with high confidence it's not data.
-                    // If all videos are failing before and after then there is a potential data issue but playback monkey cannot give signal due
-                    // its own environment issues. To handle this case we fail BeforeTest canary thus failing cycle if majority of videos are failing playback.
-                    if(videoFailedWithBothOldAndNew(beforeTestSuccess, afterTestSuccess)) // Collecting just for visibility
-                    	failedInBothBeforeAfter.add(videoCountry);
-                }
-                if(!failedInBothBeforeAfter.isEmpty())
-                    ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true,
-                            "IDs failed both before and after tests (added for visibility and these do not break cycles)", failedInBothBeforeAfter));
-            } else {
-                pbmSuccess = false;
-            }
-
-            // Clean-up to release the results as the before and after jobs are held onto by the history.
-            beforeCanaryAnnounceJob.clearResults();
-            afterCanaryAnnounceJob.clearResults();
-            validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
-
-            if(!failedIDs.isEmpty()){
-                float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
-                Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
-                for(String countryId: viewShareOfFailedVideos.keySet()){
-                	boolean pbmSuccessForThisCountry = true;
-                    Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
-                    if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
-                        pbmSuccess = false;
-                        pbmSuccessForThisCountry = false;
-                    }
-                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry, failedIDs);
-                }
-            }
-            logFailedIDs(pbmSuccess, befTestResults, failedIDs);
-        } catch(Exception ex) {
-            ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
-            pbmSuccess = false;
+        if (ctx.getConfig().isPlaybackMonkeyEnabled()){
+	        try {
+	            RegionEnum region = RegionEnum.US_EAST_1;
+	            final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = beforeCanaryAnnounceJobs.get(region);
+	            final AfterCanaryAnnounceJob afterCanaryAnnounceJob = afterCanaryAnnounceJobs.get(region);
+	            final Map<VideoCountryKey, Boolean> befTestResults = beforeCanaryAnnounceJob.getTestResults();
+	            final Map<VideoCountryKey, Boolean> aftTestResults = afterCanaryAnnounceJob.getTestResults();
+	
+	            List<VideoCountryKey> failedIDs = new ArrayList<>();
+	            if (bothResultsAreNonEmpty(befTestResults, aftTestResults)) {
+	            	List<VideoCountryKey> failedInBothBeforeAfter = new ArrayList<>();
+	                for (final VideoCountryKey videoCountry: befTestResults.keySet()) {
+	                    final Boolean afterTestSuccess = aftTestResults.get(videoCountry);
+	                    final Boolean beforeTestSuccess = befTestResults.get(videoCountry);
+	
+	                    // If before passed and after failed, then fail the data version.
+	                    if (videoFailedWithNewDataButPassedWithOld(beforeTestSuccess, afterTestSuccess)) {
+	                        failedIDs.add(videoCountry);
+	                    }
+	                    // If before passed and after passed or if before failed and after passed, the data is good.
+	                    // If before failed and after failed: if only a few videos are this way then with high confidence it's not data.
+	                    // If all videos are failing before and after then there is a potential data issue but playback monkey cannot give signal due
+	                    // its own environment issues. To handle this case we fail BeforeTest canary thus failing cycle if majority of videos are failing playback.
+	                    if(videoFailedWithBothOldAndNew(beforeTestSuccess, afterTestSuccess)) // Collecting just for visibility
+	                    	failedInBothBeforeAfter.add(videoCountry);
+	                }
+	                if(!failedInBothBeforeAfter.isEmpty())
+	                    ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true,
+	                            "IDs failed both before and after tests (added for visibility and these do not break cycles)", failedInBothBeforeAfter));
+	            } else {
+	                pbmSuccess = false;
+	            }
+	
+	            // Clean-up to release the results as the before and after jobs are held onto by the history.
+	            beforeCanaryAnnounceJob.clearResults();
+	            afterCanaryAnnounceJob.clearResults();
+	            validationVideoHolder.onCycleComplete(getCycleVersion(), failedIDs);
+	
+	            if(!failedIDs.isEmpty()){
+	                float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
+	                Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
+	                for(String countryId: viewShareOfFailedVideos.keySet()){
+	                	boolean pbmSuccessForThisCountry = true;
+	                    Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);
+	                    if(missingViewShareForCountry != null && Float.compare(missingViewShareForCountry, missingViewShareThreshold) > 0){
+	                        pbmSuccess = false;
+	                        pbmSuccessForThisCountry = false;
+	                    }
+	                    logMissingViewShare(pbmSuccessForThisCountry, missingViewShareThreshold, countryId, missingViewShareForCountry, failedIDs);
+	                }
+	            }
+	            logFailedIDs(pbmSuccess, befTestResults, failedIDs);
+	        } catch(Exception ex) {
+	            ctx.getLogger().error(PlaybackMonkey, "Error validating PBM results.", ex);
+	            pbmSuccess = false;
+	        }
         }
-        return PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        boolean finalResultAferPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        // Send success or failure result from here. As this is the final PBM step.
+        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
+		return finalResultAferPBMOverride;
     }
 
 
@@ -118,7 +122,6 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
                 ctx.getLogger().error(PlaybackMonkey, getFailureReason(befTestResults, failedIDs));
 			else
                 ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true, "failedIds not empty", failedIDs));
-            ;
 		}
 	}
 
