@@ -89,6 +89,15 @@ public class HollowBlobDataProvider {
     private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
         FileStatLogger.logFileState(ctx.getLogger(), BlobChecksum, "validateChecksums", snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
 
+        // -----------------------------------
+        // Make sure reserve delta file exists
+        if (deltaFile.exists() && !reverseDeltaFile.exists()) {
+            throw new RuntimeException("deltaFile=" + deltaFile + " but missing reverseDeltaFile");
+        }
+        if (nostreamsDeltaFile.exists() && !nostreamsReverseDeltaFile.exists()) {
+            throw new RuntimeException("nostreamsDeltaFile=" + nostreamsDeltaFile + " but missing nostreamsReverseDeltaFile");
+        }
+
         // ----------------------
         // Handle new Snapshot State
         HollowReadStateEngine anotherStateEngine = new HollowReadStateEngine();
