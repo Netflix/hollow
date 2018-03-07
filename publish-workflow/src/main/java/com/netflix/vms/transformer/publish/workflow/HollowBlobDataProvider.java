@@ -92,10 +92,10 @@ public class HollowBlobDataProvider {
         // -----------------------------------
         // Make sure reserve delta file exists
         if (deltaFile.exists() && !reverseDeltaFile.exists()) {
-            throw new RuntimeException("deltaFile=" + deltaFile + " but missing reverseDeltaFile");
+            throw new RuntimeException("Found deltaFile=" + deltaFile + " but missing reverseDeltaFile");
         }
         if (nostreamsDeltaFile.exists() && !nostreamsReverseDeltaFile.exists()) {
-            throw new RuntimeException("nostreamsDeltaFile=" + nostreamsDeltaFile + " but missing nostreamsReverseDeltaFile");
+            throw new RuntimeException("Found nostreamsDeltaFile=" + nostreamsDeltaFile + " but missing nostreamsReverseDeltaFile");
         }
 
         // ----------------------
