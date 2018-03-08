@@ -51,11 +51,16 @@ public class HollowBlobDataProvider {
     }
 
     public synchronized void revertToPriorVersion() {
-        if(revertableStateEngine != null) {
+        if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {
             ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
+        } else {
+            ctx.getLogger().info(RollbackStateEngine, "Did not rollback state engine in circuit breaker data provider because revertableStateEngine( missing={} ) or revertableNostreamsStateEngine( missing={} )",
+                    null == revertableStateEngine,
+                    null == revertableNostreamsStateEngine);
         }
+
         // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
         if (ctx.getConfig().isHollowBlobDataProviderResetStateEnabled()) { // Condition to be backwards compatible
             revertableStateEngine = null;
