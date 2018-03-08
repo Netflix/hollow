@@ -51,11 +51,19 @@ public class HollowBlobDataProvider {
     }
 
     public synchronized void revertToPriorVersion() {
-        if(revertableStateEngine != null) {
+        if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {
             ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
+        } else {
+            boolean isMissing_revertableStateEngine = (null == revertableStateEngine);
+            boolean isMissing_revertableNostreamsStateEngine = (null == revertableNostreamsStateEngine);
+            ctx.getLogger().info(RollbackStateEngine,
+                    "Did NOT rollback state engine in circuit breaker data provider because revertableStateEngine( missing={} ) or revertableNostreamsStateEngine( missing={} )",
+                    isMissing_revertableStateEngine,
+                    isMissing_revertableNostreamsStateEngine);
         }
+
         // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
         if (ctx.getConfig().isHollowBlobDataProviderResetStateEnabled()) { // Condition to be backwards compatible
             revertableStateEngine = null;
@@ -88,6 +96,15 @@ public class HollowBlobDataProvider {
 
     private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
         FileStatLogger.logFileState(ctx.getLogger(), BlobChecksum, "validateChecksums", snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
+
+        // -----------------------------------
+        // Make sure reserve delta file exists
+        if (deltaFile.exists() && !reverseDeltaFile.exists()) {
+            throw new RuntimeException("Found deltaFile=" + deltaFile + " but missing reverseDeltaFile");
+        }
+        if (nostreamsDeltaFile.exists() && !nostreamsReverseDeltaFile.exists()) {
+            throw new RuntimeException("Found nostreamsDeltaFile=" + nostreamsDeltaFile + " but missing nostreamsReverseDeltaFile");
+        }
 
         // ----------------------
         // Handle new Snapshot State
