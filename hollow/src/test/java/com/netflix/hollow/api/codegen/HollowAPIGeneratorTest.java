@@ -3,6 +3,7 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,6 +53,8 @@ public class HollowAPIGeneratorTest {
         } catch (IOException e) {
             throw new RuntimeException("Could not write files to: " + clazzFolder);
         }
+
+        Assert.assertTrue(clazzFiles.list().length > 0);
     }
 
     @SuppressWarnings("unused")
