@@ -25,6 +25,19 @@ function SearchWidgetExecutor(widget, model) {
     };
 }
 
+function InputDataVersionWidgetExecutor(widget) {
+    this.widget = widget;
+    var model = ResponseModelsFactory.prototype.getModel("InputDataVersionModel");
+    this.searchQuery = new SearchQuery();
+    var searchQuery = this.searchQuery;
+
+    this.updateJsonFromSearch = function() {
+        var dao = new InputDataVersionSearchDAO(widget, model);
+        var queryURL = UrlMapper.prototype.getIndexHost() + searchQuery.toQueryString();
+        new GetJsonFromSearch(queryURL, dao).updateJsonFromSearch();
+    };
+}
+
 function KeyValueWidgetExecutor(widget, keypath, keysOnly) {
     this.widget = widget;
     this.keyPath = keypath;
@@ -469,25 +482,24 @@ function InfoTile(divId, params) {
 //PlainTextViewWidget
 //--------------------------------------------------------------------
 function PlainTextViewWidget(divname, field) {
- this.divName = divname;
- this.dataModel = null;
- this.fieldName = field;
+     this.divName = divname;
+     this.dataModel = null;
+     this.fieldName = field;
 
- this.clear = function() {
-     $(this.divId).html("");
- };
+     this.clear = function() {
+         $(this.divId).html("");
+     };
 
- // same model as table:  rows of key-value maps
- this.applyParserData = function(model) {
-     $(this.divName).html("");
-     this.dataModel = model[0];
-     this.refresh();
- };
+     // same model as table:  rows of key-value maps
+     this.applyParserData = function(model) {
+         $(this.divName).html("");
+         this.dataModel = model[0];
+         this.refresh();
+     };
 
- this.refresh = function() {
-     $(this.divName).text(this.dataModel[this.fieldName]);
- };
-
+     this.refresh = function() {
+         $(this.divName).text(this.dataModel[this.fieldName]);
+     };
 }
 
 // --------------------------------------------------------------------
