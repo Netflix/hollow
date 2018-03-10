@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
-
 import com.netflix.hollow.api.objects.HollowMap;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import java.util.Iterator;
 import java.util.Map;
 

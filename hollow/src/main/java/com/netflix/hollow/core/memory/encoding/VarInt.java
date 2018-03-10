@@ -19,7 +19,6 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

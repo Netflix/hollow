@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.index.GrowingSegmentedLongArray;
-
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import org.junit.Assert;
 import org.junit.Test;

@@ -18,7 +18,6 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;

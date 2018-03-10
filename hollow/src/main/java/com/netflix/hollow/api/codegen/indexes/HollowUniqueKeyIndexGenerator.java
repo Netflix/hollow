@@ -24,7 +24,6 @@ import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
-
 import java.util.Arrays;
 
 /**

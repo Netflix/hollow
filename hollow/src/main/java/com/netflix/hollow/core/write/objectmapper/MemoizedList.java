@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A MemoizedList is a java.util.ArrayList which is expected to be memoized during a producer cycle.

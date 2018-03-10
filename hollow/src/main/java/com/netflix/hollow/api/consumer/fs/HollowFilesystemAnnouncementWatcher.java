@@ -17,9 +17,11 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
+import static java.nio.file.Files.getLastModifiedTime;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -28,12 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static java.nio.file.Files.getLastModifiedTime;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
 

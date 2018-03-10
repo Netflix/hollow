@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.memory.pool;
 
 import com.netflix.hollow.core.memory.SegmentedByteArray;
-
 import com.netflix.hollow.core.memory.SegmentedLongArray;
 
 /**

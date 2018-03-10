@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import com.netflix.hollow.core.memory.SegmentedByteArray;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
-
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.memory.SegmentedByteArray;
 
 /**
  * This class contains the logic for applying a delta to a current OBJECT type state

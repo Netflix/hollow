@@ -18,10 +18,9 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * A delegate used by the {@link GenericHollowObject} of the Generic Hollow Object API.

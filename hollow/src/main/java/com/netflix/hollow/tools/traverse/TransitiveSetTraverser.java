@@ -20,13 +20,6 @@ package com.netflix.hollow.tools.traverse;
 import static com.netflix.hollow.tools.traverse.TransitiveSetTraverser.TransitiveSetTraverserAction.ADD_REFERENCING_OUTSIDE_CLOSURE;
 import static com.netflix.hollow.tools.traverse.TransitiveSetTraverser.TransitiveSetTraverserAction.REMOVE_REFERENCED_OUTSIDE_CLOSURE;
 
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
-
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -35,9 +28,15 @@ import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
-import java.util.BitSet;
 import java.util.Map;
 
 /**

@@ -17,16 +17,15 @@
  */
 package com.netflix.hollow.tools.combine;
 
-import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import java.util.HashSet;
-import java.util.Set;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Specifies a set of exclusions for a {@link HollowCombiner}'s operation over one or more inputs.

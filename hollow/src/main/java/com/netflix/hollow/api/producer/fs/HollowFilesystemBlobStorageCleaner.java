@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;

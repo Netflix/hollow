@@ -17,32 +17,39 @@
  */
 package com.netflix.hollow.api.consumer.data;
 
-import com.netflix.hollow.core.type.*;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.Map;
 import com.netflix.hollow.api.consumer.HollowConsumerAPI;
 import com.netflix.hollow.api.custom.HollowAPI;
-import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.missing.HollowObjectMissingDataAccess;
-import com.netflix.hollow.core.read.dataaccess.missing.HollowListMissingDataAccess;
-import com.netflix.hollow.core.read.dataaccess.missing.HollowSetMissingDataAccess;
-import com.netflix.hollow.core.read.dataaccess.missing.HollowMapMissingDataAccess;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
-import com.netflix.hollow.api.objects.provider.HollowObjectProvider;
 import com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider;
 import com.netflix.hollow.api.objects.provider.HollowObjectFactoryProvider;
-import com.netflix.hollow.api.sampling.HollowObjectCreationSampler;
-import com.netflix.hollow.api.sampling.HollowSamplingDirector;
-import com.netflix.hollow.api.sampling.SampleResult;
+import com.netflix.hollow.api.objects.provider.HollowObjectProvider;
+import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.read.dataaccess.missing.HollowObjectMissingDataAccess;
+import com.netflix.hollow.core.type.BooleanHollowFactory;
+import com.netflix.hollow.core.type.BooleanTypeAPI;
+import com.netflix.hollow.core.type.DoubleHollowFactory;
+import com.netflix.hollow.core.type.DoubleTypeAPI;
+import com.netflix.hollow.core.type.FloatHollowFactory;
+import com.netflix.hollow.core.type.FloatTypeAPI;
+import com.netflix.hollow.core.type.HBoolean;
+import com.netflix.hollow.core.type.HDouble;
+import com.netflix.hollow.core.type.HFloat;
+import com.netflix.hollow.core.type.HInteger;
+import com.netflix.hollow.core.type.HLong;
+import com.netflix.hollow.core.type.HString;
+import com.netflix.hollow.core.type.IntegerHollowFactory;
+import com.netflix.hollow.core.type.IntegerTypeAPI;
+import com.netflix.hollow.core.type.LongHollowFactory;
+import com.netflix.hollow.core.type.LongTypeAPI;
+import com.netflix.hollow.core.type.StringHollowFactory;
+import com.netflix.hollow.core.type.StringTypeAPI;
 import com.netflix.hollow.core.util.AllHollowRecordCollection;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("all")
 public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAPI.FloatRetriever, HollowConsumerAPI.DoubleRetriever, HollowConsumerAPI.LongRetriever, HollowConsumerAPI.StringRetriever, HollowConsumerAPI.IntegerRetriever, HollowConsumerAPI.BooleanRetriever {

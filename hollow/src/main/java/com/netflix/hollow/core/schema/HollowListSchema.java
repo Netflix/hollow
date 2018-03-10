@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

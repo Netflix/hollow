@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

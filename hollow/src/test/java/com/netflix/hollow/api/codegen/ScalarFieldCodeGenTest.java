@@ -15,15 +15,13 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 
 public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
 

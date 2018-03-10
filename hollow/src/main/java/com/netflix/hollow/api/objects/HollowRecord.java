@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.api.objects;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 /**
  * A HollowRecord is the base interface for accessing data from any kind of record

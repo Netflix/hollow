@@ -25,14 +25,13 @@ import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.TypeOverview;
 import com.netflix.hollow.ui.HollowUISession;
-import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.velocity.VelocityContext;
 
 public class ShowAllTypesPage extends HollowExplorerPage {
 

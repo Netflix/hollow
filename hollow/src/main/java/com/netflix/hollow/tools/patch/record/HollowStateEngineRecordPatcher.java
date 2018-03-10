@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.tools.patch.record;
 
-import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
-import com.netflix.hollow.tools.combine.HollowCombiner;
-import com.netflix.hollow.tools.combine.HollowCombinerCopyDirector;
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.tools.combine.HollowCombiner;
+import com.netflix.hollow.tools.combine.HollowCombinerCopyDirector;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;

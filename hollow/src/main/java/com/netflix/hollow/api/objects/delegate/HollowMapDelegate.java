@@ -18,11 +18,10 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowMapTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.api.objects.HollowMap;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import java.util.Map;
 
 /**

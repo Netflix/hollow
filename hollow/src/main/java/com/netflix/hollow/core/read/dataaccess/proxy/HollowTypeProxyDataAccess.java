@@ -19,11 +19,10 @@ package com.netflix.hollow.core.read.dataaccess.proxy;
 
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
-
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 
 /**
  * A {@link HollowTypeDataAccess} which delegates all calls to another {@link HollowTypeDataAccess}

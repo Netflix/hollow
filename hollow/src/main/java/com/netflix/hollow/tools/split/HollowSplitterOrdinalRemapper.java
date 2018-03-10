@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.tools.split;
 
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
-
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

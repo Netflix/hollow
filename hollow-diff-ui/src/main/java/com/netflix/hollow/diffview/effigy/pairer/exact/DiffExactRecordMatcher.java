@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.diffview.effigy.pairer.exact;
 
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.MatchIterator;
-
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.MatchIterator;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 
 public class DiffExactRecordMatcher implements ExactRecordMatcher {

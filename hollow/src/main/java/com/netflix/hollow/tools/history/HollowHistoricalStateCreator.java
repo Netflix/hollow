@@ -17,21 +17,6 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.util.IntMap;
-import com.netflix.hollow.core.util.IntMap.IntMapEntryIterator;
-
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowTypeWriteState;
-import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -45,6 +30,20 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectDeltaHistoricalSta
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.engine.set.HollowSetDeltaHistoricalStateCreator;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.IntMap;
+import com.netflix.hollow.core.util.IntMap.IntMapEntryIterator;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
+import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.copy.HollowRecordCopier;
+import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
+import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;

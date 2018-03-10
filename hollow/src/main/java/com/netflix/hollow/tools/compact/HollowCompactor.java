@@ -17,21 +17,20 @@
  */
 package com.netflix.hollow.tools.compact;
 
-import com.netflix.hollow.core.util.IntMap;
-
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
-import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.tools.patch.delta.PartialOrdinalRemapper;
+import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.tools.patch.delta.PartialOrdinalRemapper;
+import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;

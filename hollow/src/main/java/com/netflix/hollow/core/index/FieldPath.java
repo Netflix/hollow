@@ -18,6 +18,9 @@
 
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import static com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+
 import com.netflix.hollow.core.read.dataaccess.HollowCollectionTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -28,10 +31,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-import static com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
-import static com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-
 import java.util.ArrayList;
 import java.util.List;
 

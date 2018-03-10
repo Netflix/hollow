@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.tools.patch.record;
 
-import com.netflix.hollow.tools.combine.HollowCombinerCopyDirector;
-
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.tools.combine.HollowCombinerCopyDirector;
 import java.util.BitSet;
 import java.util.Map;
 

@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.diff.exact;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.util.IntList;
 import java.util.Arrays;
 

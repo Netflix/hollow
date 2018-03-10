@@ -17,13 +17,10 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

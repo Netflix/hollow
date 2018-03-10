@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.zenoadapter.util;
 
-import com.netflix.zeno.serializer.SerializerFactory;
-
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -27,6 +25,7 @@ import com.netflix.hollow.zenoadapter.HollowSerializationFramework;
 import com.netflix.zeno.fastblob.FastBlobStateEngine;
 import com.netflix.zeno.fastblob.state.FastBlobTypeDeserializationState;
 import com.netflix.zeno.serializer.NFTypeSerializer;
+import com.netflix.zeno.serializer.SerializerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

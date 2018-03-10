@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import org.junit.Assert;
 import org.junit.Test;

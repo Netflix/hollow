@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.patch.delta;
 
 import com.netflix.hollow.core.util.IntMap;
-
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.util.HashMap;

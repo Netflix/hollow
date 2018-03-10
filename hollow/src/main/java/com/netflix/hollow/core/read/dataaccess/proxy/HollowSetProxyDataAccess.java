@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.set.PotentialMatchHollowSetOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowSetOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
  * A {@link HollowTypeProxyDataAccess} for a SET type.

@@ -18,11 +18,10 @@
 package com.netflix.hollow.tools.checksum;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import java.util.Collections;
 import java.util.Vector;
 

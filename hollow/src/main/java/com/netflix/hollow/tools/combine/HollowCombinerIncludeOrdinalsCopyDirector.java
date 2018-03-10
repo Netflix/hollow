@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.combine;
 
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-
 import java.util.BitSet;
 import java.util.Map;
 

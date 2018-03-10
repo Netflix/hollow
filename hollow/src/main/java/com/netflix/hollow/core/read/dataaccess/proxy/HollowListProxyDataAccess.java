@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.core.schema.HollowListSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowListOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
  * A {@link HollowTypeProxyDataAccess} for a LIST type.

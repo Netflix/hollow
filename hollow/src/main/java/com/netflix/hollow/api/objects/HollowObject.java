@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.api.objects;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * A HollowObject provides an interface for accessing data from an OBJECT record in

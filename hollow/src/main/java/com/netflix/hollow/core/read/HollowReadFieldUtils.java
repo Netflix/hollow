@@ -18,10 +18,9 @@
 package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.util.Arrays;
 
 /**

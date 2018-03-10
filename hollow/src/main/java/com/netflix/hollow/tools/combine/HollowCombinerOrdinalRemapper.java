@@ -19,7 +19,6 @@ package com.netflix.hollow.tools.combine;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

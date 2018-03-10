@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.history;
 
 import com.netflix.hollow.core.util.IntMap;
-
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 import java.util.HashMap;

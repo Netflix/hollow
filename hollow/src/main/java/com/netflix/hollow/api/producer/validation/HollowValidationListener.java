@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
+import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
-
-import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 /**
  * *************************************
  * NOTE: Beta API subject to change.   *

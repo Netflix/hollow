@@ -19,10 +19,10 @@ package com.netflix.hollow.core.read.engine.set;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-import com.netflix.hollow.core.util.RemovedOrdinalIterator;
-import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.util.IntMap;
+import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 
 /**
  * This class contains the logic for extracting the removed records from an SET type state

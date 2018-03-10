@@ -20,13 +20,12 @@ package com.netflix.hollow.core.write.copy;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.MIXED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.UNMIXED_HASHES;
 
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
-
-import com.netflix.hollow.core.write.HollowMapWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
+import com.netflix.hollow.core.write.HollowMapWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
 
 public class HollowMapCopier extends HollowRecordCopier {
 

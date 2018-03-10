@@ -18,12 +18,11 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.util.SimultaneousExecutor;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Unit tests for SparseBitSet implementation defined in HollowSparseIntegerSet.

@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
-
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 
 public class HollowObjectWriteRecord implements HollowWriteRecord {
 

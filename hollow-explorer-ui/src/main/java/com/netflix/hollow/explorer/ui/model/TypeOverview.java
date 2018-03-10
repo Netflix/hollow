@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.explorer.ui.model;
 
-import java.text.DecimalFormat;
-
-import java.text.NumberFormat;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.schema.HollowSchema;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 public class TypeOverview {
     private static final String[] HEAP_SIZE_UNITS = new String[] { "B", "KB", "MB", "GB", "TB" };

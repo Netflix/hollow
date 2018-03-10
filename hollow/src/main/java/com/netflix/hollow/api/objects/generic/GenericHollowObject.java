@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
-import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 
 /**
  * This is a generic handle to an OBJECT type record. 

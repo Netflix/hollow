@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 public class HollowHashIndexField {
     private final int baseIteratorFieldIdx;

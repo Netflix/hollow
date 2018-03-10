@@ -17,18 +17,17 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.index.key.PrimaryKey;
-
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.AbstractStateEngineTest;
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
