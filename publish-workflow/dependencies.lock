@@ -496,7 +496,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -1112,14 +1112,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -1127,7 +1127,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -1211,19 +1211,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -1263,7 +1263,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -1350,7 +1350,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -1360,7 +1360,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -1368,13 +1368,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -1392,7 +1392,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -1666,7 +1666,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -1764,7 +1764,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -1772,52 +1772,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -2013,7 +2021,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -2022,7 +2030,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -2209,13 +2217,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -2715,8 +2723,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -3702,7 +3709,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -4318,14 +4325,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -4333,7 +4340,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -4417,19 +4424,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -4469,7 +4476,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -4556,7 +4563,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -4566,7 +4573,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -4574,13 +4581,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -4598,7 +4605,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -4872,7 +4879,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -4970,7 +4977,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -4978,52 +4985,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -5219,7 +5234,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -5228,7 +5243,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -5415,13 +5430,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -5921,8 +5936,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -6908,7 +6922,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -7524,14 +7538,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -7539,7 +7553,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -7623,19 +7637,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -7675,7 +7689,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -7762,7 +7776,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -7772,7 +7786,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -7780,13 +7794,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -7804,7 +7818,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -8078,7 +8092,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -8176,7 +8190,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -8184,52 +8198,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -8425,7 +8447,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -8434,7 +8456,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -8621,13 +8643,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -9127,8 +9149,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -10236,7 +10257,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -10852,14 +10873,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -10867,7 +10888,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -10951,19 +10972,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -11003,7 +11024,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -11090,7 +11111,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -11100,7 +11121,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -11108,13 +11129,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -11132,7 +11153,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -11406,7 +11427,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -11504,7 +11525,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -11512,52 +11533,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -11753,7 +11782,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -11762,7 +11791,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -11949,13 +11978,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -12455,8 +12484,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -13442,7 +13470,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -14058,14 +14086,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -14073,7 +14101,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -14157,19 +14185,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -14209,7 +14237,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -14296,7 +14324,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -14306,7 +14334,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -14314,13 +14342,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -14338,7 +14366,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -14612,7 +14640,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -14710,7 +14738,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -14718,52 +14746,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -14959,7 +14995,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -14968,7 +15004,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -15155,13 +15191,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -15661,8 +15697,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -16649,7 +16684,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -17288,14 +17323,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -17303,7 +17338,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -17387,19 +17422,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -17439,7 +17474,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -17526,7 +17561,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -17536,7 +17571,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -17544,13 +17579,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -17568,7 +17603,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -17842,7 +17877,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -17940,7 +17975,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -17948,52 +17983,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -18192,7 +18235,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -18201,7 +18244,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -18388,13 +18431,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -18911,8 +18954,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -19928,7 +19970,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -20567,14 +20609,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -20582,7 +20624,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -20666,19 +20708,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -20718,7 +20760,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -20805,7 +20847,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -20815,7 +20857,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -20823,13 +20865,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -20847,7 +20889,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -21121,7 +21163,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -21219,7 +21261,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -21227,52 +21269,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -21471,7 +21521,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -21480,7 +21530,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -21667,13 +21717,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -22190,8 +22240,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -23207,7 +23256,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -23846,14 +23895,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -23861,7 +23910,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -23945,19 +23994,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -23997,7 +24046,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -24084,7 +24133,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -24094,7 +24143,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -24102,13 +24151,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -24126,7 +24175,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -24400,7 +24449,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -24498,7 +24547,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -24506,52 +24555,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -24750,7 +24807,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -24759,7 +24816,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -24946,13 +25003,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -25469,8 +25526,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
@@ -26486,7 +26542,7 @@
             ]
         },
         "com.google.protobuf:protobuf-java": {
-            "locked": "3.2.0",
+            "locked": "3.5.1",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.vms.events:vmsevents-proto-definition",
@@ -27125,14 +27181,14 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer"
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -27140,7 +27196,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.0.2",
+            "locked": "1.0.4",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
@@ -27224,19 +27280,19 @@
             ]
         },
         "com.netflix.servo:servo-apache": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-atlas": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
         },
         "com.netflix.servo:servo-aws": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -27276,7 +27332,7 @@
             ]
         },
         "com.netflix.servo:servo-tomcat": {
-            "locked": "0.12.17",
+            "locked": "0.12.19",
             "transitive": [
                 "netflix:atlas-plugin"
             ]
@@ -27363,7 +27419,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-api": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-core",
                 "com.netflix.vms.events:vmsevents-kafka",
@@ -27373,7 +27429,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-core": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-mutation-stream",
@@ -27381,13 +27437,13 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle"
             ]
         },
         "com.netflix.vms.events:vmsevents-kafka-lifecycle": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -27405,7 +27461,7 @@
             ]
         },
         "com.netflix.vms.events:vmsevents-proto-definition": {
-            "locked": "7.1.11",
+            "locked": "8.0.0",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:mutation-stream-common"
@@ -27679,7 +27735,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.5",
+            "locked": "2.4",
             "transitive": [
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.suro:suro-client",
@@ -27777,7 +27833,7 @@
             ]
         },
         "io.netty:netty-buffer": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-handler",
                 "io.netty:netty-transport",
@@ -27785,52 +27841,60 @@
             ]
         },
         "io.netty:netty-codec": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec-http",
                 "io.netty:netty-handler"
             ]
         },
         "io.netty:netty-codec-http": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
             ]
         },
         "io.netty:netty-common": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-buffer",
                 "io.netty:netty-resolver",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-handler": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty"
             ]
         },
         "io.netty:netty-resolver": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-transport"
             ]
         },
         "io.netty:netty-transport": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "io.netty:netty-codec",
                 "io.netty:netty-handler",
-                "io.netty:netty-transport-native-epoll"
+                "io.netty:netty-transport-native-epoll",
+                "io.netty:netty-transport-native-unix-common"
             ]
         },
         "io.netty:netty-transport-native-epoll": {
-            "locked": "4.1.8.Final",
+            "locked": "4.1.17.Final",
             "transitive": [
                 "com.netflix.iep-shadow:iepshadow-rxnetty",
                 "netflix:atlas-plugin"
+            ]
+        },
+        "io.netty:netty-transport-native-unix-common": {
+            "locked": "4.1.17.Final",
+            "transitive": [
+                "io.netty:netty-transport-native-epoll"
             ]
         },
         "io.reactivex:rxjava": {
@@ -28029,7 +28093,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:base-server",
                 "netflix:epic-plugin",
@@ -28038,7 +28102,7 @@
             ]
         },
         "netflix:atlas-plugin": {
-            "locked": "2.18.0",
+            "locked": "2.19.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
@@ -28225,13 +28289,13 @@
             ]
         },
         "netflix:mutation-stream-client": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
         },
         "netflix:mutation-stream-common": {
-            "locked": "3.1.4",
+            "locked": "4.0.0",
             "transitive": [
                 "netflix:mutation-stream-client"
             ]
@@ -28748,8 +28812,7 @@
                 "com.netflix.nfkafka:nfkafka-common",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
-                "com.netflix.suro:suro-kafka-producer",
-                "com.netflix.vms.events:vmsevents-kafka-lifecycle"
+                "com.netflix.suro:suro-kafka-producer"
             ]
         },
         "org.apache.lucene:lucene-analyzers-common": {
