@@ -4,6 +4,7 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +78,8 @@ public class TransformCycle {
     private boolean isFirstCycle = true;
 
     private String previouslyResolvedConverterVip;
+
+    private Map<String, String> priorStateHeader = Collections.emptyMap();
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.ctx = ctx;
@@ -259,6 +263,7 @@ public class TransformCycle {
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
+            ctx.getLogger().info(BlobState, "writeTheBlobFiles snapshotFileName({}={})", snapshotFileName, outputStateEngine.getHeaderTags());
             try (OutputStream snapshotOutputStream = ctx.files().newBlobOutputStream(new File(snapshotFileName))) {
                 writer.writeSnapshot(snapshotOutputStream);
                 ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file {}", snapshotFileName);
@@ -269,6 +274,7 @@ public class TransformCycle {
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
+                ctx.getLogger().info(BlobState, "writeTheBlobFiles deltaFileName({}={})", deltaFileName, outputStateEngine.getHeaderTags());
                 try (OutputStream deltaOutputStream = ctx.files().newBlobOutputStream(new File(deltaFileName))) {
                     writer.writeDelta(deltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Delta to local file {}", deltaFileName);
@@ -278,6 +284,8 @@ public class TransformCycle {
                 createNostreamsFilteredFile(deltaFileName, nostreamsDeltaFileName, false);
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
+                outputStateEngine.addHeaderTags(priorStateHeader); // Make sure to have reverse delta's header point to prior state
+                ctx.getLogger().info(BlobState, "writeTheBlobFiles reverseDeltaFileName({}={})", reverseDeltaFileName, outputStateEngine.getHeaderTags());
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file {}", reverseDeltaFileName);
@@ -349,6 +357,9 @@ public class TransformCycle {
         incrementSuccessCounter();
         timeSinceLastPublishGauge.notifyPublishSuccess();
         previousCycleNumber = currentCycleNumber;
+
+        ctx.getLogger().info(BlobState, "endCycleSuccessfully write state : before({}), after({}),)", priorStateHeader, outputStateEngine.getHeaderTags());
+        priorStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
     }
 
     private void incrementSuccessCounter() {

@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecksum;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
@@ -17,6 +18,7 @@ import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.publish.workflow.util.FileStatLogger;
 import java.io.File;
 import java.io.IOException;
@@ -52,13 +54,16 @@ public class HollowBlobDataProvider {
 
     public synchronized void revertToPriorVersion() {
         if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {
-            ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
+            Map<String, String> curHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+            Map<String, String> revHeaders = BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine);
+
+            ctx.getLogger().error(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider from:{}, to:{}", curHeaders, revHeaders);
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
         } else {
             boolean isMissing_revertableStateEngine = (null == revertableStateEngine);
             boolean isMissing_revertableNostreamsStateEngine = (null == revertableNostreamsStateEngine);
-            ctx.getLogger().info(RollbackStateEngine,
+            ctx.getLogger().error(RollbackStateEngine,
                     "Did NOT rollback state engine in circuit breaker data provider because revertableStateEngine( missing={} ) or revertableNostreamsStateEngine( missing={} )",
                     isMissing_revertableStateEngine,
                     isMissing_revertableNostreamsStateEngine);
@@ -96,6 +101,9 @@ public class HollowBlobDataProvider {
 
     private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
         FileStatLogger.logFileState(ctx.getLogger(), BlobChecksum, "validateChecksums", snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
+
+        Map<String, String> initRegularHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+        Map<String, String> initNoStreamsHeaders = BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine);
 
         // -----------------------------------
         // Make sure reserve delta file exists
@@ -175,6 +183,9 @@ public class HollowBlobDataProvider {
                 ctx.getLogger().warn(BlobChecksum, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
             }
         }
+
+        ctx.getLogger().info(BlobState, "ReadState validate Completed - regular  : before({}), after({}), revertable({})", initRegularHeaders, BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine));
+        ctx.getLogger().info(BlobState, "ReadState validate Completed - nostreams: before({}), after({}), revertable({}) ", initNoStreamsHeaders, BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine));
     }
 
     private static HollowReadStateEngine processReverseDeltaFile(TransformerContext ctx, String prefix, HollowReadStateEngine hollowReadStateEngine, File reverseDeltaFile, HollowReadStateEngine anotherStateEngine, HollowBlobReader anotherReader, HollowChecksum initialChecksumBeforeDelta) throws IOException {
