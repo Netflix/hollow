@@ -178,7 +178,9 @@ public class HollowBlobDataProvider {
             boolean isRevertableStateEngineCreated = false;
             if (reverseDeltaFile.exists()) {
                 revertableStateEngine = processReverseDeltaFile(ctx, "", hollowReadStateEngine, reverseDeltaFile, anotherStateEngine, anotherReader, initialChecksumBeforeDelta);
+
                 isRevertableStateEngineCreated = true;
+                ctx.getLogger().info(blobStateTags, "revertableStateEngine({}) created from {}", BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine), reverseDeltaFile);
             } else {
                 ctx.getLogger().warn(blobStateTags, "Reserve Delta File does not exists: {}", reverseDeltaFile);
             }
@@ -186,12 +188,13 @@ public class HollowBlobDataProvider {
             boolean isNostreamsReverseDeltaFileCreated = false;
             if (nostreamsReverseDeltaFile.exists()) {
                 revertableNostreamsStateEngine = processReverseDeltaFile(ctx, "NOSTREAMS", nostreamsStateEngine, nostreamsReverseDeltaFile, anotherNostreamsStateEngine, anotherNostreamsReader, initialNostreamsChecksumBeforeDelta);
+
                 isNostreamsReverseDeltaFileCreated = true;
+                ctx.getLogger().info(blobStateTags, "revertableNostreamsStateEngine({}) created from {}", BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine), nostreamsReverseDeltaFile);
             } else {
                 ctx.getLogger().warn(blobStateTags, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
             }
 
-            // -----
             // Make sure Revertable State Engine(s) were created
             if (deltaFile.exists() && !isRevertableStateEngineCreated) {
                 ctx.getLogger().error(blobStateTags, "revertableStateEngine was not created");
