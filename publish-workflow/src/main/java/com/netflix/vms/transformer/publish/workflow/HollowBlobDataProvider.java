@@ -17,12 +17,15 @@ import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.logging.TaggingLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.publish.workflow.util.FileStatLogger;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -170,22 +173,39 @@ public class HollowBlobDataProvider {
 
         // ------------------------------------------------------------------------------
         // Apply Reserve Delta to modified state to make sure it gets back to prior state
+        Collection<LogTag> blobStateTags = Arrays.asList(BlobChecksum, BlobState);
         {
+            boolean isRevertableStateEngineCreated = false;
             if (reverseDeltaFile.exists()) {
                 revertableStateEngine = processReverseDeltaFile(ctx, "", hollowReadStateEngine, reverseDeltaFile, anotherStateEngine, anotherReader, initialChecksumBeforeDelta);
+                isRevertableStateEngineCreated = true;
             } else {
-                ctx.getLogger().warn(BlobChecksum, "Reserve Delta File does not exists: {}", reverseDeltaFile);
+                ctx.getLogger().warn(blobStateTags, "Reserve Delta File does not exists: {}", reverseDeltaFile);
             }
 
+            boolean isNostreamsReverseDeltaFileCreated = false;
             if (nostreamsReverseDeltaFile.exists()) {
                 revertableNostreamsStateEngine = processReverseDeltaFile(ctx, "NOSTREAMS", nostreamsStateEngine, nostreamsReverseDeltaFile, anotherNostreamsStateEngine, anotherNostreamsReader, initialNostreamsChecksumBeforeDelta);
+                isNostreamsReverseDeltaFileCreated = true;
             } else {
-                ctx.getLogger().warn(BlobChecksum, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
+                ctx.getLogger().warn(blobStateTags, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
+            }
+
+            // -----
+            // Make sure Revertable State Engine(s) were created
+            if (deltaFile.exists() && !isRevertableStateEngineCreated) {
+                ctx.getLogger().error(blobStateTags, "revertableStateEngine was not created");
+                throw new RuntimeException("revertableStateEngine was not created");
+            }
+
+            if (nostreamsDeltaFile.exists() && !isNostreamsReverseDeltaFileCreated) {
+                ctx.getLogger().error(blobStateTags, "revertableNostreamsStateEngine was not created");
+                throw new RuntimeException("revertableNostreamsStateEngine was not created");
             }
         }
 
-        ctx.getLogger().info(BlobState, "ReadState validate Completed - regular  : before({}), after({}), revertable({})", initRegularHeaders, BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine));
-        ctx.getLogger().info(BlobState, "ReadState validate Completed - nostreams: before({}), after({}), revertable({}) ", initNoStreamsHeaders, BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine));
+        ctx.getLogger().info(blobStateTags, "ReadState validate Completed - regular  : before({}), after({}), revertable({})", initRegularHeaders, BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine));
+        ctx.getLogger().info(blobStateTags, "ReadState validate Completed - nostreams: before({}), after({}), revertable({}) ", initNoStreamsHeaders, BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine));
     }
 
     private static HollowReadStateEngine processReverseDeltaFile(TransformerContext ctx, String prefix, HollowReadStateEngine hollowReadStateEngine, File reverseDeltaFile, HollowReadStateEngine anotherStateEngine, HollowBlobReader anotherReader, HollowChecksum initialChecksumBeforeDelta) throws IOException {
