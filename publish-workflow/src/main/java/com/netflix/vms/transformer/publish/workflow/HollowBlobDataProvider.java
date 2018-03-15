@@ -56,17 +56,18 @@ public class HollowBlobDataProvider {
     }
 
     public synchronized void revertToPriorVersion() {
+        Collection<LogTag> blobStateTags = Arrays.asList(RollbackStateEngine, BlobState);
         if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {
             Map<String, String> curHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
             Map<String, String> revHeaders = BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine);
 
-            ctx.getLogger().error(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider from:{}, to:{}", curHeaders, revHeaders);
+            ctx.getLogger().error(blobStateTags, "Rolling back state engine in circuit breaker data provider from:{}, to:{}", curHeaders, revHeaders);
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
         } else {
             boolean isMissing_revertableStateEngine = (null == revertableStateEngine);
             boolean isMissing_revertableNostreamsStateEngine = (null == revertableNostreamsStateEngine);
-            ctx.getLogger().error(RollbackStateEngine,
+            ctx.getLogger().error(blobStateTags,
                     "Did NOT rollback state engine in circuit breaker data provider because revertableStateEngine( missing={} ) or revertableNostreamsStateEngine( missing={} )",
                     isMissing_revertableStateEngine,
                     isMissing_revertableNostreamsStateEngine);

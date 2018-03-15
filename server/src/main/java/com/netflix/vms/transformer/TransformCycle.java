@@ -26,6 +26,7 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
+import com.netflix.vms.logging.TaggingLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -273,16 +275,16 @@ public class TransformCycle {
     private void writeTheBlobFiles() throws IOException {
         ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
 
+        Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try {
             currentStateHeader = new HashMap<>(headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber));
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
-            ctx.getLogger().info(BlobState, "writeTheBlobFiles snapshotFileName({}={})", snapshotFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
             try (OutputStream snapshotOutputStream = ctx.files().newBlobOutputStream(new File(snapshotFileName))) {
                 writer.writeSnapshot(snapshotOutputStream);
-                ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file {}", snapshotFileName);
+                ctx.getLogger().info(blobStateTags, "Wrote Snapshot to local file( {} ) - header( {} )", snapshotFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
             }
 
             String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
@@ -290,10 +292,9 @@ public class TransformCycle {
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
-                ctx.getLogger().info(BlobState, "writeTheBlobFiles deltaFileName({}={})", deltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 try (OutputStream deltaOutputStream = ctx.files().newBlobOutputStream(new File(deltaFileName))) {
                     writer.writeDelta(deltaOutputStream);
-                    ctx.getLogger().info(WroteBlob, "Wrote Delta to local file {}", deltaFileName);
+                    ctx.getLogger().info(blobStateTags, "Wrote Delta to local file( {}) - header( {} )", deltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 }
 
                 String nostreamsDeltaFileName = fileNamer.getNostreamsDeltaFileName(previousCycleNumber, currentCycleNumber);
@@ -301,10 +302,9 @@ public class TransformCycle {
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 outputStateEngine.addHeaderTags(previousStateHeader); // Make sure to have reverse delta's header point to prior state
-                ctx.getLogger().info(BlobState, "writeTheBlobFiles reverseDeltaFileName({}={})", reverseDeltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
-                    ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file {}", reverseDeltaFileName);
+                    ctx.getLogger().info(blobStateTags, "Wrote Reverse Delta to local file( {} ) - header( {} )", reverseDeltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 }
 
                 String nostreamsReverseDeltaFileName = fileNamer.getNostreamsReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
@@ -327,10 +327,11 @@ public class TransformCycle {
 
         FilteredHollowBlobWriter writer = new FilteredHollowBlobWriter(filterConfig);
 
+        Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try(InputStream is = ctx.files().newBlobInputStream(new File(unfilteredFilename));
                 OutputStream os = ctx.files().newBlobOutputStream(new File(filteredFilename))) {
             writer.filter(!isSnapshot, is, os);
-            ctx.getLogger().info(WroteBlob, "Wrote NostreamsFilteredFile={}", filteredFilename);
+            ctx.getLogger().info(blobStateTags, "Wrote NostreamsFilteredFile({}) - header( {} )", filteredFilename, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
         }
     }
 
