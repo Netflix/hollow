@@ -16,6 +16,9 @@ import com.netflix.archaius.api.annotations.PropertyName;
 @Configuration(prefix = "vms")
 public interface TransformerConfig {
 
+    @DefaultValue("false")
+    boolean isTransformerCycleMonkeyEnabled();
+
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
