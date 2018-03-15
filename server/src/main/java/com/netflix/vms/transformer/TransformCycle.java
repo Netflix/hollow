@@ -50,6 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,7 +80,8 @@ public class TransformCycle {
 
     private String previouslyResolvedConverterVip;
 
-    private Map<String, String> priorStateHeader = Collections.emptyMap();
+    private Map<String, String> currentStateHeader = Collections.emptyMap();
+    private Map<String, String> previousStateHeader = Collections.emptyMap();
 
     public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.ctx = ctx;
@@ -121,7 +123,8 @@ public class TransformCycle {
                 endCycleSuccessfully();
             }
         } catch (Throwable th) {
-            ctx.getLogger().error(RollbackStateEngine, "Transformer failed cycle -- rolling back write state engine", th);
+            ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), th);
+            outputStateEngine.addHeaderTags(previousStateHeader);
             outputStateEngine.resetToLastPrepareForNextCycle();
             fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
@@ -144,7 +147,8 @@ public class TransformCycle {
                 submitToPublishWorkflow();
                 endCycleSuccessfully();
             } catch(Throwable th) {
-                ctx.getLogger().error(RollbackStateEngine, "Transformer failed compaction cycle -- rolling back write state engine", th);
+                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), th);
+                outputStateEngine.addHeaderTags(previousStateHeader);
                 outputStateEngine.resetToLastPrepareForNextCycle();
                 fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
                 throw th;
@@ -153,6 +157,8 @@ public class TransformCycle {
     }
 
     private void beginCycle() {
+        previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
+
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
@@ -258,12 +264,12 @@ public class TransformCycle {
         ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
 
         try {
-            headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
+            currentStateHeader = headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
             String snapshotFileName = fileNamer.getSnapshotFileName(currentCycleNumber);
-            ctx.getLogger().info(BlobState, "writeTheBlobFiles snapshotFileName({}={})", snapshotFileName, outputStateEngine.getHeaderTags());
+            ctx.getLogger().info(BlobState, "writeTheBlobFiles snapshotFileName({}={})", snapshotFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
             try (OutputStream snapshotOutputStream = ctx.files().newBlobOutputStream(new File(snapshotFileName))) {
                 writer.writeSnapshot(snapshotOutputStream);
                 ctx.getLogger().info(WroteBlob, "Wrote Snapshot to local file {}", snapshotFileName);
@@ -274,7 +280,7 @@ public class TransformCycle {
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
-                ctx.getLogger().info(BlobState, "writeTheBlobFiles deltaFileName({}={})", deltaFileName, outputStateEngine.getHeaderTags());
+                ctx.getLogger().info(BlobState, "writeTheBlobFiles deltaFileName({}={})", deltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 try (OutputStream deltaOutputStream = ctx.files().newBlobOutputStream(new File(deltaFileName))) {
                     writer.writeDelta(deltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Delta to local file {}", deltaFileName);
@@ -284,8 +290,8 @@ public class TransformCycle {
                 createNostreamsFilteredFile(deltaFileName, nostreamsDeltaFileName, false);
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
-                outputStateEngine.addHeaderTags(priorStateHeader); // Make sure to have reverse delta's header point to prior state
-                ctx.getLogger().info(BlobState, "writeTheBlobFiles reverseDeltaFileName({}={})", reverseDeltaFileName, outputStateEngine.getHeaderTags());
+                outputStateEngine.addHeaderTags(previousStateHeader); // Make sure to have reverse delta's header point to prior state
+                ctx.getLogger().info(BlobState, "writeTheBlobFiles reverseDeltaFileName({}={})", reverseDeltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
                     ctx.getLogger().info(WroteBlob, "Wrote Reverse Delta to local file {}", reverseDeltaFileName);
@@ -358,8 +364,9 @@ public class TransformCycle {
         timeSinceLastPublishGauge.notifyPublishSuccess();
         previousCycleNumber = currentCycleNumber;
 
-        ctx.getLogger().info(BlobState, "endCycleSuccessfully write state : before({}), after({}),)", priorStateHeader, outputStateEngine.getHeaderTags());
-        priorStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
+        // On success, make sure outputStateEngine has current state header
+        outputStateEngine.addHeaderTags(currentStateHeader);
+        ctx.getLogger().info(BlobState, "endCycleSuccessfully write state : before({}), after({}),)", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
     }
 
     private void incrementSuccessCounter() {

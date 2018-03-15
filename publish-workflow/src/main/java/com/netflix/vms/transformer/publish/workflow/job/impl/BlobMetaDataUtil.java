@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.configadmin.ConfigAdmin;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.HollowStateEngine;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,14 +22,17 @@ public class BlobMetaDataUtil {
         VIP, dataVersion, priorVersion, producedTime, publishedTimestamp, ProducedByServer, ProducedByJarVersion;
     }
 
-    public static Map<String, String> fetchCoreHeaders(HollowReadStateEngine stateengine) {
+    public static Map<String, String> fetchCoreHeaders(HollowStateEngine stateengine) {
         if (stateengine == null) return Collections.emptyMap();
+        return fetchCoreHeaders(stateengine.getHeaderTags());
+    }
 
+    public static Map<String, String> fetchCoreHeaders(Map<String, String> headerMap) {
         Map<String, String> map = new LinkedHashMap<>();
 
         for (HEADER header : HEADER.values()) {
             String name = header.name();
-            String value = stateengine.getHeaderTag(name);
+            String value = headerMap.get(name);
             map.put(name, value);
         }
 
