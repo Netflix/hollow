@@ -167,14 +167,14 @@ public class TransformCycle {
     }
 
     private void beginCycle() {
-        previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
-        // @TODO - NEED FIX: The cycle version does not rev until later on so this log gets recorded on a prior cycle
-        // ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
-
+        // NOTE: cycle Logs must be done after currentCycleNumber has been created; otherwise, logs will not be grouped properly to the right cycle
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
         ctx.getOctoberSkyData().refresh();
+
+        previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
+        ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
 
         if(ctx.getFastlaneIds() != null)
             ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
