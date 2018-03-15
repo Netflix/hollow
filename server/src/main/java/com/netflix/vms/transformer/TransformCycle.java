@@ -103,7 +103,10 @@ public class TransformCycle {
     }
 
     public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isFastlane) {
-        outputStateEngine.restoreFrom(restoreFrom.getStateEngine());
+        HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
+        outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
+        outputStateEngine.restoreFrom(restoreStateEngine); // @TODO: should restore headers as well
+
         if(!isFastlane)
             publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
         previousCycleNumber = restoreFrom.getCurrentVersionId();
