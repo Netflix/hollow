@@ -105,7 +105,10 @@ public class TransformCycle {
     public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isFastlane) {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
         outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
-        outputStateEngine.restoreFrom(restoreStateEngine); // @TODO: should restore headers as well
+        outputStateEngine.restoreFrom(restoreStateEngine); // @TODO FIX: should restore headers as well
+
+        // @TODO - NEED FIX: The cycle version does not rev until later on so this log gets recorded on a prior cycle
+        // ctx.getLogger().info(BlobState, "restore : input({}), output({}),)", BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
 
         if(!isFastlane)
             publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
@@ -126,8 +129,9 @@ public class TransformCycle {
                 endCycleSuccessfully();
             }
         } catch (Throwable th) {
-            ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), th);
             outputStateEngine.addHeaderTags(previousStateHeader);
+            ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine), th);
+
             outputStateEngine.resetToLastPrepareForNextCycle();
             fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
             throw th;
@@ -150,8 +154,9 @@ public class TransformCycle {
                 submitToPublishWorkflow();
                 endCycleSuccessfully();
             } catch(Throwable th) {
-                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), th);
                 outputStateEngine.addHeaderTags(previousStateHeader);
+                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine), th);
+
                 outputStateEngine.resetToLastPrepareForNextCycle();
                 fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
                 throw th;
@@ -161,6 +166,8 @@ public class TransformCycle {
 
     private void beginCycle() {
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
+        // @TODO - NEED FIX: The cycle version does not rev until later on so this log gets recorded on a prior cycle
+        // ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
 
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
@@ -267,7 +274,7 @@ public class TransformCycle {
         ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
 
         try {
-            currentStateHeader = headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber);
+            currentStateHeader = new HashMap<>(headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber));
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
@@ -342,6 +349,7 @@ public class TransformCycle {
     }
 
     private boolean rollbackFastlaneStateEngine() {
+        outputStateEngine.addHeaderTags(previousStateHeader);
         outputStateEngine.resetToLastPrepareForNextCycle();
         fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
         ctx.getLogger().info(TransformerLogTag.HideCycleFromDashboard, "Fastlane data was unchanged -- rolling back and trying again");
