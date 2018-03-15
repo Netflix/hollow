@@ -109,7 +109,7 @@ public class TransformCycle {
         outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
         outputStateEngine.restoreFrom(restoreStateEngine); // @TODO FIX: should restore headers as well
 
-        // @TODO - NEED FIX: The cycle version does not rev until later on so this log gets recorded on a prior cycle
+        // @TODO - NEED FIX: The cycle version does not rev until later on so this log does not get grouped on the right cycle (e.g. first cycle)
         // ctx.getLogger().info(BlobState, "restore : input({}), output({}),)", BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
 
         if(!isFastlane)
@@ -167,7 +167,7 @@ public class TransformCycle {
     }
 
     private void beginCycle() {
-        // NOTE: cycle Logs must be done after currentCycleNumber has been created; otherwise, logs will not be grouped properly to the right cycle
+        // NOTE: cycle Logs must be done after currentCycleNumber has been initialized; otherwise, logs will not be grouped properly to the right cycle
         currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
