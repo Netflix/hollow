@@ -35,6 +35,9 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * This is a REST endpoint that is exposed to allow slicing transformer output blobs.
+ */
 @Singleton
 @Path("/vms/pintitleslicer")
 public class VMSPinTitleSlicer {
