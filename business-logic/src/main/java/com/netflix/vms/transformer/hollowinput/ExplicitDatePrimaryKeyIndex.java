@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ExplicitDatePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ExplicitDateHollow> {
 
     public ExplicitDatePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ExplicitDate")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public ExplicitDatePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ExplicitDate")).getPrimaryKey().getFieldPaths());
     }
 
     public ExplicitDatePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

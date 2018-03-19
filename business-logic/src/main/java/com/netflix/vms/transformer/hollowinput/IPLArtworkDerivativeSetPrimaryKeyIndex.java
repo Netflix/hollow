@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class IPLArtworkDerivativeSetPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, IPLArtworkDerivativeSetHollow> {
 
     public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLArtworkDerivativeSet")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLArtworkDerivativeSet")).getPrimaryKey().getFieldPaths());
     }
 
     public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

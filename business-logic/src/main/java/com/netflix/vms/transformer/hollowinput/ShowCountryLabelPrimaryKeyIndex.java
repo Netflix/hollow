@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ShowCountryLabelPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ShowCountryLabelHollow> {
 
     public ShowCountryLabelPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowCountryLabel")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public ShowCountryLabelPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ShowCountryLabel")).getPrimaryKey().getFieldPaths());
     }
 
     public ShowCountryLabelPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+
 @SuppressWarnings("all")
 public class FlagsHollow extends HollowObject {
 
@@ -170,6 +172,27 @@ public class FlagsHollow extends HollowObject {
 
     public Boolean _getSearchOnlyOverrideBoxed() {
         return delegate().getSearchOnlyOverrideBoxed(ordinal);
+    }
+
+    public SetOfStringHollow _getTextRequiredLanguages() {
+        int refOrdinal = delegate().getTextRequiredLanguagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getSetOfStringHollow(refOrdinal);
+    }
+
+    public SetOfStringHollow _getAudioRequiredLanguages() {
+        int refOrdinal = delegate().getAudioRequiredLanguagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getSetOfStringHollow(refOrdinal);
+    }
+
+    public SetOfStringHollow _getLocalizationRequiredLanguages() {
+        int refOrdinal = delegate().getLocalizationRequiredLanguagesOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getSetOfStringHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

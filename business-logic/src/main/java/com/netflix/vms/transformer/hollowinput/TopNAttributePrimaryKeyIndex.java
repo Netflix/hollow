@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TopNAttributePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TopNAttributeHollow> {
 
     public TopNAttributePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TopNAttribute")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public TopNAttributePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TopNAttribute")).getPrimaryKey().getFieldPaths());
     }
 
     public TopNAttributePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

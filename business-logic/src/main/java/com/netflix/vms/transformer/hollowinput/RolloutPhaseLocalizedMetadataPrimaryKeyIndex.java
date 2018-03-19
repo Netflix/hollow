@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class RolloutPhaseLocalizedMetadataPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RolloutPhaseLocalizedMetadataHollow> {
 
     public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseLocalizedMetadata")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseLocalizedMetadata")).getPrimaryKey().getFieldPaths());
     }
 
     public RolloutPhaseLocalizedMetadataPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

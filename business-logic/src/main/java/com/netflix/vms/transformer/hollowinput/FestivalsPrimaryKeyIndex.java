@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class FestivalsPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, FestivalsHollow> {
 
     public FestivalsPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Festivals")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public FestivalsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Festivals")).getPrimaryKey().getFieldPaths());
     }
 
     public FestivalsPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
