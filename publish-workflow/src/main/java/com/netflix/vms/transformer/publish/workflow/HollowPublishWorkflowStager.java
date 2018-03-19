@@ -104,7 +104,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             createAnnounceJobForRegion(region, previousVersion, newVersion, canaryValidationJob, primaryRegionAnnounceJob);
         }
 
-        addDeleteJob(previousVersion, newVersion, publishJobs);
+        addDeleteJob(previousVersion, newVersion, circuitBreakerJob, publishJobs);
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
             scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
@@ -178,8 +178,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return validationJob;
     }
 
-    private void addDeleteJob(long previousVersion, long nextVersion, List<PublicationJob> publishJobsForCycle) {
-        scheduler.submitJob(jobCreator.createDeleteFileJob(publishJobsForCycle, nextVersion, 
+    private void addDeleteJob(long previousVersion, long nextVersion, CircuitBreakerJob circuitBreakerJob,
+            List<PublicationJob> publishJobsForCycle) {
+        List<PublicationJob> circuitBreakerAndPublishJobs = new ArrayList<>(publishJobsForCycle);
+        circuitBreakerAndPublishJobs.add(circuitBreakerJob);
+        scheduler.submitJob(jobCreator.createDeleteFileJob(circuitBreakerAndPublishJobs, nextVersion,
                 fileNamer.getDeltaFileName(previousVersion, nextVersion), 
                 fileNamer.getReverseDeltaFileName(nextVersion, previousVersion), 
                 fileNamer.getSnapshotFileName(nextVersion),
