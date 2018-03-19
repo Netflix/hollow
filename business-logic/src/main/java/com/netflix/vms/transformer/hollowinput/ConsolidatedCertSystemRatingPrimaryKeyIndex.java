@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ConsolidatedCertSystemRatingPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ConsolidatedCertSystemRatingHollow> {
 
     public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedCertSystemRating")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedCertSystemRating")).getPrimaryKey().getFieldPaths());
     }
 
     public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class OriginServerPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, OriginServerHollow> {
 
     public OriginServerPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("OriginServer")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public OriginServerPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("OriginServer")).getPrimaryKey().getFieldPaths());
     }
 
     public OriginServerPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.hollowinput;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+
 @SuppressWarnings("all")
 public class CSMReviewHollow extends HollowObject {
 

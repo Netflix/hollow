@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TranslatedTextPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TranslatedTextHollow> {
 
     public TranslatedTextPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TranslatedText")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public TranslatedTextPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TranslatedText")).getPrimaryKey().getFieldPaths());
     }
 
     public TranslatedTextPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

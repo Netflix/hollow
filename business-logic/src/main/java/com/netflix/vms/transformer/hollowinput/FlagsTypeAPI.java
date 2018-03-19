@@ -30,7 +30,10 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
             "removeAsset",
             "removeFromWebsiteOverride",
             "requiredLangs",
-            "searchOnlyOverride"
+            "searchOnlyOverride",
+            "textRequiredLanguages",
+            "audioRequiredLanguages",
+            "localizationRequiredLanguages"
         });
         this.delegateLookupImpl = new FlagsDelegateLookupImpl(this);
     }
@@ -304,6 +307,36 @@ public class FlagsTypeAPI extends HollowObjectTypeAPI {
     }
 
 
+
+    public int getTextRequiredLanguagesOrdinal(int ordinal) {
+        if(fieldIndex[21] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "textRequiredLanguages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[21]);
+    }
+
+    public SetOfStringTypeAPI getTextRequiredLanguagesTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public int getAudioRequiredLanguagesOrdinal(int ordinal) {
+        if(fieldIndex[22] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "audioRequiredLanguages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[22]);
+    }
+
+    public SetOfStringTypeAPI getAudioRequiredLanguagesTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
+
+    public int getLocalizationRequiredLanguagesOrdinal(int ordinal) {
+        if(fieldIndex[23] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Flags", ordinal, "localizationRequiredLanguages");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[23]);
+    }
+
+    public SetOfStringTypeAPI getLocalizationRequiredLanguagesTypeAPI() {
+        return getAPI().getSetOfStringTypeAPI();
+    }
 
     public FlagsDelegateLookupImpl getDelegateLookupImpl() {
         return delegateLookupImpl;

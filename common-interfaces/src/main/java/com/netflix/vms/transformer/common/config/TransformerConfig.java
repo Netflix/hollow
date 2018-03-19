@@ -185,7 +185,7 @@ public interface TransformerConfig {
     @DefaultValue("50s")
     String getElasticSearchSamplerIntervalInSeconds();
 
-    @DefaultValue("25000")
+    @DefaultValue("50000")
     int getElasticSearchMaxQueueSize();
 
     @DefaultValue("6")
@@ -206,12 +206,6 @@ public interface TransformerConfig {
     @DefaultValue("28")
     int getNewContentFlagDuration();
 
-    @DefaultValue("BE,CH,LU,TH,IL,GR,RO,CY,MD")
-    String getMultilanguageCatalogCountries();
-
-    @DefaultValue("true")
-    boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
-
     @DefaultValue("true")
     public boolean isRollupImagesForArtworkScheduling();
 
@@ -226,4 +220,19 @@ public interface TransformerConfig {
 
     @DefaultValue("NEW_EPISODE,NEW_EPISODE_V2,NEW_EPISODE_GLOBAL")
     public String getNewEpisodeOverlayTypes();
+
+
+    ////////////// Multi-langauge catalog configs ////////////////////////
+
+    @DefaultValue("BE,CH,LU,TH,IL,GR,RO,CY,MD")
+    String getMultilanguageCatalogCountries();
+
+    @DefaultValue("true")
+    boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
+
+    @DefaultValue("false")
+    public boolean isSubsDubsRequirementEnforced();
+
+    @DefaultValue("false")
+    public boolean isPrePromoEnabledForMultiLanguageCatalog();
 }

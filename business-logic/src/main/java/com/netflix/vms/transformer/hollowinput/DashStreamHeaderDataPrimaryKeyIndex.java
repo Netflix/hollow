@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DashStreamHeaderDataPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DashStreamHeaderDataHollow> {
 
     public DashStreamHeaderDataPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DashStreamHeaderData")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public DashStreamHeaderDataPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DashStreamHeaderData")).getPrimaryKey().getFieldPaths());
     }
 
     public DashStreamHeaderDataPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

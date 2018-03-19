@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class CSMReviewPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, CSMReviewHollow> {
 
     public CSMReviewPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CSMReview")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public CSMReviewPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CSMReview")).getPrimaryKey().getFieldPaths());
     }
 
     public CSMReviewPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

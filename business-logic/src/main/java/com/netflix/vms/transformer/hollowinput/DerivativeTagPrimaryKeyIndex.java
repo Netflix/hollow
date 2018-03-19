@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DerivativeTagPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DerivativeTagHollow> {
 
     public DerivativeTagPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DerivativeTag")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public DerivativeTagPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DerivativeTag")).getPrimaryKey().getFieldPaths());
     }
 
     public DerivativeTagPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

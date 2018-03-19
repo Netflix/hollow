@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
+import static java.util.Arrays.asList;
 
 import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -49,7 +50,6 @@ import java.util.stream.Collectors;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
-    private static final FastProperty.BooleanProperty ENABLE_LOCALE_PROMOTION = new FastProperty.BooleanProperty("netflix.vms.transformer.enable.prepromotion.multilocale", false);
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -105,17 +105,43 @@ public class VMSAvailabilityWindowModule {
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null, videoRights);
             if (locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
-                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null);
+                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null, videoRights);
         }
         return windows;
     }
 
-    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup) {
+    // todo need to split this out in a separate class. It's humongous. Not good.
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
+
+        // for multi-language catalog processing only
+        boolean isSubsDubsRequirementEnforced = ctx.getConfig().isSubsDubsRequirementEnforced();
+        boolean mustHaveSubs = false;// local subtitles
+        boolean mustHaveDubs = false;// local audio
+        boolean mustHaveLocalizedData = false;// local synopsis
+
+        FlagsHollow flags = statusHollow._getFlags();
+        if (locale != null && flags != null) {
+            Set<String> subsRequirement = new HashSet<>();
+            Set<String> dubsRequirement = new HashSet<>();
+            Set<String> localizedDataRequirement = new HashSet<>();
+
+            if (flags._getTextRequiredLanguages() != null)
+                subsRequirement = flags._getTextRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getAudioRequiredLanguages() != null)
+                dubsRequirement = flags._getAudioRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+            if (flags._getLocalizationRequiredLanguages() != null)
+                localizedDataRequirement = flags._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
+
+            String localeStr = locale.toLowerCase();
+            if (subsRequirement.contains(localeStr)) mustHaveSubs = true;
+            if (dubsRequirement.contains(localeStr)) mustHaveDubs = true;
+            if (localizedDataRequirement.contains(localeStr)) mustHaveLocalizedData = true;
+        }
 
         long minWindowStartDate = Long.MAX_VALUE;
 
@@ -164,12 +190,15 @@ public class VMSAvailabilityWindowModule {
             // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, isGoLive, contractIds, includedPackageDataCount, outputWindow.startDate.val, outputWindow.endDate.val);
 
-            // if multi-locale catalog processing, then check if title is in pre-promo phase.
+            // if multi-language catalog processing & isGoLive is false, then check if title is in pre-promo phase.
             boolean inPrePromotionPhase = false;
             if (!isGoLive && locale != null) {
+                // checking for all the contracts in the current window to determine if title is in pre-promo phase
                 for (long contractId : contractIds) {
                     ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                    if (contractHollow != null && contractHollow._getPrePromotionDays() > 0) inPrePromotionPhase = true;
+                    // @TODO: This is a bit fishy - don't we need to check for contract window?. Follow up with Sampada to see how to correctly determine if a title is in pre-promo phase. Also, pre-promo is not country-language specific. This logic is on par with current logic for country specific catalogs.
+                    if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
+                        inPrePromotionPhase = true;
                 }
                 if (!isGoLive && inPrePromotionPhase)
                     ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
@@ -207,20 +236,19 @@ public class VMSAvailabilityWindowModule {
 
 
                             if (locale != null) {
-
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                // if no assets and the the title is not in prePromotionPhase then skip this contract
+                                // if no assets and the the title is not in prePromotionPhase then skip this contract and no need to check subs/dubs requirement list too.
                                 if (packageAvailability == 0 && !inPrePromotionPhase) {
                                     ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
                                     // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
-                                    if (ENABLE_LOCALE_PROMOTION.get()) {
+                                    if (ctx.getConfig().isPrePromoEnabledForMultiLanguageCatalog()) {
                                         ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                     } else {
-                                        // if feature not enabled, and assets are missing, skip the contract
+                                        // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
                                         continue;
                                     }
                                 }
@@ -239,6 +267,24 @@ public class VMSAvailabilityWindowModule {
                                     thisWindowFoundLocalText = true; //rollup.foundLocalText();
                                     if (currentOrFirstFutureWindow == outputWindow)
                                         currentOrFirstFutureWindowFoundLocalText = true;
+                                }
+
+                                // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
+                                // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window. So if any contract has the assets, then it passes the requirement check.
+                                if (isSubsDubsRequirementEnforced && !inPrePromotionPhase) {
+                                    // if feature is enabled then check is given locale requires subs/dubs
+                                    // and in case its a requirement and it is missing -> skip the current contract.
+                                    if (mustHaveSubs && !thisWindowFoundLocalText) {
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        continue;
+                                    }
+
+                                    if (mustHaveDubs && !thisWindowFoundLocalAudio) {
+                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        continue;
+                                    }
+
+                                    // @TODO check local synopsis. Can be deferred for now.
                                 }
                             }
 

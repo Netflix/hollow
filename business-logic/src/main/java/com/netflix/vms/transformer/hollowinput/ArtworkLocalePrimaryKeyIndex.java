@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ArtworkLocalePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ArtworkLocaleHollow> {
 
     public ArtworkLocalePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ArtworkLocale")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public ArtworkLocalePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ArtworkLocale")).getPrimaryKey().getFieldPaths());
     }
 
     public ArtworkLocalePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
