@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class MapKeyPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, MapKeyHollow> {
 
     public MapKeyPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("MapKey")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public MapKeyPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("MapKey")).getPrimaryKey().getFieldPaths());
     }
 
     public MapKeyPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

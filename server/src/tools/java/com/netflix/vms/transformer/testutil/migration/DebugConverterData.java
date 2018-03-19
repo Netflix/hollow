@@ -56,6 +56,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DebugConverterData {
@@ -71,6 +72,7 @@ public class DebugConverterData {
     private static final Path REPRO_PATH = Paths.get(REPRO_DIR);
     private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
 
+    @Before
     public void setup() throws Exception {
         percentFormat.setMinimumFractionDigits(1);
         for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT, REPRO_DIR)) {
@@ -81,7 +83,7 @@ public class DebugConverterData {
 
     @Test
     public void show_DABorDOB_ConverterData() {
-        long version = 20171016204226094L;
+        long version = 20180131173015308L;
         VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.TEST_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
         inputClient.triggerRefreshTo(version);
 

@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class AltGenresPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, AltGenresHollow> {
 
     public AltGenresPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AltGenres")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public AltGenresPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AltGenres")).getPrimaryKey().getFieldPaths());
     }
 
     public AltGenresPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

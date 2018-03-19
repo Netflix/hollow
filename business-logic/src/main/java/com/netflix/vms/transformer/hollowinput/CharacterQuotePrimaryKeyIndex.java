@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class CharacterQuotePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, CharacterQuoteHollow> {
 
     public CharacterQuotePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CharacterQuote")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public CharacterQuotePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CharacterQuote")).getPrimaryKey().getFieldPaths());
     }
 
     public CharacterQuotePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {

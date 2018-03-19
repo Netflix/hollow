@@ -76,10 +76,18 @@ public class ContractRestrictionModule {
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
     }
 
+    /**
+     * For a given package in MPL feed, find a set of ContractRestriction for each country.
+     * Note package data is not available per country.
+     *
+     * @param packageHollow
+     * @return
+     */
     public Map<ISOCountry, Set<ContractRestriction>> getContractRestrictions(PackageHollow packageHollow) {
         Map<ISOCountry, Set<ContractRestriction>> restrictions = new HashMap<>();
 
         // build an asset type index to look up excluded downloadables
+        // this index is from downloadableId -> ContractAsset (assetType + language)
         DownloadableAssetTypeIndex assetTypeIdx = new DownloadableAssetTypeIndex();
         for (PackageStreamHollow stream : packageHollow._getDownloadables()) {
             ContractAssetType assetType = assetTypeDeterminer.getAssetType(stream);
@@ -124,6 +132,7 @@ public class ContractRestrictionModule {
 
                     List<RightsWindowContractHollow> applicableRightsContracts = new ArrayList<>();
                     if (window._getContractIdsExt() != null && !window._getContractIdsExt().isEmpty()) {
+                        // make sure that package id in contract matches with the packageId under consideration
                         applicableRightsContracts = filterToApplicableContracts(packageHollow, window._getContractIdsExt(), contractIds);
                     }
 
@@ -198,6 +207,15 @@ public class ContractRestrictionModule {
         return false;
     }
 
+    /**
+     * Build a contract restriction based on single contract.
+     *
+     * @param assetTypeIdx
+     * @param windowContractHollow
+     * @param videoId
+     * @param countryCode
+     * @return
+     */
     private ContractRestriction buildRestrictionBasedOnSingleApplicableContract(DownloadableAssetTypeIndex assetTypeIdx, RightsWindowContractHollow windowContractHollow, long videoId, String countryCode) {
         ContractRestriction restriction = newContractRestriction();
 
@@ -205,9 +223,14 @@ public class ContractRestrictionModule {
         if (!markAllAssetsIfNoAssetsPresent(assetTypeIdx, contractAssets))
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets, STREAM);
 
+        // get contract data from Contract feed published by beehive. This contract data has information on title, country, prepromotion and cup tokens and others.
         ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, windowContractHollow._getContractId());
+
         if (contract != null) {
+            // Contract feed also has data on disAllowedBundles
             List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
+
+            // for each disAllowedBundles, build a language restriction
             for (DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
                 LanguageRestrictions langRestriction = new LanguageRestrictions();
                 String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -230,6 +253,7 @@ public class ContractRestrictionModule {
                 langRestriction.disallowedTimedTextBcp47codes = disallowedTimedTextCodes;
                 langRestriction.disallowedTimedText = disallowedTimedTextIds;
 
+                // create a restriction for each language in the current contract restriction.
                 restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
             }
 
@@ -482,6 +506,13 @@ public class ContractRestrictionModule {
         }
     }
 
+    /**
+     * Finalize the restriction by using the assetTypeIndex to get all unmarked assets (excludedDownloadables), availableAssets (getAllMarkedForStreamingAssets)
+     *
+     * @param assetTypeIdx
+     * @param restriction
+     * @param selectedContract
+     */
     private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, ContractHollow selectedContract) {
         if (selectedContract != null && selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
             restriction.prePromotionDays = (int) selectedContract._getPrePromotionDays();

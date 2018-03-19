@@ -8,7 +8,10 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class AssetMetaDatasPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, AssetMetaDatasHollow> {
 
     public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AssetMetaDatas")).getPrimaryKey().getFieldPaths());
+        this(consumer, false);    }
+
+    public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
+        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("AssetMetaDatas")).getPrimaryKey().getFieldPaths());
     }
 
     public AssetMetaDatasPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
