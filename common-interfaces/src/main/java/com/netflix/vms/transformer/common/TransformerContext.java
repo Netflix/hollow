@@ -44,4 +44,6 @@ public interface TransformerContext {
     CupLibrary getCupLibrary();
 
     Consumer<PublicationHistory> getPublicationHistoryConsumer();
+
+    CycleMonkey getCycleMonkey();
 }

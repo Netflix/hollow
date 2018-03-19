@@ -23,6 +23,9 @@ public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
         IndexDuplicateChecker dupChecker = new IndexDuplicateChecker(stateEngine);
         dupChecker.checkDuplicates();
 
+        // Spot to trigger Cycle Monkey if enabled
+        ctx.getCycleMonkey().doMonkeyBusiness("DuplicateDetectionCircuitBreaker");
+
         if (!dupChecker.wasDupKeysDetected())
             return PASSED;
 
@@ -30,11 +33,11 @@ public class DuplicateDetectionCircuitBreaker extends HollowCircuitBreaker {
         for (Map.Entry<String, Collection<Object[]>> dupEntry : dupChecker.getResults().entrySet()) {
             StringBuilder message = new StringBuilder("Duplicate keys found for type ");
             message.append(dupEntry.getKey()).append(": ");
-            
+
             for(Object[] key : dupEntry.getValue()) {
                 message.append(Arrays.toString(key)).append(" ");
             }
-            
+
             results.addResult(false, message.toString());
         }
 

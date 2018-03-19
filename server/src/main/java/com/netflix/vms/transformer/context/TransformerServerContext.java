@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.context;
 import com.netflix.archaius.api.Config;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.logging.TaggingLoggers;
+import com.netflix.vms.transformer.TransformerCycleMonkey;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerFiles;
@@ -32,6 +34,7 @@ public class TransformerServerContext implements TransformerContext {
     private final TransformerMetricRecorder metricRecorder;
     private final OctoberSkyData octoberSkyData;
     private final CupLibrary cupLibrary;
+    private final CycleMonkey cycleMonkey;
 
     private final FrozenTransformerConfigFactory configFactory;
 
@@ -65,6 +68,7 @@ public class TransformerServerContext implements TransformerContext {
 
         this.configFactory = new FrozenTransformerConfigFactory(config);
         this.staticConfig = configFactory.createStaticConfig(TaggingLoggers.sysoutLogger());
+        this.cycleMonkey = new TransformerCycleMonkey(this);
     }
 
     @Override
@@ -152,5 +156,10 @@ public class TransformerServerContext implements TransformerContext {
     @Override
     public TransformerCycleInterrupter getCycleInterrupter() {
         return cycleInterrupter;
+    }
+
+    @Override
+    public CycleMonkey getCycleMonkey() {
+        return cycleMonkey;
     }
 }

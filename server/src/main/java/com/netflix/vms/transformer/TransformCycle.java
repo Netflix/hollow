@@ -27,6 +27,7 @@ import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
@@ -74,7 +75,7 @@ public class TransformCycle {
     private final String converterVip;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
-    private final TransformerCycleMonkey cycleMonkey;
+    private final CycleMonkey cycleMonkey;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -102,7 +103,7 @@ public class TransformCycle {
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
-        this.cycleMonkey = new TransformerCycleMonkey(ctx);
+        this.cycleMonkey = ctx.getCycleMonkey();
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
@@ -250,9 +251,6 @@ public class TransformCycle {
                 // Process fastlane
                 trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
 
-                // Spot to trigger Cycle Monkey if enabled
-                cycleMonkey.doMonkeyBusiness("transformTheData");
-
                 // Combine data
                 List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
@@ -265,6 +263,9 @@ public class TransformCycle {
                         overrideBlobID, pinnedTitles, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
+
+                // Spot to trigger Cycle Monkey if enabled
+                cycleMonkey.doMonkeyBusiness("transformTheData");
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);

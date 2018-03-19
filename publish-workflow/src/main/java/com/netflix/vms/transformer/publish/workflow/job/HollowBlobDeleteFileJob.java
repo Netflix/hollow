@@ -20,6 +20,9 @@ public class HollowBlobDeleteFileJob extends PublishWorkflowPublicationJob {
 
     @Override
     protected boolean executeJob() {
+        // Spot to trigger Cycle Monkey if enabled
+        ctx.getCycleMonkey().doMonkeyBusiness("HollowBlobDeleteFileJob");
+
         for(String filename : filesToDelete) {
             File f = new File(filename);
             if(f.exists()) {

@@ -161,8 +161,10 @@ public class SimpleTransformer {
                         packageDataModule.transform(showHierarchiesByCountry, droppedVideoIds, transformedVideoData);
                         l10nVideoResourcesModule.transform(showHierarchiesByCountry, droppedVideoIds);
 
-                        if (showHierarchiesByCountry != null) {
+                        // Spot to trigger Cycle Monkey if enabled
+                        ctx.getCycleMonkey().doMonkeyBusiness("transform");
 
+                        if (showHierarchiesByCountry != null) {
                             // get all transformed data for show hierarchies using all the modules.
                             collectionsModule.buildVideoCollectionsDataByCountry(showHierarchiesByCountry, transformedVideoData);
                             metadataModule.buildVideoMetaDataByCountry(showHierarchiesByCountry, transformedVideoData);

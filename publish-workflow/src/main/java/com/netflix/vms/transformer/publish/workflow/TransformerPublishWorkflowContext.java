@@ -4,6 +4,7 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
@@ -92,12 +93,12 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     public FileStore getFileStore() {
         return fileStore;
     }
-    
+
     @Override
     public Publisher getBlobPublisher() {
         return publisher;
     }
-    
+
     @Override
     public Publisher getNostreamsBlobPublisher() {
         return nostreamsPublisher;
@@ -112,7 +113,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     public Announcer getNostreamsStateAnnouncer() {
         return nostreamsAnnouncer;
     }
-    
+
     @Override
     public VipAnnouncer getVipAnnouncer() {
         return vipAnnouncer;
@@ -146,5 +147,10 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     @Override
     public PublishWorkflowStatusIndicator getStatusIndicator() {
         return statusIndicator;
+    }
+
+    @Override
+    public CycleMonkey getCycleMonkey() {
+        return transformerCtx.getCycleMonkey();
     }
 }

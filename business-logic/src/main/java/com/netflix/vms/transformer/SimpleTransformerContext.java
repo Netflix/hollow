@@ -1,12 +1,12 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.archaius.api.Config;
-
-import com.netflix.archaius.DefaultPropertyFactory;
 import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.archaius.DefaultPropertyFactory;
+import com.netflix.archaius.api.Config;
 import com.netflix.archaius.config.EmptyConfig;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.logging.TaggingLoggers;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
 import com.netflix.vms.transformer.common.TransformerFiles;
@@ -139,5 +139,10 @@ public class SimpleTransformerContext implements TransformerContext {
     @Override
     public TransformerCycleInterrupter getCycleInterrupter() {
         return SimpleTransformerCycleInterrupter.INSTANCE;
+    }
+
+    @Override
+    public CycleMonkey getCycleMonkey() {
+        return TransformerCycleMonkey.SIMPLE_CYCLE_MONKEY;
     }
 }
