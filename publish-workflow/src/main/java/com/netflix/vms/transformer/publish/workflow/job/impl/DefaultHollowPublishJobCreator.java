@@ -84,8 +84,9 @@ public class DefaultHollowPublishJobCreator {
         return new FileStoreHollowBlobPublishJob(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
     }
 
-    public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
-        return new HollowBlobDeleteFileJob(ctx, copyJobs, version, filesToDelete);
+    public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> circuitBreakerAndPublishJobs,
+            long version, String... filesToDelete) {
+        return new HollowBlobDeleteFileJob(ctx, circuitBreakerAndPublishJobs, version, filesToDelete);
     }
 
     public DelayJob createDelayJob(PublicationJob dependency, long delayMillis, long cycleVersion) {

@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * Simple version of TransformerServerContext, used only in slicing and in certain unit tests.
+ */
 public class SimpleTransformerContext implements TransformerContext {
 
     private final TaggingLogger logger;
