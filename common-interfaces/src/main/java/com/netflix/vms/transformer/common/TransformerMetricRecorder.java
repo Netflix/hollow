@@ -37,6 +37,7 @@ public interface TransformerMetricRecorder {
         SnapShotSize,
         ViewShareCoveredByPBM,
         PBMFailuresMissingViewShare,
+        PBMFailureCount,
 
         AnnounceSuccess,
 

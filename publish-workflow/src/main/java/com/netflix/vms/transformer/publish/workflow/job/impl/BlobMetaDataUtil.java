@@ -3,7 +3,10 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import com.netflix.appinfo.ApplicationInfoManager;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.configadmin.ConfigAdmin;
+import com.netflix.hollow.core.HollowStateEngine;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -15,18 +18,38 @@ public class BlobMetaDataUtil {
     private final static TimeZone tz = TimeZone.getTimeZone("America/Los_Angeles");
     private final static FastDateFormat formatter = FastDateFormat.getInstance("dd-MMM-yyyy HH:mm:ss z", tz);
 
+    public static enum HEADER {
+        VIP, dataVersion, priorVersion, producedTime, publishedTimestamp, ProducedByServer, ProducedByJarVersion;
+    }
+
+    public static Map<String, String> fetchCoreHeaders(HollowStateEngine stateengine) {
+        if (stateengine == null) return Collections.emptyMap();
+        return fetchCoreHeaders(stateengine.getHeaderTags());
+    }
+
+    public static Map<String, String> fetchCoreHeaders(Map<String, String> headerMap) {
+        Map<String, String> map = new LinkedHashMap<>();
+
+        for (HEADER header : HEADER.values()) {
+            String name = header.name();
+            String value = headerMap.get(name);
+            map.put(name, value);
+        }
+
+        return map;
+    }
 
     public static Map<String, String> getPublisherProps(String vip, long publishedTimestamp, String currentVersion, String priorVersion) {
         Map<String, String> map = new HashMap<>();
 
-        map.put("producedTime", formatter.format(publishedTimestamp));
-        map.put("publishedTimestamp", String.valueOf(publishedTimestamp));
-        map.put("dataVersion", currentVersion);
-        map.put("priorVersion", priorVersion);
+        map.put(HEADER.producedTime.name(), formatter.format(publishedTimestamp));
+        map.put(HEADER.publishedTimestamp.name(), String.valueOf(publishedTimestamp));
+        map.put(HEADER.dataVersion.name(), currentVersion);
+        map.put(HEADER.priorVersion.name(), priorVersion);
 
-        map.put("VIP", vip);
-        map.put("ProducedByServer", getServerId());
-        map.put("ProducedByJarVersion", getJarVersion());
+        map.put(HEADER.VIP.name(), vip);
+        map.put(HEADER.ProducedByServer.name(), getServerId());
+        map.put(HEADER.ProducedByJarVersion.name(), getJarVersion());
 
         return map;
     }

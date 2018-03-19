@@ -20,7 +20,7 @@ public class TransformerOutputBlobHeaderPopulator {
     }
     
 
-    public void addHeaders(long previousCycleNumber, long currentCycleNumber) {
+    public Map<String, String> addHeaders(long previousCycleNumber, long currentCycleNumber) {
         
         outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputClient.getCurrentVersionId()));
         outputStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
@@ -78,6 +78,7 @@ public class TransformerOutputBlobHeaderPopulator {
                                 + "SCREENSAVER_END_X:basic_passthrough(ArtworkBasicPassthrough).screensaverPassthrough(ArtworkScreensaverPassthrough).endX(INT)\n"
                                 + "SCREENSAVER_OFFSET_Y:basic_passthrough(ArtworkBasicPassthrough).screensaverPassthrough(ArtworkScreensaverPassthrough).offsetY(INT)\n"
                         );
-    }
 
+        return outputStateEngine.getHeaderTags();
+    }
 }

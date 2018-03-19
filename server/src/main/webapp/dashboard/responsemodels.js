@@ -9,9 +9,7 @@ function ResponseModelsFactory() {
 }
 
 ResponseModelsFactory.prototype.getModel = function(name, args) {
-    if (name == null || name == undefined) {
-        return new SimpleResponseModel();
-    } else if (name == "IndexTypeResponseModel") {
+    if (name == "IndexTypeResponseModel") {
         return new IndexTypeResponseModel();
     } else if (name == "IndexAliasesModel") {
         return new IndexAliasesModel();
@@ -21,6 +19,8 @@ ResponseModelsFactory.prototype.getModel = function(name, args) {
         return new TimeSeriesModel(args);
     } else if (name == "KeyValueModel") {
         return new KeyValueModel(args);
+    } else if (name == "InputDataVersionModel") {
+        return new InputDataVersionModel(args);
     } else {
         alert("JS error ResponseModelsFactory -- Unknown mode: " + name);
     }
@@ -758,4 +758,17 @@ function TimeSeriesModel(displayname) {
             timeSeries : this.dataPoints
         };
     };
+}
+
+function InputDataVersionModel() {
+    this.dataModel = [];
+
+    this.addHitInfo = function(jsonHitData) {
+        // this is the format PlainTextViewWidget expects
+        this.dataModel = [{value: jsonHitData._source.message}];
+    }
+
+    this.getDataModel = function() {
+        return this.dataModel;
+    }
 }

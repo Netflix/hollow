@@ -1,14 +1,17 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.netflix.servo.monitor.DynamicGauge;
 import com.netflix.servo.tag.BasicTag;
 import com.netflix.servo.tag.BasicTagList;
 import com.netflix.servo.tag.Tag;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 public class PlaybackMonkeyUtil {
 	static final String TIME_TAKEN = "vms.hollow.playbackmonkey.timeTakenInMillis";
@@ -38,4 +41,18 @@ public class PlaybackMonkeyUtil {
 		return failedPercent;
 	}
 
+	/**
+	 * Atlas metric: Report 1 for failure. Report 0 for success.
+     * No data will be reported (equivalent to 0 in Atlas) if PBM validation job did not run (ex: topN CB fails and PBM does not run).
+	 * @param ctx
+	 * @param success
+	 * @param vip
+	 */
+	
+	static void sendPBMFailureMetric(PublishWorkflowContext ctx, boolean success, String vip){
+    	// Atlas metric: Report 1 for failure. Report 0 for success.
+    	// No data will be reported (equivalent to 0 in Atlas) if PBM validation job did not run (ex: topN CB fails and PBM does not run).
+    	int count = (success)? 0 : 1;
+   		ctx.getMetricRecorder().recordMetric(Metric.PBMFailureCount, count, "vip", vip);
+	}
 }

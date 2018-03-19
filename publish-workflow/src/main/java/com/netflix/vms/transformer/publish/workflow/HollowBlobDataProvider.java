@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobChecksum;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBreaker;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 
@@ -16,11 +17,15 @@ import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.generated.notemplate.VideoHollow;
+import com.netflix.vms.logging.TaggingLogger.LogTag;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.publish.workflow.util.FileStatLogger;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,11 +56,23 @@ public class HollowBlobDataProvider {
     }
 
     public synchronized void revertToPriorVersion() {
-        if(revertableStateEngine != null) {
-            ctx.getLogger().info(RollbackStateEngine, "Rolling back state engine in circuit breaker data provider");
+        Collection<LogTag> blobStateTags = Arrays.asList(RollbackStateEngine, BlobState);
+        if (revertableStateEngine != null && revertableNostreamsStateEngine != null) {
+            Map<String, String> curHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+            Map<String, String> revHeaders = BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine);
+
+            ctx.getLogger().error(blobStateTags, "Rolling back state engine in circuit breaker data provider from:{}, to:{}", curHeaders, revHeaders);
             hollowReadStateEngine = revertableStateEngine;
             nostreamsStateEngine = revertableNostreamsStateEngine;
+        } else {
+            boolean isMissing_revertableStateEngine = (null == revertableStateEngine);
+            boolean isMissing_revertableNostreamsStateEngine = (null == revertableNostreamsStateEngine);
+            ctx.getLogger().error(blobStateTags,
+                    "Did NOT rollback state engine in circuit breaker data provider because revertableStateEngine( missing={} ) or revertableNostreamsStateEngine( missing={} )",
+                    isMissing_revertableStateEngine,
+                    isMissing_revertableNostreamsStateEngine);
         }
+
         // @TODO: WHY set to null??? - these should keep pointing to the prior state - memory optimization?
         if (ctx.getConfig().isHollowBlobDataProviderResetStateEnabled()) { // Condition to be backwards compatible
             revertableStateEngine = null;
@@ -88,6 +105,18 @@ public class HollowBlobDataProvider {
 
     private void validateChecksums(File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) throws IOException {
         FileStatLogger.logFileState(ctx.getLogger(), BlobChecksum, "validateChecksums", snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
+
+        Map<String, String> initRegularHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+        Map<String, String> initNoStreamsHeaders = BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine);
+
+        // -----------------------------------
+        // Make sure reserve delta file exists
+        if (deltaFile.exists() && !reverseDeltaFile.exists()) {
+            throw new RuntimeException("Found deltaFile=" + deltaFile + " but missing reverseDeltaFile");
+        }
+        if (nostreamsDeltaFile.exists() && !nostreamsReverseDeltaFile.exists()) {
+            throw new RuntimeException("Found nostreamsDeltaFile=" + nostreamsDeltaFile + " but missing nostreamsReverseDeltaFile");
+        }
 
         // ----------------------
         // Handle new Snapshot State
@@ -145,19 +174,42 @@ public class HollowBlobDataProvider {
 
         // ------------------------------------------------------------------------------
         // Apply Reserve Delta to modified state to make sure it gets back to prior state
+        Collection<LogTag> blobStateTags = Arrays.asList(BlobChecksum, BlobState);
         {
+            boolean isRevertableStateEngineCreated = false;
             if (reverseDeltaFile.exists()) {
                 revertableStateEngine = processReverseDeltaFile(ctx, "", hollowReadStateEngine, reverseDeltaFile, anotherStateEngine, anotherReader, initialChecksumBeforeDelta);
+
+                isRevertableStateEngineCreated = true;
+                ctx.getLogger().info(blobStateTags, "revertableStateEngine({}) created from {}", BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine), reverseDeltaFile);
             } else {
-                ctx.getLogger().warn(BlobChecksum, "Reserve Delta File does not exists: {}", reverseDeltaFile);
+                ctx.getLogger().warn(blobStateTags, "Reserve Delta File does not exists: {}", reverseDeltaFile);
             }
 
+            boolean isNostreamsReverseDeltaFileCreated = false;
             if (nostreamsReverseDeltaFile.exists()) {
                 revertableNostreamsStateEngine = processReverseDeltaFile(ctx, "NOSTREAMS", nostreamsStateEngine, nostreamsReverseDeltaFile, anotherNostreamsStateEngine, anotherNostreamsReader, initialNostreamsChecksumBeforeDelta);
+
+                isNostreamsReverseDeltaFileCreated = true;
+                ctx.getLogger().info(blobStateTags, "revertableNostreamsStateEngine({}) created from {}", BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine), nostreamsReverseDeltaFile);
             } else {
-                ctx.getLogger().warn(BlobChecksum, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
+                ctx.getLogger().warn(blobStateTags, "NoStreams Reserve Delta File does not exists: {}", nostreamsReverseDeltaFile);
+            }
+
+            // Make sure Revertable State Engine(s) were created
+            if (deltaFile.exists() && !isRevertableStateEngineCreated) {
+                ctx.getLogger().error(blobStateTags, "revertableStateEngine was not created");
+                throw new RuntimeException("revertableStateEngine was not created");
+            }
+
+            if (nostreamsDeltaFile.exists() && !isNostreamsReverseDeltaFileCreated) {
+                ctx.getLogger().error(blobStateTags, "revertableNostreamsStateEngine was not created");
+                throw new RuntimeException("revertableNostreamsStateEngine was not created");
             }
         }
+
+        ctx.getLogger().info(blobStateTags, "ReadState validate Completed - regular  : before({}), after({}), revertable({})", initRegularHeaders, BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableStateEngine));
+        ctx.getLogger().info(blobStateTags, "ReadState validate Completed - nostreams: before({}), after({}), revertable({}) ", initNoStreamsHeaders, BlobMetaDataUtil.fetchCoreHeaders(nostreamsStateEngine), BlobMetaDataUtil.fetchCoreHeaders(revertableNostreamsStateEngine));
     }
 
     private static HollowReadStateEngine processReverseDeltaFile(TransformerContext ctx, String prefix, HollowReadStateEngine hollowReadStateEngine, File reverseDeltaFile, HollowReadStateEngine anotherStateEngine, HollowBlobReader anotherReader, HollowChecksum initialChecksumBeforeDelta) throws IOException {

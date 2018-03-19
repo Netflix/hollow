@@ -65,6 +65,7 @@ public enum TransformerLogTag implements LogTag {
     AnnouncementSuccess,
     AnnouncementFailure,
     BlobChecksum,
+    BlobState,
     CreateDevSlice,
     DeletedTmpFile,
 

@@ -538,6 +538,7 @@ function CycleErrorCodesTab(serverInfoView) {
 // --------------------------------------------------------------------
 function CycleInputDataInformation(serverInfoView) {
     this.init = false;
+    this.inputDataWidget = new PlainTextViewWidget("#id-cycle-data-version-locations", "value");
 
     this.initialized = function() {
         return this.init;
@@ -545,7 +546,7 @@ function CycleInputDataInformation(serverInfoView) {
 
     this.clear = function() {
         $("#id-cycle-input-shardinfo-locations").html("");
-        $("#id-cycle-data-version-locations").html("");
+        this.inputDataWidget.clear();
         $("#id-cycle-output-shardinfo-locations").html("");
         this.init = false;
     };
@@ -554,16 +555,21 @@ function CycleInputDataInformation(serverInfoView) {
         query.indexName = serverInfoView.vmsIndex;
         query.indexType = indexType;
         query.size = num;
-        query.add(serverInfoView.vmsCycleId).add("eventInfo.tag:InputDataVersionIds");
+        query.add(serverInfoView.vmsCycleId);
     };
 
     this.refresh = function() {
         var inputParams = [ "Input", "Keybase", "Type", "Version", "EventId", "EventCheckpoint", "FileName", "PublishTime" ];
         var tableWidget = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", inputParams);
         var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getInputDataRegexInfo());
+        var inputDataWidgetExecutor = new InputDataVersionWidgetExecutor(this.inputDataWidget);
 
         this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50");
+        widgetExecutor.searchQuery.add("eventInfo.tag:InputDataVersionIds");
+        this.setPropertiesForQueryObject(inputDataWidgetExecutor.searchQuery, "vmsserver", "1");
+        inputDataWidgetExecutor.searchQuery.add("eventInfo.tag:InputDataConverterVersionId");
         widgetExecutor.updateJsonFromSearch();
+        inputDataWidgetExecutor.updateJsonFromSearch();
         this.init = true;
     };
 }

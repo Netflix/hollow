@@ -123,6 +123,27 @@ function KeyValueSearchDAO(widget, eventInfoKey, refresh, keysOnly) {
 
 }// KeyValueSearchDAO
 
+function InputDataVersionSearchDAO(widget, model) {
+    this.responseModel = model;
+    this.widget = widget;
+
+    this.handleJson = function(jsonData) {
+        var hits = parseInt(jsonData.hits.total);
+        if (hits < 1) {
+            this.widget.clear();
+            return;
+        }
+
+        var responseModel = this.responseModel;
+        var refdao = this;
+        $.each(jsonData.hits.hits, function(i, hit) {
+            responseModel.addHitInfo(hit);
+        });
+        this.widget.applyParserData(responseModel.getDataModel());
+        this.widget.refresh();
+    };
+}
+
 
 // if logged using objectNode, root is inputData, followed by the objectName that has an array of key-value
 // "_source": {
