@@ -19,6 +19,17 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean isTransformerCycleMonkeyEnabled();
 
+    @DefaultValue("true") // Enable by default if feature is enabled
+    boolean isTransformerCycleMonkeyAutoChaosEnabled();
+
+    @DefaultValue("true") // Enable by default if feature is enabled
+    @PropertyName(name = "vms.transformerCycleMonkeyAutoPhaseChaosEnabled.${0}")
+    public boolean isTransformerCycleMonkeyAutoPhaseChaosEnabled(String phaseName);
+
+    @DefaultValue("false") // Selectively always enable per phase but should disable isTransformerCycleMonkeyAutoChaosEnabled
+    @PropertyName(name = "vms.transformerCycleMonkeyPhaseChaosEnabled.${0}")
+    public boolean isTransformerCycleMonkeyPhaseChaosEnabled(String phaseName);
+
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 

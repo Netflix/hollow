@@ -74,6 +74,7 @@ public class TransformCycle {
     private final String converterVip;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
+    private final TransformerCycleMonkey cycleMonkey;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -101,6 +102,7 @@ public class TransformCycle {
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
+        this.cycleMonkey = new TransformerCycleMonkey(ctx);
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
@@ -185,6 +187,10 @@ public class TransformCycle {
 
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
+        // Spot to trigger Cycle Monkey if enabled
+        cycleMonkey.cycleBegin();
+        cycleMonkey.doMonkeyBusiness("beginCycle");
+
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
@@ -211,6 +217,9 @@ public class TransformCycle {
                 inputClient.triggerRefresh();
             else
                 inputClient.triggerRefreshTo(pinnedInputVersion);
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("updateTheInput");
 
             //// set the now millis
             Long nowMillis = ctx.getConfig().getNowMillis();
@@ -240,6 +249,9 @@ public class TransformCycle {
 
                 // Process fastlane
                 trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
+
+                // Spot to trigger Cycle Monkey if enabled
+                cycleMonkey.doMonkeyBusiness("transformTheData");
 
                 // Combine data
                 List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
@@ -286,6 +298,9 @@ public class TransformCycle {
                 writer.writeSnapshot(snapshotOutputStream);
                 ctx.getLogger().info(blobStateTags, "Wrote Snapshot to local file( {} ) - header( {} )", snapshotFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
             }
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("writeTheBlobFiles");
 
             String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
             createNostreamsFilteredFile(snapshotFileName, nostreamsSnapshotFileName, true);
@@ -366,6 +381,9 @@ public class TransformCycle {
             CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("submitToPublishWorkflow");
         } finally {
             ctx.getMetricRecorder().stopTimer(P4_WaitForPublishWorkflowDuration);
         }
