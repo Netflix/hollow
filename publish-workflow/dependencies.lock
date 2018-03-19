@@ -2094,7 +2094,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -2505,7 +2505,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -2546,7 +2546,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -5307,7 +5307,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5718,7 +5718,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -5759,7 +5759,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -8520,7 +8520,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -8931,7 +8931,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -8972,7 +8972,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -11855,7 +11855,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12266,7 +12266,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -12307,7 +12307,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -15068,7 +15068,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -15479,7 +15479,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -15520,7 +15520,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -18308,7 +18308,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -18724,7 +18724,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -18765,7 +18765,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -21594,7 +21594,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -22010,7 +22010,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -22051,7 +22051,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -24880,7 +24880,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -25296,7 +25296,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -25337,7 +25337,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -28166,7 +28166,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -28582,7 +28582,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.103",
+            "locked": "2.104",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -28623,7 +28623,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]

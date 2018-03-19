@@ -1711,7 +1711,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -1943,7 +1943,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -4237,7 +4237,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -4469,7 +4469,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -6763,7 +6763,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -6995,7 +6995,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -9411,7 +9411,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -9643,7 +9643,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -11937,7 +11937,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -12169,7 +12169,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -14463,7 +14463,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -14695,7 +14695,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -16998,7 +16998,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -17230,7 +17230,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -19533,7 +19533,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -19765,7 +19765,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
@@ -22068,7 +22068,7 @@
             ]
         },
         "netflix:content-usage-policy": {
-            "locked": "4.50",
+            "locked": "4.51",
             "requested": "latest.release"
         },
         "netflix:country-launch": {
@@ -22300,7 +22300,7 @@
             ]
         },
         "netflix:simone-client": {
-            "locked": "2.2.3",
+            "locked": "2.2.4",
             "transitive": [
                 "netflix:content-usage-policy"
             ]
