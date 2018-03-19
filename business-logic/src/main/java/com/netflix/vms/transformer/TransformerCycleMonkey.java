@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransformerCycleMonkey implements CycleMonkey {
     public static final CycleMonkey SIMPLE_CYCLE_MONKEY = new CycleMonkey() {
@@ -20,8 +21,8 @@ public class TransformerCycleMonkey implements CycleMonkey {
     private final Set<String> triggeredPhases = new HashSet<>();
 
     private int cycleCount = 0;
-    private int phaseCounter = 1; // phase number starts at 1
-    private int chaosPhase = 1;
+    private int chaosPhase = 1; // phase number starts at 1
+    private final AtomicInteger phaseCounter = new AtomicInteger(1);
 
     private boolean isEnabled = false;
     private boolean isAutoChaosEnabled = false;
@@ -41,7 +42,7 @@ public class TransformerCycleMonkey implements CycleMonkey {
     private synchronized int getPhaseNum(String phaseName) {
         Integer phaseNum = phaseMap.get(phaseName);
         if (phaseNum == null) {
-            phaseNum = phaseCounter++;
+            phaseNum = phaseCounter.getAndIncrement();
             phaseMap.put(phaseName, phaseNum);
         }
         return phaseNum;
