@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.servo.util.VisibleForTesting;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
@@ -144,7 +145,8 @@ public class CycleDataAggregator {
         }
     }
 
-    private String getJSON(String country, String language, String message, List<Integer> videoIds) {
+    @VisibleForTesting
+    String getJSON(String country, String language, String message, List<Integer> videoIds) {
         StringBuilder builder = new StringBuilder();
         String videoIdsAsString = Arrays.toString(videoIds.toArray());
 
@@ -155,7 +157,7 @@ public class CycleDataAggregator {
         }
         builder.append("\"count\":").append(videoIds.size()).append(",");
         builder.append("\"message\":").append("\"" + message + "\"").append(",");
-        builder.append("\"videoIds\":").append("[" + videoIdsAsString + "]");
+        builder.append("\"videoIds\":").append(videoIdsAsString);
         builder.append("}");
         return builder.toString();
     }
