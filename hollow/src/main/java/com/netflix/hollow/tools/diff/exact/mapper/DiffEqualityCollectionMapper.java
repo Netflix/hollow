@@ -18,14 +18,13 @@
 package com.netflix.hollow.tools.diff.exact.mapper;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.OrdinalIdentityTranslator;
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.OrdinalIdentityTranslator;
+import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
 
 /**
  * Not intended for external consumption.

@@ -18,11 +18,10 @@
 package com.netflix.hollow.api.custom;
 
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.SampleResult;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

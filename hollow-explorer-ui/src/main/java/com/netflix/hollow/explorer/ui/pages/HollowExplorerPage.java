@@ -19,11 +19,10 @@ package com.netflix.hollow.explorer.ui.pages;
 
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.ui.HollowUISession;
+import java.io.Writer;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.Writer;
 
 public abstract class HollowExplorerPage {
     

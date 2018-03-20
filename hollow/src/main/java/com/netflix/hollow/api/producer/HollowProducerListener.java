@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.producer.HollowProducer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
-
-import java.util.EventListener;
-import java.util.concurrent.TimeUnit;
-
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
+
+import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import java.util.EventListener;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A class should implement {@code HollowProducerListener}, if it wants to be notified on

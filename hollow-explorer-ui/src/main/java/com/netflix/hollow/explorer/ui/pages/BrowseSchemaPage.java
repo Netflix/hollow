@@ -21,10 +21,9 @@ import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.SchemaDisplay;
 import com.netflix.hollow.explorer.ui.model.SchemaDisplayField;
 import com.netflix.hollow.ui.HollowUISession;
-import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.Writer;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.velocity.VelocityContext;
 
 public class BrowseSchemaPage extends HollowExplorerPage {
 

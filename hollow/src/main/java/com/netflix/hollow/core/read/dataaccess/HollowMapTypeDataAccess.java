@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
-
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 
 /**
  * A handle for all of the records of a specific MAP type in a Hollow dataset.  The most common type of {@link HollowMapTypeDataAccess}

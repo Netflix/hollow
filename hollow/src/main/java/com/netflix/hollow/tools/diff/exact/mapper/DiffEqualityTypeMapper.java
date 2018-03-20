@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.tools.diff.exact.mapper;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
-import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.core.util.LongList;
-import com.netflix.hollow.tools.diff.exact.CombinedMatchPairResultsIterator;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.util.LongList;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.tools.diff.exact.CombinedMatchPairResultsIterator;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 

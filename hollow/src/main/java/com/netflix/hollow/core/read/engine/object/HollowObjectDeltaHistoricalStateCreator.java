@@ -17,12 +17,12 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.util.RemovedOrdinalIterator;
-import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.memory.SegmentedByteArray;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.util.IntMap;
+import com.netflix.hollow.core.util.RemovedOrdinalIterator;
 
 /**
  * This class contains the logic for extracting the removed records from an OBJECT type state

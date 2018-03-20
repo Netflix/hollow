@@ -25,7 +25,6 @@ import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import java.util.ArrayDeque;
 import java.util.BitSet;
 import java.util.HashSet;

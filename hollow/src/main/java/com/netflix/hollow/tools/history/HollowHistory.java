@@ -17,22 +17,21 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
-import com.netflix.hollow.core.util.RemovedOrdinalIterator;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
-import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
-import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
-import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.OrdinalIdentityTranslator;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.RemovedOrdinalIterator;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
+import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.OrdinalIdentityTranslator;
+import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateKeyOrdinalMapping;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoricalStateTypeKeyOrdinalMapping;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;

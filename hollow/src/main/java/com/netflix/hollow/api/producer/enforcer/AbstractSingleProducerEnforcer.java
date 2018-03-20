@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.api.producer.enforcer;
 
+import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 
 public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProducerListener implements SingleProducerEnforcer {
     private boolean hasCycleStarted = false;

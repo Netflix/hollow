@@ -9,7 +9,6 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;

@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core.write.copy;
 
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
-
+import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
 
 public class HollowListCopier extends HollowRecordCopier {
 

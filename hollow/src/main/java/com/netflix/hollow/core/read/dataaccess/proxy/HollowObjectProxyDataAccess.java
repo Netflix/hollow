@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * A {@link HollowTypeProxyDataAccess} for an OBJECT type.

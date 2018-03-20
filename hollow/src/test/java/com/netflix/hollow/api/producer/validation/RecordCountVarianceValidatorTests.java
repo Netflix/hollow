@@ -17,10 +17,6 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -29,6 +25,9 @@ import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationExcept
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.api.producer.validation.ProducerValidationTests.TypeWithPrimaryKey;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RecordCountVarianceValidatorTests {
     private InMemoryBlobStore blobStore;

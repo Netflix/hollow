@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import java.util.ArrayList;
-
 import com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import java.util.ArrayList;
 import java.util.List;
 
 /// This InMemoryAnnouncement is both a HollowProducer.Announcer and HollowConsumer.AnnouncementWatcher!

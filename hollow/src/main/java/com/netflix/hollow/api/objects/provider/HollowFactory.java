@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.objects.provider;
 
 import com.netflix.hollow.api.custom.HollowTypeAPI;
-
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 
 /**

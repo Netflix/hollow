@@ -17,16 +17,15 @@
  */
 package com.netflix.hollow.core.util;
 
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import java.io.InputStream;
-import java.io.IOException;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A utility to create and keep up-to-date a {@link HollowReadStateEngine} from a {@link HollowWriteStateEngine} 

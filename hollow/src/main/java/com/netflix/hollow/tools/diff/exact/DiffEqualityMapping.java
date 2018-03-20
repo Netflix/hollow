@@ -17,19 +17,18 @@
  */
 package com.netflix.hollow.tools.diff.exact;
 
-import com.netflix.hollow.tools.diff.HollowDiff;
-import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityCollectionMapper;
-import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityMapMapper;
-import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityObjectMapper;
-import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityOrderedListMapper;
-import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityTypeMapper;
-
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.tools.diff.HollowDiff;
+import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityCollectionMapper;
+import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityMapMapper;
+import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityObjectMapper;
+import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityOrderedListMapper;
+import com.netflix.hollow.tools.diff.exact.mapper.DiffEqualityTypeMapper;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 /**
  * A handle for all of the records of a specific type in a Hollow dataset.  The most common type of {@link HollowTypeDataAccess}

@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.tools.diff.HollowTypeDiff;
-
 import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalFilter;
 import java.util.List;
 

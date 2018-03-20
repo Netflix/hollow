@@ -20,13 +20,12 @@ package com.netflix.hollow.tools.diff.count;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldHashCode;
 import static com.netflix.hollow.core.read.HollowReadFieldUtils.fieldsAreEqual;
 
-import com.netflix.hollow.tools.diff.HollowTypeDiff;
-
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

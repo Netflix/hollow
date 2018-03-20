@@ -17,14 +17,6 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
@@ -36,6 +28,12 @@ import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationExcept
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class HollowProducerValidationListenerTest {
 

@@ -1,18 +1,8 @@
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.client.HollowAPIFactory;
-import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.InMemoryBlobStore;
-import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
-import com.netflix.hollow.api.metrics.HollowMetricsCollector;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.concurrent.Executor;
 
 // this test doesn't do much beyond making sure that a custom builder will
 // compile and ensure that HollowProducer.Builder is parameterized correctly

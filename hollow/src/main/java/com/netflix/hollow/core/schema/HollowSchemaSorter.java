@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.HollowStateEngine;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;

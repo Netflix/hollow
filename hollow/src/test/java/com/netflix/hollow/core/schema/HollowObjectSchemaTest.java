@@ -17,10 +17,8 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import org.junit.Assert;
 import org.junit.Test;
 

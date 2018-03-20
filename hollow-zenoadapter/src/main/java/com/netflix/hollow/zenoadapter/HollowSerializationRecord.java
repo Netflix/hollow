@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.zenoadapter;
 
-
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.zeno.serializer.NFSerializationRecord;
 

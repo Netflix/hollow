@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.history.keyindex;
 
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -17,9 +17,6 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import com.netflix.hollow.api.producer.HollowProducer.Nameable;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.Validator;
@@ -32,6 +29,8 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * 

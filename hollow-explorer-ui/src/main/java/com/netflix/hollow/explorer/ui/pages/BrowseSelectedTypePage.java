@@ -33,14 +33,13 @@ import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.stringifier.HollowStringifier;
 import com.netflix.hollow.ui.HollowUISession;
-import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.velocity.VelocityContext;
 
 public class BrowseSelectedTypePage extends HollowExplorerPage {
     private static final String SESSION_ATTR_QUERY_RESULT = "query-result";

@@ -18,9 +18,8 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * This is the extension of the {@link HollowRecordDelegate} interface for OBJECT type records.

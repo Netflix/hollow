@@ -23,13 +23,12 @@ import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.explorer.ui.model.QueryResult;
 import com.netflix.hollow.explorer.ui.model.QueryResult.QueryClause;
 import com.netflix.hollow.ui.HollowUISession;
-import org.apache.velocity.VelocityContext;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.velocity.VelocityContext;
 
 public class QueryPage extends HollowExplorerPage {
 

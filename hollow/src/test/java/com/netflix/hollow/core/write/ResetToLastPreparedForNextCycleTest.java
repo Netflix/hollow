@@ -17,16 +17,12 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.junit.Assert;

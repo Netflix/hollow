@@ -18,15 +18,12 @@
 package com.netflix.hollow.tools.history;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.tools.history.HollowHistoricalStateCreator;
-import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
-import com.netflix.hollow.core.write.HollowMapTypeWriteState;
-import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.write.HollowMapTypeWriteState;
+import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;

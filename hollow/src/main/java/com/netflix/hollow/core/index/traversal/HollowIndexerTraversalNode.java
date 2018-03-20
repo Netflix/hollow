@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.index.traversal;
 
-import com.netflix.hollow.core.util.IntList;
-
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.util.IntList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

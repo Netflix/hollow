@@ -20,7 +20,6 @@ package com.netflix.hollow.api.metrics;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducerListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.*;
 
 public class HollowProducerMetrics extends HollowMetrics {
     private int cyclesCompleted = 0;

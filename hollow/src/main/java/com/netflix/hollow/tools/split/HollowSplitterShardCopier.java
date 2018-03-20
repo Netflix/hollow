@@ -17,18 +17,17 @@
  */
 package com.netflix.hollow.tools.split;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
-import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.copy.HollowRecordCopier;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;

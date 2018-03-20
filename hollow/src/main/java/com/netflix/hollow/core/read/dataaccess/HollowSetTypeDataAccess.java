@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
  * A handle for all of the records of a specific SET type in a Hollow dataset.  The most common type of {@link HollowSetTypeDataAccess}

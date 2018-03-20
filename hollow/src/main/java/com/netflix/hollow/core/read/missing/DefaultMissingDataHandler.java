@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.core.read.missing;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.core.read.iterator.EmptyMapOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.EmptyOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 public class DefaultMissingDataHandler implements MissingDataHandler {
 

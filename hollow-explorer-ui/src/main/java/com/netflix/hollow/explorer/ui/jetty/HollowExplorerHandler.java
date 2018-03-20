@@ -18,7 +18,6 @@
 package com.netflix.hollow.explorer.ui.jetty;
 
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
-
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

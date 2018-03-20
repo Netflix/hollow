@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;

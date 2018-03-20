@@ -17,14 +17,13 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
-
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 
 /**
  * This is a generic handle to a LIST type record. 

@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.core.index.traversal;
 
+import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.TypeA;
 import com.netflix.hollow.core.write.objectmapper.TypeB;
 import com.netflix.hollow.core.write.objectmapper.TypeC;
-
-import com.netflix.hollow.core.AbstractStateEngineTest;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;

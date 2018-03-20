@@ -19,7 +19,6 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
-
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
