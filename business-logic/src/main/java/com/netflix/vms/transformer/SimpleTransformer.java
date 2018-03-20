@@ -44,24 +44,7 @@ import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_DROPPED_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_DROPPED_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_DROPPED_TAG;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_DUBS_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_DUBS_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_DUBS_TAG;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_TAG;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_TAG;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_MESSAGE;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_SEVERITY;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_TAG;
+import com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.l10n.L10NMiscResourcesModule;
 import com.netflix.vms.transformer.modules.l10n.L10NVideoResourcesModule;
@@ -159,12 +142,7 @@ public class SimpleTransformer {
 
         // cycle data aggregator
         CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
-        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTION_TAG, PRE_PROMOTION_SEVERITY, PRE_PROMOTION_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(NO_LOCALIZED_ASSETS, NO_LOCALIZED_ASSETS_SEVERITY, NO_LOCALIZED_ASSETS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTE_WITH_ASSETS_MISSING_TAG, PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY, PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_DUBS_TAG, LOCALE_MERCHING_MISSING_DUBS_SEVERITY, LOCALE_MERCHING_MISSING_DUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_SUBS_TAG, LOCALE_MERCHING_MISSING_SUBS_SEVERITY, LOCALE_MERCHING_MISSING_SUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_DROPPED_TAG, LOCALE_MERCHING_DROPPED_SEVERITY, LOCALE_MERCHING_DROPPED_MESSAGE);
+        VMSAvailabilityWindowModule.configureLogsTagsForAggregator(cycleDataAggregator);
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
         for (int i = 0; i < executor.getCorePoolSize(); i++) {

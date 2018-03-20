@@ -80,8 +80,5 @@ public enum TransformerLogTag implements LogTag {
     LocaleMerching_Missing_Subs,
     LocaleMerching_NoWindows,
 
-//    LocaleMerching,
-//    LocaleMerchingMissingSubs,
-//    LocaleMerchingMissingDubs,
     MultiLocaleCountries,
 }

@@ -99,6 +99,15 @@ public class VMSAvailabilityWindowModule {
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
     private final CycleDataAggregator cycleDataAggregator;
 
+    public static void configureLogsTagsForAggregator(CycleDataAggregator cycleDataAggregator) {
+        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTION_TAG, PRE_PROMOTION_SEVERITY, PRE_PROMOTION_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(NO_LOCALIZED_ASSETS, NO_LOCALIZED_ASSETS_SEVERITY, NO_LOCALIZED_ASSETS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTE_WITH_ASSETS_MISSING_TAG, PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY, PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_DUBS_TAG, LOCALE_MERCHING_MISSING_DUBS_SEVERITY, LOCALE_MERCHING_MISSING_DUBS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_SUBS_TAG, LOCALE_MERCHING_MISSING_SUBS_SEVERITY, LOCALE_MERCHING_MISSING_SUBS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_DROPPED_TAG, LOCALE_MERCHING_DROPPED_SEVERITY, LOCALE_MERCHING_DROPPED_MESSAGE);
+    }
+
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator) {
         this.api = api;
         this.ctx = ctx;
@@ -238,7 +247,6 @@ public class VMSAvailabilityWindowModule {
                 if (!isGoLive && inPrePromotionPhase)
                     // collect PRE_PROMOTION_TAG
                     cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTION_TAG);
-                //ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
             }
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
@@ -278,14 +286,13 @@ public class VMSAvailabilityWindowModule {
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
                                 // if no assets and the the title is not in prePromotionPhase then skip this contract and no need to check subs/dubs requirement list too.
                                 if (packageAvailability == 0 && !inPrePromotionPhase) {
+                                    // skipping the contract
                                     cycleDataAggregator.collect(country, locale, videoId, NO_LOCALIZED_ASSETS);
-                                    //ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
                                     // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
                                     if (ctx.getConfig().isPrePromoEnabledForMultiLanguageCatalog()) {
                                         cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTE_WITH_ASSETS_MISSING_TAG);
-                                        //ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                     } else {
                                         // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
                                         continue;
@@ -609,7 +616,6 @@ public class VMSAvailabilityWindowModule {
         if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
             // collect no windows
             cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_DROPPED_TAG);
-            //ctx.getLogger().info(TransformerLogTag.LocaleMerching, "VideoId={} not merched in country={} locale={}", videoId, country, locale);
         }
         return availabilityWindows;
     }

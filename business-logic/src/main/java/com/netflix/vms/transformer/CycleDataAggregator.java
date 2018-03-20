@@ -161,6 +161,4 @@ public class CycleDataAggregator {
         builder.append("}");
         return builder.toString();
     }
-
-
 }
