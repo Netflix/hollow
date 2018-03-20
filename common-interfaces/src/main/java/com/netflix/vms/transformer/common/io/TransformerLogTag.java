@@ -73,14 +73,15 @@ public enum TransformerLogTag implements LogTag {
     ReexploreTags,
 
     /// Multi-Locale Catalog ///
-    PrePromotion,
-    PrePromote_Asset_Missing,
+    LocaleMerching_PrePromotion_Phase,
+    LocaleMerching_PrePromote_Without_Assets,
+    LocaleMerching_Skip_Contract_No_Assets,
     LocaleMerching_Missing_Dubs,
     LocaleMerching_Missing_Subs,
     LocaleMerching_NoWindows,
 
-    LocaleMerching,
-    LocaleMerchingMissingSubs,
-    LocaleMerchingMissingDubs,
+//    LocaleMerching,
+//    LocaleMerchingMissingSubs,
+//    LocaleMerchingMissingDubs,
     MultiLocaleCountries,
 }

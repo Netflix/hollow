@@ -53,14 +53,19 @@ public class VMSAvailabilityWindowModule {
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
 
     // for aggregating pre-promotion data
-    public static final TaggingLogger.LogTag PRE_PROMOTION_TAG = TransformerLogTag.PrePromotion;
+    public static final TaggingLogger.LogTag PRE_PROMOTION_TAG = TransformerLogTag.LocaleMerching_PrePromotion_Phase;
     public static final String PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase";
     public static final TaggingLogger.Severity PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
 
+    // no assets found and not in pre-promo phase
+    public static final TaggingLogger.LogTag NO_LOCALIZED_ASSETS = TransformerLogTag.LocaleMerching_Skip_Contract_No_Assets;
+    public static final String NO_LOCALIZED_ASSETS_MESSAGE = "Titles(not in pre-promo phase) without localized assets";
+    public static final TaggingLogger.Severity NO_LOCALIZED_ASSETS_SEVERITY = TaggingLogger.Severity.INFO;
+
     // for aggregating pre-promotion data even though localized assets are missing.
-    public static final TaggingLogger.LogTag PRE_PROMOTION_ASSETS_MISSING_TAG = TransformerLogTag.PrePromote_Asset_Missing;
-    public static final String PRE_PROMOTE_ASSETS_MISSING_MESSAGE = "Pre-promote titles even though assets are missing";
-    public static final TaggingLogger.Severity PRE_PROMOTE_ASSETS_MISSING_SEVERITY = TaggingLogger.Severity.INFO;
+    public static final TaggingLogger.LogTag PRE_PROMOTE_WITH_ASSETS_MISSING_TAG = TransformerLogTag.LocaleMerching_PrePromote_Without_Assets;
+    public static final String PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE = "Pre-promote titles even though assets are missing";
+    public static final TaggingLogger.Severity PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY = TaggingLogger.Severity.INFO;
 
     // for aggregating missing audio(dubs) in locale merching
     public static final TaggingLogger.LogTag LOCALE_MERCHING_MISSING_DUBS_TAG = TransformerLogTag.LocaleMerching_Missing_Dubs;
@@ -224,7 +229,9 @@ public class VMSAvailabilityWindowModule {
                 // checking for all the contracts in the current window to determine if title is in pre-promo phase
                 for (long contractId : contractIds) {
                     ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                    // @TODO: This is a bit fishy - don't we need to check for contract window?. Follow up with Sampada to see how to correctly determine if a title is in pre-promo phase. Also, pre-promo is not country-language specific. This logic is on par with current logic for country specific catalogs.
+                    // @TODO: This is a bit fishy - don't we need to check for contract window?.
+                    // Follow up with Sampada to see how to correctly determine if a title is in pre-promo phase.
+                    // Also, pre-promo is not country-language specific. This logic is on par with current logic for country specific catalogs.
                     if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
                         inPrePromotionPhase = true;
                 }
@@ -271,12 +278,14 @@ public class VMSAvailabilityWindowModule {
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
                                 // if no assets and the the title is not in prePromotionPhase then skip this contract and no need to check subs/dubs requirement list too.
                                 if (packageAvailability == 0 && !inPrePromotionPhase) {
-                                    ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
+                                    cycleDataAggregator.collect(country, locale, videoId, NO_LOCALIZED_ASSETS);
+                                    //ctx.getLogger().info(TransformerLogTag.LocaleMerching, "Skipping contractId={} for videoId={} in country={} and locale={} because localized assets were not found in packgeId={}", contractId, videoId, country, locale, packageId);
                                     continue;
                                 } else if (packageAvailability == 0 && inPrePromotionPhase) {
                                     // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
                                     if (ctx.getConfig().isPrePromoEnabledForMultiLanguageCatalog()) {
-                                        ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
+                                        cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTE_WITH_ASSETS_MISSING_TAG);
+                                        //ctx.getLogger().info(TransformerLogTag.PrePromotion, "Localized assets were not found for the videoId={} country={} and locale={}, not skipping contract since title is in pre-promo phase", videoId, country, locale);
                                     } else {
                                         // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
                                         continue;
@@ -300,7 +309,8 @@ public class VMSAvailabilityWindowModule {
                                 }
 
                                 // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
-                                // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window. So if any contract has the assets, then it passes the requirement check.
+                                // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
+                                // So if any contract has the assets, then it passes the requirement check.
                                 if (isSubsDubsRequirementEnforced && !inPrePromotionPhase) {
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.

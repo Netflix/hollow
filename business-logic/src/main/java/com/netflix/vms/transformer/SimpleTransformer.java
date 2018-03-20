@@ -53,6 +53,12 @@ import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilit
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_MESSAGE;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_SEVERITY;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.LOCALE_MERCHING_MISSING_SUBS_TAG;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS_MESSAGE;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.NO_LOCALIZED_ASSETS_SEVERITY;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTE_WITH_ASSETS_MISSING_TAG;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_MESSAGE;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_SEVERITY;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.PRE_PROMOTION_TAG;
@@ -154,6 +160,8 @@ public class SimpleTransformer {
         // cycle data aggregator
         CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
         cycleDataAggregator.aggregateForLogTag(PRE_PROMOTION_TAG, PRE_PROMOTION_SEVERITY, PRE_PROMOTION_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(NO_LOCALIZED_ASSETS, NO_LOCALIZED_ASSETS_SEVERITY, NO_LOCALIZED_ASSETS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTE_WITH_ASSETS_MISSING_TAG, PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY, PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_DUBS_TAG, LOCALE_MERCHING_MISSING_DUBS_SEVERITY, LOCALE_MERCHING_MISSING_DUBS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_SUBS_TAG, LOCALE_MERCHING_MISSING_SUBS_SEVERITY, LOCALE_MERCHING_MISSING_SUBS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_DROPPED_TAG, LOCALE_MERCHING_DROPPED_SEVERITY, LOCALE_MERCHING_DROPPED_MESSAGE);
