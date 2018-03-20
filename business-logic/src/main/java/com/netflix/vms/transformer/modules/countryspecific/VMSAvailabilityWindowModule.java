@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
-import static java.util.Arrays.asList;
 
-import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.contract.ContractAssetType;
@@ -35,7 +34,9 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,6 +51,31 @@ import java.util.stream.Collectors;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
+
+    // for aggregating pre-promotion data
+    public static final TaggingLogger.LogTag PRE_PROMOTION_TAG = TransformerLogTag.PrePromotion;
+    public static final String PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase";
+    public static final TaggingLogger.Severity PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
+
+    // for aggregating pre-promotion data even though localized assets are missing.
+    public static final TaggingLogger.LogTag PRE_PROMOTION_ASSETS_MISSING_TAG = TransformerLogTag.PrePromote_Asset_Missing;
+    public static final String PRE_PROMOTE_ASSETS_MISSING_MESSAGE = "Pre-promote titles even though assets are missing";
+    public static final TaggingLogger.Severity PRE_PROMOTE_ASSETS_MISSING_SEVERITY = TaggingLogger.Severity.INFO;
+
+    // for aggregating missing audio(dubs) in locale merching
+    public static final TaggingLogger.LogTag LOCALE_MERCHING_MISSING_DUBS_TAG = TransformerLogTag.LocaleMerching_Missing_Dubs;
+    public static final String LOCALE_MERCHING_MISSING_DUBS_MESSAGE = "Titles missing localized dubs";
+    public static final TaggingLogger.Severity LOCALE_MERCHING_MISSING_DUBS_SEVERITY = TaggingLogger.Severity.INFO;
+
+    // for aggregating missing text (subs) in locale merching.
+    public static final TaggingLogger.LogTag LOCALE_MERCHING_MISSING_SUBS_TAG = TransformerLogTag.LocaleMerching_Missing_Subs;
+    public static final String LOCALE_MERCHING_MISSING_SUBS_MESSAGE = "Titles missing localized subs";
+    public static final TaggingLogger.Severity LOCALE_MERCHING_MISSING_SUBS_SEVERITY = TaggingLogger.Severity.INFO;
+
+    // for aggregating titles dropped in locale merching.
+    public static final TaggingLogger.LogTag LOCALE_MERCHING_DROPPED_TAG = TransformerLogTag.LocaleMerching_NoWindows;
+    public static final String LOCALE_MERCHING_DROPPED_MESSAGE = "Titles for which contracts were skipped or no windows added";
+    public static final TaggingLogger.Severity LOCALE_MERCHING_DROPPED_SEVERITY = TaggingLogger.Severity.INFO;
 
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
@@ -66,8 +92,9 @@ public class VMSAvailabilityWindowModule {
 
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
+    private final CycleDataAggregator cycleDataAggregator;
 
-    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;
@@ -75,6 +102,7 @@ public class VMSAvailabilityWindowModule {
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, ctx);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
+        this.cycleDataAggregator = cycleDataAggregator;
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
@@ -201,7 +229,9 @@ public class VMSAvailabilityWindowModule {
                         inPrePromotionPhase = true;
                 }
                 if (!isGoLive && inPrePromotionPhase)
-                    ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
+                    // collect PRE_PROMOTION_TAG
+                    cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTION_TAG);
+                //ctx.getLogger().info(TransformerLogTag.PrePromotion, "Video={} country={} locale={} is in PrePromotion phase.", videoId, country, locale);
             }
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
@@ -275,12 +305,16 @@ public class VMSAvailabilityWindowModule {
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
                                     if (mustHaveSubs && !thisWindowFoundLocalText) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        // collect missing subs
+                                        cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_MISSING_SUBS_TAG);
+                                        //ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio) {
-                                        ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        // collect missing dubs
+                                        cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_MISSING_DUBS_TAG);
+                                        //ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
                                         continue;
                                     }
 
@@ -562,9 +596,11 @@ public class VMSAvailabilityWindowModule {
                 rollup.newPrePromoDays(0);
         }
 
-        if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty()))
-            ctx.getLogger().info(TransformerLogTag.LocaleMerching,"VideoId={} not merched in country={} locale={}", videoId, country, locale);
-
+        if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
+            // collect no windows
+            cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_DROPPED_TAG);
+            //ctx.getLogger().info(TransformerLogTag.LocaleMerching, "VideoId={} not merched in country={} locale={}", videoId, country, locale);
+        }
         return availabilityWindows;
     }
 
