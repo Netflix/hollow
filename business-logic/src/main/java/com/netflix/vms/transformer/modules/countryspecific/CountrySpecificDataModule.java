@@ -7,6 +7,7 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
+import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.TransformedVideoData;
@@ -68,7 +69,7 @@ public class CountrySpecificDataModule {
 
     private VideoDataCollection videoDataCollection;
 
-    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
@@ -80,7 +81,7 @@ public class CountrySpecificDataModule {
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
-        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer);
+        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer, cycleDataAggregator);
     }
 
     @VisibleForTesting

@@ -1,13 +1,5 @@
 package com.netflix.vms.transformer;
 
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
-
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -15,7 +7,14 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
@@ -45,6 +44,7 @@ import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
+import com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.l10n.L10NMiscResourcesModule;
 import com.netflix.vms.transformer.modules.l10n.L10NVideoResourcesModule;
@@ -66,6 +66,7 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -139,6 +140,10 @@ public class SimpleTransformer {
         AtomicInteger failedIndividualTransforms = new AtomicInteger(0);
         int progressDivisor = getProgressDivisor(processGroups.size());
 
+        // cycle data aggregator
+        CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
+        VMSAvailabilityWindowModule.configureLogsTagsForAggregator(cycleDataAggregator);
+
         SimultaneousExecutor executor = new SimultaneousExecutor();
         for (int i = 0; i < executor.getCorePoolSize(); i++) {
             executor.execute(() -> {
@@ -150,7 +155,7 @@ public class SimpleTransformer {
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
-                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, objectMapper, cycleConstants, indexer);
+                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx, objectMapper, cycleConstants, indexer, cycleDataAggregator);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
@@ -220,7 +225,7 @@ public class SimpleTransformer {
                 new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
                 new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer)
-                );
+        );
 
         // @formatter:on
         // Execute Transform Modules
@@ -254,6 +259,9 @@ public class SimpleTransformer {
         ctx.getMetricRecorder().recordMetric(FailedProcessingIndividualHierarchies, failedIndividualTransforms.get());
         if (failedIndividualTransforms.get() > ctx.getConfig().getMaxTolerableFailedTransformerHierarchies())
             throw new RuntimeException("More than " + ctx.getConfig().getMaxTolerableFailedTransformerHierarchies() + " individual hierarchies failed transformation -- not publishing data");
+
+        // log all aggregated data
+        cycleDataAggregator.logAllAggregatedData();
 
         long endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");

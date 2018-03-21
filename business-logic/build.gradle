@@ -17,16 +17,6 @@ configurations.all {
   // exclude direct and transitive dependencies on platform
   all*.exclude group: 'netflix', module: 'platform-core'
   all*.exclude group: 'netflix', module: 'platform-dependency-command'
-  
-  resolutionStrategy {
-    force 'com.netflix.archaius:archaius2-api:2.2.0'
-    force 'com.netflix.archaius:archaius2-archaius1-bridge:2.2.0'
-    force 'com.netflix.archaius:archaius2-commons-configuration:2.2.0'
-    force 'com.netflix.archaius:archaius2-core:2.2.0'
-    force 'com.netflix.archaius:archaius2-guice:2.2.0'
-    force 'com.netflix.archaius:archaius2-persisted2:2.2.0'
-    force 'com.netflix.archaius:archaius2-test:2.2.0' 
-  }
 }
 
 jar {
