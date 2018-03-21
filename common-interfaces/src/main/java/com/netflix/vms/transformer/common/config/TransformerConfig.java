@@ -16,17 +16,17 @@ import com.netflix.archaius.api.annotations.PropertyName;
 @Configuration(prefix = "vms")
 public interface TransformerConfig {
 
-    @DefaultValue("false")
+    @DefaultValue("false") // Master switch for CycleMonkey
     boolean isTransformerCycleMonkeyEnabled();
 
-    @DefaultValue("true") // Enable by default if feature is enabled
+    @DefaultValue("true") // Enable by default if CycleMonkey is enabled - turns on auto failure on odd cycles
     boolean isTransformerCycleMonkeyAutoChaosEnabled();
 
-    @DefaultValue("true") // Enable by default if feature is enabled
+    @DefaultValue("true") // Enable by default if AutoChaos is enabled - toggle auto failure at phase level
     @PropertyName(name = "vms.transformerCycleMonkeyAutoPhaseChaosEnabled.${0}")
     public boolean isTransformerCycleMonkeyAutoPhaseChaosEnabled(String phaseName);
 
-    @DefaultValue("false") // Selectively always enable per phase but should disable isTransformerCycleMonkeyAutoChaosEnabled
+    @DefaultValue("false") // Explicitly toggle failure at specific phase - only active if AutoChaos is disabled
     @PropertyName(name = "vms.transformerCycleMonkeyPhaseChaosEnabled.${0}")
     public boolean isTransformerCycleMonkeyPhaseChaosEnabled(String phaseName);
 
