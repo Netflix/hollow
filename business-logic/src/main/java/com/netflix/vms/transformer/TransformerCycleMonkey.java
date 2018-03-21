@@ -63,7 +63,7 @@ public class TransformerCycleMonkey implements CycleMonkey {
 
     @Override
     public void doMonkeyBusiness(String phaseName) {
-        if (isEnabled && cycleCount % 2 == 0)
+        if (!isEnabled || cycleCount % 2 == 0)
             return; // Only trigger monkey business on odd cycles
 
         boolean isGoChaos = false;
