@@ -27,6 +27,8 @@ import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -181,15 +183,15 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS);
     }
 
-    void fireIncrementalCycleComplete(long version, long recordsAddedOrModified, long recordsRemoved) {
+    void fireIncrementalCycleComplete(long version, long recordsAddedOrModified, long recordsRemoved, HashMap<String, Object> cycleMetadata) {
         IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().success(version, recordsAddedOrModified, recordsRemoved);
         for(final IncrementalCycleListener l : incrementalCycleListeners)
-            l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
+            l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS, cycleMetadata);
     }
 
-    void fireIncrementalCycleFail(Throwable cause, long recordsAddedOrModified, long recordsRemoved) {
+    void fireIncrementalCycleFail(Throwable cause, long recordsAddedOrModified, long recordsRemoved, HashMap<String, Object> cycleMetadata) {
         IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().fail(cause, recordsAddedOrModified, recordsRemoved);
         for(final IncrementalCycleListener l : incrementalCycleListeners)
-            l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
+            l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS, cycleMetadata);
     }
 }

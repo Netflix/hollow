@@ -22,6 +22,7 @@ import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +40,7 @@ public class HollowIncrementalProducer {
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
     private final ListenerSupport listeners;
+    private final HashMap<String, Object> cycleMetadata;
 
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d, new ArrayList<IncrementalCycleListener>());
@@ -51,9 +53,14 @@ public class HollowIncrementalProducer {
         this.mutations = new ConcurrentHashMap<RecordPrimaryKey, Object>();
         this.populator = new HollowIncrementalCyclePopulator(mutations, threadsPerCpu);
         this.listeners = new ListenerSupport();
+        this.cycleMetadata = new HashMap<String, Object>();
 
         for(IncrementalCycleListener listener : listeners)
             this.listeners.add(listener);
+    }
+
+    public void addCycleMetadata(HashMap<String, Object> metadata) {
+        this.cycleMetadata.putAll(metadata);
     }
 
     public void restore(long versionDesired, BlobRetriever blobRetriever) {
@@ -89,6 +96,7 @@ public class HollowIncrementalProducer {
 
     public boolean hasChanges() { return this.mutations.size() > 0; }
 
+    public void clearCycleMetadata() { this.cycleMetadata.clear(); }
     /**
      * Runs a Hollow Cycle, if successful, cleans the mutations map.
      * @since 2.9.9
@@ -99,11 +107,11 @@ public class HollowIncrementalProducer {
         long recordsAddedOrModified = this.mutations.values().size() - recordsRemoved;
         try {
             long version = producer.runCycle(populator);
-            listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved);
+            listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
             clearChanges();
             return version;
         } catch (Exception e) {
-            listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved);
+            listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved, cycleMetadata);
             return FAILED_VERSION;
         }
     }

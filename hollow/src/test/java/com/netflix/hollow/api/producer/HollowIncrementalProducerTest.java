@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import static org.mockito.ArgumentMatchers.*;
@@ -612,6 +613,75 @@ public class HollowIncrementalProducerTest {
         Assert.assertNotNull(listener.getCause());
     }
 
+    @Test
+    public void successListenerWithMetadata() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withHollowProducer(producer)
+                .withListener(listener)
+                .build();
+
+        HashMap<String, Object> cycleMetadata = new HashMap<>();
+        cycleMetadata.put("foo", "bar");
+        incrementalProducer.addCycleMetadata(cycleMetadata);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        incrementalProducer.runCycle();
+
+        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
+    }
+
+    @Test
+    public void fireFailureListenerWithMetadata() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+        HollowProducer fakeHollowProducer = FakeHollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withVersionMinter(new TestVersionMinter())
+                .build();
+        HollowProducer fakeHollowProducerSpy = Mockito.spy(fakeHollowProducer);
+
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withHollowProducer(fakeHollowProducerSpy)
+                .withListener(listener)
+                .build();
+
+        HashMap<String, Object> cycleMetadata = new HashMap<>();
+        cycleMetadata.put("foo", "bar");
+        incrementalProducer.addCycleMetadata(cycleMetadata);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        Mockito.doThrow(new RuntimeException("oops")).when(fakeHollowProducerSpy).runCycle(any(HollowProducer.Populator.class));
+
+        incrementalProducer.runCycle();
+
+        Assert.assertEquals(IncrementalCycleListener.Status.FAIL, listener.getStatus());
+        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
+    }
+
     private HollowProducer createInMemoryProducer() {
         return HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -704,22 +774,25 @@ public class HollowIncrementalProducerTest {
         private long version;
         private Status status;
         private Throwable cause;
+        private HashMap<String, Object> cycleMetadata;
 
         @Override
-        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
             this.version = status.getVersion();
+            this.cycleMetadata = cycleMetadata;
         }
 
         @Override
-        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
             this.version = status.getVersion();
             this.cause = status.getCause();
+            this.cycleMetadata = cycleMetadata;
         }
 
         public long getRecordsRemoved() {
@@ -736,6 +809,10 @@ public class HollowIncrementalProducerTest {
 
         public long getVersion() {
             return version;
+        }
+
+        public HashMap<String, Object> getCycleMetadata() {
+            return cycleMetadata;
         }
 
         public Throwable getCause() {

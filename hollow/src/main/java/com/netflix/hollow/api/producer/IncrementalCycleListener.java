@@ -18,6 +18,7 @@
 package com.netflix.hollow.api.producer;
 
 import java.util.EventListener;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import static com.netflix.hollow.api.producer.IncrementalCycleListener.Status.*;
 
@@ -38,7 +39,7 @@ public interface IncrementalCycleListener extends EventListener {
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit);
+    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata);
 
     /**
      * Called after {@code HollowIncrementalProducer} has completed a cycle normally or abnormally. A {@code FAIL} status indicates that the
@@ -48,7 +49,7 @@ public interface IncrementalCycleListener extends EventListener {
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit);
+    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata);
 
     public class IncrementalCycleStatus {
         private final Status status;
