@@ -631,20 +631,22 @@ public class HollowIncrementalProducerTest {
         HashMap<String, Object> cycleMetadata = new HashMap<>();
         cycleMetadata.put("foo", "bar");
         incrementalProducer.addCycleMetadata(cycleMetadata);
+        Assert.assertTrue(incrementalProducer.hasMetadata());
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 100));
 
         /// .runCycle() flushes the changes to a new data state.
         long nextVersion = incrementalProducer.runCycle();
 
+        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
         Assert.assertEquals(nextVersion, listener.getVersion());
         Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertFalse(incrementalProducer.hasMetadata());
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
-
         incrementalProducer.runCycle();
+        Assert.assertEquals(new HashMap<String, Object>(), listener.getCycleMetadata());
 
-        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
     }
 
     @Test
@@ -671,6 +673,7 @@ public class HollowIncrementalProducerTest {
         HashMap<String, Object> cycleMetadata = new HashMap<>();
         cycleMetadata.put("foo", "bar");
         incrementalProducer.addCycleMetadata(cycleMetadata);
+        Assert.assertTrue(incrementalProducer.hasMetadata());
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 100));
 
@@ -680,6 +683,9 @@ public class HollowIncrementalProducerTest {
 
         Assert.assertEquals(IncrementalCycleListener.Status.FAIL, listener.getStatus());
         Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
+        Assert.assertFalse(incrementalProducer.hasMetadata());
+
+
     }
 
     private HollowProducer createInMemoryProducer() {

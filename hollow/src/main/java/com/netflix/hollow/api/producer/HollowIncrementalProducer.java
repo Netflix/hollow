@@ -97,6 +97,9 @@ public class HollowIncrementalProducer {
     public boolean hasChanges() { return this.mutations.size() > 0; }
 
     public void clearCycleMetadata() { this.cycleMetadata.clear(); }
+
+    public boolean hasMetadata() { return !this.cycleMetadata.isEmpty(); }
+
     /**
      * Runs a Hollow Cycle, if successful, cleans the mutations map.
      * @since 2.9.9
@@ -107,12 +110,14 @@ public class HollowIncrementalProducer {
         long recordsAddedOrModified = this.mutations.values().size() - recordsRemoved;
         try {
             long version = producer.runCycle(populator);
-            listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+            listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved, new HashMap<String, Object>(cycleMetadata));
             clearChanges();
             return version;
         } catch (Exception e) {
-            listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+            listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved, new HashMap<String, Object>(cycleMetadata));
             return FAILED_VERSION;
+        } finally {
+            clearCycleMetadata();
         }
     }
 
