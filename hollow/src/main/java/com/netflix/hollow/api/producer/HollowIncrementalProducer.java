@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HollowIncrementalProducer {
     
-    private static final Object DELETE_RECORD = new Object();
-
     private final HollowProducer producer;
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
@@ -64,7 +62,7 @@ public class HollowIncrementalProducer {
     }
     
     public void delete(RecordPrimaryKey key) {
-        mutations.put(key, DELETE_RECORD);
+        mutations.put(key, HollowIncrementalCyclePopulator.DELETE_RECORD);
     }
 
     public void discard(RecordPrimaryKey key) {
