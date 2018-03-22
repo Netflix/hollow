@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.objects.HollowObject;
@@ -35,14 +37,12 @@ import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import static org.mockito.ArgumentMatchers.*;
+import org.mockito.Mockito;
 
 public class HollowIncrementalProducerTest {
 
