@@ -17,10 +17,12 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.producer.IncrementalCycleListener.Status.FAIL;
+import static com.netflix.hollow.api.producer.IncrementalCycleListener.Status.SUCCESS;
+
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-import static com.netflix.hollow.api.producer.IncrementalCycleListener.Status.*;
 
 /**
  * Beta API subject to change.
