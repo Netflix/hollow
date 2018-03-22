@@ -213,7 +213,14 @@ public class HollowBlobDataProvider {
     }
 
     private static HollowReadStateEngine processReverseDeltaFile(TransformerContext ctx, String prefix, HollowReadStateEngine hollowReadStateEngine, File reverseDeltaFile, HollowReadStateEngine anotherStateEngine, HollowBlobReader anotherReader, HollowChecksum initialChecksumBeforeDelta) throws IOException {
-        anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
+        Map<String, String> coreHeaders = BlobMetaDataUtil.fetchCoreHeaders(anotherStateEngine);
+        try {
+            anotherReader.applyDelta(ctx.files().newBlobInputStream(reverseDeltaFile));
+        } catch (Exception ex) {
+            ctx.getLogger().error(BlobState, "Failed apply ReverseDelta( {} ) to stateEngine( {} )", reverseDeltaFile, coreHeaders, ex);
+            throw new IOException("Failed to apply ReverseDelta=" + reverseDeltaFile);
+        }
+
         HollowChecksum reverseDeltaChecksum = HollowChecksum.forStateEngineWithCommonSchemas(anotherStateEngine, hollowReadStateEngine);
 
         String context = prefix == null || prefix.trim().isEmpty() ? "" : prefix + " ";
@@ -228,17 +235,29 @@ public class HollowBlobDataProvider {
 
 
     private void readSnapshot(File snapshotFile, HollowReadStateEngine hollowReadStateEngine) throws IOException {
-        ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
-        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
-        hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
+        Map<String, String> coreHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+        try {
+            ctx.getLogger().info(CircuitBreaker, "Reading Snapshot blob {}", snapshotFile.getName());
+            HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+            hollowBlobReader.readSnapshot(ctx.files().newBlobInputStream(snapshotFile));
+        } catch (Exception ex) {
+            ctx.getLogger().error(BlobState, "Failed read Snapshot( {} ) to stateEngine( {} )", snapshotFile, coreHeaders, ex);
+            throw new IOException("Failed to reader Snapshot=" + snapshotFile);
+        }
+
     }
 
     private void readDelta(File deltaFile, HollowReadStateEngine hollowReadStateEngine) throws IOException {
-        ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
-        HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
-        hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
+        Map<String, String> coreHeaders = BlobMetaDataUtil.fetchCoreHeaders(hollowReadStateEngine);
+        try {
+            ctx.getLogger().info(CircuitBreaker, "Reading Delta blob {}", deltaFile.getName());
+            HollowBlobReader hollowBlobReader = new HollowBlobReader(hollowReadStateEngine);
+            hollowBlobReader.applyDelta(ctx.files().newBlobInputStream(deltaFile));
+        } catch (Exception ex) {
+            ctx.getLogger().error(BlobState, "Failed apply Delta( {} ) to stateEngine( {} )", deltaFile, coreHeaders, ex);
+            throw new IOException("Failed to apply Delta=" + deltaFile);
+        }
     }
-
 
 
     public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnCompleteVideos() {

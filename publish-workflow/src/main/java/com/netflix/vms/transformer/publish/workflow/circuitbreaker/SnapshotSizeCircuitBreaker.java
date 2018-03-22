@@ -20,6 +20,9 @@ public class SnapshotSizeCircuitBreaker extends HollowCircuitBreaker {
 
     @Override
     protected CircuitBreakerResults runCircuitBreaker(HollowReadStateEngine stateEngine) {
+        // Spot to trigger Cycle Monkey if enabled
+        ctx.getCycleMonkey().doMonkeyBusiness("SnapshotSizeCircuitBreaker");
+
         logSizeToAtlas();
         return compareMetric(snapshotSize);
     }

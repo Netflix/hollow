@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -29,13 +30,13 @@ public interface PublishWorkflowContext {
     PoisonedStateMarker getPoisonStateMarker();
 
     FileStore getFileStore();
-    
+
     HollowProducer.Publisher getBlobPublisher();
-    
+
     HollowProducer.Publisher getNostreamsBlobPublisher();
-    
+
     HollowProducer.Announcer getStateAnnouncer();
-    
+
     HollowProducer.Announcer getNostreamsStateAnnouncer();
 
     VipAnnouncer getVipAnnouncer();
@@ -51,4 +52,6 @@ public interface PublishWorkflowContext {
     Supplier<ServerUploadStatus> serverUploadStatus();
 
     PublishWorkflowStatusIndicator getStatusIndicator();
+
+    CycleMonkey getCycleMonkey();
 }

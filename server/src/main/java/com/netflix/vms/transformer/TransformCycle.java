@@ -27,6 +27,7 @@ import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
+import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
@@ -74,6 +75,7 @@ public class TransformCycle {
     private final String converterVip;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
+    private final CycleMonkey cycleMonkey;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -101,6 +103,7 @@ public class TransformCycle {
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
+        this.cycleMonkey = ctx.getCycleMonkey();
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
@@ -185,6 +188,10 @@ public class TransformCycle {
 
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
+        // Spot to trigger Cycle Monkey if enabled
+        cycleMonkey.cycleBegin();
+        cycleMonkey.doMonkeyBusiness("beginCycle");
+
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
@@ -211,6 +218,9 @@ public class TransformCycle {
                 inputClient.triggerRefresh();
             else
                 inputClient.triggerRefreshTo(pinnedInputVersion);
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("updateTheInput");
 
             //// set the now millis
             Long nowMillis = ctx.getConfig().getNowMillis();
@@ -253,6 +263,9 @@ public class TransformCycle {
                         overrideBlobID, pinnedTitles, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
                 trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
+
+                // Spot to trigger Cycle Monkey if enabled
+                cycleMonkey.doMonkeyBusiness("transformTheData");
             }
         } catch(Throwable th) {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
@@ -286,6 +299,9 @@ public class TransformCycle {
                 writer.writeSnapshot(snapshotOutputStream);
                 ctx.getLogger().info(blobStateTags, "Wrote Snapshot to local file( {} ) - header( {} )", snapshotFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
             }
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("writeTheBlobFiles");
 
             String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
             createNostreamsFilteredFile(snapshotFileName, nostreamsSnapshotFileName, true);
@@ -366,6 +382,9 @@ public class TransformCycle {
             CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
+
+            // Spot to trigger Cycle Monkey if enabled
+            cycleMonkey.doMonkeyBusiness("submitToPublishWorkflow");
         } finally {
             ctx.getMetricRecorder().stopTimer(P4_WaitForPublishWorkflowDuration);
         }
