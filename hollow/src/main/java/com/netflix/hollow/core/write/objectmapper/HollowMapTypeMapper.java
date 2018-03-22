@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;

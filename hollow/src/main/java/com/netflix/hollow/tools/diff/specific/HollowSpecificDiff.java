@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.tools.diff.specific;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
-import com.netflix.hollow.tools.diff.HollowDiffMatcher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.tools.diff.HollowDiffMatcher;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicLong;

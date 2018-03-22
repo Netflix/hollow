@@ -17,16 +17,13 @@
  */
 package com.netflix.hollow.tools.checksum;
 
-
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-
-import com.netflix.hollow.tools.checksum.HollowChecksum;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;

@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.jsonadapter.discover;
 
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -18,8 +18,6 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-
-import com.netflix.hollow.core.index.MultiLinkedElementArray;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import org.junit.Assert;
 import org.junit.Test;

@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.filter;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;

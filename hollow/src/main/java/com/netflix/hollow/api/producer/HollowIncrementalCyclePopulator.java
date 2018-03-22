@@ -9,7 +9,6 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +37,11 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
     }
 
     private void removeRecords(HollowProducer.WriteState newState) {
-        Map<String, BitSet> recordsToRemove = findTypesWithRemovedRecords(newState.getPriorState());
-        markRecordsToRemove(newState.getPriorState(), recordsToRemove);
-        removeRecordsFromNewState(newState, recordsToRemove);
+        if (newState.getPriorState() != null) {
+            Map<String, BitSet> recordsToRemove = findTypesWithRemovedRecords(newState.getPriorState());
+            markRecordsToRemove(newState.getPriorState(), recordsToRemove);
+            removeRecordsFromNewState(newState, recordsToRemove);
+        }
     }
 
     private Map<String, BitSet> findTypesWithRemovedRecords(HollowProducer.ReadState readState) {

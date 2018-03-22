@@ -19,7 +19,6 @@ package com.netflix.hollow.core.memory.encoding;
 
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.SegmentedLongArray;
-
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;

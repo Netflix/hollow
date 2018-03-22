@@ -18,12 +18,11 @@
 package com.netflix.hollow.core.read.object;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;

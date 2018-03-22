@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.memory;
 
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

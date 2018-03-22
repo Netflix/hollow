@@ -17,18 +17,17 @@
  */
 package com.netflix.hollow.core.read.object;
 
-import java.util.BitSet;
-
-import org.junit.Assert;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-import java.io.IOException;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import org.junit.Test;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import java.io.IOException;
+import java.util.BitSet;
+import org.junit.Assert;
 import org.junit.Before;
-import com.netflix.hollow.core.AbstractStateEngineTest;
+import org.junit.Test;
 
 public class HollowObjectShardedTest extends AbstractStateEngineTest {
 

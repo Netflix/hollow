@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.List;
 
 /**

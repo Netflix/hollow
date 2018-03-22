@@ -18,10 +18,9 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.api.objects.HollowList;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
  * This is the extension of the {@link HollowRecordDelegate} interface for LIST type records.

@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
 /**
  * A handle for all of the records of a specific OBJECT type in a Hollow dataset.  The most common type of {@link HollowObjectTypeDataAccess}

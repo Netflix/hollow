@@ -19,11 +19,6 @@ package com.netflix.hollow.tools.stringifier;
 
 import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
@@ -34,6 +29,13 @@ import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +44,6 @@ import java.util.Set;
  * Produces human-readable String representations of Hollow records.
  */
 public class HollowRecordStringifier implements HollowStringifier<HollowRecordStringifier> {
-
     private final Set<String> excludeObjectTypes = new HashSet<String>();
     private final boolean showOrdinals;
     private final boolean showTypes;
@@ -67,60 +68,70 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
     }
 
 
-    /**
-     * create a String representation of the specified {@link HollowRecord}.
-     */
     @Override
     public String stringify(HollowRecord record) {
-        return stringify(record.getTypeDataAccess().getDataAccess(), record.getSchema().getName(), record.getOrdinal());
+        return stringify(record.getTypeDataAccess().getDataAccess(),
+                record.getSchema().getName(), record.getOrdinal());
     }
 
-    /**
-     * create a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
-     */
+    @Override
+    public void stringify(Writer writer, HollowRecord record) throws IOException {
+        stringify(writer, record.getTypeDataAccess().getDataAccess(), record.getSchema().getName(),
+                record.getOrdinal());
+    }
+
     @Override
     public String stringify(HollowDataAccess dataAccess, String type, int ordinal) {
-        StringBuilder builder = new StringBuilder();
-
-        appendStringify(builder, dataAccess, type, ordinal, 0);
-
-        return builder.toString();
+        try {
+            StringWriter writer = new StringWriter();
+            stringify(writer, dataAccess, type, ordinal);
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Unexpected exception using StringWriter", e);
+        }
     }
 
-    private void appendStringify(StringBuilder builder, HollowDataAccess dataAccess, String type, int ordinal, int indentation) {
+    @Override
+    public void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal) throws IOException {
+        appendStringify(writer, dataAccess, type, ordinal, 0);
+    }
+
+    private void appendStringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal,
+            int indentation) throws IOException {
         if (excludeObjectTypes.contains(type)) {
-            builder.append("null");
+            writer.append("null");
             return;
         }
 
         HollowTypeDataAccess typeDataAccess = dataAccess.getTypeDataAccess(type);
 
         if(typeDataAccess == null) {
-            builder.append("[missing type " + type + "]");
+            writer.append("[missing type " + type + "]");
         } else if (ordinal == -1) {
-            builder.append("null");
+            writer.append("null");
         } else {
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
-                appendObjectStringify(builder, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendObjectStringify(writer, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowListTypeDataAccess) {
-                appendListStringify(builder, dataAccess, (HollowListTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendListStringify(writer, dataAccess, (HollowListTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowSetTypeDataAccess) {
-                appendSetStringify(builder, dataAccess, (HollowSetTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendSetStringify(writer, dataAccess, (HollowSetTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
-                appendMapStringify(builder, dataAccess, (HollowMapTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendMapStringify(writer, dataAccess, (HollowMapTypeDataAccess)typeDataAccess, ordinal, indentation);
             }
         }
 
     }
 
-    private void appendMapStringify(StringBuilder builder, HollowDataAccess dataAccess, HollowMapTypeDataAccess typeDataAccess, int ordinal, int indentation) {
+    private void appendMapStringify(Writer writer, HollowDataAccess dataAccess,
+            HollowMapTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowMapSchema schema = typeDataAccess.getSchema();
 
         if(showTypes)
-            builder.append("(").append(schema.getName()).append(")");
+            writer.append("(").append(schema.getName()).append(")");
 
         if(showOrdinals)
-            builder.append(" (ordinal ").append(ordinal).append(")");
+            writer.append(" (ordinal ").append(Integer.toString(ordinal)).append(")");
 
         indentation++;
 
@@ -130,26 +141,27 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
         HollowMapEntryOrdinalIterator iter = typeDataAccess.ordinalIterator(ordinal);
 
         while(iter.next()) {
-            builder.append("\n");
+            writer.append(NEWLINE);
 
-            appendIndentation(builder, indentation);
-            builder.append("k: ");
-            appendStringify(builder, dataAccess, keyType, iter.getKey(), indentation);
-            builder.append("\n");
-            appendIndentation(builder, indentation);
-            builder.append("v: ");
-            appendStringify(builder, dataAccess, valueType, iter.getValue(), indentation);
+            appendIndentation(writer, indentation);
+            writer.append("k: ");
+            appendStringify(writer, dataAccess, keyType, iter.getKey(), indentation);
+            writer.append(NEWLINE);
+            appendIndentation(writer, indentation);
+            writer.append("v: ");
+            appendStringify(writer, dataAccess, valueType, iter.getValue(), indentation);
         }
 
     }
 
-    private void appendSetStringify(StringBuilder builder, HollowDataAccess dataAccess, HollowSetTypeDataAccess typeDataAccess, int ordinal, int indentation) {
+    private void appendSetStringify(Writer writer, HollowDataAccess dataAccess,
+            HollowSetTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowSetSchema schema = typeDataAccess.getSchema();
         if(showTypes)
-            builder.append("(").append(schema.getName()).append(")");
+            writer.append("(").append(schema.getName()).append(")");
 
         if(showOrdinals)
-            builder.append(" (ordinal ").append(ordinal).append(")");
+            writer.append(" (ordinal ").append(Integer.toString(ordinal)).append(")");
 
         indentation++;
 
@@ -160,24 +172,25 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
         int elementOrdinal = iter.next();
 
         while(elementOrdinal != NO_MORE_ORDINALS) {
-            builder.append("\n");
+            writer.append(NEWLINE);
 
-            appendIndentation(builder, indentation);
-            builder.append("e: ");
+            appendIndentation(writer, indentation);
+            writer.append("e: ");
 
-            appendStringify(builder, dataAccess, elementType, elementOrdinal, indentation);
+            appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
 
             elementOrdinal = iter.next();
         }
     }
 
-    private void appendListStringify(StringBuilder builder, HollowDataAccess dataAccess, HollowListTypeDataAccess typeDataAccess, int ordinal, int indentation) {
+    private void appendListStringify(Writer writer, HollowDataAccess dataAccess,
+            HollowListTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowListSchema schema = typeDataAccess.getSchema();
         if(showTypes)
-            builder.append("(").append(schema.getName()).append(")");
+            writer.append("(").append(schema.getName()).append(")");
 
         if(showOrdinals)
-            builder.append(" (ordinal ").append(ordinal).append(")");
+            writer.append(" (ordinal ").append(Integer.toString(ordinal)).append(")");
 
         indentation++;
 
@@ -186,83 +199,85 @@ public class HollowRecordStringifier implements HollowStringifier<HollowRecordSt
         String elementType = schema.getElementType();
 
         for(int i=0;i<size;i++) {
-            builder.append("\n");
+            writer.append(NEWLINE);
 
             int elementOrdinal = typeDataAccess.getElementOrdinal(ordinal, i);
 
-            appendIndentation(builder, indentation);
-            builder.append("e" + i + ": ");
+            appendIndentation(writer, indentation);
+            writer.append("e" + i + ": ");
 
-            appendStringify(builder, dataAccess, elementType, elementOrdinal, indentation);
+            appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
         }
     }
 
-    private void appendObjectStringify(StringBuilder builder, HollowDataAccess dataAccess, HollowObjectTypeDataAccess typeDataAccess, int ordinal, int indentation) {
+    private void appendObjectStringify(Writer writer, HollowDataAccess dataAccess,
+            HollowObjectTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowObjectSchema schema = typeDataAccess.getSchema();
 
         GenericHollowObject obj = new GenericHollowObject(typeDataAccess, ordinal);
 
         if(collapseSingleFieldObjects && typeDataAccess.getSchema().numFields() == 1) {
-            appendFieldStringify(builder, dataAccess, indentation, schema, obj, 0, schema.getFieldName(0));
+            appendFieldStringify(writer, dataAccess, indentation, schema, obj, 0, schema.getFieldName(0));
         } else {
             if(showTypes)
-                builder.append("(").append(schema.getName()).append(")");
+                writer.append("(").append(schema.getName()).append(")");
 
             if(showOrdinals)
-                builder.append(" (ordinal ").append(ordinal).append(")");
+                writer.append(" (ordinal ").append(Integer.toString(ordinal)).append(")");
 
             indentation++;
 
             for(int i=0;i<schema.numFields();i++) {
-                builder.append("\n");
+                writer.append(NEWLINE);
 
                 String fieldName = schema.getFieldName(i);
 
-                appendIndentation(builder, indentation);
-                builder.append(fieldName).append(": ");
+                appendIndentation(writer, indentation);
+                writer.append(fieldName).append(": ");
 
-                appendFieldStringify(builder, dataAccess, indentation, schema, obj, i, fieldName);
+                appendFieldStringify(writer, dataAccess, indentation, schema, obj, i, fieldName);
             }
         }
     }
 
-    private void appendFieldStringify(StringBuilder builder, HollowDataAccess dataAccess, int indentation, HollowObjectSchema schema, GenericHollowObject obj, int i, String fieldName) {
+    private void appendFieldStringify(Writer writer, HollowDataAccess dataAccess, int indentation,
+            HollowObjectSchema schema, GenericHollowObject obj, int i, String fieldName) throws IOException {
         if(obj.isNull(fieldName)) {
-            builder.append("null");
+            writer.append("null");
         } else {
             switch(schema.getFieldType(i)) {
                 case BOOLEAN:
-                    builder.append(obj.getBoolean(fieldName));
+                    writer.append(Boolean.toString(obj.getBoolean(fieldName)));
                     break;
                 case BYTES:
-                    builder.append(Arrays.toString(obj.getBytes(fieldName)));
+                    writer.append(Arrays.toString(obj.getBytes(fieldName)));
                     break;
                 case DOUBLE:
-                    builder.append(obj.getDouble(fieldName));
+                    writer.append(Double.toString(obj.getDouble(fieldName)));
                     break;
                 case FLOAT:
-                    builder.append(obj.getFloat(fieldName));
+                    writer.append(Float.toString(obj.getFloat(fieldName)));
                     break;
                 case INT:
-                    builder.append(obj.getInt(fieldName));
+                    writer.append(Integer.toString(obj.getInt(fieldName)));
                     break;
                 case LONG:
-                    builder.append(obj.getLong(fieldName));
+                    writer.append(Long.toString(obj.getLong(fieldName)));
                     break;
                 case STRING:
-                    builder.append(obj.getString(fieldName));
+                    writer.append(obj.getString(fieldName));
                     break;
                 case REFERENCE:
                     int refOrdinal = obj.getOrdinal(fieldName);
-                    appendStringify(builder, dataAccess, schema.getReferencedType(i), refOrdinal, indentation);
+                    appendStringify(writer, dataAccess, schema.getReferencedType(i), refOrdinal, indentation);
                     break;
             }
         }
     }
 
-    private void appendIndentation(StringBuilder builder, int indentation) {
+    private void appendIndentation(Writer writer, int indentation) throws IOException {
         for(int i=0;i<indentation;i++) {
-            builder.append("  ");
+            writer.append(INDENT);
         }
     }
 

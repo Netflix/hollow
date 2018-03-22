@@ -17,12 +17,12 @@
  */
 package com.netflix.hollow.explorer.ui.model;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.ArrayList;
 import java.util.List;
-import com.netflix.hollow.core.schema.HollowSchema;
 
 public class SchemaDisplay {
     

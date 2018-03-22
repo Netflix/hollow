@@ -18,7 +18,6 @@
 package com.netflix.hollow.history.ui.jetty;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.tools.history.HollowHistory;
 

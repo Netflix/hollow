@@ -20,19 +20,6 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -40,6 +27,7 @@ import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationExcept
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
@@ -58,6 +46,19 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import com.netflix.hollow.tools.compact.HollowCompactor;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
@@ -375,6 +376,7 @@ public class HollowProducer {
         if(!singleProducerEnforcer.isPrimary()) {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary");
+            listeners.fireCycleSkipped(CycleSkipReason.NOT_PRIMARY_PRODUCER);
             return lastSucessfulCycle;
         }
 
@@ -864,8 +866,13 @@ public class HollowProducer {
 
         public abstract void cleanup();
 
+        @Deprecated
         public File getFile() {
             throw new UnsupportedOperationException("File is not available");
+        }
+
+        public Path getPath() {
+            throw new UnsupportedOperationException("Path is not available");
         }
 
         public Type getType() {
@@ -994,7 +1001,7 @@ public class HollowProducer {
         return builder.withPublisher(publisher);
     }
     
-    public static class Builder {
+    public static class Builder<B extends HollowProducer.Builder<B>> {
         protected BlobStager stager;
         protected BlobCompressor compressor;
         protected File stagingDir;
@@ -1011,92 +1018,97 @@ public class HollowProducer {
         protected BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
         protected SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
 
-        public Builder withBlobStager(HollowProducer.BlobStager stager) {
+        public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
-            return this;
+            return (B)this;
         }
 
-        public Builder withBlobCompressor(HollowProducer.BlobCompressor compressor) {
+        public B withBlobCompressor(HollowProducer.BlobCompressor compressor) {
             this.compressor = compressor;
-            return this;
+            return (B)this;
         }
         
-        public Builder withBlobStagingDir(File stagingDir) {
+        public B withBlobStagingDir(File stagingDir) {
             this.stagingDir = stagingDir;
-            return this;
+            return (B)this;
         }
         
-        public Builder withPublisher(HollowProducer.Publisher publisher) {
+        public B withPublisher(HollowProducer.Publisher publisher) {
             this.publisher = publisher; 
-            return this;
+            return (B)this;
         }
         
-        public Builder withAnnouncer(HollowProducer.Announcer announcer) {
+        public B withAnnouncer(HollowProducer.Announcer announcer) {
             this.announcer = announcer;
-            return this;
+            return (B)this;
         }
         
-        public Builder withValidator(HollowProducer.Validator validator) {
+        public B withValidator(HollowProducer.Validator validator) {
             this.validators.add(validator);
-            return this;
+            return (B)this;
         }
         
-        public Builder withValidators(HollowProducer.Validator... validators) {
+        public B withValidators(HollowProducer.Validator... validators) {
             for(Validator validator : validators)
                 this.validators.add(validator);
-            return this;
+            return (B)this;
         }
         
-        public Builder withListener(HollowProducerListener listener) {
+        public B withListener(HollowProducerListener listener) {
             this.listeners.add(listener);
-            return this;
+            return (B)this;
         }
         
-        public Builder withListeners(HollowProducerListener... listeners) {
+        public B withListeners(HollowProducerListener... listeners) {
             for(HollowProducerListener listener : listeners)
                 this.listeners.add(listener);
-            return this;
+            return (B)this;
         }
         
-        public Builder withValidationListeners(HollowValidationListener... listeners) {
+        public B withValidationListeners(HollowValidationListener... listeners) {
             for(HollowValidationListener listener : listeners)
                 this.validationListeners.add(listener);
-            return this;
+            return (B)this;
         }
         
-        public Builder withVersionMinter(HollowProducer.VersionMinter versionMinter) {
+        public B withVersionMinter(HollowProducer.VersionMinter versionMinter) {
             this.versionMinter = versionMinter;
-            return this;
+            return (B)this;
         }
         
-        public Builder withSnapshotPublishExecutor(Executor executor) {
+        public B withSnapshotPublishExecutor(Executor executor) {
             this.snapshotPublishExecutor = executor;
-            return this;
+            return (B)this;
         }
         
-        public Builder withNumStatesBetweenSnapshots(int numStatesBetweenSnapshots) {
+        public B withNumStatesBetweenSnapshots(int numStatesBetweenSnapshots) {
             this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
-            return this;
+            return (B)this;
         }
         
-        public Builder withTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
+        public B withTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
             this.targetMaxTypeShardSize = targetMaxTypeShardSize;
-            return this;
+            return (B)this;
         }
 
-        public Builder withMetricsCollector(HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
+        public B withMetricsCollector(HollowMetricsCollector<HollowProducerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
-            return this;
+            return (B)this;
         }
 
-        public Builder withBlobStorageCleaner(BlobStorageCleaner blobStorageCleaner) {
+        public B withBlobStorageCleaner(BlobStorageCleaner blobStorageCleaner) {
             this.blobStorageCleaner = blobStorageCleaner;
-            return this;
+            return (B)this;
         }
 
-        public Builder withSingleProducerEnforcer(SingleProducerEnforcer singleProducerEnforcer) {
+        public B withSingleProducerEnforcer(SingleProducerEnforcer singleProducerEnforcer) {
             this.singleProducerEnforcer = singleProducerEnforcer;
-            return this;
+            return (B)this;
+        }
+
+        public B noSingleProducerEnforcer() {
+            this.singleProducerEnforcer = null;
+            return (B)this;
         }
 
         protected void checkArguments() {

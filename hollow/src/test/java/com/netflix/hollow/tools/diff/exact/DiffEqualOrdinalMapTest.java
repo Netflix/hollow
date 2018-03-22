@@ -18,8 +18,6 @@
 package com.netflix.hollow.tools.diff.exact;
 
 import com.netflix.hollow.core.util.IntList;
-
-import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap.MatchIterator;
 import org.junit.Assert;
 import org.junit.Before;

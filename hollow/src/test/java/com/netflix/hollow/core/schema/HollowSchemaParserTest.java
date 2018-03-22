@@ -17,15 +17,8 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.schema.HollowSchemaParser;
-
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.IOException;
 import java.util.List;
 import org.junit.Assert;

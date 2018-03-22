@@ -44,7 +44,7 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiClassname);
 
         builder.append("import ").append(HollowAPIFactory.class.getName()).append(";\n");
         builder.append("import ").append(HollowAPI.class.getName()).append(";\n");

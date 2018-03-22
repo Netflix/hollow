@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.combine;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-
 import java.util.Map;
 
 /**

@@ -19,16 +19,17 @@ package com.netflix.hollow.api.producer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycleStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
+import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Beta API subject to change.
@@ -80,6 +81,16 @@ final class ListenerSupport {
 
     void fireNewDeltaChain(long version) {
         for(final HollowProducerListener l : listeners) l.onNewDeltaChain(version);
+    }
+
+    ProducerStatus.Builder fireCycleSkipped(CycleSkipReason reason) {
+        ProducerStatus.Builder psb = new ProducerStatus.Builder();
+        for (final HollowProducerListener l : listeners) {
+            if (l instanceof HollowProducerListenerV2) {
+                ((HollowProducerListenerV2) l).onCycleSkip(reason);
+            }
+        }
+        return psb;
     }
 
     ProducerStatus.Builder fireCycleStart(long version) {
@@ -137,13 +148,17 @@ final class ListenerSupport {
 
     ProducerStatus.Builder fireValidationStart(HollowProducer.ReadState readState) {
         ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
-        for(final HollowProducerListener l : listeners) l.onValidationStart(psb.version());
-        
         long version = readState.getVersion();
-        for(final HollowValidationListener vl: validationListeners){
-			vl.onValidationStart(version);
+        Set<Object> firedListeners = new HashSet<>();
+        for (final HollowProducerListener l : listeners) {
+            l.onValidationStart(version);
+            firedListeners.add(l);
         }
-        
+        for (final HollowValidationListener vl: validationListeners){
+            if (!firedListeners.contains(vl)) {
+                vl.onValidationStart(version);
+            }
+        }
         return psb;
     }
 

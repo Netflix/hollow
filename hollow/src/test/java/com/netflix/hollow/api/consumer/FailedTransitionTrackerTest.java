@@ -17,10 +17,8 @@
  */
 package com.netflix.hollow.api.consumer;
 
-
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowUpdatePlan;
-
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import java.io.IOException;
 import java.io.InputStream;

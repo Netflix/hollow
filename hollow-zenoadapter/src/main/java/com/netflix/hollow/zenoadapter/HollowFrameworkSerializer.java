@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.zenoadapter;
 
-
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;

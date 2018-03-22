@@ -19,7 +19,6 @@ package com.netflix.hollow.core.util;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-
 import java.util.BitSet;
 
 /**

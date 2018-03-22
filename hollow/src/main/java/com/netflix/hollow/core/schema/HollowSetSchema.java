@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;

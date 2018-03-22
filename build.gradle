@@ -8,8 +8,13 @@ plugins {
  
 subprojects {
   apply plugin: 'nebula.netflixoss'
+  apply plugin: 'checkstyle'
 
   group = 'com.netflix.hollow'
+  checkstyle {
+    configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
+    toolVersion = 6.19 // checkstyle v7 dropped Java 1.7 support
+  }
  
   repositories {
     jcenter()

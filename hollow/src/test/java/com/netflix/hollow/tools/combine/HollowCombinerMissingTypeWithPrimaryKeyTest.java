@@ -1,6 +1,7 @@
 package com.netflix.hollow.tools.combine;
 
 import static org.junit.Assert.assertEquals;
+
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;

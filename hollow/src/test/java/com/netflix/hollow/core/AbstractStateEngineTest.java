@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core;
 
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.IOException;
 import org.junit.Before;
 

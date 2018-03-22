@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.read.engine;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 /**

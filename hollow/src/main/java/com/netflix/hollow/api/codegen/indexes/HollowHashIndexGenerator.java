@@ -55,7 +55,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(dataset);
 
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiClassname, schemaList);
 
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + HollowHashIndexResult.class.getName() + ";\n");

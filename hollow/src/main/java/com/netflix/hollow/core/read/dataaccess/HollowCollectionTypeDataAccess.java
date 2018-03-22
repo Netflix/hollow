@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
+import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-
-import com.netflix.hollow.core.read.engine.HollowCollectionTypeReadState;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 
 /**
  * A handle for all of the records of a specific LIST or SET type in a Hollow dataset.  The most common type of {@link HollowCollectionTypeDataAccess}

@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.missing;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 /**
  * A MissingDataHandler specifies what to do when a generated API contains methods to access fields which do not

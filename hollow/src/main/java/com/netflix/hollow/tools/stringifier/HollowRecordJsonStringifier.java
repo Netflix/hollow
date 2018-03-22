@@ -17,12 +17,6 @@
  */
 package com.netflix.hollow.tools.stringifier;
 
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
@@ -32,6 +26,11 @@ import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -78,75 +77,59 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         return this;
     }
 
-
-    /**
-     * Create a JSON representation of the provided {@link HollowRecord}.
-     */
     @Override
     public String stringify(HollowRecord record) {
         return stringify(record.getTypeDataAccess().getDataAccess(), record.getSchema().getName(), record.getOrdinal());
     }
 
-
-    /**
-     * Create a JSON representation of the record in the provided dataset, of the given type, with the specified ordinal.
-     */
     @Override
-    public String stringify(HollowDataAccess dataAccess, String type, int ordinal) {
-        StringWriter builder = new StringWriter();
-
-        try {
-            appendStringify(builder, dataAccess, type, ordinal, 0);
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return builder.toString();
-    }
-
-    /**
-     * Write a JSON representation of the provided {@link HollowRecord} to the provided Writer.
-     */
     public void stringify(Writer writer, HollowRecord record) throws IOException {
         stringify(writer, record.getTypeDataAccess().getDataAccess(), record.getSchema().getName(), record.getOrdinal());
     }
 
-    /**
-     * Write a JSON representation of the record in the provided dataset, of the given type, with the specified ordinal.
-     *
-     * The representation will be written to the provided Writer.
-     */
+    @Override
+    public String stringify(HollowDataAccess dataAccess, String type, int ordinal) {
+        try {
+            StringWriter writer = new StringWriter();
+            appendStringify(writer, dataAccess, type, ordinal, 0);
+            return writer.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Error using StringWriter", e);
+        }
+    }
+
+    @Override
     public void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal) throws IOException {
         appendStringify(writer, dataAccess, type, ordinal, 0);
     }
 
-    private void appendStringify(Writer builder, HollowDataAccess dataAccess, String type, int ordinal, int indentation) throws IOException {
+    private void appendStringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal, int indentation) throws IOException {
         if (excludeObjectTypes.contains(type)) {
-            builder.append("null");
+            writer.append("null");
             return;
         }
 
         HollowTypeDataAccess typeDataAccess = dataAccess.getTypeDataAccess(type);
 
         if(typeDataAccess == null) {
-            builder.append("{ }");
+            writer.append("{ }");
         } else if (ordinal == -1) {
-            builder.append("null");
+            writer.append("null");
         } else {
             if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
-                appendObjectStringify(builder, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendObjectStringify(writer, dataAccess, (HollowObjectTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowListTypeDataAccess) {
-                appendListStringify(builder, dataAccess, (HollowListTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendListStringify(writer, dataAccess, (HollowListTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowSetTypeDataAccess) {
-                appendSetStringify(builder, dataAccess, (HollowSetTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendSetStringify(writer, dataAccess, (HollowSetTypeDataAccess)typeDataAccess, ordinal, indentation);
             } else if(typeDataAccess instanceof HollowMapTypeDataAccess) {
-                appendMapStringify(builder, dataAccess, (HollowMapTypeDataAccess)typeDataAccess, ordinal, indentation);
+                appendMapStringify(writer, dataAccess, (HollowMapTypeDataAccess)typeDataAccess, ordinal, indentation);
             }
         }
 
     }
 
-    private void appendMapStringify(Writer builder, HollowDataAccess dataAccess, HollowMapTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
+    private void appendMapStringify(Writer writer, HollowDataAccess dataAccess, HollowMapTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowMapSchema schema = typeDataAccess.getSchema();
 
         indentation++;
@@ -154,7 +137,7 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         int size = typeDataAccess.size(ordinal);
 
         if(size == 0) {
-            builder.append("{ }");
+            writer.append("{ }");
         } else {
             String keyType = schema.getKeyType();
             String valueType = schema.getValueType();
@@ -164,9 +147,9 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
             HollowMapEntryOrdinalIterator ordinalIterator = typeDataAccess.ordinalIterator(ordinal);
 
             if(keySchema.numFields() == 1) {
-                builder.append("{");
+                writer.append("{");
                 if(prettyPrint)
-                    builder.append("\n");
+                    writer.append(NEWLINE);
 
                 boolean firstEntry = true;
 
@@ -174,39 +157,39 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                     if(firstEntry) {
                         firstEntry = false;
                     } else {
-                        builder.append(",");
+                        writer.append(",");
                         if(prettyPrint)
-                            builder.append("\n");
+                            writer.append(NEWLINE);
                     }
 
                     if(prettyPrint)
-                        appendIndentation(builder, indentation);
+                        appendIndentation(writer, indentation);
 
                     boolean needToQuoteKey = keySchema.getFieldType(0) != FieldType.STRING;
 
                     if(needToQuoteKey)
-                        builder.append("\"");
+                        writer.append("\"");
 
                     int keyOrdinal = ordinalIterator.getKey();
-                    appendFieldStringify(builder, dataAccess, indentation, keySchema, keyTypeDataAccess, keyOrdinal, 0);
+                    appendFieldStringify(writer, dataAccess, indentation, keySchema, keyTypeDataAccess, keyOrdinal, 0);
 
                     if(needToQuoteKey)
-                        builder.append("\"");
+                        writer.append("\"");
 
-                    builder.append(": ");
+                    writer.append(": ");
 
-                    appendStringify(builder, dataAccess, valueType, ordinalIterator.getValue(), indentation);
+                    appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation);
                 }
 
                 if(prettyPrint && !firstEntry) {
-                    builder.append("\n");
-                    appendIndentation(builder, indentation - 1);
+                    writer.append(NEWLINE);
+                    appendIndentation(writer, indentation - 1);
                 }
-                builder.append("}");
+                writer.append("}");
             } else {
-                builder.append("[");
+                writer.append("[");
                 if(prettyPrint)
-                    builder.append("\n");
+                    writer.append(NEWLINE);
 
                 boolean firstEntry = true;
 
@@ -214,48 +197,48 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                     if(firstEntry) {
                         firstEntry = false;
                     } else {
-                        builder.append(",");
+                        writer.append(",");
                         if(prettyPrint)
-                            builder.append("\n");
+                            writer.append(NEWLINE);
                     }
                     if(prettyPrint) {
-                        appendIndentation(builder, indentation - 1);
+                        appendIndentation(writer, indentation - 1);
                     }
 
-                    builder.append("{");
+                    writer.append("{");
 
                     if(prettyPrint) {
-                        builder.append("\n");
-                        appendIndentation(builder, indentation);
+                        writer.append(NEWLINE);
+                        appendIndentation(writer, indentation);
                     }
 
-                    builder.append("\"key\":");
-                    appendStringify(builder, dataAccess, keyType, ordinalIterator.getKey(), indentation + 1);
-                    builder.append(",");
+                    writer.append("\"key\":");
+                    appendStringify(writer, dataAccess, keyType, ordinalIterator.getKey(), indentation + 1);
+                    writer.append(",");
                     if(prettyPrint) {
-                        builder.append("\n");
-                        appendIndentation(builder, indentation);
+                        writer.append(NEWLINE);
+                        appendIndentation(writer, indentation);
                     }
-                    builder.append("\"value\":");
-                    appendStringify(builder, dataAccess, valueType, ordinalIterator.getValue(), indentation + 1);
+                    writer.append("\"value\":");
+                    appendStringify(writer, dataAccess, valueType, ordinalIterator.getValue(), indentation + 1);
 
                     if(prettyPrint) {
-                        builder.append("\n");
-                        appendIndentation(builder, indentation - 1);
+                        writer.append(NEWLINE);
+                        appendIndentation(writer, indentation - 1);
                     }
 
-                    builder.append("}");
+                    writer.append("}");
                 }
 
 
 
-                builder.append("]");
+                writer.append("]");
             }
         }
 
     }
 
-    private void appendSetStringify(Writer builder, HollowDataAccess dataAccess, HollowSetTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
+    private void appendSetStringify(Writer writer, HollowDataAccess dataAccess, HollowSetTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowSetSchema schema = typeDataAccess.getSchema();
 
         indentation++;
@@ -267,37 +250,37 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         int elementOrdinal = iter.next();
 
         if(elementOrdinal == HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            builder.append("[]");
+            writer.append("[]");
         } else {
             boolean firstElement = true;
-            builder.append("[");
+            writer.append("[");
             if(prettyPrint)
-                builder.append("\n");
+                writer.append(NEWLINE);
 
             while(elementOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
                 if(firstElement)
                     firstElement = false;
                 else
-                    builder.append(",");
+                    writer.append(",");
 
                 if(prettyPrint)
-                    appendIndentation(builder, indentation);
+                    appendIndentation(writer, indentation);
 
-                appendStringify(builder, dataAccess, elementType, elementOrdinal, indentation);
+                appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
 
                 elementOrdinal = iter.next();
             }
 
             if(prettyPrint) {
-                builder.append("\n");
-                appendIndentation(builder, indentation - 1);
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation - 1);
             }
 
-            builder.append("]");
+            writer.append("]");
         }
     }
 
-    private void appendListStringify(Writer builder, HollowDataAccess dataAccess, HollowListTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
+    private void appendListStringify(Writer writer, HollowDataAccess dataAccess, HollowListTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowListSchema schema = typeDataAccess.getSchema();
 
         indentation++;
@@ -305,9 +288,9 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         int size = typeDataAccess.size(ordinal);
 
         if(size == 0) {
-            builder.append("[]");
+            writer.append("[]");
         } else {
-            builder.append("[\n");
+            writer.append("[\n");
 
             String elementType = schema.getElementType();
 
@@ -315,30 +298,30 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                 int elementOrdinal = typeDataAccess.getElementOrdinal(ordinal, i);
 
                 if(prettyPrint)
-                    appendIndentation(builder, indentation);
+                    appendIndentation(writer, indentation);
 
-                appendStringify(builder, dataAccess, elementType, elementOrdinal, indentation);
+                appendStringify(writer, dataAccess, elementType, elementOrdinal, indentation);
 
                 if(i < size - 1)
-                    builder.append(",\n");
+                    writer.append(",\n");
             }
 
             if(prettyPrint) {
-                builder.append("\n");
-                appendIndentation(builder, indentation - 1);
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation - 1);
             }
-            builder.append("]");
+            writer.append("]");
         }
     }
 
-    private void appendObjectStringify(Writer builder, HollowDataAccess dataAccess, HollowObjectTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
+    private void appendObjectStringify(Writer writer, HollowDataAccess dataAccess, HollowObjectTypeDataAccess typeDataAccess, int ordinal, int indentation) throws IOException {
         HollowObjectSchema schema = typeDataAccess.getSchema();
 
         if(schema.numFields() == 1 && (collapseAllSingleFieldObjects || collapseObjectTypes.contains(schema.getName()))) {
-            appendFieldStringify(builder, dataAccess, indentation, schema, typeDataAccess, ordinal, 0);
+            appendFieldStringify(writer, dataAccess, indentation, schema, typeDataAccess, ordinal, 0);
         } else {
 
-            builder.append("{");
+            writer.append("{");
             boolean firstField = true;
             indentation++;
 
@@ -349,53 +332,53 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
                     if(firstField)
                         firstField = false;
                     else
-                        builder.append(",");
+                        writer.append(",");
 
                     if(prettyPrint) {
-                        builder.append("\n");
-                        appendIndentation(builder, indentation);
+                        writer.append(NEWLINE);
+                        appendIndentation(writer, indentation);
                     }
 
-                    builder.append("\"").append(fieldName).append("\": ");
-                    appendFieldStringify(builder, dataAccess, indentation, schema, typeDataAccess, ordinal, i);
+                    writer.append("\"").append(fieldName).append("\": ");
+                    appendFieldStringify(writer, dataAccess, indentation, schema, typeDataAccess, ordinal, i);
                 }
 
             }
 
             if(prettyPrint && !firstField) {
-                builder.append("\n");
-                appendIndentation(builder, indentation - 1);
+                writer.append(NEWLINE);
+                appendIndentation(writer, indentation - 1);
             }
-            builder.append("}");
+            writer.append("}");
         }
     }
 
-    private void appendFieldStringify(Writer builder, HollowDataAccess dataAccess, int indentation, HollowObjectSchema schema, HollowObjectTypeDataAccess typeDataAccess, int ordinal, int fieldIdx) throws IOException {
+    private void appendFieldStringify(Writer writer, HollowDataAccess dataAccess, int indentation, HollowObjectSchema schema, HollowObjectTypeDataAccess typeDataAccess, int ordinal, int fieldIdx) throws IOException {
         switch(schema.getFieldType(fieldIdx)) {
             case BOOLEAN:
-                builder.append(typeDataAccess.readBoolean(ordinal, fieldIdx).booleanValue() ? "true" : "false");
+                writer.append(typeDataAccess.readBoolean(ordinal, fieldIdx).booleanValue() ? "true" : "false");
                 return;
             case BYTES:
-                builder.append(Arrays.toString(typeDataAccess.readBytes(ordinal, fieldIdx)));
+                writer.append(Arrays.toString(typeDataAccess.readBytes(ordinal, fieldIdx)));
                 return;
             case DOUBLE:
-                builder.append(String.valueOf(typeDataAccess.readDouble(ordinal, fieldIdx)));
+                writer.append(String.valueOf(typeDataAccess.readDouble(ordinal, fieldIdx)));
                 return;
             case FLOAT:
-                builder.append(String.valueOf(typeDataAccess.readFloat(ordinal, fieldIdx)));
+                writer.append(String.valueOf(typeDataAccess.readFloat(ordinal, fieldIdx)));
                 return;
             case INT:
-                builder.append(String.valueOf(typeDataAccess.readInt(ordinal, fieldIdx)));
+                writer.append(String.valueOf(typeDataAccess.readInt(ordinal, fieldIdx)));
                 return;
             case LONG:
-                builder.append(String.valueOf(typeDataAccess.readLong(ordinal, fieldIdx)));
+                writer.append(String.valueOf(typeDataAccess.readLong(ordinal, fieldIdx)));
                 return;
             case STRING:
-                builder.append("\"").append(escapeString(typeDataAccess.readString(ordinal, fieldIdx))).append("\"");
+                writer.append("\"").append(escapeString(typeDataAccess.readString(ordinal, fieldIdx))).append("\"");
                 return;
             case REFERENCE:
                 int refOrdinal = typeDataAccess.readOrdinal(ordinal, fieldIdx);
-                appendStringify(builder, dataAccess, schema.getReferencedType(fieldIdx), refOrdinal, indentation);
+                appendStringify(writer, dataAccess, schema.getReferencedType(fieldIdx), refOrdinal, indentation);
                 return;
         }
     }
@@ -406,40 +389,40 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
         return str.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
-    private void appendIndentation(Writer builder, int indentation) throws IOException {
+    private void appendIndentation(Writer writer, int indentation) throws IOException {
         switch(indentation) {
             case 0:
                 return;
             case 1:
-                builder.append("  ");
+                writer.append(INDENT);
                 return;
             case 2:
-                builder.append("    ");
+                writer.append(INDENT + INDENT);
                 return;
             case 3:
-                builder.append("      ");
+                writer.append(INDENT + INDENT + INDENT);
                 return;
             case 4:
-                builder.append("        ");
+                writer.append(INDENT + INDENT + INDENT + INDENT);
                 return;
             case 5:
-                builder.append("          ");
+                writer.append(INDENT + INDENT + INDENT + INDENT + INDENT);
                 return;
             case 6:
-                builder.append("            ");
+                writer.append(INDENT + INDENT + INDENT + INDENT + INDENT + INDENT);
                 return;
             case 7:
-                builder.append("              ");
+                writer.append(INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT);
                 return;
             case 8:
-                builder.append("                ");
+                writer.append(INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT);
                 return;
             case 9:
-                builder.append("                  ");
+                writer.append(INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT + INDENT);
                 return;
             default:
                 for(int i=0;i<indentation;i++) {
-                    builder.append("  ");
+                    writer.append(INDENT);
                 }
         }
     }

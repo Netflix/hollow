@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.jsonadapter.discover;
 
-
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
 public class HollowDiscoveredField {

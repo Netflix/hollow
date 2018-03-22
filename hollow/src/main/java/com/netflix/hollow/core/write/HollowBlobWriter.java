@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.core.write;
 
-import java.util.ArrayList;
-
-import com.netflix.hollow.core.memory.encoding.VarInt;
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.HollowBlobHeader;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**

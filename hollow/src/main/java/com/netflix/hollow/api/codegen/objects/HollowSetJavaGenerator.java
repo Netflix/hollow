@@ -25,7 +25,9 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.Arrays;
 import java.util.Set;
 
 /**
@@ -52,7 +54,7 @@ public class HollowSetJavaGenerator extends HollowCollectionsGenerator {
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, apiClassname, Arrays.<HollowSchema>asList(schema));
 
         builder.append("import " + HollowSet.class.getName() + ";\n");
         builder.append("import " + HollowSetSchema.class.getName() + ";\n");

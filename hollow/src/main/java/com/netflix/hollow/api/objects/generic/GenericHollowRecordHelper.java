@@ -17,21 +17,11 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
-import com.netflix.hollow.api.objects.generic.GenericHollowList;
-import com.netflix.hollow.api.objects.generic.GenericHollowMap;
-import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-import com.netflix.hollow.api.objects.generic.GenericHollowSet;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -42,6 +32,11 @@ import com.netflix.hollow.core.read.dataaccess.missing.HollowListMissingDataAcce
 import com.netflix.hollow.core.read.dataaccess.missing.HollowMapMissingDataAccess;
 import com.netflix.hollow.core.read.dataaccess.missing.HollowObjectMissingDataAccess;
 import com.netflix.hollow.core.read.dataaccess.missing.HollowSetMissingDataAccess;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
  * Contains some useful methods for interacting with the Generic Hollow Objects API. 

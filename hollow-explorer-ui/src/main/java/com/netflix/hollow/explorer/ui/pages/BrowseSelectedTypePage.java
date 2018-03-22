@@ -31,7 +31,10 @@ import com.netflix.hollow.explorer.ui.model.QueryResult;
 import com.netflix.hollow.explorer.ui.model.TypeKey;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+import com.netflix.hollow.tools.stringifier.HollowStringifier;
 import com.netflix.hollow.ui.HollowUISession;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -39,16 +42,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.VelocityContext;
 
 public class BrowseSelectedTypePage extends HollowExplorerPage {
+    private static final String SESSION_ATTR_QUERY_RESULT = "query-result";
 
     public BrowseSelectedTypePage(HollowExplorerUI ui) {
-        super(ui, "browse-selected-type.vm");
+        super(ui);
     }
 
     @Override
     protected void setUpContext(HttpServletRequest req, HollowUISession session, VelocityContext ctx) {
-        HollowTypeReadState typeState = ui.getStateEngine().getTypeState(req.getParameter("type"));
-        
-        HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(typeState);
+        HollowTypeReadState typeState = getTypeState(req);
         
         int page = req.getParameter("page") == null ? 0 : Integer.parseInt(req.getParameter("page"));
         int pageSize = req.getParameter("pageSize") == null ? 20 : Integer.parseInt(req.getParameter("pageSize"));
@@ -59,10 +61,11 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         BitSet selectedOrdinals = typeState.getPopulatedOrdinals();
 
         if("true".equals(req.getParameter("clearQuery")))
-            session.clearAttribute("query-result");
+            session.clearAttribute(SESSION_ATTR_QUERY_RESULT);
 
-        if(session.getAttribute("query-result") != null) {
-            QueryResult queryResult = (QueryResult) session.getAttribute("query-result");
+        if(session.getAttribute(SESSION_ATTR_QUERY_RESULT) != null) {
+            QueryResult queryResult =
+                (QueryResult) session.getAttribute(SESSION_ATTR_QUERY_RESULT);
             queryResult.recalculateIfNotCurrent(ui.getStateEngine());
             
             selectedOrdinals = queryResult.getQueryMatches().get(typeState.getSchema().getName());
@@ -80,7 +83,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         PrimaryKey primaryKey = getPrimaryKey(typeState.getSchema());
         int fieldPathIndexes[][] = getFieldPathIndexes(primaryKey); 
         
-        List<TypeKey> keys = new ArrayList<TypeKey>(pageSize);
+        List<TypeKey> keys = new ArrayList<>(pageSize);
         
         for(int i=0;i<pageSize && currentOrdinal != -1;i++) {
             keys.add(getKey(startRec + i, typeState, currentOrdinal, fieldPathIndexes));
@@ -95,37 +98,15 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         } catch(Exception e) {
             key = "";
         }
-        
-        int ordinal = req.getParameter("ordinal") == null ? -1 : Integer.parseInt(req.getParameter("ordinal"));
-        if("".equals(key) && ordinal != -1) {
-            displayRecord(ctx, displayFormat, typeState, ordinal);
-            if(fieldPathIndexes != null)
-                key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
-        } else if(!"".equals(key)) {
-            if(ordinal != -1 && selectedOrdinals.get(ordinal) && recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
-                displayRecord(ctx, displayFormat, typeState, ordinal);
-            } else {
-                if(idx != null) {
-                    ordinal = findOrdinal(idx, key);
-                    if(ordinal != -1)
-                        displayRecord(ctx, displayFormat, typeState, ordinal);
-                    else
-                        ctx.put("selectedRecordData", "ERROR: Key " + key + " was not found!");
-                } else {
-                    /// scan through all records
-                    ordinal = selectedOrdinals.nextSetBit(0);
-                    while(ordinal != -1) {
-                        if(recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
-                            displayRecord(ctx, displayFormat, typeState, ordinal);
-                            break;
-                        }
-                        
-                        ordinal = selectedOrdinals.nextSetBit(ordinal+1);
-                    }
-                }
-            }
+
+        Integer ordinal =
+            getOrdinalToDisplay(req, key, parsedKey, selectedOrdinals, fieldPathIndexes);
+        if (ordinal != null && !ordinal.equals(-1) && "".equals(key)
+                && fieldPathIndexes != null) {
+            // set key for the case where it was unset previously
+            key = getKey(-1, typeState, ordinal, fieldPathIndexes).getKey();
         }
-        
+
         int numRecords = selectedOrdinals.cardinality();
 
         ctx.put("keys", keys);
@@ -139,12 +120,56 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         ctx.put("display", displayFormat);
     }
 
-    private void displayRecord(VelocityContext ctx, String displayFormat, HollowTypeReadState typeState, int ordinal) {
-        if("json".equals(displayFormat)) {
-            ctx.put("selectedRecordData", new HollowRecordJsonStringifier().stringify(ui.getStateEngine(), typeState.getSchema().getName(), ordinal));
-        } else {
-            ctx.put("selectedRecordData", new HollowRecordStringifier().stringify(ui.getStateEngine(), typeState.getSchema().getName(), ordinal));
+    private Integer getOrdinalToDisplay(HttpServletRequest req, String key,
+            Object[] parsedKey, BitSet selectedOrdinals, int[][] fieldPathIndexes) {
+        HollowTypeReadState typeState = getTypeState(req);
+        int ordinal = req.getParameter("ordinal") == null ? -1
+            : Integer.parseInt(req.getParameter("ordinal"));
+        if ("".equals(key) && ordinal != -1) { // trust ordinal if key is empty
+            return ordinal;
+        } else if (!"".equals(key)) {
+            // verify ordinal key matches parsed key
+            if (ordinal != -1 && selectedOrdinals.get(ordinal)
+                    && recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
+                return ordinal;
+            } else {
+                HollowPrimaryKeyIndex idx = findPrimaryKeyIndex(typeState);
+                if (idx != null) {
+                    // N.B. - findOrdinal can return -1, the caller deals with it
+                    return findOrdinal(idx, key);
+                } else {
+                    // no index, scan through records
+                    ordinal = selectedOrdinals.nextSetBit(0);
+                    while (ordinal != -1) {
+                        if (recordKeyEquals(typeState, ordinal, parsedKey, fieldPathIndexes)) {
+                            return ordinal;
+                        }
+                        ordinal = selectedOrdinals.nextSetBit(ordinal + 1);
+                    }
+                }
+            }
         }
+        return -1;
+    }
+
+    @Override
+    protected void renderPage(HttpServletRequest req, VelocityContext ctx, Writer writer) {
+        String key = (String) ctx.get("key");
+        Integer ordinal = (Integer) ctx.get("ordinal");
+        ui.getVelocityEngine().getTemplate("browse-selected-type-top.vm").merge(ctx, writer);
+        try {
+            if (!"".equals(key) && ordinal != null && ordinal.equals(-1)) {
+                writer.append("ERROR: Key " + key + " was not found!");
+            } else if (!"".equals(key) && ordinal != null) {
+                HollowStringifier stringifier = "json".equals(req.getParameter("display"))
+                    ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
+                stringifier.stringify(writer, ui.getStateEngine(),
+                    getTypeState(req).getSchema().getName(), ordinal);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error streaming response", e);
+        }
+        ui.getVelocityEngine().getTemplate("browse-selected-type-bottom.vm").merge(ctx, writer);
     }
 
     private TypeKey getKey(int recordIdx, HollowTypeReadState typeState, int ordinal, int[][] fieldPathIndexes) {
@@ -264,4 +289,7 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         return true;
     }
 
+    private HollowTypeReadState getTypeState(HttpServletRequest req) {
+        return ui.getStateEngine().getTypeState(req.getParameter("type"));
+    }
 }

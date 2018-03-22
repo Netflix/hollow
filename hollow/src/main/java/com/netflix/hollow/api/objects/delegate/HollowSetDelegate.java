@@ -18,11 +18,10 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowSetTypeAPI;
-
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
  * This is the extension of the {@link HollowRecordDelegate} interface for SET type records.

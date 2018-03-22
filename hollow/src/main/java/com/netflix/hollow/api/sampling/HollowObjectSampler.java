@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.api.sampling;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.read;
 
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
-
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.SnapshotPopulatedOrdinalsReader;

@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.api.producer.validation;
 
+import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.netflix.hollow.api.producer.HollowProducerListener.Status;
 /**
  * *************************************
  * NOTE: Beta API subject to change.   *

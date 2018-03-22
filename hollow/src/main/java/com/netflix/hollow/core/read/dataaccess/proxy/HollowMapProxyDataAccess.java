@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.map.PotentialMatchHollowMapEntryOrdinalIteratorImpl;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIteratorImpl;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 
 /**
  * A {@link HollowTypeProxyDataAccess} for a MAP type.

@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.sampling;
 
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-
 import java.util.Collection;
 
 public interface HollowSampler {

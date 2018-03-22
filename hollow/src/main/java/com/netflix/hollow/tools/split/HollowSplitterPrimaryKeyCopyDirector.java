@@ -19,7 +19,6 @@ package com.netflix.hollow.tools.split;
 
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
-
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.util.ArrayList;

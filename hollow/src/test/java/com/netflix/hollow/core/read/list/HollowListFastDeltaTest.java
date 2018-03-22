@@ -18,12 +18,11 @@
 package com.netflix.hollow.core.read.list;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
+import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
-import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;

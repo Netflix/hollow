@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.tools.split;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.List;
 
 /**

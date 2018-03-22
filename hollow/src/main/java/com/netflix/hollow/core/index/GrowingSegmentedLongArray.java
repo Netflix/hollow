@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-
 import java.util.Arrays;
 
 public class GrowingSegmentedLongArray {

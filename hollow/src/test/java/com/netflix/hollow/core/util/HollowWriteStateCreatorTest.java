@@ -17,15 +17,13 @@
  */
 package com.netflix.hollow.core.util;
 
-
-import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
-
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;

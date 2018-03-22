@@ -1,11 +1,9 @@
 package com.netflix.hollow.diff.ui;
 
-import org.junit.Test;
-
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.diffview.FakeHollowDiffGenerator;
 import com.netflix.hollow.tools.diff.HollowDiff;
-
+import org.junit.Test;
 
 public class DiffUITest {
 

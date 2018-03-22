@@ -15,6 +15,15 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Not intended for external consumption.
  *
@@ -54,7 +63,18 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     }
 
     protected void appendPackageAndCommonImports(StringBuilder builder) {
-        String fullPackageName = createFullPackageName(packageName, subPackageName, config.isUsePackageGrouping());
+        appendPackageAndCommonImports(builder, null, new ArrayList<HollowSchema>());
+    }
+
+    protected void appendPackageAndCommonImports(StringBuilder builder,
+            String apiClassname) {
+        appendPackageAndCommonImports(builder, apiClassname, new ArrayList<HollowSchema>());
+    }
+
+    protected void appendPackageAndCommonImports(StringBuilder builder,
+            String apiClassname, List<HollowSchema> schemasToImport) {
+        String fullPackageName =
+            createFullPackageName(packageName, subPackageName, config.isUsePackageGrouping());
         if (!isEmpty(fullPackageName)) {
             builder.append("package ").append(fullPackageName).append(";\n\n");
 
@@ -63,9 +83,42 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
             }
 
             if (config.isUsePackageGrouping()) {
-                builder.append("import ").append(packageName).append(".*;\n");
-                builder.append("import ").append(packageName).append(".core.*;\n");
-                if (useCollectionsImport) builder.append("import ").append(packageName).append(".collections.*;\n\n");
+                if (apiClassname != null) {
+                    appendImportFromBasePackage(builder, apiClassname);
+                }
+                Set<String> schemaNameSet = new HashSet<>();
+                for (HollowSchema schema : schemasToImport) {
+                    switch (schema.getSchemaType()) {
+                        case OBJECT:
+                            addToSetIfNotPrimitive(schemaNameSet, schema.getName());
+                            break;
+                        case SET:
+                            addToSetIfNotPrimitive(schemaNameSet,
+                                    ((HollowSetSchema) schema).getElementType());
+                            break;
+                        case LIST:
+                            addToSetIfNotPrimitive(schemaNameSet,
+                                    ((HollowListSchema) schema).getElementType());
+                            break;
+                        case MAP:
+                            HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                            addToSetIfNotPrimitive(schemaNameSet, mapSchema.getKeyType(),
+                                    mapSchema.getValueType());
+                            break;
+                        default:
+                            throw new IllegalArgumentException(
+                                    "Unexpected HollowSchema to import: " + schema);
+
+                    }
+                }
+                for (String schemaName : schemaNameSet) {
+                    appendImportFromBasePackage(builder, schemaName);
+                }
+                appendImportFromBasePackage(builder, "core.*");
+                if (useCollectionsImport) {
+                    appendImportFromBasePackage(builder, "collections.*");
+                }
+                builder.append("\n");
             }
         }
     }
@@ -81,5 +134,23 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
 
     private boolean isEmpty(String value) {
         return value == null || value.trim().isEmpty();
+    }
+
+    private void appendImportFromBasePackage(StringBuilder builder, String leaf) {
+        builder.append("import ").append(packageName).append(".").append(leaf).append(";\n");
+    }
+
+    /**
+     * Adds the schema name to the set if the schema name doesn't correspond to a Hollow
+     * primitive type. Factored out to prevent bloat in the switch statement it is called
+     * from.
+     */
+    private void addToSetIfNotPrimitive(Set<String> schemaNameSet,
+            String... schemaNames) {
+        for (String schemaName : schemaNames) {
+            if (!HollowCodeGenerationUtils.isPrimitiveType(schemaName)) {
+                schemaNameSet.add(schemaName);
+            }
+        }
     }
 }

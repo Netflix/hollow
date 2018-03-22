@@ -35,6 +35,7 @@ import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import java.util.Arrays;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
@@ -59,7 +60,7 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
     @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
-        appendPackageAndCommonImports(builder);
+        appendPackageAndCommonImports(builder, null, Arrays.asList(schema));
 
         builder.append("import " + HollowFactory.class.getName() + ";\n");
         builder.append("import " + HollowTypeDataAccess.class.getName() + ";\n");

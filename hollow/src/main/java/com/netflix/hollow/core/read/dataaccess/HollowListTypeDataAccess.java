@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.read.dataaccess;
 
-import com.netflix.hollow.core.schema.HollowListSchema;
-
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
+import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
  * A handle for all of the records of a specific LIST type in a Hollow dataset.  The most common type of {@link HollowListTypeDataAccess}

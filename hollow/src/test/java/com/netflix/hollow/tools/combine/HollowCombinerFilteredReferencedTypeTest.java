@@ -1,13 +1,13 @@
 package com.netflix.hollow.tools.combine;
 
-import org.junit.Assert;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import java.io.IOException;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import java.io.IOException;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowCombinerFilteredReferencedTypeTest {
