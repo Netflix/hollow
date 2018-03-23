@@ -28,6 +28,8 @@ public class BlobMetaDataUtil {
     }
 
     public static Map<String, String> fetchCoreHeaders(Map<String, String> headerMap) {
+        if (headerMap == null || headerMap.isEmpty()) return Collections.emptyMap();
+
         Map<String, String> map = new LinkedHashMap<>();
 
         for (HEADER header : HEADER.values()) {
