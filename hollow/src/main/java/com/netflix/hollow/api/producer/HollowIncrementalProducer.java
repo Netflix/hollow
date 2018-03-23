@@ -100,6 +100,14 @@ public class HollowIncrementalProducer {
 
     public boolean hasMetadata() { return !this.cycleMetadata.isEmpty(); }
 
+    public void addListener(IncrementalCycleListener listener) {
+        this.listeners.add(listener);
+    }
+
+    public void removeListener(IncrementalCycleListener listener) {
+        this.listeners.remove(listener);
+    }
+
     /**
      * Runs a Hollow Cycle, if successful, cleans the mutations map.
      * @since 2.9.9

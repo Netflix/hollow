@@ -684,8 +684,32 @@ public class HollowIncrementalProducerTest {
         Assert.assertEquals(IncrementalCycleListener.Status.FAIL, listener.getStatus());
         Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
         Assert.assertFalse(incrementalProducer.hasMetadata());
+    }
 
+    @Test
+    public void addsListenersAfterInitialization() {
+        HollowProducer producer = createInMemoryProducer();
 
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withHollowProducer(producer)
+                .build();
+
+        //Adding the listener after initialization
+        incrementalProducer.addListener(listener);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertEquals(1L, listener.getRecordsAddedOrModified());
+        Assert.assertNull(listener.getCause());
     }
 
     private HollowProducer createInMemoryProducer() {
