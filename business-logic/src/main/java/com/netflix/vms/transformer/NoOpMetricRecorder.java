@@ -8,7 +8,7 @@ public class NoOpMetricRecorder implements TransformerMetricRecorder {
     public void startTimer(DurationMetric metric) {}
 
     @Override
-    public void stopTimer(DurationMetric metric) {}
+    public long stopTimer(DurationMetric metric) {return 0;}
 
     @Override
     public void resetTimer(DurationMetric metric) {}

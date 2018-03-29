@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer.startup;
 
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P1_ReadInputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P5_WaitForNextCycleDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.ConsecutiveCycleFailures;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
@@ -23,6 +19,7 @@ import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerCycleInterrupter;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
@@ -48,6 +45,7 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
 @Singleton
 public class TransformerCycleKickoff {
+    private final TransformerContext ctx;
 
     @Inject
     public TransformerCycleKickoff(
@@ -72,7 +70,7 @@ public class TransformerCycleKickoff {
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
-        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
+        ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -112,11 +110,9 @@ public class TransformerCycleKickoff {
 
                         // Reset for next cycle
                         ctx.getCycleInterrupter().reset(ctx.getCurrentCycleId());
-                        ctx.getMetricRecorder().resetTimer(P1_ReadInputDataDuration);
-                        ctx.getMetricRecorder().resetTimer(P2_ProcessDataDuration);
-                        ctx.getMetricRecorder().resetTimer(P3_WriteOutputDataDuration);
-                        ctx.getMetricRecorder().resetTimer(P4_WaitForPublishWorkflowDuration);
-                        ctx.getMetricRecorder().resetTimer(P5_WaitForNextCycleDuration);
+                        for (DurationMetric metric : DurationMetric.values()) {
+                            ctx.getMetricRecorder().resetTimer(metric);
+                        }
                     }
                 }
             }
@@ -147,7 +143,7 @@ public class TransformerCycleKickoff {
                     msUntilNextCycle = minCycleTime - timeSinceLastCycle;
                 }
                 long sleepDuration = System.currentTimeMillis() - sleepStart;
-                ctx.getMetricRecorder().stopTimer(P5_WaitForNextCycleDuration);
+                ctx.stopTimerAndLogDuration(P5_WaitForNextCycleDuration);
                 ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
             }
 
@@ -199,31 +195,36 @@ public class TransformerCycleKickoff {
     }
 
     private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
-        if(cfg.isRestoreFromPreviousStateEngine()) {
-            long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
-            long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
+        ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
+        try {
+            if(cfg.isRestoreFromPreviousStateEngine()) {
+                long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
+                long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
 
-            if(restoreVersion != Long.MIN_VALUE) {
-                VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                outputClient.triggerRefreshTo(restoreVersion);
-                if(outputClient.getCurrentVersionId() != restoreVersion)
-                    throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
+                if(restoreVersion != Long.MIN_VALUE) {
+                    VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
+                    outputClient.triggerRefreshTo(restoreVersion);
+                    if(outputClient.getCurrentVersionId() != restoreVersion)
+                        throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
 
-                if(isFastlane(cfg)) {
-                    cycle.restore(outputClient, null, true);
+                    if(isFastlane(cfg)) {
+                        cycle.restore(outputClient, null, true);
+                    } else {
+                        VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
+                        nostreamsOutputClient.triggerRefreshTo(restoreVersion);
+                        if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
+                            throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+
+                        cycle.restore(outputClient, nostreamsOutputClient, false);
+                    }
+
                 } else {
-                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
-                    nostreamsOutputClient.triggerRefreshTo(restoreVersion);
-                    if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
-                        throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
-
-                    cycle.restore(outputClient, nostreamsOutputClient, false);
+                    if(cfg.isFailIfRestoreNotAvailable())
+                        throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
                 }
-
-            } else {
-                if(cfg.isFailIfRestoreNotAvailable())
-                    throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
             }
+        } finally {
+            ctx.stopTimerAndLogDuration(DurationMetric.P0_RestoreDataDuration);
         }
     }
 

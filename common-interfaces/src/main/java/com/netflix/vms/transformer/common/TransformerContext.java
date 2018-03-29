@@ -1,10 +1,12 @@
 package com.netflix.vms.transformer.common;
 
 import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -46,4 +48,9 @@ public interface TransformerContext {
     Consumer<PublicationHistory> getPublicationHistoryConsumer();
 
     CycleMonkey getCycleMonkey();
+
+    default void stopTimerAndLogDuration(DurationMetric metric) {
+        long duration = getMetricRecorder().stopTimer(metric);
+        getLogger().info(TransformerLogTag.TransformDuration, "Metric={}, Duration={}", metric.name(), duration);
+    }
 }

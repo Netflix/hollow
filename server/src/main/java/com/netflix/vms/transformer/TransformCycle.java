@@ -235,7 +235,7 @@ public class TransformCycle {
 
             VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
         } finally {
-            ctx.getMetricRecorder().stopTimer(P1_ReadInputDataDuration);
+            ctx.stopTimerAndLogDuration(P1_ReadInputDataDuration);
         }
     }
 
@@ -271,7 +271,7 @@ public class TransformCycle {
             ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
             throw th;
         } finally {
-            ctx.getMetricRecorder().stopTimer(P2_ProcessDataDuration);
+            ctx.stopTimerAndLogDuration(P2_ProcessDataDuration);
         }
 
         return true;
@@ -330,7 +330,7 @@ public class TransformCycle {
             ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
             throw e;
         } finally {
-            ctx.getMetricRecorder().stopTimer(P3_WriteOutputDataDuration);
+            ctx.stopTimerAndLogDuration(P3_WriteOutputDataDuration);
         }
     }
 
@@ -386,7 +386,7 @@ public class TransformCycle {
             // Spot to trigger Cycle Monkey if enabled
             cycleMonkey.doMonkeyBusiness("submitToPublishWorkflow");
         } finally {
-            ctx.getMetricRecorder().stopTimer(P4_WaitForPublishWorkflowDuration);
+            ctx.stopTimerAndLogDuration(P4_WaitForPublishWorkflowDuration);
         }
     }
 

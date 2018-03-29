@@ -8,6 +8,7 @@ public enum TransformerLogTag implements LogTag {
     TransformCycleSuccess,
     TransformCycleMonkey,
     TransformCycleFailed,
+    TransformDuration,
     CycleFastlaneIds,
     TransformProgress,
     TransformInfo,
