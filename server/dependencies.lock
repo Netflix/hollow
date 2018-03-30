@@ -399,7 +399,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -619,7 +618,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -4085,7 +4084,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -4305,7 +4303,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -7771,7 +7769,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -7991,7 +7988,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -11545,7 +11542,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -11765,7 +11761,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -16971,7 +16967,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -17191,7 +17186,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -20657,7 +20652,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -20877,7 +20871,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -24347,7 +24341,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -24567,7 +24560,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
         },
         "com.netflix.archaius:archaius-core": {
@@ -28008,7 +28001,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -28231,22 +28223,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -31825,7 +31816,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -32048,22 +32038,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -35642,7 +35631,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -35865,22 +35853,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -39459,7 +39446,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -39682,22 +39668,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -43276,7 +43261,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -43499,22 +43483,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -47093,7 +47076,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -47316,22 +47298,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -50910,7 +50891,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -51133,22 +51113,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -54727,7 +54706,6 @@
                 "com.datastax.cassandra:cassandra-driver-core",
                 "com.fasterxml.jackson.datatype:jackson-datatype-guava",
                 "com.google.inject:guice",
-                "com.netflix.aeneas:aeneas-core",
                 "com.netflix.archaius:archaius-core",
                 "com.netflix.astyanax:astyanax-contrib",
                 "com.netflix.astyanax:astyanax-core",
@@ -54950,22 +54928,21 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release",
-            "transitive": [
-                "com.netflix.aeneas:aeneas-recipes",
-                "com.netflix.aeneas:aeneas-test"
-            ]
-        },
-        "com.netflix.aeneas:aeneas-recipes": {
-            "locked": "1.51.10",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.51.10",
+            "locked": "1.52.0",
             "requested": "latest.release"
+        },
+        "com.netflix.aeneas:aeneas-test-common": {
+            "locked": "1.52.0",
+            "transitive": [
+                "com.netflix.aeneas:aeneas-test"
+            ]
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
