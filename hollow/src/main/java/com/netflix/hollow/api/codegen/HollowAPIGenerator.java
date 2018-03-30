@@ -399,7 +399,7 @@ public class HollowAPIGenerator {
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
         @Override
         protected HollowAPIGenerator  instantiateGenerator() {
-            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts);
+            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts, destinationPath);
         }
 
         @Override
