@@ -172,7 +172,24 @@ public class HollowClientUpdater {
     public void setFilter(HollowFilterConfig filter) {
         this.filter = filter;
     }
+
+    /**
+     * Returns the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
+     */
+    public int getNumFailedSnapshotTransitions() {
+        return failedTransitionTracker.getNumFailedSnapshotTransitions();
+    }
+
+    /**
+     * Returns the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
+     */
+    public int getNumFailedDeltaTransitions() {
+        return failedTransitionTracker.getNumFailedDeltaTransitions();
+    }
     
+    /**
+     * Clear any failed transitions from the {@link FailedTransitionTracker}, so that they may be reattempted when an update is triggered.
+     */
     public void clearFailedTransitions() {
         this.failedTransitionTracker.clear();
     }
