@@ -13,6 +13,7 @@ import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.internal.hollow.factory.HollowAnnouncerFactory;
 import com.netflix.internal.hollow.factory.HollowPublisherFactory;
 import com.netflix.vms.transformer.TransformCycle;
@@ -28,7 +29,6 @@ import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
-import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
@@ -46,6 +46,7 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
     private final TransformerContext ctx;
+    private final boolean isFastlane;
 
     @Inject
     public TransformerCycleKickoff(
@@ -73,14 +74,18 @@ public class TransformerCycleKickoff {
         ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
+        this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         TransformCycle cycle = new TransformCycle(
                 ctx,
                 fileStore,
+                hermesBlobAnnouncer,
                 publishStager,
                 transformerConfig.getConverterVip(),
                 transformerConfig.getTransformerVip());
 
-        restore(cycle, ctx.getConfig(), fileStore, hermesBlobAnnouncer);
+        if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
+            TransformCycle.restore(new SimultaneousExecutor(), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);
+        }
 
         Thread t = new Thread(new Runnable() {
             private long cycleStartTime = 0;
@@ -88,7 +93,6 @@ public class TransformerCycleKickoff {
 
             @Override
             public void run() {
-                boolean isFastlane = isFastlane(ctx.getConfig());
                 while(true) {
                     cycleStartTime = System.currentTimeMillis();
                     try {
@@ -118,7 +122,7 @@ public class TransformerCycleKickoff {
             }
 
             private void waitForMinCycleTimeToPass() {
-                if(isFastlane(ctx.getConfig()))
+                if (isFastlane)
                     return;
 
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
@@ -188,52 +192,13 @@ public class TransformerCycleKickoff {
 
     private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
-        if(isFastlane(ctx.getConfig()))
+        if (isFastlane)
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
         return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
-    private void restore(TransformCycle cycle, TransformerConfig cfg, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer) {
-        ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
-        try {
-            if(cfg.isRestoreFromPreviousStateEngine()) {
-                long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
-                long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
-
-                if(restoreVersion != Long.MIN_VALUE) {
-                    VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                    outputClient.triggerRefreshTo(restoreVersion);
-                    if(outputClient.getCurrentVersionId() != restoreVersion)
-                        throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
-
-                    if(isFastlane(cfg)) {
-                        cycle.restore(outputClient, null, true);
-                    } else {
-                        VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
-                        nostreamsOutputClient.triggerRefreshTo(restoreVersion);
-                        if(nostreamsOutputClient.getCurrentVersionId() != restoreVersion)
-                            throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
-
-                        cycle.restore(outputClient, nostreamsOutputClient, false);
-                    }
-
-                } else {
-                    if(cfg.isFailIfRestoreNotAvailable())
-                        throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
-                }
-            }
-        } finally {
-            ctx.stopTimerAndLogDuration(DurationMetric.P0_RestoreDataDuration);
-        }
-    }
-
     private boolean shouldTryCompaction(TransformerConfig cfg) {
-        return !isFastlane(cfg) && cfg.isCompactionEnabled();
+        return !isFastlane && cfg.isCompactionEnabled();
     }
-
-    private boolean isFastlane(TransformerConfig cfg) {
-        return OverrideVipNameUtil.isOverrideVip(cfg);
-    }
-
 }

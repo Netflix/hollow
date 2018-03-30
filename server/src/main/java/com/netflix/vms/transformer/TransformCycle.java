@@ -22,6 +22,7 @@ import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
@@ -29,8 +30,10 @@ import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
 import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
+import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -46,6 +49,7 @@ import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
 import java.io.File;
@@ -72,6 +76,7 @@ public class TransformCycle {
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
     private final FileStore filestore;
+    private final HermesBlobAnnouncer hermesBlobAnnouncer;
     private final String converterVip;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
@@ -87,19 +92,22 @@ public class TransformCycle {
     private Map<String, String> currentStateHeader = Collections.emptyMap();
     private Map<String, String> previousStateHeader = Collections.emptyMap();
 
-    public TransformCycle(TransformerContext ctx, FileStore fileStore, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
         this.ctx = ctx;
+        this.versionMinter = new SequenceVersionMinter();
+        currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
+
         this.transformerVip = transformerVip;
         this.converterVip = converterVip;
         this.previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
         this.filestore = fileStore;
+        this.hermesBlobAnnouncer = hermesBlobAnnouncer;
         this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
         this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
         this.publishWorkflowStager = publishStager;
-        this.versionMinter = new SequenceVersionMinter();
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
@@ -169,13 +177,18 @@ public class TransformCycle {
         }
     }
 
-    private void beginCycle() {
-        // NOTE: cycle Logs must be done after currentCycleNumber has been initialized; otherwise, logs will not be grouped properly to the right cycle
-        currentCycleNumber = versionMinter.mintANewVersion();
+    private static long initCycleNumber(TransformerContext ctx, VersionMinter versionMinter) {
+        long currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
         ctx.getCycleInterrupter().begin(currentCycleNumber);
-        ctx.getOctoberSkyData().refresh();
+        return currentCycleNumber;
+    }
 
+    private void beginCycle() {
+        // First cycle already initialized in Constructor
+        if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
+
+        ctx.getOctoberSkyData().refresh();
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
         ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
 
@@ -197,9 +210,73 @@ public class TransformCycle {
         pinTitleMgr.prepareForNextCycle();
     }
 
+    private static ExecuteFutureResult executeRestore(String name, TransformerContext ctx, SimultaneousExecutor executor, VMSOutputDataClient outputClient, long restoreVersion) {
+        ExecuteFutureResult restoreResult = new ExecuteFutureResult(ctx, name);
+        executor.execute(() -> {
+            if (outputClient != null) {
+                try {
+                    restoreResult.starting();;
+
+                    // Spot to trigger Cycle Monkey if enabled
+                    ctx.getCycleMonkey().doMonkeyBusiness(restoreResult.getName());
+
+                    long start = System.currentTimeMillis();
+                    outputClient.triggerRefreshTo(restoreVersion);
+                    ctx.getLogger().info(TransformerLogTag.TransformRestore, "Restored {} version={}, duration={}", name, restoreVersion, (System.currentTimeMillis() - start));
+                    restoreResult.completed();
+                } catch (Exception ex) {
+                    restoreResult.failed(ex);
+                }
+            }
+        });
+
+        return restoreResult;
+    }
+
+    public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isFastlane, boolean isRunWithinUpdateInput) {
+        // No need to track duration if RunWithinUpdateInput since it will be part of that duration
+        if (!isRunWithinUpdateInput) ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
+        try {
+            TransformerConfig cfg = ctx.getConfig();
+            if (cfg.isRestoreFromPreviousStateEngine()) {
+                long latestVersion = hermesBlobAnnouncer.getLatestAnnouncedVersionFromCassandra(cfg.getTransformerVip());
+                long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
+
+                if (restoreVersion != Long.MIN_VALUE) {
+                    // Restore in parallel if needed
+                    VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
+                    VMSOutputDataClient nostreamsOutputClient = isFastlane ? null : new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
+                    ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+                    ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+
+                    // Wait to complete and validate success
+                    executor.awaitSuccessfulCompletion();
+                    restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
+                    restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
+
+                    if (outputClient == null || outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
+                    if (nostreamsOutputClient != null && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+
+                    cycle.restore(outputClient, nostreamsOutputClient, isFastlane);
+                } else {
+                    if (cfg.isFailIfRestoreNotAvailable())
+                        throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
+                }
+            }
+        } catch (IllegalStateException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new IllegalStateException("Failed to restore data", ex);
+        } finally {
+            if (!isRunWithinUpdateInput) ctx.stopTimerAndLogDuration(DurationMetric.P0_RestoreDataDuration);
+        }
+    }
+
     private void updateTheInput() {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
         try {
+            SimultaneousExecutor executor = new SimultaneousExecutor();
+
             FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
 
             /// load the input data
@@ -214,13 +291,36 @@ public class TransformCycle {
                 previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
             }
 
-            if(pinnedInputVersion == null)
-                inputClient.triggerRefresh();
-            else
-                inputClient.triggerRefreshTo(pinnedInputVersion);
+            final Long pinnedInputVersionCopy = pinnedInputVersion;
+            ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
+            executor.execute(() -> {
+                try {
+                    inputProcessingResult.starting();;
 
-            // Spot to trigger Cycle Monkey if enabled
-            cycleMonkey.doMonkeyBusiness("updateTheInput");
+                    // Spot to trigger Cycle Monkey if enabled
+                    cycleMonkey.doMonkeyBusiness(inputProcessingResult.getName());
+
+                    if (pinnedInputVersionCopy == null)
+                        inputClient.triggerRefresh();
+                    else {
+                        inputClient.triggerRefreshTo(pinnedInputVersionCopy);
+                        if (inputClient.getCurrentVersionId() != pinnedInputVersionCopy) throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersionCopy);
+                    }
+
+                    inputProcessingResult.completed();
+                } catch(Exception ex) {
+                    inputProcessingResult.failed(ex);
+                }
+            });
+
+            // Determine whether to process restore here; only if it is first cycle
+            if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
+                restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
+            }
+
+            // Wait to complete and validate success
+            executor.awaitSuccessfulCompletion();
+            inputProcessingResult.throwExceptionIfNotCompleteSuccessfully();
 
             //// set the now millis
             Long nowMillis = ctx.getConfig().getNowMillis();
@@ -234,6 +334,8 @@ public class TransformCycle {
             ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
 
             VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to process input", ex);
         } finally {
             ctx.stopTimerAndLogDuration(P1_ReadInputDataDuration);
         }
@@ -428,4 +530,45 @@ public class TransformCycle {
             return converterVip;
     }
 
+    public static class ExecuteFutureResult {
+        public enum Status {IDLE, RUNNING, COMPLETED, FAILED;}
+
+        private final TransformerContext ctx;
+        private final String name;
+        private Status status;
+        private Exception exception;
+
+        ExecuteFutureResult(TransformerContext ctx, String name) {
+            this.ctx = ctx;
+            this.name = name;
+            this.status = Status.IDLE;
+        }
+
+        public String getName() { return name; }
+        public Status getStatus() { return status; }
+        public Exception getException() { return exception; }
+        public void starting() { this.status = Status.RUNNING; }
+        public void completed() { completed(false, null); }
+        public void failed(Exception ex) { completed(false, ex); }
+
+        private void completed(boolean isFailed, Exception ex) {
+            this.exception = ex;
+            if (isFailed) {
+                this.status = Status.FAILED;
+                ctx.getLogger().error(TransformerLogTag.BlobState, "Execute {} failed", ex);
+            } else {
+                this.status = Status.COMPLETED;
+                ctx.getLogger().info(TransformerLogTag.BlobState, "Execute {} completed successfully");
+            }
+        }
+
+        public void throwExceptionIfNotCompleteSuccessfully() throws Exception {
+            if (status == Status.COMPLETED) return;
+
+            if (status == Status.FAILED) {
+                throw new Exception(name + " failed", exception);
+            }
+            throw new Exception(name + " not completed. Current status=" + status);
+        }
+    }
 }

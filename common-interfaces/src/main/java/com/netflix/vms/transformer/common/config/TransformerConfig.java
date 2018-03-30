@@ -30,6 +30,9 @@ public interface TransformerConfig {
     @PropertyName(name = "vms.transformerCycleMonkeyPhaseChaosEnabled.${0}")
     public boolean isTransformerCycleMonkeyPhaseChaosEnabled(String phaseName);
 
+    @DefaultValue("true")
+    boolean isProcessRestoreAndInputInParallel();
+
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
