@@ -274,6 +274,20 @@ public class HollowConsumer {
     }
 
     /**
+     * Returns the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
+     */
+    public int getNumFailedSnapshotTransitions() {
+        return updater.getNumFailedSnapshotTransitions();
+    }
+
+    /**
+     * Returns the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
+     */
+    public int getNumFailedDeltaTransitions() {
+        return updater.getNumFailedDeltaTransitions();
+    }
+
+    /**
      * Returns a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
      * <p>
      * This is useful if performing long-running operations which require a consistent view of the entire dataset in a single data state, to guarantee that updates do not happen while the operation runs.

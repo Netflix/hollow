@@ -33,7 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class HollowIncrementalProducer {
     
-    private static final Object DELETE_RECORD = new Object();
     private static final long FAILED_VERSION = Long.MIN_VALUE;
 
     private final HollowProducer producer;
@@ -83,7 +82,7 @@ public class HollowIncrementalProducer {
     }
     
     public void delete(RecordPrimaryKey key) {
-        mutations.put(key, DELETE_RECORD);
+        mutations.put(key, HollowIncrementalCyclePopulator.DELETE_RECORD);
     }
 
     public void discard(RecordPrimaryKey key) {
@@ -133,7 +132,7 @@ public class HollowIncrementalProducer {
         long recordsToRemove = 0L;
         Collection<Object> records = mutations.values();
         for(Object record : records) {
-            if(record == DELETE_RECORD) recordsToRemove++;
+            if(record == HollowIncrementalCyclePopulator.DELETE_RECORD) recordsToRemove++;
         }
         return recordsToRemove;
     }
