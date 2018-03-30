@@ -227,6 +227,8 @@ public class TransformCycle {
                 } catch (Exception ex) {
                     restoreResult.failed(ex);
                 }
+            } else {
+                restoreResult.completed();
             }
         });
 
@@ -246,7 +248,7 @@ public class TransformCycle {
                     // Restore in parallel if needed
                     VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
                     VMSOutputDataClient nostreamsOutputClient = isFastlane ? null : new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
-                    ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+                    ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
                     ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
 
                     // Wait to complete and validate success
@@ -275,7 +277,7 @@ public class TransformCycle {
     private void updateTheInput() {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
         try {
-            SimultaneousExecutor executor = new SimultaneousExecutor();
+            SimultaneousExecutor executor = new SimultaneousExecutor(3, "vms-restore-and-input-processing");
 
             FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
 
@@ -555,10 +557,10 @@ public class TransformCycle {
             this.exception = ex;
             if (isFailed) {
                 this.status = Status.FAILED;
-                ctx.getLogger().error(TransformerLogTag.BlobState, "Execute {} failed", ex);
+                ctx.getLogger().error(TransformerLogTag.BlobState, "Execute {} failed", name, ex);
             } else {
                 this.status = Status.COMPLETED;
-                ctx.getLogger().info(TransformerLogTag.BlobState, "Execute {} completed successfully");
+                ctx.getLogger().info(TransformerLogTag.BlobState, "Execute {} completed successfully", name);
             }
         }
 

@@ -84,7 +84,7 @@ public class TransformerCycleKickoff {
                 transformerConfig.getTransformerVip());
 
         if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-            TransformCycle.restore(new SimultaneousExecutor(), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);
+            TransformCycle.restore(new SimultaneousExecutor(2, "vms-restore"), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);
         }
 
         Thread t = new Thread(new Runnable() {
