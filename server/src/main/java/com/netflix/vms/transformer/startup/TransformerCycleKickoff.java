@@ -46,7 +46,6 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
     private final TransformerContext ctx;
-    private final boolean isFastlane;
 
     @Inject
     public TransformerCycleKickoff(
@@ -63,7 +62,6 @@ public class TransformerCycleKickoff {
             CupLibrary cupLibrary,
             FastlaneIdRetriever fastlaneIdRetriever,
             TransformerServerHealthIndicator healthIndicator) {
-
         FileStore.useMultipartUploadWhenApplicable(true);
 
         Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
@@ -72,9 +70,9 @@ public class TransformerCycleKickoff {
         Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
         ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        PublishWorkflowStager publishStager = publishStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
+        final boolean isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
+        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
-        this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         TransformCycle cycle = new TransformCycle(
                 ctx,
                 fileStore,
@@ -101,7 +99,7 @@ public class TransformerCycleKickoff {
                         cycle.cycle();
                         markCycleSucessful();
 
-                        if(shouldTryCompaction(ctx.getConfig())) {
+                        if (shouldTryCompaction(isFastlane, ctx.getConfig())) {
                             cycle.tryCompaction();
                             markCycleSucessful();
                         }
@@ -190,7 +188,7 @@ public class TransformerCycleKickoff {
                 });
     }
 
-    private final PublishWorkflowStager publishStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private static final PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
         if (isFastlane)
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
@@ -198,7 +196,7 @@ public class TransformerCycleKickoff {
         return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
-    private boolean shouldTryCompaction(TransformerConfig cfg) {
+    private static boolean shouldTryCompaction(boolean isFastlane, TransformerConfig cfg) {
         return !isFastlane && cfg.isCompactionEnabled();
     }
 }
