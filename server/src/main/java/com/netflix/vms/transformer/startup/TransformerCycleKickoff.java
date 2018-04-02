@@ -45,7 +45,6 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 
 @Singleton
 public class TransformerCycleKickoff {
-    private final TransformerContext ctx;
 
     @Inject
     public TransformerCycleKickoff(
@@ -69,8 +68,8 @@ public class TransformerCycleKickoff {
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
         Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
 
-        ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        final boolean isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
+        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
+        boolean isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
         PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
