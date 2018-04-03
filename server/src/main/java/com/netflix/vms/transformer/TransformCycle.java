@@ -13,6 +13,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackSt
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformRestore;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
@@ -161,7 +162,7 @@ public class TransformCycle {
         if(compactor.needsCompaction()) {
             try {
                 beginCycle();
-                ctx.getLogger().info(StateEngineCompaction, "Compacting State Engine");
+                ctx.getLogger().info(Arrays.asList(BlobState, StateEngineCompaction), "Compacting State Engine");
                 compactor.compact();
                 writeTheBlobFiles();
                 submitToPublishWorkflow();
@@ -222,7 +223,8 @@ public class TransformCycle {
 
                     long start = System.currentTimeMillis();
                     outputClient.triggerRefreshTo(restoreVersion);
-                    ctx.getLogger().info(TransformerLogTag.TransformRestore, "Restored {} version={}, duration={}", name, restoreVersion, (System.currentTimeMillis() - start));
+
+                    ctx.getLogger().info(Arrays.asList(TransformRestore, BlobState), "Restored {} version={}, duration={}, header={}", name, restoreVersion, (System.currentTimeMillis() - start), BlobMetaDataUtil.fetchCoreHeaders(outputClient.getStateEngine()));
                     restoreResult.completed();
                 } catch (Exception ex) {
                     restoreResult.failed(ex);
@@ -268,10 +270,37 @@ public class TransformCycle {
         } catch (IllegalStateException ex) {
             throw ex;
         } catch (Exception ex) {
+            ctx.getLogger().error(Arrays.asList(TransformRestore, BlobState), "Failed to restore data", ex);
             throw new IllegalStateException("Failed to restore data", ex);
         } finally {
             if (!isRunWithinUpdateInput) ctx.stopTimerAndLogDuration(DurationMetric.P0_RestoreDataDuration);
         }
+    }
+
+    private static ExecuteFutureResult executeLoadInput(SimultaneousExecutor executor, TransformerContext ctx, HollowClient inputClient, final Long pinnedInputVersion) {
+        ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
+        executor.execute(() -> {
+            try {
+                inputProcessingResult.starting();;
+
+                // Spot to trigger Cycle Monkey if enabled
+                ctx.getCycleMonkey().doMonkeyBusiness(inputProcessingResult.getName());
+
+                if (pinnedInputVersion == null)
+                    inputClient.triggerRefresh();
+                else {
+                    inputClient.triggerRefreshTo(pinnedInputVersion);
+                    if (inputClient.getCurrentVersionId() != pinnedInputVersion) throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
+                }
+
+                ctx.getLogger().info(BlobState, "Loaded input to version={}, header={}", inputClient.getCurrentVersionId(), inputClient.getStateEngine().getHeaderTags());
+                inputProcessingResult.completed();
+            } catch (Exception ex) {
+                ctx.getLogger().error(BlobState, "Failed to Load Input", ex);
+                inputProcessingResult.failed(ex);
+            }
+        });
+        return inputProcessingResult;
     }
 
     private void updateTheInput() {
@@ -292,28 +321,8 @@ public class TransformCycle {
                 this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
                 previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
             }
-
-            final Long pinnedInputVersionCopy = pinnedInputVersion;
-            ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
-            executor.execute(() -> {
-                try {
-                    inputProcessingResult.starting();;
-
-                    // Spot to trigger Cycle Monkey if enabled
-                    cycleMonkey.doMonkeyBusiness(inputProcessingResult.getName());
-
-                    if (pinnedInputVersionCopy == null)
-                        inputClient.triggerRefresh();
-                    else {
-                        inputClient.triggerRefreshTo(pinnedInputVersionCopy);
-                        if (inputClient.getCurrentVersionId() != pinnedInputVersionCopy) throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersionCopy);
-                    }
-
-                    inputProcessingResult.completed();
-                } catch(Exception ex) {
-                    inputProcessingResult.failed(ex);
-                }
-            });
+            // Load Input on thread so it can process restore on first cycle if needed
+            ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputClient, pinnedInputVersion);
 
             // Determine whether to process restore here; only if it is first cycle
             if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
@@ -337,6 +346,7 @@ public class TransformCycle {
 
             VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
         } catch (Exception ex) {
+            ctx.getLogger().error(BlobState, "Failed to process Input", ex);
             throw new RuntimeException("Failed to process input", ex);
         } finally {
             ctx.stopTimerAndLogDuration(P1_ReadInputDataDuration);
@@ -372,7 +382,7 @@ public class TransformCycle {
                 cycleMonkey.doMonkeyBusiness("transformTheData");
             }
         } catch(Throwable th) {
-            ctx.getLogger().error(TransformCycleFailed, "transform failed", th);
+            ctx.getLogger().error(Arrays.asList(BlobState, TransformCycleFailed), "transform failed", th);
             throw th;
         } finally {
             ctx.stopTimerAndLogDuration(P2_ProcessDataDuration);
@@ -389,7 +399,7 @@ public class TransformCycle {
         PinTitleHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 
-    private void writeTheBlobFiles() throws IOException {
+    private void writeTheBlobFiles() throws Exception {
         ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
@@ -430,8 +440,8 @@ public class TransformCycle {
                 String nostreamsReverseDeltaFileName = fileNamer.getNostreamsReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 createNostreamsFilteredFile(reverseDeltaFileName, nostreamsReverseDeltaFileName, false);
             }
-        } catch(IOException e) {
-            ctx.getLogger().error(WritingBlobsFailed, "Writing blobs failed", e);
+        } catch (Exception e) {
+            ctx.getLogger().error(Arrays.asList(BlobState, WritingBlobsFailed), "Writing blobs failed", e);
             throw e;
         } finally {
             ctx.stopTimerAndLogDuration(P3_WriteOutputDataDuration);
