@@ -253,8 +253,9 @@ public class TransformCycle {
                     restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
                     restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
 
-                    if (outputClient == null || outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
-                    if (nostreamsOutputClient != null && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+                    // Validate that both has restored to the specified version
+                    if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
+                    if (nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
 
                     cycle.restore(outputClient, nostreamsOutputClient);
                 } else {
