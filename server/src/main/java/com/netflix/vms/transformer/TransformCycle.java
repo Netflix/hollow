@@ -51,7 +51,7 @@ import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
-import com.netflix.vms.transformer.util.OverrideVipNameUtil;
+import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
 import java.io.File;
 import java.io.IOException;
@@ -104,7 +104,7 @@ public class TransformCycle {
         this.filestore = fileStore;
         this.hermesBlobAnnouncer = hermesBlobAnnouncer;
         this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
-        this.isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
+        this.isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
@@ -232,22 +232,22 @@ public class TransformCycle {
         return restoreResult;
     }
 
-    private static void restoreInParallel(SimultaneousExecutor executor, TransformerContext ctx, long restoreVersion, VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient) throws Exception {
+    private static void restoreInParallel(SimultaneousExecutor executor, TransformerContext ctx, long restoreVersion, VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient, boolean isRestoreNoStreamNeeded) throws Exception {
         // Execute Restore in background
         ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
-        ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+        ExecuteFutureResult restoreNoStreamsBlobResult = isRestoreNoStreamNeeded ? executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion) : null;
 
         // Wait for them to complete and validate success
         executor.awaitSuccessfulCompletion();
         restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
-        restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
+        if (isRestoreNoStreamNeeded) restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
 
         // Validate that both have restored to the specified version
-        if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
-        if (nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+        if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) to specified restoreVersion: " + restoreVersion + ",  currentVersion=" + outputClient.getCurrentVersionId());
+        if (isRestoreNoStreamNeeded && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) to specified restoreVersion: " + restoreVersion + ",  currentVersion=" + nostreamsOutputClient.getCurrentVersionId());
     }
 
-    public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isRunWithinUpdateInput) {
+    public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isFastlane, boolean isRunWithinUpdateInput) {
         // No need to track duration if RunWithinUpdateInput since it will be part of that duration
         if (!isRunWithinUpdateInput) ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
         try {
@@ -259,8 +259,9 @@ public class TransformCycle {
                 if (restoreVersion != Long.MIN_VALUE) {
                     // Restore in parallel
                     VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
-                    restoreInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient);
+                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, VipNameUtil.getNoStreamsVip(cfg.getTransformerVip()));
+                    boolean isRestoreNoStreamNeeded = !isFastlane; // Fastlane does not deal with NoStream blob
+                    restoreInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient, isRestoreNoStreamNeeded);
 
                     // Let TransformCycle complete the restore process
                     cycle.restore(outputClient, nostreamsOutputClient);
@@ -325,7 +326,7 @@ public class TransformCycle {
 
             // Determine whether to process restore here; only if it is first cycle
             if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-                restore(executor, ctx, this, filestore, hermesBlobAnnouncer, true);
+                restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
             }
 
             // Wait to complete and validate success
@@ -394,7 +395,7 @@ public class TransformCycle {
         SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, outputStateEngine, ctx);
         transformer.transform();
 
-        String BLOB_ID = OverrideVipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
+        String BLOB_ID = VipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
         PinTitleHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 

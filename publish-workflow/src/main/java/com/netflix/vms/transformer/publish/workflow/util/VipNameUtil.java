@@ -1,8 +1,9 @@
-package com.netflix.vms.transformer.util;
+package com.netflix.vms.transformer.publish.workflow.util;
 
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 
-public class OverrideVipNameUtil {
+public class VipNameUtil {
+    private static final String NOSTREAMS_VIP_SUFFIX = "_nostreams";
     private static final String OVERRIDE_VIP_SUFFIX = "_override";
 
     private static boolean isOverrideVip(String vip) {
@@ -27,5 +28,13 @@ public class OverrideVipNameUtil {
             return vip.substring(0, len);
         }
         return vip;
+    }
+
+    public static String getNoStreamsVip(TransformerConfig cfg) {
+        return getNoStreamsVip(cfg.getTransformerVip());
+    }
+
+    public static String getNoStreamsVip(String vip) {
+        return vip + NOSTREAMS_VIP_SUFFIX;
     }
 }

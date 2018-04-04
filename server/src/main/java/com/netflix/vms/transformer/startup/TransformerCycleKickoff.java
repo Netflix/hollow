@@ -35,9 +35,9 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
+import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
-import com.netflix.vms.transformer.util.OverrideVipNameUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
@@ -64,12 +64,12 @@ public class TransformerCycleKickoff {
         FileStore.useMultipartUploadWhenApplicable(true);
 
         Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
-        Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
+        Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + VipNameUtil.getNoStreamsVip(transformerConfig));
         Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
-        Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip() + "_nostreams");
+        Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + VipNameUtil.getNoStreamsVip(transformerConfig));
 
         TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
-        boolean isFastlane = OverrideVipNameUtil.isOverrideVip(ctx.getConfig());
+        boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
@@ -81,7 +81,7 @@ public class TransformerCycleKickoff {
                 transformerConfig.getTransformerVip());
 
         if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-            TransformCycle.restore(new SimultaneousExecutor(2, "vms-restore"), ctx, cycle, fileStore, hermesBlobAnnouncer, false);
+            TransformCycle.restore(new SimultaneousExecutor(2, "vms-restore"), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);
         }
 
         Thread t = new Thread(new Runnable() {

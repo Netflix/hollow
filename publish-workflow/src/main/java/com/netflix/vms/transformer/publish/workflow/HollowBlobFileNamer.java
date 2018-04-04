@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import java.io.File;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -17,7 +18,7 @@ public class HollowBlobFileNamer {
     }
 
     public String getNostreamsDeltaFileName(long previousVersion, long nextVersion) {
-        return FILENAME_PREFIX + vip + "_nostreams-delta-" + previousVersion + "-" + nextVersion;
+        return FILENAME_PREFIX + VipNameUtil.getNoStreamsVip(vip) + "-delta-" + previousVersion + "-" + nextVersion;
     }
 
     public String getReverseDeltaFileName(long nextVersion, long previousVersion) {
@@ -25,7 +26,7 @@ public class HollowBlobFileNamer {
     }
 
     public String getNostreamsReverseDeltaFileName(long nextVersion, long previousVersion) {
-        return FILENAME_PREFIX + vip + "_nostreams-reversedelta-" + nextVersion + "-" + previousVersion;
+        return FILENAME_PREFIX + VipNameUtil.getNoStreamsVip(vip) + "-reversedelta-" + nextVersion + "-" + previousVersion;
     }
 
     public String getSnapshotFileName(long nextVersion) {
@@ -33,7 +34,7 @@ public class HollowBlobFileNamer {
     }
 
     public String getNostreamsSnapshotFileName(long nextVersion) {
-        return FILENAME_PREFIX + vip + "_nostreams-snapshot-" + nextVersion;
+        return FILENAME_PREFIX + VipNameUtil.getNoStreamsVip(vip) + "-snapshot-" + nextVersion;
     }
 
     public String getPinTitleFileName(long version, boolean includeFullPath, int ... topNodes) {
