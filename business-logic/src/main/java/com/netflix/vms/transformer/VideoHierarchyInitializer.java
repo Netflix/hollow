@@ -31,6 +31,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class is used to create {@link VideoHierarchy} objects.
+ */
 public class VideoHierarchyInitializer {
 
     private final VMSHollowInputAPI api;
@@ -157,15 +160,14 @@ public class VideoHierarchyInitializer {
     }
 
 
-
     boolean isTopNodeIncluded(long videoId, String countryCode) {
         if (!isSupportedCountry(countryCode))
             return false;
 
-        if(!isContentApproved(videoId, countryCode))
+        if (!isContentApproved(videoId, countryCode))
             return false;
 
-        if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode))
+        if (isGoLiveOrHasFirstDisplayDate(videoId, countryCode))
             return true;
 
         if (DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode))
@@ -177,21 +179,22 @@ public class VideoHierarchyInitializer {
         return false;
     }
 
+    /**
+     * Returns true if this child node should appears in the transformer output.
+     */
     boolean isChildNodeIncluded(long videoId, String countryCode) {
-        if(!isContentApproved(videoId, countryCode))
+        if (!isContentApproved(videoId, countryCode) || !isInVideoGeneral(videoId)) {
             return false;
-
-        if(isGoLiveOrHasFirstDisplayDate(videoId, countryCode) || hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
+        }
+        if (isGoLiveOrHasFirstDisplayDate(videoId, countryCode) || hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
             return true;
-
         return false;
     }
 
 
-
     boolean isContentApproved(long videoId, String countryCode) {
         HollowHashIndexResult queryResult = videoTypeCountryIndex.findMatches(videoId, countryCode);
-        if(queryResult == null || queryResult.numResults() == 0)
+        if (queryResult == null || queryResult.numResults() == 0)
             return false;
 
         int ordinal = queryResult.iterator().next();
@@ -291,5 +294,12 @@ public class VideoHierarchyInitializer {
         for (IndividualSupplementalHollow supplemental : sups._getSupplementals()) {
             toSet.add((int) supplemental._getMovieId());
         }
+    }
+
+    /**
+     * Returns true if the specified videoId is in the VideoGeneral feed.
+     */
+    private boolean isInVideoGeneral(long videoId) {
+        return videoGeneralIndex.getMatchingOrdinal(videoId) != -1;
     }
 }

@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class represents a full video hierachy - Show->Season->Episode
+ */
 public class VideoHierarchy {
 
     private final TransformerContext ctx;
