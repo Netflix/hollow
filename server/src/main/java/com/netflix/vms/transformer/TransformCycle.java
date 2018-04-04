@@ -116,17 +116,16 @@ public class TransformCycle {
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
-    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isFastlane) {
+    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
-        outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
-        outputStateEngine.restoreFrom(restoreStateEngine); // @TODO FIX: should restore headers as well
-
-        // @TODO - NEED FIX: The cycle version does not rev until later on so this log does not get grouped on the right cycle (e.g. first cycle)
-        // ctx.getLogger().info(BlobState, "restore : input({}), output({}),)", BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
-
-        if(!isFastlane)
-            publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
+        { // @TODO FIX: should restore headers as well
+            outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
+            outputStateEngine.restoreFrom(restoreStateEngine);
+        }
+        ctx.getLogger().info(BlobState, "restore : input({}), output({}),)", BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
         previousCycleNumber = restoreFrom.getCurrentVersionId();
+
+        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
     }
 
     public void cycle() throws Throwable {
@@ -214,30 +213,26 @@ public class TransformCycle {
     private static ExecuteFutureResult executeRestore(String name, TransformerContext ctx, SimultaneousExecutor executor, VMSOutputDataClient outputClient, long restoreVersion) {
         ExecuteFutureResult restoreResult = new ExecuteFutureResult(ctx, name);
         executor.execute(() -> {
-            if (outputClient != null) {
-                try {
-                    restoreResult.starting();;
+            try {
+                restoreResult.started();;
 
-                    // Spot to trigger Cycle Monkey if enabled
-                    ctx.getCycleMonkey().doMonkeyBusiness(restoreResult.getName());
+                // Spot to trigger Cycle Monkey if enabled
+                ctx.getCycleMonkey().doMonkeyBusiness(restoreResult.getName());
 
-                    long start = System.currentTimeMillis();
-                    outputClient.triggerRefreshTo(restoreVersion);
+                long start = System.currentTimeMillis();
+                outputClient.triggerRefreshTo(restoreVersion);
 
-                    ctx.getLogger().info(Arrays.asList(TransformRestore, BlobState), "Restored {} version={}, duration={}, header={}", name, restoreVersion, (System.currentTimeMillis() - start), BlobMetaDataUtil.fetchCoreHeaders(outputClient.getStateEngine()));
-                    restoreResult.completed();
-                } catch (Exception ex) {
-                    restoreResult.failed(ex);
-                }
-            } else {
+                ctx.getLogger().info(Arrays.asList(TransformRestore, BlobState), "Restored {} version={}, duration={}, header={}", name, restoreVersion, (System.currentTimeMillis() - start), BlobMetaDataUtil.fetchCoreHeaders(outputClient.getStateEngine()));
                 restoreResult.completed();
+            } catch (Exception ex) {
+                restoreResult.failed(ex);
             }
         });
 
         return restoreResult;
     }
 
-    public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isFastlane, boolean isRunWithinUpdateInput) {
+    public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isRunWithinUpdateInput) {
         // No need to track duration if RunWithinUpdateInput since it will be part of that duration
         if (!isRunWithinUpdateInput) ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
         try {
@@ -249,7 +244,7 @@ public class TransformCycle {
                 if (restoreVersion != Long.MIN_VALUE) {
                     // Restore in parallel if needed
                     VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                    VMSOutputDataClient nostreamsOutputClient = isFastlane ? null : new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
+                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
                     ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
                     ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
 
@@ -261,7 +256,7 @@ public class TransformCycle {
                     if (outputClient == null || outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
                     if (nostreamsOutputClient != null && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
 
-                    cycle.restore(outputClient, nostreamsOutputClient, isFastlane);
+                    cycle.restore(outputClient, nostreamsOutputClient);
                 } else {
                     if (cfg.isFailIfRestoreNotAvailable())
                         throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
@@ -281,7 +276,7 @@ public class TransformCycle {
         ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
         executor.execute(() -> {
             try {
-                inputProcessingResult.starting();;
+                inputProcessingResult.started();;
 
                 // Spot to trigger Cycle Monkey if enabled
                 ctx.getCycleMonkey().doMonkeyBusiness(inputProcessingResult.getName());
@@ -326,7 +321,7 @@ public class TransformCycle {
 
             // Determine whether to process restore here; only if it is first cycle
             if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-                restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
+                restore(executor, ctx, this, filestore, hermesBlobAnnouncer, true);
             }
 
             // Wait to complete and validate success
@@ -543,7 +538,7 @@ public class TransformCycle {
     }
 
     public static class ExecuteFutureResult {
-        public enum Status {IDLE, RUNNING, COMPLETED, FAILED;}
+        public enum Status { IDLE, STARTED, COMPLETED, FAILED; }
 
         private final TransformerContext ctx;
         private final String name;
@@ -559,7 +554,10 @@ public class TransformCycle {
         public String getName() { return name; }
         public Status getStatus() { return status; }
         public Exception getException() { return exception; }
-        public void starting() { this.status = Status.RUNNING; }
+
+        public void started() {
+            this.status = Status.STARTED;
+        }
         public void completed() { completed(false, null); }
         public void failed(Exception ex) { completed(false, ex); }
 
