@@ -116,7 +116,7 @@ public class TransformCycle {
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
-    public void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
+    private void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
         { // @TODO FIX: should restore headers as well
             outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
@@ -232,6 +232,21 @@ public class TransformCycle {
         return restoreResult;
     }
 
+    private static void restoreInParallel(SimultaneousExecutor executor, TransformerContext ctx, long restoreVersion, VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient) throws Exception {
+        // Execute Restore in background
+        ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
+        ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+
+        // Wait for them to complete and validate success
+        executor.awaitSuccessfulCompletion();
+        restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
+        restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
+
+        // Validate that both have restored to the specified version
+        if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
+        if (nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
+    }
+
     public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isRunWithinUpdateInput) {
         // No need to track duration if RunWithinUpdateInput since it will be part of that duration
         if (!isRunWithinUpdateInput) ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
@@ -242,29 +257,17 @@ public class TransformCycle {
                 long restoreVersion = cfg.getRestoreFromSpecificVersion() != null ? cfg.getRestoreFromSpecificVersion() : latestVersion;
 
                 if (restoreVersion != Long.MIN_VALUE) {
-                    // Restore in parallel if needed
+                    // Restore in parallel
                     VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
                     VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip() + "_nostreams");
-                    ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
-                    ExecuteFutureResult restoreNoStreamsBlobResult = executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion);
+                    restoreInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient);
 
-                    // Wait to complete and validate success
-                    executor.awaitSuccessfulCompletion();
-                    restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
-                    restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
-
-                    // Validate that both has restored to the specified version
-                    if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) from state: " + restoreVersion);
-                    if (nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) from state: " + restoreVersion);
-
+                    // Let TransformCycle complete the restore process
                     cycle.restore(outputClient, nostreamsOutputClient);
-                } else {
-                    if (cfg.isFailIfRestoreNotAvailable())
-                        throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
+                } else if (cfg.isFailIfRestoreNotAvailable()) {
+                    throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
                 }
             }
-        } catch (IllegalStateException ex) {
-            throw ex;
         } catch (Exception ex) {
             ctx.getLogger().error(Arrays.asList(TransformRestore, BlobState), "Failed to restore data", ex);
             throw new IllegalStateException("Failed to restore data", ex);
