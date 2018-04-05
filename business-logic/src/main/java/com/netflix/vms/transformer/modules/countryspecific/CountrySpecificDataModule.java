@@ -342,6 +342,18 @@ public class CountrySpecificDataModule {
         return countryType;
     }
 
+    /**
+     * This method calculates metadata availability date for a video. This date determines when the search team will start promoting the titles correctly.
+     * <br>
+     * For the actual logic see {@link SensitiveVideoServerSideUtil#getMetadataAvailabilityDate(boolean, boolean, Set, Long, Long, Long, Integer, Integer, CycleConstants, Long)}
+     *
+     * @param videoId
+     * @param countryCode
+     * @param firstDisplayDate
+     * @param availabilityWindowList - Availability windows in country
+     * @param data
+     * @param rollup
+     */
     private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);
