@@ -15506,8 +15506,7 @@
         "org.glassfish:javax.el": {
             "locked": "3.0.0",
             "transitive": [
-                "org.eclipse.jetty:jetty-jsp",
-                "org.glassfish.web:javax.servlet.jsp"
+                "org.eclipse.jetty:jetty-jsp"
             ]
         },
         "org.ow2.asm:asm": {
