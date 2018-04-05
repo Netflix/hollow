@@ -37,6 +37,27 @@ public class SensitiveVideoServerSideUtil {
         return false;
     }
 
+    /**
+     * If the title is not an original and is in DVD catalog, then return an exempt date (some date in 1997).
+     * <br>
+     * Calculate grace period date: Availability Date -  days using metadataReleaseDays or prePromoDays (first non-null value))
+     * <br>
+     * Calculate minimum of following dates - firstDisplayDate, firstPhaseStartDate, availabilityDate, gracePeriodDate and earliestPhaseDate
+     * <br>
+     * If minimum is null - then hold back all metadata.
+     *
+     * @param inDVDCatalog
+     * @param isOriginal
+     * @param videoSetTypes
+     * @param firstDisplayDate When the title was first released/available in Netflix
+     * @param firstPhaseStartDate Start date of first phase in Rollouts with tag DISPLAY_PAGE
+     * @param availabilityDate Start date of the first window in the availability windows
+     * @param prePromoDays Pre-promo days from Contract of the first availability Window
+     * @param metadataReleaseDays Metadata release days from VideoGeneral feed
+     * @param constants Cycle constants for hold back and exempt dates
+     * @param earliestScheduledPhaseDate Earliest scheduled phase of the images for the given title
+     * @return Metadata availability date
+     */
     public static final Date getMetadataAvailabilityDate(boolean inDVDCatalog, boolean isOriginal, Set<VideoSetType> videoSetTypes, Long firstDisplayDate, Long firstPhaseStartDate,
             Long availabilityDate, Integer prePromoDays, Integer metadataReleaseDays, CycleConstants constants, Long earliestScheduledPhaseDate) {
         if (inDVDCatalog && !isOriginal)
@@ -60,6 +81,13 @@ public class SensitiveVideoServerSideUtil {
         return OutputUtil.getRoundedDate(minValue);
     }
 
+    /**
+     * Check if metadata availability date is in future.
+     *
+     * @param metadataAvailabilityDate
+     * @param ctx
+     * @return true if metadata is sensitive.
+     */
     public static boolean isSensitiveMetaData(Date metadataAvailabilityDate, TransformerContext ctx) {
         return metadataAvailabilityDate == null || metadataAvailabilityDate.val > ctx.getNowMillis();
     }
