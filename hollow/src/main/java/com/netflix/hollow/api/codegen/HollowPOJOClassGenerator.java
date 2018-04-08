@@ -17,7 +17,9 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
 
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -93,6 +95,8 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         if (schema.numFields() == 1) {
             generateSingleArgumentConstructor(classBodyBuilder);
         }
+        generateChainableSetters(classBodyBuilder);
+        generateChainableAddForSetAndList(classBodyBuilder);
         generateEqualsMethod(classBodyBuilder);
         generateHashCodeMethod(classBodyBuilder);
         generateToStringMethod(classBodyBuilder);
@@ -147,6 +151,47 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
             classBodyBuilder.append("    public ").append(getClassName()).append("(String value) {\n");
             classBodyBuilder.append("        this.").append(getFieldName(0)).append(" = value.toCharArray();\n");
             classBodyBuilder.append("    }\n\n");
+        }
+    }
+
+    private void generateChainableSetters(StringBuilder classBodyBuilder) {
+        for (int i = 0; i < schema.numFields(); i++) {
+            classBodyBuilder.append("    public ").append(getClassName()).append(" set")
+                .append(uppercase(getFieldName(i))).append("(")
+                .append(fieldType(i)).append(" ").append(getFieldName(i)).append(") {\n");
+            classBodyBuilder.append("        this.").append(getFieldName(i)).append(" = ")
+                .append(getFieldName(i)).append(";\n");
+            classBodyBuilder.append("        return this;\n");
+            classBodyBuilder.append("    }\n");
+        }
+    }
+
+    private void generateChainableAddForSetAndList(StringBuilder classBodyBuilder) {
+        for (int i = 0; i < schema.numFields(); i++) {
+            if (schema.getFieldType(i) != FieldType.REFERENCE) {
+                continue;
+            }
+            HollowSchema referencedSchema = findSchema(schema.getReferencedType(i));
+            if (referencedSchema instanceof HollowListSchema || referencedSchema instanceof HollowSetSchema) {
+                HollowSchema elementSchema = findSchema(referencedSchema instanceof HollowListSchema
+                        ? ((HollowListSchema) referencedSchema).getElementType()
+                        : ((HollowSetSchema) referencedSchema).getElementType());
+                String elementType = buildFieldType(elementSchema);
+                Class fieldImplementationType = referencedSchema instanceof HollowListSchema
+                    ? ArrayList.class : HashSet.class;
+                importClasses.add(fieldImplementationType);
+                classBodyBuilder.append("    public ").append(getClassName()).append(" addTo")
+                    .append(uppercase(getFieldName(i))).append("(")
+                    .append(elementType).append(" ").append(lowercase(elementType)).append(") {\n");
+                classBodyBuilder.append("        if (this.").append(getFieldName(i)).append(" == null) {\n");
+                classBodyBuilder.append("            this.").append(getFieldName(i)).append(" = new ")
+                    .append(fieldImplementationType.getSimpleName()).append("<").append(elementType).append(">();\n");
+                classBodyBuilder.append("        }\n");
+                classBodyBuilder.append("        this.").append(getFieldName(i)).append(".add(")
+                    .append(lowercase(elementType)).append(");\n");
+                classBodyBuilder.append("        return this;\n");
+                classBodyBuilder.append("    }\n");
+            }
         }
     }
 
@@ -340,14 +385,6 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         }
 
         throw new IllegalArgumentException("Expected HollowCollectionSchema or HollowMapSchema but got " + referencedSchema.getClass().getSimpleName());
-    }
-
-    private static String lowercaseFirstCharacter(String input) {
-        return input.substring(0, 1).toLowerCase() + input.substring(1);
-    }
-
-    private static String uppercaseFirstCharacter(String input) {
-        return input.substring(0, 1).toUpperCase() + input.substring(1);
     }
 
     private HollowSchema findSchema(String schemaName) {
