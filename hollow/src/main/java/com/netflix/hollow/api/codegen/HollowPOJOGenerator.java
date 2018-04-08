@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
+
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -59,8 +61,8 @@ public class HollowPOJOGenerator {
     }
 
     public void generateFiles(File directory) throws IOException {
-        for(HollowSchema schema : schemas) {
-            if(schema instanceof HollowObjectSchema) {
+        for (HollowSchema schema : schemas) {
+            if (schema instanceof HollowObjectSchema && !isPrimitiveType(schema.getName())) {
                 HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(schemas, (HollowObjectSchema) schema, packageName, pojoClassNameSuffix);
                 FileWriter writer = new FileWriter(new File(directory, generator.getClassName() + ".java"));
                 writer.write(generator.generate());
