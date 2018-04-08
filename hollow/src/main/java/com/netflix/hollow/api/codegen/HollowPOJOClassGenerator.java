@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
+
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -130,7 +132,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
             }
             classBodyBuilder.append("    public ");
             classBodyBuilder.append(fieldType(i));
-            classBodyBuilder.append(" ").append(schema.getFieldName(i)).append(" = ").append(defaultValue(i)).append(";\n");
+            classBodyBuilder.append(" ").append(getFieldName(i)).append(" = ").append(defaultValue(i)).append(";\n");
         }
     }
 
@@ -138,12 +140,12 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("    public ").append(getClassName()).append("() { }\n\n");
 
         classBodyBuilder.append("    public ").append(getClassName()).append("(").append(fieldType(0)).append(" value) {\n");
-        classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value;\n");
+        classBodyBuilder.append("        this.").append(getFieldName(0)).append(" = value;\n");
         classBodyBuilder.append("    }\n\n");
 
         if (schema.getFieldType(0) == FieldType.STRING) {
             classBodyBuilder.append("    public ").append(getClassName()).append("(String value) {\n");
-            classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value.toCharArray();\n");
+            classBodyBuilder.append("        this.").append(getFieldName(0)).append(" = value.toCharArray();\n");
             classBodyBuilder.append("    }\n\n");
         }
     }
@@ -161,17 +163,17 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
                 case FLOAT:
                 case INT:
                 case LONG:
-                    classBodyBuilder.append("        if(o.").append(schema.getFieldName(i)).append(" != ").append(schema.getFieldName(i)).append(") return false;\n");
+                    classBodyBuilder.append("        if(o.").append(getFieldName(i)).append(" != ").append(getFieldName(i)).append(") return false;\n");
                     break;
                 case BYTES:
                 case STRING:
                     importClasses.add(Arrays.class);
-                    classBodyBuilder.append("        if(!Arrays.equals(o.").append(schema.getFieldName(i)).append(", ").append(schema.getFieldName(i)).append(")) return false;\n");
+                    classBodyBuilder.append("        if(!Arrays.equals(o.").append(getFieldName(i)).append(", ").append(getFieldName(i)).append(")) return false;\n");
                     break;
                 case REFERENCE:
-                    classBodyBuilder.append("        if(o.").append(schema.getFieldName(i)).append(" == null) {\n");
-                    classBodyBuilder.append("            if(").append(schema.getFieldName(i)).append(" != null) return false;\n");
-                    classBodyBuilder.append("        } else if(!o.").append(schema.getFieldName(i)).append(".equals(").append(schema.getFieldName(i)).append(")) return false;\n");
+                    classBodyBuilder.append("        if(o.").append(getFieldName(i)).append(" == null) {\n");
+                    classBodyBuilder.append("            if(").append(getFieldName(i)).append(" != null) return false;\n");
+                    classBodyBuilder.append("        } else if(!o.").append(getFieldName(i)).append(".equals(").append(getFieldName(i)).append(")) return false;\n");
                     break;
             }
         }
@@ -184,7 +186,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("        int hashCode = 1;\n");
         boolean tempExists = false;
         for(int i=0;i<schema.numFields();i++) {
-            String fieldName = schema.getFieldName(i);
+            String fieldName = getFieldName(i);
             switch(schema.getFieldType(i)) {
                 case BOOLEAN:
                     classBodyBuilder.append("        hashCode = hashCode * 31 + (" + fieldName + "? 1231 : 1237);\n");
@@ -225,7 +227,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
             classBodyBuilder.append("        builder.append(\"");
             if(i > 0)
                 classBodyBuilder.append(",");
-            classBodyBuilder.append(schema.getFieldName(i)).append("=\").append(").append(schema.getFieldName(i)).append(");\n");
+            classBodyBuilder.append(getFieldName(i)).append("=\").append(").append(getFieldName(i)).append(");\n");
         }
         classBodyBuilder.append("        builder.append(\"}\");\n");
         classBodyBuilder.append("        return builder.toString();\n");
@@ -354,5 +356,12 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
                 return schema;
         }
         throw new IllegalArgumentException("Schema " + schemaName + " does not exist!  Referenced by type " + schema.getName());
+    }
+
+    /**
+     * Returns a field name that is same for use as a java variable.
+     */
+    private String getFieldName(int index) {
+        return substituteInvalidChars(schema.getFieldName(index));
     }
 }
