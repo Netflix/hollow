@@ -86,34 +86,69 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("@HollowTypeName(name=\"").append(schema.getName()).append("\")\n");
         classBodyBuilder.append("public class ").append(getClassName()).append(" implements Cloneable {\n\n");
 
-        for(int i=0;i<schema.numFields();i++) {
-            if(fieldNeedsTypeNameAnnotation(i)) {
+        generateInstanceVariables(classBodyBuilder);
+        classBodyBuilder.append("\n");
+        if (schema.numFields() == 1) {
+            generateSingleArgumentConstructor(classBodyBuilder);
+        }
+        generateEqualsMethod(classBodyBuilder);
+        generateHashCodeMethod(classBodyBuilder);
+        generateToStringMethod(classBodyBuilder);
+        generateCloneMethod(classBodyBuilder);
+        classBodyBuilder.append("    }\n\n");
+
+        if (memoizeOrdinal) {
+            classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
+        }
+
+        classBodyBuilder.append("}");
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("package ").append(packageName).append(";\n\n");
+
+        List<String> importClassNames = new ArrayList<String>();
+
+        for(Class<?> c : importClasses) {
+            importClassNames.add(c.getName());
+        }
+
+        Collections.sort(importClassNames);
+
+        for(String className : importClassNames) {
+            builder.append("import ").append(className).append(";\n");
+        }
+
+        builder.append("\n").append(classBodyBuilder);
+
+        return builder.toString();
+    }
+
+    private void generateInstanceVariables(StringBuilder classBodyBuilder) {
+        for (int i=0;i<schema.numFields();i++) {
+            if (fieldNeedsTypeNameAnnotation(i)) {
                 classBodyBuilder.append("    @HollowTypeName(name=\"").append(schema.getReferencedType(i)).append("\")\n");
             }
-
             classBodyBuilder.append("    public ");
-
             classBodyBuilder.append(fieldType(i));
-
             classBodyBuilder.append(" ").append(schema.getFieldName(i)).append(" = ").append(defaultValue(i)).append(";\n");
         }
+    }
 
-        classBodyBuilder.append("\n");
+    private void generateSingleArgumentConstructor(StringBuilder classBodyBuilder) {
+        classBodyBuilder.append("    public ").append(getClassName()).append("() { }\n\n");
 
-        if(schema.numFields() == 1) {
-            classBodyBuilder.append("    public ").append(getClassName()).append("() { }\n\n");
+        classBodyBuilder.append("    public ").append(getClassName()).append("(").append(fieldType(0)).append(" value) {\n");
+        classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value;\n");
+        classBodyBuilder.append("    }\n\n");
 
-            classBodyBuilder.append("    public ").append(getClassName()).append("(").append(fieldType(0)).append(" value) {\n");
-            classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value;\n");
+        if (schema.getFieldType(0) == FieldType.STRING) {
+            classBodyBuilder.append("    public ").append(getClassName()).append("(String value) {\n");
+            classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value.toCharArray();\n");
             classBodyBuilder.append("    }\n\n");
-
-            if(schema.getFieldType(0) == FieldType.STRING) {
-                classBodyBuilder.append("    public ").append(getClassName()).append("(String value) {\n");
-                classBodyBuilder.append("        this.").append(schema.getFieldName(0)).append(" = value.toCharArray();\n");
-                classBodyBuilder.append("    }\n\n");
-            }
         }
+    }
 
+    private void generateEqualsMethod(StringBuilder classBodyBuilder) {
         classBodyBuilder.append("    public boolean equals(Object other) {\n");
         classBodyBuilder.append("        if(other == this)  return true;\n");
         classBodyBuilder.append("        if(!(other instanceof ").append(getClassName()).append("))\n");
@@ -142,8 +177,9 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         }
         classBodyBuilder.append("        return true;\n");
         classBodyBuilder.append("    }\n\n");
+    }
 
-
+    private void generateHashCodeMethod(StringBuilder classBodyBuilder) {
         classBodyBuilder.append("    public int hashCode() {\n");
         classBodyBuilder.append("        int hashCode = 1;\n");
         boolean tempExists = false;
@@ -180,7 +216,9 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         }
         classBodyBuilder.append("        return hashCode;\n");
         classBodyBuilder.append("    }\n\n");
+    }
 
+    private void generateToStringMethod(StringBuilder classBodyBuilder) {
         classBodyBuilder.append("    public String toString() {\n");
         classBodyBuilder.append("        StringBuilder builder = new StringBuilder(\"").append(getClassName()).append("{\");\n");
         for(int i=0;i<schema.numFields();i++) {
@@ -192,8 +230,9 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("        builder.append(\"}\");\n");
         classBodyBuilder.append("        return builder.toString();\n");
         classBodyBuilder.append("    }\n\n");
+    }
 
-
+    private void generateCloneMethod(StringBuilder classBodyBuilder) {
         classBodyBuilder.append("    public ").append(getClassName()).append(" clone() {\n");
         classBodyBuilder.append("        try {\n");
         classBodyBuilder.append("            ").append(getClassName())
@@ -204,32 +243,6 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("            return clone;\n");
         classBodyBuilder
                 .append("        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }\n");
-        classBodyBuilder.append("    }\n\n");
-
-        if (memoizeOrdinal) {
-            classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
-        }
-
-        classBodyBuilder.append("}");
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("package ").append(packageName).append(";\n\n");
-
-        List<String> importClassNames = new ArrayList<String>();
-
-        for(Class<?> c : importClasses) {
-            importClassNames.add(c.getName());
-        }
-
-        Collections.sort(importClassNames);
-
-        for(String className : importClassNames) {
-            builder.append("import ").append(className).append(";\n");
-        }
-
-        builder.append("\n").append(classBodyBuilder);
-
-        return builder.toString();
     }
 
     private boolean fieldNeedsTypeNameAnnotation(int i) {
@@ -327,6 +340,13 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         throw new IllegalArgumentException("Expected HollowCollectionSchema or HollowMapSchema but got " + referencedSchema.getClass().getSimpleName());
     }
 
+    private static String lowercaseFirstCharacter(String input) {
+        return input.substring(0, 1).toLowerCase() + input.substring(1);
+    }
+
+    private static String uppercaseFirstCharacter(String input) {
+        return input.substring(0, 1).toUpperCase() + input.substring(1);
+    }
 
     private HollowSchema findSchema(String schemaName) {
         for(HollowSchema schema : allSchemas) {
