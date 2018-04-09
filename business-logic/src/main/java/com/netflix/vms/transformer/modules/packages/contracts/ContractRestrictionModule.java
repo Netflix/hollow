@@ -8,9 +8,9 @@ import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
-import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
+import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
@@ -65,11 +65,14 @@ public class ContractRestrictionModule {
     private final Map<String, Strings> bcp47Codes;
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
+    private final CupTokenFetcher cupTokenFetcher;
 
-    public ContractRestrictionModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public ContractRestrictionModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer,
+            CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.indexer = indexer;
         this.cycleConstants = cycleConstants;
+        this.cupTokenFetcher = cupTokenFetcher;
         this.videoStatusIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_STATUS);
         this.cupKeysMap = new HashMap<>();
         this.bcp47Codes = new HashMap<>();
@@ -257,7 +260,7 @@ public class ContractRestrictionModule {
                 restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
             }
 
-            String cupToken = contract._getCupToken()._getValue();
+            String cupToken = cupTokenFetcher.getCupTokenString(videoId, contract);
             restriction.cupKeys.add(getCupKey(cupToken));
         }
 
@@ -336,8 +339,7 @@ public class ContractRestrictionModule {
                 }
             }
 
-            StringHollow cupKeyHollow = contract == null ? null : contract._getCupToken();
-            String cupKey = (cupKeyHollow == null ? CupKey.DEFAULT : cupKeyHollow._getValue());
+            String cupKey = cupTokenFetcher.getCupTokenString(videoId, contract);
             orderedContractIdCupKeyMap.put((int) contractId, cupKey);
 
             // if any rights contract is downloadable, then the package is downloadable.

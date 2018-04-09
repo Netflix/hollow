@@ -59,7 +59,8 @@ public enum IndexSpec {
     MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag.value", "scheduleId.value"),
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
     
-    TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId");
+    TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
+    CUP_TOKEN(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "contractId.value");
 
 
     private final IndexType indexType;
