@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class LocaleTerritoryCodePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, LocaleTerritoryCodeHollow> {
 
     public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocaleTerritoryCode")).getPrimaryKey().getFieldPaths());
+    public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("LocaleTerritoryCode")).getPrimaryKey().getFieldPaths());
     }
 
     public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "LocaleTerritoryCode", isListenToDataRefreah, fieldPaths);
+    public LocaleTerritoryCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "LocaleTerritoryCode", isListenToDataRefresh, fieldPaths);
     }
 
     public LocaleTerritoryCodeHollow findMatch(Object... keys) {

@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class IPLArtworkDerivativeSetPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, IPLArtworkDerivativeSetHollow> {
 
     public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLArtworkDerivativeSet")).getPrimaryKey().getFieldPaths());
+    public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLArtworkDerivativeSet")).getPrimaryKey().getFieldPaths());
     }
 
     public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "IPLArtworkDerivativeSet", isListenToDataRefreah, fieldPaths);
+    public IPLArtworkDerivativeSetPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "IPLArtworkDerivativeSet", isListenToDataRefresh, fieldPaths);
     }
 
     public IPLArtworkDerivativeSetHollow findMatch(Object... keys) {
