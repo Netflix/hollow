@@ -23,6 +23,7 @@ import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -41,15 +42,16 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     protected final String type;
     protected final HollowObjectSchema schema;
 
-    public HollowDataAccessorGenerator(String packageName, String apiclassName, HollowObjectSchema schema, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
-        this.className = getclassName(schema);
+    public HollowDataAccessorGenerator(String packageName, String apiclassName, HollowObjectSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
+        this.className = getClassName(schema);
         this.apiclassName = apiclassName;
         this.type =  hollowImplClassname(schema.getName());
         this.schema = schema;
     }
 
-    protected String getclassName(HollowObjectSchema schema) {
+    protected String getClassName(HollowObjectSchema schema) {
         return schema.getName() + "DataAccessor";
     }
 

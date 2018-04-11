@@ -15,6 +15,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -35,11 +36,14 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     protected final String packageName;
     protected final String subPackageName;
     protected final CodeGeneratorConfig config;
+    protected final HollowDataset dataset;
 
     protected String className;
     protected boolean useCollectionsImport=false;
 
-    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, CodeGeneratorConfig config) {
+    public HollowConsumerJavaFileGenerator(String packageName, String subPackageName, HollowDataset dataset,
+            CodeGeneratorConfig config) {
+        this.dataset = dataset;
         this.packageName = packageName;
         this.subPackageName = subPackageName;
         this.config = config;
@@ -90,20 +94,20 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                 for (HollowSchema schema : schemasToImport) {
                     switch (schema.getSchemaType()) {
                         case OBJECT:
-                            addToSetIfNotPrimitive(schemaNameSet, schema.getName());
+                            addToSetIfNotPrimitiveOrCollection(schemaNameSet, schema.getName());
                             break;
                         case SET:
-                            addToSetIfNotPrimitive(schemaNameSet,
+                            addToSetIfNotPrimitiveOrCollection(schemaNameSet,
                                     ((HollowSetSchema) schema).getElementType());
                             break;
                         case LIST:
-                            addToSetIfNotPrimitive(schemaNameSet,
+                            addToSetIfNotPrimitiveOrCollection(schemaNameSet,
                                     ((HollowListSchema) schema).getElementType());
                             break;
                         case MAP:
                             HollowMapSchema mapSchema = (HollowMapSchema) schema;
-                            addToSetIfNotPrimitive(schemaNameSet, mapSchema.getKeyType(),
-                                    mapSchema.getValueType());
+                            addToSetIfNotPrimitiveOrCollection(schemaNameSet, mapSchema.getKeyType(),
+                                    mapSchema.getKeyType());
                             break;
                         default:
                             throw new IllegalArgumentException(
@@ -145,10 +149,11 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
      * primitive type. Factored out to prevent bloat in the switch statement it is called
      * from.
      */
-    private void addToSetIfNotPrimitive(Set<String> schemaNameSet,
-            String... schemaNames) {
+    private void addToSetIfNotPrimitiveOrCollection(Set<String> schemaNameSet, String... schemaNames) {
         for (String schemaName : schemaNames) {
-            if (!HollowCodeGenerationUtils.isPrimitiveType(schemaName)) {
+            // collections schemas get brought in by a star import
+            if (!HollowCodeGenerationUtils.isCollectionType(schemaName, dataset) &&
+                    !HollowCodeGenerationUtils.isPrimitiveType(schemaName)) {
                 schemaNameSet.add(schemaName);
             }
         }

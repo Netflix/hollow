@@ -25,6 +25,7 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowMapTypeAPI;
 import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 
@@ -39,8 +40,9 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowMapSchema schema;
 
-    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema, CodeGeneratorConfig config) {
-        super(apiClassname, packageName, schema, config);
+    public TypeAPIMapJavaGenerator(String apiClassname, String packageName, HollowMapSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, dataset, config);
         this.schema = schema;
     }
 

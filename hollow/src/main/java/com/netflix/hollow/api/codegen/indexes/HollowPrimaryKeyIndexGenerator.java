@@ -34,12 +34,10 @@ import java.util.List;
  * @see HollowAPIGenerator
  */
 public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
-    protected final HollowDataset dataset;
     protected final PrimaryKey pk;
 
     public HollowPrimaryKeyIndexGenerator(HollowDataset dataset, String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, schema, config);
-        this.dataset = dataset;
+        super(packageName, apiClassname, schema, dataset, config);
         this.pk = schema.getPrimaryKey();
         isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = false;

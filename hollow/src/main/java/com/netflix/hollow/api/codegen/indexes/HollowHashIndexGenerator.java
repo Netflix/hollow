@@ -44,7 +44,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
     private final boolean isListenToDataRefreah;
 
     public HollowHashIndexGenerator(String packageName, String apiClassname, HollowDataset dataset, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, config);
+        super(packageName, apiClassname, dataset, config);
         this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
         this.isListenToDataRefreah = config.isListenToDataRefresh();

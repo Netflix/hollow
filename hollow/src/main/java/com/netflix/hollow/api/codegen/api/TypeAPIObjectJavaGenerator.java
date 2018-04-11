@@ -26,6 +26,7 @@ import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
@@ -52,8 +53,9 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         }
     });
 
-    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,CodeGeneratorConfig config) {
-        super(apiClassname, packageName, schema, config);
+    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, dataset, config);
         this.objectSchema = schema;
 
         this.importClasses.add(HollowObjectTypeAPI.class);
