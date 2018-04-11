@@ -148,8 +148,10 @@ public class PackageDataCollection {
 
     private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
         Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
-        for (CdnDeploymentHollow deployment : cdnDeployments) {
-            originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+        if (cdnDeployments != null) {
+            for (CdnDeploymentHollow deployment : cdnDeployments) {
+                originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+            }
         }
     }
 
