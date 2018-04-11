@@ -1,0 +1,52 @@
+package com.netflix.vms.transformer.converterpojos;
+
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
+
+
+@SuppressWarnings("all")
+@HollowTypeName(name="Date")
+public class Date implements Cloneable {
+
+    public long value = java.lang.Long.MIN_VALUE;
+
+    public Date() { }
+
+    public Date(long value) {
+        this.value = value;
+    }
+
+    public Date setValue(long value) {
+        this.value = value;
+        return this;
+    }
+    public boolean equals(Object other) {
+        if(other == this)  return true;
+        if(!(other instanceof Date))
+            return false;
+
+        Date o = (Date) other;
+        if(o.value != value) return false;
+        return true;
+    }
+
+    public int hashCode() {
+        int hashCode = 1;
+        hashCode = hashCode * 31 + (int) (value ^ (value >>> 32));
+        return hashCode;
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder("Date{");
+        builder.append("value=").append(value);
+        builder.append("}");
+        return builder.toString();
+    }
+
+    public Date clone() {
+        try {
+            Date clone = (Date)super.clone();
+            return clone;
+        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
+    }
+
+}
