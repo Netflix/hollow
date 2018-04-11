@@ -38,23 +38,20 @@ import java.util.Set;
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowMapJavaGenerator extends HollowCollectionsGenerator {
-
     private final HollowMapSchema schema;
-    private final HollowDataset dataset;
     private final String keyClassName;
     private final String valueClassName;
 
     private final boolean parameterizeKey;
     private final boolean parameterizeValue;
 
-    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema, HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, schema, config);
-
+    public HollowMapJavaGenerator(String packageName, String apiClassname, HollowMapSchema schema,
+            HollowDataset dataset, Set<String> parameterizedTypes, boolean parameterizeClassNames,
+            CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, dataset, config);
         this.schema = schema;
-        this.dataset = dataset;
         this.keyClassName = hollowImplClassname(schema.getKeyType());
         this.valueClassName = hollowImplClassname(schema.getValueType());
         this.parameterizeKey = parameterizeClassNames || parameterizedTypes.contains(schema.getKeyType());

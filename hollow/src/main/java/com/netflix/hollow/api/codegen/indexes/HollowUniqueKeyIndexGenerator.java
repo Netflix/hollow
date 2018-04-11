@@ -22,6 +22,7 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.Arrays;
@@ -40,8 +41,9 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     protected boolean isParameterizedConstructorPublic = true;
     protected boolean isAutoListenToDataRefresh = false;
 
-    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, config);
+    public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, dataset, config);
 
         this.type = schema.getName();
         this.className = getClassName(schema);

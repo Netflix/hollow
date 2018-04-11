@@ -30,6 +30,7 @@ import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -41,7 +42,6 @@ import java.util.Arrays;
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "core";
@@ -49,9 +49,9 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
     private final String objectClassName;
     private final HollowSchema schema;
 
-    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
-
+    public HollowFactoryJavaGenerator(String packageName, HollowSchema schema, HollowDataset dataset,
+            CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.objectClassName = hollowImplClassname(schema.getName());
         this.className = hollowFactoryClassname(schema.getName());
         this.schema = schema;

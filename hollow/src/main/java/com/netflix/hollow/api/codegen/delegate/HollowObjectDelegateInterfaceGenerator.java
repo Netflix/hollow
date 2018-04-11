@@ -29,18 +29,19 @@ import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowObjectDelegateInterfaceGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, CodeGeneratorConfig config) {
-        super(packageName, schema, ergonomicShortcuts, config);
+    public HollowObjectDelegateInterfaceGenerator(String packageName, HollowObjectSchema schema,
+            HollowErgonomicAPIShortcuts ergonomicShortcuts, HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, schema, ergonomicShortcuts, dataset, config);
         this.className = delegateInterfaceName(schema.getName());
     }
 

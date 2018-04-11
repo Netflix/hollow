@@ -131,8 +131,6 @@ public class HollowAPIGenerator {
      * @param apiClassname the class name of the generated implementation of {@link HollowAPI}
      * @param packageName the package name under which all generated classes will be placed
      * @param dataset a HollowStateEngine containing the schemas which define the data model.
-     * @param parameterizeSpecificTypeNames methods with matching names which return a Hollow Object will be parameterized.  This is useful when
-     *                               alternate implementations are desired for some types.
      * @param destinationPath the directory under which the source files will be generated
      */
     public HollowAPIGenerator(String apiClassname,
@@ -293,8 +291,10 @@ public class HollowAPIGenerator {
         }
         directory.mkdirs();
 
-        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname, dataset, parameterizeClassNames, config);
-        HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName, apiClassname, config);
+        HollowAPIClassJavaGenerator apiClassGenerator = new HollowAPIClassJavaGenerator(packageName, apiClassname,
+                dataset, parameterizeClassNames, config);
+        HollowAPIFactoryJavaGenerator apiFactoryGenerator = new HollowAPIFactoryJavaGenerator(packageName,
+                apiClassname, dataset, config);
 
         HollowHashIndexGenerator hashIndexGenerator = new HollowHashIndexGenerator(packageName, apiClassname, dataset, config);
 
@@ -315,7 +315,7 @@ public class HollowAPIGenerator {
     /**
      * Generate files based on dataset schemas under the specified directory
      *
-     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFilesForHollowSchemas(HollowJavaFileGenerator)}
+     * @deprecated construct {@code HollowAPIGenerator} with a {@code destinationPath} then call {@link #generateSourceFilesForHollowSchemas()}
      */
     protected void generateFilesForHollowSchemas(File directory) throws IOException {
         for(HollowSchema schema : dataset.getSchemas()) {
@@ -328,16 +328,23 @@ public class HollowAPIGenerator {
 
             if(schema.getSchemaType() == SchemaType.OBJECT) {
                 HollowObjectSchema objSchema = (HollowObjectSchema)schema;
-                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, objSchema, ergonomicShortcuts, config));
-                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, objSchema, ergonomicShortcuts, config));
-                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, objSchema, ergonomicShortcuts, config));
+                generateFile(directory, new HollowObjectDelegateInterfaceGenerator(packageName, objSchema,
+                        ergonomicShortcuts, dataset, config));
+                generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, objSchema,
+                        ergonomicShortcuts, dataset, config));
+                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, objSchema,
+                        ergonomicShortcuts, dataset, config));
 
-                generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, objSchema, config));
+                generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, objSchema,
+                        dataset, config));
                 if (!config.isReservePrimaryKeyIndexForTypeWithPrimaryKey()) {
-                    generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname, objSchema, config));
+                    generateFile(directory, new LegacyHollowPrimaryKeyIndexGenerator(packageName, apiClassname,
+                            objSchema, dataset, config));
                 } else if ((objSchema).getPrimaryKey() != null) {
-                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname,  objSchema, config));
-                    generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, objSchema, config));
+                    generateFile(directory, new HollowPrimaryKeyIndexGenerator(dataset, packageName, apiClassname,
+                            objSchema, config));
+                    generateFile(directory, new HollowUniqueKeyIndexGenerator(packageName, apiClassname, objSchema,
+                            dataset, config));
                 }
             }
         }
@@ -366,13 +373,13 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, config);
+            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, dataset, config);
         } else if(schema instanceof HollowListSchema) {
-            return new TypeAPIListJavaGenerator(apiClassname, packageName, (HollowListSchema)schema, config);
+            return new TypeAPIListJavaGenerator(apiClassname, packageName, (HollowListSchema)schema, dataset, config);
         } else if(schema instanceof HollowSetSchema) {
-            return new TypeAPISetJavaGenerator(apiClassname, packageName, (HollowSetSchema)schema, config);
+            return new TypeAPISetJavaGenerator(apiClassname, packageName, (HollowSetSchema)schema, dataset, config);
         } else if(schema instanceof HollowMapSchema) {
-            return new TypeAPIMapJavaGenerator(apiClassname, packageName, (HollowMapSchema)schema, config);
+            return new TypeAPIMapJavaGenerator(apiClassname, packageName, (HollowMapSchema)schema, dataset, config);
         }
 
         throw new UnsupportedOperationException("What kind of schema is a " + schema.getClass().getName() + "?");
@@ -380,11 +387,14 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getHollowObjectGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema, parameterizedTypes, parameterizeClassNames, ergonomicShortcuts, config);
+            return new HollowObjectJavaGenerator(packageName, apiClassname, (HollowObjectSchema) schema,
+                    parameterizedTypes, parameterizeClassNames, ergonomicShortcuts, dataset, config);
         } else if(schema instanceof HollowListSchema) {
-            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema, parameterizedTypes, parameterizeClassNames, config);
+            return new HollowListJavaGenerator(packageName, apiClassname, (HollowListSchema) schema,
+                    parameterizedTypes, parameterizeClassNames, dataset, config);
         } else if(schema instanceof HollowSetSchema) {
-            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema, parameterizedTypes, parameterizeClassNames, config);
+            return new HollowSetJavaGenerator(packageName, apiClassname, (HollowSetSchema) schema,
+                    parameterizedTypes, parameterizeClassNames, dataset, config);
         } else if(schema instanceof HollowMapSchema) {
             return new HollowMapJavaGenerator(packageName, apiClassname, (HollowMapSchema) schema, dataset, parameterizedTypes, parameterizeClassNames, config);
         }
@@ -393,7 +403,7 @@ public class HollowAPIGenerator {
     }
 
     protected HollowFactoryJavaGenerator getHollowFactoryGenerator(HollowSchema schema) {
-        return new HollowFactoryJavaGenerator(packageName, schema, config);
+        return new HollowFactoryJavaGenerator(packageName, schema, dataset, config);
     }
 
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
