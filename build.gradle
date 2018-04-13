@@ -12,6 +12,11 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'netflix.findbugs'
     apply plugin: 'nebula.facet'
+    apply plugin: 'checkstyle'
+    checkstyle {
+      configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
+      toolVersion = 8.8
+    }
 
     group = "com.netflix.vms.transformer"
 
