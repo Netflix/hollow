@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.logging.TaggingLogger;
@@ -34,9 +35,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

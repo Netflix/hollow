@@ -8,7 +8,6 @@ import com.netflix.archaius.guice.ArchaiusModule;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.guice.jetty.JettyModule;
 import com.netflix.governator.guice.servlet.WebApplicationInitializer;
-
 import java.io.IOException;
 import java.util.Properties;
 

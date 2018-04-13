@@ -3,15 +3,14 @@ package com.netflix.vms.transformer.modules.packages.contracts;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
 
+import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.hollowoutput.DownloadableId;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.netflix.vms.transformer.contract.ContractAsset;
 
 public class DownloadableAssetTypeIndex {
     private final Map<ContractAsset, DownloadableIdList> downloadableIdsByContract;

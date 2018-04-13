@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.meta;
 
-
-
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;

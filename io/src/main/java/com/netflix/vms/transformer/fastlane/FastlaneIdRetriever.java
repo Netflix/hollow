@@ -6,7 +6,6 @@ import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.mutationstream.fastlane.FastlaneCassandraHelper;
 import com.netflix.mutationstream.fastlane.FastlaneVideo;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

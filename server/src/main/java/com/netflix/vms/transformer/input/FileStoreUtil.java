@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileAccessItem;
-
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

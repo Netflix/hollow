@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.modules.rollout;
 
-import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
-
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -23,6 +21,7 @@ import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.Date;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;

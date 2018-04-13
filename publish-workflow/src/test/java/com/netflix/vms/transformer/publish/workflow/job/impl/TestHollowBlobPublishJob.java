@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import java.io.File;

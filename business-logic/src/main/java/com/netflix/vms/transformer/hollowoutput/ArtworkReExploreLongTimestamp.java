@@ -1,7 +1,5 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.lang.Long;
-
 public class ArtworkReExploreLongTimestamp {
 
     public long reExploreTimestamp = Long.MIN_VALUE;

@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.vms.transformer.hollowoutput.DateWindow;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

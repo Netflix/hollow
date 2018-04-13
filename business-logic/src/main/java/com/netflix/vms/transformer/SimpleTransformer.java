@@ -1,5 +1,13 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -7,14 +15,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
-import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
@@ -66,7 +67,6 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

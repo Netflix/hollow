@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.job;
 
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
-
 import java.io.File;
 
 public abstract class CircuitBreakerJob extends PublishWorkflowPublicationJob {

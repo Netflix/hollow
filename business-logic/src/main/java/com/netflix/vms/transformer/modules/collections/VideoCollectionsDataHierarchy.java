@@ -7,7 +7,6 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoCollectionsData;
 import com.netflix.vms.transformer.hollowoutput.VideoEpisode;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

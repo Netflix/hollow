@@ -1,17 +1,14 @@
 package com.netflix.vms.transformer.fastproperties;
 
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;

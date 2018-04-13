@@ -3,19 +3,17 @@ package com.netflix.vms.transformer.logger;
 import static com.netflix.vms.logging.Slf4jTaggingLogger.severityToInt;
 import static org.slf4j.helpers.MessageFormatter.arrayFormat;
 
-import java.util.Collection;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LocationAwareLogger;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
+import java.util.Collection;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 
 // TODO: timt: partially duplicated from TaggingLoggers; could extend/compose Slf4jTaggingLogger
 public class TransformerServerLogger implements TaggingLogger {

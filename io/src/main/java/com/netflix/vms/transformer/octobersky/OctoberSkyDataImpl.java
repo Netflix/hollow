@@ -8,7 +8,6 @@ import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;

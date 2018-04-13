@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer;
 
-
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;

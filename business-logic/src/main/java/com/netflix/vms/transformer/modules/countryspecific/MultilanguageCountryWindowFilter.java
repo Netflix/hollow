@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
-
 import java.util.Arrays;
 import java.util.List;
 
