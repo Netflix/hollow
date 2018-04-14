@@ -15,7 +15,13 @@
 *#
 
 <b>State: $currentStateVersion</b><p/>
-
+#if($prevStateVersion != -1)
+	<a href="$basePath/state?version=$prevStateVersion">&lt; prev version</a>
+#end
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#if($nextStateVersion != -1)
+	<a href="$basePath/state?version=$nextStateVersion">&gt; next version</a>
+#end
 <table border="1">
     #foreach($summary in $typeChanges)
         <tr>
@@ -31,10 +37,3 @@
 </table>
 
 <p/>
-#if($prevStateVersion != -1)
-	<a href="$basePath/state?version=$prevStateVersion">&lt; prev version</a>
-#end
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-#if($nextStateVersion != -1)
-	<a href="$basePath/state?version=$nextStateVersion">&gt; next version</a>
-#end
