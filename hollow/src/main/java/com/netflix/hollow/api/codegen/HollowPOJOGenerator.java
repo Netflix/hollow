@@ -19,7 +19,7 @@ package com.netflix.hollow.api.codegen;
 
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimitiveType;
 
-import com.netflix.hollow.core.HollowStateEngine;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -27,33 +27,23 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * This class is used to generate java code which defines POJOs, which can in turn be used to populate a 
  * {@link HollowWriteStateEngine} via a {@link HollowObjectMapper}
  * 
  * The generated java code is based on a data model (defined by a set of {@link HollowSchema}).
- *
  */
 public class HollowPOJOGenerator {
 
     private final String packageName;
     private final String pojoClassNameSuffix;
-    private final Collection<HollowSchema> schemas;
+    private final HollowDataset dataset;
 
-    public HollowPOJOGenerator(String packageName, HollowStateEngine stateEngine) {
-        this(packageName, "POJO", stateEngine);
-    }
-
-    public HollowPOJOGenerator(String packageName, String pojoClassNameSuffix, HollowStateEngine stateEngine) {
-        this(packageName, pojoClassNameSuffix, stateEngine.getSchemas());
-    }
-    
-    public HollowPOJOGenerator(String packageName, String pojoClassNameSuffix, Collection<HollowSchema> schemas) {
+    public HollowPOJOGenerator(String packageName, String pojoClassNameSuffix, HollowDataset dataset) {
         this.packageName = packageName;
         this.pojoClassNameSuffix = pojoClassNameSuffix;
-        this.schemas = schemas;
+        this.dataset = dataset;
     }
 
     public void generateFiles(String directory) throws IOException {
@@ -61,9 +51,10 @@ public class HollowPOJOGenerator {
     }
 
     public void generateFiles(File directory) throws IOException {
-        for (HollowSchema schema : schemas) {
+        for (HollowSchema schema : dataset.getSchemas()) {
             if (schema instanceof HollowObjectSchema && !isPrimitiveType(schema.getName())) {
-                HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(schemas, (HollowObjectSchema) schema, packageName, pojoClassNameSuffix);
+                HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(dataset, (HollowObjectSchema) schema,
+                        packageName, pojoClassNameSuffix);
                 FileWriter writer = new FileWriter(new File(directory, generator.getClassName() + ".java"));
                 writer.write(generator.generate());
                 writer.close();
