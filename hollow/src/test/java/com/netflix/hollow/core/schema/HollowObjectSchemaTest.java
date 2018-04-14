@@ -17,13 +17,13 @@
  */
 package com.netflix.hollow.core.schema;
 
+import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowObjectSchemaTest {
-
     @Test
     public void findsCommonSchemas() {
         HollowObjectSchema s1 = new HollowObjectSchema("Test", 2, "F2");
@@ -52,6 +52,21 @@ public class HollowObjectSchemaTest {
             Assert.assertNotEquals(s1.getPrimaryKey(), s3.getPrimaryKey());
             Assert.assertNotEquals(s1.getPrimaryKey(), c3.getPrimaryKey());
             Assert.assertNull(c3.getPrimaryKey());
+        }
+    }
+
+    @Test
+    public void findCommonSchema_incompatible() {
+        try {
+            HollowObjectSchema s1 = new HollowObjectSchema("Test", 2, "F1");
+            s1.addField("F1", FieldType.INT);
+            HollowObjectSchema s2 = new HollowObjectSchema("Test", 2, "F1");
+            s2.addField("F1", FieldType.STRING);
+            s1.findCommonSchema(s2);
+            Assert.fail("Expected IncompatibleSchemaException");
+        } catch (IncompatibleSchemaException e) {
+            Assert.assertEquals("Test", e.getTypeName());
+            Assert.assertEquals("F1", e.getFieldName());
         }
     }
 
