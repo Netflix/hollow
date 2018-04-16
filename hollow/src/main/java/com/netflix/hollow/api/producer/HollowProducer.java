@@ -20,6 +20,7 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -307,7 +308,7 @@ public class HollowProducer {
 
         try {
             listeners.fireProducerRestoreStart(versionDesired);
-            if(versionDesired != Long.MIN_VALUE) {
+            if (versionDesired != HollowConstants.VERSION_NONE) {
 
                 HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
@@ -328,7 +329,7 @@ public class HollowProducer {
                 }
             }
         } catch(Throwable th) {
-            status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
+            status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : HollowConstants.VERSION_NONE, th);
             throw th;
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);

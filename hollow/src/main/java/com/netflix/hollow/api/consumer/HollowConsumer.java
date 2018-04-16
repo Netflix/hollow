@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.consumer;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -347,7 +348,7 @@ public class HollowConsumer {
      * <dl>
      * <dt>The "from" version</dt>
      * <dd>The unique identifier of the state to which a delta transition should be applied.  If
-     * this is a snapshot, then this value is Long.MIN_VALUE</dd>
+     * this is a snapshot, then this value is HollowConstants.VERSION_NONE.</dd>
      * <p>
      * <dt>The "to" version</dt>
      * <dd>The unique identifier of the state at which a dataset will arrive after this blob is applied.</dd>
@@ -365,7 +366,7 @@ public class HollowConsumer {
          * Instantiate a snapshot to a specified data state version.
          */
         public Blob(long toVersion) {
-            this(Long.MIN_VALUE, toVersion);
+            this(HollowConstants.VERSION_NONE, toVersion);
         }
 
         /**
@@ -388,7 +389,7 @@ public class HollowConsumer {
         public abstract InputStream getInputStream() throws IOException;
 
         public boolean isSnapshot() {
-            return fromVersion == Long.MIN_VALUE;
+            return fromVersion == HollowConstants.VERSION_NONE;
         }
 
         public boolean isReverseDelta() {
@@ -418,7 +419,7 @@ public class HollowConsumer {
      */
     public static interface AnnouncementWatcher {
 
-        public static final long NO_ANNOUNCEMENT_AVAILABLE = Long.MIN_VALUE;
+        public static final long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
 
         /**
          * Return the latest announced version.
