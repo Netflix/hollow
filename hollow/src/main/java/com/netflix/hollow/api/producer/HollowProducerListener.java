@@ -20,6 +20,7 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import java.util.EventListener;
@@ -215,7 +216,7 @@ public interface HollowProducerListener extends EventListener {
         }
 
         static ProducerStatus unknownFailure() {
-            return new ProducerStatus(Status.FAIL, Long.MIN_VALUE, null, null);
+            return new ProducerStatus(Status.FAIL, HollowConstants.VERSION_NONE, null, null);
         }
 
         static ProducerStatus fail(long version) {
@@ -277,7 +278,7 @@ public interface HollowProducerListener extends EventListener {
             private final long start;
             private long end;
 
-            private long version = Long.MIN_VALUE;
+            private long version = HollowConstants.VERSION_NONE;
             private Status status = FAIL;
             private Throwable cause = null;
             private ReadState readState = null;
@@ -347,7 +348,7 @@ public interface HollowProducerListener extends EventListener {
         }
 
         static RestoreStatus unknownFailure() {
-            return new RestoreStatus(Status.FAIL, Long.MIN_VALUE, Long.MIN_VALUE, null);
+            return new RestoreStatus(Status.FAIL, HollowConstants.VERSION_NONE, HollowConstants.VERSION_NONE, null);
         }
 
         static RestoreStatus fail(long versionDesired, long versionReached, Throwable cause) {
@@ -365,7 +366,7 @@ public interface HollowProducerListener extends EventListener {
          * The version desired to restore to when calling
          * {@link HollowProducer#restore(long, com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever)}
          *
-         * @return the latest announced version or {@code Long.MIN_VALUE} if latest announced version couldn't be
+         * @return the latest announced version or {@code HollowConstants.VERSION_NONE} if latest announced version couldn't be
          * retrieved
          */
         public long getDesiredVersion() {
@@ -375,10 +376,10 @@ public interface HollowProducerListener extends EventListener {
         /**
          * The version reached when restoring.
          * When {@link HollowProducer#restore(long, com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever)}
-         * succeeds then {@code versionDesired == versionReached} is always true. Can be {@code Long.MIN_VALUE}
+         * succeeds then {@code versionDesired == versionReached} is always true. Can be {@code HollowConstants.VERSION_NONE}
          * indicating restore failed to reach any state, or the version of an intermediate state reached.
          *
-         * @return the version restored to when successful, otherwise {@code Long.MIN_VALUE} if no version was
+         * @return the version restored to when successful, otherwise {@code HollowConstants.VERSION_NONE} if no version was
          * reached or the version of an intermediate state reached before restore completed unsuccessfully.
          */
         public long getVersionReached() {
