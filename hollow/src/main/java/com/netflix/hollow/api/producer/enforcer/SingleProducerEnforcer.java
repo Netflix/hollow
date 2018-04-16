@@ -39,4 +39,10 @@ public interface SingleProducerEnforcer {
      */
     boolean isPrimary();
 
+
+    /**
+     * Force Maring producer to enable processing cycles.
+     */
+    void force();
+
 }
