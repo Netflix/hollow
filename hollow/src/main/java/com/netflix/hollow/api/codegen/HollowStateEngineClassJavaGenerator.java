@@ -301,7 +301,7 @@ public class HollowStateEngineClassJavaGenerator implements HollowJavaFileGenera
     }
 
     private List<HollowSchema> schemaList() {
-        // Sort Schema to have consistent ordering when generating VMSHollowStateEngine
+        // Sort Schema to have consistent ordering when generating state engine
         List<HollowSchema> schemaList = new ArrayList<HollowSchema>(stateEngine.getSchemas());
         Collections.sort(schemaList, new Comparator<HollowSchema>() {
             @Override
