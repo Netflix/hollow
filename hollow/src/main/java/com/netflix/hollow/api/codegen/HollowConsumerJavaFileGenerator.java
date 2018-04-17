@@ -15,6 +15,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.api.codegen.objects.HollowCollectionsGenerator;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -107,7 +108,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                         case MAP:
                             HollowMapSchema mapSchema = (HollowMapSchema) schema;
                             addToSetIfNotPrimitiveOrCollection(schemaNameSet, mapSchema.getKeyType(),
-                                    mapSchema.getKeyType());
+                                    mapSchema.getValueType());
                             break;
                         default:
                             throw new IllegalArgumentException(
@@ -120,7 +121,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                 }
                 appendImportFromBasePackage(builder, "core.*");
                 if (useCollectionsImport) {
-                    appendImportFromBasePackage(builder, "collections.*");
+                    appendImportFromBasePackage(builder, HollowCollectionsGenerator.SUB_PACKAGE_NAME + ".*");
                 }
                 builder.append("\n");
             }
