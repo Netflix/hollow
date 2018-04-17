@@ -42,6 +42,9 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -55,8 +58,44 @@ import java.util.Set;
  *
  * The generated java code is based on a data model (defined by a set of {@link HollowSchema}), and will
  * contain convenience methods for traversing a dataset, based on the specific fields in the data model.
+ *
+ * You may also run the main() method directly.
  */
 public class HollowAPIGenerator {
+    /**
+     * An enumeration of possible arguments to the code generator when being called via the main
+     * function. Not expected to be used outside the library itself, except for documentation
+     * purposes.
+     * Unless otherwise noted, having repeated parameters results in the previous value being
+     * overwritten.
+     */
+    public enum GeneratorArguments {
+        /**
+         * Add a class to the data model. Takes the fully qualified class name. This class must be
+         * available on the classpath. Having multiple of this parameter results in multiple classes
+         * being added to the data model.
+         */
+        addToDataModel,
+        /**
+         * Add schema from a schema file to the data model. The schema file must be available on the
+         * classpath. Having multiple of this parameter results in multiple schemas being added to
+         * the data model.
+         */
+        addSchemaFileToDataModel,
+        /**
+         * Sets the API class name.
+         */
+        apiClassName,
+        /**
+         * Sets the package name for the generated files.
+         */
+        packageName,
+        /**
+         * Sets the path the files with be generated in.
+         */
+        pathToGeneratedFiles;
+    }
+
     protected final String apiClassname;
     protected final String packageName;
     protected final Path destinationPath;
@@ -170,6 +209,45 @@ public class HollowAPIGenerator {
             }
         }
         this.destinationPath = destinationPath;
+    }
+
+    /**
+     * Usage: java HollowAPIGenerator --argName1=argValue1 --argName2==argValue2. See {@link GeneratorArguments} for
+     * available arguments.
+     */
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        if (args.length == 0) {
+            System.out.println("Usage:\n"
+                    + "java " + HollowAPIGenerator.class.getName() + " --arg1=value1 --arg2=value2\n"
+                    + "see " + GeneratorArguments.class.getName() + " for available arguments.");
+            return;
+        }
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        HollowAPIGenerator.Builder builder = new HollowAPIGenerator.Builder();
+        HollowObjectMapper mapper = new HollowObjectMapper(engine);
+        ArgumentParser<GeneratorArguments> argumentParser = new ArgumentParser(GeneratorArguments.class, args);
+        for (ArgumentParser<GeneratorArguments>.ParsedArgument arg : argumentParser.getParsedArguments()) {
+            switch (arg.getKey()) {
+                case addToDataModel:
+                    mapper.initializeTypeState(HollowAPIGenerator.class.getClassLoader().loadClass(arg.getValue()));
+                    break;
+                case addSchemaFileToDataModel:
+                    HollowWriteStateCreator.readSchemaFileIntoWriteState(arg.getValue(), engine);
+                    break;
+                case apiClassName:
+                    builder.withAPIClassname(arg.getValue());
+                    break;
+                case packageName:
+                    builder.withPackageName(arg.getValue());
+                    break;
+                case pathToGeneratedFiles:
+                    builder.withDestination(arg.getValue());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unhandled argument " + arg.getKey());
+            }
+        }
+        builder.withDataModel(engine).build().generateSourceFiles();
     }
 
     /**

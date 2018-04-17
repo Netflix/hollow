@@ -1,0 +1,8 @@
+Minion @PrimaryKey(minionId) {
+    long minionId;
+    String name;
+}
+
+String {
+    string value;
+}
