@@ -19,6 +19,7 @@ package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -33,17 +34,17 @@ import java.util.logging.Logger;
 public class HollowSchemaParser {
 
     private static final Logger log = Logger.getLogger(HollowSchemaParser.class.getName());
-    /**
-     * Parse a collection of {@link HollowSchema}s from the provided String. 
-     */
-    public static List<HollowSchema> parseCollectionOfSchemas(String schemas) throws IOException {
-        StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(schemas));
-        configureTokenizer(tokenizer);
 
+    /**
+     * Parse a collection of {@link HollowSchema}s from the provided Reader.
+     */
+    public static List<HollowSchema> parseCollectionOfSchemas(Reader reader) throws IOException {
+        StreamTokenizer tokenizer = new StreamTokenizer(reader);
+        configureTokenizer(tokenizer);
         List<HollowSchema> schemaList = new ArrayList<HollowSchema>();
 
         HollowSchema schema = parseSchema(tokenizer);
-        while(schema != null) {
+        while (schema != null) {
             schemaList.add(schema);
             schema = parseSchema(tokenizer);
         }
@@ -52,7 +53,14 @@ public class HollowSchemaParser {
     }
 
     /**
-     * Parse a single {@link HollowSchema} from the provided String. 
+     * Parse a collection of {@link HollowSchema}s from the provided String.
+     */
+    public static List<HollowSchema> parseCollectionOfSchemas(String schemas) throws IOException {
+        return parseCollectionOfSchemas(new StringReader(schemas));
+    }
+
+    /**
+     * Parse a single {@link HollowSchema} from the provided String.
      */
     public static HollowSchema parseSchema(String schema) throws IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(schema));
