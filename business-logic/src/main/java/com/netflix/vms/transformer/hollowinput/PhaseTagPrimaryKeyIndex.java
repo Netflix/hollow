@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class PhaseTagPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, PhaseTagHollow> {
 
     public PhaseTagPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public PhaseTagPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PhaseTag")).getPrimaryKey().getFieldPaths());
+    public PhaseTagPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("PhaseTag")).getPrimaryKey().getFieldPaths());
     }
 
     public PhaseTagPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public PhaseTagPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "PhaseTag", isListenToDataRefreah, fieldPaths);
+    public PhaseTagPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "PhaseTag", isListenToDataRefresh, fieldPaths);
     }
 
     public PhaseTagHollow findMatch(Object... keys) {

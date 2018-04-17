@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class RolloutPhaseArtworkPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RolloutPhaseArtworkHollow> {
 
     public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseArtwork")).getPrimaryKey().getFieldPaths());
+    public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RolloutPhaseArtwork")).getPrimaryKey().getFieldPaths());
     }
 
     public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "RolloutPhaseArtwork", isListenToDataRefreah, fieldPaths);
+    public RolloutPhaseArtworkPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "RolloutPhaseArtwork", isListenToDataRefresh, fieldPaths);
     }
 
     public RolloutPhaseArtworkHollow findMatch(Object... keys) {

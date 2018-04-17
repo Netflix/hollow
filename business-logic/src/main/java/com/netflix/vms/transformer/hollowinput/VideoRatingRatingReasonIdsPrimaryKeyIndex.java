@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoRatingRatingReasonIdsPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoRatingRatingReasonIdsHollow> {
 
     public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoRatingRatingReasonIds")).getPrimaryKey().getFieldPaths());
+    public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoRatingRatingReasonIds")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "VideoRatingRatingReasonIds", isListenToDataRefreah, fieldPaths);
+    public VideoRatingRatingReasonIdsPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "VideoRatingRatingReasonIds", isListenToDataRefresh, fieldPaths);
     }
 
     public VideoRatingRatingReasonIdsHollow findMatch(Object... keys) {

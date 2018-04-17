@@ -86,6 +86,7 @@ public class VMSAvailabilityWindowModule {
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
+    private final HollowPrimaryKeyIndex merchLanguageDateIdx;
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
@@ -113,6 +114,7 @@ public class VMSAvailabilityWindowModule {
         this.ctx = ctx;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
+        this.merchLanguageDateIdx = indexer.getPrimaryKeyIndex(IndexSpec.MERCH_LANGUAGE_DATE);
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, ctx);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);

@@ -59,7 +59,10 @@ public enum IndexSpec {
     MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag.value", "scheduleId.value"),
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
     
-    TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId");
+    TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
+
+    // Merch-language-dates
+    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguagesDTO", "movieId.value", "countryCode.value", "languageCode.value");
 
 
     private final IndexType indexType;

@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DamMerchStillsMomentPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DamMerchStillsMomentHollow> {
 
     public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DamMerchStillsMoment")).getPrimaryKey().getFieldPaths());
+    public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DamMerchStillsMoment")).getPrimaryKey().getFieldPaths());
     }
 
     public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "DamMerchStillsMoment", isListenToDataRefreah, fieldPaths);
+    public DamMerchStillsMomentPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "DamMerchStillsMoment", isListenToDataRefresh, fieldPaths);
     }
 
     public DamMerchStillsMomentHollow findMatch(Object... keys) {

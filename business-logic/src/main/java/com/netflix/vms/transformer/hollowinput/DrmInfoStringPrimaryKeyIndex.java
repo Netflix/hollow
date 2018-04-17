@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DrmInfoStringPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DrmInfoStringHollow> {
 
     public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmInfoString")).getPrimaryKey().getFieldPaths());
+    public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DrmInfoString")).getPrimaryKey().getFieldPaths());
     }
 
     public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "DrmInfoString", isListenToDataRefreah, fieldPaths);
+    public DrmInfoStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "DrmInfoString", isListenToDataRefresh, fieldPaths);
     }
 
     public DrmInfoStringHollow findMatch(Object... keys) {

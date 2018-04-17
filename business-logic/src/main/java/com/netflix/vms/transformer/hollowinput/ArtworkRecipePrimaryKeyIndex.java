@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ArtworkRecipePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ArtworkRecipeHollow> {
 
     public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ArtworkRecipe")).getPrimaryKey().getFieldPaths());
+    public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ArtworkRecipe")).getPrimaryKey().getFieldPaths());
     }
 
     public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "ArtworkRecipe", isListenToDataRefreah, fieldPaths);
+    public ArtworkRecipePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "ArtworkRecipe", isListenToDataRefresh, fieldPaths);
     }
 
     public ArtworkRecipeHollow findMatch(Object... keys) {

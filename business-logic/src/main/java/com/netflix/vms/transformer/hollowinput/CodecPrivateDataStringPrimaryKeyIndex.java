@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class CodecPrivateDataStringPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, CodecPrivateDataStringHollow> {
 
     public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CodecPrivateDataString")).getPrimaryKey().getFieldPaths());
+    public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("CodecPrivateDataString")).getPrimaryKey().getFieldPaths());
     }
 
     public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "CodecPrivateDataString", isListenToDataRefreah, fieldPaths);
+    public CodecPrivateDataStringPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "CodecPrivateDataString", isListenToDataRefresh, fieldPaths);
     }
 
     public CodecPrivateDataStringHollow findMatch(Object... keys) {

@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DisallowedSubtitleLangCodePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DisallowedSubtitleLangCodeHollow> {
 
     public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedSubtitleLangCode")).getPrimaryKey().getFieldPaths());
+    public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedSubtitleLangCode")).getPrimaryKey().getFieldPaths());
     }
 
     public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "DisallowedSubtitleLangCode", isListenToDataRefreah, fieldPaths);
+    public DisallowedSubtitleLangCodePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "DisallowedSubtitleLangCode", isListenToDataRefresh, fieldPaths);
     }
 
     public DisallowedSubtitleLangCodeHollow findMatch(Object... keys) {

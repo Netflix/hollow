@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class ConsolidatedCertSystemRatingPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, ConsolidatedCertSystemRatingHollow> {
 
     public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedCertSystemRating")).getPrimaryKey().getFieldPaths());
+    public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("ConsolidatedCertSystemRating")).getPrimaryKey().getFieldPaths());
     }
 
     public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "ConsolidatedCertSystemRating", isListenToDataRefreah, fieldPaths);
+    public ConsolidatedCertSystemRatingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "ConsolidatedCertSystemRating", isListenToDataRefresh, fieldPaths);
     }
 
     public ConsolidatedCertSystemRatingHollow findMatch(Object... keys) {
