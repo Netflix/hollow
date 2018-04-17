@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class EpisodesPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, EpisodesHollow> {
 
     public EpisodesPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public EpisodesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Episodes")).getPrimaryKey().getFieldPaths());
+    public EpisodesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Episodes")).getPrimaryKey().getFieldPaths());
     }
 
     public EpisodesPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public EpisodesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "Episodes", isListenToDataRefreah, fieldPaths);
+    public EpisodesPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "Episodes", isListenToDataRefresh, fieldPaths);
     }
 
     public EpisodesHollow findMatch(Object... keys) {

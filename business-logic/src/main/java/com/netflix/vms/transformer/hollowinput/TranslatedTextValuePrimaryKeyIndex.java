@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class TranslatedTextValuePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, TranslatedTextValueHollow> {
 
     public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TranslatedTextValue")).getPrimaryKey().getFieldPaths());
+    public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("TranslatedTextValue")).getPrimaryKey().getFieldPaths());
     }
 
     public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "TranslatedTextValue", isListenToDataRefreah, fieldPaths);
+    public TranslatedTextValuePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "TranslatedTextValue", isListenToDataRefresh, fieldPaths);
     }
 
     public TranslatedTextValueHollow findMatch(Object... keys) {

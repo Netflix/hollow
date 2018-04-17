@@ -14,8 +14,8 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         super(consumer, true, queryType, selectFieldPath, matchFieldPaths);
     }
 
-    public VMSHollowInputAPIHashIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String queryType, String selectFieldPath, String... matchFieldPaths) {
-        super(consumer, isListenToDataRefreah, queryType, selectFieldPath, matchFieldPaths);
+    public VMSHollowInputAPIHashIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String queryType, String selectFieldPath, String... matchFieldPaths) {
+        super(consumer, isListenToDataRefresh, queryType, selectFieldPath, matchFieldPaths);
     }
 
     public Iterable<CharacterQuoteHollow> findCharacterQuoteMatches(Object... keys) {
@@ -190,6 +190,17 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<ListOfDerivativeTagHollow>(matches.iterator()) {
             public ListOfDerivativeTagHollow getData(int ordinal) {
                 return api.getListOfDerivativeTagHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<LongHollow> findLongMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<LongHollow>(matches.iterator()) {
+            public LongHollow getData(int ordinal) {
+                return api.getLongHollow(ordinal);
             }
         };
     }
@@ -641,6 +652,17 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<CharacterHollow>(matches.iterator()) {
             public CharacterHollow getData(int ordinal) {
                 return api.getCharacterHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<CinderCupTokenRecordHollow> findCinderCupTokenRecordMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<CinderCupTokenRecordHollow>(matches.iterator()) {
+            public CinderCupTokenRecordHollow getData(int ordinal) {
+                return api.getCinderCupTokenRecordHollow(ordinal);
             }
         };
     }

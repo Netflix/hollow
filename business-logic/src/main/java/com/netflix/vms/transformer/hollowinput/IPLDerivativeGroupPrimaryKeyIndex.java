@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class IPLDerivativeGroupPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, IPLDerivativeGroupHollow> {
 
     public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLDerivativeGroup")).getPrimaryKey().getFieldPaths());
+    public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("IPLDerivativeGroup")).getPrimaryKey().getFieldPaths());
     }
 
     public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "IPLDerivativeGroup", isListenToDataRefreah, fieldPaths);
+    public IPLDerivativeGroupPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "IPLDerivativeGroup", isListenToDataRefresh, fieldPaths);
     }
 
     public IPLDerivativeGroupHollow findMatch(Object... keys) {
