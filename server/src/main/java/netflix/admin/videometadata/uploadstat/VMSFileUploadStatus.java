@@ -1,7 +1,6 @@
 package netflix.admin.videometadata.uploadstat;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.Map;

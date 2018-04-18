@@ -20,6 +20,7 @@ public class CupLibraryImpl implements CupLibrary {
         this.cupFactory = cupFactory;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getMaximumVideoHeight(Set<String> cupTokens, String deviceCategory) {
         return cupFactory.getCupMaximumVideoHeight(cupTokens, deviceCategory);

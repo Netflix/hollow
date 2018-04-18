@@ -1,4 +1,82 @@
 {
+    "checkstyle": {
+        "antlr:antlr": {
+            "locked": "2.7.7",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "com.google.code.findbugs:jsr305": {
+            "locked": "1.3.9",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
+        "com.google.errorprone:error_prone_annotations": {
+            "locked": "2.1.3",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
+        "com.google.guava:guava": {
+            "locked": "23.6-jre",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "com.google.j2objc:j2objc-annotations": {
+            "locked": "1.1",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
+        "com.puppycrawl.tools:checkstyle": {
+            "locked": "8.8",
+            "requested": "8.8"
+        },
+        "commons-beanutils:commons-beanutils": {
+            "locked": "1.9.3",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "commons-cli:commons-cli": {
+            "locked": "1.4",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "commons-collections:commons-collections": {
+            "locked": "3.2.2",
+            "transitive": [
+                "commons-beanutils:commons-beanutils"
+            ]
+        },
+        "net.sf.saxon:Saxon-HE": {
+            "locked": "9.8.0-7",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "org.antlr:antlr4-runtime": {
+            "locked": "4.7.1",
+            "transitive": [
+                "com.puppycrawl.tools:checkstyle"
+            ]
+        },
+        "org.checkerframework:checker-compat-qual": {
+            "locked": "2.0.0",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        },
+        "org.codehaus.mojo:animal-sniffer-annotations": {
+            "locked": "1.14",
+            "transitive": [
+                "com.google.guava:guava"
+            ]
+        }
+    },
     "compile": {
         "antlr:antlr": {
             "locked": "2.7.7",
@@ -618,8 +696,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -972,7 +1049,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -2849,7 +2926,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -2931,7 +3008,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -4303,8 +4380,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -4657,7 +4733,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -6534,7 +6610,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6616,7 +6692,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7988,8 +8064,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -8342,7 +8417,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -10219,7 +10294,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10301,7 +10376,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -11761,8 +11836,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -12115,7 +12189,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -13987,7 +14061,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14069,7 +14143,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -14825,7 +14899,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -14837,48 +14911,32 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.servlet:servlet-api": {
             "locked": "2.5",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7"
+                "org.gretty:gretty-runner-jetty7"
             ]
-        },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty7": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jetty.orbit:com.sun.el": {
@@ -14971,35 +15029,35 @@
         "org.eclipse.jetty:jetty-jsp": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7"
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-plus": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7"
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7",
-                "org.eclipse.jetty:jetty-servlet"
+                "org.eclipse.jetty:jetty-servlet",
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7",
                 "org.eclipse.jetty:jetty-jndi",
-                "org.eclipse.jetty:jetty-security"
+                "org.eclipse.jetty:jetty-security",
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7",
-                "org.eclipse.jetty:jetty-webapp"
+                "org.eclipse.jetty:jetty-webapp",
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-util": {
@@ -15012,8 +15070,8 @@
         "org.eclipse.jetty:jetty-webapp": {
             "locked": "7.6.16.v20140903",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty7",
-                "org.eclipse.jetty:jetty-plus"
+                "org.eclipse.jetty:jetty-plus",
+                "org.gretty:gretty-runner-jetty7"
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
@@ -15021,6 +15079,22 @@
             "transitive": [
                 "org.eclipse.jetty:jetty-webapp"
             ]
+        },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty7"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty7": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.7",
@@ -15033,7 +15107,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -15045,48 +15119,32 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8"
+                "org.gretty:gretty-runner-jetty8"
             ]
-        },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty8": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jetty.orbit:com.sun.el": {
@@ -15167,7 +15225,7 @@
         "org.eclipse.jetty:jetty-annotations": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8"
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-continuation": {
@@ -15197,36 +15255,36 @@
         "org.eclipse.jetty:jetty-jsp": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8"
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-plus": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8",
-                "org.eclipse.jetty:jetty-servlet"
+                "org.eclipse.jetty:jetty-servlet",
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8",
                 "org.eclipse.jetty:jetty-jndi",
-                "org.eclipse.jetty:jetty-security"
+                "org.eclipse.jetty:jetty-security",
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8",
-                "org.eclipse.jetty:jetty-webapp"
+                "org.eclipse.jetty:jetty-webapp",
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-util": {
@@ -15239,9 +15297,9 @@
         "org.eclipse.jetty:jetty-webapp": {
             "locked": "8.1.8.v20121106",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty8",
                 "org.eclipse.jetty:jetty-annotations",
-                "org.eclipse.jetty:jetty-plus"
+                "org.eclipse.jetty:jetty-plus",
+                "org.gretty:gretty-runner-jetty8"
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
@@ -15249,6 +15307,22 @@
             "transitive": [
                 "org.eclipse.jetty:jetty-webapp"
             ]
+        },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty8"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty8": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.7",
@@ -15261,7 +15335,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -15273,13 +15347,13 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.annotation:javax.annotation-api": {
@@ -15298,10 +15372,10 @@
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty.websocket:websocket-servlet",
                 "org.eclipse.jetty:jetty-jsp",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "javax.websocket:javax.websocket-api": {
@@ -15311,33 +15385,17 @@
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty9": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
-        },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jetty.orbit:javax.servlet.jsp.jstl": {
@@ -15359,66 +15417,66 @@
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-client-impl": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9"
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-api": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-common",
                 "org.eclipse.jetty.websocket:websocket-servlet"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-client": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-client-impl",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-common": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-server": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-servlet": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty:jetty-annotations": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
-                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server",
                 "org.eclipse.jetty:jetty-server"
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -15426,48 +15484,48 @@
             ]
         },
         "org.eclipse.jetty:jetty-jndi": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty:jetty-plus"
             ]
         },
         "org.eclipse.jetty:jetty-jsp": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9"
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-plus": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
-                "org.eclipse.jetty:jetty-servlet"
+                "org.eclipse.jetty:jetty-servlet",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
-                "org.eclipse.jetty:jetty-security"
+                "org.eclipse.jetty:jetty-security",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty.websocket:websocket-server",
-                "org.eclipse.jetty:jetty-webapp"
+                "org.eclipse.jetty:jetty-webapp",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -15478,15 +15536,15 @@
             ]
         },
         "org.eclipse.jetty:jetty-webapp": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
                 "org.eclipse.jetty:jetty-annotations",
-                "org.eclipse.jetty:jetty-plus"
+                "org.eclipse.jetty:jetty-plus",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
-            "locked": "9.2.22.v20170606",
+            "locked": "9.2.24.v20180105",
             "transitive": [
                 "org.eclipse.jetty:jetty-webapp"
             ]
@@ -15509,23 +15567,39 @@
                 "org.eclipse.jetty:jetty-jsp"
             ]
         },
-        "org.ow2.asm:asm": {
-            "locked": "5.0.3",
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
+                "org.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty9"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty9": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
+        },
+        "org.ow2.asm:asm": {
+            "locked": "6.0",
+            "transitive": [
                 "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty9",
                 "org.ow2.asm:asm-tree"
             ]
         },
         "org.ow2.asm:asm-commons": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty9",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty9"
             ]
         },
         "org.ow2.asm:asm-tree": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
                 "org.ow2.asm:asm-commons"
             ]
@@ -15541,7 +15615,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -15553,13 +15627,13 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.annotation:javax.annotation-api": {
@@ -15571,10 +15645,10 @@
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
                 "org.eclipse.jetty.websocket:websocket-servlet",
                 "org.eclipse.jetty:apache-jsp",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "javax.websocket:javax.websocket-api": {
@@ -15584,33 +15658,17 @@
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty93": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
-        },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jdt.core.compiler:ecj": {
@@ -15635,7 +15693,7 @@
         "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93"
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-api": {
@@ -15674,14 +15732,14 @@
         "org.eclipse.jetty:apache-jsp": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93"
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-annotations": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
-                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-http": {
@@ -15708,30 +15766,30 @@
         "org.eclipse.jetty:jetty-plus": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
-                "org.eclipse.jetty:jetty-servlet"
+                "org.eclipse.jetty:jetty-servlet",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
-                "org.eclipse.jetty:jetty-security"
+                "org.eclipse.jetty:jetty-security",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
                 "org.eclipse.jetty.websocket:websocket-server",
-                "org.eclipse.jetty:jetty-webapp"
+                "org.eclipse.jetty:jetty-webapp",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-util": {
@@ -15749,9 +15807,9 @@
         "org.eclipse.jetty:jetty-webapp": {
             "locked": "9.3.20.v20170531",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
                 "org.eclipse.jetty:jetty-annotations",
-                "org.eclipse.jetty:jetty-plus"
+                "org.eclipse.jetty:jetty-plus",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
@@ -15759,6 +15817,22 @@
             "transitive": [
                 "org.eclipse.jetty:jetty-webapp"
             ]
+        },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty93"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty93": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
         },
         "org.mortbay.jasper:apache-el": {
             "locked": "8.0.33",
@@ -15773,22 +15847,22 @@
             ]
         },
         "org.ow2.asm:asm": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
                 "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty93",
                 "org.ow2.asm:asm-tree"
             ]
         },
         "org.ow2.asm:asm-commons": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty93",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty93"
             ]
         },
         "org.ow2.asm:asm-tree": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
                 "org.ow2.asm:asm-commons"
             ]
@@ -15804,7 +15878,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -15816,13 +15890,13 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.annotation:javax.annotation-api": {
@@ -15834,52 +15908,41 @@
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
                 "org.eclipse.jetty.websocket:websocket-servlet",
                 "org.eclipse.jetty:apache-jsp",
-                "org.eclipse.jetty:jetty-server"
+                "org.eclipse.jetty:jetty-server",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "javax.websocket:javax.websocket-api": {
             "locked": "1.0",
             "transitive": [
-                "org.eclipse.jetty.websocket:javax-websocket-client-impl",
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
+        "javax.websocket:javax.websocket-client-api": {
+            "locked": "1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty"
+                "org.eclipse.jetty.websocket:javax-websocket-client-impl"
             ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-jetty94": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
-        "org.eclipse.jdt.core.compiler:ecj": {
-            "locked": "4.4.2",
+        "org.eclipse.jdt:ecj": {
+            "locked": "3.12.3",
             "transitive": [
-                "org.eclipse.jetty:apache-jsp"
+                "org.mortbay.jasper:apache-jsp"
             ]
         },
         "org.eclipse.jetty.toolchain:jetty-schemas": {
@@ -15890,71 +15953,72 @@
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-client-impl": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:javax-websocket-server-impl": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94"
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-api": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-common",
                 "org.eclipse.jetty.websocket:websocket-servlet"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-client": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-client-impl",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-common": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-server": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:javax-websocket-server-impl"
             ]
         },
         "org.eclipse.jetty.websocket:websocket-servlet": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server"
             ]
         },
         "org.eclipse.jetty:apache-jsp": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94"
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-annotations": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
-                "org.eclipse.jetty.websocket:javax-websocket-server-impl"
+                "org.eclipse.jetty.websocket:javax-websocket-server-impl",
+                "org.eclipse.jetty:apache-jsp",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-client": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client"
             ]
         },
         "org.eclipse.jetty:jetty-http": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-server",
                 "org.eclipse.jetty:jetty-client",
@@ -15962,7 +16026,7 @@
             ]
         },
         "org.eclipse.jetty:jetty-io": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -15972,42 +16036,42 @@
             ]
         },
         "org.eclipse.jetty:jetty-jndi": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty:jetty-plus"
             ]
         },
         "org.eclipse.jetty:jetty-plus": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-security": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
-                "org.eclipse.jetty:jetty-servlet"
+                "org.eclipse.jetty:jetty-servlet",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-server": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
-                "org.eclipse.jetty:jetty-security"
+                "org.eclipse.jetty:jetty-security",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-servlet": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
                 "org.eclipse.jetty.websocket:websocket-server",
-                "org.eclipse.jetty:jetty-webapp"
+                "org.eclipse.jetty:jetty-webapp",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-util": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
                 "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty.websocket:websocket-common",
@@ -16019,48 +16083,65 @@
             ]
         },
         "org.eclipse.jetty:jetty-webapp": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
                 "org.eclipse.jetty:jetty-annotations",
-                "org.eclipse.jetty:jetty-plus"
+                "org.eclipse.jetty:jetty-plus",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.eclipse.jetty:jetty-xml": {
-            "locked": "9.4.6.v20170531",
+            "locked": "9.4.8.v20171121",
             "transitive": [
+                "org.eclipse.jetty.websocket:websocket-client",
                 "org.eclipse.jetty:jetty-webapp"
             ]
         },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-jetty94"
+            ]
+        },
+        "org.gretty:gretty-runner-jetty94": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
+        },
         "org.mortbay.jasper:apache-el": {
-            "locked": "8.5.9.1",
+            "locked": "8.5.23",
             "transitive": [
                 "org.mortbay.jasper:apache-jsp"
             ]
         },
         "org.mortbay.jasper:apache-jsp": {
-            "locked": "8.5.9.1",
+            "locked": "8.5.23",
             "transitive": [
                 "org.eclipse.jetty:apache-jsp"
             ]
         },
         "org.ow2.asm:asm": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
                 "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty94",
                 "org.ow2.asm:asm-tree"
             ]
         },
         "org.ow2.asm:asm-commons": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-jetty94",
-                "org.eclipse.jetty:jetty-annotations"
+                "org.eclipse.jetty:jetty-annotations",
+                "org.gretty:gretty-runner-jetty94"
             ]
         },
         "org.ow2.asm:asm-tree": {
-            "locked": "5.0.3",
+            "locked": "6.0",
             "transitive": [
                 "org.ow2.asm:asm-commons"
             ]
@@ -16076,7 +16157,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -16088,81 +16169,65 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat"
+                "org.gretty:gretty-runner-tomcat"
             ]
-        },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-tomcat": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat7"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-tomcat7": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "7.0.78",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat",
                 "org.apache.tomcat.embed:tomcat-embed-jasper",
-                "org.apache.tomcat.embed:tomcat-embed-websocket"
+                "org.apache.tomcat.embed:tomcat-embed-websocket",
+                "org.gretty:gretty-runner-tomcat"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-el": {
             "locked": "7.0.78",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat7",
-                "org.apache.tomcat.embed:tomcat-embed-jasper"
+                "org.apache.tomcat.embed:tomcat-embed-jasper",
+                "org.gretty:gretty-runner-tomcat7"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-jasper": {
             "locked": "7.0.78",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat7"
+                "org.gretty:gretty-runner-tomcat7"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-logging-log4j": {
             "locked": "7.0.78",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat"
+                "org.gretty:gretty-runner-tomcat"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-websocket": {
             "locked": "7.0.78",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat7"
+                "org.gretty:gretty-runner-tomcat7"
             ]
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jdt.core.compiler:ecj": {
@@ -16170,6 +16235,22 @@
             "transitive": [
                 "org.apache.tomcat.embed:tomcat-embed-jasper"
             ]
+        },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat7"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat7": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.7",
@@ -16182,7 +16263,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -16194,81 +16275,65 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8"
+                "org.gretty:gretty-runner-tomcat8"
             ]
-        },
-        "org.akhikhl.gretty:gretty-runner": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-tomcat": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-runner-tomcat8": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
         },
         "org.apache.tomcat.embed:tomcat-embed-core": {
             "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8",
                 "org.apache.tomcat.embed:tomcat-embed-jasper",
-                "org.apache.tomcat.embed:tomcat-embed-websocket"
+                "org.apache.tomcat.embed:tomcat-embed-websocket",
+                "org.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-el": {
             "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8",
-                "org.apache.tomcat.embed:tomcat-embed-jasper"
+                "org.apache.tomcat.embed:tomcat-embed-jasper",
+                "org.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-jasper": {
             "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8"
+                "org.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-logging-log4j": {
             "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8"
+                "org.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.apache.tomcat.embed:tomcat-embed-websocket": {
             "locked": "8.0.44",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner-tomcat8"
+                "org.gretty:gretty-runner-tomcat8"
             ]
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-runner"
+                "org.gretty:gretty-runner"
             ]
         },
         "org.eclipse.jdt:ecj": {
@@ -16277,6 +16342,22 @@
                 "org.apache.tomcat.embed:tomcat-embed-jasper"
             ]
         },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat8"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat8": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
+        },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.7",
             "transitive": [
@@ -16284,10 +16365,129 @@
             ]
         }
     },
+    "grettyRunnerTomcat9": {
+        "ch.qos.logback:logback-classic": {
+            "locked": "1.1.3",
+            "transitive": [
+                "org.gretty:gretty-runner"
+            ]
+        },
+        "ch.qos.logback:logback-core": {
+            "locked": "1.1.3",
+            "transitive": [
+                "ch.qos.logback:logback-classic"
+            ]
+        },
+        "commons-cli:commons-cli": {
+            "locked": "1.2",
+            "transitive": [
+                "org.gretty:gretty-runner"
+            ]
+        },
+        "commons-io:commons-io": {
+            "locked": "2.4",
+            "transitive": [
+                "org.gretty:gretty-runner"
+            ]
+        },
+        "javax.servlet:javax.servlet-api": {
+            "locked": "4.0.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.apache.tomcat.embed:tomcat-embed-core": {
+            "locked": "9.0.5",
+            "transitive": [
+                "org.apache.tomcat.embed:tomcat-embed-jasper",
+                "org.apache.tomcat.embed:tomcat-embed-websocket",
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.apache.tomcat.embed:tomcat-embed-el": {
+            "locked": "9.0.5",
+            "transitive": [
+                "org.apache.tomcat.embed:tomcat-embed-jasper",
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.apache.tomcat.embed:tomcat-embed-jasper": {
+            "locked": "9.0.5",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.apache.tomcat.embed:tomcat-embed-websocket": {
+            "locked": "9.0.5",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.apache.tomcat:tomcat-annotations-api": {
+            "locked": "9.0.5",
+            "transitive": [
+                "org.apache.tomcat.embed:tomcat-embed-core"
+            ]
+        },
+        "org.codehaus.groovy:groovy": {
+            "locked": "2.4.13",
+            "transitive": [
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-runner"
+            ]
+        },
+        "org.codehaus.groovy:groovy-json": {
+            "locked": "2.4.13",
+            "transitive": [
+                "org.gretty:gretty-runner"
+            ]
+        },
+        "org.eclipse.jdt:ecj": {
+            "locked": "3.12.3",
+            "transitive": [
+                "org.apache.tomcat.embed:tomcat-embed-jasper"
+            ]
+        },
+        "org.gretty:gretty-runner": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat8"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat8": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat9"
+            ]
+        },
+        "org.gretty:gretty-runner-tomcat9": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
+        },
+        "org.slf4j:log4j-over-slf4j": {
+            "locked": "1.7.12",
+            "transitive": [
+                "org.gretty:gretty-runner-tomcat"
+            ]
+        },
+        "org.slf4j:slf4j-api": {
+            "locked": "1.7.12",
+            "transitive": [
+                "ch.qos.logback:logback-classic",
+                "org.slf4j:log4j-over-slf4j"
+            ]
+        }
+    },
     "grettySpringLoaded": {
         "org.springframework:springloaded": {
-            "locked": "1.2.5.RELEASE",
-            "requested": "1.2.5.RELEASE"
+            "locked": "1.2.8.RELEASE",
+            "requested": "1.2.8.RELEASE"
         }
     },
     "grettyStarter": {
@@ -16300,7 +16500,7 @@
         "ch.qos.logback:logback-classic": {
             "locked": "1.1.3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "ch.qos.logback:logback-core": {
@@ -16312,19 +16512,19 @@
         "commons-cli:commons-cli": {
             "locked": "1.2",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "commons-configuration:commons-configuration": {
             "locked": "1.10",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "commons-io:commons-io": {
             "locked": "2.4",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "commons-lang:commons-lang": {
@@ -16340,40 +16540,40 @@
                 "org.springframework:spring-core"
             ]
         },
-        "org.akhikhl.gretty:gretty-core": {
-            "locked": "2.0.0",
-            "transitive": [
-                "org.akhikhl.gretty:gretty-starter"
-            ]
-        },
-        "org.akhikhl.gretty:gretty-starter": {
-            "locked": "2.0.0",
-            "requested": "2.0.0"
-        },
         "org.apache.commons:commons-lang3": {
             "locked": "3.7",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "org.apache.servicemix.bundles:org.apache.servicemix.bundles.bcprov-jdk16": {
             "locked": "1.46_3",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "org.codehaus.groovy:groovy": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core",
-                "org.codehaus.groovy:groovy-json"
+                "org.codehaus.groovy:groovy-json",
+                "org.gretty:gretty-core"
             ]
         },
         "org.codehaus.groovy:groovy-json": {
-            "locked": "2.4.11",
+            "locked": "2.4.13",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
+        },
+        "org.gretty:gretty-core": {
+            "locked": "2.1.0",
+            "transitive": [
+                "org.gretty:gretty-starter"
+            ]
+        },
+        "org.gretty:gretty-starter": {
+            "locked": "2.1.0",
+            "requested": "2.1.0"
         },
         "org.slf4j:slf4j-api": {
             "locked": "1.7.7",
@@ -16397,7 +16597,7 @@
         "org.springframework.boot:spring-boot-devtools": {
             "locked": "1.3.3.RELEASE",
             "transitive": [
-                "org.akhikhl.gretty:gretty-core"
+                "org.gretty:gretty-core"
             ]
         },
         "org.springframework:spring-aop": {
@@ -16438,39 +16638,66 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.9",
-            "requested": "0.7.9"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.7.9",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.7.9",
-            "requested": "0.7.9"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.7.9",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.7.9",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
-        "org.ow2.asm:asm-debug-all": {
-            "locked": "5.2",
+        "org.ow2.asm:asm": {
+            "locked": "6.0",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
-                "org.jacoco:org.jacoco.report"
+                "org.ow2.asm:asm-tree"
+            ]
+        },
+        "org.ow2.asm:asm-analysis": {
+            "locked": "6.0",
+            "transitive": [
+                "org.jacoco:org.jacoco.core"
+            ]
+        },
+        "org.ow2.asm:asm-commons": {
+            "locked": "6.0",
+            "transitive": [
+                "org.jacoco:org.jacoco.core"
+            ]
+        },
+        "org.ow2.asm:asm-tree": {
+            "locked": "6.0",
+            "transitive": [
+                "org.jacoco:org.jacoco.core",
+                "org.ow2.asm:asm-analysis",
+                "org.ow2.asm:asm-commons",
+                "org.ow2.asm:asm-util"
+            ]
+        },
+        "org.ow2.asm:asm-util": {
+            "locked": "6.0",
+            "transitive": [
+                "org.jacoco:org.jacoco.core"
             ]
         }
     },
@@ -17185,8 +17412,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -17539,7 +17765,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -19416,7 +19642,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19498,7 +19724,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -20870,8 +21096,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -21224,7 +21449,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -23101,7 +23326,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23183,7 +23408,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -24559,8 +24784,7 @@
             ]
         },
         "com.netflix.aeneas:aeneas-core": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.archaius:archaius-core": {
             "locked": "0.7.6",
@@ -24913,7 +25137,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -26784,7 +27008,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26866,7 +27090,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -28223,14 +28447,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -28609,7 +28831,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -28623,25 +28845,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -30523,7 +30745,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30606,7 +30828,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -32038,14 +32260,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -32424,7 +32644,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -32438,25 +32658,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -34338,7 +34558,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34421,7 +34641,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35853,14 +36073,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -36239,7 +36457,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -36253,25 +36471,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -38153,7 +38371,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38236,7 +38454,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -39668,14 +39886,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -40054,7 +40270,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -40068,25 +40284,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -41968,7 +42184,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42051,7 +42267,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -43483,14 +43699,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -43869,7 +44083,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -43883,25 +44097,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -45783,7 +45997,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45866,7 +46080,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47298,14 +47512,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -47684,7 +47896,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -47698,25 +47910,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -49598,7 +49810,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49681,7 +49893,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -51113,14 +51325,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -51499,7 +51709,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -51513,25 +51723,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -53413,7 +53623,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53496,7 +53706,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -54928,14 +55138,12 @@
         },
         "com.netflix.aeneas:aeneas-core": {
             "locked": "1.52.3",
-            "requested": "latest.release",
             "transitive": [
                 "com.netflix.aeneas:aeneas-test"
             ]
         },
         "com.netflix.aeneas:aeneas-test": {
-            "locked": "1.52.3",
-            "requested": "latest.release"
+            "locked": "1.52.3"
         },
         "com.netflix.aeneas:aeneas-test-common": {
             "locked": "1.52.3",
@@ -55314,7 +55522,7 @@
             "locked": "1.17.5"
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -55328,25 +55536,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+",
             "transitive": [
                 "netflix:netflix-internal-hollow"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "2.15.1",
+            "locked": "2.15.2",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -57228,7 +57436,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.106",
+            "locked": "2.108",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -57311,7 +57519,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "60.73",
+            "locked": "60.74",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]

@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
-
-import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
+import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 
 @SuppressWarnings("all")
 public class StoriesSynopsesHookListTypeAPI extends HollowListTypeAPI {

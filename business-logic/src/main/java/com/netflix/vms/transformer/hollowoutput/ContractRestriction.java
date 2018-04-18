@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

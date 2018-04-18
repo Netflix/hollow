@@ -1,11 +1,16 @@
 package com.netflix.vms.transformer.modules.media;
 
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
-import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
@@ -16,13 +21,8 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.VideoDateUtil;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;

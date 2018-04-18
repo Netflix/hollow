@@ -1,8 +1,7 @@
 package com.netflix.vms.transformer.rest.blobinfo;
 
-import com.google.inject.Singleton;
-
 import com.google.common.base.Strings;
+import com.google.inject.Singleton;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.fastproperties.ClientPinningUtil;
 import java.io.IOException;

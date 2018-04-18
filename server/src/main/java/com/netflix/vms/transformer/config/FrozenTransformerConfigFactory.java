@@ -9,7 +9,6 @@ import com.netflix.archaius.api.annotations.Configuration;
 import com.netflix.archaius.config.MapConfig;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Method;

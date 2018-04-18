@@ -1,10 +1,19 @@
 package com.netflix.vms.transformer.modules.meta;
 
+import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
+import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
+import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
+import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
+import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import static com.netflix.hollow.core.read.iterator.HollowOrdinalIterator.NO_MORE_ORDINALS;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -39,19 +48,10 @@ import com.netflix.vms.transformer.hollowoutput.VRole;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.IndexSpec;
-import static com.netflix.vms.transformer.index.IndexSpec.L10N_STORIES_SYNOPSES;
-import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
-import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

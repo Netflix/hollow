@@ -5,7 +5,6 @@ import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
 import com.netflix.vms.transformer.hollowoutput.Date;
-
 import java.util.Calendar;
 import java.util.TimeZone;
 

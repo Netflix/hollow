@@ -3,12 +3,11 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MarkedPoisonState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
-
-import java.util.Arrays;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
+import java.util.Arrays;
 
 public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
 

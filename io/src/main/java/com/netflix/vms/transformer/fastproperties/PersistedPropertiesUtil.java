@@ -1,12 +1,15 @@
 package com.netflix.vms.transformer.fastproperties;
 
+import com.google.common.base.Strings;
+import com.netflix.config.NetflixConfiguration;
+import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,11 +24,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-
-import com.google.common.base.Strings;
-import com.netflix.config.NetflixConfiguration;
-import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 public class PersistedPropertiesUtil {
 

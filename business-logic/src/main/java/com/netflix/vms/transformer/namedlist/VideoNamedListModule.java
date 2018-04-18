@@ -16,9 +16,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
-
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;

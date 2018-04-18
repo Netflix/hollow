@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer;
 
 import com.google.common.annotations.VisibleForTesting;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;

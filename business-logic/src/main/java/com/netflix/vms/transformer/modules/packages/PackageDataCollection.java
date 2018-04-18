@@ -5,8 +5,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.hollowinput.CdnDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
-import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
-import com.netflix.vms.transformer.hollowinput.StreamDeploymentLabelHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowoutput.BaseDownloadable;
 import com.netflix.vms.transformer.hollowoutput.DownloadableId;
@@ -23,7 +21,6 @@ import com.netflix.vms.transformer.hollowoutput.TrickPlayType;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoResolution;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -148,8 +145,10 @@ public class PackageDataCollection {
 
     private void convertCdnDeploymentsAndAddToList(PackageStreamHollow stream, List<Strings> originServerNames) {
         Set<CdnDeploymentHollow> cdnDeployments = stream._getDeployment()._getDeploymentInfo()._getCdnDeployments();
-        for (CdnDeploymentHollow deployment : cdnDeployments) {
-            originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+        if (cdnDeployments != null) {
+            for (CdnDeploymentHollow deployment : cdnDeployments) {
+                originServerNames.add(new Strings(deployment._getOriginServer()._getValue()));
+            }
         }
     }
 

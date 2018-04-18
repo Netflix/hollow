@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.fastlane;
 
-import com.netflix.hollow.api.producer.HollowProducer.Announcer;
-
-import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.api.producer.HollowProducer.Announcer;
+import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;

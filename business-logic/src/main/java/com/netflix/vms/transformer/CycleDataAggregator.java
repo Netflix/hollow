@@ -4,7 +4,6 @@ import com.netflix.servo.util.VisibleForTesting;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

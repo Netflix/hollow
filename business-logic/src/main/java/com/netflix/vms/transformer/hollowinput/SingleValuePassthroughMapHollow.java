@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.objects.HollowMap;
-import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
 

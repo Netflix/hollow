@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
-
 import java.util.Map;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 public abstract class CanaryValidationJob extends PublishWorkflowPublicationJob {
 

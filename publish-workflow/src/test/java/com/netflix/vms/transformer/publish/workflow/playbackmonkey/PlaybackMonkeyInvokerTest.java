@@ -1,28 +1,22 @@
 package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import com.netflix.config.NetflixConfiguration;
+import com.netflix.lifecycle.NFLifecycleUnitTester;
+import com.netflix.niws.client.RestClientManager;
+import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.netflix.aws.file.FileAccessItem;
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration;
-import com.netflix.lifecycle.NFLifecycleUnitTester;
-import com.netflix.niws.client.RestClientManager;
-import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
-import com.netflix.vms.logging.TaggingLogger;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
-import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 
 public class PlaybackMonkeyInvokerTest {
     private static final String COUNTRY = "US";

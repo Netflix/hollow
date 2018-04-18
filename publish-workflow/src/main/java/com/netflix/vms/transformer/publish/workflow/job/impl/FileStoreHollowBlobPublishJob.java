@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishedBlob;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;

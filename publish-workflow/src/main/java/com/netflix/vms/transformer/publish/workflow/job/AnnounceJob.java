@@ -1,9 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
-
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 public abstract class AnnounceJob extends PublishWorkflowPublicationJob {
     public final static String ANNOUNCE_DELTA_JOB_NAME_PREFIX = "announce_delta_";
