@@ -34,7 +34,9 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
 
     protected abstract boolean _isPrimary();
 
-    protected abstract void _force();
+    protected void _force() {
+        throw new UnsupportedOperationException("forcing a producer to become primary is not supported");
+    }
 
     @Override
     public void enable() {

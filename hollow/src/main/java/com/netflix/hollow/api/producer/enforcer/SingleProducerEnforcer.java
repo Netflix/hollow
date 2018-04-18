@@ -41,7 +41,7 @@ public interface SingleProducerEnforcer {
 
 
     /**
-     * Force Maring producer to enable processing cycles.
+     * Force marking producer to enable processing cycles.
      */
     void force();
 
