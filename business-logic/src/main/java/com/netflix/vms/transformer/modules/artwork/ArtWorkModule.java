@@ -474,6 +474,8 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
 
     private @NotNull Optional<java.lang.Integer> maybeInt(String key, Map<String, String> map) {
         return Optional.ofNullable(map.get(key))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
                 .map(str -> {
                     try {
                         return java.lang.Integer.valueOf(str);
