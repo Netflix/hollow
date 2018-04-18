@@ -388,6 +388,9 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         maybePassThroughString("DESIGN_EFFORT", keyValues)
                 .ifPresent(s -> getBasicPassthrough(artwork).design_effort = s);
 
+        maybePassThroughString("BRANDING_ALIGNMENT", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).branding_alignment = s);
+
         maybePassthroughList("AWARD_CAMPAIGNS", keyListValues)
                 .ifPresent(l -> getBasicPassthrough(artwork).awardCampaigns = l);
 
