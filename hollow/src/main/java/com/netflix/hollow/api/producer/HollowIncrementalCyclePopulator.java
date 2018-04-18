@@ -69,19 +69,30 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         TransitiveSetTraverser.removeReferencedOutsideClosure(priorStateEngine, recordsToRemove);
     }
 
-    private void markTypeRecordsToRemove(HollowReadStateEngine priorStateEngine, String type, BitSet typeRecordsToRemove) {
+    private void markTypeRecordsToRemove(HollowReadStateEngine priorStateEngine, final String type, final BitSet typeRecordsToRemove) {
         HollowTypeReadState priorReadState = priorStateEngine.getTypeState(type);
         HollowSchema schema = priorReadState.getSchema();
         if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
-            HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
+            final HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
 
-            for(Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                if(entry.getKey().getType().equals(type)) {
-                    int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
+            SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+            for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
+                executor.execute(new Runnable() {
+                    public void run() {
+                        if(entry.getKey().getType().equals(type)) {
+                            int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
 
-                    if(priorOrdinal != -1)
-                        typeRecordsToRemove.set(priorOrdinal);
-                }
+                            if(priorOrdinal != -1)
+                                typeRecordsToRemove.set(priorOrdinal);
+                        }
+                    }
+                });
+            }
+
+            try {
+                executor.awaitSuccessfulCompletion();
+            } catch(Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
