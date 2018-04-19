@@ -38,12 +38,12 @@ import java.util.BitSet;
 public class HollowHistoryTypeKeyIndex {
 
     private final PrimaryKey primaryKey;
-    private final String keyFieldParts[][];
-    private final boolean keyFieldIsIndexed[];
+    private final String[][] keyFieldParts;
+    private final boolean[] keyFieldIsIndexed;
     private HollowObjectSchema keySchema;
 
-    private int hashedRecordKeys[];
-    private int hashedFieldKeys[][];
+    private int[] hashedRecordKeys;
+    private int[][] hashedFieldKeys;
     private LongList hashedFieldKeyChains;
 
     private int maxIndexedKeyOrdinal = 0;
@@ -61,10 +61,10 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     public void addFieldIndex(String fieldName, HollowDataset dataModel) {
-        String fieldPathParts[] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), fieldName);
+        String[] fieldPathParts = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), fieldName);
         
         for(int i=0;i<primaryKey.numFields();i++) {
-            String pkFieldPathParts[] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), primaryKey.getFieldPath(i));
+            String[] pkFieldPathParts = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), primaryKey.getFieldPath(i));
             if(Arrays.equals(pkFieldPathParts, fieldPathParts)) {
                 keyFieldIsIndexed[i] = true;
                 break;
@@ -164,7 +164,7 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     private int[] initializeHashedKeyArray(int hashTableSize) {
-        int hashedRecordKeys[] = new int[hashTableSize];
+        int[] hashedRecordKeys = new int[hashTableSize];
         Arrays.fill(hashedRecordKeys, -1);
         return hashedRecordKeys;
     }
@@ -198,8 +198,8 @@ public class HollowHistoryTypeKeyIndex {
 
     private int findKeyHashCode(HollowObjectTypeReadState typeState, int ordinal) {
         int hashCode = 0;
-        for(int i=0;i<keyFieldParts.length;i++) {
-            int fieldHashCode = findKeyFieldHashCode(typeState, ordinal, keyFieldParts[i], 0);
+        for (String[] keyFieldPart : keyFieldParts) {
+            int fieldHashCode = findKeyFieldHashCode(typeState, ordinal, keyFieldPart, 0);
             hashCode = (hashCode * 31) ^ fieldHashCode;
         }
         return HashCodes.hashInt(hashCode);
@@ -272,8 +272,8 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     private void addMatches(Matcher matcher, int fieldIndex, int hashCode, IntList results) {
-        hashCode = HashCodes.hashInt(hashCode);
-        int bucket = hashCode & (hashedFieldKeys[fieldIndex].length - 1);
+        int hashIntCode = HashCodes.hashInt(hashCode);
+        int bucket = hashIntCode & (hashedFieldKeys[fieldIndex].length - 1);
 
         while(hashedFieldKeys[fieldIndex][bucket] != -1) {
             int chainIndex = hashedFieldKeys[fieldIndex][bucket];
@@ -292,11 +292,11 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
-    private static interface Matcher {
-        public boolean foundMatch(int ordinal);
+    private interface Matcher {
+        boolean foundMatch(int ordinal);
     }
 
-    private int findKeyFieldHashCode(HollowObjectTypeReadState typeState, int ordinal, String keyFieldParts[], int keyFieldPartPosition) {
+    private int findKeyFieldHashCode(HollowObjectTypeReadState typeState, int ordinal, String[] keyFieldParts, int keyFieldPartPosition) {
         int schemaPosition = typeState.getSchema().getPosition(keyFieldParts[keyFieldPartPosition]);
         if(keyFieldPartPosition < keyFieldParts.length - 1) {
             HollowObjectTypeReadState nextPartTypeState = (HollowObjectTypeReadState) typeState.getSchema().getReferencedTypeState(schemaPosition);
@@ -315,7 +315,7 @@ public class HollowHistoryTypeKeyIndex {
         return true;
     }
 
-    private boolean recordFieldMatchesKey(HollowObjectTypeReadState typeState, int ordinal, HollowObjectTypeReadState keyTypeState, int keyOrdinal, int keyFieldPosition, String keyFieldParts[], int keyFieldPartPosition) {
+    private boolean recordFieldMatchesKey(HollowObjectTypeReadState typeState, int ordinal, HollowObjectTypeReadState keyTypeState, int keyOrdinal, int keyFieldPosition, String[] keyFieldParts, int keyFieldPartPosition) {
         int schemaPosition = typeState.getSchema().getPosition(keyFieldParts[keyFieldPartPosition]);
         if(keyFieldPartPosition < keyFieldParts.length - 1) {
             HollowObjectTypeReadState nextPartTypeState = (HollowObjectTypeReadState) typeState.getSchema().getReferencedTypeState(schemaPosition);
@@ -387,7 +387,7 @@ public class HollowHistoryTypeKeyIndex {
         writeStateEngine.add(primaryKey.getType(), rec);
     }
 
-    private void writeKeyField(HollowObjectTypeReadState typeState, int ordinal, HollowObjectWriteRecord rec, String keyField, String keyFieldParts[], int keyFieldPartPosition) {
+    private void writeKeyField(HollowObjectTypeReadState typeState, int ordinal, HollowObjectWriteRecord rec, String keyField, String[] keyFieldParts, int keyFieldPartPosition) {
         int schemaPosition = typeState.getSchema().getPosition(keyFieldParts[keyFieldPartPosition]);
         if(keyFieldPartPosition < keyFieldParts.length - 1) {
             HollowObjectTypeReadState nextPartTypeState = (HollowObjectTypeReadState) typeState.getSchema().getReferencedTypeState(schemaPosition);
@@ -442,7 +442,7 @@ public class HollowHistoryTypeKeyIndex {
         }
     }
 
-    private void addSchemaField(HollowObjectSchema schema, HollowObjectSchema keySchema, String keyField, String keyFieldParts[], int keyFieldPartPosition) {
+    private void addSchemaField(HollowObjectSchema schema, HollowObjectSchema keySchema, String keyField, String[] keyFieldParts, int keyFieldPartPosition) {
         int schemaPosition = schema.getPosition(keyFieldParts[keyFieldPartPosition]);
         if(keyFieldPartPosition < keyFieldParts.length - 1) {
             HollowObjectSchema nextPartSchema = (HollowObjectSchema) schema.getReferencedTypeState(schemaPosition).getSchema();
@@ -458,7 +458,7 @@ public class HollowHistoryTypeKeyIndex {
     }
 
     private String[][] getKeyFieldParts(HollowDataset dataModel) {
-        String keyFieldParts[][] = new String[primaryKey.numFields()][];
+        String[][] keyFieldParts = new String[primaryKey.numFields()][];
         for(int i=0;i<primaryKey.numFields();i++)
             keyFieldParts[i] = PrimaryKey.getCompleteFieldPathParts(dataModel, primaryKey.getType(), primaryKey.getFieldPath(i));
         return keyFieldParts;
