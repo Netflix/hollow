@@ -208,6 +208,9 @@ public class HollowHistoryTypeKeyIndex {
     public IntList queryIndexedFields(final String query) {
         final HollowObjectTypeReadState keyTypeState = (HollowObjectTypeReadState) readStateEngine.getTypeState(primaryKey.getType());
         IntList matchingKeys = new IntList();
+        if (keyTypeState == null){
+            return matchingKeys;
+        }
 
         for(int i=0;i<primaryKey.numFields();i++) {
             final int fieldIndex = i;

@@ -69,6 +69,9 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         addRecord(3.3F, "one", 3L, 1.1D);
 
         roundTripSnapshot();
+
+        assertResults(keyIdx, "A", "two");
+
         keyIdx.update(readStateEngine, false);
 
         addRecord(1.1F, "one", 1L, 1.1D);
