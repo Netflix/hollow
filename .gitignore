@@ -5,6 +5,7 @@
 .gradle
 .settings
 .idea
+/*.iml
 business-logic/out
 common-interfaces/out
 io/out
