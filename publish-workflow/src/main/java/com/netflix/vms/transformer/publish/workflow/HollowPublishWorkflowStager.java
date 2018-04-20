@@ -27,6 +27,7 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublis
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
+import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,14 +76,14 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         if(circuitBreakerDataProvider != null)
             circuitBreakerDataProvider.notifyRestoredStateEngine(restoredState, nostreamsRestoredState);
     }
-    
+
     @Override
     public HollowReadStateEngine getCurrentReadStateEngine() {
         if(circuitBreakerDataProvider != null)
             return circuitBreakerDataProvider.getStateEngine();
         throw new IllegalStateException("No HollowReadStateEngine is available");
     }
-    
+
     @Override
     public CycleStatusFuture triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
         PublishWorkflowContext ctx = jobCreator.beginStagingNewCycle();
@@ -107,7 +108,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
             scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
-        
+
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }
 
@@ -163,7 +164,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
-        
+
         File nostreamsSnapshotFile = new File(fileNamer.getNostreamsSnapshotFileName(newVersion));
         File nostreamsDeltaFile = new File(fileNamer.getNostreamsDeltaFileName(previousVersion, newVersion));
         File nostreamsReverseDeltaFile = new File(fileNamer.getNostreamsReverseDeltaFileName(newVersion, previousVersion));
@@ -182,8 +183,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         List<PublicationJob> circuitBreakerAndPublishJobs = new ArrayList<>(publishJobsForCycle);
         circuitBreakerAndPublishJobs.add(circuitBreakerJob);
         scheduler.submitJob(jobCreator.createDeleteFileJob(circuitBreakerAndPublishJobs, nextVersion,
-                fileNamer.getDeltaFileName(previousVersion, nextVersion), 
-                fileNamer.getReverseDeltaFileName(nextVersion, previousVersion), 
+                fileNamer.getDeltaFileName(previousVersion, nextVersion),
+                fileNamer.getReverseDeltaFileName(nextVersion, previousVersion),
                 fileNamer.getSnapshotFileName(nextVersion),
                 fileNamer.getNostreamsDeltaFileName(previousVersion, nextVersion),
                 fileNamer.getNostreamsReverseDeltaFileName(nextVersion, previousVersion),
@@ -203,8 +204,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, false, inputDataVersion, previousVersion, newVersion, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
-            
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.SNAPSHOT, true, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
+
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.SNAPSHOT, true, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
@@ -212,8 +213,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, false, inputDataVersion, previousVersion, newVersion, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
-            
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.DELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
+
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.DELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
@@ -221,8 +222,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, false, inputDataVersion, previousVersion, newVersion, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
-            
-            publishJob = jobCreator.createPublishJob(vip + "_nostreams", PublishType.REVERSEDELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
+
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.REVERSEDELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
