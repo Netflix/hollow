@@ -15,6 +15,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
     public PassthroughString focal_point = null;
     public PassthroughString approval_source = null;
     public PassthroughString design_effort = null;
+    public PassthroughString branding_alignment = null;
     public List<__passthrough_string> personIdStrs = null;
     public NullablePrimitiveBoolean approval_state = null;
     public ArtworkReExploreLongTimestamp reExploreLongTimestamp = null;
@@ -56,6 +57,9 @@ public class ArtworkBasicPassthrough implements Cloneable {
         if(o.design_attribute == null) {
         	if(design_effort != null) return false;
         } else if(!o.design_effort.equals(design_effort)) return false;
+        if(o.branding_alignment == null) {
+            if(branding_alignment != null) return false;
+        } else if(!o.branding_alignment.equals(branding_alignment)) return false;
         if(o.personIdStrs == null) {
             if(personIdStrs != null) return false;
         } else if(!o.personIdStrs.equals(personIdStrs)) return false;
@@ -81,6 +85,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         hashCode = hashCode * 31 + (focal_point == null ? 1237 : focal_point.hashCode());
         hashCode = hashCode * 31 + (approval_source == null ? 1237 : approval_source.hashCode());
         hashCode = hashCode * 31 + (design_effort == null ? 1237 : design_effort.hashCode());
+        hashCode = hashCode * 31 + (branding_alignment == null ? 1237 : branding_alignment.hashCode());
         hashCode = hashCode * 31 + (personIdStrs == null ? 1237 : personIdStrs.hashCode());
         hashCode = hashCode * 31 + (approval_state == null ? 1231 : approval_state.hashCode());
         hashCode = hashCode * 31 + (reExploreLongTimestamp == null ? 1231 : reExploreLongTimestamp.hashCode());
@@ -100,6 +105,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         builder.append(",focal_point=").append(focal_point);
         builder.append(",approval_source=").append(approval_source);
         builder.append(",design_effort=").append(design_effort);
+        builder.append(",branding_alignment=").append(branding_alignment);
         builder.append(",personIdStrs=").append(personIdStrs);
         builder.append(",approval_state=").append(approval_state);
         builder.append(",re_explore_timestamp=").append(reExploreLongTimestamp.toString());

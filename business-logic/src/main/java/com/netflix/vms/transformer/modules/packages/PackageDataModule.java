@@ -7,9 +7,10 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.VideoHierarchy;
-import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
@@ -82,7 +83,8 @@ public class PackageDataModule {
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
     private final TransformerContext ctx;
 
-    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper,
+            CycleConstants cycleConstants, VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = objectMapper;
@@ -95,7 +97,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, cycleConstants, indexer, cupTokenFetcher);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
         this.hdrProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "HDR");

@@ -7,7 +7,6 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.input.FileStoreUtil;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;

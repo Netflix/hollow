@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class StatusPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, StatusHollow> {
 
     public StatusPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public StatusPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Status")).getPrimaryKey().getFieldPaths());
+    public StatusPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("Status")).getPrimaryKey().getFieldPaths());
     }
 
     public StatusPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public StatusPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "Status", isListenToDataRefreah, fieldPaths);
+    public StatusPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "Status", isListenToDataRefresh, fieldPaths);
     }
 
     public StatusHollow findMatch(Object... keys) {

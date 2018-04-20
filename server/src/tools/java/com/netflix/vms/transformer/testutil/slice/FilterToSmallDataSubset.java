@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.testutil.slice;
 
-
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;

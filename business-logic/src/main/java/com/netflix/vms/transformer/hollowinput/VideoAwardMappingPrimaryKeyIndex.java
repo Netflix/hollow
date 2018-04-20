@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class VideoAwardMappingPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, VideoAwardMappingHollow> {
 
     public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoAwardMapping")).getPrimaryKey().getFieldPaths());
+    public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("VideoAwardMapping")).getPrimaryKey().getFieldPaths());
     }
 
     public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "VideoAwardMapping", isListenToDataRefreah, fieldPaths);
+    public VideoAwardMappingPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "VideoAwardMapping", isListenToDataRefresh, fieldPaths);
     }
 
     public VideoAwardMappingHollow findMatch(Object... keys) {

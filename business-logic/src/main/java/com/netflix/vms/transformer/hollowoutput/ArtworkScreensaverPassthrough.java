@@ -2,9 +2,9 @@ package com.netflix.vms.transformer.hollowoutput;
 
 public class ArtworkScreensaverPassthrough implements Cloneable {
 
-    public int startX = java.lang.Integer.MIN_VALUE;
-    public int endX = java.lang.Integer.MIN_VALUE;
-    public int offsetY = java.lang.Integer.MIN_VALUE;
+    public int startX = 0;
+    public int endX = 0;
+    public int offsetY = 0;
     
     @Override
     public int hashCode() {

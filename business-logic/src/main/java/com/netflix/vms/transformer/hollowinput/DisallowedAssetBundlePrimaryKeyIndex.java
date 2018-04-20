@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class DisallowedAssetBundlePrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, DisallowedAssetBundleHollow> {
 
     public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedAssetBundle")).getPrimaryKey().getFieldPaths());
+    public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("DisallowedAssetBundle")).getPrimaryKey().getFieldPaths());
     }
 
     public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "DisallowedAssetBundle", isListenToDataRefreah, fieldPaths);
+    public DisallowedAssetBundlePrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "DisallowedAssetBundle", isListenToDataRefresh, fieldPaths);
     }
 
     public DisallowedAssetBundleHollow findMatch(Object... keys) {

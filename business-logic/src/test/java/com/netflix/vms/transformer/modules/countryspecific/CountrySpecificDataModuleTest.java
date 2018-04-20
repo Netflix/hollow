@@ -1,18 +1,16 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class CountrySpecificDataModuleTest {
 	

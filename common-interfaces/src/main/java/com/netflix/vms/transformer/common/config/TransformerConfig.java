@@ -238,4 +238,7 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     public boolean isPrePromoEnabledForMultiLanguageCatalog();
+
+    @DefaultValue("false")
+    public boolean isReadCupTokensFromCinderFeed();
 }

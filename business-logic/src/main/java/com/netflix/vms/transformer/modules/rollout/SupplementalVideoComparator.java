@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.rollout;
 
 import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
-
 import java.util.Comparator;
 
 public class SupplementalVideoComparator implements Comparator<SupplementalVideo> {

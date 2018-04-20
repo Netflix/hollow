@@ -44,7 +44,7 @@ public class TransformerServerHealthIndicator implements HealthIndicator, Transf
     }
 
     private Status startupStatus = Status.STARTING;
-    private Health healthStatus = Health.unhealthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
+    private Health healthStatus = Health.healthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
 
     @Override
     public void cycleSucessful() {
@@ -74,11 +74,6 @@ public class TransformerServerHealthIndicator implements HealthIndicator, Transf
 
     public synchronized void setStartupStatus(Status startupStatus, Throwable th) {
         this.startupStatus = startupStatus;
-        if (startupStatus == Status.STARTED_SUCCESSFUL) {
-            healthStatus = Health.healthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
-        } else {
-            healthStatus = th == null ? Health.unhealthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build() : Health.unhealthy(th)
-                    .withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
-        }
+        healthStatus = Health.healthy().withDetail(TRANSFORMER_STATUS_STRING, startupStatus.name()).build();
     }
 }

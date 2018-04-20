@@ -23,7 +23,6 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

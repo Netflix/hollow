@@ -8,18 +8,18 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 public class RightsWindowContractPrimaryKeyIndex extends AbstractHollowUniqueKeyIndex<VMSHollowInputAPI, RightsWindowContractHollow> {
 
     public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer) {
-        this(consumer, false);    }
+        this(consumer, true);    }
 
-    public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah) {
-        this(consumer, isListenToDataRefreah, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RightsWindowContract")).getPrimaryKey().getFieldPaths());
+    public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh) {
+        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema("RightsWindowContract")).getPrimaryKey().getFieldPaths());
     }
 
     public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer, String... fieldPaths) {
         this(consumer, true, fieldPaths);
     }
 
-    public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefreah, String... fieldPaths) {
-        super(consumer, "RightsWindowContract", isListenToDataRefreah, fieldPaths);
+    public RightsWindowContractPrimaryKeyIndex(HollowConsumer consumer, boolean isListenToDataRefresh, String... fieldPaths) {
+        super(consumer, "RightsWindowContract", isListenToDataRefresh, fieldPaths);
     }
 
     public RightsWindowContractHollow findMatch(Object... keys) {

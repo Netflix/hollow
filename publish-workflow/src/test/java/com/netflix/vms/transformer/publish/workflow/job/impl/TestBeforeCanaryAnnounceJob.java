@@ -5,7 +5,6 @@ import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import java.util.Collections;
 import java.util.List;

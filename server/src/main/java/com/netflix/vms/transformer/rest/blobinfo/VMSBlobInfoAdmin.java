@@ -1,10 +1,9 @@
 package com.netflix.vms.transformer.rest.blobinfo;
 
-import com.google.inject.Singleton;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.astyanax.model.ColumnFamily;
 import com.netflix.aws.db.Item;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileStore;
@@ -14,11 +13,9 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFa
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.fastproperties.ClientPinningUtil;
-import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.AttributeKeys;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.BlobType;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,12 +28,10 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.codehaus.jackson.map.ObjectMapper;

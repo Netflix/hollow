@@ -1,15 +1,14 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import com.netflix.config.FastProperty;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.vms.logging.TaggingLogger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.netflix.config.FastProperty;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.vms.logging.TaggingLogger;
 
 public class PublishRegionProvider {
 

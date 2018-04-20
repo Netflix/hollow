@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.util;
 
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

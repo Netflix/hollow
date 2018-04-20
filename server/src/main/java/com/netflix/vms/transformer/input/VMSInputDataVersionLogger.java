@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.logging.TaggingLogger;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataVersionIds;
 
+import com.netflix.vms.logging.TaggingLogger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;

@@ -1,11 +1,9 @@
 package com.netflix.vms.transformer.publish.workflow.logmessage;
 
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.Test;
-
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 
 public class ViewShareMessageTest {
 

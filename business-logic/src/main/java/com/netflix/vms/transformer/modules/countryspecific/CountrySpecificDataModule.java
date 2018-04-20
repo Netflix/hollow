@@ -10,6 +10,7 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
@@ -69,7 +70,9 @@ public class CountrySpecificDataModule {
 
     private VideoDataCollection videoDataCollection;
 
-    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants constants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator) {
+    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper,
+            CycleConstants constants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
+            CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
@@ -81,7 +84,8 @@ public class CountrySpecificDataModule {
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
-        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer, cycleDataAggregator);
+        this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer,
+                cycleDataAggregator, cupTokenFetcher);
     }
 
     @VisibleForTesting
@@ -190,7 +194,7 @@ public class CountrySpecificDataModule {
         }
 
         for (Map.Entry<Integer, MulticatalogCountryData> entry : map.entrySet()) {
-            mapper.addObject(entry.getValue());
+            mapper.add(entry.getValue());
         }
     }
 
@@ -342,6 +346,18 @@ public class CountrySpecificDataModule {
         return countryType;
     }
 
+    /**
+     * This method calculates metadata availability date for a video. This date determines when the search team will start promoting the titles correctly.
+     * <br>
+     * For the actual logic see {@link SensitiveVideoServerSideUtil#getMetadataAvailabilityDate(boolean, boolean, Set, Long, Long, Long, Integer, Integer, CycleConstants, Long)}
+     *
+     * @param videoId
+     * @param countryCode
+     * @param firstDisplayDate
+     * @param availabilityWindowList - Availability windows in country
+     * @param data
+     * @param rollup
+     */
     private void populateMetaDataAvailabilityDate(long videoId, String countryCode, Long firstDisplayDate, List<VMSAvailabilityWindow> availabilityWindowList, CompleteVideoCountrySpecificData data, CountrySpecificRollupValues rollup) {
         VMSAvailabilityWindow firstWindow = getEarlierstWindow(availabilityWindowList);
         WindowPackageContractInfo packageContractInfo = getWindowPackageContractInfo(firstWindow);

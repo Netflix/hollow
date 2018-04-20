@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.playbackmonkey;
 
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-
 import java.util.ArrayList;
 import java.util.List;
 

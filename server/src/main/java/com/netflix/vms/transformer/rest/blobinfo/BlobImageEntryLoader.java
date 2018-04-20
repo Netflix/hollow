@@ -1,5 +1,10 @@
 package com.netflix.vms.transformer.rest.blobinfo;
 
+import com.netflix.aws.db.Item;
+import com.netflix.aws.db.ItemAttribute;
+import com.netflix.aws.file.FileStore;
+import com.netflix.config.NetflixConfiguration;
+import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.AttributeKeys;
 import com.netflix.vms.transformer.rest.blobinfo.BlobImageEntry.BlobType;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
@@ -7,11 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import com.netflix.aws.db.Item;
-import com.netflix.aws.db.ItemAttribute;
-import com.netflix.aws.file.FileStore;
-import com.netflix.config.NetflixConfiguration;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 
 /**
  * Loader to fetch blob info (snapshot, delta and reserve delta)
