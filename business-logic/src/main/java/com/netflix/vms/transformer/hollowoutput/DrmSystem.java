@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-
 import java.util.Map;
 
 @HollowPrimaryKey(fields="id")

@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.util;
 
 import com.netflix.vms.transformer.CycleConstants;
-
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryListHollow;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;

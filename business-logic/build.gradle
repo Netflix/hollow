@@ -23,3 +23,6 @@ jar {
   from 'src/main/java'
 }
 
+tasks.checkstyleMain {
+  exclude '**/hollowinput/**'
+}

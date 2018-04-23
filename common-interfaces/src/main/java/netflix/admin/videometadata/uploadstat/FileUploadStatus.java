@@ -1,8 +1,7 @@
 package netflix.admin.videometadata.uploadstat;
 
-import java.util.Collection;
-
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import java.util.Collection;
 
 public interface FileUploadStatus {
 

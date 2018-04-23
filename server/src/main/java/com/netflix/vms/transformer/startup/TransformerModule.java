@@ -1,12 +1,10 @@
 package com.netflix.vms.transformer.startup;
 
 import com.google.inject.AbstractModule;
-// Common module dependencies
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.netflix.archaius.ConfigProxyFactory;
 import com.netflix.cup.CupModule;
-// Server dependencies
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.SimpleTransformerCycleInterrupter;
@@ -22,6 +20,9 @@ import com.netflix.vms.transformer.octobersky.OctoberSkyDataImpl;
 import com.netflix.vms.transformer.publish.workflow.util.TransformerServerCassandraHelper;
 import com.netflix.vms.transformer.util.SequenceVersionMinter;
 import javax.inject.Singleton;
+
+// Common module dependencies
+// Server dependencies
 
 
 /**

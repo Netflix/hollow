@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.namedlist;
 
-
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;

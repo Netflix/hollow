@@ -5,7 +5,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

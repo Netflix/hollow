@@ -2,11 +2,10 @@ package com.netflix.vms.transformer;
 
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.util.VMSTransformerHashCodeFinder;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *

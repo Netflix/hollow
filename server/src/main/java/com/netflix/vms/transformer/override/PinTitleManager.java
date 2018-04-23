@@ -6,7 +6,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.util.OverrideVipNameUtil;
+import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -272,7 +272,7 @@ public class PinTitleManager {
     // Create Output Based Processor
     @VisibleForTesting
     PinTitleProcessor createOutputBasedProcessor() {
-        String vip = outputDataVip != null ? outputDataVip : OverrideVipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
+        String vip = outputDataVip != null ? outputDataVip : VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
         if (fileStore != null) {
             return new OutputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
         } else {

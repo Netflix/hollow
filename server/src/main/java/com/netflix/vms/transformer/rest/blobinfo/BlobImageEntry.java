@@ -4,7 +4,6 @@ import com.netflix.aws.db.Item;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.videometadata.VMSToStringBuilder;
 import com.netflix.videometadata.util.UnmodifiableCollections;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.codehaus.jackson.map.ObjectMapper;

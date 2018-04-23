@@ -4,11 +4,6 @@ import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraH
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.DataCanary;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
@@ -23,6 +18,10 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
 import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class CassandraCanaryValidationJob extends CanaryValidationJob {
 

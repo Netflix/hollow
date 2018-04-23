@@ -44,10 +44,12 @@ public class AtlasTransformerMetricRecorder implements TransformerMetricRecorder
     }
 
     @Override
-    public void stopTimer(DurationMetric metric) {
+    public long stopTimer(DurationMetric metric) {
         DurationMeter meter = meterMap.get(metric);
         if (meter == null) throw new RuntimeException("Metric=" + metric + " has not been started");
         meter.stop();
+
+        return meter.getDuration();
     }
 
     @Override

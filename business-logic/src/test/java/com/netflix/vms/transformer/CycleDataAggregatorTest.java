@@ -1,21 +1,21 @@
 package com.netflix.vms.transformer;
 
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.when;
+
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import java.util.Arrays;
+import java.util.Collection;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Matchers.eq;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
-
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * Unit tests for cycle data aggregator.

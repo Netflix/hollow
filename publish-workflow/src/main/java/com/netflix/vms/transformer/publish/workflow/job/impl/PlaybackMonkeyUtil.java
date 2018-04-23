@@ -1,9 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.netflix.servo.monitor.DynamicGauge;
 import com.netflix.servo.tag.BasicTag;
 import com.netflix.servo.tag.BasicTagList;
@@ -12,6 +8,9 @@ import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class PlaybackMonkeyUtil {
 	static final String TIME_TAKEN = "vms.hollow.playbackmonkey.timeTakenInMillis";

@@ -64,7 +64,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import javax.validation.constraints.NotNull;
 
 public abstract class ArtWorkModule extends AbstractTransformModule{
     protected final String entityType;
@@ -368,71 +370,63 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             keyListValues.put(key, values);
         }
 
-        PassthroughString passThroughString = getPassThroughString("APPROVAL_SOURCE", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).approval_source = passThroughString;
-        }
-        passThroughString = getPassThroughString("designAttribute", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).design_attribute = passThroughString;
-        }
+        maybePassThroughString("APPROVAL_SOURCE", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).approval_source = s);
 
-        passThroughString = getPassThroughString("FOCAL_POINT", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).focal_point = passThroughString;
-        }            // Sort descriptor necessary for client artwork resolver
+        maybePassThroughString("designAttribute", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).design_attribute = s);
 
-        passThroughString = getPassThroughString("TONE", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).tone = passThroughString;
-        }
-        passThroughString = getPassThroughString("GROUP_ID", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).group_id = passThroughString;
-        }
+        maybePassThroughString("FOCAL_POINT", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).focal_point = s); // Sort descriptor necessary for client artwork resolver
 
-        passThroughString = getPassThroughString("DESIGN_EFFORT", keyValues);
-        if(passThroughString != null) {
-            getBasicPassthrough(artwork).design_effort = passThroughString;
-        }
+        maybePassThroughString("TONE", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).tone = s);
 
-        if (keyListValues.containsKey("AWARD_CAMPAIGNS")) {
-            getBasicPassthrough(artwork).awardCampaigns = keyListValues.get("AWARD_CAMPAIGNS");
-        }
-        if (keyListValues.containsKey("themes")) {
-            getBasicPassthrough(artwork).themes = keyListValues.get("themes");
-        }
-        if (keyListValues.containsKey("IDENTIFIERS")) {
-            getBasicPassthrough(artwork).identifiers = keyListValues.get("IDENTIFIERS");
-        }
-        if (keyListValues.containsKey("PERSON_IDS")) {
-            getBasicPassthrough(artwork).personIdStrs = keyListValues.get("PERSON_IDS");
-        }
+        maybePassThroughString("GROUP_ID", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).group_id = s);
+
+        maybePassThroughString("DESIGN_EFFORT", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).design_effort = s);
+
+        maybePassThroughString("BRANDING_ALIGNMENT", keyValues)
+                .ifPresent(s -> getBasicPassthrough(artwork).branding_alignment = s);
+
+        maybePassthroughList("AWARD_CAMPAIGNS", keyListValues)
+                .ifPresent(l -> getBasicPassthrough(artwork).awardCampaigns = l);
+
+        maybePassthroughList("themes", keyListValues)
+                .ifPresent(l -> getBasicPassthrough(artwork).themes = l);
+
+        maybePassthroughList("IDENTIFIERS", keyListValues)
+                .ifPresent(l -> getBasicPassthrough(artwork).identifiers = l);
+
+        maybePassthroughList("PERSON_IDS", keyListValues)
+                .ifPresent(l -> getBasicPassthrough(artwork).personIdStrs = l);
+
         applyLocaleOverridableAttributes(artwork, keyValues);
 
-        String startX = keyValues.get("SCREENSAVER_START_X");
-        String endX = keyValues.get("SCREENSAVER_END_X");
-        String offsetY = keyValues.get("SCREENSAVER_OFFSET_Y");
-        if(startX != null || endX != null || offsetY != null) {
+        Optional<java.lang.Integer> startX = maybeInt("SCREENSAVER_START_X", keyValues);
+        Optional<java.lang.Integer> endX = maybeInt("SCREENSAVER_END_X", keyValues);
+        Optional<java.lang.Integer> offsetY = maybeInt("SCREENSAVER_OFFSET_Y", keyValues);
+        if(startX.isPresent() || endX.isPresent() || offsetY.isPresent()) {
             ArtworkScreensaverPassthrough screensaverPassthrough = new ArtworkScreensaverPassthrough();
-            try {
-                if(startX != null)  screensaverPassthrough.startX = java.lang.Integer.parseInt(startX);
-                if(endX != null)    screensaverPassthrough.endX = java.lang.Integer.parseInt(endX);
-                if(offsetY != null) screensaverPassthrough.offsetY = java.lang.Integer.parseInt(offsetY);
-                getBasicPassthrough(artwork).screensaverPassthrough = screensaverPassthrough;
-            } catch(NumberFormatException unexpected) {
-                ctx.getLogger().error(TransformerLogTag.UnexpectedError, "Failed to parse artwork SCREENSAVER attributes", unexpected);
-            }
+            startX.ifPresent(i -> screensaverPassthrough.startX = i);
+            endX.ifPresent(i -> screensaverPassthrough.endX = i);
+            offsetY.ifPresent(i -> screensaverPassthrough.offsetY = i);
+            getBasicPassthrough(artwork).screensaverPassthrough = screensaverPassthrough;
         }
 
         ArtworkSourcePassthrough sourcePassThrough = new ArtworkSourcePassthrough();
-        sourcePassThrough.source_file_id = getArtworkSourceString("source_file_id", keyValues);
-        sourcePassThrough.original_source_file_id = getArtworkSourceString("original_source_file_id", keyValues);
-        if (sourcePassThrough.original_source_file_id == null) sourcePassThrough.original_source_file_id = sourcePassThrough.source_file_id;
+        maybeArtworkSourceString("source_file_id", keyValues)
+                .ifPresent(sourceString -> sourcePassThrough.source_file_id = sourceString);
+        sourcePassThrough.original_source_file_id = maybeArtworkSourceString("original_source_file_id", keyValues)
+                .orElse(sourcePassThrough.source_file_id);
 
         artwork.source = sourcePassThrough;
-        artwork.source_movie_id = getPassThroughVideo("SOURCE_MOVIE_ID", keyValues);
-        artwork.acquisitionSource = getAcquisitionSource("ACQUISITION_SOURCE", keyValues);
+        maybePassthroughVideo("SOURCE_MOVIE_ID", keyValues)
+                .ifPresent(video -> artwork.source_movie_id = video);
+        maybeAcquisitionSource("ACQUISITION_SOURCE", keyValues)
+                .ifPresent(source -> artwork.acquisitionSource = source);
     }
 
     protected Map<String, String> getSingleKeyValuesMap(ArtworkAttributesHollow attributes) {
@@ -476,36 +470,43 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
         return artwork.basic_passthrough;
     }
 
-    private PassthroughVideo getPassThroughVideo(String key, Map<String, String> keyValues) {
-        PassthroughString passThroughString = getPassThroughString(key, keyValues);
-        if (passThroughString == null) return null;
-
-        String videoStr = new String(passThroughString.value);
-        return new PassthroughVideo(java.lang.Integer.parseInt(videoStr));
+    private @NotNull Optional<PassthroughVideo> maybePassthroughVideo(String key, Map<String, String> map) {
+        return maybeInt(key, map)
+                .map(PassthroughVideo::new);
     }
 
-    private PassthroughString getPassThroughString(String key, Map<String, String> keyValues) {
-        String value = keyValues.get(key);
-        if(value != null) {
-            return new PassthroughString(value);
-        }
-        return null;
+    private @NotNull Optional<java.lang.Integer> maybeInt(String key, Map<String, String> map) {
+        return Optional.ofNullable(map.get(key))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(str -> {
+                    try {
+                        return java.lang.Integer.valueOf(str);
+                    } catch (NumberFormatException ex) {
+                        ctx.getLogger().error(TransformerLogTag.UnexpectedError,
+                                "Failed to parse attribute as int; key={} value={}", key, str, ex);
+                    }
+                    return null;
+                });
     }
 
-    private AcquisitionSource getAcquisitionSource(String key, Map<String, String> keyValues) {
-        String value = keyValues.get(key);
-        if (value != null) {
-            return new AcquisitionSource(value);
-        }
-        return null;
+    private @NotNull Optional<PassthroughString> maybePassThroughString(String key, Map<String, String> map) {
+        return Optional.ofNullable(map.get(key))
+                .map(PassthroughString::new);
     }
 
-    private ArtworkSourceString getArtworkSourceString(String key, Map<String, String> keyValues) {
-        String value = keyValues.get(key);
-        if(value != null) {
-            return new ArtworkSourceString(value);
-        }
-        return null;
+    private @NotNull Optional<List<__passthrough_string>> maybePassthroughList(String key, Map<String, List<__passthrough_string>> map) {
+        return Optional.ofNullable(map.get(key));
+    }
+
+    private @NotNull Optional<AcquisitionSource> maybeAcquisitionSource(String key, Map<String, String> map) {
+        return Optional.ofNullable(map.get(key))
+                .map(AcquisitionSource::new);
+    }
+
+    private @NotNull Optional<ArtworkSourceString> maybeArtworkSourceString(String key, Map<String, String> map) {
+        return Optional.ofNullable(map.get(key))
+                .map(ArtworkSourceString::new);
     }
 
     protected final ArtWorkImageTypeEntry getImageTypeEntry(String typeName) {

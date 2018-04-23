@@ -1,12 +1,16 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
+import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
+import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
+import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
-import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
+import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
@@ -34,13 +38,9 @@ import com.netflix.vms.transformer.hollowoutput.OfflineViewingRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing;
-import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
-import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,11 +65,14 @@ public class ContractRestrictionModule {
     private final Map<String, Strings> bcp47Codes;
 
     private final StreamContractAssetTypeDeterminer assetTypeDeterminer;
+    private final CupTokenFetcher cupTokenFetcher;
 
-    public ContractRestrictionModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public ContractRestrictionModule(VMSHollowInputAPI api, CycleConstants cycleConstants, VMSTransformerIndexer indexer,
+            CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.indexer = indexer;
         this.cycleConstants = cycleConstants;
+        this.cupTokenFetcher = cupTokenFetcher;
         this.videoStatusIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_STATUS);
         this.cupKeysMap = new HashMap<>();
         this.bcp47Codes = new HashMap<>();
@@ -257,7 +260,7 @@ public class ContractRestrictionModule {
                 restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
             }
 
-            String cupToken = contract._getCupToken()._getValue();
+            String cupToken = cupTokenFetcher.getCupTokenString(videoId, contract);
             restriction.cupKeys.add(getCupKey(cupToken));
         }
 
@@ -336,8 +339,7 @@ public class ContractRestrictionModule {
                 }
             }
 
-            StringHollow cupKeyHollow = contract == null ? null : contract._getCupToken();
-            String cupKey = (cupKeyHollow == null ? CupKey.DEFAULT : cupKeyHollow._getValue());
+            String cupKey = cupTokenFetcher.getCupTokenString(videoId, contract);
             orderedContractIdCupKeyMap.put((int) contractId, cupKey);
 
             // if any rights contract is downloadable, then the package is downloadable.

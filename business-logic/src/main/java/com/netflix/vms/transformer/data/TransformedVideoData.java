@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.data;
 import com.google.common.collect.Maps;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
-
 import java.util.Map;
 import java.util.Set;
 

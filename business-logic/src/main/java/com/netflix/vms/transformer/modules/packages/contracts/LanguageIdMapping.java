@@ -1,11 +1,10 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
-import java.io.InputStream;
-
 import java.io.IOException;
-import java.util.Properties;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class LanguageIdMapping {
     

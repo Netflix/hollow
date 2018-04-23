@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.akhikhl.gretty:gretty:2.0.0'
+        classpath 'org.gretty:gretty:2.1.0'
     }
 }
 
@@ -11,7 +11,7 @@ apply plugin: 'war'
 
 apply plugin: 'netflix.ospackage-tomcat'
 
-apply plugin: "org.akhikhl.gretty"
+apply plugin: 'org.gretty'
 
 repositories {
     jcenter()
@@ -59,7 +59,7 @@ dependencies {
     compile 'netflix:base-server'
 
     // Cassandra Aeneas driver
-    compile "com.netflix.aeneas:aeneas-core:latest.release"
+    compile "com.netflix.aeneas:aeneas-core"
 
     // VMS Transformer
     compile project(':vmstransformer-common-interfaces')
@@ -82,7 +82,7 @@ dependencies {
     testCompile 'com.netflix.hollow:hollow-jsonadapter:2.+'
 
     // Cassandra Aeneas unit test kit.
-    testCompile "com.netflix.aeneas:aeneas-test:latest.release"
+    testCompile "com.netflix.aeneas:aeneas-test"
     testCompile 'com.netflix.governator:governator-test-junit'
     testCompile "netflix:videoresolutiontypelibrary:latest.release"
 

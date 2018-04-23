@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer;
 
-
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;

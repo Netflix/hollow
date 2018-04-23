@@ -1,12 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJobQueue;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class PublishWorkflowPublicationJobQueue implements PublicationJobQueue {
 

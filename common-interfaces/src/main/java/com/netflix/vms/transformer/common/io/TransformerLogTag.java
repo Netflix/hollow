@@ -8,6 +8,8 @@ public enum TransformerLogTag implements LogTag {
     TransformCycleSuccess,
     TransformCycleMonkey,
     TransformCycleFailed,
+    TransformRestore,
+    TransformDuration,
     CycleFastlaneIds,
     TransformProgress,
     TransformInfo,
@@ -80,6 +82,7 @@ public enum TransformerLogTag implements LogTag {
     LocaleMerching_Missing_Dubs,
     LocaleMerching_Missing_Subs,
     LocaleMerching_NoWindows,
+    LocaleMerching_NoEarliestWindowInfo,
 
     MultiLocaleCountries,
 }

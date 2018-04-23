@@ -5,7 +5,6 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.TransformerContext;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

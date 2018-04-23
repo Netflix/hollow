@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.artwork;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowoutput.Artwork;
-
 import java.util.Comparator;
 
 public class ArtWorkComparator implements Comparator<Artwork> {

@@ -3,11 +3,10 @@ package com.netflix.vms.transformer.util;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
-
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageTypeEntry;
+import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
 import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;

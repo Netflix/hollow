@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.logging.TaggingLogger;
@@ -8,6 +9,7 @@ import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.contract.ContractAssetType;
+import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.*;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -25,9 +27,7 @@ import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
-import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,14 +37,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import java.util.stream.Collectors;
+import javax.ws.rs.HEAD;
 
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
 
-    // for aggregating pre-promotion data
+    // for aggregating pre-promotion videos in multi-langauge catalog.
     public static final TaggingLogger.LogTag PRE_PROMOTION_TAG = TransformerLogTag.LocaleMerching_PrePromotion_Phase;
     public static final String PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase";
     public static final TaggingLogger.Severity PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
@@ -74,6 +76,13 @@ public class VMSAvailabilityWindowModule {
     public static final String LOCALE_MERCHING_DROPPED_MESSAGE = "Titles for which contracts were skipped or no windows added";
     public static final TaggingLogger.Severity LOCALE_MERCHING_DROPPED_SEVERITY = TaggingLogger.Severity.INFO;
 
+    public static final TaggingLogger.LogTag LOCALE_MERCHING_NO_EARLIEST_WINDOW = TransformerLogTag.LocaleMerching_NoEarliestWindowInfo;
+    public static final String LOCALE_MERCHING_NO_EARLIEST_WINDOW_MESSAGE = "Titles for which no information present for earliest window start date for "
+            + "localized assets availability";
+    public static final TaggingLogger.Severity LOCALE_MERCHING_NO_EARLIEST_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
+
+
+
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
@@ -82,7 +91,6 @@ public class VMSAvailabilityWindowModule {
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
-    private final Strings DEFAULT_CUP_TOKEN = new Strings(CupKey.DEFAULT);
     private final LinkedHashSetOfStrings EMPTY_CUP_TOKENS;
     private final LinkedHashSetOfStrings DEFAULT_CUP_TOKENS;
 
@@ -91,6 +99,7 @@ public class VMSAvailabilityWindowModule {
     private final WindowPackageContractInfoModule windowPackageContractInfoModule;
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
     private final CycleDataAggregator cycleDataAggregator;
+    private final CupTokenFetcher cupTokenFetcher;
 
     public static void configureLogsTagsForAggregator(CycleDataAggregator cycleDataAggregator) {
         cycleDataAggregator.aggregateForLogTag(PRE_PROMOTION_TAG, PRE_PROMOTION_SEVERITY, PRE_PROMOTION_MESSAGE);
@@ -99,16 +108,19 @@ public class VMSAvailabilityWindowModule {
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_DUBS_TAG, LOCALE_MERCHING_MISSING_DUBS_SEVERITY, LOCALE_MERCHING_MISSING_DUBS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_SUBS_TAG, LOCALE_MERCHING_MISSING_SUBS_SEVERITY, LOCALE_MERCHING_MISSING_SUBS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_DROPPED_TAG, LOCALE_MERCHING_DROPPED_SEVERITY, LOCALE_MERCHING_DROPPED_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_NO_EARLIEST_WINDOW, LOCALE_MERCHING_NO_EARLIEST_WINDOW_SEVERITY, LOCALE_MERCHING_NO_EARLIEST_WINDOW_MESSAGE);
     }
 
-    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator) {
+    public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
+            VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.merchLanguageDateIdx = indexer.getPrimaryKeyIndex(IndexSpec.MERCH_LANGUAGE_DATE);
+        this.cupTokenFetcher = cupTokenFetcher;
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, ctx);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher, ctx);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
         this.cycleDataAggregator = cycleDataAggregator;
 
@@ -116,7 +128,7 @@ public class VMSAvailabilityWindowModule {
         EMPTY_CUP_TOKENS.ordinals = Collections.emptyList();
 
         DEFAULT_CUP_TOKENS = new LinkedHashSetOfStrings();
-        DEFAULT_CUP_TOKENS.ordinals = Collections.singletonList(DEFAULT_CUP_TOKEN);
+        DEFAULT_CUP_TOKENS.ordinals = Collections.singletonList(new Strings(CupKey.DEFAULT));
     }
 
 
@@ -368,7 +380,7 @@ public class VMSAvailabilityWindowModule {
 
                                     // merge cup tokens
                                     List<Strings> cupTokens = new ArrayList<>();
-                                    Strings contractCupToken = contractData == null ? DEFAULT_CUP_TOKEN : new Strings(contractData._getCupToken()._getValue());
+                                    Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData);
                                     if (windowPackageContractInfo.videoContractInfo.contractId > contractId) {
                                         cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
                                         if (!cupTokens.contains(contractCupToken))
@@ -433,7 +445,9 @@ public class VMSAvailabilityWindowModule {
 
                                     if (packageData != null) {
                                         // package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(packageData, windowContractHollow, contractData, country, isAvailableForDownload, packageDataCollection);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(
+                                                videoId, packageData, windowContractHollow, contractData, country,
+                                                isAvailableForDownload, packageDataCollection);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = contractPackages == null ? true : packageData.isDefaultPackage;
                                         if (!considerForPackageSelection) {
@@ -800,6 +814,9 @@ public class VMSAvailabilityWindowModule {
                     else return false;
                 }
 
+            } else {
+                cycleDataAggregator.collect(countryCode, locale, (int) videoId, LOCALE_MERCHING_NO_EARLIEST_WINDOW);
+                return false;
             }
         }
     }
