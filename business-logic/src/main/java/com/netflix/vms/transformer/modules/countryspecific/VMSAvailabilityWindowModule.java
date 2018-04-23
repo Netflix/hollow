@@ -38,12 +38,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.ws.rs.HEAD;
 
 public class VMSAvailabilityWindowModule {
 
-    public static final long ONE_THOUSAND_YEARS = (1000L * 365L * 24L * 60L * 60L * 1000L);
+    public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
 
     // for aggregating pre-promotion videos in multi-langauge catalog.
