@@ -62,7 +62,7 @@ public enum IndexSpec {
     TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
 
     // Merch-language-dates
-    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguagesDTO", "movieId.value", "countryCode.value", "languageCode.value");
+    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value", "languageCode.value");
 
 
     private final IndexType indexType;
