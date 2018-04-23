@@ -144,6 +144,9 @@ class HollowObjectTypeReadStateShard {
     }
 
     public Boolean readBoolean(int ordinal, int fieldIndex) {
+        if (ordinal < 0)
+            return null;
+
         HollowObjectTypeDataElements currentData;
         long value;
 
@@ -167,6 +170,9 @@ class HollowObjectTypeReadStateShard {
     }
 
     public byte[] readBytes(int ordinal, int fieldIndex) {
+        if (ordinal < 0)
+            return null;
+
         HollowObjectTypeDataElements currentData;
         byte[] result;
 
@@ -200,6 +206,9 @@ class HollowObjectTypeReadStateShard {
     }
 
     public String readString(int ordinal, int fieldIndex) {
+        if (ordinal < 0)
+            return null;
+
         HollowObjectTypeDataElements currentData;
         String result;
 
@@ -231,6 +240,9 @@ class HollowObjectTypeReadStateShard {
     }
 
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
+        if (ordinal < 0)
+            return testValue == null;
+
         HollowObjectTypeDataElements currentData;
         boolean result;
 
