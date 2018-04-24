@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -22,6 +23,7 @@ public class CatalogSizeCircuitBreakerTest {
 
 
     @Test
+    @Ignore
     public void testCatalogSizeCircuitBreaker() throws Exception {
         File localFile = new File("/Users/ksatiya/Downloads/20180424171608397");
         HollowReadStateEngine readEngine = new HollowReadStateEngine();

@@ -94,8 +94,6 @@ public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreak
                         .append(" size : ").append(countryLanguageCatalogSize.get(country).get(language))
                         .append(",");
             }
-            String completeMessage = message.toString();
-            System.out.println(completeMessage);
             ctx.getLogger().log(TaggingLogger.Severity.INFO, Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
