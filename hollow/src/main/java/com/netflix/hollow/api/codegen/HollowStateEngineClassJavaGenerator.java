@@ -25,17 +25,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowImp
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.lowercase;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.HollowStateEngine;
-import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
@@ -46,12 +35,22 @@ import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.api.sampling.HollowObjectCreationSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.api.sampling.SampleResult;
+import com.netflix.hollow.core.HollowStateEngine;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
 import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -302,7 +301,7 @@ public class HollowStateEngineClassJavaGenerator implements HollowJavaFileGenera
     }
 
     private List<HollowSchema> schemaList() {
-        // Sort Schema to have consistent ordering when generating VMSHollowStateEngine
+        // Sort Schema to have consistent ordering when generating state engine
         List<HollowSchema> schemaList = new ArrayList<HollowSchema>(stateEngine.getSchemas());
         Collections.sort(schemaList, new Comparator<HollowSchema>() {
             @Override

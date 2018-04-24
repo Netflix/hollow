@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.history.ui.jetty;
 
-import org.eclipse.jetty.server.Server;
-
 import com.netflix.hollow.history.ui.HollowHistoryUI;
 import com.netflix.hollow.history.ui.jetty.HollowHistoryUIServer.UIServer;
+import org.eclipse.jetty.server.Server;
 
 final class JettyBasedUIServer implements UIServer {
     private final Server server;

@@ -17,9 +17,7 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-
 import org.junit.Assert;
 import org.junit.Test;
 

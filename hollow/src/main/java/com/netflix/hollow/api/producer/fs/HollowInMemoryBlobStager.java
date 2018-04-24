@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -29,7 +30,7 @@ public class HollowInMemoryBlobStager implements HollowProducer.BlobStager {
 
     @Override
     public Blob openSnapshot(long version) {
-        return new InMemoryBlob(Long.MIN_VALUE, version, Blob.Type.SNAPSHOT);
+        return new InMemoryBlob(HollowConstants.VERSION_NONE, version, Blob.Type.SNAPSHOT);
     }
 
     @Override

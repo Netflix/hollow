@@ -17,21 +17,20 @@
  */
 package com.netflix.hollow.core.index;
 
-import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
-import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
-import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.HashCodes;
+import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
+import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeStateListener;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;

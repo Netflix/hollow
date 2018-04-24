@@ -17,20 +17,18 @@
  */
 package com.netflix.hollow.tools.diff;
 
-import com.netflix.hollow.core.util.IntList;
-import com.netflix.hollow.core.util.LongList;
-
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.tools.diff.HollowDiffMatcher;
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
-import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.util.LongList;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
+import com.netflix.hollow.core.write.HollowObjectWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -18,14 +18,13 @@
 package com.netflix.hollow.tools.history;
 
 import com.netflix.hollow.api.client.StackTraceRecorder;
-
-import com.netflix.hollow.core.util.IntMap;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.IntMap;
 
 public abstract class HollowHistoricalTypeDataAccess implements HollowTypeDataAccess {
 

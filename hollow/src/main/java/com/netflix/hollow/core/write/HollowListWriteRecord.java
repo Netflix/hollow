@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
+import com.netflix.hollow.core.memory.encoding.VarInt;
+import com.netflix.hollow.core.util.IntList;
 
 public class HollowListWriteRecord implements HollowWriteRecord {
 

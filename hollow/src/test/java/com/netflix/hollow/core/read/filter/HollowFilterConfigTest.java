@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.read.filter;
 
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-
 import org.junit.Assert;
 import org.junit.Test;
 

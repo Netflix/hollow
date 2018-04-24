@@ -17,19 +17,18 @@
  */
 package com.netflix.hollow.core.read.engine;
 
+import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
+import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
+import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
+import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.HollowBlobHeader;
-import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-import com.netflix.hollow.core.read.engine.list.HollowListTypeReadState;
-import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
-import com.netflix.hollow.core.read.engine.set.HollowSetTypeReadState;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;

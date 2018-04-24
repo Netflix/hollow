@@ -20,10 +20,9 @@ package com.netflix.hollow.tools.stringifier;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.INDENT;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.NEWLINE;
 
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.IOException;
 
 /**
  * Unit tests for the HollowRecordStringifier.

@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core.read.engine;
 
-import com.netflix.hollow.core.schema.HollowCollectionSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowCollectionTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowCollectionSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 /**
  * The parent class for {@link HollowTypeReadState}s for SET or LIST records. 

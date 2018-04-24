@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.core.util;
 
-import com.netflix.hollow.core.util.RemovedOrdinalIterator;
-
 import java.util.BitSet;
 import org.junit.Assert;
 import org.junit.Test;

@@ -21,7 +21,6 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substitut
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
-import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
@@ -30,8 +29,6 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchemaSorter;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +44,7 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
     private final boolean isListenToDataRefreah;
 
     public HollowHashIndexGenerator(String packageName, String apiClassname, HollowDataset dataset, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, config);
+        super(packageName, apiClassname, dataset, config);
         this.className = apiClassname + "HashIndex";
         this.dataset = dataset;
         this.isListenToDataRefreah = config.isListenToDataRefresh();

@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.api.objects;
 
-import com.netflix.hollow.core.schema.HollowMapSchema;
-
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowMapSchema;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Iterator;

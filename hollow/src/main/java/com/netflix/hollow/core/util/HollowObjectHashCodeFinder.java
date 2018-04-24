@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.util;
 
 import com.netflix.hollow.api.objects.HollowRecord;
-
 import java.util.Set;
 
 /**

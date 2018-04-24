@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 public class HollowHistoricalObjectDataAccess extends HollowHistoricalTypeDataAccess implements HollowObjectTypeDataAccess {
 

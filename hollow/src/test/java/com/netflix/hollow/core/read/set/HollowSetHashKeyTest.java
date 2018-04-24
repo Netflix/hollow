@@ -17,18 +17,17 @@
  */
 package com.netflix.hollow.core.read.set;
 
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import org.junit.Assert;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowSetHashKeyTest {

@@ -18,6 +18,7 @@ package com.netflix.hollow.api.codegen.delegate;
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 public abstract class HollowObjectDelegateGenerator extends HollowConsumerJavaFileGenerator {
@@ -26,8 +27,9 @@ public abstract class HollowObjectDelegateGenerator extends HollowConsumerJavaFi
     protected final HollowObjectSchema schema;
     protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
 
-    public HollowObjectDelegateGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
+    public HollowObjectDelegateGenerator(String packageName, HollowObjectSchema schema,
+            HollowErgonomicAPIShortcuts ergonomicShortcuts, HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.schema = schema;
         this.ergonomicShortcuts = ergonomicShortcuts;
     }

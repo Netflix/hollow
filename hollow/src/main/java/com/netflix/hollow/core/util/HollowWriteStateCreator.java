@@ -17,6 +17,15 @@
  */
 package com.netflix.hollow.core.util;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.schema.HollowListSchema;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchemaParser;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
@@ -24,15 +33,11 @@ import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.schema.HollowListSchema;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.BitSet;
 import java.util.Collection;
 
@@ -51,6 +56,24 @@ public class HollowWriteStateCreator {
         populateStateEngineWithTypeWriteStates(stateEngine, schemas);
 
         return stateEngine;
+    }
+
+    /**
+     * Reads a schema file into the provided HollowWriteStateEngine. The schema file must be on the classpath.
+     */
+    public static void readSchemaFileIntoWriteState(String schemaFilePath, HollowWriteStateEngine engine)
+            throws IOException {
+        InputStream input = null;
+        try {
+            input = HollowWriteStateCreator.class.getResourceAsStream(schemaFilePath);
+            Collection<HollowSchema> schemas =
+                HollowSchemaParser.parseCollectionOfSchemas(new BufferedReader(new InputStreamReader(input)));
+            populateStateEngineWithTypeWriteStates(engine, schemas);
+        } finally {
+            if (input != null) {
+                input.close();
+            }
+        }
     }
 
     /**
@@ -162,5 +185,4 @@ public class HollowWriteStateCreator {
         writeEngine.overrideNextStateRandomizedTag(readEngine.getCurrentRandomizedTag());
         writeEngine.prepareForWrite();
     }
-
 }

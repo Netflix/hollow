@@ -21,11 +21,11 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
-import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
-
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
+import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -85,7 +85,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
     @Override
     public HollowProducer.Blob openSnapshot(long version) {
-        return new FilesystemBlob(Long.MIN_VALUE, version, SNAPSHOT, stagingPath, compressor);
+        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, SNAPSHOT, stagingPath, compressor);
     }
 
     @Override

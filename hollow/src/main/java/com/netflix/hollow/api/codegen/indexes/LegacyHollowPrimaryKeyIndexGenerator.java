@@ -20,6 +20,7 @@ package com.netflix.hollow.api.codegen.indexes;
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
@@ -30,8 +31,9 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
  */
 public class LegacyHollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerator {
 
-    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema, CodeGeneratorConfig config) {
-        super(packageName, apiClassname, schema, config);
+    public LegacyHollowPrimaryKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, apiClassname, schema, dataset, config);
 
         isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = true;

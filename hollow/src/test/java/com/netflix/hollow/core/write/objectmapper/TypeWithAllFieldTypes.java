@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import java.util.Arrays;
-
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import java.util.Arrays;
 
 @SuppressWarnings("deprecation")
 public class TypeWithAllFieldTypes {

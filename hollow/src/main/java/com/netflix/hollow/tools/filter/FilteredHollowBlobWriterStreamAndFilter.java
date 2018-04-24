@@ -18,7 +18,6 @@
 package com.netflix.hollow.tools.filter;
 
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
-
 import java.io.DataOutputStream;
 import java.io.OutputStream;
 

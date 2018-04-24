@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -42,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A HollowProxyDataAccess delegates all calls to another {@link HollowDataAccess}.
  * <p>
- * This is useful when a {@link HollowConsumer.ObjectLongevityConfig} calls for the object longevity feature to be enabled.
+ * This is useful when a {@link com.netflix.hollow.api.consumer.HollowConsumer.ObjectLongevityConfig} calls for the object longevity feature to be enabled.
  * In this case, when a state transition occurs, all existing objects backed by the latest {@link HollowReadStateEngine} 
  * will need to be backed by a {@link HollowHistoricalStateDataAccess}. 
  *   

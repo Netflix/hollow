@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.tools.history.keyindex;
 
-import com.netflix.hollow.core.util.IntMap;
-import com.netflix.hollow.core.util.IntMap.IntMapEntryIterator;
-
-import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.util.IntMap;
+import com.netflix.hollow.core.util.IntMap.IntMapEntryIterator;
+import com.netflix.hollow.tools.combine.OrdinalRemapper;
 
 public class HollowHistoricalStateTypeKeyOrdinalMapping {
 

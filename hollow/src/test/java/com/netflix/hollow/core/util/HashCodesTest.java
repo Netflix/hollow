@@ -17,13 +17,12 @@
  */
 package com.netflix.hollow.core.util;
 
+import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
-import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import org.junit.Assert;
 import java.util.Random;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class HashCodesTest {

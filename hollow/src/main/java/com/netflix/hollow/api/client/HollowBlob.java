@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.HollowConstants;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,7 +27,7 @@ import java.io.InputStream;
  * <dl>
  *      <dt>The "from" version</dt>
  *      <dd>The unique identifier of the state to which a delta transition should be applied.  If
- *          this is a snapshot, then this value is Long.MIN_VALUE</dd>
+ *          this is a snapshot, then this value is HollowConstants.VERSION_NONE.</dd>
  *          
  *      <dt>The "to" version</dt>
  *      <dd>The unique identifier of the state at which a dataset will arrive after this blob is applied.</dd>
@@ -36,7 +36,7 @@ import java.io.InputStream;
  *      <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
  * </dl>
  * 
- * @deprecated Extend the {@link HollowConsumer.Blob} for use with the {@link HollowConsumer.BlobRetriever} instead.
+ * @deprecated Extend the {@link com.netflix.hollow.api.consumer.HollowConsumer.Blob} for use with the {@link HollowConsumer.BlobRetriever} instead.
  * 
  */
 @Deprecated
@@ -49,7 +49,7 @@ public abstract class HollowBlob {
      * Instantiate a snapshot to a specified data state version.
      */
     public HollowBlob(long toVersion) {
-        this(Long.MIN_VALUE, toVersion);
+        this(HollowConstants.VERSION_NONE, toVersion);
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class HollowBlob {
     public abstract InputStream getInputStream() throws IOException;
 
     public boolean isSnapshot() {
-        return fromVersion == Long.MIN_VALUE;
+        return fromVersion == HollowConstants.VERSION_NONE;
     }
 
     public boolean isReverseDelta() {

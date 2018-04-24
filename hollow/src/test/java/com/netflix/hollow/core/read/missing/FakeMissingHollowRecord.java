@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.core.read.missing;
 
-import com.netflix.hollow.core.schema.HollowSchema;
-
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowSchema;
 
 public class FakeMissingHollowRecord implements HollowRecord {
 

@@ -1,14 +1,13 @@
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Unit tests to verify that HollowProducerListener objects provided to HollowProducers

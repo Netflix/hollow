@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.objects.delegate;
 
 import com.netflix.hollow.api.custom.HollowTypeAPI;
-
 import com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider;
 
 /**

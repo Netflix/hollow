@@ -17,11 +17,10 @@
  */
 package com.netflix.hollow.diff.ui.jetty;
 
-import org.eclipse.jetty.server.Server;
-
 import com.netflix.hollow.diff.ui.HollowDiffUI;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer.UIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
+import org.eclipse.jetty.server.Server;
 
 final class JettyBasedUIServer implements UIServer {
     private final Server server;

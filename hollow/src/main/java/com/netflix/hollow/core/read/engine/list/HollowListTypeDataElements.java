@@ -20,7 +20,6 @@ package com.netflix.hollow.core.read.engine.list;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.encoding.GapEncodedVariableLengthIntegerReader;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import java.io.DataInputStream;
 import java.io.IOException;

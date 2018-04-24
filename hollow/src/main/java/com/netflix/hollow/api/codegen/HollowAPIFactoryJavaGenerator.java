@@ -20,6 +20,7 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import java.util.Collections;
 import java.util.Set;
@@ -35,8 +36,9 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
 
     private final String apiClassname;
 
-    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
+    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, HollowDataset dataset,
+            CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.apiClassname = apiClassname;
         this.className = apiClassname + "Factory";
     }

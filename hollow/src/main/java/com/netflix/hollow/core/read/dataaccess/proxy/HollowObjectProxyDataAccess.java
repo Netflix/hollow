@@ -17,10 +17,9 @@
  */
 package com.netflix.hollow.core.read.dataaccess.proxy;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 /**
  * A {@link HollowTypeProxyDataAccess} for an OBJECT type.
@@ -39,66 +38,62 @@ public class HollowObjectProxyDataAccess extends HollowTypeProxyDataAccess imple
 
     @Override
     public HollowObjectSchema getSchema() {
-        return currentDataAccess().getSchema();
+        return ((HollowObjectTypeDataAccess) currentDataAccess).getSchema();
     }
 
     @Override
     public boolean isNull(int ordinal, int fieldIndex) {
-        return currentDataAccess().isNull(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).isNull(ordinal, fieldIndex);
     }
 
     @Override
     public int readOrdinal(int ordinal, int fieldIndex) {
-        return currentDataAccess().readOrdinal(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readOrdinal(ordinal, fieldIndex);
     }
 
     @Override
     public int readInt(int ordinal, int fieldIndex) {
-        return currentDataAccess().readInt(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readInt(ordinal, fieldIndex);
     }
 
     @Override
     public float readFloat(int ordinal, int fieldIndex) {
-        return currentDataAccess().readFloat(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readFloat(ordinal, fieldIndex);
     }
 
     @Override
     public double readDouble(int ordinal, int fieldIndex) {
-        return currentDataAccess().readDouble(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readDouble(ordinal, fieldIndex);
     }
 
     @Override
     public long readLong(int ordinal, int fieldIndex) {
-        return currentDataAccess().readLong(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readLong(ordinal, fieldIndex);
     }
 
     @Override
     public Boolean readBoolean(int ordinal, int fieldIndex) {
-        return currentDataAccess().readBoolean(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readBoolean(ordinal, fieldIndex);
     }
 
     @Override
     public byte[] readBytes(int ordinal, int fieldIndex) {
-        return currentDataAccess().readBytes(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readBytes(ordinal, fieldIndex);
     }
 
     @Override
     public String readString(int ordinal, int fieldIndex) {
-        return currentDataAccess().readString(ordinal, fieldIndex);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).readString(ordinal, fieldIndex);
     }
 
     @Override
     public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue) {
-        return currentDataAccess().isStringFieldEqual(ordinal, fieldIndex, testValue);
+        return ((HollowObjectTypeDataAccess) currentDataAccess).isStringFieldEqual(ordinal, fieldIndex, testValue);
     }
 
     @Override
     public int findVarLengthFieldHashCode(int ordinal, int fieldIndex) {
-        return currentDataAccess().findVarLengthFieldHashCode(ordinal, fieldIndex);
-    }
-
-    private HollowObjectTypeDataAccess currentDataAccess() {
-        return (HollowObjectTypeDataAccess)currentDataAccess;
+        return ((HollowObjectTypeDataAccess) currentDataAccess).findVarLengthFieldHashCode(ordinal, fieldIndex);
     }
 
 }

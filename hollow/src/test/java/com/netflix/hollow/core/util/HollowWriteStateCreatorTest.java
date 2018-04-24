@@ -17,15 +17,13 @@
  */
 package com.netflix.hollow.core.util;
 
-
-import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
-
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowShardLargeType;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.io.IOException;
@@ -151,6 +149,14 @@ public class HollowWriteStateCreatorTest {
             HollowWriteStateCreator.populateUsingReadEngine(repopulatedWriteStateEngine, readEngine);
             Assert.fail();
         } catch(Exception expected) { }
+    }
+
+    @Test
+    public void testReadSchemaFileIntoWriteState() throws Exception {
+        HollowWriteStateEngine engine = new HollowWriteStateEngine();
+        Assert.assertEquals("Should have no type states", 0, engine.getOrderedTypeStates().size());
+        HollowWriteStateCreator.readSchemaFileIntoWriteState("/schema1.txt", engine);
+        Assert.assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
     }
     
     @SuppressWarnings("unused")

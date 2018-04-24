@@ -19,11 +19,10 @@ package com.netflix.hollow.api.metrics;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
-
 import java.util.Collection;
 import java.util.HashMap;
 
-abstract class HollowMetrics {
+public abstract class HollowMetrics {
 
     private HashMap<String, Long> typeHeapFootprint = new HashMap<>();
     private HashMap<String, Integer> typePopulatedOrdinals = new HashMap<>();

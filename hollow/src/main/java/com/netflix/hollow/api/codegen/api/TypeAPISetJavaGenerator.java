@@ -25,6 +25,7 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 
@@ -39,8 +40,9 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
     private final HollowSetSchema schema;
 
-    public TypeAPISetJavaGenerator(String apiClassname, String packageName, HollowSetSchema schema,CodeGeneratorConfig config) {
-        super(apiClassname, packageName, schema, config);
+    public TypeAPISetJavaGenerator(String apiClassname, String packageName, HollowSetSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, dataset, config);
         this.schema = schema;
     }
 

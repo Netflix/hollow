@@ -15,16 +15,16 @@
  */
 package com.netflix.hollow.api.consumer.data;
 
-import com.netflix.hollow.core.AbstractStateEngineTest;
-import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.api.consumer.data.AbstractHollowDataAccessor.UpdatedRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;

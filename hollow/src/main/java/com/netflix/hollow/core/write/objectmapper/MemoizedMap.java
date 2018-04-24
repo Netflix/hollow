@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A MemoizedMap is a java.util.HashMap which is expected to be memoized during a producer cycle.

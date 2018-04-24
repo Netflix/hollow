@@ -17,29 +17,28 @@
  */
 package com.netflix.hollow.tools.combine;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.schema.HollowSchemaSorter;
-import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowSchema;
-import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ByteArrayOrdinalMap;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.core.write.HollowHashableWriteRecord;
-import com.netflix.hollow.core.write.HollowTypeWriteState;
-import com.netflix.hollow.core.write.HollowWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
-import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
+import com.netflix.hollow.core.schema.HollowSchemaSorter;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.HollowHashableWriteRecord;
+import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
+import com.netflix.hollow.core.write.HollowTypeWriteState;
+import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;

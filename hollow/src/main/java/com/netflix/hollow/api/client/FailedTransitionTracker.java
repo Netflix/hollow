@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-
 import java.util.HashSet;
 
 /**
@@ -55,7 +54,24 @@ public class FailedTransitionTracker {
         }
         return false;
     }
-    
+
+    /**
+     * Returns the number of failed snapshot transitions.
+     */
+    public int getNumFailedSnapshotTransitions() {
+        return this.failedSnapshotTransitions.size();
+    }
+
+    /**
+     * Returns the number of failed delta transitions.
+     */
+    public int getNumFailedDeltaTransitions() {
+        return this.failedDeltaTransitions.size();
+    }
+
+    /**
+     * Clear all failing transitions.
+     */
     public void clear() {
         failedSnapshotTransitions.clear();
         failedDeltaTransitions.clear();

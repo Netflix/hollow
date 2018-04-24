@@ -19,8 +19,6 @@ package com.netflix.hollow.core.util;
 
 import static org.junit.Assert.fail;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-
 import java.util.concurrent.Callable;
 import org.junit.Test;
 

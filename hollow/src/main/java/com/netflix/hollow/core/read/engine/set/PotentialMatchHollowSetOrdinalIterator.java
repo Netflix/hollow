@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.read.engine.set;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 

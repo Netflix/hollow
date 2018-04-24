@@ -20,11 +20,10 @@ package com.netflix.hollow.core.write;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.IGNORED_HASHES;
 import static com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior.MIXED_HASHES;
 
+import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import com.netflix.hollow.core.util.LongList;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
 
 public class HollowSetWriteRecord implements HollowHashableWriteRecord {
 

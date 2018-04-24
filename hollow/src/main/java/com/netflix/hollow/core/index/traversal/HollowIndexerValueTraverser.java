@@ -18,12 +18,11 @@
 package com.netflix.hollow.core.index.traversal;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
-
-import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.read.HollowReadFieldUtils;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.util.IntList;
 import java.util.BitSet;
 
 /**

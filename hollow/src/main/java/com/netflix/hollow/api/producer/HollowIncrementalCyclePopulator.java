@@ -1,3 +1,20 @@
+/*
+ *
+ *  Copyright 2018 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -9,7 +26,6 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,19 +86,30 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         TransitiveSetTraverser.removeReferencedOutsideClosure(priorStateEngine, recordsToRemove);
     }
 
-    private void markTypeRecordsToRemove(HollowReadStateEngine priorStateEngine, String type, BitSet typeRecordsToRemove) {
+    private void markTypeRecordsToRemove(HollowReadStateEngine priorStateEngine, final String type, final BitSet typeRecordsToRemove) {
         HollowTypeReadState priorReadState = priorStateEngine.getTypeState(type);
         HollowSchema schema = priorReadState.getSchema();
         if(schema.getSchemaType() == HollowSchema.SchemaType.OBJECT) {
-            HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
+            final HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
 
-            for(Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-                if(entry.getKey().getType().equals(type)) {
-                    int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
+            SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+            for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
+                executor.execute(new Runnable() {
+                    public void run() {
+                        if(entry.getKey().getType().equals(type)) {
+                            int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
 
-                    if(priorOrdinal != -1)
-                        typeRecordsToRemove.set(priorOrdinal);
-                }
+                            if(priorOrdinal != -1)
+                                typeRecordsToRemove.set(priorOrdinal);
+                        }
+                    }
+                });
+            }
+
+            try {
+                executor.awaitSuccessfulCompletion();
+            } catch(Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

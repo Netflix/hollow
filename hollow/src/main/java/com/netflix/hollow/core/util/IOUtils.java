@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.util;
 
 import com.netflix.hollow.core.memory.encoding.VarInt;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

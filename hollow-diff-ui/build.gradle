@@ -3,7 +3,9 @@ apply plugin: 'java'
 sourceSets {
     tools {
         compileClasspath += main.output
+        compileClasspath += test.output
         runtimeClasspath += main.output
+        runtimeClasspath += test.output
     }
 }
  
@@ -16,8 +18,8 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
 
-    toolsCompile configurations.compile
-    toolsRuntime configurations.runtime
+    toolsCompile configurations.compile + configurations.testCompile
+    toolsRuntime configurations.runtime + configurations.testRuntime
 }
 
 configurations {

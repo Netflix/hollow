@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
 
 public class HistoricalPrimaryKeyMatcher {

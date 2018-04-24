@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.api.objects;
 
-import com.netflix.hollow.core.schema.HollowSetSchema;
-
 import com.netflix.hollow.api.objects.delegate.HollowRecordDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.AbstractSet;
 import java.util.Iterator;
 

@@ -17,9 +17,8 @@
  */
 package com.netflix.hollow.core.index.key;
 
-import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.util.Arrays;
 
 /**

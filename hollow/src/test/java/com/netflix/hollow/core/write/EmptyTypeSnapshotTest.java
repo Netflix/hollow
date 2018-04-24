@@ -18,15 +18,10 @@
 package com.netflix.hollow.core.write;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
-import com.netflix.hollow.core.write.HollowListTypeWriteState;
-import com.netflix.hollow.core.write.HollowMapTypeWriteState;
-import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
-import com.netflix.hollow.core.write.HollowSetTypeWriteState;
 import java.io.IOException;
 import org.junit.Test;
 

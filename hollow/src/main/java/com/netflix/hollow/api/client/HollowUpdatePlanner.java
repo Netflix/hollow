@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 
 /**
@@ -58,13 +59,13 @@ public class HollowUpdatePlanner {
      * @param desiredVersion - The version to which the hollow state engine should be updated once the resultant steps are applied.
      */
     public HollowUpdatePlan planInitializingUpdate(long desiredVersion) throws Exception {
-        return planUpdate(Long.MIN_VALUE, desiredVersion, true);
+        return planUpdate(HollowConstants.VERSION_NONE, desiredVersion, true);
     }
 
     /**
      * Returns the sequence of steps necessary to bring a hollow state engine up to date.
      *
-     * @param currentVersion - The current version of the hollow state engine, or Long.MIN_VALUE if not yet initialized
+     * @param currentVersion - The current version of the hollow state engine, or HollowConstants.VERSION_NONE if not yet initialized
      * @param desiredVersion - The version to which the hollow state engine should be updated once the resultant steps are applied.
      * @param allowSnapshot  - Allow a snapshot plan to be created if the destination version is not reachable
      */
@@ -72,7 +73,7 @@ public class HollowUpdatePlanner {
         if(desiredVersion == currentVersion)
             return HollowUpdatePlan.DO_NOTHING;
 
-        if(currentVersion == Long.MIN_VALUE)
+        if (currentVersion == HollowConstants.VERSION_NONE)
             return snapshotPlan(desiredVersion);
 
         HollowUpdatePlan deltaPlan = deltaPlan(currentVersion, desiredVersion, doubleSnapshotConfig.maxDeltasBeforeDoubleSnapshot());
@@ -130,9 +131,9 @@ public class HollowUpdatePlanner {
         long achievedVersion = currentVersion;
         int transitionCounter = 0;
 
-        while(currentVersion > desiredVersion && transitionCounter < maxDeltas) {
+        while (currentVersion > desiredVersion && transitionCounter < maxDeltas) {
             currentVersion = includeNextReverseDelta(plan, currentVersion);
-            if(currentVersion > Long.MIN_VALUE)
+            if (currentVersion != HollowConstants.VERSION_NONE)
                 achievedVersion = currentVersion;
             transitionCounter++;
         }
@@ -154,7 +155,7 @@ public class HollowUpdatePlanner {
             return transition.getToVersion();
         }
 
-        return Long.MAX_VALUE;
+        return HollowConstants.VERSION_LATEST;
     }
 
     private long includeNextReverseDelta(HollowUpdatePlan plan, long currentVersion) {
@@ -164,7 +165,7 @@ public class HollowUpdatePlanner {
             return transition.getToVersion();
         }
 
-        return Long.MIN_VALUE;
+        return HollowConstants.VERSION_NONE;
     }
 
     private long includeNearestSnapshot(HollowUpdatePlan plan, long desiredVersion) {
@@ -174,7 +175,7 @@ public class HollowUpdatePlanner {
             return transition.getToVersion();
         }
 
-        return Long.MAX_VALUE;
+        return HollowConstants.VERSION_LATEST;
     }
 
 }

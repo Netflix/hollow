@@ -17,17 +17,16 @@
  */
 package com.netflix.hollow.core.write;
 
-import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
-
-import com.netflix.hollow.core.util.SimultaneousExecutor;
-import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-import com.netflix.hollow.core.util.DefaultHashCodeFinder;
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
-import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.HollowStateEngine;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
+import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.DefaultHashCodeFinder;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
+import com.netflix.hollow.core.util.HollowWriteStateCreator;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -17,10 +17,6 @@
  */
 package com.netflix.hollow.zenoadapter;
 
-
-import com.netflix.zeno.serializer.common.MapSerializer;
-
-import com.netflix.zeno.serializer.SerializerFactory;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -42,7 +38,9 @@ import com.netflix.zeno.fastblob.record.schema.MapFieldDefinition;
 import com.netflix.zeno.fastblob.record.schema.TypedFieldDefinition;
 import com.netflix.zeno.serializer.NFTypeSerializer;
 import com.netflix.zeno.serializer.SerializationFramework;
+import com.netflix.zeno.serializer.SerializerFactory;
 import com.netflix.zeno.serializer.common.ListSerializer;
+import com.netflix.zeno.serializer.common.MapSerializer;
 import com.netflix.zeno.serializer.common.SetSerializer;
 import java.util.Collection;
 import java.util.Map;

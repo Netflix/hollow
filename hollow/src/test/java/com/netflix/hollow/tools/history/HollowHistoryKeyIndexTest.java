@@ -17,18 +17,17 @@
  */
 package com.netflix.hollow.tools.history;
 
-import com.netflix.hollow.core.index.key.PrimaryKey;
-
-import com.netflix.hollow.core.util.StateEngineRoundTripper;
-import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.AbstractStateEngineTest;
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
+import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
-import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
+import com.netflix.hollow.tools.history.keyindex.HollowHistoryKeyIndex;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,6 +69,9 @@ public class HollowHistoryKeyIndexTest extends AbstractStateEngineTest {
         addRecord(3.3F, "one", 3L, 1.1D);
 
         roundTripSnapshot();
+
+        assertResults(keyIdx, "A", "two");
+
         keyIdx.update(readStateEngine, false);
 
         addRecord(1.1F, "one", 1L, 1.1D);

@@ -17,15 +17,14 @@
  */
 package com.netflix.hollow.core.read;
 
-import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import org.junit.Assert;
+import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 

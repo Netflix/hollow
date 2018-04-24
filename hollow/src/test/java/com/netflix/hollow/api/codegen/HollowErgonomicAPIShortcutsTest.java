@@ -18,12 +18,11 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
-
-import org.junit.Assert;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowErgonomicAPIShortcutsTest {

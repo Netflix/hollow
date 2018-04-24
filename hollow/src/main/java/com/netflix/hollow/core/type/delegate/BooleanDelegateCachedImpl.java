@@ -17,12 +17,12 @@
  */
 package com.netflix.hollow.core.type.delegate;
 
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.type.BooleanTypeAPI;
-import com.netflix.hollow.api.custom.HollowTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 public class BooleanDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, BooleanDelegate {
 

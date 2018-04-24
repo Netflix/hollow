@@ -17,12 +17,11 @@
  */
 package com.netflix.hollow.tools.diff.count;
 
-import com.netflix.hollow.tools.diff.HollowTypeDiff;
-
-import java.util.Collections;
+import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.tools.diff.HollowDiff;
 import com.netflix.hollow.tools.diff.HollowDiffNodeIdentifier;
-import com.netflix.hollow.core.util.IntList;
+import com.netflix.hollow.tools.diff.HollowTypeDiff;
+import java.util.Collections;
 import java.util.List;
 
 public class HollowDiffShortcutTypeCountingNode extends HollowDiffCountingNode {

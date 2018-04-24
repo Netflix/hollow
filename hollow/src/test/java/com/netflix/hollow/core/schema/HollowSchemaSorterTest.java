@@ -1,11 +1,10 @@
 package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
-
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import org.junit.Assert;
-import java.util.List;
 import java.io.IOException;
+import java.util.List;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class HollowSchemaSorterTest {

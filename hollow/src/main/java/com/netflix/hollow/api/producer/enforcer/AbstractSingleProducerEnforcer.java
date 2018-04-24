@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.api.producer.enforcer;
 
+import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 
 public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProducerListener implements SingleProducerEnforcer {
     private boolean hasCycleStarted = false;
@@ -33,6 +33,10 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
     protected abstract void _disable();
 
     protected abstract boolean _isPrimary();
+
+    protected void _force() {
+        throw new UnsupportedOperationException("forcing a producer to become primary is not supported");
+    }
 
     @Override
     public void enable() {
@@ -62,6 +66,14 @@ public abstract class AbstractSingleProducerEnforcer extends AbstractHollowProdu
             wasPrimary = true;
         }
         return primary;
+    }
+
+    @Override
+    public void force() {
+        if (_isPrimary()) {
+            return;
+        }
+        _force();
     }
 
     @Override

@@ -18,12 +18,11 @@
 package com.netflix.hollow.core.read.map;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
-
+import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
+import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
-import com.netflix.hollow.core.read.engine.map.HollowMapTypeReadState;
-import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
