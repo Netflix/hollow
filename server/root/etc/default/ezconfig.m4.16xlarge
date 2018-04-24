@@ -1,4 +1,3 @@
 JAVA_GC          = PAROLD
 JAVA_HEAPSIZE    = 230g
-JAVA_EXPLICITNEW = enabled
 JAVA_NEWSIZE     = 70g
