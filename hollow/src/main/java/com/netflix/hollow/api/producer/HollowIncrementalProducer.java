@@ -25,6 +25,7 @@ import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,7 +40,7 @@ public class HollowIncrementalProducer {
     private final ConcurrentHashMap<RecordPrimaryKey, Object> mutations;
     private final HollowProducer.Populator populator;
     private final ListenerSupport listeners;
-    private final HashMap<String, Object> cycleMetadata;
+    private final Map<String, Object> cycleMetadata;
     private final Class<?>[] dataModel;
     private final HollowConsumer.AnnouncementWatcher announcementWatcher;
     private final HollowConsumer.BlobRetriever blobRetriever;
@@ -116,8 +117,16 @@ public class HollowIncrementalProducer {
         return this.mutations.size() > 0;
     }
 
-    public void addCycleMetadata(HashMap<String, Object> metadata) {
+    public void addCycleMetadata(String key, Object value) {
+        this.cycleMetadata.put(key, value);
+    }
+
+    public void addAllCycleMetadata(HashMap<String, Object> metadata) {
         this.cycleMetadata.putAll(metadata);
+    }
+
+    public void removeFromCycleMetadata(String key) {
+        this.cycleMetadata.remove(key);
     }
 
     public void clearCycleMetadata() {

@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.producer;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class AbstractIncrementalCycleListener implements IncrementalCycleListener {
     @Override
-    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) { }
+    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) { }
 
     @Override
-    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) { }
+    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) { }
 }

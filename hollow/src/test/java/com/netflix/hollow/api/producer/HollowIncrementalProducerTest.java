@@ -811,15 +811,24 @@ public class HollowIncrementalProducerTest {
 
         HashMap<String, Object> cycleMetadata = new HashMap<>();
         cycleMetadata.put("foo", "bar");
-        incrementalProducer.addCycleMetadata(cycleMetadata);
+        incrementalProducer.addAllCycleMetadata(cycleMetadata);
         Assert.assertTrue(incrementalProducer.hasMetadata());
 
+        //Add more metadata
+        incrementalProducer.addCycleMetadata("key2", "baz");
+        incrementalProducer.addCycleMetadata("key3", "baz");
+
         incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        //Remove metadata
+        incrementalProducer.removeFromCycleMetadata("key2");
 
         /// .runCycle() flushes the changes to a new data state.
         long nextVersion = incrementalProducer.runCycle();
 
-        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
+        Assert.assertTrue(listener.getCycleMetadata().containsKey("foo"));
+        Assert.assertFalse(listener.getCycleMetadata().containsKey("key2"));
+        Assert.assertTrue(listener.getCycleMetadata().containsKey("key3"));
         Assert.assertEquals(nextVersion, listener.getVersion());
         Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
         Assert.assertFalse(incrementalProducer.hasMetadata());
@@ -853,7 +862,7 @@ public class HollowIncrementalProducerTest {
 
         HashMap<String, Object> cycleMetadata = new HashMap<>();
         cycleMetadata.put("foo", "bar");
-        incrementalProducer.addCycleMetadata(cycleMetadata);
+        incrementalProducer.addAllCycleMetadata(cycleMetadata);
         Assert.assertTrue(incrementalProducer.hasMetadata());
 
         incrementalProducer.addOrModify(new TypeA(1, "one", 100));
@@ -899,10 +908,10 @@ public class HollowIncrementalProducerTest {
         private long version;
         private Status status;
         private Throwable cause;
-        private HashMap<String, Object> cycleMetadata;
+        private Map<String, Object> cycleMetadata;
 
         @Override
-        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) {
+        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
@@ -911,7 +920,7 @@ public class HollowIncrementalProducerTest {
         }
 
         @Override
-        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, HashMap<String, Object> cycleMetadata) {
+        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
@@ -936,7 +945,7 @@ public class HollowIncrementalProducerTest {
             return version;
         }
 
-        public HashMap<String, Object> getCycleMetadata() {
+        public Map<String, Object> getCycleMetadata() {
             return cycleMetadata;
         }
 
