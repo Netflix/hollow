@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
+import com.netflix.hollow.core.index.HollowHashIndex;
+import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.i18n.NFLocale;
+import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.generated.notemplate.*;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
@@ -12,38 +14,48 @@ import java.util.*;
 /**
  * Circuit breaker to check catalog sizes
  */
-public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
+public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
 
-    private static final String RULE_NAME = "catalog_size";
+    private final String ruleName;
 
-    public CatalogSizeCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
+    public CatalogSizeCircuitBreaker(PublishWorkflowContext ctx, long versionId, String ruleName) {
         super(ctx, versionId);
+        this.ruleName = ruleName;
     }
 
     @Override
     public String getRuleName() {
-        return RULE_NAME;
+        return ruleName;
     }
 
     @Override
     public boolean isCountrySpecific() {
-        return super.isCountrySpecific();
+        return true;
     }
 
     @Override
     protected CircuitBreakerResults runCircuitBreaker(HollowReadStateEngine stateEngine) {
         CircuitBreakerResults results = new CircuitBreakerResults();
-        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "MulticatalogCountryData", "videoId.value", "country!");
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "MulticatalogCountryData", "videoId.value", "country.id");
+        HollowHashIndex completeVideoIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "country.id");
         VMSRawHollowAPI hollowApi = new VMSRawHollowAPI(stateEngine);
 
         Map<String, Integer> countryCatalogSize = new HashMap<>();
         Map<String, Map<String, Integer>> countryLanguageCatalogSize = new HashMap<>();
 
         Set<String> countries = ctx.getOctoberSkyData().getMultiLanguageCatalogCountries();
-        Collection<CompleteVideoHollow> allCompleteVideoHollow = hollowApi.getAllCompleteVideoHollow();
-        for (CompleteVideoHollow completeVideoHollow : allCompleteVideoHollow) {
 
-            for (String country : countries) {
+
+        for (String country : countries) {
+            countryCatalogSize.putIfAbsent(country, 0);
+            countryLanguageCatalogSize.putIfAbsent(country, new HashMap<>());
+
+            HollowHashIndexResult hashIndexResult = completeVideoIdx.findMatches(country);
+            HollowOrdinalIterator iterator = hashIndexResult.iterator();
+            int ordinal = iterator.next();
+            while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+
+                CompleteVideoHollow completeVideoHollow = hollowApi.getCompleteVideoHollow(ordinal);
 
                 countryCatalogSize.putIfAbsent(country, 0);
                 boolean isAvailableForEd = isAvailableForED(completeVideoHollow, country, null, idx, hollowApi);
@@ -55,18 +67,21 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                 Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
                 for (String language : languages) {
 
-                    countryLanguageCatalogSize.putIfAbsent(country, new HashMap<>());
+
                     Map<String, Integer> languageCatalogSize = countryLanguageCatalogSize.get(country);
                     languageCatalogSize.putIfAbsent(language, 0);
 
                     isAvailableForEd = isAvailableForED(completeVideoHollow, country, language, idx, hollowApi);
                     if (isAvailableForEd) {
-                        int count = languageCatalogSize.get(country);
-                        languageCatalogSize.put(country, count + 1);
+                        int count = languageCatalogSize.get(language);
+                        languageCatalogSize.put(language, count + 1);
                     }
                 }
+
+                ordinal = iterator.next();
             }
         }
+
 
         for (String country : countries) {
 
@@ -79,6 +94,8 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                         .append(" size : ").append(countryLanguageCatalogSize.get(country).get(language))
                         .append(",");
             }
+            String completeMessage = message.toString();
+            System.out.println(completeMessage);
             ctx.getLogger().log(TaggingLogger.Severity.INFO, Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
@@ -86,23 +103,26 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
     }
 
     boolean isAvailableForED(CompleteVideoHollow completeVideoHollow, String country, String language, HollowPrimaryKeyIndex idx, VMSRawHollowAPI api) {
+
         boolean isGoLive = completeVideoHollow._getData()._getFacetData()._getVideoMediaData()._getIsGoLive();
-        if (isGoLive) { return false; }
+        if (!isGoLive) { return false; }
 
         if (language != null) {
             int multiCatalogCountryDataOrdinal;
-            long videoId = completeVideoHollow._getId()._getValue();
+            int videoId = completeVideoHollow._getId()._getValue();
             multiCatalogCountryDataOrdinal = idx.getMatchingOrdinal(videoId, country);
             if (multiCatalogCountryDataOrdinal != -1) {
                 MulticatalogCountryDataHollow multicatalogCountryDataHollow = api.getMulticatalogCountryDataHollow(multiCatalogCountryDataOrdinal);
                 MapOfNFLocaleToMulticatalogCountryLocaleDataHollow map = multicatalogCountryDataHollow._getLanguageData();
-                if (!map.isEmpty() && map.containsKey(country)) {
-                    NFLocale locale = NFLocale.findInstance(language);
-                    if (locale != null) {
-                        MulticatalogCountryLocaleDataHollow localeDataHollow = map.get(locale);
-                        ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow = localeDataHollow._getAvailabilityWindows();
 
+                for (Map.Entry<NFLocaleHollow, MulticatalogCountryLocaleDataHollow> entry : map.entrySet()) {
+                    String nfLocale = entry.getKey()._getValue();
+                    if (nfLocale.equals(language)) {
+                        MulticatalogCountryLocaleDataHollow localeDataHollow = entry.getValue();
+
+                        ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow = localeDataHollow._getAvailabilityWindows();
                         ListIterator<VMSAvailabilityWindowHollow> it = availabilityWindowListHollow.listIterator();
+
                         while (it.hasNext()) {
                             VMSAvailabilityWindowHollow availabilityWindowHollow = it.next();
                             long start = availabilityWindowHollow._getStartDate()._getVal();
@@ -112,6 +132,7 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                         }
                     }
                 }
+
             }
 
             return false;
