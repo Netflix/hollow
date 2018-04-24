@@ -184,14 +184,14 @@ final class ListenerSupport {
     }
 
     void fireIncrementalCycleComplete(long version, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
-        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().success(version, recordsAddedOrModified, recordsRemoved);
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().success(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
         for(final IncrementalCycleListener l : incrementalCycleListeners)
-            l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS, cycleMetadata);
+            l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
     }
 
     void fireIncrementalCycleFail(Throwable cause, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
-        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().fail(cause, recordsAddedOrModified, recordsRemoved);
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().fail(cause, recordsAddedOrModified, recordsRemoved, cycleMetadata);
         for(final IncrementalCycleListener l : incrementalCycleListeners)
-            l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS, cycleMetadata);
+            l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
     }
 }

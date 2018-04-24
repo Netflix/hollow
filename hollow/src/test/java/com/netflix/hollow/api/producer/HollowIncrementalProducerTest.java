@@ -911,22 +911,22 @@ public class HollowIncrementalProducerTest {
         private Map<String, Object> cycleMetadata;
 
         @Override
-        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) {
+        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
             this.version = status.getVersion();
-            this.cycleMetadata = cycleMetadata;
+            this.cycleMetadata = status.getCycleMetadata();
         }
 
         @Override
-        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata) {
+        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
             this.status = status.getStatus();
             this.recordsAddedOrModified = status.getRecordsAddedOrModified();
             this.recordsRemoved = status.getRecordsRemoved();
             this.version = status.getVersion();
             this.cause = status.getCause();
-            this.cycleMetadata = cycleMetadata;
+            this.cycleMetadata =  status.getCycleMetadata();
         }
 
         public long getRecordsRemoved() {

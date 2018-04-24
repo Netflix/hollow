@@ -41,7 +41,7 @@ public interface IncrementalCycleListener extends EventListener {
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata);
+    public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit);
 
     /**
      * Called after {@code HollowIncrementalProducer} has completed a cycle normally or abnormally. A {@code FAIL} status indicates that the
@@ -51,20 +51,22 @@ public interface IncrementalCycleListener extends EventListener {
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
-    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit, Map<String, Object> cycleMetadata);
+    public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit);
 
     public class IncrementalCycleStatus {
         private final Status status;
         private final long version;
         private final long recordsAddedOrModified;
         private final long recordsRemoved;
+        private final Map<String, Object> cycleMetadata;
         private final Throwable throwable;
 
-        public IncrementalCycleStatus(Status status, long version, Throwable throwable, long recordsAddedOrModified, long recordsRemoved) {
+        public IncrementalCycleStatus(Status status, long version, Throwable throwable, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
             this.status = status;
             this.version = version;
             this.recordsAddedOrModified = recordsAddedOrModified;
             this.recordsRemoved = recordsRemoved;
+            this.cycleMetadata = cycleMetadata;
             this.throwable = throwable;
         }
 
@@ -101,6 +103,13 @@ public interface IncrementalCycleListener extends EventListener {
         }
 
         /**
+         * @return cycle metadata attached before runCycle in {@code HollowIncrementalProducer}
+         */
+        public Map<String, Object> getCycleMetadata() {
+            return cycleMetadata;
+        }
+
+        /**
          * Returns the failure cause if this status represents a {@code HollowProducer} failure that was caused by an exception.
          *
          * @return Throwable if {@code Status.equals(FAIL)} else null.
@@ -118,30 +127,33 @@ public interface IncrementalCycleListener extends EventListener {
             private Throwable cause = null;
             private long recordsAddedOrModified;
             private long recordsRemoved;
+            private Map<String, Object> cycleMetadata;
 
             Builder() {
                 start = System.currentTimeMillis();
             }
 
-            Builder success(long version, long recordsAddedOrModified, long recordsRemoved) {
+            Builder success(long version, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
                 this.status = SUCCESS;
                 this.version = version;
                 this.recordsAddedOrModified = recordsAddedOrModified;
                 this.recordsRemoved = recordsRemoved;
+                this.cycleMetadata = cycleMetadata;
                 return this;
             }
 
-            Builder fail(Throwable cause, long recordsAddedOrModified, long recordsRemoved) {
+            Builder fail(Throwable cause, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
                 this.status = FAIL;
                 this.cause = cause;
                 this.recordsAddedOrModified = recordsAddedOrModified;
                 this.recordsRemoved = recordsRemoved;
+                this.cycleMetadata = cycleMetadata;
                 return this;
             }
 
             IncrementalCycleStatus build() {
                 end = System.currentTimeMillis();
-                return new IncrementalCycleStatus(status, version, cause, recordsAddedOrModified, recordsRemoved);
+                return new IncrementalCycleStatus(status, version, cause, recordsAddedOrModified, recordsRemoved, cycleMetadata);
             }
 
             long elapsed() {
