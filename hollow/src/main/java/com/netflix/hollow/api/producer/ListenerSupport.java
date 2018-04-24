@@ -23,10 +23,13 @@ import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.PublishStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListenerV2.CycleSkipReason;
+import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycleStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -38,10 +41,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 final class ListenerSupport {
     private final Set<HollowProducerListener> listeners;
     private final Set<HollowValidationListener> validationListeners;
+    private final Set<IncrementalCycleListener> incrementalCycleListeners;
 
     ListenerSupport() {
         listeners = new CopyOnWriteArraySet<>();
         validationListeners = new CopyOnWriteArraySet<>();
+        incrementalCycleListeners = new CopyOnWriteArraySet<>();
     }
 
     void add(HollowProducerListener listener) {
@@ -52,8 +57,16 @@ final class ListenerSupport {
     	validationListeners.add(listener);
     }
 
+    void add(IncrementalCycleListener listener) {
+        incrementalCycleListeners.add(listener);
+    }
+
     void remove(HollowProducerListener listener) {
         listeners.remove(listener);
+    }
+
+    void remove(IncrementalCycleListener listener) {
+        incrementalCycleListeners.remove(listener);
     }
 
     void fireProducerInit(long elapsedMillis) {
@@ -168,5 +181,17 @@ final class ListenerSupport {
     void fireAnnouncementComplete(ProducerStatus.Builder psb) {
         ProducerStatus st = psb.build();
         for(final HollowProducerListener l : listeners) l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS);
+    }
+
+    void fireIncrementalCycleComplete(long version, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().success(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+        for(final IncrementalCycleListener l : incrementalCycleListeners)
+            l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
+    }
+
+    void fireIncrementalCycleFail(Throwable cause, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().fail(cause, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+        for(final IncrementalCycleListener l : incrementalCycleListeners)
+            l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
     }
 }

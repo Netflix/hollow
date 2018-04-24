@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.objects.HollowObject;
@@ -32,9 +34,14 @@ import com.netflix.hollow.core.util.AllHollowRecordCollection;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,7 +65,7 @@ public class HollowIncrementalProducerTest {
     public void publishAndLoadASnapshot() {
         HollowProducer producer = createInMemoryProducer();
 
-        /// initialize the data -- classic producer creates the first state in the delta chain. 
+        /// initialize the data -- classic producer creates the first state in the delta chain.
         initializeData(producer);
 
         /// now we'll be incrementally updating the state by mutating individual records
@@ -284,14 +291,14 @@ public class HollowIncrementalProducerTest {
     public void continuesARestoredState() {
         HollowProducer genesisProducer = createInMemoryProducer();
 
-        /// initialize the data -- classic producer creates the first state in the delta chain. 
+        /// initialize the data -- classic producer creates the first state in the delta chain.
         long originalVersion = genesisProducer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeA(1, "one", 1));
             }
         });
 
-        /// now at some point in the future, we will start up and create a new classic producer 
+        /// now at some point in the future, we will start up and create a new classic producer
         /// to back the HollowIncrementalProducer.
         HollowProducer backingProducer = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
@@ -708,6 +715,273 @@ public class HollowIncrementalProducerTest {
         Assert.assertFalse(finalTypeDNames.contains("two"));
     }
 
+    @Test
+    public void fireSuccessListener() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withProducer(producer)
+                .withListener(listener)
+                .build();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+        incrementalProducer.delete(new TypeA(5, "five", 5));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertEquals(3L, listener.getRecordsAddedOrModified());
+        Assert.assertEquals(1L, listener.getRecordsRemoved());
+        Assert.assertNull(listener.getCause());
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        /// another new state with a single change
+        long finalVersion = incrementalProducer.runCycle();
+
+        Assert.assertEquals(finalVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertEquals(1L, listener.getRecordsAddedOrModified());
+        Assert.assertEquals(0L, listener.getRecordsRemoved());
+        Assert.assertNull(listener.getCause());
+    }
+
+    @Test
+    public void fireFailureListener() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+        HollowProducer fakeHollowProducer = FakeHollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withVersionMinter(new TestVersionMinter())
+                .build();
+        HollowProducer fakeHollowProducerSpy = Mockito.spy(fakeHollowProducer);
+
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withProducer(fakeHollowProducerSpy)
+                .withListener(listener)
+                .build();
+
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.addOrModify(new TypeA(4, "five", 6));
+        incrementalProducer.delete(new TypeA(5, "five", 5));
+
+
+        Mockito.doThrow(new RuntimeException("oops")).when(fakeHollowProducerSpy).runCycle(any(HollowProducer.Populator.class));
+
+        long nextVersion = incrementalProducer.runCycle();
+
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.FAIL, listener.getStatus());
+        Assert.assertEquals(4L, listener.getRecordsAddedOrModified());
+        Assert.assertEquals(1L, listener.getRecordsRemoved());
+        Assert.assertNotNull(listener.getCause());
+    }
+
+    @Test
+    public void successListenerWithMetadata() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withProducer(producer)
+                .withListener(listener)
+                .build();
+
+        HashMap<String, Object> cycleMetadata = new HashMap<>();
+        cycleMetadata.put("foo", "bar");
+        incrementalProducer.addAllCycleMetadata(cycleMetadata);
+        Assert.assertTrue(incrementalProducer.hasMetadata());
+
+        //Add more metadata
+        incrementalProducer.addCycleMetadata("key2", "baz");
+        incrementalProducer.addCycleMetadata("key3", "baz");
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        //Remove metadata
+        incrementalProducer.removeFromCycleMetadata("key2");
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        Assert.assertTrue(listener.getCycleMetadata().containsKey("foo"));
+        Assert.assertFalse(listener.getCycleMetadata().containsKey("key2"));
+        Assert.assertTrue(listener.getCycleMetadata().containsKey("key3"));
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertFalse(incrementalProducer.hasMetadata());
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+        incrementalProducer.runCycle();
+        Assert.assertEquals(new HashMap<String, Object>(), listener.getCycleMetadata());
+
+    }
+
+    @Test
+    public void fireFailureListenerWithMetadata() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+        HollowProducer fakeHollowProducer = FakeHollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withVersionMinter(new TestVersionMinter())
+                .build();
+        HollowProducer fakeHollowProducerSpy = Mockito.spy(fakeHollowProducer);
+
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withProducer(fakeHollowProducerSpy)
+                .withListener(listener)
+                .build();
+
+        HashMap<String, Object> cycleMetadata = new HashMap<>();
+        cycleMetadata.put("foo", "bar");
+        incrementalProducer.addAllCycleMetadata(cycleMetadata);
+        Assert.assertTrue(incrementalProducer.hasMetadata());
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        Mockito.doThrow(new RuntimeException("oops")).when(fakeHollowProducerSpy).runCycle(any(HollowProducer.Populator.class));
+
+        incrementalProducer.runCycle();
+
+        Assert.assertEquals(IncrementalCycleListener.Status.FAIL, listener.getStatus());
+        Assert.assertEquals(cycleMetadata, listener.getCycleMetadata());
+        Assert.assertFalse(incrementalProducer.hasMetadata());
+    }
+
+    @Test
+    public void addsListenersAfterInitialization() {
+        HollowProducer producer = createInMemoryProducer();
+
+        initializeData(producer);
+
+        FakeIncrementalCycleListener listener = new FakeIncrementalCycleListener();
+
+        HollowIncrementalProducer incrementalProducer = HollowIncrementalProducer
+                .withProducer(producer)
+                .build();
+
+        //Adding the listener after initialization
+        incrementalProducer.addListener(listener);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        Assert.assertEquals(nextVersion, listener.getVersion());
+        Assert.assertEquals(IncrementalCycleListener.Status.SUCCESS, listener.getStatus());
+        Assert.assertEquals(1L, listener.getRecordsAddedOrModified());
+        Assert.assertNull(listener.getCause());
+    }
+
+    private class FakeIncrementalCycleListener extends AbstractIncrementalCycleListener {
+        private long recordsRemoved;
+        private long recordsAddedOrModified;
+        private long version;
+        private Status status;
+        private Throwable cause;
+        private Map<String, Object> cycleMetadata;
+
+        @Override
+        public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+            this.status = status.getStatus();
+            this.recordsAddedOrModified = status.getRecordsAddedOrModified();
+            this.recordsRemoved = status.getRecordsRemoved();
+            this.version = status.getVersion();
+            this.cycleMetadata = status.getCycleMetadata();
+        }
+
+        @Override
+        public void onCycleFail(IncrementalCycleStatus status, long elapsed, TimeUnit unit) {
+            this.status = status.getStatus();
+            this.recordsAddedOrModified = status.getRecordsAddedOrModified();
+            this.recordsRemoved = status.getRecordsRemoved();
+            this.version = status.getVersion();
+            this.cause = status.getCause();
+            this.cycleMetadata =  status.getCycleMetadata();
+        }
+
+        public long getRecordsRemoved() {
+            return recordsRemoved;
+        }
+
+        public long getRecordsAddedOrModified() {
+            return recordsAddedOrModified;
+        }
+
+        public Status getStatus() {
+            return status;
+        }
+
+        public long getVersion() {
+            return version;
+        }
+
+        public Map<String, Object> getCycleMetadata() {
+            return cycleMetadata;
+        }
+
+        public Throwable getCause() {
+            return cause;
+        }
+    }
+
+    private static final class TestVersionMinter implements HollowProducer.VersionMinter {
+        private static int versionCounter = 0;
+
+        @Override
+        public long mint() {
+            return versionCounter++;
+        }
+    }
+
+    private static final class FakeHollowProducer extends HollowProducer {
+
+        public FakeHollowProducer(Publisher publisher, Announcer announcer) {
+            super(publisher, announcer);
+        }
+
+        public long runCycle() {
+            return runCycle(new Populator() {
+                @Override
+                public void populate(WriteState newState) throws Exception {
+                    throw new Exception("something went wrong");
+                }
+            });
+        }
+    }
     private static class FakeAnnouncer implements HollowProducer.Announcer {
         @Override
         public void announce(long stateVersion) {
