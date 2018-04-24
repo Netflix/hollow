@@ -36,7 +36,9 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	private final String NAME = "RecordCountVarianceValidator";
 	
 	private final String typeName;
-	private final float allowableVariancePercent;
+	private float allowableVariancePercent;
+	private float cycleAllowableVariancePercent;
+
 	// status is used to capture details about validation. Helps surface information.
 	private SingleValidationStatus status = null;
 	
@@ -75,13 +77,21 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 		float actualChangePercent = getChangePercent(latestCardinality , previousCardinality );
 		builder.addAdditionalInfo(ACTUAL_CHANGE_PERCENT_NAME, String.valueOf(actualChangePercent));
 		
-		if (Float.compare(actualChangePercent , allowableVariancePercent) > 0) {
-			String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent, allowableVariancePercent);
+		if (Float.compare(actualChangePercent , cycleAllowableVariancePercent) > 0) {
+			String message = String.format(FAILED_RECORD_COUNT_VALIDATION, typeName, actualChangePercent, cycleAllowableVariancePercent);
 			handleEndValidation(builder, Status.FAIL, message);
 		}
 		handleEndValidation(builder, Status.SUCCESS, "");
 	}
-	
+
+	/**
+	 * locks allowableVariancePercent as cycleAllowableVariancePercent so it doesn't get changed during current cycle
+	 */
+	@Override
+	public void lock() {
+		cycleAllowableVariancePercent = allowableVariancePercent;
+	}
+
 	@Override
 	public String toString(){
 		if(status != null) {
@@ -90,6 +100,14 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 			return  msg.append(status.getAdditionalInfo()).toString();
 		}
 		return("RecordCountVarianceValidator status for "+typeName+" is null. This is unexpected. Please check validator definition.");
+	}
+
+	/**
+	 * Allows to update the allowableVariancePercent in runtime
+	 * @param allowableVariancePercent
+	 */
+	public void updateVariancePercent(float allowableVariancePercent) {
+		this.allowableVariancePercent = allowableVariancePercent;
 	}
 
 	private SingleValidationStatusBuilder initializeForValidation(ReadState readState) {
