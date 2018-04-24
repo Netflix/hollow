@@ -36,6 +36,7 @@ import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -572,6 +573,262 @@ public class HollowIncrementalProducerTest {
         incrementalProducer.runCycle();
 
         Assert.assertFalse(incrementalProducer.hasChanges());
+    }
+
+    @Test
+    public void addAndDeleteCollections() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        Collection addOrModifyList = Arrays.asList(
+                new TypeA(1, "one", 100),
+                new TypeA(2, "two", 2),
+                new TypeA(3, "three", 300),
+                new TypeA(3, "three", 3),
+                new TypeA(4, "five", 6)
+        );
+
+        Collection deleteList = Arrays.asList(
+                new TypeA(5, "five", 5),
+                new TypeB(2, "3")
+        );
+
+        incrementalProducer.addOrModify(addOrModifyList);
+        incrementalProducer.delete(deleteList);
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        /// another new state with a single change
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 100L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 1, "1");
+        assertTypeB(idx, 2, null);
+        assertTypeB(idx, 3, "3");
+        assertTypeB(idx, 4, "4");
+        assertTypeB(idx, 5, null);
+
+        consumer.triggerRefreshTo(finalVersion);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1000L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+    }
+
+    @Test
+    public void addAndDeleteCollectionsInParallel() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        Collection addOrModifyList = Arrays.asList(
+                new TypeA(1, "one", 100),
+                new TypeA(2, "two", 2),
+                new TypeA(3, "three", 300),
+                new TypeA(3, "three", 3),
+                new TypeA(4, "five", 6)
+        );
+
+        Collection deleteList = Arrays.asList(
+                new TypeA(5, "five", 5),
+                new TypeB(2, "3")
+        );
+
+        incrementalProducer.addOrModifyInParallel(addOrModifyList);
+        incrementalProducer.deleteInParallel(deleteList);
+
+        /// .runCycle() flushes the changes to a new data state.
+        long nextVersion = incrementalProducer.runCycle();
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 1000));
+
+        /// another new state with a single change
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(nextVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 100L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 1, "1");
+        assertTypeB(idx, 2, null);
+        assertTypeB(idx, 3, "3");
+        assertTypeB(idx, 4, "4");
+        assertTypeB(idx, 5, null);
+
+        consumer.triggerRefreshTo(finalVersion);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1000L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 4, "five", 6L);
+        assertTypeA(idx, 5, "five", null);
+    }
+
+    @Test
+    public void discardCollections() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        Collection addOrModifyList = Arrays.asList(
+                new TypeA(1, "one", 100),
+                new TypeA(2, "two", 2),
+                new TypeA(3, "three", 300),
+                new TypeA(3, "three", 3),
+                new TypeA(4, "five", 6)
+        );
+
+        Collection deleteList = Arrays.asList(
+                new TypeA(5, "five", 5),
+                new TypeB(2, "3")
+        );
+
+        incrementalProducer.addOrModify(addOrModifyList);
+        incrementalProducer.delete(deleteList);
+
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        incrementalProducer.discard(addOrModifyList);
+        incrementalProducer.discard(deleteList);
+
+        Assert.assertFalse(incrementalProducer.hasChanges());
+
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(finalVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 5, "five", 5L);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 1, "1");
+        assertTypeB(idx, 2, "2");
+        assertTypeB(idx, 3, "3");
+        assertTypeB(idx, 4, "4");
+        assertTypeB(idx, 5, null);
+    }
+
+    @Test
+    public void discardCollectionsInParallel() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        Collection addOrModifyList = Arrays.asList(
+                new TypeA(1, "one", 100),
+                new TypeA(2, "two", 2),
+                new TypeA(3, "three", 300),
+                new TypeA(3, "three", 3),
+                new TypeA(4, "five", 6)
+        );
+
+        Collection deleteList = Arrays.asList(
+                new TypeA(5, "five", 5),
+                new TypeB(2, "3")
+        );
+
+        incrementalProducer.addOrModify(addOrModifyList);
+        incrementalProducer.delete(deleteList);
+
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        incrementalProducer.discardInParallel(addOrModifyList);
+        incrementalProducer.discardInParallel(deleteList);
+
+        Assert.assertFalse(incrementalProducer.hasChanges());
+
+        long finalVersion = incrementalProducer.runCycle();
+
+        /// now we read the changes and assert
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(finalVersion);
+
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeA(idx, 1, "one", 1L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 3, "three", 3L);
+        assertTypeA(idx, 4, "four", 4L);
+        assertTypeA(idx, 5, "five", 5L);
+
+        idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeB", "id");
+        Assert.assertFalse(idx.containsDuplicates());
+
+        assertTypeB(idx, 1, "1");
+        assertTypeB(idx, 2, "2");
+        assertTypeB(idx, 3, "3");
+        assertTypeB(idx, 4, "4");
+        assertTypeB(idx, 5, null);
     }
 
     @Test
