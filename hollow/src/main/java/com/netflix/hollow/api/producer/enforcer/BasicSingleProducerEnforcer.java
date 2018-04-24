@@ -35,4 +35,9 @@ public class BasicSingleProducerEnforcer extends AbstractSingleProducerEnforcer 
         return isPrimary;
     }
 
+    @Override
+    protected void _force() {
+        isPrimary = true;
+    }
+
 }
