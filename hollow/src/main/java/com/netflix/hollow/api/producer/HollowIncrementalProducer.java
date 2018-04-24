@@ -121,7 +121,7 @@ public class HollowIncrementalProducer {
         this.cycleMetadata.put(key, value);
     }
 
-    public void addAllCycleMetadata(HashMap<String, Object> metadata) {
+    public void addAllCycleMetadata(Map<String, Object> metadata) {
         this.cycleMetadata.putAll(metadata);
     }
 
