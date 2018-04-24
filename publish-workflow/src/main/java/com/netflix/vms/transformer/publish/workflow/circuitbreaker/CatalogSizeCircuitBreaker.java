@@ -97,6 +97,7 @@ public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreak
             ctx.getLogger().log(TaggingLogger.Severity.INFO, Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
+        results.addResult(true, "Catalog size circuit breaker has passed");
         return results;
     }
 
