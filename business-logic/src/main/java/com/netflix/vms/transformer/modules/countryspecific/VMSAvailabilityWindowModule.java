@@ -12,32 +12,14 @@ import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.*;
-import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
-import com.netflix.vms.transformer.hollowoutput.CupKey;
-import com.netflix.vms.transformer.hollowoutput.DateWindow;
-import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
-import com.netflix.vms.transformer.hollowoutput.PackageData;
-import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
-import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
-import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
-import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
+import com.netflix.vms.transformer.hollowoutput.*;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.lang.Integer;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -46,40 +28,38 @@ public class VMSAvailabilityWindowModule {
     public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
 
-    // for aggregating pre-promotion videos in multi-langauge catalog.
-    public static final TaggingLogger.LogTag PRE_PROMOTION_TAG = TransformerLogTag.LocaleMerching_PrePromotion_Phase;
-    public static final String PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase";
-    public static final TaggingLogger.Severity PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
+    // title is in pre-promotion phase
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
+    public static final String LANGUAGE_CATALOG_PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase in country-language catalog";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // no assets found and not in pre-promo phase
-    public static final TaggingLogger.LogTag NO_LOCALIZED_ASSETS = TransformerLogTag.LocaleMerching_Skip_Contract_No_Assets;
-    public static final String NO_LOCALIZED_ASSETS_MESSAGE = "Titles(not in pre-promo phase) without localized assets";
-    public static final TaggingLogger.Severity NO_LOCALIZED_ASSETS_SEVERITY = TaggingLogger.Severity.INFO;
+    // title skipped contract since no localized assets were available
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG = TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
+    public static final String LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_MESSAGE = "Titles contract skipped because no localized assets were found";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // for aggregating pre-promotion data even though localized assets are missing.
-    public static final TaggingLogger.LogTag PRE_PROMOTE_WITH_ASSETS_MISSING_TAG = TransformerLogTag.LocaleMerching_PrePromote_Without_Assets;
-    public static final String PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE = "Pre-promote titles even though assets are missing";
-    public static final TaggingLogger.Severity PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY = TaggingLogger.Severity.INFO;
+    // for aggregating missing audio(dubs)
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_DUBS_TAG = TransformerLogTag.Language_catalog_Missing_Dubs;
+    public static final String LANGUAGE_CATALOG_MISSING_DUBS_MESSAGE = "Titles missing localized dubs";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_DUBS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // for aggregating missing audio(dubs) in locale merching
-    public static final TaggingLogger.LogTag LOCALE_MERCHING_MISSING_DUBS_TAG = TransformerLogTag.LocaleMerching_Missing_Dubs;
-    public static final String LOCALE_MERCHING_MISSING_DUBS_MESSAGE = "Titles missing localized dubs";
-    public static final TaggingLogger.Severity LOCALE_MERCHING_MISSING_DUBS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // for aggregating missing text (subs) in locale merching.
-    public static final TaggingLogger.LogTag LOCALE_MERCHING_MISSING_SUBS_TAG = TransformerLogTag.LocaleMerching_Missing_Subs;
-    public static final String LOCALE_MERCHING_MISSING_SUBS_MESSAGE = "Titles missing localized subs";
-    public static final TaggingLogger.Severity LOCALE_MERCHING_MISSING_SUBS_SEVERITY = TaggingLogger.Severity.INFO;
+    // for aggregating missing text (subs)
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_SUBS_TAG = TransformerLogTag.Language_catalog_Missing_Subs;
+    public static final String LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE = "Titles missing localized subs";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY = TaggingLogger.Severity.INFO;
 
     // for aggregating titles dropped in locale merching.
-    public static final TaggingLogger.LogTag LOCALE_MERCHING_DROPPED_TAG = TransformerLogTag.LocaleMerching_NoWindows;
-    public static final String LOCALE_MERCHING_DROPPED_MESSAGE = "Titles for which contracts were skipped or no windows added";
-    public static final TaggingLogger.Severity LOCALE_MERCHING_DROPPED_SEVERITY = TaggingLogger.Severity.INFO;
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_WINDOWS_TAG = TransformerLogTag.Language_catalog_NoWindows;
+    public static final String LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE = "Titles for which no windows were found country-language catalog";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    public static final TaggingLogger.LogTag LOCALE_MERCHING_NO_EARLIEST_WINDOW = TransformerLogTag.LocaleMerching_NoEarliestWindowInfo;
-    public static final String LOCALE_MERCHING_NO_EARLIEST_WINDOW_MESSAGE = "Titles for which no information present for earliest window start date for "
-            + "localized assets availability";
-    public static final TaggingLogger.Severity LOCALE_MERCHING_NO_EARLIEST_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_ASSET_RIGHTS = TransformerLogTag.Language_catalog_NoAssetRights;
+    public static final String LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE = "Titles for asset rights are not present";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY = TaggingLogger.Severity.INFO;
+
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_FILTER_WINDOW_TAG = TransformerLogTag.Language_catalog_NoAssetRights;
+    public static final String LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE = "Titles for asset rights are not present";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_FILETER_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
 
 
 
@@ -102,13 +82,13 @@ public class VMSAvailabilityWindowModule {
     private final CupTokenFetcher cupTokenFetcher;
 
     public static void configureLogsTagsForAggregator(CycleDataAggregator cycleDataAggregator) {
-        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTION_TAG, PRE_PROMOTION_SEVERITY, PRE_PROMOTION_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(NO_LOCALIZED_ASSETS, NO_LOCALIZED_ASSETS_SEVERITY, NO_LOCALIZED_ASSETS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(PRE_PROMOTE_WITH_ASSETS_MISSING_TAG, PRE_PROMOTE_WITH_ASSETS_MISSING_SEVERITY, PRE_PROMOTE_WITH_ASSETS_MISSING_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_DUBS_TAG, LOCALE_MERCHING_MISSING_DUBS_SEVERITY, LOCALE_MERCHING_MISSING_DUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_MISSING_SUBS_TAG, LOCALE_MERCHING_MISSING_SUBS_SEVERITY, LOCALE_MERCHING_MISSING_SUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_DROPPED_TAG, LOCALE_MERCHING_DROPPED_SEVERITY, LOCALE_MERCHING_DROPPED_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LOCALE_MERCHING_NO_EARLIEST_WINDOW, LOCALE_MERCHING_NO_EARLIEST_WINDOW_SEVERITY, LOCALE_MERCHING_NO_EARLIEST_WINDOW_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_PRE_PROMOTION_TAG, LANGUAGE_CATALOG_PRE_PROMOTION_SEVERITY, LANGUAGE_CATALOG_PRE_PROMOTION_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_SEVERITY, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_FILTER_WINDOW_TAG, LANGUAGE_CATALOG_FILETER_WINDOW_SEVERITY, LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_MISSING_DUBS_TAG, LANGUAGE_CATALOG_MISSING_DUBS_SEVERITY, LANGUAGE_CATALOG_MISSING_DUBS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_MISSING_SUBS_TAG, LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY, LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_WINDOWS_TAG, LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY, LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_ASSET_RIGHTS, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE);
     }
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
@@ -146,50 +126,44 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
-    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String locale, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
+    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String language, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
 
         RightsHollow rights = videoRights._getRights();
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
-            windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, locale != null);
+            windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, language != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, locale, rollup, isGoLive, rights, locale != null, videoRights);
-            if (locale != null && windows.isEmpty() && isLanguageOverride(videoRights))
-                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, locale != null, videoRights);
+            windows = populateEpisodeOrStandaloneWindowData(videoId, country, language, rollup, isGoLive, rights, language != null, videoRights);
+            if (language != null && windows.isEmpty() && isLanguageOverride(videoRights))
+                windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, language != null, videoRights);
         }
         return windows;
     }
 
-    // todo need to split this out in a separate class. It's humongous. Not good.
-    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String locale, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
+    // todo need to split this out in a separate class. It's humongous. Not good. I promise to improve this one day.
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String language, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
-        boolean evaluatingUsingLanguage = locale != null;
 
         // for multi-language catalog processing only
         boolean isSubsDubsRequirementEnforced = ctx.getConfig().isSubsDubsRequirementEnforced();
         boolean mustHaveSubs = false;// local subtitles
         boolean mustHaveDubs = false;// local audio
-        boolean mustHaveLocalizedData = false;// local synopsis
 
         FlagsHollow flags = statusHollow._getFlags();
-        if (locale != null && flags != null) {
+        if (language != null && flags != null) {
             Set<String> subsRequirement = new HashSet<>();
             Set<String> dubsRequirement = new HashSet<>();
-            Set<String> localizedDataRequirement = new HashSet<>();
 
             if (flags._getTextRequiredLanguages() != null)
                 subsRequirement = flags._getTextRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
             if (flags._getAudioRequiredLanguages() != null)
                 dubsRequirement = flags._getAudioRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
-            if (flags._getLocalizationRequiredLanguages() != null)
-                localizedDataRequirement = flags._getLocalizationRequiredLanguages().stream().map(s -> s._getValue().toLowerCase()).collect(Collectors.toSet());
 
-            String localeStr = locale.toLowerCase();
+            String localeStr = language.toLowerCase();
             if (subsRequirement.contains(localeStr)) mustHaveSubs = true;
             if (dubsRequirement.contains(localeStr)) mustHaveDubs = true;
-            if (localizedDataRequirement.contains(localeStr)) mustHaveLocalizedData = true;
         }
 
         long minWindowStartDate = Long.MAX_VALUE;
@@ -236,26 +210,9 @@ public class VMSAvailabilityWindowModule {
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
 
 
-            // should use window data, check isGoLive flag, start-end dates and if video is in pre-promotion phase
-            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, locale, isGoLive, contractIds, includedPackageDataCount,
+            // should use window data, check isGoLive flag, start-end dates and if video is ready for pre-promotion (is locale aware)
+            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, language, isGoLive, contractIds, includedPackageDataCount,
                     outputWindow.startDate.val, outputWindow.endDate.val);
-
-            // if multi-language catalog processing & isGoLive is false, then check if title is in pre-promo phase.
-//            boolean inPrePromotionPhase = false;
-//            if (!isGoLive && locale != null) {
-//                // checking for all the contracts in the current window to determine if title is in pre-promo phase
-//                for (long contractId : contractIds) {
-//                    ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-//                    // @TODO: This is a bit fishy - don't we need to check for contract window?.
-//                    // Follow up with Sampada to see how to correctly determine if a title is in pre-promo phase.
-//                    // Also, pre-promo is not country-language specific. This logic is on par with current logic for country specific catalogs.
-//                    if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
-//                        inPrePromotionPhase = true;
-//                }
-//                if (!isGoLive && inPrePromotionPhase)
-//                    // collect PRE_PROMOTION_TAG
-//                    cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTION_TAG);
-//            }
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
@@ -271,7 +228,7 @@ public class VMSAvailabilityWindowModule {
                     List<RightsContractAssetHollow> contractAssets = new ArrayList<>();
                     if (windowContractHollow._getAssets() != null)
                         contractAssets = windowContractHollow._getAssets().stream().collect(Collectors.toList());
-                    long contractAssetAvailability = locale == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(locale, contractAssets);
+                    long contractAssetAvailability = language == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(language, contractAssets);
 
                     // check if package list in the contract is not null or empty
                     if (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty()) {
@@ -288,60 +245,66 @@ public class VMSAvailabilityWindowModule {
                                 packageData = packageDataCollection.getPackageData();
 
 
-                            if (locale != null) {
-                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(locale, packageData, contractAssetAvailability);
+                            if (language != null) {
+                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
+                                boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds);
 
                                 // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                // if no assets and the the title is not in prePromotionPhase then skip this contract and no need to check subs/dubs requirement list too.
                                 if (packageAvailability == 0 && !shouldFilterOutWindowInfo) {
-                                    // skipping the contract
-                                    cycleDataAggregator.collect(country, locale, videoId, NO_LOCALIZED_ASSETS);
-                                    continue;
+
+                                    if (!readyForPrePromotion) {
+                                        // skipping the contract if title is not ready for pre-promotion in language catalog.
+                                        cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
+                                        continue;
+                                    }
                                 }
-//                                else if (packageAvailability == 0 && inPrePromotionPhase) {
-//                                    // if feature (do not drop windows if assets are missing) enabled then do not skip the contract
-//                                    if (ctx.getConfig().isPrePromoEnabledForMultiLanguageCatalog()) {
-//                                        cycleDataAggregator.collect(country, locale, videoId, PRE_PROMOTE_WITH_ASSETS_MISSING_TAG);
-//                                    } else {
-//                                        // if feature not enabled, and assets are missing, skip the contract even if title is in Pre-promo phase
-//                                        continue;
-//                                    }
-//                                }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
                                 if (!considerPackageForLang && contractPackages.size() == 1) {
                                     considerPackageForLang = true;
                                 }
 
-                                if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
-                                    thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
-                                    if (currentOrFirstFutureWindow == outputWindow)
-                                        currentOrFirstFutureWindowFoundLocalAudio = true;
-                                }
-                                if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
-                                    thisWindowFoundLocalText = true; //rollup.foundLocalText();
-                                    if (currentOrFirstFutureWindow == outputWindow)
-                                        currentOrFirstFutureWindowFoundLocalText = true;
-                                }
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                                    thisWindowFoundLocalAudio = true;
+
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                                    thisWindowFoundLocalText = true;
 
                                 // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                 // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
                                 // So if any contract has the assets, then it passes the requirement check.
                                 if (isSubsDubsRequirementEnforced && !shouldFilterOutWindowInfo) {
+
+                                    boolean missingRequiredLocalizedAssets = false;
+
                                     // if feature is enabled then check is given locale requires subs/dubs
                                     // and in case its a requirement and it is missing -> skip the current contract.
                                     if (mustHaveSubs && !thisWindowFoundLocalText) {
                                         // collect missing subs
-                                        cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_MISSING_SUBS_TAG);
-                                        //ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingSubs), "[Missing Subs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
-                                        continue;
+                                        cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_MISSING_SUBS_TAG);
+                                        missingRequiredLocalizedAssets = true;
                                     }
 
                                     if (mustHaveDubs && !thisWindowFoundLocalAudio) {
                                         // collect missing dubs
-                                        cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_MISSING_DUBS_TAG);
-                                        //ctx.getLogger().info(asList(TransformerLogTag.LocaleMerching, TransformerLogTag.LocaleMerchingMissingDubs), "[Missing Dubs] Skipping contractId={}, packageId={} for videoId={} in country={} and locale={}", contractId, packageId, videoId, country, locale);
+                                        cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_MISSING_DUBS_TAG);
+                                        missingRequiredLocalizedAssets = true;
+                                    }
+
+                                    if (missingRequiredLocalizedAssets && !readyForPrePromotion) {
+                                        // todo should skip or make shouldFilterWindowInfo as true and let the window be available with packageid as zero
+                                        // skip the contract since title does not meet the rules for localized asset requirement check and is not in
+                                        // pre-promotion phase too
                                         continue;
+                                    } else {
+
+                                        // title meets the rules for localized assets requirement OR is ready for pre-promotion
+
+                                        if (thisWindowFoundLocalAudio == true && currentOrFirstFutureWindow == outputWindow)
+                                            currentOrFirstFutureWindowFoundLocalAudio = true;
+
+                                        if (thisWindowFoundLocalText == true && currentOrFirstFutureWindow == outputWindow)
+                                            currentOrFirstFutureWindowFoundLocalText = true;
                                     }
 
                                     // @TODO check local synopsis. Can be deferred for now.
@@ -508,7 +471,7 @@ public class VMSAvailabilityWindowModule {
                     } else {
                         // package list is empty for the given contract -- use the contract only. Applicable only for non multi-locale country that is if locale is not passed
 
-                        if (locale == null) {
+                        if (language == null) {
                             // build info without package data, Use the assets and contract data though
                             WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
@@ -520,7 +483,7 @@ public class VMSAvailabilityWindowModule {
                         }
                     }
                 } else {
-                    if (locale == null) {
+                    if (language == null) {
                         // if no assets and no associated package available then build info using just contract ID and video ID
                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
 
@@ -538,7 +501,7 @@ public class VMSAvailabilityWindowModule {
 
             // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
             // Basically - Do not add: if all windows were filtered out for multicatalog country
-            if (locale == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
+            if (language == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
                 availabilityWindows.add(outputWindow);
 
                 // if evaluating episode and isGoLive is true, then roll up the windows to season.
@@ -610,23 +573,23 @@ public class VMSAvailabilityWindowModule {
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
 
             // for multi-catalog country, rollup the local audio and text values
-            if (locale != null) {
+            if (language != null) {
                 if (currentOrFirstFutureWindowFoundLocalAudio)
                     rollup.foundLocalAudio();
                 if (currentOrFirstFutureWindowFoundLocalText)
                     rollup.foundLocalText();
             }
 
-        } else if (locale == null) {
+        } else if (language == null) {
             // if no current or future window found, then do this, but why?
             rollup.newEpisodeData(isGoLive, contractIdForMaxPackageId);
             if (rollup.doEpisode())
                 rollup.newPrePromoDays(0);
         }
 
-        if (locale != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
+        if (language != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
             // collect no windows
-            cycleDataAggregator.collect(country, locale, videoId, LOCALE_MERCHING_DROPPED_TAG);
+            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_WINDOWS_TAG);
         }
         return availabilityWindows;
     }
@@ -754,26 +717,19 @@ public class VMSAvailabilityWindowModule {
      * @param endDate
      * @return if window data should be filtered.
      */
-    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String locale, boolean isGoLive, Collection<Long> contractIds, int
+    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
             unfilteredCount, long startDate, long endDate) {
 
         // window has ended, then filter it
         if (endDate < ctx.getNowMillis())
             return true;
 
-        if (locale == null) {
+        if (language == null) {
 
             if (!isGoLive) {
-                boolean isWindowDataNeeded = false;
-                for (Long contractId : contractIds) {
-                    ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                    if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
-                        isWindowDataNeeded = true;
-                    }
-                }
-
-                if (!isWindowDataNeeded)
-                    return true;
+                boolean readyForPrePromotion = readyForPrePromotionInCountryCatalog(videoId, countryCode, contractIds);
+                if (readyForPrePromotion)
+                    return false;
             }
 
             if (unfilteredCount < 3 && endDate > ctx.getNowMillis())
@@ -785,40 +741,93 @@ public class VMSAvailabilityWindowModule {
             return false;
         } else {
 
-            int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, countryCode, locale);
-            if (ordinal != -1) {
-                FeedMovieCountryLanguagesHollow feedMovieCountryLanguagesHollow = api.getFeedMovieCountryLanguagesHollow(ordinal);
-                long earliestWindowStartDate = feedMovieCountryLanguagesHollow._getEarliestWindowStartDate()._getValue();
+            Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
+            if (earliestWindowStartDate != null) {
+                // here means we have asset rights for that language and corresponding earliest asset availability date
+                boolean isFutureDate = ctx.getNowMillis() < earliestWindowStartDate;
 
-                // in future
-                if (earliestWindowStartDate >  ctx.getNowMillis()) {
-                    // find if ready for pre-promo
-                    int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
-                    for (Long contractId : contractIds) {
-                        ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                        if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract
-                                ._getPrePromotionDays() > 0 || (daysBeforeWindowStart <= contract._getPrePromotionDays()))) {
-                            // ready for pre-promo, window should not be filtered
-                            // collect PRE_PROMOTION_TAG
-                            cycleDataAggregator.collect(countryCode, locale, (int) videoId, PRE_PROMOTION_TAG);
+                // if isGoLive is true, meaning gatekeeper thinks title has minimum requirement to go live in a country
+                if (isGoLive) {
+
+                    // earliest window start date is greater than now, meaning window has started
+                    if (!isFutureDate)
+                        return false;
+                    else {
+                        int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
+                        if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, language, contractIds, daysBeforeWindowStart)) {
+                            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
+                            return false;
+                        }
+                    }
+                } else {
+                    // Case: if isGoLive is not true
+
+                    // it's a future date for asset availability, check if ready for pre-promo
+                    if (isFutureDate) {
+                        int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
+                        if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, language, contractIds, daysBeforeWindowStart)) {
+                            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
                             return false;
                         }
                     }
 
-                    // if not ready for pre-promo and earliest window start is far away, filter the window
+                    // else log and filter window
+                    cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_FILTER_WINDOW_TAG);
                     return true;
-
-                } else {
-
-                    if (!isGoLive) return true;
-                    else return false;
                 }
 
-            } else {
-                cycleDataAggregator.collect(countryCode, locale, (int) videoId, LOCALE_MERCHING_NO_EARLIEST_WINDOW);
-                return false;
+            }
+
+            // no asset rights, filter out the window
+            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_NO_ASSET_RIGHTS);
+            return true;
+        }
+    }
+
+    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String countryCode, String language, Collection<Long> contractIds, int daysBeforeWindowStart) {
+        for (long contractId : contractIds) {
+            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract
+                    ._getPrePromotionDays() > 0 || (daysBeforeWindowStart <= contract._getPrePromotionDays()))) {
+                return true;
             }
         }
+        return false;
+    }
+
+    private boolean readyForPrePromotionInCountryCatalog(long videoId, String country, Collection<Long> contractIds) {
+        boolean shouldPrePromote = false;
+        for (Long contractId : contractIds) {
+            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                shouldPrePromote = true;
+            }
+        }
+        return shouldPrePromote;
+    }
+
+    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String country, String language, Collection<Long> contractIds) {
+        boolean shouldPrePromote = false;
+        Long earliestAssetAvailabilityDate = getEarliestAssetRightsAvailabilityDate(videoId, country, language);
+        if (earliestAssetAvailabilityDate != null) {
+            boolean isFutureDate = ctx.getNowMillis() < earliestAssetAvailabilityDate;
+            if (isFutureDate) {
+                int daysBeforeWindowStart = (int) ((earliestAssetAvailabilityDate - ctx.getNowMillis()) / MS_IN_DAY);
+                shouldPrePromote = readyForPrePromotionInLanguageCatalog(videoId, country, null, contractIds, daysBeforeWindowStart);
+            }
+        }
+        return shouldPrePromote;
+    }
+
+    private Long getEarliestAssetRightsAvailabilityDate(long videoId, String country, String language) {
+        int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country, language);
+        if (ordinal != -1) {
+
+            // here means we have asset rights for that language and corresponding earliest asset availability date
+            FeedMovieCountryLanguagesHollow feedMovieCountryLanguagesHollow = api.getFeedMovieCountryLanguagesHollow(ordinal);
+            return feedMovieCountryLanguagesHollow._getEarliestWindowStartDate()._getValue();
+        }
+        return null;
     }
 
 

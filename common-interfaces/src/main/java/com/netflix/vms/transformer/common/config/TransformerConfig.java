@@ -237,10 +237,8 @@ public interface TransformerConfig {
     public boolean isSubsDubsRequirementEnforced();
 
     @DefaultValue("false")
-    public boolean isPrePromoEnabledForMultiLanguageCatalog();
-
-    @DefaultValue("false")
     public boolean isMerchLanguageDatesEnabledForMultiLanguageCatalog();
 
+    @DefaultValue("false")
     public boolean isReadCupTokensFromCinderFeed();
 }

@@ -37,13 +37,13 @@ public class CycleDataAggregatorTest {
 
     @Test
     public void testCollect() {
-        cycleDataAggregator.aggregateForLogTag(TransformerLogTag.LocaleMerching_NoWindows, TaggingLogger.Severity.ERROR, "some message");
-        cycleDataAggregator.collect("US", "en", 123, TransformerLogTag.LocaleMerching_NoWindows);
+        cycleDataAggregator.aggregateForLogTag(TransformerLogTag.Language_catalog_NoWindows, TaggingLogger.Severity.ERROR, "some message");
+        cycleDataAggregator.collect("US", "en", 123, TransformerLogTag.Language_catalog_NoWindows);
         String expectedMessage = cycleDataAggregator.getJSON("US", "en", "some message", Arrays.asList(123));
         cycleDataAggregator.logAllAggregatedData();
         Mockito.verify(taggingLogger, atLeastOnce()).log(
                 eq(TaggingLogger.Severity.ERROR),
-                eq(Arrays.asList(TransformerLogTag.LocaleMerching_NoWindows)),
+                eq(Arrays.asList(TransformerLogTag.Language_catalog_NoWindows)),
                 eq(expectedMessage)
         );
     }
