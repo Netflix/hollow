@@ -59,14 +59,11 @@ import java.util.Set;
 public class HollowAPIClassJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "";
 
-    private final HollowDataset dataset;
     private final boolean parameterizeClassNames;
 
     public HollowAPIClassJavaGenerator(String packageName, String apiClassname, HollowDataset dataset, boolean parameterizeClassNames, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
-
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.className = apiClassname;
-        this.dataset = dataset;
         this.parameterizeClassNames = parameterizeClassNames;
     }
 

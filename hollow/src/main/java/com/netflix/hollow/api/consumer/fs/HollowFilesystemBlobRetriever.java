@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
+import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -82,7 +83,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         if(Files.exists(exactPath))
             return new FilesystemBlob(exactPath, desiredVersion);
         
-        long maxVersionBeforeDesired = Long.MIN_VALUE;
+        long maxVersionBeforeDesired = HollowConstants.VERSION_NONE;
         String maxVersionBeforeDesiredFilename = null;
 
         try(DirectoryStream<Path> directoryStream = Files.newDirectoryStream(blobStorePath)) {
@@ -101,7 +102,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         }
 
         HollowConsumer.Blob filesystemBlob = null;
-        if(maxVersionBeforeDesired > Long.MIN_VALUE)
+        if (maxVersionBeforeDesired != HollowConstants.VERSION_NONE)
             filesystemBlob = new FilesystemBlob(blobStorePath.resolve(maxVersionBeforeDesiredFilename), maxVersionBeforeDesired);
 
         if(fallbackBlobRetriever != null) {

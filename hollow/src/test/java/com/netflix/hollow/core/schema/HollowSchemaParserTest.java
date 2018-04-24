@@ -19,7 +19,10 @@ package com.netflix.hollow.core.schema;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -211,4 +214,20 @@ public class HollowSchemaParserTest {
         Assert.assertEquals(4, schemas.size());
     }
 
+    @Test
+    public void testParseCollectionOfSchemas_reader() throws Exception {
+        InputStream input = null;
+        try {
+            input = getClass().getResourceAsStream("/schema1.txt");
+            List<HollowSchema> schemas =
+                    HollowSchemaParser.parseCollectionOfSchemas(new BufferedReader(new InputStreamReader(input)));
+            Assert.assertEquals("Should have two schemas", 2, schemas.size());
+            Assert.assertEquals("Should have Minion schema", "Minion", schemas.get(0).getName());
+            Assert.assertEquals("Should have String schema", "String", schemas.get(1).getName());
+        } finally {
+            if (input != null) {
+                input.close();
+            }
+        }
+    }
 }

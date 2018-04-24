@@ -80,6 +80,17 @@ public class FailedTransitionTrackerTest {
         Assert.assertTrue(tracker.anyTransitionWasFailed(plan));
     }
 
+    @Test
+    public void testGetNumFailedSnapshotTransitions() {
+        // setUp adds a single failed snapshot transition
+        Assert.assertEquals(1, tracker.getNumFailedSnapshotTransitions());
+    }
+
+    @Test
+    public void testGetNumFailedDeltaTransitions() {
+        // setUp adds a two failed delta transitions
+        Assert.assertEquals(2, tracker.getNumFailedDeltaTransitions());
+    }
 
     static class FakeHollowBlob extends Blob {
         public FakeHollowBlob(long toVersion) {

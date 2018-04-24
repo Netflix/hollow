@@ -17,7 +17,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VMS Data History</title>
+  <title>Hollow Data History</title>
   <!-- <link rel="stylesheet" type="text/css" href="$basePath/resource/normalize.css"/> -->
   <style>
 	#total-stats {

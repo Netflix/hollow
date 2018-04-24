@@ -17,14 +17,16 @@ package com.netflix.hollow.api.codegen.indexes;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
+import com.netflix.hollow.core.HollowDataset;
 
 public abstract class HollowIndexGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "index";
 
     protected final String apiClassname;
 
-    public HollowIndexGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
+    public HollowIndexGenerator(String packageName, String apiClassname, HollowDataset dataset,
+            CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.apiClassname = apiClassname;
     }
 }

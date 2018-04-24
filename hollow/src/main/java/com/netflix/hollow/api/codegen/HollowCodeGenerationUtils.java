@@ -26,6 +26,7 @@ import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowListSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -393,5 +394,9 @@ public class HollowCodeGenerationUtils {
             primitiveTypes.add(type);
         }
         return primitiveTypes;
+    }
+
+    public static boolean isCollectionType(String schemaName, HollowDataset dataset) {
+        return dataset.getSchema(schemaName).getSchemaType() != HollowSchema.SchemaType.OBJECT;
     }
 }

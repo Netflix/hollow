@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core.schema;
 
+import com.netflix.hollow.api.error.IncompatibleSchemaException;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -159,12 +160,17 @@ public class HollowObjectSchema extends HollowSchema {
         PrimaryKey primaryKey = isNullableObjectEquals(this.primaryKey, otherSchema.getPrimaryKey()) ? this.primaryKey : null;
         HollowObjectSchema commonSchema = new HollowObjectSchema(getName(), commonFields, primaryKey);
 
-        for(int i=0;i<fieldNames.length;i++) {
+        for (int i = 0; i < fieldNames.length; i++) {
             int otherFieldIndex = otherSchema.getPosition(fieldNames[i]);
-            if(otherFieldIndex != -1) {
-                if(fieldTypes[i] != otherSchema.getFieldType(otherFieldIndex)
+             if (otherFieldIndex != -1) {
+                if (fieldTypes[i] != otherSchema.getFieldType(otherFieldIndex)
                         || !referencedTypesEqual(referencedTypes[i], otherSchema.getReferencedType(otherFieldIndex))) {
-                    throw new IllegalArgumentException("No common schema exists for " + getName() + ": field " + fieldNames[i] + " has unmatched types");
+                    String fieldType = fieldTypes[i] == FieldType.REFERENCE ? referencedTypes[i]
+                        : fieldTypes[i].toString().toLowerCase();
+                    String otherFieldType = otherSchema.getFieldType(otherFieldIndex) == FieldType.REFERENCE
+                        ? otherSchema.getReferencedType(otherFieldIndex)
+                        : otherSchema.getFieldType(otherFieldIndex).toString().toLowerCase();
+                    throw new IncompatibleSchemaException(getName(), fieldNames[i], fieldType, otherFieldType);
                 }
 
                 commonSchema.addField(fieldNames[i], fieldTypes[i], referencedTypes[i]);
