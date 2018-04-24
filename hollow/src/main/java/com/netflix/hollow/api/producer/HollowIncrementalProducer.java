@@ -46,7 +46,7 @@ public class HollowIncrementalProducer {
     private final HollowConsumer.AnnouncementWatcher announcementWatcher;
     private final HollowConsumer.BlobRetriever blobRetriever;
     private final double threadsPerCpu;
-
+    private long lastSucessfulCycle;
 
     public HollowIncrementalProducer(HollowProducer producer) {
         this(producer, 1.0d, null, null, new ArrayList<IncrementalCycleListener>());
@@ -204,8 +204,13 @@ public class HollowIncrementalProducer {
         long recordsAddedOrModified = this.mutations.values().size() - recordsRemoved;
         try {
             long version = producer.runCycle(populator);
+            if(version == lastSucessfulCycle) {
+                return version;
+            }
             listeners.fireIncrementalCycleComplete(version, recordsAddedOrModified, recordsRemoved, new HashMap<String, Object>(cycleMetadata));
+            //Only clean changes when the version is new.
             clearChanges();
+            lastSucessfulCycle = version;
             return version;
         } catch (Exception e) {
             listeners.fireIncrementalCycleFail(e, recordsAddedOrModified, recordsRemoved, new HashMap<String, Object>(cycleMetadata));
