@@ -5,10 +5,11 @@ import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
-import com.netflix.vms.generated.notemplate.*;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Circuit breaker to check catalog sizes
@@ -37,12 +38,12 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
         CircuitBreakerResults results = new CircuitBreakerResults();
         HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "MulticatalogCountryData", "videoId.value", "country.id");
         HollowHashIndex completeVideoIdx = new HollowHashIndex(stateEngine, "CompleteVideo", "", "country.id");
-        VMSRawHollowAPI hollowApi = new VMSRawHollowAPI(stateEngine);
+        com.netflix.vms.generated.notemplate.VMSRawHollowAPI hollowApi = new com.netflix.vms.generated.notemplate.VMSRawHollowAPI(stateEngine);
 
         Map<String, Integer> countryCatalogSize = new HashMap<>();
         Map<String, Map<String, Integer>> countryLanguageCatalogSize = new HashMap<>();
 
-        Set<String> countries = ctx.getOctoberSkyData().getMultiLanguageCatalogCountries();
+        java.util.Set<String> countries = ctx.getOctoberSkyData().getMultiLanguageCatalogCountries();
 
 
         for (String country : countries) {
@@ -56,7 +57,7 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                 int ordinal = iterator.next();
                 while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
 
-                    CompleteVideoHollow completeVideoHollow = hollowApi.getCompleteVideoHollow(ordinal);
+                    com.netflix.vms.generated.notemplate.CompleteVideoHollow completeVideoHollow = hollowApi.getCompleteVideoHollow(ordinal);
 
                     countryCatalogSize.putIfAbsent(country, 0);
                     boolean isAvailableForEd = isAvailableForED(completeVideoHollow, country, null, idx, hollowApi);
@@ -65,7 +66,7 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                         countryCatalogSize.put(country, count + 1);
                     }
 
-                    Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
+                    java.util.Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
                     for (String language : languages) {
 
 
@@ -92,24 +93,25 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
             StringBuilder message = new StringBuilder();
             message.append(country + " size : " + countryCatalogSize.get(country)).append(", ");
 
-            Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
+            java.util.Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
             for (String language : languages) {
                 int count = 0;
                 if (countryLanguageCatalogSize.get(country) != null && countryLanguageCatalogSize.get(country).get(language) != null) {
                     count = countryLanguageCatalogSize.get(country).get(language);
                 }
                 message.append(country).append(":").append(language)
-                        .append(" size : ").append(count)
-                        .append(",");
+                       .append(" size : ").append(count)
+                       .append(",");
             }
-            ctx.getLogger().info(Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
+            ctx.getLogger().info(java.util.Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
         results.addResult(true, "Catalog size circuit breaker has passed");
         return results;
     }
 
-    boolean isAvailableForED(CompleteVideoHollow completeVideoHollow, String country, String language, HollowPrimaryKeyIndex idx, VMSRawHollowAPI api) {
+    boolean isAvailableForED(com.netflix.vms.generated.notemplate.CompleteVideoHollow completeVideoHollow, String country, String language,
+                             HollowPrimaryKeyIndex idx, com.netflix.vms.generated.notemplate.VMSRawHollowAPI api) {
 
         boolean isGoLive = completeVideoHollow._getData()._getFacetData()._getVideoMediaData()._getIsGoLive();
         if (!isGoLive) { return false; }
@@ -119,19 +121,23 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
             int videoId = completeVideoHollow._getId()._getValue();
             multiCatalogCountryDataOrdinal = idx.getMatchingOrdinal(videoId, country);
             if (multiCatalogCountryDataOrdinal != -1) {
-                MulticatalogCountryDataHollow multicatalogCountryDataHollow = api.getMulticatalogCountryDataHollow(multiCatalogCountryDataOrdinal);
-                MapOfNFLocaleToMulticatalogCountryLocaleDataHollow map = multicatalogCountryDataHollow._getLanguageData();
+                com.netflix.vms.generated.notemplate.MulticatalogCountryDataHollow
+                        multicatalogCountryDataHollow = api.getMulticatalogCountryDataHollow(multiCatalogCountryDataOrdinal);
+                com.netflix.vms.generated.notemplate.MapOfNFLocaleToMulticatalogCountryLocaleDataHollow map = multicatalogCountryDataHollow._getLanguageData();
 
-                for (Map.Entry<NFLocaleHollow, MulticatalogCountryLocaleDataHollow> entry : map.entrySet()) {
+                for (java.util.Map.Entry<com.netflix.vms.generated.notemplate.NFLocaleHollow, com.netflix.vms.generated.notemplate.MulticatalogCountryLocaleDataHollow> entry : map
+                        .entrySet()) {
                     String nfLocale = entry.getKey()._getValue();
                     if (nfLocale.equals(language)) {
-                        MulticatalogCountryLocaleDataHollow localeDataHollow = entry.getValue();
+                        com.netflix.vms.generated.notemplate.MulticatalogCountryLocaleDataHollow localeDataHollow = entry.getValue();
 
-                        ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow = localeDataHollow._getAvailabilityWindows();
-                        ListIterator<VMSAvailabilityWindowHollow> it = availabilityWindowListHollow.listIterator();
+                        com.netflix.vms.generated.notemplate.ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow =
+                                localeDataHollow._getAvailabilityWindows();
+                        java.util.ListIterator<com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow> it =
+                                availabilityWindowListHollow.listIterator();
 
                         while (it.hasNext()) {
-                            VMSAvailabilityWindowHollow availabilityWindowHollow = it.next();
+                            com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow availabilityWindowHollow = it.next();
                             long start = availabilityWindowHollow._getStartDate()._getVal();
                             long end = availabilityWindowHollow._getEndDate()._getVal();
 
@@ -145,10 +151,11 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
             return false;
 
         } else {
-            List<VMSAvailabilityWindowHollow> availabilityWindowsHollow = completeVideoHollow._getData()._getCountrySpecificData()._getAvailabilityWindows();
+            java.util.List<com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow>
+                    availabilityWindowsHollow = completeVideoHollow._getData()._getCountrySpecificData()._getAvailabilityWindows();
             if (availabilityWindowsHollow == null || availabilityWindowsHollow.isEmpty()) { return false; }
 
-            for (VMSAvailabilityWindowHollow window : availabilityWindowsHollow) {
+            for (com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow window : availabilityWindowsHollow) {
 
                 long start = window._getStartDate()._getVal();
                 long end = window._getEndDate()._getVal();
