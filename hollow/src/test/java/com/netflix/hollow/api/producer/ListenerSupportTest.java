@@ -17,14 +17,14 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class ListenerSupportTest {
     interface ProducerAndValidationListener
