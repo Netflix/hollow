@@ -85,4 +85,5 @@ public enum TransformerLogTag implements LogTag {
     Language_catalog_WindowFiltered,// title has asset rights but in future so window filtered.
 
     MultiLocaleCountries,
+    Catalog_Size,
 }

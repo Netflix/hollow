@@ -8,6 +8,7 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.servo.monitor.DynamicCounter;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CatalogSizeCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CertificationSystemCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.DuplicateDetectionCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
@@ -60,6 +61,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "GlobalPerson"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
                 new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
+                new CatalogSizeCircuitBreaker(ctx, cycleVersion, "CatalogSize"),
         };
 	}
 
