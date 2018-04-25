@@ -84,4 +84,5 @@ public enum TransformerLogTag implements LogTag {
     LocaleMerching_NoWindows,
 
     MultiLocaleCountries,
+    Catalog_Size,
 }

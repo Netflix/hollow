@@ -8,14 +8,9 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.servo.monitor.DynamicCounter;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CertificationSystemCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.DuplicateDetectionCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.*;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResult;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker.CircuitBreakerResults;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNViewShareAvailabilityCircuitBreaker;
-import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import java.io.File;
 import java.util.ArrayList;
@@ -60,6 +55,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
                 new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "GlobalPerson"),
                 new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
                 new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
+                new CatalogSizeCircuitBreaker(ctx, cycleVersion, "CatalogSize"),
         };
 	}
 
