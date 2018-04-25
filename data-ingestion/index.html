@@ -666,6 +666,10 @@
 
 
 <p>When processing an entire file, it is expected that the file contains only a single json array of records of the expected type.  The records will be processed in parallel.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hollow to JSON</p>
+<p>Hollow objects can be converted to JSON string using <code>HollowRecordJsonStringifier</code>. Tools backed by Hollow data is one of the cases where this can be useful.</p>
+</div>
 <h2 id="zeno-to-hollow">Zeno to Hollow</h2>
 <p>The project <em>hollow-zenoadapter</em> has an adapter which can be used with Hollow’s predecessor, Zeno.  We used this as part of our migration path from Zeno to Hollow, and it is provided for current users of Zeno who would like to migrate to Hollow as well.  Start with the <em>HollowStateEngineCreator</em>.</p>
                 

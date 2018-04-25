@@ -678,6 +678,15 @@
 
 <p>When defined in the schema, primary keys are a part of your data model and drive useful functionality and default configuration in the <a href="../tooling/#hollow-explorer">hollow explorer</a>, <a href="../tooling/#history-tool">hollow history</a>, and <a href="../tooling/#diff-tool">diff ui</a>.  They also provide a shortcut when creating a <a href="../indexing-querying/#default-primary-keys">primary key index</a>.</p>
 <p>Primary keys defined in the schema follow the same convention as primary keys defined for indexes.  They consist of one or more <a href="../indexing-querying/#field-paths">field paths</a>, which will auto-expand if they terminate in a <code>REFERENCE</code> field.</p>
+<div class="admonition warning">
+<p class="admonition-title">Null values are not supported</p>
+<p>Primary key field(s) cannot have null values. This is not supported as it was not needed. Please be mindful when adding values to primary key fields. This will result in exception similar to below. </p>
+<p><code>java
+java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang.RuntimeException: Attempting to read null value as int
+at com.netflix.hollow.core.write.HollowBlobWriter.writeSnapshot(HollowBlobWriter.java:69)
+at com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager$FilesystemBlob
+.write(HollowFilesystemBlobStager.java:117)</code></p>
+</div>
 <h3 id="inlined-vs-referenced-fields">Inlined vs Referenced Fields</h3>
 <p>We can <em>inline</em> some fields in our POJOs so that they are no longer <code>REFERENCE</code> fields, but instead encode their data directly in each record:</p>
 <div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
