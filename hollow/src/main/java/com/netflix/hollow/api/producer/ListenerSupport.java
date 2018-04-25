@@ -77,8 +77,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onProducerInit(elapsedMillis, MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireProducerRestoreStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -87,8 +87,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onProducerRestoreStart(version);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireProducerRestoreStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -97,8 +97,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onProducerRestoreComplete(status, elapsedMillis, MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireProducerRestoreComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -107,8 +107,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onNewDeltaChain(version);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireNewDeltaChain failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -119,8 +119,8 @@ final class ListenerSupport {
             if (l instanceof HollowProducerListenerV2) {
                 try {
                     ((HollowProducerListenerV2) l).onCycleSkip(reason);
-                } catch(RuntimeException e) {
-                    log.warning("Execution of " + l.getClass().getName() + "  during fireCycleSkipped failed | " + e);
+                } catch(Throwable t) {
+                    log.warning("Error executing listener" + t);
                 }
             }
         }
@@ -132,8 +132,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onCycleStart(version);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireCycleStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return psb;
@@ -144,8 +144,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onCycleComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireCycleComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -154,8 +154,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onNoDeltaAvailable(psb.version());
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireNoDelta failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -165,8 +165,8 @@ final class ListenerSupport {
         for (final HollowProducerListener l : listeners) {
             try {
                 l.onPopulateStart(version);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during firePopulateStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return builder;
@@ -177,8 +177,8 @@ final class ListenerSupport {
         for (final HollowProducerListener l : listeners) {
             try {
                 l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during firePopulateComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -188,8 +188,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onPublishStart(version);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during firePublishStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return psb;
@@ -200,8 +200,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during firePublishComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -211,8 +211,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireArtifactPublish failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -222,8 +222,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onIntegrityCheckStart(psb.version());
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireIntegrityCheckStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return psb;
@@ -234,8 +234,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onIntegrityCheckComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireIntegrityCheckComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -248,8 +248,8 @@ final class ListenerSupport {
             try {
                 l.onValidationStart(version);
                 firedListeners.add(l);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireValidationStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
 
         }
@@ -258,8 +258,8 @@ final class ListenerSupport {
                 if (!firedListeners.contains(vl)) {
                     vl.onValidationStart(version);
                 }
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + vl.getClass().getName() + "  during fireValidationStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return psb;
@@ -270,8 +270,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireValidationComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         
@@ -279,8 +279,8 @@ final class ListenerSupport {
         for(final HollowValidationListener vl : validationListeners) {
             try {
                 vl.onValidationComplete(valStatus, psb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + vl.getClass().getName() + "  during fireValidationComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -290,8 +290,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onAnnouncementStart(psb.version());
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireAnnouncementStart failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
         return psb;
@@ -302,8 +302,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireAnnouncementComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -313,8 +313,8 @@ final class ListenerSupport {
         for(final IncrementalCycleListener l : incrementalCycleListeners) {
             try {
                 l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireIncrementalCycleComplete failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
@@ -324,8 +324,8 @@ final class ListenerSupport {
         for(final IncrementalCycleListener l : incrementalCycleListeners) {
             try {
                 l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch(RuntimeException e) {
-                log.warning("Execution of " + l.getClass().getName() + "  during fireIncrementalCycleFail failed | " + e);
+            } catch(Throwable t) {
+                log.warning("Error executing listener" + t);
             }
         }
     }
