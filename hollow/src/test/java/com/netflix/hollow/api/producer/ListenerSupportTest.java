@@ -24,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 public class ListenerSupportTest {
     interface ProducerAndValidationListener
             extends HollowProducerListenerV2, HollowValidationListener {
@@ -57,5 +59,98 @@ public class ListenerSupportTest {
         Mockito.verify(listener).onValidationStart(version);
         Mockito.verify(validationListener).onValidationStart(version);
         Mockito.verify(producerAndValidationListener).onValidationStart(version);
+    }
+
+    @Test
+    public void testFireValidationStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(validationListener).onValidationStart(version);
+        listenerSupport.fireValidationStart(readState);
+        Mockito.verify(listener).onValidationStart(version);
+        Mockito.verify(producerAndValidationListener).onValidationStart(version);
+    }
+
+    @Test
+    public void fireProducerInitDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onProducerInit(1L, MILLISECONDS);
+        listenerSupport.fireProducerInit(1L);
+        Mockito.verify(listener).onProducerInit(1L, MILLISECONDS);
+    }
+
+    @Test
+    public void fireProducerRestoreStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onProducerRestoreStart(version);
+        listenerSupport.fireProducerRestoreComplete(null, 1L);
+        Mockito.verify(listener).onProducerRestoreComplete(null, 1L, MILLISECONDS);
+    }
+
+    @Test
+    public void fireNewDeltaChainDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onNewDeltaChain(version);
+        listenerSupport.fireNewDeltaChain(version);
+        Mockito.verify(listener).onNewDeltaChain(version);
+
+    }
+
+    @Test
+    public void fireCycleStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onCycleStart(version);
+        listenerSupport.fireCycleStart(version);
+        Mockito.verify(listener).onCycleStart(version);
+    }
+
+    @Test
+    public void firePopulateStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onPopulateStart(version);
+        listenerSupport.firePopulateStart(version);
+        Mockito.verify(listener).onPopulateStart(version);
+    }
+
+    @Test
+    public void firePublishStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onPublishStart(version);
+        listenerSupport.firePublishStart(version);
+        Mockito.verify(listener).onPublishStart(version);
+    }
+
+    @Test
+    public void fireIntegrityCheckStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onIntegrityCheckStart(version);
+        listenerSupport.fireIntegrityCheckStart(readState);
+        Mockito.verify(listener).onIntegrityCheckStart(version);
+    }
+
+
+    @Test
+    public void fireAnnouncementStartDontStopWhenOneFails() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+        Mockito.doThrow(RuntimeException.class).when(listener).onAnnouncementStart(version);
+        listenerSupport.fireAnnouncementStart(readState);
+        Mockito.verify(listener).onAnnouncementStart(version);
     }
 }
