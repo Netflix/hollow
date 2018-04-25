@@ -6,7 +6,6 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.generated.notemplate.*;
-import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.*;
@@ -14,7 +13,7 @@ import java.util.*;
 /**
  * Circuit breaker to check catalog sizes
  */
-public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
+public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
 
     private final String ruleName;
 
@@ -48,37 +47,42 @@ public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreak
 
         for (String country : countries) {
             countryCatalogSize.putIfAbsent(country, 0);
-            countryLanguageCatalogSize.putIfAbsent(country, new HashMap<>());
 
             HollowHashIndexResult hashIndexResult = completeVideoIdx.findMatches(country);
-            HollowOrdinalIterator iterator = hashIndexResult.iterator();
-            int ordinal = iterator.next();
-            while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+            if (hashIndexResult != null) {
 
-                CompleteVideoHollow completeVideoHollow = hollowApi.getCompleteVideoHollow(ordinal);
+                countryLanguageCatalogSize.putIfAbsent(country, new HashMap<>());
+                HollowOrdinalIterator iterator = hashIndexResult.iterator();
+                int ordinal = iterator.next();
+                while (ordinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
 
-                countryCatalogSize.putIfAbsent(country, 0);
-                boolean isAvailableForEd = isAvailableForED(completeVideoHollow, country, null, idx, hollowApi);
-                if (isAvailableForEd) {
-                    int count = countryCatalogSize.get(country);
-                    countryCatalogSize.put(country, count + 1);
-                }
+                    CompleteVideoHollow completeVideoHollow = hollowApi.getCompleteVideoHollow(ordinal);
 
-                Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
-                for (String language : languages) {
-
-
-                    Map<String, Integer> languageCatalogSize = countryLanguageCatalogSize.get(country);
-                    languageCatalogSize.putIfAbsent(language, 0);
-
-                    isAvailableForEd = isAvailableForED(completeVideoHollow, country, language, idx, hollowApi);
+                    countryCatalogSize.putIfAbsent(country, 0);
+                    boolean isAvailableForEd = isAvailableForED(completeVideoHollow, country, null, idx, hollowApi);
                     if (isAvailableForEd) {
-                        int count = languageCatalogSize.get(language);
-                        languageCatalogSize.put(language, count + 1);
+                        int count = countryCatalogSize.get(country);
+                        countryCatalogSize.put(country, count + 1);
                     }
-                }
 
-                ordinal = iterator.next();
+                    Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
+                    for (String language : languages) {
+
+
+                        Map<String, Integer> languageCatalogSize = countryLanguageCatalogSize.get(country);
+                        languageCatalogSize.putIfAbsent(language, 0);
+
+                        isAvailableForEd = isAvailableForED(completeVideoHollow, country, language, idx, hollowApi);
+                        if (isAvailableForEd) {
+                            int count = languageCatalogSize.get(language);
+                            languageCatalogSize.put(language, count + 1);
+                        }
+                    }
+
+                    ordinal = iterator.next();
+                }
+            } else {
+                ctx.getLogger().error(TransformerLogTag.Catalog_Size, "HashIndexResult to find complete video for country={} is null", country);
             }
         }
 
@@ -90,11 +94,15 @@ public class CatalogSizeCircuitBreaker extends HollowCountrySpecificCircuitBreak
 
             Set<String> languages = ctx.getOctoberSkyData().getCatalogLanguages(country);
             for (String language : languages) {
+                int count = 0;
+                if (countryLanguageCatalogSize.get(country) != null && countryLanguageCatalogSize.get(country).get(language) != null) {
+                    count = countryLanguageCatalogSize.get(country).get(language);
+                }
                 message.append(country).append(":").append(language)
-                        .append(" size : ").append(countryLanguageCatalogSize.get(country).get(language))
+                        .append(" size : ").append(count)
                         .append(",");
             }
-            ctx.getLogger().log(TaggingLogger.Severity.INFO, Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
+            ctx.getLogger().info(Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
         results.addResult(true, "Catalog size circuit breaker has passed");
