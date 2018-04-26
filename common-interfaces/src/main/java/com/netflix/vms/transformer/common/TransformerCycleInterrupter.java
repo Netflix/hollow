@@ -12,6 +12,10 @@ public interface TransformerCycleInterrupter {
 
     boolean isCycleInterrupted();
 
+    void pauseCycle(boolean isPaused);
+
+    boolean isCyclePaused();
+
     String getCycleInterruptMsg();
 
     /**

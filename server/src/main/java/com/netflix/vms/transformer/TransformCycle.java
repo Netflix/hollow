@@ -13,6 +13,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackSt
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCyclePaused;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformRestore;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
@@ -200,6 +201,17 @@ public class TransformCycle {
         }
 
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
+
+        // Check whether to Pause Cycle
+        boolean wasCyclePaused = false;
+        while (ctx.getCycleInterrupter().isCyclePaused()) {
+            try {
+                if (!wasCyclePaused) ctx.getLogger().warn(TransformCyclePaused, "Paused cycle={}", currentCycleNumber);
+                wasCyclePaused = true;
+                Thread.sleep(30 * 1000);
+            } catch (InterruptedException e) {}
+        }
+        if (wasCyclePaused) ctx.getLogger().info(TransformCyclePaused, "Resumed cycle={}", currentCycleNumber);
 
         // Spot to trigger Cycle Monkey if enabled
         cycleMonkey.cycleBegin();

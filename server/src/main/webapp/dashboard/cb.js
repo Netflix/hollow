@@ -563,6 +563,8 @@ function addEventListeners() {
   $('#edit-threshold-override-button').click(editThresholdOverride);
 
   //Baseline Reset Related Handlers
+  $('#interrupt-cycle-link').click(handleInterruptCycleLink);
+  $('#unpause-cycle-link').click(handleUnpauseCycleLink);
   $('#reset-baseline-link').click(handleResetBaselineLink);
   $('#close-reset-baseline-modal').click(closeResetBaselineModal);
   $('#reset-baseline-button').click(resetBaseline);
@@ -580,6 +582,20 @@ function handleResetBaselineRuleNameSelectionChanged() {
     $('#reset-baseline-country-select').show();
   else
     $('#reset-baseline-country-select').hide();
+}
+
+function handleInterruptCycleLink(event) {
+    var msg = prompt("Please enter reason to interrupt cycle", "Interrupting Cycle");
+    if (msg != null) {
+       var pause = confirm('Pause next cycle?')
+       window.location = "/REST/vms/interruptcycle?interrupt=true&message=" + msg + "&pause" + pause;
+    }
+}
+
+function handleUnpauseCycleLink(event) {
+    if (confirm('Proceed to unpause cycle?')) {
+        window.location = "/REST/vms/interruptcycle?pause=false"
+    }
 }
 
 function handleResetBaselineLink(event) {

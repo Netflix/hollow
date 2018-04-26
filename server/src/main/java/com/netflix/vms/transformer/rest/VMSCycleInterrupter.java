@@ -32,18 +32,24 @@ public class VMSCycleInterrupter {
     @Produces({ MediaType.TEXT_PLAIN })
     public Response doGet(@Context HttpServletRequest req,
             @QueryParam("interrupt") Boolean interrupt,
+            @QueryParam("pause") Boolean pause,
             @QueryParam("message") String msg) throws Exception, Throwable {
 
-        String response = null;
+        String response = "";
+        if (pause != null) {
+            cycleInterrupter.pauseCycle(pause);
+            response = "Next cycle will be paused: " + pause + "; ";
+        }
+
         if (interrupt != null && interrupt == true) {
             if (msg == null || msg.trim().isEmpty()) throw new IllegalArgumentException("message is required");
 
             cycleInterrupter.interruptCycle(msg);
 
             String reqTime = formatter.format(new Date());
-            response = "Cycle Interrupt request received at " + reqTime + " with message=" + msg;
-        } else {
-            response = "USAGE: interrupt=true&message=[REASON FOR CYCLE INTERRUPT]";
+            response += "Cycle Interrupt request received at " + reqTime + " with message=" + msg;
+        } else if (pause == null) {
+            response = "USAGE: interrupt=true&pause=true&message=[REASON FOR CYCLE INTERRUPT]";
         }
 
         if (!cycleInterrupter.getHistory().isEmpty()) {

@@ -5,6 +5,7 @@ import com.netflix.vms.logging.TaggingLogger.LogTag;
 public enum TransformerLogTag implements LogTag {
     WaitForNextCycle,
     TransformCycleBegin,
+    TransformCyclePaused,
     TransformCycleSuccess,
     TransformCycleMonkey,
     TransformCycleFailed,
