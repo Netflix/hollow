@@ -588,13 +588,15 @@ function handleInterruptCycleLink(event) {
     var msg = prompt("Please enter reason to interrupt cycle", "Interrupting Cycle");
     if (msg != null) {
        var pause = confirm('Pause next cycle?')
-       window.location = "/REST/vms/interruptcycle?interrupt=true&message=" + msg + "&pause" + pause;
+       var url = "/REST/vms/interruptcycle?interrupt=true&pause=" + pause + "&message=" + msg;
+       top.open(url,'_interrupt');
     }
 }
 
 function handleUnpauseCycleLink(event) {
     if (confirm('Proceed to unpause cycle?')) {
-        window.location = "/REST/vms/interruptcycle?pause=false"
+       var url = "/REST/vms/interruptcycle?pause=false"
+       top.open(url,'_interrupt');
     }
 }
 
