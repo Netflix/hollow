@@ -6,6 +6,7 @@ public enum TransformerLogTag implements LogTag {
     WaitForNextCycle,
     TransformCycleBegin,
     TransformCyclePaused,
+    TransformCycleResumed,
     TransformCycleSuccess,
     TransformCycleMonkey,
     TransformCycleFailed,
