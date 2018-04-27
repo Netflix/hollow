@@ -182,42 +182,51 @@ public class TransformCycle {
     private static long initCycleNumber(TransformerContext ctx, VersionMinter versionMinter) {
         long currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
-        ctx.getCycleInterrupter().begin(currentCycleNumber);
         return currentCycleNumber;
+    }
+
+    private void checkPauseCycle() {
+        boolean wasCyclePaused = false;
+        while (ctx.getCycleInterrupter().isCyclePaused()) {
+            if (!wasCyclePaused) ctx.getLogger().warn(TransformCyclePaused, "Paused cycle={}", currentCycleNumber);
+            wasCyclePaused = true;
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {}
+        }
+        if (wasCyclePaused) ctx.getLogger().warn(Arrays.asList(TransformCyclePaused, TransformCycleResumed), "Resumed cycle={}", currentCycleNumber);
+    }
+
+    private void trackIds(TransformerLogTag tag, String format, Set<?> ids) {
+        if (ids == null || ids.isEmpty()) return;
+
+        ctx.getLogger().info(tag, format, ids);
     }
 
     private void beginCycle() {
         // First cycle already initialized in Constructor
         if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
 
-        ctx.getOctoberSkyData().refresh();
+        // Track cycle begin
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
         ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
-
-        if(ctx.getFastlaneIds() != null)
-            ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
-
-        if (ctx.getPinTitleSpecs() != null) {
-            ctx.getLogger().info(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
-        }
-
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
-        // Check whether to Pause Cycle
-        boolean wasCyclePaused = false;
-        while (ctx.getCycleInterrupter().isCyclePaused()) {
-            try {
-                if (!wasCyclePaused) ctx.getLogger().warn(TransformCyclePaused, "Paused cycle={}", currentCycleNumber);
-                wasCyclePaused = true;
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-        }
-        if (wasCyclePaused) ctx.getLogger().warn(Arrays.asList(TransformCyclePaused, TransformCycleResumed), "Resumed cycle={}", currentCycleNumber);
+        // Check whether to Pause Cycle (before any logic)
+        checkPauseCycle();
+
+        // Init Context to begin cycle processing (e.g. Freeze Config)
+        ctx.beginCycle();
+        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at beginCycle");
+
+        // track ids
+        trackIds(CycleFastlaneIds, "Fastlane Ids={}", ctx.getFastlaneIds());
+        trackIds(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
 
         // Spot to trigger Cycle Monkey if enabled
-        cycleMonkey.cycleBegin();
         cycleMonkey.doMonkeyBusiness("beginCycle");
 
+        // Prepare state(s) for new cycle
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
