@@ -212,7 +212,7 @@ public class TransformCycle {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {}
         }
-        if (wasCyclePaused) ctx.getLogger().warn(TransformCycleResumed, "Resumed cycle={}", currentCycleNumber);
+        if (wasCyclePaused) ctx.getLogger().warn(Arrays.asList(TransformCyclePaused, TransformCycleResumed), "Resumed cycle={}", currentCycleNumber);
 
         // Spot to trigger Cycle Monkey if enabled
         cycleMonkey.cycleBegin();
