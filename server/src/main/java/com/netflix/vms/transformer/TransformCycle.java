@@ -88,6 +88,7 @@ public class TransformCycle {
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
     private boolean isFastlane = false;
+    private boolean isNoStreamsBlobEnabled = true;
     private boolean isFirstCycle = true;
     private boolean isRestoreDone = false;
 
@@ -107,7 +108,6 @@ public class TransformCycle {
         this.filestore = fileStore;
         this.hermesBlobAnnouncer = hermesBlobAnnouncer;
         this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
-        this.isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
@@ -116,11 +116,21 @@ public class TransformCycle {
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
         this.cycleMonkey = ctx.getCycleMonkey();
+
+        this.isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
+        this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
+
         Monitors.registerObject(timeSinceLastPublishGauge);
     }
 
-    private void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom) {
+    private static boolean isNoStreamsBlobEnabled(boolean isFastlane) {
+        return !isFastlane; // Fastlane does not deal with NoStreams blob
+    }
+
+    private void restore(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isNoStreamsBlobEnabled) {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
+        HollowReadStateEngine restoreNoStreamStateEngine = isNoStreamsBlobEnabled ? nostreamsRestoreFrom.getStateEngine() : null;
+
         { // @TODO FIX: should restore headers as well
             outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
             outputStateEngine.restoreFrom(restoreStateEngine);
@@ -128,7 +138,7 @@ public class TransformCycle {
         ctx.getLogger().info(BlobState, "restore : input({}), output({}),)", BlobMetaDataUtil.fetchCoreHeaders(restoreStateEngine), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
         previousCycleNumber = restoreFrom.getCurrentVersionId();
 
-        publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
+        publishWorkflowStager.notifyRestoredStateEngine(restoreStateEngine, restoreNoStreamStateEngine);
         isRestoreDone = true;
     }
 
@@ -211,7 +221,7 @@ public class TransformCycle {
 
         // Track cycle begin
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
-        ctx.getLogger().info(BlobState, "beginCycle : previousStateHeader({})", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
+        ctx.getLogger().info(BlobState, "beginCycle : cycle={}, isFastlane={}, isNoStreamsBlobEnabled={}, previousStateHeader({})", currentCycleNumber, isFastlane, isNoStreamsBlobEnabled, BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
         // Check whether to Pause Cycle (before any logic)
@@ -256,19 +266,19 @@ public class TransformCycle {
         return restoreResult;
     }
 
-    private static void restoreInParallel(SimultaneousExecutor executor, TransformerContext ctx, long restoreVersion, VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient, boolean isRestoreNoStreamNeeded) throws Exception {
+    private static void restoreInParallel(SimultaneousExecutor executor, TransformerContext ctx, long restoreVersion, VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient, boolean isNoStreamsBlobEnabled) throws Exception {
         // Execute Restore in background
         ExecuteFutureResult restoreNormalBlobResult = executeRestore("restoreNormalBlob", ctx, executor, outputClient, restoreVersion);
-        ExecuteFutureResult restoreNoStreamsBlobResult = isRestoreNoStreamNeeded ? executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion) : null;
+        ExecuteFutureResult restoreNoStreamsBlobResult = isNoStreamsBlobEnabled ? executeRestore("restoreNoStreamsBlob", ctx, executor, nostreamsOutputClient, restoreVersion) : null;
 
         // Wait for them to complete and validate success
         executor.awaitSuccessfulCompletion();
         restoreNormalBlobResult.throwExceptionIfNotCompleteSuccessfully();
-        if (isRestoreNoStreamNeeded) restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
+        if (isNoStreamsBlobEnabled) restoreNoStreamsBlobResult.throwExceptionIfNotCompleteSuccessfully();
 
         // Validate that both have restored to the specified version
         if (outputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (with streams) to specified restoreVersion: " + restoreVersion + ",  currentVersion=" + outputClient.getCurrentVersionId());
-        if (isRestoreNoStreamNeeded && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) to specified restoreVersion: " + restoreVersion + ",  currentVersion=" + nostreamsOutputClient.getCurrentVersionId());
+        if (isNoStreamsBlobEnabled && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) throw new IllegalStateException("Failed to restore (nostreams) to specified restoreVersion: " + restoreVersion + ",  currentVersion=" + nostreamsOutputClient.getCurrentVersionId());
     }
 
     public static void restore(SimultaneousExecutor executor, TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, boolean isFastlane, boolean isRunWithinUpdateInput) {
@@ -284,11 +294,12 @@ public class TransformCycle {
                     // Restore in parallel
                     VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
                     VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore, VipNameUtil.getNoStreamsVip(cfg.getTransformerVip()));
-                    boolean isRestoreNoStreamNeeded = !isFastlane; // Fastlane does not deal with NoStream blob
-                    restoreInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient, isRestoreNoStreamNeeded);
+
+                    boolean isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
+                    restoreInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient, isNoStreamsBlobEnabled);
 
                     // Let TransformCycle complete the restore process
-                    cycle.restore(outputClient, nostreamsOutputClient);
+                    cycle.restore(outputClient, nostreamsOutputClient, isNoStreamsBlobEnabled);
                 } else if (cfg.isFailIfRestoreNotAvailable()) {
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
                 }
@@ -441,8 +452,10 @@ public class TransformCycle {
             // Spot to trigger Cycle Monkey if enabled
             cycleMonkey.doMonkeyBusiness("writeTheBlobFiles");
 
-            String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
-            createNostreamsFilteredFile(snapshotFileName, nostreamsSnapshotFileName, true);
+            if (isNoStreamsBlobEnabled) {
+                String nostreamsSnapshotFileName = fileNamer.getNostreamsSnapshotFileName(currentCycleNumber);
+                createNostreamsFilteredFile(snapshotFileName, nostreamsSnapshotFileName, true);
+            }
 
             if(previousCycleNumber != Long.MIN_VALUE) {
                 String deltaFileName = fileNamer.getDeltaFileName(previousCycleNumber, currentCycleNumber);
@@ -451,8 +464,10 @@ public class TransformCycle {
                     ctx.getLogger().info(blobStateTags, "Wrote Delta to local file( {}) - header( {} )", deltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 }
 
-                String nostreamsDeltaFileName = fileNamer.getNostreamsDeltaFileName(previousCycleNumber, currentCycleNumber);
-                createNostreamsFilteredFile(deltaFileName, nostreamsDeltaFileName, false);
+                if (isNoStreamsBlobEnabled) {
+                    String nostreamsDeltaFileName = fileNamer.getNostreamsDeltaFileName(previousCycleNumber, currentCycleNumber);
+                    createNostreamsFilteredFile(deltaFileName, nostreamsDeltaFileName, false);
+                }
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
                 outputStateEngine.addHeaderTags(previousStateHeader); // Make sure to have reverse delta's header point to prior state
@@ -461,8 +476,10 @@ public class TransformCycle {
                     ctx.getLogger().info(blobStateTags, "Wrote Reverse Delta to local file( {} ) - header( {} )", reverseDeltaFileName, BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
                 }
 
-                String nostreamsReverseDeltaFileName = fileNamer.getNostreamsReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
-                createNostreamsFilteredFile(reverseDeltaFileName, nostreamsReverseDeltaFileName, false);
+                if (isNoStreamsBlobEnabled) {
+                    String nostreamsReverseDeltaFileName = fileNamer.getNostreamsReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
+                    createNostreamsFilteredFile(reverseDeltaFileName, nostreamsReverseDeltaFileName, false);
+                }
             }
         } catch (Exception e) {
             ctx.getLogger().error(Arrays.asList(BlobState, WritingBlobsFailed), "Writing blobs failed", e);
