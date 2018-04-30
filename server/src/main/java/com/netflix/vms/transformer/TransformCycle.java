@@ -89,6 +89,7 @@ public class TransformCycle {
     private long currentCycleNumber = Long.MIN_VALUE;
     private boolean isFastlane = false;
     private boolean isFirstCycle = true;
+    private boolean isRestoreDone = false;
 
     private String previouslyResolvedConverterVip;
 
@@ -128,6 +129,7 @@ public class TransformCycle {
         previousCycleNumber = restoreFrom.getCurrentVersionId();
 
         publishWorkflowStager.notifyRestoredStateEngine(restoreFrom.getStateEngine(), nostreamsRestoreFrom.getStateEngine());
+        isRestoreDone = true;
     }
 
     public void cycle() throws Throwable {
@@ -346,8 +348,8 @@ public class TransformCycle {
             // Load Input on thread so it can process restore on first cycle if needed
             ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputClient, pinnedInputVersion);
 
-            // Determine whether to process restore here; only if it is first cycle
-            if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
+            // Determine whether to process restore here; only restore once
+            if (!isRestoreDone && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
                 restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
             }
 
