@@ -742,7 +742,7 @@ public class VMSAvailabilityWindowModule {
      * @param unfilteredCount
      * @param startDate
      * @param endDate
-     * @return if window data should be filtered.
+     * @return false means do not filter out the window
      */
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
             unfilteredCount, long startDate, long endDate) {
