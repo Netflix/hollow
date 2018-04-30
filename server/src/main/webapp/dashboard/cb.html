@@ -35,10 +35,6 @@
                 <a href="#" id="interrupt-cycle-link">Interrupt Cycle</a>
               </td>
               <td nowrap> | </td>
-             <td nowrap>
-                <a href="#" id="unpause-cycle-link">Unpause Cycle</a>
-              </td>
-              <td nowrap> | </td>
               <td nowrap>
                 <a href="#" id="reset-baseline-link">Reset Baselines</a>
               </td>
@@ -126,6 +122,27 @@
       <input type="text" size="10" data-role="none" id="cb-threshold-text"/>
       &nbsp;&nbsp;
       <input type="button" value="Update" data-role="none"id="update-cb-threshold-button"/>
+    </div>
+  </div>
+
+  <div id="interrupt-cycle-modal">
+    <div id="interrupt-cycle-modal-header">
+      <img src="images/close.png" height="12" width="12" style="float:right" id="close-interrupt-cycle-modal" />
+      <p>Interrupt Cycle</p>
+    </div>
+    <div id="interrupt-cycle-form">
+      <table cellpadding=2 cellspacing=2>
+        <tr><th nowrap>Interrupt Reason: &nbsp;</th><td><input type="text"     id="interrupt-cycle-reason" size="50" value="CB Interrupt Cycle"/></td></tr>
+        <tr><th nowrap>Pause Next Cycle: &nbsp;</th><td><input type="checkbox" id="interrupt-cycle-pause" /></td></tr>
+        <tr><td rowspan=2>&nbsp;&nbsp;</td></tr>
+        <tr><td rowspan=2>
+            <center>
+            <input type="button" value="Cancel" data-role="none" id="interrupt-cycle-cancel-button"/>
+            &nbsp;&nbsp;
+            <input type="button" value="Proceed" data-role="none" id="interrupt-cycle-proceed-button"/>
+            </center>
+        </td></tr>
+      </table>
     </div>
   </div>
 

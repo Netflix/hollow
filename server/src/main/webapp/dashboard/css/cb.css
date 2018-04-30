@@ -112,6 +112,35 @@ a.ed-override-link, a.threshold-override-link {
   font-size: 20px;
 }
 
+#interrupt-cycle-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 600px;
+  background-color: #fff;
+  z-index: 3;
+}
+
+#interrupt-cycle-modal-header {
+  border-bottom: 1px solid #000;
+  line-height: 200%;
+  padding: 20px;
+}
+
+#interrupt-cycle-modal-header p {
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-size: 20px;
+}
+
+#interrupt-cycle-form {
+  font-size: 15px;
+  padding: 15px;
+}
+
 #enabled-disabled-override-modal-header {
   border-bottom: 1px solid #000;
   line-height: 200%;
@@ -204,7 +233,11 @@ a.ed-override-link, a.threshold-override-link {
   font-size: 18px;
 }
 
-#close-enabled-disabled-override-modal, #close-threshold-override-modal, #close-edit-threshold-modal, #close-reset-baseline-modal {
+.button {
+  cursor: pointer;
+}
+
+#close-enabled-disabled-override-modal, #close-threshold-override-modal, #close-edit-threshold-modal, #close-reset-baseline-modal, #close-interrupt-cycle-modal {
   cursor: pointer;
 }
 

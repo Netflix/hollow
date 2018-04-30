@@ -44,6 +44,7 @@ public class VMSCycleInterrupter {
         if (interrupt != null && interrupt == true) {
             if (msg == null || msg.trim().isEmpty()) throw new IllegalArgumentException("message is required");
 
+            if (pause != null) msg += "; Pause Next Cycle:" + pause;
             cycleInterrupter.interruptCycle(msg);
 
             String reqTime = formatter.format(new Date());
