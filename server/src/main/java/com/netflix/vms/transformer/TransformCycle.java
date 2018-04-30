@@ -13,6 +13,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackSt
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCyclePaused;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleResumed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformRestore;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
@@ -88,6 +90,7 @@ public class TransformCycle {
     private boolean isFastlane = false;
     private boolean isNoStreamsBlobEnabled = true;
     private boolean isFirstCycle = true;
+    private boolean isRestoreDone = false;
 
     private String previouslyResolvedConverterVip;
 
@@ -136,6 +139,7 @@ public class TransformCycle {
         previousCycleNumber = restoreFrom.getCurrentVersionId();
 
         publishWorkflowStager.notifyRestoredStateEngine(restoreStateEngine, restoreNoStreamStateEngine);
+        isRestoreDone = true;
     }
 
     public void cycle() throws Throwable {
@@ -190,31 +194,51 @@ public class TransformCycle {
     private static long initCycleNumber(TransformerContext ctx, VersionMinter versionMinter) {
         long currentCycleNumber = versionMinter.mintANewVersion();
         ctx.setCurrentCycleId(currentCycleNumber);
-        ctx.getCycleInterrupter().begin(currentCycleNumber);
         return currentCycleNumber;
+    }
+
+    private void checkPauseCycle() {
+        boolean wasCyclePaused = false;
+        while (ctx.getCycleInterrupter().isCyclePaused()) {
+            if (!wasCyclePaused) ctx.getLogger().warn(TransformCyclePaused, "Paused cycle={}", currentCycleNumber);
+            wasCyclePaused = true;
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {}
+        }
+        if (wasCyclePaused) ctx.getLogger().warn(Arrays.asList(TransformCyclePaused, TransformCycleResumed), "Resumed cycle={}", currentCycleNumber);
+    }
+
+    private void trackIds(TransformerLogTag tag, String format, Set<?> ids) {
+        if (ids == null || ids.isEmpty()) return;
+
+        ctx.getLogger().info(tag, format, ids);
     }
 
     private void beginCycle() {
         // First cycle already initialized in Constructor
         if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
 
-        ctx.getOctoberSkyData().refresh();
+        // Track cycle begin
         previousStateHeader = new HashMap<>(outputStateEngine.getHeaderTags());
         ctx.getLogger().info(BlobState, "beginCycle : cycle={}, isFastlane={}, isNoStreamsBlobEnabled={}, previousStateHeader({})", currentCycleNumber, isFastlane, isNoStreamsBlobEnabled, BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
-
-        if(ctx.getFastlaneIds() != null)
-            ctx.getLogger().info(CycleFastlaneIds, ctx.getFastlaneIds());
-
-        if (ctx.getPinTitleSpecs() != null) {
-            ctx.getLogger().info(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
-        }
-
         ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
 
+        // Check whether to Pause Cycle (before any logic)
+        checkPauseCycle();
+
+        // Init Context to begin cycle processing (e.g. Freeze Config)
+        ctx.beginCycle();
+        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at beginCycle");
+
+        // track ids
+        trackIds(CycleFastlaneIds, "Fastlane Ids={}", ctx.getFastlaneIds());
+        trackIds(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
+
         // Spot to trigger Cycle Monkey if enabled
-        cycleMonkey.cycleBegin();
         cycleMonkey.doMonkeyBusiness("beginCycle");
 
+        // Prepare state(s) for new cycle
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
@@ -335,8 +359,8 @@ public class TransformCycle {
             // Load Input on thread so it can process restore on first cycle if needed
             ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputClient, pinnedInputVersion);
 
-            // Determine whether to process restore here; only if it is first cycle
-            if (isFirstCycle && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
+            // Determine whether to process restore here; only restore once
+            if (!isRestoreDone && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
                 restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
             }
 

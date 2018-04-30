@@ -49,6 +49,17 @@ public interface TransformerContext {
 
     CycleMonkey getCycleMonkey();
 
+    /**
+     * Initialize Transformer Context for new cycle
+     */
+    default void beginCycle() {
+        getOctoberSkyData().refresh();
+        getCycleMonkey().cycleBegin();
+
+        long currentCycleNumber = getCurrentCycleId();
+        getCycleInterrupter().begin(currentCycleNumber);
+    }
+
     default void stopTimerAndLogDuration(DurationMetric metric) {
         long duration = getMetricRecorder().stopTimer(metric);
         getLogger().info(TransformerLogTag.TransformDuration, "Metric={}, Duration={}", metric.name(), duration);

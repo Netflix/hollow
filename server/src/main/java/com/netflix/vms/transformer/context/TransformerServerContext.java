@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
+import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistory;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationHistoryConsumer;
 import com.netflix.vms.transformer.config.FrozenTransformerConfigFactory;
@@ -75,7 +76,15 @@ public class TransformerServerContext implements TransformerContext {
     public void setCurrentCycleId(long currentCycleId) {
         this.currentCycleId = currentCycleId;
         this.logger = logger.withCurrentCycleId(currentCycleId);
+    }
+
+    @Override
+    public void beginCycle() {
+        TransformerContext.super.beginCycle();
+
+        // freeze config for new cycle
         this.staticConfig = configFactory.createStaticConfig(logger);
+        this.logger.info(TransformerLogTag.FreezeConfig, "Config Frozen");
     }
 
     @Override
