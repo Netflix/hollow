@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core;
 
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.List;
@@ -38,5 +39,10 @@ public interface HollowDataset {
      * @return the schema for the specified type in this dataset.
      */
     HollowSchema getSchema(String typeName);
+
+    /**
+     * Like {@link #getSchema}, but throws a {@link SchemaNotFoundException} if the schema is not found.
+     */
+    HollowSchema getNonNullSchema(String typeName) throws SchemaNotFoundException;
 
 }

@@ -88,7 +88,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("    }\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh) {\n");
-        builder.append("        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
+        builder.append("        this(consumer, isListenToDataRefresh, ((HollowObjectSchema)consumer.getStateEngine().getNonNullSchema(\"" + type + "\")).getPrimaryKey().getFieldPaths());\n");
         builder.append("    }\n\n");
 
     }
