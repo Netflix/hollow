@@ -321,8 +321,8 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
         builder.append("        if(fieldIndex[" + fieldNum +"] == -1)\n");
-        builder.append("            return missingDataHandler().handleBoolean(\"").append(objectSchema.getName()).append("\", ordinal, \"").append(fieldName).append("\") == Boolean.TRUE;\n");
-        builder.append("        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[" + fieldNum + "]) == Boolean.TRUE;\n");
+        builder.append("            return Boolean.TRUE.equals(missingDataHandler().handleBoolean(\"").append(objectSchema.getName()).append("\", ordinal, \"").append(fieldName).append("\"));\n");
+        builder.append("        return Boolean.TRUE.equals(getTypeDataAccess().readBoolean(ordinal, fieldIndex[" + fieldNum + "]));\n");
         builder.append("    }\n\n");
 
         builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");
