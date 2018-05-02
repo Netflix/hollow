@@ -87,6 +87,10 @@ public class HollowAPIGenerator {
          */
         apiClassName,
         /**
+         * Sets the class postfix for the generated types.
+         */
+        classPostfix,
+        /**
          * Sets the package name for the generated files.
          */
         packageName,
@@ -236,6 +240,9 @@ public class HollowAPIGenerator {
                     break;
                 case apiClassName:
                     builder.withAPIClassname(arg.getValue());
+                    break;
+                case classPostfix:
+                    builder.withClassPostfix(arg.getValue());
                     break;
                 case packageName:
                     builder.withPackageName(arg.getValue());
