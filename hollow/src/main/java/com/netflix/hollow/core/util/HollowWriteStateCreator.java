@@ -65,7 +65,7 @@ public class HollowWriteStateCreator {
             throws IOException {
         InputStream input = null;
         try {
-            input = HollowWriteStateCreator.class.getResourceAsStream(schemaFilePath);
+            input = HollowWriteStateCreator.class.getClassLoader().getResourceAsStream(schemaFilePath);
             Collection<HollowSchema> schemas =
                 HollowSchemaParser.parseCollectionOfSchemas(new BufferedReader(new InputStreamReader(input)));
             populateStateEngineWithTypeWriteStates(engine, schemas);
