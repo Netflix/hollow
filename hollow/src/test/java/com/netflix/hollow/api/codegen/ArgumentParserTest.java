@@ -53,7 +53,7 @@ public class ArgumentParserTest {
             "--orderCoffee=first", "--drinkCoffee=next", "--writeArgumentParserClass=yay"}).getParsedArguments().size());
         assertParsedArgument("--orderCoffee=fi.rst", Commands.orderCoffee, "fi.rst");
         assertParsedArgument("--drinkCoffee=ne/x--t", Commands.drinkCoffee, "ne/x--t");
-        assertParsedArgument("--writeArgumentParserClass=complete", Commands.writeArgumentParserClass, "complete");
+        assertParsedArgument("--writeArgumentParserClass=compl_ete", Commands.writeArgumentParserClass, "compl_ete");
 
     }
 

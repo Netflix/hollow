@@ -91,6 +91,10 @@ public class HollowAPIGenerator {
          */
         classPostfix,
         /**
+         * Sets the getter prefix to the provided string.
+         */
+        getterPrefix,
+        /**
          * Sets the package name for the generated files.
          */
         packageName,
@@ -243,6 +247,9 @@ public class HollowAPIGenerator {
                     break;
                 case classPostfix:
                     builder.withClassPostfix(arg.getValue());
+                    break;
+                case getterPrefix:
+                    builder.withGetterPrefix(arg.getValue());
                     break;
                 case packageName:
                     builder.withPackageName(arg.getValue());
