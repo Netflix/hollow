@@ -367,13 +367,17 @@ public class HollowHashIndexBuilder {
                 if(matchOrdinal != hashOrdinal) {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     int fieldIdx = fieldPath[fieldPath.length-1];
-                    if(!HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
+                    if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
                         return false;
                 }
             }
         }
 
         return true;
+    }
+
+    private boolean isAnyFieldNull(int matchOrdinal, int hashOrdinal) {
+        return matchOrdinal == -1 || hashOrdinal == -1;
     }
 
     private int getMatchHash(int matchIdx) {
