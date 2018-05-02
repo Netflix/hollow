@@ -125,43 +125,44 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
     boolean isAvailableForED(CompleteVideoHollow completeVideoHollow, String country, String language,
                              HollowPrimaryKeyIndex idx, VMSRawHollowAPI api) {
 
+        boolean isGoLive;
 
-        // check for null first
+        // check for null first and isGoLive flag
         if (completeVideoHollow._getData() != null && completeVideoHollow._getData()._getFacetData() != null && completeVideoHollow._getData()._getFacetData
                 ()._getVideoMediaData() != null) {
 
-            boolean isGoLive = completeVideoHollow._getData()._getFacetData()._getVideoMediaData()._getIsGoLive();
+            isGoLive = completeVideoHollow._getData()._getFacetData()._getVideoMediaData()._getIsGoLive();
 
             if (!isGoLive) { return false; }
+        }
 
-            if (language != null) {
-                int multiCatalogCountryDataOrdinal;
-                int videoId = completeVideoHollow._getId()._getValue();
-                multiCatalogCountryDataOrdinal = idx.getMatchingOrdinal(videoId, country);
-                if (multiCatalogCountryDataOrdinal != -1) {
-                    MulticatalogCountryDataHollow multicatalogCountryDataHollow = api.getMulticatalogCountryDataHollow(multiCatalogCountryDataOrdinal);
-                    MapOfNFLocaleToMulticatalogCountryLocaleDataHollow map = multicatalogCountryDataHollow._getLanguageData();
+        if (language != null) {
+            int multiCatalogCountryDataOrdinal;
+            int videoId = completeVideoHollow._getId()._getValue();
+            multiCatalogCountryDataOrdinal = idx.getMatchingOrdinal(videoId, country);
+            if (multiCatalogCountryDataOrdinal != -1) {
+                MulticatalogCountryDataHollow multicatalogCountryDataHollow = api.getMulticatalogCountryDataHollow(multiCatalogCountryDataOrdinal);
+                MapOfNFLocaleToMulticatalogCountryLocaleDataHollow map = multicatalogCountryDataHollow._getLanguageData();
 
-                    for (Map.Entry<NFLocaleHollow, MulticatalogCountryLocaleDataHollow> entry : map
-                            .entrySet()) {
-                        String nfLocale = entry.getKey()._getValue();
-                        if (nfLocale.equals(language)) {
-                            MulticatalogCountryLocaleDataHollow localeDataHollow = entry.getValue();
+                for (Map.Entry<NFLocaleHollow, MulticatalogCountryLocaleDataHollow> entry : map
+                        .entrySet()) {
+                    String nfLocale = entry.getKey()._getValue();
+                    if (nfLocale.equals(language)) {
+                        MulticatalogCountryLocaleDataHollow localeDataHollow = entry.getValue();
 
-                            ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow = localeDataHollow._getAvailabilityWindows();
-                            ListIterator<VMSAvailabilityWindowHollow> it = availabilityWindowListHollow.listIterator();
+                        ListOfVMSAvailabilityWindowHollow availabilityWindowListHollow = localeDataHollow._getAvailabilityWindows();
+                        ListIterator<VMSAvailabilityWindowHollow> it = availabilityWindowListHollow.listIterator();
 
-                            while (it.hasNext()) {
-                                VMSAvailabilityWindowHollow availabilityWindowHollow = it.next();
-                                long start = availabilityWindowHollow._getStartDate()._getVal();
-                                long end = availabilityWindowHollow._getEndDate()._getVal();
+                        while (it.hasNext()) {
+                            VMSAvailabilityWindowHollow availabilityWindowHollow = it.next();
+                            long start = availabilityWindowHollow._getStartDate()._getVal();
+                            long end = availabilityWindowHollow._getEndDate()._getVal();
 
-                                if (start <= ctx.getNowMillis() && ctx.getNowMillis() < end) { return true; }
-                            }
+                            if (start <= ctx.getNowMillis() && ctx.getNowMillis() < end) { return true; }
                         }
                     }
-
                 }
+
             }
 
             return false;
