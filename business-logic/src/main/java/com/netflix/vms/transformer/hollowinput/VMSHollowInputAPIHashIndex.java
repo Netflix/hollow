@@ -1,10 +1,11 @@
 package com.netflix.vms.transformer.hollowinput;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
-import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import java.util.Collections;
+import java.lang.Iterable;
+import com.netflix.hollow.api.consumer.index.AbstractHollowHashIndex;
+import com.netflix.hollow.api.consumer.data.AbstractHollowOrdinalIterable;
 
 
 @SuppressWarnings("all")
@@ -916,6 +917,28 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         return new AbstractHollowOrdinalIterable<LocaleTerritoryCodeListHollow>(matches.iterator()) {
             public LocaleTerritoryCodeListHollow getData(int ordinal) {
                 return api.getLocaleTerritoryCodeListHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<MapOfStringToLongHollow> findMapOfStringToLongMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<MapOfStringToLongHollow>(matches.iterator()) {
+            public MapOfStringToLongHollow getData(int ordinal) {
+                return api.getMapOfStringToLongHollow(ordinal);
+            }
+        };
+    }
+
+    public Iterable<FeedMovieCountryLanguagesHollow> findFeedMovieCountryLanguagesMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<FeedMovieCountryLanguagesHollow>(matches.iterator()) {
+            public FeedMovieCountryLanguagesHollow getData(int ordinal) {
+                return api.getFeedMovieCountryLanguagesHollow(ordinal);
             }
         };
     }
