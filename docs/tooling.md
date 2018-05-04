@@ -2,6 +2,26 @@
 
 Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.
 
+## Blob Storage Manipulation
+
+### Cleaning
+
+Using the `BlobStorageCleaner` capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.
+
+Hollow ships with `HollowFilesystemBlobStorageCleaner` which allows to only keep a given number of snapshots. It can be used in the following way:
+
+```java
+HollowProducer.Publisher publisher = new HollowFilesystemPublisher(publishDir);
+HollowProducer.BlobStorageCleaner blobStorageCleaner = new HollowFilesystemBlobStorageCleaner(publishDir, 10);
+HollowProducer producer = HollowProducer.withPublisher(publisher)
+                                                .withBlobStorageCleaner(blobStorageCleaner)
+                                                .build();
+```
+
+The integer `10` parameter will set the value for `numOfSnapshotsToKeep`.
+
+It is also possible to add your own blob storage cleaner by extending `HollowProducer.BlobStorageCleaner` class and provide your own mechanism to clean snapshots/deltas/reverse deltas.
+
 ## Hollow Explorer
 
 Hollow ships with a UI which can be used to browse and search records within any dataset.
