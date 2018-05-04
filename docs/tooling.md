@@ -2,6 +2,166 @@
 
 Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.
 
+## Metrics
+
+Implementing a `HollowMetricsCollector` allows to retrieve metrics from your data. Hollow collects metrics for producer and consumers by default which can be accessed by the `HollowMetricsCollector` on every cycle.
+
+Common metrics for producer and consumer:
+
+* `typeHeapFootprint`: provides the approximate heap footprint for each Type in your data. This is based on [Heap Usage Analysis](tooling.md#heap-usage-analysis)
+* `typePopulatedOrdinals`: provides the number or ordinals per Type in your data.
+* `currentVersion`: provides the current version of your data.
+* `totalHeapFootprint`: provides the approximate heap footprint for your data. This is based on [Heap Usage Analysis](tooling.md#heap-usage-analysis)
+* `totalPopulatedOrdinals`: provides the total number of ordinals in your data.
+
+### Producer
+
+In addition to the common metrics, hollow collects the following metrics from a producer:
+
+* `cyclesCompleted`
+* `cyclesSucceeded`
+* `cycleFailed` 
+* ` snapshotsCompleted` 
+* `snapshotsFailed` 
+* `deltasCompleted` 
+* `deltasFailed` 
+* `reverseDeltasCompleted` 
+* `reverseDeltasFailed` 
+
+
+#### Usage
+
+```java
+HollowProducer producer = HollowProducer.withPublisher(publisher)
+                                                .withMetricsCollector(hollowMetricsCollector) 
+                                                .build();
+```
+
+#### Prometheus Example
+
+```groovy
+import com.netflix.hollow.api.metrics.HollowMetricsCollector
+import com.netflix.hollow.api.metrics.HollowProducerMetrics
+import io.prometheus.client.Gauge
+
+class MyPrometheusProducerrMetricsCollector extends HollowMetricsCollector<HollowProducerMetrics> {
+    private static Gauge hollowConsumerGauge = Gauge
+            .build()
+            .name("hollowProducerMetrics")
+            .labelNames("metric")
+            .help("Hollow Producer Metrics")
+            .register()
+
+
+    private static void set(String metric, Double value) {
+        hollowConsumerGauge.labels(metric).set(value)
+    }
+
+    private static final long kb = 1024
+
+    @Override
+    void collect(HollowConsumerMetrics metrics) {
+        //Common hollow metrics
+        metrics.typeHeapFootprint.each { String type, Long heapCost ->
+            set("${type}_heap_cost_kb", heapCost / kb)
+        }
+        metrics.typePopulatedOrdinals.each { String type, Integer ordinals ->
+            set("${type}_domain_object_count", ordinals)
+        }
+        set("total_heap_cost_kb", metrics.totalHeapFootprint)
+        set("total_domain_object_count", metrics.totalPopulatedOrdinals)
+        set("current_version", metrics.currentVersion)
+
+        //Producer specific metrics
+        set("cycles_completed", metrics.cyclesCompleted)
+        set("cycles_succeeded", metrics.cyclesSucceeded)
+        set("cycles_failed", metrics.cyclesFailed)
+        set("snapshots_completed", metrics.snapshotsCompleted)
+        set("snapshotsFailed", metrics.snapshotsFailed)
+        set("deltas_completed", metrics.deltasCompleted)
+        set("deltas_failed", metrics.deltasFailed)
+    }
+}
+```
+
+### Consumer
+
+In addition to the common metrics, hollow collects the following metrics from a consumer:
+
+* `refreshFailed`
+* `refreshSucceeded`
+
+#### Usage
+
+```java
+HollowConsumer
+   .withBlobRetriever(blobRetriever)           
+   .withMetricsCollector(hollowMetricsCollector) 
+   .build();
+```
+
+#### Prometheus Example
+
+```groovy
+import com.netflix.hollow.api.metrics.HollowMetricsCollector
+import com.netflix.hollow.api.metrics.HollowConsumerMetrics
+import io.prometheus.client.Gauge
+
+class MyPrometheusConsumerMetricsCollector extends HollowMetricsCollector<HollowConsumerMetrics> {
+    private static Gauge hollowConsumerGauge = Gauge
+            .build()
+            .name("hollowConsumerMetrics")
+            .labelNames("metric")
+            .help("Hollow Consumer Metrics")
+            .register()
+
+
+    private static void set(String metric, Double value) {
+        hollowConsumerGauge.labels(metric).set(value)
+    }
+
+    private static final long kb = 1024
+
+    @Override
+    void collect(HollowConsumerMetrics metrics) {
+        //Common hollow metrics
+        metrics.typeHeapFootprint.each { String type, Long heapCost ->
+            set("${type}_heap_cost_kb", heapCost / kb)
+        }
+        metrics.typePopulatedOrdinals.each { String type, Integer ordinals ->
+            set("${type}_domain_object_count", ordinals)
+        }
+        set("total_heap_cost_kb", metrics.totalHeapFootprint)
+        set("total_domain_object_count", metrics.totalPopulatedOrdinals)
+        set("current_version", metrics.currentVersion)
+
+        //Consumer specific metrics
+        set("refresh_failed", metrics.refreshFailed)
+        set("refresh_succeeded", metrics.getRefreshSucceded())
+    }
+}
+```
+
+## Blob Storage Manipulation
+
+### Cleaning
+
+Using the `BlobStorageCleaner` capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.
+
+Hollow ships with `HollowFilesystemBlobStorageCleaner` which allows to only keep a given number of snapshots. It can be used in the following way:
+
+```java
+HollowProducer.Publisher publisher = new HollowFilesystemPublisher(publishDir);
+HollowProducer.BlobStorageCleaner blobStorageCleaner = new HollowFilesystemBlobStorageCleaner(publishDir, 10);
+HollowProducer producer = HollowProducer.withPublisher(publisher)
+                                                .withBlobStorageCleaner(blobStorageCleaner)
+                                                .build();
+```
+
+The integer `10` parameter will set the value for `numOfSnapshotsToKeep`.
+
+It is also possible to add your own blob storage cleaner by extending `HollowProducer.BlobStorageCleaner` class and provide your own mechanism to clean snapshots/deltas/reverse deltas.
+
 ## Hollow Explorer
 
 Hollow ships with a UI which can be used to browse and search records within any dataset.
