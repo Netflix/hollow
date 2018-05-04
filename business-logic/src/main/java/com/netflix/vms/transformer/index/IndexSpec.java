@@ -62,7 +62,7 @@ public enum IndexSpec {
     TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
 
     // Merch-language-dates
-    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value", "languageCode.value"),
+    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
     CUP_TOKEN(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "contractId.value");
 
 

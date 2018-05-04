@@ -563,6 +563,11 @@ function addEventListeners() {
   $('#edit-threshold-override-button').click(editThresholdOverride);
 
   //Baseline Reset Related Handlers
+  $('#interrupt-cycle-link').click(handleInterruptCycleLink);
+  $('#interrupt-cycle-cancel-button').click(handleInterruptCycleClose);
+  $('#close-interrupt-cycle-modal').click(handleInterruptCycleClose);
+  $('#interrupt-cycle-proceed-button').click(handleInterruptCycleProceed);
+  
   $('#reset-baseline-link').click(handleResetBaselineLink);
   $('#close-reset-baseline-modal').click(closeResetBaselineModal);
   $('#reset-baseline-button').click(resetBaseline);
@@ -570,6 +575,37 @@ function addEventListeners() {
 }
 
 // ALL THE HANDLERS
+function centerModal(dialog) {
+  var height = dialog.height();
+  var width = dialog.width();
+  var windowHeight = $(window).height();
+  var windowWidth = $(window).width();
+  var left = (windowWidth - width) / 2;
+  dialog.css('left', left).css('top', '20px');
+}
+
+function handleInterruptCycleLink() {
+  $('#modal-background').show();
+
+  var interruptDialog = $('#interrupt-cycle-modal');
+  centerModal(interruptDialog);
+  interruptDialog.show();
+}
+
+function handleInterruptCycleClose() {
+  var interruptDialog = $('#interrupt-cycle-modal');
+  interruptDialog.hide();
+  $('#modal-background').hide();
+}
+
+function handleInterruptCycleProceed() {
+  var msg = document.getElementById('interrupt-cycle-reason').value;
+  var pause = document.getElementById('interrupt-cycle-pause').checked;
+  var url = "/REST/vms/interruptcycle?interrupt=true&pause=" + pause + "&message=" + msg;
+  top.open(url, 'interruptcycle');
+
+  handleInterruptCycleClose()
+}
 
 function handleResetBaselineRuleNameSelectionChanged() {
   // Get the rulename

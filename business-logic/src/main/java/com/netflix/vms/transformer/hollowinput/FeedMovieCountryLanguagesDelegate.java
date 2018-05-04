@@ -10,9 +10,7 @@ public interface FeedMovieCountryLanguagesDelegate extends HollowObjectDelegate 
 
     public int getCountryCodeOrdinal(int ordinal);
 
-    public int getLanguageCodeOrdinal(int ordinal);
-
-    public int getEarliestWindowStartDateOrdinal(int ordinal);
+    public int getLanguageToEarliestWindowStartDateMapOrdinal(int ordinal);
 
     public FeedMovieCountryLanguagesTypeAPI getTypeAPI();
 

@@ -12,8 +12,7 @@ public class FeedMovieCountryLanguagesTypeAPI extends HollowObjectTypeAPI {
         super(api, typeDataAccess, new String[] {
             "movieId",
             "countryCode",
-            "languageCode",
-            "earliestWindowStartDate"
+            "languageToEarliestWindowStartDateMap"
         });
         this.delegateLookupImpl = new FeedMovieCountryLanguagesDelegateLookupImpl(this);
     }
@@ -38,24 +37,14 @@ public class FeedMovieCountryLanguagesTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getStringTypeAPI();
     }
 
-    public int getLanguageCodeOrdinal(int ordinal) {
+    public int getLanguageToEarliestWindowStartDateMapOrdinal(int ordinal) {
         if(fieldIndex[2] == -1)
-            return missingDataHandler().handleReferencedOrdinal("FeedMovieCountryLanguages", ordinal, "languageCode");
+            return missingDataHandler().handleReferencedOrdinal("FeedMovieCountryLanguages", ordinal, "languageToEarliestWindowStartDateMap");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[2]);
     }
 
-    public StringTypeAPI getLanguageCodeTypeAPI() {
-        return getAPI().getStringTypeAPI();
-    }
-
-    public int getEarliestWindowStartDateOrdinal(int ordinal) {
-        if(fieldIndex[3] == -1)
-            return missingDataHandler().handleReferencedOrdinal("FeedMovieCountryLanguages", ordinal, "earliestWindowStartDate");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[3]);
-    }
-
-    public LongTypeAPI getEarliestWindowStartDateTypeAPI() {
-        return getAPI().getLongTypeAPI();
+    public MapOfStringToLongTypeAPI getLanguageToEarliestWindowStartDateMapTypeAPI() {
+        return getAPI().getMapOfStringToLongTypeAPI();
     }
 
     public FeedMovieCountryLanguagesDelegateLookupImpl getDelegateLookupImpl() {

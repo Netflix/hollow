@@ -26,18 +26,11 @@ public class FeedMovieCountryLanguagesHollow extends HollowObject {
         return  api().getStringHollow(refOrdinal);
     }
 
-    public StringHollow _getLanguageCode() {
-        int refOrdinal = delegate().getLanguageCodeOrdinal(ordinal);
+    public MapOfStringToLongHollow _getLanguageToEarliestWindowStartDateMap() {
+        int refOrdinal = delegate().getLanguageToEarliestWindowStartDateMapOrdinal(ordinal);
         if(refOrdinal == -1)
             return null;
-        return  api().getStringHollow(refOrdinal);
-    }
-
-    public LongHollow _getEarliestWindowStartDate() {
-        int refOrdinal = delegate().getEarliestWindowStartDateOrdinal(ordinal);
-        if(refOrdinal == -1)
-            return null;
-        return  api().getLongHollow(refOrdinal);
+        return  api().getMapOfStringToLongHollow(refOrdinal);
     }
 
     public VMSHollowInputAPI api() {

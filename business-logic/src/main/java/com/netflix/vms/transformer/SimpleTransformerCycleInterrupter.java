@@ -16,6 +16,7 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
 
     private Long cycleId;
     private boolean isInterrupted;
+    private boolean isCyclePaused;
     private String interruptMsg;
 
     private TreeMap<Long, CycleInterruptEntry> historyMap = new TreeMap<>();
@@ -27,6 +28,16 @@ public class SimpleTransformerCycleInterrupter implements TransformerCycleInterr
     @Override
     public void begin(long cycleId) {
         this.cycleId = cycleId;
+    }
+
+    @Override
+    public void pauseCycle(boolean isPaused) {
+        this.isCyclePaused = isPaused;
+    }
+
+    @Override
+    public boolean isCyclePaused() {
+        return isCyclePaused;
     }
 
     @Override

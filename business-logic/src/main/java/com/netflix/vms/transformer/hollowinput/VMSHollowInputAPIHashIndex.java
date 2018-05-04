@@ -932,6 +932,18 @@ public class VMSHollowInputAPIHashIndex extends AbstractHollowHashIndex<VMSHollo
         };
     }
 
+    public Iterable<MapOfStringToLongHollow> findMapOfStringToLongMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<MapOfStringToLongHollow>(matches.iterator()) {
+            public MapOfStringToLongHollow getData(int ordinal) {
+                return api.getMapOfStringToLongHollow(ordinal);
+            }
+        };
+    }
+
+
     public Iterable<MasterScheduleHollow> findMasterScheduleMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();

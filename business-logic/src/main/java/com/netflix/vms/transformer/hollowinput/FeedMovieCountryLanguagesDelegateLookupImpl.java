@@ -21,12 +21,8 @@ public class FeedMovieCountryLanguagesDelegateLookupImpl extends HollowObjectAbs
         return typeAPI.getCountryCodeOrdinal(ordinal);
     }
 
-    public int getLanguageCodeOrdinal(int ordinal) {
-        return typeAPI.getLanguageCodeOrdinal(ordinal);
-    }
-
-    public int getEarliestWindowStartDateOrdinal(int ordinal) {
-        return typeAPI.getEarliestWindowStartDateOrdinal(ordinal);
+    public int getLanguageToEarliestWindowStartDateMapOrdinal(int ordinal) {
+        return typeAPI.getLanguageToEarliestWindowStartDateMapOrdinal(ordinal);
     }
 
     public FeedMovieCountryLanguagesTypeAPI getTypeAPI() {

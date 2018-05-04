@@ -14,12 +14,15 @@ import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.FeedMovieCountryLanguagesHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
+import com.netflix.vms.transformer.hollowinput.LongHollow;
+import com.netflix.vms.transformer.hollowinput.MapOfStringToLongHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -852,7 +855,16 @@ public class VMSAvailabilityWindowModule {
 
             // here means we have asset rights for that language and corresponding earliest asset availability date
             FeedMovieCountryLanguagesHollow feedMovieCountryLanguagesHollow = api.getFeedMovieCountryLanguagesHollow(ordinal);
-            return feedMovieCountryLanguagesHollow._getEarliestWindowStartDate()._getValue();
+            MapOfStringToLongHollow languageToDateMapHollow = feedMovieCountryLanguagesHollow._getLanguageToEarliestWindowStartDateMap();
+
+            if (languageToDateMapHollow != null && languageToDateMapHollow.isEmpty()) {
+                for (Map.Entry<StringHollow, LongHollow> entry : languageToDateMapHollow.entrySet()) {
+                    if (entry.getKey()._getValue().equals(language)) {
+                        return entry.getValue()._getValue();
+                    }
+                }
+            }
+            return null;
         }
         return null;
     }

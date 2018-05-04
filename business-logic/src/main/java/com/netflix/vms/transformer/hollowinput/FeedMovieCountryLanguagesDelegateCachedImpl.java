@@ -11,15 +11,13 @@ public class FeedMovieCountryLanguagesDelegateCachedImpl extends HollowObjectAbs
 
     private final int movieIdOrdinal;
     private final int countryCodeOrdinal;
-    private final int languageCodeOrdinal;
-    private final int earliestWindowStartDateOrdinal;
+    private final int languageToEarliestWindowStartDateMapOrdinal;
     private FeedMovieCountryLanguagesTypeAPI typeAPI;
 
     public FeedMovieCountryLanguagesDelegateCachedImpl(FeedMovieCountryLanguagesTypeAPI typeAPI, int ordinal) {
         this.movieIdOrdinal = typeAPI.getMovieIdOrdinal(ordinal);
         this.countryCodeOrdinal = typeAPI.getCountryCodeOrdinal(ordinal);
-        this.languageCodeOrdinal = typeAPI.getLanguageCodeOrdinal(ordinal);
-        this.earliestWindowStartDateOrdinal = typeAPI.getEarliestWindowStartDateOrdinal(ordinal);
+        this.languageToEarliestWindowStartDateMapOrdinal = typeAPI.getLanguageToEarliestWindowStartDateMapOrdinal(ordinal);
         this.typeAPI = typeAPI;
     }
 
@@ -31,12 +29,8 @@ public class FeedMovieCountryLanguagesDelegateCachedImpl extends HollowObjectAbs
         return countryCodeOrdinal;
     }
 
-    public int getLanguageCodeOrdinal(int ordinal) {
-        return languageCodeOrdinal;
-    }
-
-    public int getEarliestWindowStartDateOrdinal(int ordinal) {
-        return earliestWindowStartDateOrdinal;
+    public int getLanguageToEarliestWindowStartDateMapOrdinal(int ordinal) {
+        return languageToEarliestWindowStartDateMapOrdinal;
     }
 
     @Override
