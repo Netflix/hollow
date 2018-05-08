@@ -17,12 +17,18 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.api.producer.HollowProducer.Artifacts;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
@@ -197,6 +203,25 @@ public class HollowProducerTest {
             int valueFieldCount = 2;
             restoreAndAssert(producerV2, v3, sizeV3, valueMultiplierV3, valueFieldCount);
         }
+    }
+
+    @Test
+    public void testRollsBackStateEngineOnPublishFailure() throws Exception {
+        HollowProducer producer = spy(createProducer(tmpFolder, schema));
+        Assert.assertEquals("Should have no populated ordinals", 0,
+                producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
+        doThrow(new RuntimeException("Publish failed")).when(producer).publish(
+                any(WriteState.class), any(Artifacts.class));
+        try {
+            producer.runCycle(new HollowProducer.Populator() {
+                public void populate(WriteState newState) {
+                    newState.add(new TestPojoV1(1, 1));
+                }
+            });
+        } catch (RuntimeException e) { // expected
+        }
+        Assert.assertEquals("Should still have no populated ordinals", 0,
+                producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
     }
 
     private long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
