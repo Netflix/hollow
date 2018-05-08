@@ -494,7 +494,10 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
+    /**
+     * Publish the write state, storing the artifacts in the provided object. Visible for testing.
+     */
+    protected void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
         ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
             stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
@@ -948,11 +951,11 @@ public class HollowProducer {
         }
     }
 
-    public static interface Announcer {
-        public void announce(long stateVersion);
+    public interface Announcer {
+        void announce(long stateVersion);
     }
 
-    private static final class Artifacts {
+    protected static final class Artifacts {
         Blob snapshot = null;
         Blob delta = null;
         Blob reverseDelta = null;
