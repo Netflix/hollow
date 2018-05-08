@@ -48,10 +48,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HollowProducerTest {
-    private static final String namespace = "hollowProducerTest";
+    private static final String NAMESPACE = "hollowProducerTest";
 
     private File tmpFolder;
-    HollowObjectSchema schema;
+    private HollowObjectSchema schema;
     private HollowConsumer.BlobRetriever blobRetriever;
 
     private Map<Long, Blob> blobMap = new HashMap<>();
@@ -66,43 +66,23 @@ public class HollowProducerTest {
         schema.addField("v1", FieldType.INT);
 
         tmpFolder = Files.createTempDirectory(null).toFile();
-        blobRetriever = new FakeBlobRetriever(namespace, tmpFolder.getAbsolutePath());
+        blobRetriever = new FakeBlobRetriever(NAMESPACE, tmpFolder.getAbsolutePath());
     }
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-                                                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
-                                                .build();
-                
+            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder)).build();
         producer.initializeDataModel(schemas);
         producer.addListener(new FakeProducerListener());
         return producer;
     }
 
-    public long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
-        producer.runCycle(new HollowProducer.Populator() {
-            public void populate(HollowProducer.WriteState newState) throws Exception {
-                for (int i = 1; i <= size; i++) {
-                    newState.add(new TestPojoV1(i, i * valueMultiplier));
-                }
-            }
-        });
-        Assert.assertNotNull(lastProducerStatus);
-        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
-        return lastProducerStatus.getVersion();
-    }
-
-    public long testPublishV2(HollowProducer producer, final int size, final int valueMultiplier) {
-        producer.runCycle(new HollowProducer.Populator() {
-            public void populate(HollowProducer.WriteState newState) throws Exception {
-                for (int i = 1; i <= size; i++) {
-                    newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
-                }
-            }
-        });
-        Assert.assertNotNull(lastProducerStatus);
-        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
-        return lastProducerStatus.getVersion();
+    @After
+    public void tearDown() {
+        for (File file : blobFileMap.values()) {
+            System.out.println("\t deleting: " + file);
+            file.delete();
+        }
     }
 
     @Test
@@ -114,7 +94,7 @@ public class HollowProducerTest {
             producer.restore(fakeVersion, blobRetriever);
             Assert.fail();
         } catch(Exception expected) { }
-        
+
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.FAIL, lastRestoreStatus.getStatus());
     }
@@ -198,7 +178,7 @@ public class HollowProducerTest {
         HollowProducer producerV2 = createProducer(tmpFolder, schemaV2);
         long v2 = testPublishV2(producerV2, sizeV2, valueMultiplierV2);
 
-        { // Restore V1 
+        { // Restore V1
             int valueFieldCount = 1;
             restoreAndAssert(producerV2, v1, sizeV1, valueMultiplierV1, valueFieldCount);
         }
@@ -208,15 +188,41 @@ public class HollowProducerTest {
         int valueMultiplierV3 = valueMultiplierV1 * 3;
         long v3 = testPublishV2(producerV2, sizeV3, valueMultiplierV3);
 
-        { // Restore V2 
+        { // Restore V2
             int valueFieldCount = 2;
             restoreAndAssert(producerV2, v2, sizeV2, valueMultiplierV2, valueFieldCount);
         }
 
-        { // Restore V3 
+        { // Restore V3
             int valueFieldCount = 2;
             restoreAndAssert(producerV2, v3, sizeV3, valueMultiplierV3, valueFieldCount);
         }
+    }
+
+    private long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= size; i++) {
+                    newState.add(new TestPojoV1(i, i * valueMultiplier));
+                }
+            }
+        });
+        Assert.assertNotNull(lastProducerStatus);
+        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
+        return lastProducerStatus.getVersion();
+    }
+
+    private long testPublishV2(HollowProducer producer, final int size, final int valueMultiplier) {
+        producer.runCycle(new HollowProducer.Populator() {
+            public void populate(HollowProducer.WriteState newState) throws Exception {
+                for (int i = 1; i <= size; i++) {
+                    newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
+                }
+            }
+        });
+        Assert.assertNotNull(lastProducerStatus);
+        Assert.assertEquals(Status.SUCCESS, lastProducerStatus.getStatus());
+        return lastProducerStatus.getVersion();
     }
 
     private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier) throws Exception {
@@ -248,14 +254,6 @@ public class HollowProducerTest {
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
         System.out.println("Asserted Correctness of version:" + version + "\n\n");
-    }
-
-    @After
-    public void tearDown() {
-        for (File file : blobFileMap.values()) {
-            System.out.println("\t deleting: " + file);
-            file.delete();
-        }
     }
 
     @SuppressWarnings("unused")
