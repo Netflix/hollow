@@ -148,7 +148,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
             int[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
-                if (query[i].equals(hashOrdinal))
+                if (!query[i].equals(hashOrdinal))
                     return false;
             } else {
                 for(int j=0;j<fieldPath.length - 1;j++) {
