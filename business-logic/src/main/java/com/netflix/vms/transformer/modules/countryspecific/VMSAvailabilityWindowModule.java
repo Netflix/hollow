@@ -279,13 +279,19 @@ public class VMSAvailabilityWindowModule {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
                                 boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds);
 
-                                // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
                                 if (packageAvailability == 0 && !shouldFilterOutWindowInfo) {
 
                                     if (!readyForPrePromotion) {
                                         // skipping the contract if title is not ready for pre-promotion in language catalog.
                                         cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
-                                        continue;
+
+                                        // if package availability is enforced (make sure contract gives access to some existing asset understandable in this language)
+                                        // then ignore/drop this this contract
+                                        if (ctx.getConfig().isPackageAvailabilityEnforced())
+                                            continue;
+
+                                        // else do not drop the contract instead proceed to verify the subs/dubs requirement
+
                                     }
                                 }
 
