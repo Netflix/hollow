@@ -1058,7 +1058,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -1075,32 +1075,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -3358,7 +3358,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -3375,32 +3375,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -5658,7 +5658,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -5675,32 +5675,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -8107,7 +8107,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -8124,32 +8124,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -10407,7 +10407,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -10424,32 +10424,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -12707,7 +12707,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -12724,32 +12724,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -15016,7 +15016,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -15033,32 +15033,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -17325,7 +17325,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -17342,32 +17342,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
@@ -19634,7 +19634,7 @@
             ]
         },
         "com.netflix.spectator:spectator-api": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.spectator:spectator-ext-gc",
@@ -19651,32 +19651,32 @@
             ]
         },
         "com.netflix.spectator:spectator-ext-gc": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-jvm": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
         "com.netflix.spectator:spectator-ext-sandbox": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-nflx-plugin": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "netflix:atlas-client"
             ]
         },
         "com.netflix.spectator:spectator-reg-servo": {
-            "locked": "0.65.1",
+            "locked": "0.66.0",
             "transitive": [
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
