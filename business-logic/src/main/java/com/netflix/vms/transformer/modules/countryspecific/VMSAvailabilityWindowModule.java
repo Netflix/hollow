@@ -58,48 +58,50 @@ public class VMSAvailabilityWindowModule {
     public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
 
-    // title is in pre-promotion phase
+    // title is in pre-promotion phase using the new feed data
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
     public static final String LANGUAGE_CATALOG_PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase in country-language catalog";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // early pre-promotion
+    // early pre-promotion if using contract pre-promo days and no new feed
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_TAG = TransformerLogTag.Language_catalog_diff_early_promotion;
     public static final String LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_MESSAGE = "titles that would get early pre-promoted if using the contract pre-promo days logic and not relying on new feed.";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // diff, correct pre-promotions
+    // diff, correct pre-promotions using new feed
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_TAG = TransformerLogTag.Language_catalog_diff_prePromo;
     public static final String LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_MESSAGE = "titles that will get pre-promoted correctly, previously dropping "
             + "contracts/windows";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_SEVERITY = TaggingLogger.Severity.INFO;
 
 
-    // title skipped contract since no localized assets were available
+    // title skipped contract since no localized assets were available - DROPPING
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG = TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
     public static final String LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_MESSAGE = "Titles contract skipped because no localized assets were found";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // for aggregating missing audio(dubs)
+    // titles that voilate the required dubs rule
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_DUBS_TAG = TransformerLogTag.Language_catalog_Missing_Dubs;
     public static final String LANGUAGE_CATALOG_MISSING_DUBS_MESSAGE = "Titles missing localized dubs";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_DUBS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // for aggregating missing text (subs)
+    // titles that voilate the required subs rules
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_SUBS_TAG = TransformerLogTag.Language_catalog_Missing_Subs;
     public static final String LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE = "Titles missing localized subs";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // for aggregating titles dropped in locale merching.
+    // titles that have zero windows in the catalog
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_WINDOWS_TAG = TransformerLogTag.Language_catalog_NoWindows;
     public static final String LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE = "Titles for which no windows were found country-language catalog";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY = TaggingLogger.Severity.INFO;
 
+    // if asset rights are not present in the feed
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_ASSET_RIGHTS = TransformerLogTag.Language_catalog_NoAssetRights;
-    public static final String LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE = "Titles for asset rights are not present";
+    public static final String LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE = "Titles that do not have asset rights";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY = TaggingLogger.Severity.INFO;
 
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_FILTER_WINDOW_TAG = TransformerLogTag.Language_catalog_NoAssetRights;
+    // if window is filtered for unknown reasons
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_FILTER_WINDOW_TAG = TransformerLogTag.Language_catalog_WindowFiltered;
     public static final String LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE = "Titles for asset rights are not present";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_FILTER_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
 
@@ -334,7 +336,7 @@ public class VMSAvailabilityWindowModule {
                                         // compare here
                                         if (readyForPrePromotion) {
                                             // titles that will get promoted with new logic correctly
-                                            cycleDataAggregator.collect(country, videoId, TransformerLogTag.Language_catalog_diff_prePromo);
+                                            cycleDataAggregator.collect(country, language, videoId, TransformerLogTag.Language_catalog_diff_prePromo);
 
                                         }
 
@@ -919,7 +921,7 @@ public class VMSAvailabilityWindowModule {
                         }
                     }
                 } else {
-                    // Case: if isGoLive is not true
+                    // Case: if isGoLive is false
 
                     // it's a future date for asset availability, check if ready for pre-promo
                     if (isFutureDate) {
