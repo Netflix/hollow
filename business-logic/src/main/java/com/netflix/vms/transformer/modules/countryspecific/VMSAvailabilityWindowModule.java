@@ -984,7 +984,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     private Long getEarliestAssetRightsAvailabilityDate(long videoId, String country, String language) {
-        int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country, language);
+        int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
         if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
             ctx.getLogger().info(TransformerLogTag.debugging, "querying earliest window date for 80040725 in BE and fr");
         }
