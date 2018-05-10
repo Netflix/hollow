@@ -236,8 +236,12 @@ public interface TransformerConfig {
     @DefaultValue("false")
     public boolean isSubsDubsRequirementEnforced();
 
+    @DefaultValue("true")
+    boolean isOldPromotionLogicEnabled();
+
+    // false is good, since logic will rely on subs/dubs requirements from gatekeeper.
     @DefaultValue("false")
-    public boolean isPrePromoEnabledForMultiLanguageCatalog();
+    public boolean isPackageAvailabilityEnforced();
 
     @DefaultValue("false")
     public boolean isReadCupTokensFromCinderFeed();

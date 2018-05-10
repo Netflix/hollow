@@ -60,6 +60,9 @@ public enum IndexSpec {
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
     
     TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
+
+    // Merch-language-dates
+    MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
     CUP_TOKEN(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "contractId.value");
 
 

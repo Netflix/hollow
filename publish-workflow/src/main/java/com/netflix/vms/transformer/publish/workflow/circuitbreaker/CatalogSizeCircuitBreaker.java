@@ -115,6 +115,7 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
                        .append(" size : ").append(count)
                        .append(",");
             }
+            System.out.println(message);
             ctx.getLogger().info(Collections.singleton(TransformerLogTag.Catalog_Size), message.toString());
         }
 
