@@ -828,8 +828,10 @@ public class VMSAvailabilityWindowModule {
         return transformedVideoData.getTransformedPackageData(videoId).getPackageDataCollection((int) packageId);
     }
 
+    // one year
     private static final long FUTURE_CUTOFF_IN_MILLIS = 360L * 24L * 60L * 60L * 1000L;
 
+    // old logic for checking if window should be filtered out in country catalog
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
         if (endDate < ctx.getNowMillis())
             return true;
@@ -899,6 +901,8 @@ public class VMSAvailabilityWindowModule {
                 if (!isFutureDate)
                     return false;
                 else {
+                    // if assets will be available in future, then check if ready for pre-promote
+
                     int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
                     if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, contractIds, daysBeforeWindowStart)) {
                         cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
@@ -969,6 +973,8 @@ public class VMSAvailabilityWindowModule {
                 shouldPrePromote = readyForPrePromotionInLanguageCatalog(videoId, country, contractIds, daysBeforeWindowStart);
             }
         }
+
+
         return shouldPrePromote;
     }
 
