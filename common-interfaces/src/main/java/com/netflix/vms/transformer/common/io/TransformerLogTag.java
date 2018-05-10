@@ -92,6 +92,8 @@ public enum TransformerLogTag implements LogTag {
     Language_catalog_diff_prePromo,// titles that will get pre-promoted now, (compared to dropping) or will have availability windows.
     Language_catalog_diff_early_promotion,// titles get promoted early
 
+    debugging,
+
     MultiLocaleCountries,
     Catalog_Size,
 }

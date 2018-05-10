@@ -97,10 +97,10 @@ public class VideoHierarchyTest {
         // add all VideoGenerals except idExcludedFromVideoGeneral
         ALL_VIDEOS.stream().forEach(id -> {
             if (!id.equals(idExcludedFromVideoGeneral))
-                readStateEngineCreator.add(new VideoGeneral().setVideoId(id));
+                readStateEngineCreator.add(new VideoGeneral(id));
         });
         // add hierarchy
-        readStateEngineCreator.add(new ShowSeasonEpisode().setMovieId(SHOW).setMerchOrder("")
+        readStateEngineCreator.add(new ShowSeasonEpisode(SHOW, -1).setMerchOrder("")
                 .addToSeasons(new Season().setMovieId(S1).setMerchOrder("")
                         .addToEpisodes(new Episode().setMovieId(S1E1))
                         .addToEpisodes(new Episode().setMovieId(S1E2)))
@@ -109,18 +109,18 @@ public class VideoHierarchyTest {
                         .addToEpisodes(new Episode().setMovieId(S2E2))
                         .addToEpisodes(new Episode().setMovieId(S2E3))))
                 // add all supplementals
-                .add(new Supplementals().setMovieId(SHOW)
+                .add(new Supplementals(SHOW)
                         .addToSupplementals(new IndividualSupplemental().setMovieId(SHOW_SUP)))
-                .add(new Supplementals().setMovieId(S1E1)
+                .add(new Supplementals(S1E1)
                         .addToSupplementals(new IndividualSupplemental().setMovieId(S1E1SUP1))
                         .addToSupplementals(new IndividualSupplemental().setMovieId(S1E1SUP2)))
-                .add(new Supplementals().setMovieId(S2)
+                .add(new Supplementals(S2)
                         .addToSupplementals(new IndividualSupplemental().setMovieId(S2SUP)));
         // make each video valid in the US
         ALL_VIDEOS.forEach(videoId ->
-                readStateEngineCreator.add(new VideoType().setVideoId(videoId)
+                readStateEngineCreator.add(new VideoType(videoId)
                         .addToCountryInfos(new VideoTypeDescriptor().setCountryCode(NFCountry.US.getId())))
-                        .add(new Status().setMovieId(videoId).setCountryCode(NFCountry.US.getId())
+                        .add(new Status(videoId, NFCountry.US.getId())
                                 .setFlags(new Flags().setGoLive(true))));
         return readStateEngineCreator.build();
     }

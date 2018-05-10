@@ -22,7 +22,6 @@ import com.netflix.vms.transformer.hollowinput.RightsHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -394,11 +393,12 @@ public class VMSAvailabilityWindowModule {
                                             continue;
                                         }
 
-                                        // if not subs/dubs requirement then fallback to fileter logic using old value
-                                        shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
-
                                         // @TODO check local synopsis. Can be deferred for now.
                                     }
+
+                                    // if not subs/dubs requirement then fallback to filter logic using old value
+                                    shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
+
                                 } else {
 
                                     // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
@@ -948,9 +948,12 @@ public class VMSAvailabilityWindowModule {
     private boolean readyForPrePromotionInLanguageCatalog(long videoId, String countryCode, String language, Collection<Long> contractIds, int daysBeforeWindowStart) {
         for (long contractId : contractIds) {
             ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract
-                    ._getPrePromotionDays() > 0 || (daysBeforeWindowStart <= contract._getPrePromotionDays()))) {
-                return true;
+            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
+
+                if (daysBeforeWindowStart <= contract._getPrePromotionDays())
+                    return true;
+
+                return false;
             }
         }
         return false;
@@ -982,20 +985,31 @@ public class VMSAvailabilityWindowModule {
 
     private Long getEarliestAssetRightsAvailabilityDate(long videoId, String country, String language) {
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country, language);
+        if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
+            ctx.getLogger().info(TransformerLogTag.debugging, "querying earliest window date for 80040725 in BE and fr");
+        }
         if (ordinal != -1) {
 
             // here means we have asset rights for that language and corresponding earliest asset availability date
             FeedMovieCountryLanguagesHollow feedMovieCountryLanguagesHollow = api.getFeedMovieCountryLanguagesHollow(ordinal);
-            MapOfStringToLongHollow languageToDateMapHollow = feedMovieCountryLanguagesHollow._getLanguageToEarliestWindowStartDateMap();
-
-            if (languageToDateMapHollow != null && languageToDateMapHollow.isEmpty()) {
-                for (Map.Entry<StringHollow, LongHollow> entry : languageToDateMapHollow.entrySet()) {
-                    if (entry.getKey()._getValue().equals(language)) {
-                        return entry.getValue()._getValue();
-                    }
+            MapOfStringToLongHollow mapOfStringToLongHollow = feedMovieCountryLanguagesHollow._getLanguageToEarliestWindowStartDateMap();
+            if (mapOfStringToLongHollow.containsKey(language)) {
+                LongHollow longHollow = mapOfStringToLongHollow.get(language);
+                if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
+                    ctx.getLogger().info(TransformerLogTag.debugging, "found earliest window date for 80040725 in BE and fr " + longHollow._getValue());
                 }
+                return longHollow._getValue();
+            } else {
+                if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
+                    ctx.getLogger().info(TransformerLogTag.debugging, "fr not found in map " + language);
+                }
+                return null;
             }
-            return null;
+
+        }
+
+        if (country.equals("BE") && language.equals("fr") && videoId == 80040725 && ordinal==-1) {
+            ctx.getLogger().info(TransformerLogTag.debugging, "did not find earliest window date for 80040725 in BE and fr");
         }
         return null;
     }
