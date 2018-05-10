@@ -268,9 +268,6 @@ public class VMSAvailabilityWindowModule {
                     if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
                         oldPrePromotionPhase = true;
                 }
-//                if (!isGoLive && oldPrePromotionPhase)
-//                    // collect PRE_PROMOTION_OLD_TAG
-//                    cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_PRE_PROMOTION_OLD_TAG);
             }
 
             // should use window data, check isGoLive flag, start-end dates and if video is ready for pre-promotion (is locale aware)
@@ -396,7 +393,7 @@ public class VMSAvailabilityWindowModule {
                                         // @TODO check local synopsis. Can be deferred for now.
                                     }
 
-                                    // if not subs/dubs requirement then fallback to filter logic using old value
+                                    // use the value from old filtering logic of windows
                                     shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
 
                                 } else {
@@ -878,74 +875,77 @@ public class VMSAvailabilityWindowModule {
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
             unfilteredCount, long startDate, long endDate, boolean oldLogic) {
 
-        if (oldLogic) {
+        if (oldLogic || language == null) {
+            // use old logic
             return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
         }
+
+        // language is not null, hence using asset rights feed to check assets availability date and decide if the title needs to pre-promoted (provide
+        // availablity date) for
+
         // window has ended, then filter it
         if (endDate < ctx.getNowMillis())
             return true;
 
-        if (language == null) {
+        Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
+        if (earliestWindowStartDate != null) {
+            // here means we have asset rights for that language and corresponding earliest asset availability date
+            boolean isFutureDate = ctx.getNowMillis() < earliestWindowStartDate;
 
-            if (!isGoLive) {
-                boolean readyForPrePromotion = readyForPrePromotionInCountryCatalog(videoId, countryCode, contractIds);
-                if (readyForPrePromotion)
+            // if isGoLive is true, meaning gatekeeper thinks title has minimum requirement to go live in a country
+            if (isGoLive) {
+
+                // earliest window start date is greater than now, meaning window has started
+                if (!isFutureDate)
                     return false;
-            }
-
-            if (unfilteredCount < 3 && endDate > ctx.getNowMillis())
-                return false;
-
-            if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
-                return true;
-
-            return false;
-        } else {
-
-            Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
-            if (earliestWindowStartDate != null) {
-                // here means we have asset rights for that language and corresponding earliest asset availability date
-                boolean isFutureDate = ctx.getNowMillis() < earliestWindowStartDate;
-
-                // if isGoLive is true, meaning gatekeeper thinks title has minimum requirement to go live in a country
-                if (isGoLive) {
-
-                    // earliest window start date is greater than now, meaning window has started
-                    if (!isFutureDate)
+                else {
+                    int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
+                    if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, contractIds, daysBeforeWindowStart)) {
+                        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
                         return false;
-                    else {
-                        int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
-                        if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, language, contractIds, daysBeforeWindowStart)) {
-                            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
-                            return false;
-                        }
                     }
-                } else {
-                    // Case: if isGoLive is false
+                }
+            } else {
+                // Case: if isGoLive is false
 
-                    // it's a future date for asset availability, check if ready for pre-promo
-                    if (isFutureDate) {
-                        int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
-                        if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, language, contractIds, daysBeforeWindowStart)) {
-                            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
-                            return false;
-                        }
+                // it's a future date for asset availability, check if ready for pre-promo
+                if (isFutureDate) {
+                    boolean isWindowDataNeeded = false;
+                    int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
+                    if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, contractIds, daysBeforeWindowStart)) {
+                        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
+                        // window data is needed if the title is ready for pre-promotion in country-language catalog
+                        isWindowDataNeeded = true;
                     }
 
-                    // else log and filter window
-                    cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_FILTER_WINDOW_TAG);
-                    return true;
+                    // if window data is not needed, then filter the window
+                    if (!isWindowDataNeeded)
+                        return true;
+
+                    // if window start date is greater than a year, then filter the window even if assets are available
+                    if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
+                        return true;
+
+                    // if here, then window data is needed and window start date is reasonable, so do not filter the window
+                    return false;
                 }
 
+                // if isGoLive is false, and the assets have been delivered, we still filter the window, since isGoLive false indicates, the title is not
+                // valid in that country and all it's support country-language catalog.
+                // else log and filter window
+                cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_FILTER_WINDOW_TAG);
+                return true;
             }
 
-            // no asset rights, filter out the window
-            cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_NO_ASSET_RIGHTS);
-            return true;
         }
+
+        // no asset rights, filter out the window
+        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_NO_ASSET_RIGHTS);
+        return true;
+
     }
 
-    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String countryCode, String language, Collection<Long> contractIds, int daysBeforeWindowStart) {
+    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String countryCode, Collection<Long> contractIds, int daysBeforeWindowStart) {
         for (long contractId : contractIds) {
             ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
             if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
@@ -959,17 +959,6 @@ public class VMSAvailabilityWindowModule {
         return false;
     }
 
-    private boolean readyForPrePromotionInCountryCatalog(long videoId, String country, Collection<Long> contractIds) {
-        boolean shouldPrePromote = false;
-        for (Long contractId : contractIds) {
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
-                shouldPrePromote = true;
-            }
-        }
-        return shouldPrePromote;
-    }
-
     private boolean readyForPrePromotionInLanguageCatalog(long videoId, String country, String language, Collection<Long> contractIds) {
         boolean shouldPrePromote = false;
         Long earliestAssetAvailabilityDate = getEarliestAssetRightsAvailabilityDate(videoId, country, language);
@@ -977,7 +966,7 @@ public class VMSAvailabilityWindowModule {
             boolean isFutureDate = ctx.getNowMillis() < earliestAssetAvailabilityDate;
             if (isFutureDate) {
                 int daysBeforeWindowStart = (int) ((earliestAssetAvailabilityDate - ctx.getNowMillis()) / MS_IN_DAY);
-                shouldPrePromote = readyForPrePromotionInLanguageCatalog(videoId, country, null, contractIds, daysBeforeWindowStart);
+                shouldPrePromote = readyForPrePromotionInLanguageCatalog(videoId, country, contractIds, daysBeforeWindowStart);
             }
         }
         return shouldPrePromote;
@@ -985,31 +974,16 @@ public class VMSAvailabilityWindowModule {
 
     private Long getEarliestAssetRightsAvailabilityDate(long videoId, String country, String language) {
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
-        if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
-            ctx.getLogger().info(TransformerLogTag.debugging, "querying earliest window date for 80040725 in BE and fr");
-        }
         if (ordinal != -1) {
 
             // here means we have asset rights for that language and corresponding earliest asset availability date
             FeedMovieCountryLanguagesHollow feedMovieCountryLanguagesHollow = api.getFeedMovieCountryLanguagesHollow(ordinal);
             MapOfStringToLongHollow mapOfStringToLongHollow = feedMovieCountryLanguagesHollow._getLanguageToEarliestWindowStartDateMap();
-            if (mapOfStringToLongHollow.containsKey(language)) {
-                LongHollow longHollow = mapOfStringToLongHollow.get(language);
-                if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
-                    ctx.getLogger().info(TransformerLogTag.debugging, "found earliest window date for 80040725 in BE and fr " + longHollow._getValue());
-                }
+            LongHollow longHollow = mapOfStringToLongHollow.get(language);
+            if (longHollow != null) {
                 return longHollow._getValue();
-            } else {
-                if (country.equals("BE") && language.equals("fr") && videoId == 80040725) {
-                    ctx.getLogger().info(TransformerLogTag.debugging, "fr not found in map " + language);
-                }
-                return null;
-            }
+            } else { return null; }
 
-        }
-
-        if (country.equals("BE") && language.equals("fr") && videoId == 80040725 && ordinal==-1) {
-            ctx.getLogger().info(TransformerLogTag.debugging, "did not find earliest window date for 80040725 in BE and fr");
         }
         return null;
     }

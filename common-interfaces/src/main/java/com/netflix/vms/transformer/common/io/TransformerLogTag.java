@@ -87,12 +87,8 @@ public enum TransformerLogTag implements LogTag {
     Language_catalog_NoAssetRights,// title did not have asset rights for the locale
     Language_catalog_WindowFiltered,// title has asset rights but in future so window filtered.
 
-    Language_catalog_old_PrePromote,// titles getting promoted with old logic
-
     Language_catalog_diff_prePromo,// titles that will get pre-promoted now, (compared to dropping) or will have availability windows.
     Language_catalog_diff_early_promotion,// titles get promoted early
-
-    debugging,
 
     MultiLocaleCountries,
     Catalog_Size,
