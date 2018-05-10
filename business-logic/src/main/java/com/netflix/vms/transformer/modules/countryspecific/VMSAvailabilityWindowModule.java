@@ -311,7 +311,7 @@ public class VMSAvailabilityWindowModule {
 
                             if (language != null) {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
-                                boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds);
+                                boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
 
                                 // COMPARE here oldPrePromo and new pre-promo flag
                                 if (oldPrePromotionPhase && !readyForPrePromotion) {
@@ -363,13 +363,19 @@ public class VMSAvailabilityWindowModule {
                                     considerPackageForLang = true;
                                 }
 
-                                if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
-                                    thisWindowFoundLocalAudio = true;
-
-                                if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
-                                    thisWindowFoundLocalText = true;
-
                                 if (useOldPromotionLogic) {
+
+                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
+                                        thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
+                                        if (currentOrFirstFutureWindow == outputWindow)
+                                            currentOrFirstFutureWindowFoundLocalAudio = true;
+                                    }
+                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
+                                        thisWindowFoundLocalText = true; //rollup.foundLocalText();
+                                        if (currentOrFirstFutureWindow == outputWindow)
+                                            currentOrFirstFutureWindowFoundLocalText = true;
+                                    }
+
                                     // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                     // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
                                     // So if any contract has the assets, then it passes the requirement check.
@@ -397,6 +403,12 @@ public class VMSAvailabilityWindowModule {
                                     shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
 
                                 } else {
+
+                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                                        thisWindowFoundLocalAudio = true;
+
+                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                                        thisWindowFoundLocalText = true;
 
                                     // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                     // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
@@ -963,14 +975,22 @@ public class VMSAvailabilityWindowModule {
         return false;
     }
 
-    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String country, String language, Collection<Long> contractIds) {
+    private boolean readyForPrePromotionInLanguageCatalog(long videoId, String country, String language, Collection<Long> contractIds, long startDate) {
         boolean shouldPrePromote = false;
         Long earliestAssetAvailabilityDate = getEarliestAssetRightsAvailabilityDate(videoId, country, language);
+
         if (earliestAssetAvailabilityDate != null) {
             boolean isFutureDate = ctx.getNowMillis() < earliestAssetAvailabilityDate;
+
             if (isFutureDate) {
                 int daysBeforeWindowStart = (int) ((earliestAssetAvailabilityDate - ctx.getNowMillis()) / MS_IN_DAY);
                 shouldPrePromote = readyForPrePromotionInLanguageCatalog(videoId, country, contractIds, daysBeforeWindowStart);
+
+                if (!shouldPrePromote) return false;
+
+                // if window start date is greater than a year, then pre-promotion does not apply even if assets are available earlier
+                if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
+                    return true;
             }
         }
 
