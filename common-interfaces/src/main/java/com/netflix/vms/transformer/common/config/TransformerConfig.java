@@ -233,6 +233,9 @@ public interface TransformerConfig {
     @DefaultValue("true")
     boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
 
+    @DefaultValue("")
+    String getOctoberSkyNamespace();
+
     @DefaultValue("false")
     public boolean isSubsDubsRequirementEnforced();
 

@@ -75,7 +75,14 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         // use default october sky namespace to check for countries that uses multi-lingual catalogs
         List<String> countries;
         if (config.isUseOctoberSkyForMultiLanguageCatalogCountries()) {
-            countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+
+            if (!config.getOctoberSkyNamespace().isEmpty()) {
+                NamespaceLaunchConfiguration nsConf = octoberSky.forNamespace(config.getOctoberSkyNamespace());
+                countries = nsConf.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+            } else {
+                countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+            }
+
         } else {
             countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(",")).collect(Collectors.toList());
         }

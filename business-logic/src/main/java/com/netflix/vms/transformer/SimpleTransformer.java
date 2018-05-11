@@ -119,6 +119,9 @@ public class SimpleTransformer {
         // print multiLanguageCatalog countries
         OctoberSkyData octoberSkyData = ctx.getOctoberSkyData();
         Set<String> multiLanguageCatalogCountries = octoberSkyData.getMultiLanguageCatalogCountries();
+        if (!ctx.getConfig().getOctoberSkyNamespace().isEmpty()) {
+            ctx.getLogger().info(MultiLocaleCountries, "Using October sky namespace {}", ctx.getConfig().getOctoberSkyNamespace());
+        }
         ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {} out of all supported countries {}", multiLanguageCatalogCountries, octoberSkyData.getSupportedCountries());
         for (String country : multiLanguageCatalogCountries) {
             ctx.getLogger().info(MultiLocaleCountries, "Country {}: multi-language catalogs supported for locale={}", country, octoberSkyData.getCatalogLanguages(country));
