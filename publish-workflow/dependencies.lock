@@ -149,7 +149,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -161,7 +161,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -3236,7 +3236,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -3248,7 +3248,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -6323,7 +6323,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -6335,7 +6335,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -9559,7 +9559,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -9571,7 +9571,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -12646,7 +12646,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -12658,7 +12658,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -15733,7 +15733,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -15745,7 +15745,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -18893,7 +18893,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -18905,7 +18905,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -22053,7 +22053,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -22065,7 +22065,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
@@ -25213,7 +25213,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-kms": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-s3"
             ]
@@ -25225,7 +25225,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.315",
+            "locked": "1.11.317",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:gutenberg-common",
