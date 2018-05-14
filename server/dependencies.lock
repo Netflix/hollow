@@ -111,7 +111,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -184,7 +184,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -3814,7 +3814,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -3887,7 +3887,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -7517,7 +7517,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -7590,7 +7590,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -16911,7 +16911,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -16984,7 +16984,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -20614,7 +20614,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -20687,7 +20687,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -27985,7 +27985,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -28058,7 +28058,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -31817,7 +31817,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -31890,7 +31890,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -35649,7 +35649,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -35722,7 +35722,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -39481,7 +39481,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -39554,7 +39554,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -43313,7 +43313,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -43386,7 +43386,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -47145,7 +47145,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -47218,7 +47218,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -50977,7 +50977,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -51050,7 +51050,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -54809,7 +54809,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-autoscaling": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.servo:servo-aws"
             ]
@@ -54882,7 +54882,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sts": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-aws"
             ]
