@@ -155,7 +155,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -3242,7 +3242,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -6329,7 +6329,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -9565,7 +9565,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -12652,7 +12652,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -15739,7 +15739,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -18899,7 +18899,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -22059,7 +22059,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
@@ -25219,7 +25219,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-route53": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:platform-ipc"
             ]
