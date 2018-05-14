@@ -159,7 +159,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -171,7 +171,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -2560,7 +2560,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -2572,7 +2572,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -4961,7 +4961,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -4973,7 +4973,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -7511,7 +7511,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -7523,7 +7523,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -9912,7 +9912,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -9924,7 +9924,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -12313,7 +12313,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -12325,7 +12325,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -14723,7 +14723,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -14735,7 +14735,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -17133,7 +17133,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -17145,7 +17145,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
@@ -19543,7 +19543,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-s3": {
-            "locked": "1.11.317",
+            "locked": "1.11.319",
             "transitive": [
                 "netflix:whitecastle_v2"
             ]
@@ -19555,7 +19555,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-sqs": {
-            "locked": "1.11.315",
+            "locked": "1.11.319",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "netflix:platform-aws",
