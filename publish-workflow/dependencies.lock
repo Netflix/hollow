@@ -143,7 +143,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -170,7 +170,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -3230,7 +3230,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -3257,7 +3257,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -6317,7 +6317,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -6344,7 +6344,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -9553,7 +9553,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -9580,7 +9580,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -12640,7 +12640,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -12667,7 +12667,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -15727,7 +15727,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -15754,7 +15754,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -18887,7 +18887,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -18914,7 +18914,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -22047,7 +22047,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -22074,7 +22074,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -25207,7 +25207,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ec2": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -25234,7 +25234,7 @@
             ]
         },
         "com.amazonaws:aws-java-sdk-ses": {
-            "locked": "1.11.314",
+            "locked": "1.11.315",
             "transitive": [
                 "netflix:platform-aws"
             ]
