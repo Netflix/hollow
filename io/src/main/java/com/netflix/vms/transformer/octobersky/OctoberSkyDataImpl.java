@@ -13,15 +13,10 @@ import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OctoberSkyDataImpl implements OctoberSkyData {
@@ -71,7 +66,9 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         for (String cStr : octoberSky.getCountryCodes()) {
             String countryCodeStr = cStr.trim();
             Country country = beehiveNamespace.getCountry(countryCodeStr);
-            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT))) { minMetadataCountries.add(countryCodeStr); }
+            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT))) {
+                minMetadataCountries.add(countryCodeStr);
+            }
         }
         return minMetadataCountries;
     }
@@ -89,7 +86,8 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
             }
 
         } else {
-            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(",")).collect(Collectors.toList());
+            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(","))
+                              .collect(Collectors.toList());
         }
 
         Map<String, Set<String>> multilanguageCountryCatalogLocales = new HashMap<>();
@@ -112,8 +110,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         return multilanguageCountryCatalogLocales;
     }
 
-    private static Map<String, Set<String>> getMultiCatalogLanguages(LaunchConfiguration launchConfiguration, String namespace, String
-            property) {
+    private static Map<String, Set<String>> getMultiCatalogLanguages(LaunchConfiguration launchConfiguration, String namespace, String property) {
         Map<String, Set<String>> tempMap = Maps.newHashMap();
         ObjectMapper om = new ObjectMapper();
         NamespaceLaunchConfiguration beehiveNS = launchConfiguration.forNamespace(namespace);
@@ -124,7 +121,8 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
             try {
                 if (StringUtils.isNotEmpty(value)) {
 
-                    List<String> elements = om.readValue(value, new TypeReference<List<String>>() {});
+                    List<String> elements = om.readValue(value, new TypeReference<List<String>>() {
+                    });
                     catalogLanguages = elements.stream()
                                                .map(Catalog::new)
                                                .map(Catalog::getLanguage)
