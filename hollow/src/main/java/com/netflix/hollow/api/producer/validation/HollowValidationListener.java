@@ -33,7 +33,10 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public interface HollowValidationListener extends EventListener{
-	
+    // TODO(hollow3): expose structured validation result instead of relying on toString of a Validator
+    // TODO(hollow3): fire start/complete callbacks as each validator is run in addition to the
+    //                start/complete of the overall validation stage
+    // TODO(hollow3): reconcile stage-scope callbacks in this interface and HollowProducerListener
 
     /**
      * Called when the {@code HollowProducer} has begun validating the new data state produced this cycle.
@@ -51,5 +54,7 @@ public interface HollowValidationListener extends EventListener{
      * @param elapsed duration of the validation stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
+    // TODO(hollow3): either provide access to the ProducerStatus or provide access to the same information
+    //                attatched to  ProducerStatus (e.g. version)
     public void onValidationComplete(AllValidationStatus status, long elapsed, TimeUnit unit);
 }
