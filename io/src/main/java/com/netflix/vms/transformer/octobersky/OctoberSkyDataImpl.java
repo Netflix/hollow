@@ -1,7 +1,12 @@
 package com.netflix.vms.transformer.octobersky;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.netflix.i18n.NFLocale;
 import com.netflix.launch.common.Catalog;
 import com.netflix.launch.common.Country;
 import com.netflix.launch.common.LaunchConfiguration;
@@ -13,8 +18,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 
 @Singleton
 public class OctoberSkyDataImpl implements OctoberSkyData {
@@ -64,8 +71,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         for (String cStr : octoberSky.getCountryCodes()) {
             String countryCodeStr = cStr.trim();
             Country country = beehiveNamespace.getCountry(countryCodeStr);
-            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT)))
-                minMetadataCountries.add(countryCodeStr);
+            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT))) { minMetadataCountries.add(countryCodeStr); }
         }
         return minMetadataCountries;
     }
@@ -77,8 +83,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         if (config.isUseOctoberSkyForMultiLanguageCatalogCountries()) {
 
             if (!config.getOctoberSkyNamespace().isEmpty()) {
-                NamespaceLaunchConfiguration nsConf = octoberSky.forNamespace(config.getOctoberSkyNamespace());
-                countries = nsConf.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+                return getMultiCatalogLanguages(octoberSky, config.getOctoberSkyNamespace(), "catalogs");
             } else {
                 countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
             }
@@ -105,6 +110,35 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         }
 
         return multilanguageCountryCatalogLocales;
+    }
+
+    private static Map<String, Set<String>> getMultiCatalogLanguages(LaunchConfiguration launchConfiguration, String namespace, String
+            property) {
+        Map<String, Set<String>> tempMap = Maps.newHashMap();
+        ObjectMapper om = new ObjectMapper();
+        NamespaceLaunchConfiguration beehiveNS = launchConfiguration.forNamespace(namespace);
+        for (Country country : beehiveNS.getCountries()) {
+            String value = country.fetchProperty(property);
+            Set<String> catalogLanguages = Sets.newHashSet();
+
+            try {
+                if (StringUtils.isNotEmpty(value)) {
+
+                    List<String> elements = om.readValue(value, new TypeReference<List<String>>() {});
+                    catalogLanguages = elements.stream()
+                                               .map(Catalog::new)
+                                               .map(Catalog::getLanguage)
+                                               .filter(Objects::nonNull)
+                                               .map(NFLocale::getName)
+                                               .collect(Collectors.toSet());
+                }
+            } catch (Exception ex) {
+                return tempMap;
+            }
+
+            tempMap.put(country.getCode(), catalogLanguages);
+        }
+        return tempMap;
     }
 
 }
