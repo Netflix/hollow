@@ -35,7 +35,7 @@ class HollowListTypeReadStateShard {
             do {
                 currentData = this.currentData;
 
-                long fixedLengthOffset = currentData.bitsPerListPointer * ordinal;
+                long fixedLengthOffset = (long)currentData.bitsPerListPointer * ordinal;
 
                 startAndEndElement = ordinal == 0 ?
                         currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
