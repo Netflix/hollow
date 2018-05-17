@@ -188,8 +188,8 @@ class HollowSetTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredBitsForSetPointers = currentData.bitsPerFixedLengthSetPortion * ((long)currentData.maxOrdinal + 1);
-        long requiredBitsForBuckets = (long)currentData.bitsPerElement * currentData.totalNumberOfBuckets;
+        long requiredBitsForSetPointers = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerFixedLengthSetPortion;
+        long requiredBitsForBuckets = currentData.totalNumberOfBuckets * currentData.bitsPerElement;
         long requiredBits = requiredBitsForSetPointers + requiredBitsForBuckets;
         return requiredBits / 8;
     }

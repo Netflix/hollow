@@ -233,8 +233,8 @@ class HollowMapTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredBitsForMapPointers = (long)currentData.bitsPerFixedLengthMapPortion * ((long)currentData.maxOrdinal + 1);
-        long requiredBitsForMapBuckets = (long)currentData.bitsPerMapEntry * currentData.totalNumberOfBuckets;
+        long requiredBitsForMapPointers = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerFixedLengthMapPortion;
+        long requiredBitsForMapBuckets = (long)currentData.totalNumberOfBuckets * currentData.bitsPerMapEntry;
         long requiredBits = requiredBitsForMapPointers + requiredBitsForMapBuckets;
         return requiredBits / 8;
     }

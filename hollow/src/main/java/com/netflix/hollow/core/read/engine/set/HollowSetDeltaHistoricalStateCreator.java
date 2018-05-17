@@ -58,8 +58,8 @@ public class HollowSetDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.setPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerFixedLengthSetPortion * ((long)historicalDataElements.maxOrdinal + 1));
-        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerElement * historicalDataElements.totalNumberOfBuckets);
+        historicalDataElements.setPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerFixedLengthSetPortion);
+        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerElement);
 
         iter.reset();
 

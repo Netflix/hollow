@@ -58,8 +58,8 @@ public class HollowMapDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.mapPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerFixedLengthMapPortion * ((long)historicalDataElements.maxOrdinal + 1));
-        historicalDataElements.entryArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerMapEntry * historicalDataElements.totalNumberOfBuckets);
+        historicalDataElements.mapPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerFixedLengthMapPortion);
+        historicalDataElements.entryArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerMapEntry);
 
         iter.reset();
 

@@ -68,8 +68,8 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerFixedLengthMapPortion * ((long)target.maxOrdinal + 1));
-        target.entryArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerMapEntry * target.totalNumberOfBuckets);
+        target.mapPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthMapPortion);
+        target.entryArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerMapEntry);
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
                 && target.bitsPerMapSizeValue == from.bitsPerMapSizeValue
@@ -113,7 +113,7 @@ class HollowMapDeltaApplicator {
     }
 
     private void fastCopyRecords(int recordsToCopy) {
-        long mapPointerAndSizeBitsToCopy = (long)target.bitsPerFixedLengthMapPortion * recordsToCopy;
+        long mapPointerAndSizeBitsToCopy = (long)recordsToCopy * target.bitsPerFixedLengthMapPortion;
         long eachMapPointerDifference = currentWriteStartBucket - currentFromStateStartBucket;
 
         target.mapPointerAndSizeArray.copyBits(from.mapPointerAndSizeArray, currentFromStateCopyStartBit, currentWriteStartBit, mapPointerAndSizeBitsToCopy);

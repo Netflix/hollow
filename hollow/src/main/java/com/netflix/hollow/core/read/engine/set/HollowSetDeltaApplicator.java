@@ -67,8 +67,8 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, target.bitsPerFixedLengthSetPortion * ((long)target.maxOrdinal + 1));
-        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerElement * target.totalNumberOfBuckets);
+        target.setPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerFixedLengthSetPortion);
+        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfBuckets * target.bitsPerElement);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer
                 && target.bitsPerSetSizeValue == from.bitsPerSetSizeValue
@@ -111,7 +111,7 @@ class HollowSetDeltaApplicator {
     }
 
     private void fastCopyRecords(int recordsToCopy) {
-        long setPointerAndSizeBitsToCopy = (long)target.bitsPerFixedLengthSetPortion * recordsToCopy;
+        long setPointerAndSizeBitsToCopy = (long)recordsToCopy * target.bitsPerFixedLengthSetPortion;
         long eachSetPointerDifference = currentWriteStartBucket - currentFromStateStartBucket;
 
         target.setPointerAndSizeArray.copyBits(from.setPointerAndSizeArray, currentFromStateCopyStartBit, currentWriteStartBit, setPointerAndSizeBitsToCopy);

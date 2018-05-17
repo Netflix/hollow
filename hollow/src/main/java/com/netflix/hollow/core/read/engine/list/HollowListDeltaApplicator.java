@@ -62,8 +62,8 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerArray = new FixedLengthElementArray(target.memoryRecycler, target.bitsPerListPointer * ((long)target.maxOrdinal + 1));
-        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerElement * target.totalNumberOfElements);
+        target.listPointerArray = new FixedLengthElementArray(target.memoryRecycler, ((long)target.maxOrdinal + 1) * target.bitsPerListPointer);
+        target.elementArray = new FixedLengthElementArray(target.memoryRecycler, target.totalNumberOfElements * target.bitsPerElement);
 
         if(target.bitsPerListPointer == from.bitsPerListPointer
                 && target.bitsPerElement == from.bitsPerElement)
@@ -104,7 +104,7 @@ class HollowListDeltaApplicator {
     }
 
     private void fastCopyRecords(int recordsToCopy) {
-        long listPointerBitsToCopy = (long)target.bitsPerListPointer * recordsToCopy;
+        long listPointerBitsToCopy = (long)recordsToCopy * target.bitsPerListPointer;
         long eachListPointerDifference = currentWriteStartElement - currentFromStateStartElement;
 
         target.listPointerArray.copyBits(from.listPointerArray, currentFromStateCopyStartBit, currentWriteStartBit, listPointerBitsToCopy);
