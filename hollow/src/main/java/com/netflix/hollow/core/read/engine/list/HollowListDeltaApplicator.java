@@ -62,7 +62,7 @@ class HollowListDeltaApplicator {
         target.bitsPerListPointer = delta.bitsPerListPointer;
         target.bitsPerElement = delta.bitsPerElement;
 
-        target.listPointerArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerListPointer * (target.maxOrdinal + 1));
+        target.listPointerArray = new FixedLengthElementArray(target.memoryRecycler, target.bitsPerListPointer * ((long)target.maxOrdinal + 1));
         target.elementArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerElement * target.totalNumberOfElements);
 
         if(target.bitsPerListPointer == from.bitsPerListPointer

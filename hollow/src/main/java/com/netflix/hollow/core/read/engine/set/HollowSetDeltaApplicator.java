@@ -67,7 +67,7 @@ class HollowSetDeltaApplicator {
         target.emptyBucketValue = delta.emptyBucketValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.setPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerFixedLengthSetPortion * (target.maxOrdinal + 1));
+        target.setPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, target.bitsPerFixedLengthSetPortion * ((long)target.maxOrdinal + 1));
         target.elementArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerElement * target.totalNumberOfBuckets);
 
         if(target.bitsPerSetPointer == from.bitsPerSetPointer

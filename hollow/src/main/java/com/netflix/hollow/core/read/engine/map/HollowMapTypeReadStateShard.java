@@ -38,7 +38,7 @@ class HollowMapTypeReadStateShard {
 
         do {
             currentData = this.currentData;
-            size = (int)currentData.mapPointerAndSizeArray.getElementValue((long)(ordinal * currentData.bitsPerFixedLengthMapPortion) + currentData.bitsPerMapPointer, currentData.bitsPerMapSizeValue);
+            size = (int)currentData.mapPointerAndSizeArray.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthMapPortion) + currentData.bitsPerMapPointer, currentData.bitsPerMapSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -233,7 +233,7 @@ class HollowMapTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredBitsForMapPointers = (long)currentData.bitsPerFixedLengthMapPortion * (currentData.maxOrdinal + 1);
+        long requiredBitsForMapPointers = (long)currentData.bitsPerFixedLengthMapPortion * ((long)currentData.maxOrdinal + 1);
         long requiredBitsForMapBuckets = (long)currentData.bitsPerMapEntry * currentData.totalNumberOfBuckets;
         long requiredBits = requiredBitsForMapPointers + requiredBitsForMapBuckets;
         return requiredBits / 8;

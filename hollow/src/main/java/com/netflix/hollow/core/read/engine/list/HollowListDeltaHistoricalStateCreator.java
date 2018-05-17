@@ -57,7 +57,7 @@ public class HollowListDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerListPointer * (historicalDataElements.maxOrdinal + 1));
+        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerListPointer * ((long)historicalDataElements.maxOrdinal + 1));
         historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerElement * historicalDataElements.totalNumberOfElements);
 
         iter.reset();
@@ -110,7 +110,7 @@ public class HollowListDeltaHistoricalStateCreator {
         long size = fromEndElement - fromStartElement;
 
         historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, bitsPerElement * fromStartElement, bitsPerElement * nextStartElement, size * bitsPerElement);
-        historicalDataElements.listPointerArray.setElementValue(historicalDataElements.bitsPerListPointer * nextOrdinal, historicalDataElements.bitsPerListPointer, nextStartElement + size);
+        historicalDataElements.listPointerArray.setElementValue((long)historicalDataElements.bitsPerListPointer * nextOrdinal, historicalDataElements.bitsPerListPointer, nextStartElement + size);
 
         ordinalMapping.put(ordinal, nextOrdinal);
         nextOrdinal++;

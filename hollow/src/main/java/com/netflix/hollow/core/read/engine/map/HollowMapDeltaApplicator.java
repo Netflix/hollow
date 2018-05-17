@@ -68,7 +68,7 @@ class HollowMapDeltaApplicator {
         target.emptyBucketKeyValue = delta.emptyBucketKeyValue;
         target.totalNumberOfBuckets = delta.totalNumberOfBuckets;
 
-        target.mapPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerFixedLengthMapPortion * (target.maxOrdinal + 1));
+        target.mapPointerAndSizeArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerFixedLengthMapPortion * ((long)target.maxOrdinal + 1));
         target.entryArray = new FixedLengthElementArray(target.memoryRecycler, (long)target.bitsPerMapEntry * target.totalNumberOfBuckets);
 
         if(target.bitsPerMapPointer == from.bitsPerMapPointer
