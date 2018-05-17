@@ -116,7 +116,6 @@ class HollowSetTypeReadStateShard {
 
         return -1;
     }
-    
 
     public int relativeBucketValue(int setOrdinal, int bucketIndex) {
         HollowSetTypeDataElements currentData;

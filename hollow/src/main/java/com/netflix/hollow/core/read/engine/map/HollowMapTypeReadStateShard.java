@@ -216,7 +216,7 @@ class HollowMapTypeReadStateShard {
                 long offset = getAbsoluteBucketStart(currentData, shardOrdinal);
     
                 checksum.applyInt(ordinal);
-                for(int i=0;i<numBuckets;i++) {
+                for(int i=0; i<numBuckets; i++) {
                     int bucketKey = getBucketKeyByAbsoluteIndex(currentData, offset + i);
                     if(bucketKey != currentData.emptyBucketKeyValue) {
                         checksum.applyInt(i);
