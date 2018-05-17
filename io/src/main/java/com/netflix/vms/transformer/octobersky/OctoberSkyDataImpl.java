@@ -13,9 +13,14 @@ import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -60,7 +65,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     }
 
     private static Set<String> findCountriesWithMinMetadata(LaunchConfiguration octoberSky) {
-        Set<String> minMetadataCountries = new HashSet<String>();
+        Set<String> minMetadataCountries = new HashSet<>();
 
         NamespaceLaunchConfiguration beehiveNamespace = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
         for (String cStr : octoberSky.getCountryCodes()) {
@@ -119,7 +124,7 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
             Set<String> catalogLanguages = Sets.newHashSet();
 
             try {
-                if (StringUtils.isNotEmpty(value)) {
+                if (!value.isEmpty()) {
 
                     List<String> elements = om.readValue(value, new TypeReference<List<String>>() {
                     });
