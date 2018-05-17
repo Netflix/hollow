@@ -36,7 +36,9 @@ class HollowSetTypeReadStateShard {
 
         do {
             currentData = this.currentData;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue((long)(ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
+            size = (int)currentData.setPointerAndSizeArray.getElementValue(
+                    ((long)currentData.bitsPerFixedLengthSetPortion * ordinal) + currentData.bitsPerSetPointer,
+                    currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
