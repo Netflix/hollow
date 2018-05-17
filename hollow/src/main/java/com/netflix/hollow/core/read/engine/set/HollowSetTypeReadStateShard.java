@@ -36,7 +36,9 @@ class HollowSetTypeReadStateShard {
 
         do {
             currentData = this.currentData;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue((long)(ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
+            size = (int)currentData.setPointerAndSizeArray.getElementValue(
+                    ((long)currentData.bitsPerFixedLengthSetPortion * ordinal) + currentData.bitsPerSetPointer,
+                    currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -55,7 +57,9 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentData;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeArray.getElementValue(
+                        (long)currentData.bitsPerFixedLengthSetPortion * ordinal,
+                        currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             hashCode = HashCodes.hashInt(hashCode);
@@ -93,7 +97,9 @@ class HollowSetTypeReadStateShard {
                 currentData = this.currentData;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
-                endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+                endBucket = currentData.setPointerAndSizeArray.getElementValue(
+                        (long)currentData.bitsPerFixedLengthSetPortion * ordinal,
+                        currentData.bitsPerSetPointer);
             } while(readWasUnsafe(currentData));
 
             long bucket = startBucket + (hashCode & (endBucket - startBucket - 1));
@@ -116,7 +122,6 @@ class HollowSetTypeReadStateShard {
 
         return -1;
     }
-    
 
     public int relativeBucketValue(int setOrdinal, int bucketIndex) {
         HollowSetTypeDataElements currentData;
@@ -140,11 +145,17 @@ class HollowSetTypeReadStateShard {
     }
 
     private long getAbsoluteBucketStart(HollowSetTypeDataElements currentData, int ordinal) {
-        return ordinal == 0 ? 0 : currentData.setPointerAndSizeArray.getElementValue((long)(ordinal - 1) * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
+        return ordinal == 0
+                ? 0
+                : currentData.setPointerAndSizeArray.getElementValue(
+                        (long)currentData.bitsPerFixedLengthSetPortion * (ordinal - 1),
+                        currentData.bitsPerSetPointer);
     }
 
     private int absoluteBucketValue(HollowSetTypeDataElements currentData, long absoluteBucketIndex) {
-        return (int)currentData.elementArray.getElementValue(absoluteBucketIndex * currentData.bitsPerElement, currentData.bitsPerElement);
+        return (int)currentData.elementArray.getElementValue(
+                absoluteBucketIndex * currentData.bitsPerElement,
+                currentData.bitsPerElement);
     }
     
     void invalidate() {
