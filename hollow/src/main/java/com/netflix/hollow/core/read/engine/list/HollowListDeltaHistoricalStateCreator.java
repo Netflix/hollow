@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -61,7 +63,7 @@ public class HollowListDeltaHistoricalStateCreator {
         iter.reset();
 
         int ordinal = iter.next();
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             ordinalMapping.put(ordinal, nextOrdinal);
             copyRecord(ordinal);
 
@@ -84,7 +86,7 @@ public class HollowListDeltaHistoricalStateCreator {
         int removedEntryCount = 0;
         long totalElementCount = 0;
         int ordinal = iter.next();
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             removedEntryCount++;
             totalElementCount += typeState.size(ordinal);
             ordinal = iter.next();

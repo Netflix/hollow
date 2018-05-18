@@ -20,9 +20,9 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import com.netflix.hollow.core.HollowConstants;
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 

@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
+import com.netflix.hollow.core.HollowConstants;
 import java.io.IOException;
 import java.io.InputStream;
 

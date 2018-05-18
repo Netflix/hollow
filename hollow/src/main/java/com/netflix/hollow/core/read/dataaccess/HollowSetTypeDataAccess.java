@@ -50,7 +50,7 @@ public interface HollowSetTypeDataAccess extends HollowCollectionTypeDataAccess 
     /**
      * Returns The matching ordinal of the element from the set at the specified ordinal which matches the provided hash key.
      * 
-     * @return the matching element's ordinal, or -1 if no such element exists. 
+     * @return the matching element's ordinal, or {@link com.netflix.hollow.core.HollowConstants.NULL_ORDINAL} if no such element exists.
      */
     public int findElement(int ordinal, Object... hashKey);
 

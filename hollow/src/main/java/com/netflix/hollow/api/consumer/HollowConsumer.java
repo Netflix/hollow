@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -27,6 +26,7 @@ import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;

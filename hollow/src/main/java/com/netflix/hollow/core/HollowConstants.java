@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api;
+package com.netflix.hollow.core;
 
 /**
  * An interface to gather various sentinel constants used across hollow.
@@ -30,4 +30,9 @@ public interface HollowConstants {
      * A version of VERSION_NONE signifies "no version".
      */
     long VERSION_NONE = Long.MIN_VALUE;
+
+    /**
+     * An ordinal of NULL_ORDINAL signifies "null reference" or "no ordinal"
+     */
+    int ORDINAL_NONE = -1;
 }

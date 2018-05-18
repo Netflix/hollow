@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
@@ -98,7 +100,7 @@ class HollowListTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int size = size(shardOrdinal);
