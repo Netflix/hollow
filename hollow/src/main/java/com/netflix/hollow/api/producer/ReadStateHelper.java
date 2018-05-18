@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**

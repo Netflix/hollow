@@ -17,9 +17,9 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

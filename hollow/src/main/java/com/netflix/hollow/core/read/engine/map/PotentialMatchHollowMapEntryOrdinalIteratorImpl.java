@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
@@ -58,7 +60,7 @@ public class PotentialMatchHollowMapEntryOrdinalIteratorImpl implements HollowMa
         long currentBucketValue = dataAccess.relativeBucket(mapOrdinal, currentBucket);
 
         int currentBucketKey = (int)(currentBucketValue >>> 32);
-        if(currentBucketKey == -1)
+        if(currentBucketKey == ORDINAL_NONE)
             return false;
 
         key = currentBucketKey;

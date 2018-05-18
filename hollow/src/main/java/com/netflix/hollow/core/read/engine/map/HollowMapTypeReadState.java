@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowMapSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
@@ -66,7 +68,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
             throw new IllegalArgumentException("Number of shards must be a power of 2!");
         
         HollowMapTypeReadStateShard shards[] = new HollowMapTypeReadStateShard[numShards];
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             shards[i] = new HollowMapTypeReadStateShard();
         
         this.shards = shards;
@@ -78,7 +80,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(dis);
         
-        for(int i=0;i<shards.length;i++) {
+        for(int i=0; i<shards.length; i++) {
             HollowMapTypeDataElements snapshotData = new HollowMapTypeDataElements(memoryRecycler);
             snapshotData.readSnapshot(dis);
             shards[i].setCurrentData(snapshotData);
@@ -95,7 +97,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(dis);
 
-        for(int i=0;i<shards.length;i++) {
+        for(int i=0; i<shards.length; i++) {
             HollowMapTypeDataElements deltaData = new HollowMapTypeDataElements(memoryRecycler);
             HollowMapTypeDataElements nextData = new HollowMapTypeDataElements(memoryRecycler);
             deltaData.readDelta(dis);
@@ -155,12 +157,12 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         sampler.recordGet();
         
         if(keyDeriver == null)
-            return -1;
+            return ORDINAL_NONE;
         
         FieldType fieldTypes[] = keyDeriver.getFieldTypes();
         
         if(hashKey.length != fieldTypes.length)
-            return -1;
+            return ORDINAL_NONE;
 
         return shards[ordinal & shardNumberMask].findKey(ordinal >> shardOrdinalShift, hashKey);
     }
@@ -236,14 +238,14 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     @Override
     protected void invalidate() {
         stateListeners = EMPTY_LISTENERS;
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             shards[i].invalidate();
     }
 
     HollowMapTypeDataElements[] currentDataElements() {
         HollowMapTypeDataElements currentDataElements[] = new HollowMapTypeDataElements[shards.length];
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             currentDataElements[i] = shards[i].currentDataElements();
         
         return currentDataElements;
@@ -263,7 +265,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         
         BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             shards[i].applyToChecksum(checksum, populatedOrdinals, i, shards.length);
     }
 
@@ -271,7 +273,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     public long getApproximateHeapFootprintInBytes() {
         long totalApproximateHeapFootprintInBytes = 0;
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
         
         return totalApproximateHeapFootprintInBytes;
@@ -283,7 +285,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         
         BitSet populatedOrdinals = getPopulatedOrdinals();
 
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
         
         return totalApproximateHoleCostInBytes;
@@ -297,7 +299,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
         if(getSchema().getHashKey() != null)
             this.keyDeriver = new HollowPrimaryKeyValueDeriver(getSchema().getHashKey(), getStateEngine());
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             shards[i].setKeyDeriver(keyDeriver);
     }
 

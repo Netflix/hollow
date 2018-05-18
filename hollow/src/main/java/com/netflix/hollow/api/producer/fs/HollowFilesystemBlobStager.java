@@ -21,11 +21,11 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

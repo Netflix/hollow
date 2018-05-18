@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.map;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
@@ -72,7 +74,7 @@ class HollowMapTypeReadStateShard {
                 bucketKeyOrdinal = getBucketKeyByAbsoluteIndex(currentData, bucket);
             }
 
-            valueOrdinal = -1;
+            valueOrdinal = ORDINAL_NONE;
         } while(readWasUnsafe(currentData));
 
         return valueOrdinal;
@@ -113,7 +115,7 @@ class HollowMapTypeReadStateShard {
 
         } while(readWasUnsafe(currentData));
 
-        return -1;
+        return ORDINAL_NONE;
     }
 
     public long findEntry(int ordinal, Object... hashKey) {
@@ -209,14 +211,14 @@ class HollowMapTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
                 long offset = getAbsoluteBucketStart(currentData, shardOrdinal);
     
                 checksum.applyInt(ordinal);
-                for(int i=0;i<numBuckets;i++) {
+                for(int i=0; i<numBuckets; i++) {
                     int bucketKey = getBucketKeyByAbsoluteIndex(currentData, offset + i);
                     if(bucketKey != currentData.emptyBucketKeyValue) {
                         checksum.applyInt(i);
