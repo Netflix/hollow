@@ -1090,7 +1090,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -4792,7 +4792,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -8494,7 +8494,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -17886,7 +17886,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -21588,7 +21588,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -29020,7 +29020,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -32851,7 +32851,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -36682,7 +36682,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -40513,7 +40513,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -44344,7 +44344,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -48175,7 +48175,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -52006,7 +52006,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
@@ -55837,7 +55837,7 @@
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
-            "locked": "1.5.13",
+            "locked": "1.5.14",
             "transitive": [
                 "com.netflix.hystrix:hystrix-metrics-event-stream",
                 "com.netflix.hystrix:hystrix-serialization",
