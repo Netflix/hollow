@@ -802,7 +802,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -3101,7 +3101,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -5400,7 +5400,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -7848,7 +7848,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -10147,7 +10147,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -12446,7 +12446,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -14754,7 +14754,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -17062,7 +17062,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -19370,7 +19370,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.16.7",
             "requested": "2.+"
         },
         "com.netflix.hystrix:hystrix-core": {
