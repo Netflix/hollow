@@ -58,8 +58,8 @@ public class HollowMapDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.mapPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerFixedLengthMapPortion * (historicalDataElements.maxOrdinal + 1));
-        historicalDataElements.entryArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.bitsPerMapEntry * historicalDataElements.totalNumberOfBuckets);
+        historicalDataElements.mapPointerAndSizeArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerFixedLengthMapPortion);
+        historicalDataElements.entryArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfBuckets * historicalDataElements.bitsPerMapEntry);
 
         iter.reset();
 
@@ -122,8 +122,8 @@ public class HollowMapDeltaHistoricalStateCreator {
         long fromEndBucket = stateEngineDataElements[shard].mapPointerAndSizeArray.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerFixedLengthMapPortion, stateEngineDataElements[shard].bitsPerMapPointer);
         long numBuckets = fromEndBucket - fromStartBucket;
 
-        historicalDataElements.mapPointerAndSizeArray.setElementValue(nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion, historicalDataElements.bitsPerMapPointer, nextStartBucket + numBuckets);
-        historicalDataElements.mapPointerAndSizeArray.setElementValue((nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion) + historicalDataElements.bitsPerMapPointer, historicalDataElements.bitsPerMapSizeValue, size);
+        historicalDataElements.mapPointerAndSizeArray.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion, historicalDataElements.bitsPerMapPointer, nextStartBucket + numBuckets);
+        historicalDataElements.mapPointerAndSizeArray.setElementValue(((long)nextOrdinal * historicalDataElements.bitsPerFixedLengthMapPortion) + historicalDataElements.bitsPerMapPointer, historicalDataElements.bitsPerMapSizeValue, size);
 
         historicalDataElements.entryArray.copyBits(stateEngineDataElements[shard].entryArray, fromStartBucket * bitsPerBucket, nextStartBucket * bitsPerBucket, numBuckets * bitsPerBucket);
 

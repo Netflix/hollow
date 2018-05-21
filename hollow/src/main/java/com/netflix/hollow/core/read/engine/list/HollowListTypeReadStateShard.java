@@ -37,7 +37,7 @@ class HollowListTypeReadStateShard {
             do {
                 currentData = this.currentData;
 
-                long fixedLengthOffset = (long)currentData.bitsPerListPointer * ordinal;
+                long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
                 startAndEndElement = ordinal == 0 ?
                         currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
@@ -66,7 +66,7 @@ class HollowListTypeReadStateShard {
         do {
             currentData = this.currentData;
 
-            long fixedLengthOffset = currentData.bitsPerListPointer * ordinal;
+            long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
             long startAndEndElement = ordinal == 0 ?
                     currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
@@ -115,8 +115,8 @@ class HollowListTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredListPointerBits = ((long)currentData.bitsPerListPointer * (currentData.maxOrdinal + 1));
-        long requiredElementBits = (currentData.totalNumberOfElements * currentData.bitsPerElement);
+        long requiredListPointerBits = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
+        long requiredElementBits = currentData.totalNumberOfElements * currentData.bitsPerElement;
         long requiredBits = requiredListPointerBits + requiredElementBits;
         return requiredBits / 8;
     }

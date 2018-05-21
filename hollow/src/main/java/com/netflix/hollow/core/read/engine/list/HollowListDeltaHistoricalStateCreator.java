@@ -57,8 +57,8 @@ public class HollowListDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerListPointer * (historicalDataElements.maxOrdinal + 1));
-        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerElement * historicalDataElements.totalNumberOfElements);
+        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer);
+        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement);
 
         iter.reset();
 
@@ -109,8 +109,8 @@ public class HollowListDeltaHistoricalStateCreator {
         long fromEndElement = stateEngineDataElements[shard].listPointerArray.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
         long size = fromEndElement - fromStartElement;
 
-        historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, bitsPerElement * fromStartElement, bitsPerElement * nextStartElement, size * bitsPerElement);
-        historicalDataElements.listPointerArray.setElementValue(historicalDataElements.bitsPerListPointer * nextOrdinal, historicalDataElements.bitsPerListPointer, nextStartElement + size);
+        historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, fromStartElement * bitsPerElement, nextStartElement * bitsPerElement, size * bitsPerElement);
+        historicalDataElements.listPointerArray.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerListPointer, historicalDataElements.bitsPerListPointer, nextStartElement + size);
 
         ordinalMapping.put(ordinal, nextOrdinal);
         nextOrdinal++;
