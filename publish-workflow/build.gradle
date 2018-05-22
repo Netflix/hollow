@@ -1,10 +1,10 @@
 dependencies {
     compile project(':vmstransformer-common-interfaces')
     compile project(':vmstransformer-io')
+    compile project(':vmstransformer-hollowoutput-api-notemplate')
 
     compile 'com.netflix.hollow:hollow:2.+'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
-    compile 'netflix:vms-hollow-generated-notemplate:latest.release'
     compile 'netflix:playback-monkey-model:latest.release'
     compile 'netflix:awsutils:latest.release'
     compile 'netflix:hermes:latest.release'

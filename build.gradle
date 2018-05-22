@@ -1,6 +1,7 @@
 allprojects {
     apply plugin: 'netflix.nebula'
 }
+
 dependencyRecommendations {
     mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
 }
@@ -65,5 +66,14 @@ subprojects {
         exclude group: 'com.oracle'
         exclude group: 'org.apache.ant', module: 'ant'
         exclude group: 'org.apache.cxf', module: 'cxf'
+    }
+
+    ext {
+        // calculate vmsHollowOutputPojosArgs and expose to vmstransformer-hollowoutput-api
+        // and vmstransformer-hollowoutput-api-notemplate
+        def vmsHollowOutputPojosDir = new File("${rootProject.projectDir}/vmstransformer-hollowoutput-model/src/main/java/com/netflix/vms/transformer/hollowoutput")
+        def vmsHollowOutputPojosFiles = []
+        vmsHollowOutputPojosDir.eachFile(groovy.io.FileType.FILES){file -> vmsHollowOutputPojosFiles << file}
+        vmsHollowOutputPojosArgs = vmsHollowOutputPojosFiles.stream().map{f -> '--addToDataModel=com.netflix.vms.transformer.hollowoutput.' + f.getName().replace('.java', '')}.collect()
     }
 }
