@@ -40,6 +40,7 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -309,6 +310,8 @@ public class VMSAvailabilityWindowModule {
                                 packageData = packageDataCollection.getPackageData();
 
 
+                            // Language filtering/merching rules starts here..
+
                             if (language != null) {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
                                 boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
@@ -333,9 +336,11 @@ public class VMSAvailabilityWindowModule {
                                         if (readyForPrePromotion) {
                                             // titles that will get promoted with new logic correctly
                                             cycleDataAggregator.collect(country, language, videoId, TransformerLogTag.Language_catalog_diff_prePromo);
-
                                         }
 
+
+                                        // skipping the contract if title is not ready for pre-promotion in language catalog.
+                                        cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
                                         continue;
                                     }
 
@@ -363,69 +368,49 @@ public class VMSAvailabilityWindowModule {
                                     considerPackageForLang = true;
                                 }
 
-                                if (useOldPromotionLogic) {
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
+                                    thisWindowFoundLocalAudio = true;
 
-                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0) {
-                                        thisWindowFoundLocalAudio = true; // rollup.foundLocalAudio();
-                                        if (currentOrFirstFutureWindow == outputWindow)
+                                if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
+                                    thisWindowFoundLocalText = true;
+
+                                if (useOldPromotionLogic) {
+                                    shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
+                                    readyForPrePromotion = oldPrePromotionPhase;
+                                }
+
+                                // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
+                                // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
+                                // So if any contract has the assets, then it passes the requirement check.
+                                if (isSubsDubsRequirementEnforced) {
+
+                                    boolean assetsAvailable = assetAvailabilityCheck(mustHaveSubs, thisWindowFoundLocalText, mustHaveDubs,
+                                            thisWindowFoundLocalAudio, country, language, videoId,
+                                            readyForPrePromotion);
+
+                                    if (!assetsAvailable) {
+                                        // todo should skip or make shouldFilterWindowInfo as true and let the window be available with packageid as zero
+                                        // skip the contract since title does not meet the rules for localized asset requirement check and is not in
+                                        // pre-promotion phase too
+                                        continue;
+                                    } else {
+
+                                        // title meets the rules for localized assets requirement OR is ready for pre-promotion
+                                        if (thisWindowFoundLocalAudio == true && currentOrFirstFutureWindow == outputWindow)
                                             currentOrFirstFutureWindowFoundLocalAudio = true;
-                                    }
-                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0) {
-                                        thisWindowFoundLocalText = true; //rollup.foundLocalText();
-                                        if (currentOrFirstFutureWindow == outputWindow)
+
+                                        if (thisWindowFoundLocalText == true && currentOrFirstFutureWindow == outputWindow)
                                             currentOrFirstFutureWindowFoundLocalText = true;
                                     }
-
-                                    // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
-                                    // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
-                                    // So if any contract has the assets, then it passes the requirement check.
-                                    if (isSubsDubsRequirementEnforced && !oldPrePromotionPhase) {
-
-                                        boolean assetsAvailable = assetAvailabilityCheck(mustHaveSubs, thisWindowFoundLocalText, mustHaveDubs,
-                                                                                         thisWindowFoundLocalAudio, country, language, videoId,
-                                                                                         oldPrePromotionPhase);
-                                        if (!assetsAvailable) {
-                                            continue;
-                                        }
-                                    }
-                                    // use the value from old filtering logic of windows
-                                    shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
-
                                 } else {
 
-                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.AUDIO.getBitIdentifier()) != 0)
-                                        thisWindowFoundLocalAudio = true;
+                                    // if subs/dubs requirement is not enforced then continue to do the old logic
+                                    // title meets the rules for localized assets requirement OR is ready for pre-promotion
+                                    if (thisWindowFoundLocalAudio == true && currentOrFirstFutureWindow == outputWindow)
+                                        currentOrFirstFutureWindowFoundLocalAudio = true;
 
-                                    if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
-                                        thisWindowFoundLocalText = true;
-
-                                    // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
-                                    // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
-                                    // So if any contract has the assets, then it passes the requirement check.
-                                    if (isSubsDubsRequirementEnforced && !shouldFilterOutWindowInfo) {
-
-                                        boolean assetsAvailable = assetAvailabilityCheck(mustHaveSubs, thisWindowFoundLocalText, mustHaveDubs,
-                                                                                         thisWindowFoundLocalAudio, country, language, videoId,
-                                                                                         readyForPrePromotion);
-
-                                        if (!assetsAvailable) {
-                                            // todo should skip or make shouldFilterWindowInfo as true and let the window be available with packageid as zero
-                                            // skip the contract since title does not meet the rules for localized asset requirement check and is not in
-                                            // pre-promotion phase too
-                                            continue;
-                                        } else {
-
-                                            // title meets the rules for localized assets requirement OR is ready for pre-promotion
-
-                                            if (thisWindowFoundLocalAudio == true && currentOrFirstFutureWindow == outputWindow)
-                                                currentOrFirstFutureWindowFoundLocalAudio = true;
-
-                                            if (thisWindowFoundLocalText == true && currentOrFirstFutureWindow == outputWindow)
-                                                currentOrFirstFutureWindowFoundLocalText = true;
-                                        }
-
-
-                                    }
+                                    if (thisWindowFoundLocalText == true && currentOrFirstFutureWindow == outputWindow)
+                                        currentOrFirstFutureWindowFoundLocalText = true;
                                 }
                             }
 
@@ -923,7 +908,7 @@ public class VMSAvailabilityWindowModule {
             // if isGoLive is true, meaning gatekeeper thinks title has minimum requirement to go live in a country
             if (isGoLive) {
 
-                // earliest window start date is greater than now, meaning window has started
+                // earliest window start date is greater than now, meaning window has started, so do not filter it
                 if (!isFutureDate)
                     return false;
                 else {
