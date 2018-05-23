@@ -101,7 +101,11 @@ public class HollowAPIGenerator {
         /**
          * Sets the path the files with be generated in.
          */
-        pathToGeneratedFiles;
+        pathToGeneratedFiles,
+        /**
+         * Parameterizes all methods that return a HollowObject.
+         */
+        parameterizeAllClassNames;
     }
 
     protected final String apiClassname;
@@ -256,6 +260,9 @@ public class HollowAPIGenerator {
                     break;
                 case pathToGeneratedFiles:
                     builder.withDestination(arg.getValue());
+                    break;
+                case parameterizeAllClassNames:
+                    builder.withParameterizeAllClassNames(Boolean.valueOf(arg.getValue()));
                     break;
                 default:
                     throw new IllegalArgumentException("Unhandled argument " + arg.getKey());
@@ -500,8 +507,8 @@ public class HollowAPIGenerator {
 
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
         @Override
-        protected HollowAPIGenerator  instantiateGenerator() {
-            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts, destinationPath);
+        protected HollowAPIGenerator instantiateGenerator() {
+            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassNames, useErgonomicShortcuts, destinationPath);
         }
 
         @Override
