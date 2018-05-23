@@ -1,18 +1,25 @@
 package com.netflix.vms.transformer.octobersky;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.netflix.i18n.NFLocale;
 import com.netflix.launch.common.Catalog;
 import com.netflix.launch.common.Country;
 import com.netflix.launch.common.LaunchConfiguration;
 import com.netflix.launch.common.NamespaceLaunchConfiguration;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,14 +65,15 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     }
 
     private static Set<String> findCountriesWithMinMetadata(LaunchConfiguration octoberSky) {
-        Set<String> minMetadataCountries = new HashSet<String>();
+        Set<String> minMetadataCountries = new HashSet<>();
 
         NamespaceLaunchConfiguration beehiveNamespace = octoberSky.forNamespace(BEEHIVE_NAMESPACE);
         for (String cStr : octoberSky.getCountryCodes()) {
             String countryCodeStr = cStr.trim();
             Country country = beehiveNamespace.getCountry(countryCodeStr);
-            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT)))
+            if (country != null && Boolean.valueOf(country.fetchProperty(IS_MIN_METADATA_PRESENT))) {
                 minMetadataCountries.add(countryCodeStr);
+            }
         }
         return minMetadataCountries;
     }
@@ -75,9 +83,16 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         // use default october sky namespace to check for countries that uses multi-lingual catalogs
         List<String> countries;
         if (config.isUseOctoberSkyForMultiLanguageCatalogCountries()) {
-            countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+
+            if (!config.getOctoberSkyNamespace().isEmpty()) {
+                return getMultiCatalogLanguages(octoberSky, config.getOctoberSkyNamespace(), "catalogs");
+            } else {
+                countries = octoberSky.getCountries().stream().map(c -> c.getCode()).collect(Collectors.toList());
+            }
+
         } else {
-            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(",")).collect(Collectors.toList());
+            countries = Arrays.stream(config.getMultilanguageCatalogCountries().split(","))
+                              .collect(Collectors.toList());
         }
 
         Map<String, Set<String>> multilanguageCountryCatalogLocales = new HashMap<>();
@@ -98,6 +113,35 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
         }
 
         return multilanguageCountryCatalogLocales;
+    }
+
+    private static Map<String, Set<String>> getMultiCatalogLanguages(LaunchConfiguration launchConfiguration, String namespace, String property) {
+        Map<String, Set<String>> tempMap = Maps.newHashMap();
+        ObjectMapper om = new ObjectMapper();
+        NamespaceLaunchConfiguration beehiveNS = launchConfiguration.forNamespace(namespace);
+        for (Country country : beehiveNS.getCountries()) {
+            String value = country.fetchProperty(property);
+            Set<String> catalogLanguages = Sets.newHashSet();
+
+            try {
+                if (!value.isEmpty()) {
+
+                    List<String> elements = om.readValue(value, new TypeReference<List<String>>() {
+                    });
+                    catalogLanguages = elements.stream()
+                                               .map(Catalog::new)
+                                               .map(Catalog::getLanguage)
+                                               .filter(Objects::nonNull)
+                                               .map(NFLocale::getName)
+                                               .collect(Collectors.toSet());
+                }
+            } catch (Exception ex) {
+                return tempMap;
+            }
+
+            tempMap.put(country.getCode(), catalogLanguages);
+        }
+        return tempMap;
     }
 
 }

@@ -233,6 +233,9 @@ public interface TransformerConfig {
     @DefaultValue("true")
     boolean isUseOctoberSkyForMultiLanguageCatalogCountries();
 
+    @DefaultValue("")
+    String getOctoberSkyNamespace();
+
     @DefaultValue("false")
     public boolean isSubsDubsRequirementEnforced();
 
@@ -240,7 +243,7 @@ public interface TransformerConfig {
     boolean isOldPromotionLogicEnabled();
 
     // false is good, since logic will rely on subs/dubs requirements from gatekeeper.
-    @DefaultValue("false")
+    @DefaultValue("true")
     public boolean isPackageAvailabilityEnforced();
 
     @DefaultValue("false")
