@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
@@ -395,7 +397,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashMask = hashTableSize - 1;
 
         int ordinal = ordinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             int hashCode = recordHash(ordinal);
             int bucket = hashCode & hashMask;
 
@@ -428,7 +430,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashMask = hashTableSize - 1;
 
         int prevOrdinal = prevOrdinals.nextSetBit(0);
-        while(prevOrdinal != -1) {
+        while(prevOrdinal != ORDINAL_NONE) {
             if(!ordinals.get(prevOrdinal)) {
                 /// remove this ordinal
                 int hashCode = recordHash(prevOrdinal);
@@ -442,7 +444,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 bucket = (bucket + 1) & hashMask;
                 int moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
 
-                while(moveOrdinal != -1) {
+                while(moveOrdinal != ORDINAL_NONE) {
                     int naturalHash = recordHash(moveOrdinal);
                     int naturalBucket = naturalHash & hashMask;
 
@@ -464,7 +466,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
 
         int ordinal = ordinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if(!prevOrdinals.get(ordinal)) {
                 int hashCode = recordHash(ordinal);
                 int bucket = hashCode & hashMask;
@@ -564,7 +566,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int removedRecords = 0;
 
         int prevOrdinal = previousOrdinals.nextSetBit(0);
-        while(prevOrdinal != -1) {
+        while(prevOrdinal != ORDINAL_NONE) {
             prevCardinality++;
             if(!ordinals.get(prevOrdinal))
                 removedRecords++;
