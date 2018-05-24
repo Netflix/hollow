@@ -16,7 +16,7 @@
     
     
       
-        <title>Community - Hollow (Netflix OSS)</title>
+        <title>Testing - Hollow (Netflix OSS)</title>
       
     
     
@@ -78,7 +78,7 @@
             
               
             
-            Community
+            Testing
           
         </span>
       </div>
@@ -329,11 +329,47 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../testing/" title="Testing" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Testing
+      </label>
+    
+    <a href="./" title="Testing" class="md-nav__link md-nav__link--active">
       Testing
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#hollowreadstateenginebuilder" title="HollowReadStateEngineBuilder" class="md-nav__link">
+    HollowReadStateEngineBuilder
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -353,54 +389,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Community
-      </label>
-    
-    <a href="./" title="Community" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
       Community
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#stack-overflow" title="Stack Overflow" class="md-nav__link">
-    Stack Overflow
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gitter" title="Gitter" class="md-nav__link">
-    Gitter
-  </a>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -449,15 +442,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#stack-overflow" title="Stack Overflow" class="md-nav__link">
-    Stack Overflow
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gitter" title="Gitter" class="md-nav__link">
-    Gitter
+  <a href="#hollowreadstateenginebuilder" title="HollowReadStateEngineBuilder" class="md-nav__link">
+    HollowReadStateEngineBuilder
   </a>
   
 </li>
@@ -476,26 +462,18 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/Netflix/hollow/edit/master/docs/community.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/Netflix/hollow/edit/master/docs/testing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="getting-support">Getting Support</h1>
-<p>For bug reports and feature requests, please file a <a href="https://github.com/Netflix/hollow/issues">GitHub issue</a>.  </p>
-<p>If you have a question that isn't covered in this documentation, please reach out for help either on Stack Overflow or <a href="https://gitter.im/Netflix/hollow">Gitter</a></p>
-<h2 id="stack-overflow">Stack Overflow</h2>
-<p>The Platform Data Technologies team at Netflix will monitor posts tagged with <code>hollow</code>.</p>
-<h2 id="gitter">Gitter</h2>
-<p>The Platform Data Technologies team at Netflix is often available for chat via <a href="https://gitter.im/Netflix/hollow">Gitter</a>.  We hope that you'll stick around and pay it forward by answering other users' questions when they arise.</p>
-<h1 id="contributing-to-hollow">Contributing to Hollow</h1>
-<p>We'll gladly review and accept pull requests for Hollow.  If you want to have a design discussion for your changes, please reach out to us on Gitter.</p>
-<h2 id="backwards-compatibility">Backwards Compatibility</h2>
-<p>New features in Hollow should always be added in a way that is backwards compatible, except in <em>extremely</em> rare cases when a major version is released.</p>
-<p>If you would like to make a contribution which breaks backwards compatibility, please contact us so we can evaluate alternate ways to achieve the desired result, and/or whether to schedule the change for an upcoming major version release.</p>
-<h2 id="dependencies">Dependencies</h2>
-<p>The core project <em>hollow</em> should have zero <code>compile</code> dependencies, and should only depend on one library (jUnit) as a <code>test</code> dependency.  We believe this provides long-term stability for users, reduces licensing concerns, and eliminates the possibility that <em>other</em> project dependencies will be compiled against incompatible versions of dependent libraries.</p>
-<p>If you would like to make a contribution which requires a third-party dependency, please contact us before proceeding so we can discuss the appropriate location for the addition.</p>
-<h2 id="sunmiscunsafe">sun.misc.Unsafe</h2>
-<p>The core project <em>hollow</em> utilizes <code>sun.misc.Unsafe</code>. Your IDE may treat this as an error. See <a href="https://github.com/Netflix/hollow/issues/5">Issue #5</a> for how to compile without errors.</p>
+                <h1 id="unit-testing-with-hollow-objects">Unit testing with Hollow objects</h1>
+<p>Hollow provides a <code>hollow-test</code> jar that contains some testing utilities to facilitate unit testing with Hollow objects.</p>
+<h3 id="hollowreadstateenginebuilder">HollowReadStateEngineBuilder</h3>
+<p>This class allows easy creation of <code>HollowReadStateEngine</code> objects for use in unit tests.</p>
+<div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">engine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowReadStateEngineBuilder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="s">&quot;bar&quot;</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+</pre></div>
                 
                   
                 
@@ -514,7 +492,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../glossary/" title="Glossary" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../advanced-topics/" title="Advanced Topics" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -523,19 +501,19 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Glossary
+                Advanced Topics
               </span>
             </div>
           </a>
         
         
-          <a href="../acknowledgements/" title="Acknowledgements" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../glossary/" title="Glossary" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Acknowledgements
+                Glossary
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
