@@ -246,6 +246,6 @@ public interface TransformerConfig {
     @DefaultValue("true")
     public boolean isPackageAvailabilityEnforced();
 
-    @DefaultValue("false")
+    @DefaultValue("true")
     public boolean isReadCupTokensFromCinderFeed();
 }
