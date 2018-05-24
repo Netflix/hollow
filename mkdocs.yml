@@ -15,6 +15,7 @@ pages:
   - Interacting with a Hollow Dataset: 'interacting-with-a-dataset.md'
   - Data Ingestion: 'data-ingestion.md'
   - Advanced Topics: 'advanced-topics.md'
+  - Testing: 'testing.md'
   - Glossary: 'glossary.md'
   - Community: 'community.md'
   - Acknowledgements: 'acknowledgements.md'
