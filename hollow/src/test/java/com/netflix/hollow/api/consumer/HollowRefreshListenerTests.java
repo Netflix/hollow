@@ -58,6 +58,7 @@ public class HollowRefreshListenerTests {
                                         @Override public boolean forceDropData() { return false; }
                                         @Override public boolean enableLongLivedObjectSupport() { return true; }
                                         @Override public boolean enableExpiredUsageStackTraces() { return false; }
+                                        @Override public boolean enableSampling() { return false; }
                                         @Override public boolean dropDataAutomatically() { return true; }
                                  })
                                  .build();

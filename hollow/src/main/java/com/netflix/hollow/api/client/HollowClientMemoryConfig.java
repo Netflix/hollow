@@ -32,7 +32,7 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
 
     public static final long ONE_HOUR = 60 * 60 * 1000;
 
-    public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, ONE_HOUR, ONE_HOUR);
+    public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, false, ONE_HOUR, ONE_HOUR);
 
     /**
      * Whether or not a double snapshot will ever be attempted by the {@link HollowClient}
@@ -44,14 +44,17 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
     public static class SpecifiedConfig implements HollowClientMemoryConfig {
 
         private final boolean enableLongLivedObjectSupport;
+        private final boolean enableSampling;
         private final boolean dropDataAutomatically;
         private final long gracePeriodMillis;
         private final long usageDetectionPeriodMillis;
 
         public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
-                                           long gracePeriodMillis, long usageDetectionPeriodMillis) {
+                                           boolean enableSampling, long gracePeriodMillis,
+                                           long usageDetectionPeriodMillis) {
             this.enableLongLivedObjectSupport = enableLongLivedObjectSupport;
             this.dropDataAutomatically = dropDataAutomatically;
+            this.enableSampling = enableSampling;
             this.gracePeriodMillis = gracePeriodMillis;
             this.usageDetectionPeriodMillis = usageDetectionPeriodMillis;
         }
@@ -65,6 +68,11 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
         public long usageDetectionPeriodMillis() { return usageDetectionPeriodMillis; }
 
         public boolean enableExpiredUsageStackTraces() { return false; }
+
+        @Override
+        public boolean enableSampling() {
+            return enableSampling;
+        }
 
         public boolean forceDropData() { return false; }
         

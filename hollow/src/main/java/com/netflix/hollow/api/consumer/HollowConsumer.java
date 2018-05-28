@@ -474,6 +474,13 @@ public class HollowConsumer {
         public boolean enableExpiredUsageStackTraces();
 
         /**
+         * Indicates whether or not sampling data will be collected on stale objects
+         *
+         * @return true if sampling should be collected, false otherwise
+         */
+        public boolean enableSampling();
+
+        /**
          * If long-lived object support is enabled, this returns the number of milliseconds before the {@link StaleHollowReferenceDetector}
          * will begin flagging usage of stale objects.
          *
@@ -525,6 +532,11 @@ public class HollowConsumer {
 
             @Override
             public boolean enableExpiredUsageStackTraces() {
+                return false;
+            }
+
+            @Override
+            public boolean enableSampling() {
                 return false;
             }
 
