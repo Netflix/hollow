@@ -17,15 +17,15 @@
  */
 package com.netflix.hollow.core.memory.encoding;
 
+import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_BUCKETS;
+
 import com.netflix.hollow.core.memory.ArrayByteData;
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 
-
 public class HashCodes {
-
     private static final int MURMURHASH_SEED = 0xeab524b9;
-    
+
     public static int hashCode(ByteDataBuffer data) {
         return hashCode(data.getUnderlyingArray(), 0, (int) data.length());
     }
@@ -168,13 +168,37 @@ public class HashCodes {
         return key;
     }
 
-    public static int hashTableSize(int numElements) {
+    /**
+     * Determine size of hash table capable of storing the specified number of elements with a load
+     * factor applied.
+     *
+     * @param numElements number of elements to be stored in the table
+     * @return size of hash table, always a power of 2
+     * @throws IllegalArgumentException when numElements is negative or exceeds
+     *                                  {@link com.netflix.hollow.core.HollowConstants#HASH_TABLE_MAX_BUCKETS}
+     */
+    public static int hashTableSize(int numElements) throws IllegalArgumentException {
+        if (numElements < 0) {
+            throw new IllegalArgumentException("cannot be negative; numElements="+numElements);
+        } else if (numElements > HASH_TABLE_MAX_BUCKETS) {
+            throw new IllegalArgumentException("exceeds maximum number of buckets; numElements="+numElements);
+        }
+
         if (numElements == 0)
             return 1;
         if (numElements < 3)
             return numElements * 2;
-        int sizeAfterLoadFactor = numElements * 10 / 7;
-        return 1 << (32 - Integer.numberOfLeadingZeros(sizeAfterLoadFactor - 1));
-    }
 
+        // Apply load factor to number of elements and determine next
+        // largest power of 2 that fits in an int
+        int sizeAfterLoadFactor = (int)((long)numElements * 10 / 7);
+        final int size;
+        int bits = 32 - Integer.numberOfLeadingZeros(sizeAfterLoadFactor - 1);
+        if (bits == 31) {
+            size = HASH_TABLE_MAX_BUCKETS;
+        } else {
+            size = 1 << bits;
+        }
+        return size;
+    }
 }
