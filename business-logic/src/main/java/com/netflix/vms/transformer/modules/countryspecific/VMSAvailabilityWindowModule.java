@@ -1,13 +1,22 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.InteractivePackage;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Missing_Dubs;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Missing_Subs;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoAssetRights;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_PrePromote;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_WindowFiltered;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_diff_early_promotion;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_diff_prePromo;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
@@ -61,60 +70,6 @@ public class VMSAvailabilityWindowModule {
     public static final long MS_IN_DAY = TimeUnit.DAYS.toMillis(1);
     public static final long FUTURE_CUT_OFF_FOR_REPORT = TimeUnit.DAYS.toMillis(30);
 
-    // title is in pre-promotion phase using the new feed data
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
-    public static final String LANGUAGE_CATALOG_PRE_PROMOTION_MESSAGE = "Titles in Pre-promotion phase in country-language catalog";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // early pre-promotion if using contract pre-promo days and no new feed
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_TAG = TransformerLogTag.Language_catalog_diff_early_promotion;
-    public static final String LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_MESSAGE = "titles that would get early pre-promoted if using the contract pre-promo days logic and not relying on new feed.";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // diff, correct pre-promotions using new feed
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_TAG = TransformerLogTag.Language_catalog_diff_prePromo;
-    public static final String LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_MESSAGE = "titles that will get pre-promoted correctly, previously dropping "
-            + "contracts/windows";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_SEVERITY = TaggingLogger.Severity.INFO;
-
-
-    // title skipped contract since no localized assets were available - DROPPING
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG = TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
-    public static final String LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_MESSAGE = "Titles contract skipped because no localized assets were found";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // titles that voilate the required dubs rule
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_DUBS_TAG = TransformerLogTag.Language_catalog_Missing_Dubs;
-    public static final String LANGUAGE_CATALOG_MISSING_DUBS_MESSAGE = "Titles missing localized dubs";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_DUBS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // titles that voilate the required subs rules
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_MISSING_SUBS_TAG = TransformerLogTag.Language_catalog_Missing_Subs;
-    public static final String LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE = "Titles missing localized subs";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // titles that have zero windows in the catalog
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_WINDOWS_TAG = TransformerLogTag.Language_catalog_NoWindows;
-    public static final String LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE = "Titles for which no windows were found country-language catalog";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // if asset rights are not present in the feed
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_NO_ASSET_RIGHTS = TransformerLogTag.Language_catalog_NoAssetRights;
-    public static final String LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE = "Titles that do not have asset rights";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // if window is filtered for unknown reasons
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_FILTER_WINDOW_TAG = TransformerLogTag.Language_catalog_WindowFiltered;
-    public static final String LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE = "Titles for asset rights are not present";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_FILTER_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
-
-    // titles that do not meet merch requirements (only for for future titles where start window is in next 90 days and any title that has live window but fails the assets check)
-    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG = TransformerLogTag.Language_Catalog_Title_Availability;
-    public static final String LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE = "Future Titles (next 90 days) and current title that miss localized asset requirement check";
-    public static final TaggingLogger.Severity LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY = TaggingLogger.Severity.INFO;
-
-
-
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
@@ -132,23 +87,6 @@ public class VMSAvailabilityWindowModule {
     private final MultilanguageCountryWindowFilter multilanguageCountryWindowFilter;
     private final CycleDataAggregator cycleDataAggregator;
     private final CupTokenFetcher cupTokenFetcher;
-
-    public static void configureLogsTagsForAggregator(CycleDataAggregator cycleDataAggregator) {
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_PRE_PROMOTION_TAG, LANGUAGE_CATALOG_PRE_PROMOTION_SEVERITY, LANGUAGE_CATALOG_PRE_PROMOTION_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_TAG, LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_SEVERITY,
-                                               LANGUAGE_CATALOG_PRE_PROMOTION_EARLY_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_TAG, LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_SEVERITY,
-                                               LANGUAGE_CATALOG_PRE_PROMOTION_DIFF_MESSAGE);
-
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_SEVERITY, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_FILTER_WINDOW_TAG, LANGUAGE_CATALOG_FILTER_WINDOW_SEVERITY, LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_MISSING_DUBS_TAG, LANGUAGE_CATALOG_MISSING_DUBS_SEVERITY, LANGUAGE_CATALOG_MISSING_DUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_MISSING_SUBS_TAG, LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY, LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_WINDOWS_TAG, LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY, LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE);
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_ASSET_RIGHTS, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE);
-
-        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG, LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY, LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE);
-    }
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
                                        VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {
@@ -373,7 +311,7 @@ public class VMSAvailabilityWindowModule {
                                 // COMPARE here oldPrePromo and new pre-promo flag
                                 if (oldPrePromotionPhase && !readyForPrePromotion) {
                                     // titles that would get early pre-promoted if using the contract pre-promo days logic and not relying on new feed.
-                                    cycleDataAggregator.collect(country, videoId, TransformerLogTag.Language_catalog_diff_early_promotion);
+                                    cycleDataAggregator.collect(country, videoId, Language_catalog_diff_early_promotion);
 
                                 } else if (!oldPrePromotionPhase && readyForPrePromotion) {
 
@@ -389,12 +327,12 @@ public class VMSAvailabilityWindowModule {
                                         // compare here
                                         if (readyForPrePromotion) {
                                             // titles that will get promoted with new logic correctly
-                                            cycleDataAggregator.collect(country, language, videoId, TransformerLogTag.Language_catalog_diff_prePromo);
+                                            cycleDataAggregator.collect(country, language, videoId, Language_catalog_diff_prePromo);
                                         }
 
 
                                         // skipping the contract if title is not ready for pre-promotion in language catalog.
-                                        cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
+                                        cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
                                         continue;
                                     }
 
@@ -404,7 +342,7 @@ public class VMSAvailabilityWindowModule {
 
                                         if (!readyForPrePromotion) {
                                             // skipping the contract if title is not ready for pre-promotion in language catalog.
-                                            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
+                                            cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
 
                                             // if package availability is enforced (make sure contract gives access to some existing asset understandable in this language)
                                             // then ignore/drop this this contract
@@ -446,7 +384,7 @@ public class VMSAvailabilityWindowModule {
 
                                         TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                         if (titleMissingAssets != null) {
-                                            cycleDataAggregator.collect(country, language, titleMissingAssets, TransformerLogTag.Language_Catalog_Title_Availability);
+                                            cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                         }
 
                                         continue;
@@ -662,7 +600,7 @@ public class VMSAvailabilityWindowModule {
 
                 if (!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() == 1) {
                     considerForPackageSelection = true;
-                    ctx.getLogger().warn(TransformerLogTag.InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
+                    ctx.getLogger().warn(InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
                 }
 
                 if (considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
@@ -713,7 +651,7 @@ public class VMSAvailabilityWindowModule {
 
         if (language != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
             // collect no windows
-            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_WINDOWS_TAG);
+            cycleDataAggregator.collect(country, language, videoId, Language_catalog_NoWindows);
         }
         return availabilityWindows;
     }
@@ -845,13 +783,13 @@ public class VMSAvailabilityWindowModule {
 
         if (mustHaveSubs && !thisWindowFoundLocalText) {
             // collect missing subs
-            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_MISSING_SUBS_TAG);
+            cycleDataAggregator.collect(country, language, videoId, Language_catalog_Missing_Subs);
             missingRequiredLocalizedAssets = true;
         }
 
         if (mustHaveDubs && !thisWindowFoundLocalAudio) {
             // collect missing dubs
-            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_MISSING_DUBS_TAG);
+            cycleDataAggregator.collect(country, language, videoId, Language_catalog_Missing_Dubs);
             missingRequiredLocalizedAssets = true;
         }
 
@@ -957,7 +895,7 @@ public class VMSAvailabilityWindowModule {
 
                     int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
                     if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, contractIds, daysBeforeWindowStart)) {
-                        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
+                        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
                         return false;
                     }
                 }
@@ -969,7 +907,7 @@ public class VMSAvailabilityWindowModule {
                     boolean isWindowDataNeeded = false;
                     int daysBeforeWindowStart = (int) ((earliestWindowStartDate - ctx.getNowMillis()) / MS_IN_DAY);
                     if (readyForPrePromotionInLanguageCatalog(videoId, countryCode, contractIds, daysBeforeWindowStart)) {
-                        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_PRE_PROMOTION_TAG);
+                        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
                         // window data is needed if the title is ready for pre-promotion in country-language catalog
                         isWindowDataNeeded = true;
                     }
@@ -989,14 +927,14 @@ public class VMSAvailabilityWindowModule {
                 // if isGoLive is false, and the assets have been delivered, we still filter the window, since isGoLive false indicates, the title is not
                 // valid in that country and all it's support country-language catalog.
                 // else log and filter window
-                cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_FILTER_WINDOW_TAG);
+                cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_WindowFiltered);
                 return true;
             }
 
         }
 
         // no asset rights, filter out the window
-        cycleDataAggregator.collect(countryCode, language, (int) videoId, LANGUAGE_CATALOG_NO_ASSET_RIGHTS);
+        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_NoAssetRights);
         return true;
 
     }
