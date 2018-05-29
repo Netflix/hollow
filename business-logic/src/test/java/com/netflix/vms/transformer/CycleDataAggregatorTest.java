@@ -9,6 +9,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import java.util.Arrays;
 import java.util.Collection;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,9 +38,10 @@ public class CycleDataAggregatorTest {
 
     @Test
     public void testCollect() {
+        JsonNodeFactory factory = JsonNodeFactory.instance;
         cycleDataAggregator.aggregateForLogTag(TransformerLogTag.Language_catalog_NoWindows, TaggingLogger.Severity.ERROR, "some message");
         cycleDataAggregator.collect("US", "en", 123, TransformerLogTag.Language_catalog_NoWindows);
-        String expectedMessage = cycleDataAggregator.getJSON("US", "en", "some message", Arrays.asList(123));
+        String expectedMessage = cycleDataAggregator.getJSON(factory, "US", "en", "some message", Arrays.asList(123));
         cycleDataAggregator.logAllAggregatedData();
         Mockito.verify(taggingLogger, atLeastOnce()).log(
                 eq(TaggingLogger.Severity.ERROR),
@@ -50,8 +52,9 @@ public class CycleDataAggregatorTest {
 
     @Test
     public void testGetAsJSON() {
+        JsonNodeFactory factory = JsonNodeFactory.instance;
         String expectedString = "{\"country\":\"US\",\"language\":\"en\",\"count\":1,\"message\":\"No message\",\"videoIds\":[123]}";
-        String actual = cycleDataAggregator.getJSON("US", "en", "No message", Arrays.asList(123));
+        String actual = cycleDataAggregator.getJSON(factory, "US", "en", "No message", Arrays.asList(123));
         Assert.assertEquals(expectedString, actual);
     }
 
