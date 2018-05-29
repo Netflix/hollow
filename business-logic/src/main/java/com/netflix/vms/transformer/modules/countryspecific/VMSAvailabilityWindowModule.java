@@ -462,6 +462,13 @@ public class VMSAvailabilityWindowModule {
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
                             if (windowPackageContractInfo != null) {
 
+                                // if the current package id is the highest package id, then update the contract id for max package id.
+                                if (packageId.val == maxPackageId)
+                                    contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
+                                // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
+                                if (packageId.val == packageIdForWindow)
+                                    thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+
                                 // For existing windowPackageContractInfo object
                                 // check if this window data should be filtered
                                 if (shouldFilterOutWindowInfo) {
@@ -469,13 +476,6 @@ public class VMSAvailabilityWindowModule {
                                     if (contractId > windowPackageContractInfo.videoContractInfo.contractId) {
                                         // update contract id, since it is higher value.
                                         windowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
-
-                                        // if the current package id is the highest package id, then update the contract id for max package id.
-                                        if (packageId.val == maxPackageId)
-                                            contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
-                                        // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
-                                        if (packageId.val == packageIdForWindow)
-                                            thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                     }
 
                                 } else {
@@ -487,14 +487,8 @@ public class VMSAvailabilityWindowModule {
 
                                     // update the package window package contract info
                                     outputWindow.windowInfosByPackageId.put(packageId, updatedClone);
-
-                                    // if the current package id is the highest package id, then update the contract id for max package id.
-                                    if (packageId.val == maxPackageId)
-                                        contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
-                                    // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
-                                    if (packageId.val == packageIdForWindow)
-                                        thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                 }
+
                             } else {
 
                                 // if windowPackageContractInfo is not present in outputWindow.windowInfosByPackageId for the given packageId
