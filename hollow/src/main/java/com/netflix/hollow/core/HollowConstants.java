@@ -40,5 +40,5 @@ public interface HollowConstants {
      * The maximum number of buckets allowed in a Hollow hash table. Empty space is reserved (based on 70% load factor),
      * otherwise performance approaches O(n).
      */
-    int HASH_TABLE_MAX_BUCKETS = (int)((1L << 30) * 7 / 10);
+    int HASH_TABLE_MAX_SIZE = (int)((1L << 30) * 7 / 10);
 }

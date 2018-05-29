@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.core.util;
 
-import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_BUCKETS;
+import static com.netflix.hollow.core.HollowConstants.HASH_TABLE_MAX_SIZE;
 
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
@@ -68,7 +68,7 @@ public class HashCodesTest {
         Assert.assertEquals(536870912, HashCodes.hashTableSize(N + 1));
 
         // exceeding maximum hash table size (before load factor)
-        N = HASH_TABLE_MAX_BUCKETS;
+        N = HASH_TABLE_MAX_SIZE;
         Assert.assertEquals(1073741824, HashCodes.hashTableSize(N));
         try {
             HashCodes.hashTableSize(N + 1);
@@ -100,7 +100,7 @@ public class HashCodesTest {
     @Ignore
     public void testHashTableSize_exhaustively() {
         int size = HashCodes.hashTableSize(2);
-        for (int N=3; N<HASH_TABLE_MAX_BUCKETS; ++N) {
+        for (int N=3; N< HASH_TABLE_MAX_SIZE; ++N) {
             int s = HashCodes.hashTableSize(N);
             if (s < size) {
                 StringBuilder sb = new StringBuilder();
