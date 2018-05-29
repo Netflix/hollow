@@ -40,7 +40,6 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,11 +51,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jackson.node.ObjectNode;
 
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
+    public static final long FUTURE_CUT_OFF_FOR_REPORT = 90 * MS_IN_DAY;
 
     // title is in pre-promotion phase using the new feed data
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
@@ -389,9 +392,12 @@ public class VMSAvailabilityWindowModule {
                                             readyForPrePromotion);
 
                                     if (!assetsAvailable) {
-                                        // todo should skip or make shouldFilterWindowInfo as true and let the window be available with packageid as zero
-                                        // skip the contract since title does not meet the rules for localized asset requirement check and is not in
-                                        // pre-promotion phase too
+
+                                        TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                        if (titleMissingAssets != null) {
+                                            cycleDataAggregator.collect(country, language, titleMissingAssets, TransformerLogTag.Language_Catalog_Title_Availability);
+                                        }
+
                                         continue;
                                     } else {
 
@@ -787,6 +793,27 @@ public class VMSAvailabilityWindowModule {
     }
 
     /**
+     * Use this criteria for reporting titles that do not have localized assets or rather they fail asset availability check.
+     * Return object only if the title has a future window in next 90 days or is live current window and assets are missing.
+     */
+    private TitleAvailabilityForMultiCatalog shouldReportMissingAssets(int videoId, long packageId, long contractId, long windowStart, long windowEnd, boolean thisWindowFoundLocalText, boolean thisWindowFoundLocalAudio) {
+        boolean isLiveWindow = windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis();
+        boolean isFuture = windowStart > ctx.getNowMillis() && windowStart < (ctx.getNowMillis() + FUTURE_CUT_OFF_FOR_REPORT);
+
+        if (isLiveWindow || isFuture) {
+
+            List<String> assetsMissing = new ArrayList<>();
+            if (!thisWindowFoundLocalAudio) assetsMissing.add(LocalizedAssets.DUBS.toString());
+            if (!thisWindowFoundLocalText) assetsMissing.add(LocalizedAssets.SUBS.toString());
+            TitleAvailabilityForMultiCatalog notAvailable = new TitleAvailabilityForMultiCatalog(videoId, windowStart, windowEnd, packageId, contractId, assetsMissing);
+            return notAvailable;
+        }
+        return null;
+    }
+
+    /**
+
+    /**
      * This method checks the localization requirements. If the check fails, then this method returns false.
      *
      * @param mustHaveSubs
@@ -1027,6 +1054,47 @@ public class VMSAvailabilityWindowModule {
     public void reset() {
         this.transformedVideoData = null;
         this.windowPackageContractInfoModule.reset();
+    }
+
+
+    /**
+     * Structure to collect missing/not merched title availability data in a language catalog.
+     */
+    public static class TitleAvailabilityForMultiCatalog implements CycleDataAggregator.JSONMessage {
+
+        private ObjectNode objectNode;
+
+        private TitleAvailabilityForMultiCatalog(int videoId, long start, long end, long packageId, long contractId, List<String> assetsMissing) {
+            JsonNodeFactory factory = JsonNodeFactory.instance;
+            objectNode = factory.objectNode();
+            objectNode.put("videoId", factory.numberNode(videoId));
+            objectNode.put("contractId", factory.numberNode(contractId));
+            objectNode.put("packageId", factory.numberNode(packageId));
+            objectNode.put("windowStart", factory.numberNode(start));
+            objectNode.put("windowEnd", factory.numberNode(end));
+
+            ArrayNode arrayNode = factory.arrayNode();
+            for (String assetMissing : assetsMissing)
+                arrayNode.add(factory.textNode(assetMissing));
+
+            objectNode.put("assetsMissing", arrayNode);
+        }
+
+        @Override
+        public ObjectNode getObjectNode() {
+            return objectNode;
+        }
+    }
+
+    private enum LocalizedAssets {
+
+        SUBS("subs"), DUBS("dubs"), SYNOPSIS("synopsis");
+
+        private String value;
+
+        LocalizedAssets(String value) {
+            this.value = value;
+        }
     }
 
     private static final Comparator<RightsWindowHollow> RIGHTS_WINDOW_COMPARATOR = (o1, o2) -> {
