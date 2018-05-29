@@ -58,8 +58,8 @@ import org.codehaus.jackson.node.ObjectNode;
 public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
-    public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
-    public static final long FUTURE_CUT_OFF_FOR_REPORT = 30 * MS_IN_DAY;
+    public static final long MS_IN_DAY = TimeUnit.DAYS.toMillis(1);
+    public static final long FUTURE_CUT_OFF_FOR_REPORT = TimeUnit.DAYS.toMillis(30);
 
     // title is in pre-promotion phase using the new feed data
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
@@ -108,6 +108,11 @@ public class VMSAvailabilityWindowModule {
     public static final String LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE = "Titles for asset rights are not present";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_FILTER_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
 
+    // titles that do not meet merch requirements (only for for future titles where start window is in next 90 days and any title that has live window but fails the assets check)
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG = TransformerLogTag.Language_Catalog_Title_Availability;
+    public static final String LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE = "Future Titles (next 90 days) and current title that miss localized asset requirement check";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY = TaggingLogger.Severity.INFO;
+
 
 
     private final VMSHollowInputAPI api;
@@ -141,6 +146,8 @@ public class VMSAvailabilityWindowModule {
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_MISSING_SUBS_TAG, LANGUAGE_CATALOG_MISSING_SUBS_SEVERITY, LANGUAGE_CATALOG_MISSING_SUBS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_WINDOWS_TAG, LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY, LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_ASSET_RIGHTS, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE);
+
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG, LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY, LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE);
     }
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
@@ -812,8 +819,6 @@ public class VMSAvailabilityWindowModule {
     }
 
     /**
-
-    /**
      * This method checks the localization requirements. If the check fails, then this method returns false.
      *
      * @param mustHaveSubs
@@ -842,8 +847,6 @@ public class VMSAvailabilityWindowModule {
             missingRequiredLocalizedAssets = true;
         }
 
-        // @TODO check local synopsis. Can be deferred for now.
-
         if (missingRequiredLocalizedAssets && !inPrePromoPhase) {
             return false;
         }
@@ -871,18 +874,9 @@ public class VMSAvailabilityWindowModule {
 
     // old logic for checking if window should be filtered out in country catalog
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
-        if (endDate < ctx.getNowMillis())
-            return true;
 
         if (!isGoLive) {
-            boolean isWindowDataNeeded = false;
-            for (Long contractId : contractIds) {
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
-                    isWindowDataNeeded = true;
-                }
-            }
-
+            boolean isWindowDataNeeded = checkContracts(videoId, countryCode, contractIds);
             if (!isWindowDataNeeded)
                 return true;
         }
@@ -893,6 +887,16 @@ public class VMSAvailabilityWindowModule {
         if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
             return true;
 
+        return false;
+    }
+
+    boolean checkContracts(long videoId, String countryCode, Collection<Long> contractIds) {
+        for (Long contractId : contractIds) {
+            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -915,6 +919,10 @@ public class VMSAvailabilityWindowModule {
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
             unfilteredCount, long startDate, long endDate, boolean oldLogic) {
 
+        // window has ended, then filter it
+        if (endDate < ctx.getNowMillis())
+            return true;
+
         if (oldLogic || language == null) {
             // use old logic
             return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
@@ -923,9 +931,7 @@ public class VMSAvailabilityWindowModule {
         // language is not null, hence using asset rights feed to check assets availability date and decide if the title needs to pre-promoted (provide
         // availablity date) for
 
-        // window has ended, then filter it
-        if (endDate < ctx.getNowMillis())
-            return true;
+
 
         Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
         if (earliestWindowStartDate != null) {
