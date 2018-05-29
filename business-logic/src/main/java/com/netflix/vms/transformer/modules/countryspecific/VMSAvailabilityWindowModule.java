@@ -189,6 +189,19 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
+    private VMSAvailabilityWindow newVMSAvailabilityWindow(RightsWindowHollow rightsWindowHollow) {
+        VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
+        outputWindow.windowInfosByPackageId = new HashMap<>();
+        outputWindow.startDate = OutputUtil.getRoundedDate(rightsWindowHollow._getStartDate());
+        outputWindow.endDate = OutputUtil.getRoundedDate(rightsWindowHollow._getEndDate());
+        if (rightsWindowHollow._getOnHold()) {
+            outputWindow.startDate.val += ONE_THOUSAND_YEARS;
+            outputWindow.endDate.val += ONE_THOUSAND_YEARS;
+            outputWindow.onHold = true;
+        }
+        return outputWindow;
+    }
+
     // todo need to split this out in a separate class. It's humongous. Not good. I promise to improve this one day.
     private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String language, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
 
@@ -238,15 +251,7 @@ public class VMSAvailabilityWindowModule {
             boolean thisWindowFoundLocalText = false;
 
             // create new window
-            VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
-            outputWindow.windowInfosByPackageId = new HashMap<>();
-            outputWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
-            outputWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
-            if (window._getOnHold()) {
-                outputWindow.startDate.val += ONE_THOUSAND_YEARS;
-                outputWindow.endDate.val += ONE_THOUSAND_YEARS;
-                outputWindow.onHold = true;
-            }
+            VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
 
             // collect all contractId for the window -> A window could have multiple contracts.
             List<Long> contractIds = new ArrayList<>();
