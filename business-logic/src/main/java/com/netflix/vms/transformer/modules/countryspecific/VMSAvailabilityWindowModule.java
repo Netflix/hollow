@@ -202,6 +202,45 @@ public class VMSAvailabilityWindowModule {
         return outputWindow;
     }
 
+    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, ContractHollow contractData, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
+
+        long contractId = contractData._getContractId();
+
+        // 1. merge cup token values
+        List<Strings> cupTokens = new ArrayList<>();
+        Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData);
+        if (existingInfo.videoContractInfo.contractId > contractId) {
+            cupTokens.addAll(existingInfo.videoContractInfo.cupTokens.ordinals);
+            if (!cupTokens.contains(contractCupToken)) cupTokens.add(contractCupToken);
+        } else {
+            cupTokens.add(contractCupToken);
+            for (Strings cupToken : existingInfo.videoContractInfo.cupTokens.ordinals) {
+                if (!cupToken.equals(contractCupToken)) cupTokens.add(cupToken);
+            }
+        }
+        // 2. merge bcp47 code values
+        Set<Strings> bcp47Codes = new HashSet<>(existingInfo.videoContractInfo.assetBcp47Codes);
+        for (RightsContractAssetHollow asset : contractAssets) {
+            bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
+        }
+
+        // 3. clone the exiting contract info, and assign all new values
+        WindowPackageContractInfo clone = existingInfo.clone();
+        clone.videoContractInfo = existingInfo.videoContractInfo.clone();
+        clone.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
+        clone.videoContractInfo.assetBcp47Codes = bcp47Codes;
+
+        // update the rest
+        // 4. update the map windowInfoByPackageId with current packageId with cloned windowPackageContractInfo
+        // 5. the primary package id for the contractInfo is the max packageId for previous and current packageId
+        // 6. the contract id for the contractInfo, is the max contractId from the previous and current contractId
+        clone.videoContractInfo.contractId = Math.max(existingInfo.videoContractInfo.contractId, (int) contractId);
+        clone.videoContractInfo.isAvailableForDownload = existingInfo.videoContractInfo.isAvailableForDownload || isAvailableForDownload;
+        clone.videoContractInfo.primaryPackageId = (int) Math.max(existingInfo.videoContractInfo.primaryPackageId, packageId);
+
+        return clone;
+    }
+
     // todo need to split this out in a separate class. It's humongous. Not good. I promise to improve this one day.
     private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String language, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
 
@@ -441,43 +480,13 @@ public class VMSAvailabilityWindowModule {
 
                                 } else {
 
-                                    // if existing windowPackageContractInfo is present and window data is not to be filtered, then do the following
-                                    // 1. merge cup token values
-                                    // 2. merge bcp47 code values
-                                    // 3. clone the exiting contract info, and assign all new values
-                                    // 4. update the map windowInfoByPackageId with current packageId with cloned windowPackageContractInfo
-                                    // 5. the primary package id for the contractInfo is the max packageId for previous and current packageId
-                                    // 6. the contract id for the contractInfo, is the max contractId from the previous and current contractId
+                                    // if existing windowPackageContractInfo is present and window data is NOT TO BE filtered,
+                                    // then clone and update window package contract info.
+                                    WindowPackageContractInfo updatedClone = cloneWindowPackageContractInfo(videoId, windowPackageContractInfo,
+                                            contractData, contractAssets, isAvailableForDownload, packageId.val);
 
-                                    // merge cup tokens
-                                    List<Strings> cupTokens = new ArrayList<>();
-                                    Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData);
-                                    if (windowPackageContractInfo.videoContractInfo.contractId > contractId) {
-                                        cupTokens.addAll(windowPackageContractInfo.videoContractInfo.cupTokens.ordinals);
-                                        if (!cupTokens.contains(contractCupToken))
-                                            cupTokens.add(contractCupToken);
-                                    } else {
-                                        cupTokens.add(contractCupToken);
-                                        for (Strings cupToken : windowPackageContractInfo.videoContractInfo.cupTokens.ordinals) {
-                                            if (!cupToken.equals(contractCupToken))
-                                                cupTokens.add(cupToken);
-                                        }
-                                    }
-                                    // merge bcp47 codes
-                                    Set<Strings> bcp47Codes = new HashSet<>(windowPackageContractInfo.videoContractInfo.assetBcp47Codes);
-                                    for (RightsContractAssetHollow asset : contractAssets) {
-                                        bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
-                                    }
-                                    // clone the contract info
-                                    windowPackageContractInfo = windowPackageContractInfo.clone();
-                                    windowPackageContractInfo.videoContractInfo = windowPackageContractInfo.videoContractInfo.clone();
-                                    windowPackageContractInfo.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(cupTokens);
-                                    windowPackageContractInfo.videoContractInfo.assetBcp47Codes = bcp47Codes;
-                                    windowPackageContractInfo.videoContractInfo.contractId = Math.max(windowPackageContractInfo.videoContractInfo.contractId, (int) contractId);
-                                    windowPackageContractInfo.videoContractInfo.isAvailableForDownload = windowPackageContractInfo.videoContractInfo.isAvailableForDownload || isAvailableForDownload;
-                                    windowPackageContractInfo.videoContractInfo.primaryPackageId = (int) Math.max(windowPackageContractInfo.videoContractInfo.primaryPackageId, contractPackageHollow._getPackageId());
                                     // update the package window package contract info
-                                    outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
+                                    outputWindow.windowInfosByPackageId.put(packageId, updatedClone);
 
                                     // if the current package id is the highest package id, then update the contract id for max package id.
                                     if (packageId.val == maxPackageId)
