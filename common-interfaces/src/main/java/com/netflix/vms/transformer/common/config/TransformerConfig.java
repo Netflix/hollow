@@ -239,9 +239,6 @@ public interface TransformerConfig {
     @DefaultValue("false")
     public boolean isSubsDubsRequirementEnforced();
 
-    @DefaultValue("true")
-    boolean isOldPromotionLogicEnabled();
-
     // false is good, since logic will rely on subs/dubs requirements from gatekeeper.
     @DefaultValue("true")
     public boolean isPackageAvailabilityEnforced();

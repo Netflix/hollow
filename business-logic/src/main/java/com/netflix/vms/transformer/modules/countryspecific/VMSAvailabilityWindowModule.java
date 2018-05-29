@@ -258,26 +258,9 @@ public class VMSAvailabilityWindowModule {
             if (window._getContractIdsExt() != null)
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
 
-            // if multi-language catalog processing & isGoLive is false, then check if title is in pre-promo phase.
-            // OLD LOGIC, USING FOR COMPARING FLAGS
-            boolean useOldPromotionLogic = ctx.getConfig().isOldPromotionLogicEnabled();
-            boolean oldPrePromotionPhase = false;
-            if (!isGoLive && language != null) {
-                // checking for all the contracts in the current window to determine if title is in pre-promo phase
-                for (long contractId : contractIds) {
-                    ContractHollow contractHollow = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
-                    if (contractHollow != null && (contractHollow._getDayOfBroadcast() || contractHollow._getDayAfterBroadcast() || contractHollow._getPrePromotionDays() > 0))
-                        oldPrePromotionPhase = true;
-                }
-            }
-
             // should use window data, check isGoLive flag, start-end dates and if video is ready for pre-promotion (is locale aware)
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, language, isGoLive, contractIds, includedPackageDataCount,
-                                                                          outputWindow.startDate.val, outputWindow.endDate.val, false);
-
-            // OLD LOGIC
-            boolean oldShouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, language, isGoLive, contractIds, includedPackageDataCount,
-                                                                             outputWindow.startDate.val, outputWindow.endDate.val, true);
+                                                                          outputWindow.startDate.val, outputWindow.endDate.val);
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
@@ -316,50 +299,19 @@ public class VMSAvailabilityWindowModule {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
                                 boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
 
-                                // COMPARE here oldPrePromo and new pre-promo flag
-                                if (oldPrePromotionPhase && !readyForPrePromotion) {
-                                    // titles that would get early pre-promoted if using the contract pre-promo days logic and not relying on new feed.
-                                    cycleDataAggregator.collect(country, videoId, TransformerLogTag.Language_catalog_diff_early_promotion);
+                                if (packageAvailability == 0 && !shouldFilterOutWindowInfo) {
 
-                                } else if (!oldPrePromotionPhase && readyForPrePromotion) {
-
-                                    // titles that should get pre-promoted but were not and with new feed they will get pre-promoted
-
-                                }
-
-                                if (useOldPromotionLogic) {
-                                    // OLD LOGIC, USING FOR COMPARING
-                                    // multi-catalog processing -- make sure contract gives access to some existing asset understandable in this language
-                                    if (packageAvailability == 0) {
-
-                                        // compare here
-                                        if (readyForPrePromotion) {
-                                            // titles that will get promoted with new logic correctly
-                                            cycleDataAggregator.collect(country, language, videoId, TransformerLogTag.Language_catalog_diff_prePromo);
-                                        }
-
-
+                                    if (!readyForPrePromotion) {
                                         // skipping the contract if title is not ready for pre-promotion in language catalog.
                                         cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
-                                        continue;
-                                    }
 
-                                } else {
+                                        // if package availability is enforced (make sure contract gives access to some existing asset understandable in this language)
+                                        // then ignore/drop this this contract
+                                        if (ctx.getConfig().isPackageAvailabilityEnforced())
+                                            continue;
 
-                                    if (packageAvailability == 0 && !shouldFilterOutWindowInfo) {
+                                        // else do not drop the contract instead proceed to verify the subs/dubs requirement
 
-                                        if (!readyForPrePromotion) {
-                                            // skipping the contract if title is not ready for pre-promotion in language catalog.
-                                            cycleDataAggregator.collect(country, language, videoId, LANGUAGE_CATALOG_NO_LOCALIZED_ASSETS_TAG);
-
-                                            // if package availability is enforced (make sure contract gives access to some existing asset understandable in this language)
-                                            // then ignore/drop this this contract
-                                            if (ctx.getConfig().isPackageAvailabilityEnforced())
-                                                continue;
-
-                                            // else do not drop the contract instead proceed to verify the subs/dubs requirement
-
-                                        }
                                     }
                                 }
 
@@ -374,10 +326,6 @@ public class VMSAvailabilityWindowModule {
                                 if (considerPackageForLang && (packageAvailability & ContractAssetType.SUBTITLES.getBitIdentifier()) != 0)
                                     thisWindowFoundLocalText = true;
 
-                                if (useOldPromotionLogic) {
-                                    shouldFilterOutWindowInfo = oldShouldFilterOutWindowInfo;
-                                    readyForPrePromotion = oldPrePromotionPhase;
-                                }
 
                                 // only check subs/dubs requirement if feature is enabled and title is not in prePromotion
                                 // quick note thisWindowFoundLocalText/thisWindowFoundLocalAudio flags are across contracts in a window.
@@ -885,10 +833,9 @@ public class VMSAvailabilityWindowModule {
      * @param endDate
      * @return false means do not filter out the window
      */
-    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
-            unfilteredCount, long startDate, long endDate, boolean oldLogic) {
+    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
 
-        if (oldLogic || language == null) {
+        if (language == null) {
             // use old logic
             return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
         }
