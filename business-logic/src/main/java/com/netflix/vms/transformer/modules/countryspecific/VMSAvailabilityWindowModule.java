@@ -59,7 +59,7 @@ public class VMSAvailabilityWindowModule {
 
     public static final long ONE_THOUSAND_YEARS = TimeUnit.DAYS.toMillis(1000L * 365L);
     public static final long MS_IN_DAY = 1000 * 60 * 60 * 24;
-    public static final long FUTURE_CUT_OFF_FOR_REPORT = 90 * MS_IN_DAY;
+    public static final long FUTURE_CUT_OFF_FOR_REPORT = 30 * MS_IN_DAY;
 
     // title is in pre-promotion phase using the new feed data
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_PRE_PROMOTION_TAG = TransformerLogTag.Language_catalog_PrePromote;
@@ -794,7 +794,7 @@ public class VMSAvailabilityWindowModule {
 
     /**
      * Use this criteria for reporting titles that do not have localized assets or rather they fail asset availability check.
-     * Return object only if the title has a future window in next 90 days or is live current window and assets are missing.
+     * Return object only if the title has a future window in next 30 days or is live current window and assets are missing.
      */
     private TitleAvailabilityForMultiCatalog shouldReportMissingAssets(int videoId, long packageId, long contractId, long windowStart, long windowEnd, boolean thisWindowFoundLocalText, boolean thisWindowFoundLocalAudio) {
         boolean isLiveWindow = windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis();
