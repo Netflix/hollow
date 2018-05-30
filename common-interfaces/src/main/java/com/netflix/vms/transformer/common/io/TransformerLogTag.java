@@ -81,14 +81,10 @@ public enum TransformerLogTag implements LogTag {
     /// Multi-Locale Catalog ///
     Language_catalog_PrePromote,// title is in pre-promotion phase
     Language_catalog_Skip_Contract_No_Assets,// title skipped contract since no localized assets were available
-    Language_catalog_Missing_Dubs,// title missing localized dubs
-    Language_catalog_Missing_Subs,// title missing localized subs
+
     Language_catalog_NoWindows,// title has no locale aware windows
     Language_catalog_NoAssetRights,// title did not have asset rights for the locale
     Language_catalog_WindowFiltered,// title has asset rights but in future so window filtered.
-
-    Language_catalog_diff_prePromo,// titles that will get pre-promoted now, (compared to dropping) or will have availability windows.
-    Language_catalog_diff_early_promotion,// titles get promoted early
 
     Language_Catalog_Title_Availability,// titles that do not meet the localized asset requirements - FOR REPORTING
 
