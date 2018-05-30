@@ -46,7 +46,6 @@ import com.netflix.vms.transformer.modules.artwork.PersonImagesModule;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsDataHierarchy;
 import com.netflix.vms.transformer.modules.collections.VideoCollectionsModule;
 import com.netflix.vms.transformer.modules.countryspecific.CountrySpecificDataModule;
-import com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule;
 import com.netflix.vms.transformer.modules.deploymentintent.CacheDeploymentIntentModule;
 import com.netflix.vms.transformer.modules.l10n.L10NMiscResourcesModule;
 import com.netflix.vms.transformer.modules.l10n.L10NVideoResourcesModule;
@@ -141,7 +140,7 @@ public class SimpleTransformer {
 
         // cycle data aggregator
         CycleDataAggregator cycleDataAggregator = new CycleDataAggregator(ctx);
-        VMSAvailabilityWindowModule.configureLogsTagsForAggregator(cycleDataAggregator);
+        CycleDataAggregatorHelper.configureLogsTagsForVMSWindowModule(cycleDataAggregator);
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
         CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(ctx.getConfig(), indexer, api);
