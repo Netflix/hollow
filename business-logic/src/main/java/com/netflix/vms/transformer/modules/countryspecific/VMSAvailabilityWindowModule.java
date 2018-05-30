@@ -409,13 +409,6 @@ public class VMSAvailabilityWindowModule {
                             WindowPackageContractInfo windowPackageContractInfo = outputWindow.windowInfosByPackageId.get(packageId);
                             if (windowPackageContractInfo != null) {
 
-                                // if the current package id is the highest package id, then update the contract id for max package id.
-                                if (packageId.val == maxPackageId)
-                                    contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
-                                // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
-                                if (packageId.val == packageIdForWindow)
-                                    thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
-
                                 // For existing windowPackageContractInfo object
                                 // check if this window data should be filtered
                                 if (shouldFilterOutWindowInfo) {
@@ -423,6 +416,13 @@ public class VMSAvailabilityWindowModule {
                                     if (contractId > windowPackageContractInfo.videoContractInfo.contractId) {
                                         // update contract id, since it is higher value.
                                         windowPackageContractInfo.videoContractInfo.contractId = (int) contractId;
+
+                                        // if the current package id is the highest package id, then update the contract id for max package id.
+                                        if (packageId.val == maxPackageId)
+                                            contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
+                                        // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
+                                        if (packageId.val == packageIdForWindow)
+                                            thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
                                     }
 
                                 } else {
@@ -434,6 +434,14 @@ public class VMSAvailabilityWindowModule {
 
                                     // update the package window package contract info
                                     outputWindow.windowInfosByPackageId.put(packageId, updatedClone);
+
+                                    // if the current package id is the highest package id, then update the contract id for max package id.
+                                    if (packageId.val == maxPackageId)
+                                        contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
+                                    // if current package equals package id for this window, then update the window assets group id, max contract id for the current window.
+                                    if (packageId.val == packageIdForWindow)
+                                        thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+
                                 }
 
                             } else {
@@ -761,17 +769,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     /**
-     * This method checks the localization requirements. If the check fails, then this method returns false.
-     *
-     * @param mustHaveSubs
-     * @param thisWindowFoundLocalText
-     * @param mustHaveDubs
-     * @param thisWindowFoundLocalAudio
-     * @param country
-     * @param language
-     * @param videoId
-     * @param inPrePromoPhase
-     * @return
+     * This method checks the localization requirements. If the check fails, then this method returns false.s
      */
     private boolean assetAvailabilityCheck(boolean mustHaveSubs, boolean thisWindowFoundLocalText, boolean mustHaveDubs, boolean
             thisWindowFoundLocalAudio, String country, String language, int videoId, boolean inPrePromoPhase) {
@@ -818,7 +816,14 @@ public class VMSAvailabilityWindowModule {
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
 
         if (!isGoLive) {
-            boolean isWindowDataNeeded = checkContracts(videoId, countryCode, contractIds);
+            boolean isWindowDataNeeded = false;
+            for (Long contractId : contractIds) {
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                    isWindowDataNeeded = true;
+                }
+            }
+
             if (!isWindowDataNeeded)
                 return true;
         }
@@ -849,21 +854,10 @@ public class VMSAvailabilityWindowModule {
      * - if isGoLive is true, then check if window is open, endDate is greater than now
      * - if isGoLive is true and endDate is > now, then check is window start is not in future.
      *
-     * @param videoId
-     * @param countryCode
-     * @param isGoLive
-     * @param contractIds
-     * @param unfilteredCount
-     * @param startDate
-     * @param endDate
      * @return false means do not filter out the window
      */
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int
             unfilteredCount, long startDate, long endDate, boolean oldLogic) {
-
-        // window has ended, then filter it
-        if (endDate < ctx.getNowMillis())
-            return true;
 
         if (oldLogic || language == null) {
             // use old logic
@@ -873,7 +867,9 @@ public class VMSAvailabilityWindowModule {
         // language is not null, hence using asset rights feed to check assets availability date and decide if the title needs to pre-promoted (provide
         // availablity date) for
 
-
+        // window has ended, then filter it
+        if (endDate < ctx.getNowMillis())
+            return true;
 
         Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
         if (earliestWindowStartDate != null) {
@@ -1003,7 +999,6 @@ public class VMSAvailabilityWindowModule {
         this.transformedVideoData = null;
         this.windowPackageContractInfoModule.reset();
     }
-
 
     /**
      * Structure to collect missing/not merched title availability data in a language catalog.
