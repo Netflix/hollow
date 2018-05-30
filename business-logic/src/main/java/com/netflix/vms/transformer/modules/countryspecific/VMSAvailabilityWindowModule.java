@@ -680,6 +680,10 @@ public class VMSAvailabilityWindowModule {
     // old logic for checking if window should be filtered out in country catalog
     private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
 
+        // window has ended, then filter it
+        if (endDate < ctx.getNowMillis())
+            return true;
+
         if (!isGoLive) {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
