@@ -706,16 +706,6 @@ public class VMSAvailabilityWindowModule {
         return false;
     }
 
-    boolean checkContracts(long videoId, String countryCode, Collection<Long> contractIds) {
-        for (Long contractId : contractIds) {
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * This function checks if the given window should be filtered.
      * - If the window end data is less than now, meaning window has already passed, then answer is yes.
@@ -806,8 +796,6 @@ public class VMSAvailabilityWindowModule {
 
                 if (daysBeforeWindowStart <= contract._getPrePromotionDays())
                     return true;
-
-                return false;
             }
         }
         return false;
