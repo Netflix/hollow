@@ -2,11 +2,9 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InteractivePackage;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoAssetRights;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_PrePromote;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_WindowFiltered;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -453,7 +451,7 @@ public class VMSAvailabilityWindowModule {
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
             // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
-            // Basically - Do not add: if all windows were filtered out for multicatalog country
+            // Basically - Do not add: outputWindow to availabilityWindows list if multi-language catalog and empty info is present.
             if (language == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
                 availabilityWindows.add(outputWindow);
 
@@ -709,7 +707,7 @@ public class VMSAvailabilityWindowModule {
      * - If the window end data is less than now, meaning window has already passed, then answer is yes.
      * - if isGoLive flag is false, then check if window data is needed. This is mainly for video (check all contracts) that are in pre-promotion stage or in days after broadcast.
      * - if isGoLive is true, then check if window is open, endDate is greater than now
-     * - if isGoLive is true and endDate is > now, then check is window start is not in future.
+     * - if isGoLive is true and endDate is > now, then check is window start is not in far future.
      *
      * @return false means do not filter out the window
      */
@@ -720,76 +718,43 @@ public class VMSAvailabilityWindowModule {
             return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
         }
 
-        // language is not null, hence using asset rights feed to check assets availability date
+        // language is not null -> use earliest window start date for that language (best estimate the assets will be available)
 
         // window has ended, then filter it
         if (endDate < ctx.getNowMillis()) return true;
 
-        Long earliestWindowStartDate = getEarliestAssetRightsAvailabilityDate(videoId, countryCode, language);
-        if (earliestWindowStartDate != null) {
-            // here means we have asset rights for that language and corresponding earliest asset availability date
-            boolean isFutureDate = ctx.getNowMillis() < earliestWindowStartDate;
-
-            // if isGoLive is true, meaning gatekeeper thinks title has minimum requirement to go live in a country
-            if (isGoLive) {
-
-                // earliest window start date is greater than now, meaning window has started, so do not filter it
-                if (!isFutureDate) return false;
-                else {
-                    // if assets will be available in future, then check if ready for pre-promote
-                    boolean shouldPrePromote = shouldPrePromote(videoId, countryCode, contractIds, earliestWindowStartDate);
-                    if (shouldPrePromote) {
-                        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
-                        return false;
-                    } else {
-                        return true;
-                    }
+        if (!isGoLive) {
+            Long earliestWindowStartDateForTheLanguageWithAssets = getEarliestWindowStartDateForTheLanguage(videoId, countryCode, language);
+            boolean isWindowDataNeeded = false;
+            if (startDate > ctx.getNowMillis()) {
+                boolean shouldPrePromote = shouldPrePromote(videoId, countryCode, contractIds, earliestWindowStartDateForTheLanguageWithAssets);
+                if (shouldPrePromote) {
+                    cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
+                    isWindowDataNeeded = true;
                 }
-            } else {
-                // Case: if isGoLive is false
-
-                // it's a future date for asset availability, check if ready for pre-promo
-                if (isFutureDate) {
-
-                    boolean shouldPrePromote = shouldPrePromote(videoId, countryCode, contractIds, earliestWindowStartDate);
-                    if (shouldPrePromote)
-                        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
-
-                    // if window data is not needed, then filter the window
-                    if (!shouldPrePromote) return true;
-
-                    // if window start date is greater than a year, then filter the window even if assets are available
-                    if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS) return true;
-
-                    // if here, then window data is needed and window start date is reasonable, so do not filter the window
-                    return false;
-                }
-
-                // if isGoLive is false, and the assets have been delivered, we still filter the window, since isGoLive false indicates, the title is not
-                // valid in that country and all it's support country-language catalog.
-                // else log and filter window
-                cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_WindowFiltered);
-                return true;
             }
 
+            if (!isWindowDataNeeded) return true;
         }
 
-        // no asset rights, filter out the window
-        cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_NoAssetRights);
-        return true;
+        if (unfilteredCount < 3 && endDate > ctx.getNowMillis()) return false;
 
+        if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS) return true;
+
+        return false;
     }
 
-    private boolean shouldPrePromote(long videoId, String countryCode, Collection<Long> contractIds, long earliestAssetAvailabilityDate) {
+    private boolean shouldPrePromote(long videoId, String countryCode, Collection<Long> contractIds, Long earliestWindowStartDateForTheLanguageWithAssets) {
 
-        int daysBeforeAssetsAreAvailable = (int) ((earliestAssetAvailabilityDate - ctx.getNowMillis()) / MS_IN_DAY);
+        if (earliestWindowStartDateForTheLanguageWithAssets == null) return false;
 
+        int daysBeforeEarliestWindowWithAssetsAvailability = (int) ((earliestWindowStartDateForTheLanguageWithAssets - ctx.getNowMillis()) / MS_IN_DAY);
         boolean daysBeforeToPromoteCheck = false;
         for (long contractId : contractIds) {
             ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
             if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
 
-                if (daysBeforeAssetsAreAvailable <= contract._getPrePromotionDays())
+                if (daysBeforeEarliestWindowWithAssetsAvailability <= contract._getPrePromotionDays())
                     daysBeforeToPromoteCheck = true;
             }
         }
@@ -802,20 +767,22 @@ public class VMSAvailabilityWindowModule {
 
     private boolean readyForPrePromotionInLanguageCatalog(long videoId, String country, String language, Collection<Long> contractIds, long startDate) {
 
-        Long earliestAssetAvailabilityDate = getEarliestAssetRightsAvailabilityDate(videoId, country, language);
-        if (earliestAssetAvailabilityDate != null) {
-            boolean isFutureDate = ctx.getNowMillis() < earliestAssetAvailabilityDate;
-            if (isFutureDate) {
-                return shouldPrePromote(videoId, country, contractIds, earliestAssetAvailabilityDate);
+        if (startDate > ctx.getNowMillis()) {
+            // pre-promotion check only for evaluating future windows
+            // get the earliest window start date for the languages
+            Long earliestWindowStartDateForTheLanguageWithAssets = getEarliestWindowStartDateForTheLanguage(videoId, country, language);
+            if (earliestWindowStartDateForTheLanguageWithAssets != null) {
+                boolean isFutureDate = ctx.getNowMillis() < earliestWindowStartDateForTheLanguageWithAssets;
+                if (isFutureDate) {
+                    return shouldPrePromote(videoId, country, contractIds, earliestWindowStartDateForTheLanguageWithAssets);
+                } else return false;
             }
-            else return false;
         }
 
-        // assets not available, nothing to pre-promote
         return false;
     }
 
-    private Long getEarliestAssetRightsAvailabilityDate(long videoId, String country, String language) {
+    private Long getEarliestWindowStartDateForTheLanguage(long videoId, String country, String language) {
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
         if (ordinal != -1) {
 
