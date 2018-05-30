@@ -240,15 +240,11 @@ public class VMSAvailabilityWindowModule {
             // create new window
             VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
 
-            // collect all contractId for the window -> A window could have multiple contracts.
-            List<Long> contractIds = new ArrayList<>();
-            if (window._getContractIdsExt() != null)
-                contractIds = window._getContractIdsExt().stream().map(c -> c._getContractId()).collect(Collectors.toList());
-
             // collect all contracts for the window
             List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
             if (window._getContractIdsExt() != null)
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
+            List<Long> contractIds = windowContracts.stream().map(c -> c._getContractId()).collect(Collectors.toList());
 
             // if multi-language catalog processing & isGoLive is false, then check if title is in pre-promo phase.
             // OLD LOGIC, USING FOR COMPARING FLAGS
