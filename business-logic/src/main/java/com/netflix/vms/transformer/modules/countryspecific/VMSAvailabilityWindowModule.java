@@ -260,15 +260,17 @@ public class VMSAvailabilityWindowModule {
                                 boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
 
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
-                                if (packageAvailability == 0 && !readyForPrePromotion) {
+                                if (packageAvailability == 0) {
 
                                     cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
                                     TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                     if (titleMissingAssets != null) {
                                         cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                     }
-                                    // skip
-                                    continue;
+                                    if (!readyForPrePromotion) {
+                                        // skip
+                                        continue;
+                                    }
                                 }
 
                                 boolean considerPackageForLang = packageData == null ? true : packageData.isDefaultPackage;
