@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
- * Create hollow integer set for sparse non-negative & unique integer values referenced by fieldPath in a type based on a predicate.
+ * Create hollow integer set for sparse non-negative {@literal &} unique integer values referenced by fieldPath in a type based on a predicate.
  */
 public class HollowSparseIntegerSet implements HollowTypeStateListener {
 

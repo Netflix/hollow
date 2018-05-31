@@ -55,9 +55,9 @@ public class HollowFilesystemBlobStager implements BlobStager {
      *
      * @param stagingPath
      * @param compressor
-     * @throws IOException
+     * @throws RuntimeException if errors creating the specified path
      */
-    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) {
+    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) throws RuntimeException {
         this.stagingPath = stagingPath;
         this.compressor = compressor;
 
