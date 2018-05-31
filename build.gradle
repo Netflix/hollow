@@ -1,5 +1,10 @@
 buildscript {
   repositories { jcenter() }
+  configurations.classpath {
+    resolutionStrategy {
+      force 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.7'
+    }
+  }
 }
 
 plugins {
