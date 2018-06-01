@@ -44,7 +44,7 @@ public class CycleDataAggregator {
     }
 
     /**
-     * Add a message & severity for the log tag. This message is used for representing the aggregated data for this log tag.
+     * Add a message and severity for the log tag. This message is used for representing the aggregated data for this log tag.
      * Configure the aggregator with more information before starting a cycle.
      *
      * @param logTag  LogTag for aggregation

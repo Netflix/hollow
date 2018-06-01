@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class represents a full video hierachy - Show->Season->Episode
+ * This class represents a full video hierarchy - Show -%gt; Season -%gt; Episode
  */
 public class VideoHierarchy {
 

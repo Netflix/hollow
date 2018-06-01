@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * This class encapsulates two data types for videos.
  * <ul>
- * <li>All the video data (media, meta, images & country specific data) that needs to be grouped by country and video id</li>
+ * <li>All the video data (media, meta, images and country specific data) that needs to be grouped by country and video id</li>
  * <li>All the video data needs to be grouped only by videoId (Video miscellaneous data and transformed packages).</li>
  * </ul>
  */

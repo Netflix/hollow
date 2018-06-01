@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This class encapsulates/holds media, meta, images & country specific video data by video id.
+ * This class encapsulates/holds media, meta, images and country specific video data by video id.
  */
 public class VideoDataCollection {
 

@@ -63,7 +63,7 @@ public class ClientPinningUtil {
      * Pinning is done by creating / updating fast properties through odin
      * @param vipName
      * @param blobVersion
-     * @throws PersistedPropertiesException
+     * @throws IOException
      */
     public static void pinClients(String vipName, String blobVersion, RegionEnum region) throws IOException {
 

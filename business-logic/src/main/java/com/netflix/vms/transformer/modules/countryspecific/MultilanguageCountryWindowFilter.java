@@ -58,7 +58,7 @@ public class MultilanguageCountryWindowFilter {
      * Determines if the language is available for the given package.
      * 001 - AUDIO assets only
      * 010 - SUBTITLES only
-     * 011 - AUDIO & SUBTITLES
+     * 011 - AUDIO and SUBTITLES
      *
      * @param language
      * @param pkg
