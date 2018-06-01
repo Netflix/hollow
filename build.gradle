@@ -1,5 +1,6 @@
 allprojects {
     apply plugin: 'netflix.nebula'
+    apply plugin: 'nebula.release'
 }
 
 dependencyRecommendations {

@@ -1,5 +1,3 @@
-apply plugin: 'nebula.release'
-
 dependencies {
     compile 'com.netflix.hollow:hollow:2.+'
 }
