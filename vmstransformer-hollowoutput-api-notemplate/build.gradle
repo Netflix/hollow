@@ -1,0 +1,41 @@
+dependencies {
+  compile project(':vmstransformer-hollowoutput-model')
+}
+
+task generateApi(type:JavaExec) {
+  def arguments = project.property('vmsHollowOutputPojosArgs').collect()
+  arguments.add("--apiClassName=VMSRawHollowAPI")
+  arguments.add("--classPostfix=Hollow")
+  arguments.add("--getterPrefix=_")
+  arguments.add("--packageName=com.netflix.vms.generated.notemplate")
+  arguments.add("--pathToGeneratedFiles=${buildDir}/generated/java")
+  main = 'com.netflix.hollow.api.codegen.HollowAPIGenerator'
+    classpath = configurations.compile + sourceSets.main.output
+    args(arguments)
+}
+
+sourceSets {
+  generated {
+    java {
+      srcDir "${buildDir}/generated/java"
+      outputDir = sourceSets.main.java.outputDir
+    }
+    compileClasspath += sourceSets.main.compileClasspath
+  }
+}
+
+// include generated files in source jar
+sourceJar {
+  from "${buildDir}/generated/java"
+}
+
+findbugs {
+  sourceSets = [sourceSets.main, sourceSets.test]
+}
+checkstyle {
+  sourceSets = [sourceSets.main, sourceSets.test]
+}
+
+tasks.compileGeneratedJava.dependsOn(generateApi)
+tasks.jar.dependsOn(tasks.compileGeneratedJava)
+tasks.sourceJar.dependsOn(tasks.compileGeneratedJava)

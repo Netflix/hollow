@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -947,11 +946,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -1432,6 +1431,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -2529,10 +2537,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -4033,11 +4037,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -4518,6 +4522,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -5615,10 +5628,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -7119,11 +7128,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -7604,6 +7613,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -8702,10 +8720,6 @@
                 "netflix:content-usage-policy"
             ]
         },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
-        },
         "netflix:vms-utils": {
             "locked": "60.90",
             "requested": "latest.release"
@@ -9349,8 +9363,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -9421,8 +9434,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         }
     },
     "jacocoAnt": {
@@ -9433,8 +9445,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.1",
@@ -10354,11 +10365,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -10839,6 +10850,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -11936,10 +11956,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -13440,11 +13456,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -13925,6 +13941,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -15022,10 +15047,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -16550,11 +16571,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -17035,6 +17056,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -18152,10 +18182,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -19709,11 +19735,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -20194,6 +20220,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -21311,10 +21346,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -22868,11 +22899,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -23353,6 +23384,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -24470,10 +24510,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -26027,11 +26063,11 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "2.16.6",
+            "locked": "2.17.1",
             "requested": "2.+",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
-                "netflix:vms-hollow-generated-notemplate"
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "com.netflix.hystrix:hystrix-core": {
@@ -26512,6 +26548,15 @@
             "project": true,
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -27629,10 +27674,6 @@
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
-        },
-        "netflix:vms-hollow-generated-notemplate": {
-            "locked": "60.90",
-            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",

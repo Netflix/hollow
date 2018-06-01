@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -1062,8 +1061,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -1629,6 +1628,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -3011,10 +3023,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -4764,8 +4773,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -5331,6 +5340,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -6713,10 +6735,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -8466,8 +8485,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -9033,6 +9052,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -10415,10 +10447,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -11197,8 +11226,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -12257,8 +12285,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -12824,6 +12852,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -14207,10 +14248,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -16718,8 +16756,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         }
     },
     "jacocoAnt": {
@@ -16730,8 +16767,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.1",
@@ -17858,8 +17894,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -18425,6 +18461,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -19807,10 +19856,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -21560,8 +21606,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -22127,6 +22173,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -23509,10 +23568,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -25267,8 +25323,8 @@
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -25834,6 +25890,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -27216,10 +27285,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -28986,8 +29052,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -29562,6 +29628,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -30972,10 +31051,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -32817,8 +32893,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -33393,6 +33469,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -34803,10 +34892,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -36648,8 +36734,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -37224,6 +37310,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -38634,10 +38733,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -40479,8 +40575,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -41055,6 +41151,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -42465,10 +42574,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -44310,8 +44416,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -44886,6 +44992,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -46296,10 +46415,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -48141,8 +48257,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -48717,6 +48833,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -50127,10 +50256,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -51972,8 +52098,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -52548,6 +52674,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -53958,10 +54097,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
@@ -55803,8 +55939,8 @@
                 "com.netflix.hollow:hollow-explorer-ui",
                 "com.netflix.hollow:hollow-jsonadapter",
                 "com.netflix.hollow:hollow-ui-tools",
-                "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow",
                 "netflix:netflix-internal-hollow",
                 "netflix:vms-hollow-generated-notemplate",
@@ -56379,6 +56515,19 @@
                 "com.netflix.vms.transformer:vmstransformer-business-logic",
                 "com.netflix.vms.transformer:vmstransformer-io",
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+            ]
+        },
+        "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic",
+                "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate"
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-io": {
@@ -57789,10 +57938,7 @@
         },
         "netflix:vms-hollow-generated-notemplate": {
             "locked": "60.90",
-            "requested": "latest.release",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
+            "requested": "latest.release"
         },
         "netflix:vms-utils": {
             "locked": "60.90",
