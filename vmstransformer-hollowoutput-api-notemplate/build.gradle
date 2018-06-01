@@ -1,3 +1,5 @@
+apply plugin: 'nebula.release'
+
 dependencies {
   compile project(':vmstransformer-hollowoutput-model')
 }
