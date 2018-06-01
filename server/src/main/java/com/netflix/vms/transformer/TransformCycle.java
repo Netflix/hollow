@@ -90,7 +90,7 @@ public class TransformCycle {
     private boolean isFastlane = false;
     private boolean isNoStreamsBlobEnabled = true;
     private boolean isFirstCycle = true;
-    private boolean isRestoreDone = false;
+    private boolean isRestoreNeeded = true;
 
     private String previouslyResolvedConverterVip;
 
@@ -139,7 +139,11 @@ public class TransformCycle {
         previousCycleNumber = restoreFrom.getCurrentVersionId();
 
         publishWorkflowStager.notifyRestoredStateEngine(restoreStateEngine, restoreNoStreamStateEngine);
-        isRestoreDone = true;
+        setRestoreNeeded(false);
+    }
+
+    private void setRestoreNeeded(boolean isRestoreNeeded) {
+        this.isRestoreNeeded = isRestoreNeeded;
     }
 
     public void cycle() throws Throwable {
@@ -301,7 +305,11 @@ public class TransformCycle {
                     // Let TransformCycle complete the restore process
                     cycle.restore(outputClient, nostreamsOutputClient, isNoStreamsBlobEnabled);
                 } else if (cfg.isFailIfRestoreNotAvailable()) {
+                    // @TODO: Wonder if restoreVersion==Long.MIN_VALUE is sufficient to detect new namespace and if so, this exception is not needed
                     throw new IllegalStateException("Cannot restore from previous state -- previous state does not exist?  If this is expected (e.g. a new VIP), temporarily set vms.failIfRestoreNotAvailable=false");
+                } else {
+                    // Likely new Namespace
+                    cycle.setRestoreNeeded(false);
                 }
             }
         } catch (Exception ex) {
@@ -360,7 +368,7 @@ public class TransformCycle {
             ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputClient, pinnedInputVersion);
 
             // Determine whether to process restore here; only restore once
-            if (!isRestoreDone && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
+            if (isRestoreNeeded && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
                 restore(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
             }
 
