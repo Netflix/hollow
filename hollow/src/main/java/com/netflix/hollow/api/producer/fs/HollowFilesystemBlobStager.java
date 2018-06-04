@@ -25,6 +25,7 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -54,9 +55,9 @@ public class HollowFilesystemBlobStager implements BlobStager {
      *
      * @param stagingPath
      * @param compressor
-     * @throws IOException
+     * @throws RuntimeException if errors creating the specified path
      */
-    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) {
+    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) throws RuntimeException {
         this.stagingPath = stagingPath;
         this.compressor = compressor;
 
@@ -84,7 +85,7 @@ public class HollowFilesystemBlobStager implements BlobStager {
 
     @Override
     public HollowProducer.Blob openSnapshot(long version) {
-        return new FilesystemBlob(Long.MIN_VALUE, version, SNAPSHOT, stagingPath, compressor);
+        return new FilesystemBlob(HollowConstants.VERSION_NONE, version, SNAPSHOT, stagingPath, compressor);
     }
 
     @Override

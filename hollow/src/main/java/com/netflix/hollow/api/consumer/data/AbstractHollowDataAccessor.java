@@ -184,7 +184,7 @@ public abstract class AbstractHollowDataAccessor<T> {
     /**
      * Return only the Records that are Added
      * 
-     * @See {@link #getUpdatedRecords()}
+     * @see #getUpdatedRecords()
      */
     public Collection<T> getAddedRecords() {
         if (!isDataChangeComputed) computeDataChange();
@@ -194,7 +194,7 @@ public abstract class AbstractHollowDataAccessor<T> {
     /**
      * Return only the Records that are Removed
      * 
-     * @See {@link #getUpdatedRecords()}
+     * @see #getUpdatedRecords()
      */
     public Collection<T> getRemovedRecords() {
         if (!isDataChangeComputed) computeDataChange();

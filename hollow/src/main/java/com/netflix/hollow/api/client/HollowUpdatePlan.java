@@ -18,6 +18,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.HollowConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -62,17 +63,12 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
     public long destinationVersion(long currentVersion) {
         long dest = destinationVersion();
-        if(dest == Long.MIN_VALUE)
-            return currentVersion;
-        return dest;
+        return dest == HollowConstants.VERSION_NONE ? currentVersion : dest;
     }
 
     public long destinationVersion() {
-        if(transitions.isEmpty())
-            return Long.MIN_VALUE;
-
-        HollowConsumer.Blob lastTransition = transitions.get(transitions.size() - 1);
-        return lastTransition.getToVersion();
+        return transitions.isEmpty() ? HollowConstants.VERSION_NONE
+            : transitions.get(transitions.size() - 1).getToVersion();
     }
 
     public int numTransitions() {

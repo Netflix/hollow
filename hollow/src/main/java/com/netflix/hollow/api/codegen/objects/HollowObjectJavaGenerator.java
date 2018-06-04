@@ -32,6 +32,7 @@ import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
@@ -41,7 +42,6 @@ import java.util.Set;
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     public static final String SUB_PACKAGE_NAME = "";
@@ -55,8 +55,10 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     private final boolean useBooleanFieldErgonomics;
     private final boolean restrictApiToFieldType;
 
-    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String> parameterizedTypes, boolean parameterizeClassNames, HollowErgonomicAPIShortcuts ergonomicShortcuts, CodeGeneratorConfig config) {
-        super(packageName, computeSubPackageName(schema), config);
+    public HollowObjectJavaGenerator(String packageName, String apiClassname, HollowObjectSchema schema, Set<String>
+            parameterizedTypes, boolean parameterizeClassNames, HollowErgonomicAPIShortcuts ergonomicShortcuts,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, computeSubPackageName(schema), dataset, config);
 
         this.apiClassname = apiClassname;
         this.schema = schema;

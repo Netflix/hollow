@@ -18,6 +18,7 @@
 package com.netflix.hollow.tools.history;
 
 import com.netflix.hollow.api.client.StackTraceRecorder;
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -206,4 +207,12 @@ public class HollowHistoricalStateDataAccess implements HollowDataAccess {
         return getTypeDataAccess(name).getSchema();
     }
 
+    @Override
+    public HollowSchema getNonNullSchema(String name) {
+        HollowSchema schema = getSchema(name);
+        if (schema == null) {
+            throw new SchemaNotFoundException(name, getAllTypes());
+        }
+        return schema;
+    }
 }

@@ -21,16 +21,19 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
 public class HollowClientUpdater {
+    private static final Logger LOG = Logger.getLogger(HollowClientUpdater.class.getName());
 
     private final HollowUpdatePlanner planner;
     private HollowDataHolder hollowDataHolder;
@@ -71,29 +74,40 @@ public class HollowClientUpdater {
         this.metricsCollector = metricsCollector;
     }
 
+    /**
+     * Updates the state to the provided version. Returns true if the update was successful.
+     */
     public synchronized boolean updateTo(long version) throws Throwable {
-        if(version == getCurrentVersionId())
-            return true;
+        if (version == getCurrentVersionId()) {
+            if (version == HollowConstants.VERSION_NONE && hollowDataHolder == null) {
+                LOG.info("No versions to update to, initializing to empty state");
+                // attempting to refresh, but no available versions - initialize to empty state
+                hollowDataHolder = newHollowDataHolder();
+                forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
+                return true;
+            } else { // already up to date
+                return true;
+            }
+        }
 
         long beforeVersion = getCurrentVersionId();
 
-        for(HollowConsumer.RefreshListener listener : refreshListeners)
+        for (HollowConsumer.RefreshListener listener : refreshListeners)
             listener.refreshStarted(beforeVersion, version);
 
         try {
             HollowUpdatePlan updatePlan = planUpdate(version);
 
-            if(updatePlan.destinationVersion() == Long.MIN_VALUE && version != Long.MAX_VALUE)
+            if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
+                    && version != HollowConstants.VERSION_LATEST)
                 throw new Exception("Could not create an update plan for version " + version);
 
-            if(updatePlan.destinationVersion(version) == getCurrentVersionId())
+            if (updatePlan.destinationVersion(version) == getCurrentVersionId())
                 return true;
 
-            if(updatePlan.isSnapshotPlan()) {
-                if(hollowDataHolder == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
-                    HollowReadStateEngine newStateEngine = newStateEngine();
-                    HollowDataHolder newHollowDataHolder = new HollowDataHolder(newStateEngine, apiFactory, failedTransitionTracker, staleReferenceDetector, refreshListeners, objectLongevityConfig);
-                    newHollowDataHolder.setFilter(filter);
+            if (updatePlan.isSnapshotPlan()) {
+                if (hollowDataHolder == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
+                    HollowDataHolder newHollowDataHolder = newHollowDataHolder();
                     newHollowDataHolder.update(updatePlan);
                     hollowDataHolder = newHollowDataHolder;
                     forceDoubleSnapshot = false;
@@ -129,9 +143,8 @@ public class HollowClientUpdater {
     }
 
     public long getCurrentVersionId() {
-        if(hollowDataHolder != null)
-            return hollowDataHolder.getCurrentVersion();
-        return Long.MIN_VALUE;
+        return hollowDataHolder != null ? hollowDataHolder.getCurrentVersion()
+            : HollowConstants.VERSION_NONE;
     }
 
     public void forceDoubleSnapshotNextUpdate() {
@@ -144,8 +157,18 @@ public class HollowClientUpdater {
         return planner.planUpdate(hollowDataHolder.getCurrentVersion(), version, doubleSnapshotConfig.allowDoubleSnapshot());
     }
 
-    private boolean shouldCreateSnapshotPlan() {
-        return hollowDataHolder == null || (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot());
+    /**
+     * Whether or not a snapshot plan should be created. Visible for testing.
+     */
+    boolean shouldCreateSnapshotPlan() {
+        return hollowDataHolder == null || getCurrentVersionId() == HollowConstants.VERSION_NONE
+            ||  (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot());
+    }
+
+    private HollowDataHolder newHollowDataHolder() {
+        return new HollowDataHolder(newStateEngine(), apiFactory,
+                failedTransitionTracker, staleReferenceDetector, refreshListeners,
+                objectLongevityConfig).setFilter(filter);
     }
 
     private HollowReadStateEngine newStateEngine() {

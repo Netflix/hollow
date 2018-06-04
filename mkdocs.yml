@@ -1,0 +1,34 @@
+site_name: Hollow (Netflix OSS)
+repo_url: 'https://github.com/Netflix/hollow'
+theme: material
+theme_dir: mkdocs-material/material
+pages:
+  - Introduction: 'index.md'
+  - Quick Start: 'quick-start.md'
+  - Getting Started: 'getting-started.md'
+  - Indexing/Querying: 'indexing-querying.md'
+  - Infrastructure Hooks: 'infrastructure.md'
+  - Producers and Consumers: 'producer-consumer-apis.md'
+  - Tooling: 'tooling.md'
+  - Data Modeling: 'data-modeling.md'
+  - Diving Deeper: 'diving-deeper.md'
+  - Interacting with a Hollow Dataset: 'interacting-with-a-dataset.md'
+  - Data Ingestion: 'data-ingestion.md'
+  - Advanced Topics: 'advanced-topics.md'
+  - Testing: 'testing.md'
+  - Glossary: 'glossary.md'
+  - Community: 'community.md'
+  - Acknowledgements: 'acknowledgements.md'
+  - License: 'license.md'
+markdown_extensions:
+  - admonition
+  - codehilite
+extra:
+  palette:
+    primary: 'red'
+    accent: 'brown'
+  social:
+      - type: 'github'
+        link: 'https://github.com/Netflix/hollow'
+      - type: 'gitter'
+        link: 'https://gitter.im/Netflix/hollow'

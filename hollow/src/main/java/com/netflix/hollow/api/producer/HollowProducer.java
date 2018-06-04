@@ -36,6 +36,7 @@ import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidat
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -307,7 +308,7 @@ public class HollowProducer {
 
         try {
             listeners.fireProducerRestoreStart(versionDesired);
-            if(versionDesired != Long.MIN_VALUE) {
+            if (versionDesired != HollowConstants.VERSION_NONE) {
 
                 HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
                 client.triggerRefreshTo(versionDesired);
@@ -328,7 +329,7 @@ public class HollowProducer {
                 }
             }
         } catch(Throwable th) {
-            status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : Long.MIN_VALUE, th);
+            status = RestoreStatus.fail(versionDesired, readState != null ? readState.getVersion() : HollowConstants.VERSION_NONE, th);
             throw th;
         } finally {
             listeners.fireProducerRestoreComplete(status, currentTimeMillis() - start);
@@ -493,7 +494,10 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
+    /**
+     * Publish the write state, storing the artifacts in the provided object. Visible for testing.
+     */
+    protected void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
         ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
             stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
@@ -947,11 +951,11 @@ public class HollowProducer {
         }
     }
 
-    public static interface Announcer {
-        public void announce(long stateVersion);
+    public interface Announcer {
+        void announce(long stateVersion);
     }
 
-    private static final class Artifacts {
+    protected static final class Artifacts {
         Blob snapshot = null;
         Blob delta = null;
         Blob reverseDelta = null;

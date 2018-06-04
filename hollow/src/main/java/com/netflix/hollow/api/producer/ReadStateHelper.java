@@ -18,6 +18,7 @@
 package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -99,6 +100,6 @@ final class ReadStateHelper {
     }
 
     long pendingVersion() {
-        return pending != null ? pending.getVersion() : Long.MIN_VALUE;
+        return pending != null ? pending.getVersion() : HollowConstants.VERSION_NONE;
     }
 }

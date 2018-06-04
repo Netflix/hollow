@@ -20,6 +20,7 @@ package com.netflix.hollow.api.codegen;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import java.util.Collections;
 import java.util.Set;
@@ -35,8 +36,9 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
 
     private final String apiClassname;
 
-    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, CodeGeneratorConfig config) {
-        super(packageName, SUB_PACKAGE_NAME, config);
+    public HollowAPIFactoryJavaGenerator(String packageName, String apiClassname, HollowDataset dataset,
+            CodeGeneratorConfig config) {
+        super(packageName, SUB_PACKAGE_NAME, dataset, config);
         this.apiClassname = apiClassname;
         this.className = apiClassname + "Factory";
     }
@@ -74,6 +76,9 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
 
         builder.append("    @Override\n");
         builder.append("    public HollowAPI createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {\n");
+        builder.append("        if (!(previousCycleAPI instanceof ").append(apiClassname).append(")) {\n");
+        builder.append("            throw new ClassCastException(previousCycleAPI.getClass() + \" not instance of ").append(apiClassname).append("\");");
+        builder.append("        }\n");
         builder.append("        return new ").append(apiClassname).append("(dataAccess, cachedTypes, Collections.<String, HollowFactory<?>>emptyMap(), (").append(apiClassname).append(") previousCycleAPI);\n");
         builder.append("    }\n\n");
 

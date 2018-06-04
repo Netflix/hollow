@@ -26,6 +26,7 @@ import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
@@ -52,8 +53,9 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         }
     });
 
-    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,CodeGeneratorConfig config) {
-        super(apiClassname, packageName, schema, config);
+    public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,
+            HollowDataset dataset, CodeGeneratorConfig config) {
+        super(apiClassname, packageName, schema, dataset, config);
         this.objectSchema = schema;
 
         this.importClasses.add(HollowObjectTypeAPI.class);
@@ -319,8 +321,8 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("    public boolean get").append(uppercase(fieldName)).append("(int ordinal) {\n");
         builder.append("        if(fieldIndex[" + fieldNum +"] == -1)\n");
-        builder.append("            return missingDataHandler().handleBoolean(\"").append(objectSchema.getName()).append("\", ordinal, \"").append(fieldName).append("\") == Boolean.TRUE;\n");
-        builder.append("        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[" + fieldNum + "]) == Boolean.TRUE;\n");
+        builder.append("            return Boolean.TRUE.equals(missingDataHandler().handleBoolean(\"").append(objectSchema.getName()).append("\", ordinal, \"").append(fieldName).append("\"));\n");
+        builder.append("        return Boolean.TRUE.equals(getTypeDataAccess().readBoolean(ordinal, fieldIndex[" + fieldNum + "]));\n");
         builder.append("    }\n\n");
 
         builder.append("    public Boolean get").append(uppercase(fieldName)).append("Boxed(int ordinal) {\n");

@@ -18,6 +18,7 @@
 package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.HollowConstants;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -150,7 +151,7 @@ public abstract class HollowAnnouncementWatcher {
 
     public static class DefaultWatcher extends HollowAnnouncementWatcher {
 
-        private long latestVersion = Long.MAX_VALUE;
+        private long latestVersion = HollowConstants.VERSION_LATEST;
 
         public DefaultWatcher() {
             super();

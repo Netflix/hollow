@@ -20,6 +20,7 @@ package com.netflix.hollow.api.client;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -51,7 +52,7 @@ public class HollowDataHolder {
 
     private WeakReference<HollowHistoricalStateDataAccess> priorHistoricalDataAccess;
 
-    private long currentVersion = Long.MIN_VALUE;
+    private long currentVersion = HollowConstants.VERSION_NONE;
 
     public HollowDataHolder(HollowReadStateEngine stateEngine, 
                             HollowAPIFactory apiFactory, 
@@ -80,8 +81,9 @@ public class HollowDataHolder {
         return currentVersion;
     }
 
-    public void setFilter(HollowFilterConfig filter) {
+    public HollowDataHolder setFilter(HollowFilterConfig filter) {
         this.filter = filter;
+        return this;
     }
 
     public void update(HollowUpdatePlan updatePlan) throws Throwable {

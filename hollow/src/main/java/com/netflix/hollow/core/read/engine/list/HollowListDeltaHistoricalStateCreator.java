@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
@@ -55,13 +57,13 @@ public class HollowListDeltaHistoricalStateCreator {
     public void populateHistory() {
         populateStats();
 
-        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerListPointer * (historicalDataElements.maxOrdinal + 1));
-        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, (long)historicalDataElements.bitsPerElement * historicalDataElements.totalNumberOfElements);
+        historicalDataElements.listPointerArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, ((long)historicalDataElements.maxOrdinal + 1) * historicalDataElements.bitsPerListPointer);
+        historicalDataElements.elementArray = new FixedLengthElementArray(historicalDataElements.memoryRecycler, historicalDataElements.totalNumberOfElements * historicalDataElements.bitsPerElement);
 
         iter.reset();
 
         int ordinal = iter.next();
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             ordinalMapping.put(ordinal, nextOrdinal);
             copyRecord(ordinal);
 
@@ -84,7 +86,7 @@ public class HollowListDeltaHistoricalStateCreator {
         int removedEntryCount = 0;
         long totalElementCount = 0;
         int ordinal = iter.next();
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             removedEntryCount++;
             totalElementCount += typeState.size(ordinal);
             ordinal = iter.next();
@@ -107,8 +109,8 @@ public class HollowListDeltaHistoricalStateCreator {
         long fromEndElement = stateEngineDataElements[shard].listPointerArray.getElementValue((long)shardOrdinal * stateEngineDataElements[shard].bitsPerListPointer, stateEngineDataElements[shard].bitsPerListPointer);
         long size = fromEndElement - fromStartElement;
 
-        historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, bitsPerElement * fromStartElement, bitsPerElement * nextStartElement, size * bitsPerElement);
-        historicalDataElements.listPointerArray.setElementValue(historicalDataElements.bitsPerListPointer * nextOrdinal, historicalDataElements.bitsPerListPointer, nextStartElement + size);
+        historicalDataElements.elementArray.copyBits(stateEngineDataElements[shard].elementArray, fromStartElement * bitsPerElement, nextStartElement * bitsPerElement, size * bitsPerElement);
+        historicalDataElements.listPointerArray.setElementValue((long)nextOrdinal * historicalDataElements.bitsPerListPointer, historicalDataElements.bitsPerListPointer, nextStartElement + size);
 
         ordinalMapping.put(ordinal, nextOrdinal);
         nextOrdinal++;

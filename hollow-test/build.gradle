@@ -1,0 +1,7 @@
+apply plugin: 'java'
+
+dependencies {
+  compile project(':hollow')
+
+  testCompile 'junit:junit:4.11'
+}

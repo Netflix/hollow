@@ -32,6 +32,7 @@ import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
+import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -40,12 +41,12 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
  *
  * @see HollowAPIGenerator
- *
  */
 public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegateGenerator {
 
-    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema, HollowErgonomicAPIShortcuts ergonomicShortcuts,CodeGeneratorConfig config) {
-        super(packageName, schema, ergonomicShortcuts, config);
+    public HollowObjectDelegateCachedImplGenerator(String packageName, HollowObjectSchema schema,
+            HollowErgonomicAPIShortcuts ergonomicShortcuts, HollowDataset dataset, CodeGeneratorConfig config) {
+        super(packageName, schema, ergonomicShortcuts, dataset, config);
         this.className = delegateCachedImplName(schema.getName());
     }
 
@@ -188,7 +189,8 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             break;
         case BYTES:
             builder.append("    public byte[] get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
+            // we need the cast to get around http://findbugs.sourceforge.net/bugDescriptions.html#EI_EXPOSE_REP
+            builder.append("        return (byte[]) ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case DOUBLE:
