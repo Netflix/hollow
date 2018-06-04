@@ -192,8 +192,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new RuntimeException(ex);
         }
 
         preparedForNextCycle = false;
@@ -222,8 +222,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new RuntimeException(ex);
         }
 
         preparedForNextCycle = true;
@@ -261,8 +261,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable th) {
-            throw new RuntimeException(th);
+        } catch(Exception ex) {
+            throw new RuntimeException(ex);
         }
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
