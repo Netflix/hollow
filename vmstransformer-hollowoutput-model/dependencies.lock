@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -79,20 +78,20 @@
     },
     "compile": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "compileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "default": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "findbugs": {
@@ -109,8 +108,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -181,8 +179,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         }
     },
     "jacocoAnt": {
@@ -193,8 +190,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.1"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.1",
@@ -246,38 +242,38 @@
     },
     "runtime": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "runtimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "testCompile": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "testCompileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "testRuntime": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     },
     "testRuntimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "2.17.1",
-            "requested": "2.+"
+            "locked": "3.0.0",
+            "requested": "latest.release"
         }
     }
 }
