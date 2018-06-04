@@ -19,7 +19,7 @@ import com.netflix.vms.transformer.converterpojos.Supplementals;
 import com.netflix.vms.transformer.converterpojos.VideoGeneral;
 import com.netflix.vms.transformer.converterpojos.VideoType;
 import com.netflix.vms.transformer.converterpojos.VideoTypeDescriptor;
-import com.netflix.vms.transformer.helper.TestReadStateEngineCreator;
+import com.netflix.vms.transformer.helper.HollowReadStateEngineBuilder;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -93,7 +93,7 @@ public class VideoHierarchyTest {
     }
 
     private HollowReadStateEngine createReadStateEngine(int idExcludedFromVideoGeneral) {
-        TestReadStateEngineCreator readStateEngineCreator = new TestReadStateEngineCreator();
+        HollowReadStateEngineBuilder readStateEngineCreator = new HollowReadStateEngineBuilder();
         // add all VideoGenerals except idExcludedFromVideoGeneral
         ALL_VIDEOS.stream().forEach(id -> {
             if (!id.equals(idExcludedFromVideoGeneral))
