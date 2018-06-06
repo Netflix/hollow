@@ -262,14 +262,21 @@ public class VMSAvailabilityWindowModule {
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
                                 if (packageAvailability == 0) {
 
+                                    boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
+                                    boolean ignoreAssetsMissingCheck = false;
+                                    if (grandfatherEnabled && statusHollow._getFlags()._getGrandfatheredLanguages().findElement(language) != null) {
+                                        ignoreAssetsMissingCheck = true;
+                                    }
+
                                     cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
-                                    TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                    TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window
+                                            ._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                     if (titleMissingAssets != null) {
                                         cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                     }
                                     if (!readyForPrePromotion) {
-                                        // skip
-                                        continue;
+                                        // skip contract if no override is mentioned and grandfather is enabled for the title.
+                                        if (!ignoreAssetsMissingCheck) continue;
                                     }
                                 }
 

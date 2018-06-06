@@ -236,6 +236,9 @@ public interface TransformerConfig {
     @DefaultValue("")
     String getOctoberSkyNamespace();
 
+    @DefaultValue("false")
+    boolean isGrandfatherEnabled();
+
     @DefaultValue("true")
     public boolean isReadCupTokensFromCinderFeed();
 }
