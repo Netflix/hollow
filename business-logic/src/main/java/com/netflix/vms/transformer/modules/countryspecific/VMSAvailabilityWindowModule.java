@@ -269,13 +269,12 @@ public class VMSAvailabilityWindowModule {
                                     }
 
                                     cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
-                                    TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window
-                                            ._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                    TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                     if (titleMissingAssets != null) {
                                         cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                     }
                                     if (!readyForPrePromotion) {
-                                        // skip contract if no override is mentioned and grandfather is enabled for the title.
+                                        // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
                                         if (!ignoreAssetsMissingCheck) continue;
                                     }
                                 }
