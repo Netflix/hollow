@@ -39,6 +39,19 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
     }
 
     @Test
+    public void testStringifyTypeWithSpecialCharactersInString() throws IOException {
+        String msg = "String types should be printed correctly";
+        Assert.assertEquals(msg, "\"foo " + "\\\\t" + " " + "\\\"foo" + "\\\" " + "\\\\r" + " foo " + "\\\\n\"",
+                stringifyType(TypeWithString.class, false, new TypeWithString("foo \t \"foo\" \r foo \n")));
+        Assert.assertEquals(msg, "{" + NEWLINE
+                        + INDENT + "\"value\": {" + NEWLINE
+                        + INDENT + INDENT + "\"value\": \"foo " + "\\\\t" + " " + "\\\"foo" + "\\\" " + "\\\\r" + " foo " + "\\\\n\"" + NEWLINE
+                        + INDENT + "}" + NEWLINE
+                        + "}",
+                stringifyType(TypeWithString.class, true, new TypeWithString("foo \t \"foo\" \r foo \n")));
+    }
+
+    @Test
     public void testStringifyTypeWithPrimitive() throws IOException {
         String msg = "Primitive types should be printed correctly";
         Assert.assertEquals(msg, "1337",

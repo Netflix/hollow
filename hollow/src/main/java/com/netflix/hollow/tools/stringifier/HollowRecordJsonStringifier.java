@@ -36,7 +36,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,6 +50,18 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     private final Set<String> excludeObjectTypes = new HashSet<String>();
     private final boolean collapseAllSingleFieldObjects;
     private final boolean prettyPrint;
+
+    private Map<Character, String> escapedSymbols = Collections.unmodifiableMap(
+            new HashMap<Character, String>() {
+                {
+                    put('\t', "\\\\t");
+                    put('\b', "\\\\b");
+                    put('\f', "\\\\f");
+                    put('\n', "\\\\n");
+                    put('\r', "\\\\r");
+                    put('\"', "\\\"");
+                }
+            });
 
     public HollowRecordJsonStringifier() {
         this(true, true);
@@ -384,9 +398,12 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     }
 
     private String escapeString(String str) {
-        if(str.indexOf('\\') == -1 && str.indexOf('\"') == -1)
-            return str;
-        return str.replace("\\", "\\\\").replace("\"", "\\\"");
+        for (Character escapeSequence : escapedSymbols.keySet()) {
+            if (str.indexOf(escapeSequence) > -1) {
+                str = str.replace(escapeSequence.toString(), escapedSymbols.get(escapeSequence));
+            }
+        }
+        return str;
     }
 
     private void appendIndentation(Writer writer, int indentation) throws IOException {
