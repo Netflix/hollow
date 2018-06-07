@@ -89,11 +89,6 @@ public class DuplicateDataDetectionValidator implements Nameable, Validator {
 		handleEndValidation(statusBuilder, Status.SUCCESS, "");
 	}
 
-	@Override
-	public void lock() {
-		//Do nothing
-	}
-
 	private Collection<Object[]> getDuplicateKeys(HollowReadStateEngine stateEngine, PrimaryKey primaryKey) {
 		HollowTypeReadState typeState = stateEngine.getTypeState(dataTypeName);
 		HollowPrimaryKeyIndex hollowPrimaryKeyIndex = typeState.getListener(HollowPrimaryKeyIndex.class);

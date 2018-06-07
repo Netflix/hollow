@@ -255,11 +255,6 @@ public class HollowProducerConsumerTests {
                                                     @Override public void validate(ReadState readState) {
                                                         throw new ValidationException("Expected to fail!");
                                                     }
-
-                                                    @Override
-                                                    public void lock() {
-                                                        //do nothing
-                                                    }
                                                 })
                                                 .build();
         
@@ -281,11 +276,6 @@ public class HollowProducerConsumerTests {
                                                     @Override public void validate(ReadState readState) {
                                                         if(++counter == 2)
                                                             throw new ValidationException("Expected to fail!");
-                                                    }
-
-                                                    @Override
-                                                    public void lock() {
-                                                        //Do nothing
                                                     }
                                                 })
                                                 .build();

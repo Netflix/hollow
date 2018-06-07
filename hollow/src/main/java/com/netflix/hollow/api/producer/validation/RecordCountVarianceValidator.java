@@ -88,7 +88,7 @@ public class RecordCountVarianceValidator implements Nameable, Validator {
 	 * locks allowableVariancePercent as cycleAllowableVariancePercent so it doesn't get changed during current cycle
 	 */
 	@Override
-	public void lock() {
+	public void lockSettings() {
 		cycleAllowableVariancePercent = allowableVariancePercent;
 	}
 
