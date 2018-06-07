@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InteractivePackage;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Grandfather;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_PrePromote;
@@ -263,21 +264,26 @@ public class VMSAvailabilityWindowModule {
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
                                 if (packageAvailability == 0) {
 
+                                    // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
                                     boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
-                                    boolean ignoreAssetsMissingCheck = false;
+                                    boolean skipContract = true;
                                     StringHollow stringHollow = statusHollow._getFlags()._getGrandfatheredLanguages().findElement(language);
                                     if (grandfatherEnabled && stringHollow != null && stringHollow.getOrdinal() != -1) {
-                                        ignoreAssetsMissingCheck = true;
+                                        skipContract = false;
                                     }
 
-                                    cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
-                                    TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
-                                    if (titleMissingAssets != null) {
-                                        cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
-                                    }
                                     if (!readyForPrePromotion) {
                                         // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
-                                        if (!ignoreAssetsMissingCheck) continue;
+                                        if (skipContract) {
+                                            cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
+                                            TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                            if (titleMissingAssets != null) {
+                                                cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
+                                            }
+                                            continue;
+                                        } else {
+                                            cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
+                                        }
                                     }
                                 }
 

@@ -85,6 +85,7 @@ public enum TransformerLogTag implements LogTag {
     Language_catalog_NoWindows,// title has no locale aware windows
     Language_catalog_NoAssetRights,// title did not have asset rights for the locale
     Language_catalog_WindowFiltered,// title has asset rights but in future so window filtered.
+    Language_Catalog_Grandfather,// titles that are grandfathered (merched with no localized assets)
 
     Language_Catalog_Title_Availability,// titles that do not meet the localized asset requirements - FOR REPORTING
 
