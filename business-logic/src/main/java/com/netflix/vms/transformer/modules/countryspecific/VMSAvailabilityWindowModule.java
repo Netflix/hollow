@@ -1,7 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InteractivePackage;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Grandfather;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_PrePromote;
@@ -288,7 +287,8 @@ public class VMSAvailabilityWindowModule {
                                         }
                                         continue;
                                     } else {
-                                        cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
+                                        // should we collect this info?
+                                        //cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
                                     }
                                 }
 
