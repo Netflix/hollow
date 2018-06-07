@@ -8,6 +8,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_c
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
+import com.google.common.collect.Sets;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.CycleDataAggregator;
@@ -51,6 +52,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -203,6 +205,12 @@ public class VMSAvailabilityWindowModule {
         List<RightsWindowHollow> sortedWindows = new ArrayList<>(rights._getWindows());
         Collections.sort(sortedWindows, RIGHTS_WINDOW_COMPARATOR);
 
+        Set<String> grandfatherLanguages = Sets.newHashSet();
+        if (language != null && statusHollow._getFlags()._getGrandfatheredLanguages() != null) {
+            Iterator<StringHollow> it = statusHollow._getFlags()._getGrandfatheredLanguages().iterator();
+            while (it.hasNext()) grandfatherLanguages.add(it.next()._getValue());
+        }
+
         for (RightsWindowHollow window : sortedWindows) {
 
             int packageIdForWindow = 0;
@@ -262,28 +270,25 @@ public class VMSAvailabilityWindowModule {
                                 boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
 
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
-                                if (packageAvailability == 0) {
+                                if (packageAvailability == 0 && !readyForPrePromotion) {
 
                                     // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
                                     boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
                                     boolean skipContract = true;
-                                    StringHollow stringHollow = statusHollow._getFlags()._getGrandfatheredLanguages().findElement(language);
-                                    if (grandfatherEnabled && stringHollow != null && stringHollow.getOrdinal() != -1) {
+                                    if (grandfatherEnabled && grandfatherLanguages.contains(language)) {
                                         skipContract = false;
                                     }
 
-                                    if (!readyForPrePromotion) {
-                                        // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
-                                        if (skipContract) {
-                                            cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
-                                            TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
-                                            if (titleMissingAssets != null) {
-                                                cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
-                                            }
-                                            continue;
-                                        } else {
-                                            cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
+                                    // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
+                                    if (skipContract) {
+                                        cycleDataAggregator.collect(country, language, videoId, Language_catalog_Skip_Contract_No_Assets);
+                                        TitleAvailabilityForMultiCatalog titleMissingAssets = shouldReportMissingAssets(videoId, packageId.val, contractId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                        if (titleMissingAssets != null) {
+                                            cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                         }
+                                        continue;
+                                    } else {
+                                        cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
                                     }
                                 }
 
