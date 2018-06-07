@@ -39,47 +39,47 @@ HollowProducer producer = HollowProducer.withPublisher(publisher)
 
 #### Prometheus Example
 
-```groovy
-import com.netflix.hollow.api.metrics.HollowMetricsCollector
-import com.netflix.hollow.api.metrics.HollowProducerMetrics
-import io.prometheus.client.Gauge
+```java
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowProducerMetrics;
+import io.prometheus.client.Gauge;
 
-class MyPrometheusProducerrMetricsCollector extends HollowMetricsCollector<HollowProducerMetrics> {
+class MyPrometheusProducerMetricsCollector extends HollowMetricsCollector<HollowProducerMetrics> {
     private static Gauge hollowConsumerGauge = Gauge
             .build()
             .name("hollowProducerMetrics")
             .labelNames("metric")
             .help("Hollow Producer Metrics")
-            .register()
+            .register();
 
 
     private static void set(String metric, Double value) {
-        hollowConsumerGauge.labels(metric).set(value)
+        hollowConsumerGauge.labels(metric).set(value);
     }
 
-    private static final long kb = 1024
+    private static final long kb = 1024;
 
     @Override
     void collect(HollowConsumerMetrics metrics) {
         //Common hollow metrics
-        metrics.typeHeapFootprint.each { String type, Long heapCost ->
-            set("${type}_heap_cost_kb", heapCost / kb)
-        }
-        metrics.typePopulatedOrdinals.each { String type, Integer ordinals ->
-            set("${type}_domain_object_count", ordinals)
-        }
-        set("total_heap_cost_kb", metrics.totalHeapFootprint)
-        set("total_domain_object_count", metrics.totalPopulatedOrdinals)
-        set("current_version", metrics.currentVersion)
+        metrics.getTypeHeapFootprint().forEach((String type, Long heapCost) ->
+                set(type + "_heap_cost_kb", heapCost / kb)
+        );
+        metrics.getTypePopulatedOrdinals().forEach((String type, Long ordinals)->
+                set(type + "_domain_object_count", ordinals)
+        );
+        set("total_heap_cost_kb", metrics.getTotalHeapFootprint());
+        set("total_domain_object_count", metrics.getTotalPopulatedOrdinals());
+        set("current_version", metrics.getCurrentVersion());
 
         //Producer specific metrics
-        set("cycles_completed", metrics.cyclesCompleted)
-        set("cycles_succeeded", metrics.cyclesSucceeded)
-        set("cycles_failed", metrics.cyclesFailed)
-        set("snapshots_completed", metrics.snapshotsCompleted)
-        set("snapshotsFailed", metrics.snapshotsFailed)
-        set("deltas_completed", metrics.deltasCompleted)
-        set("deltas_failed", metrics.deltasFailed)
+        set("cycles_completed", metrics.getCyclesCompleted());
+        set("cycles_succeeded", metrics.getCyclesSucceeded());
+        set("cycles_failed", metrics.getCycleFailed());
+        set("snapshots_completed", metrics.getSnapshotsCompleted());
+        set("snapshotsFailed", metrics.getSnapshotsFailed());
+        set("deltas_completed", metrics.getDeltasCompleted());
+        set("deltas_failed", metrics.getDeltasFailed());
     }
 }
 ```
@@ -102,10 +102,10 @@ HollowConsumer
 
 #### Prometheus Example
 
-```groovy
-import com.netflix.hollow.api.metrics.HollowMetricsCollector
-import com.netflix.hollow.api.metrics.HollowConsumerMetrics
-import io.prometheus.client.Gauge
+```java
+import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
+import io.prometheus.client.Gauge;
 
 class MyPrometheusConsumerMetricsCollector extends HollowMetricsCollector<HollowConsumerMetrics> {
     private static Gauge hollowConsumerGauge = Gauge
@@ -113,31 +113,31 @@ class MyPrometheusConsumerMetricsCollector extends HollowMetricsCollector<Hollow
             .name("hollowConsumerMetrics")
             .labelNames("metric")
             .help("Hollow Consumer Metrics")
-            .register()
+            .register();
 
 
     private static void set(String metric, Double value) {
-        hollowConsumerGauge.labels(metric).set(value)
+        hollowConsumerGauge.labels(metric).set(value);
     }
 
-    private static final long kb = 1024
+    private static final long kb = 1024;
 
     @Override
     void collect(HollowConsumerMetrics metrics) {
         //Common hollow metrics
-        metrics.typeHeapFootprint.each { String type, Long heapCost ->
-            set("${type}_heap_cost_kb", heapCost / kb)
-        }
-        metrics.typePopulatedOrdinals.each { String type, Integer ordinals ->
-            set("${type}_domain_object_count", ordinals)
-        }
-        set("total_heap_cost_kb", metrics.totalHeapFootprint)
-        set("total_domain_object_count", metrics.totalPopulatedOrdinals)
-        set("current_version", metrics.currentVersion)
+        metrics.getTypeHeapFootprint().forEach((String type, Long heapCost) ->
+                set(type + "_heap_cost_kb", heapCost / kb)
+        );
+        metrics.getTypePopulatedOrdinals().forEach((String type, Long ordinals)->
+                set(type + "_domain_object_count", ordinals)
+        );
+        set("total_heap_cost_kb", metrics.getTotalHeapFootprint());
+        set("total_domain_object_count", metrics.getTotalPopulatedOrdinals());
+        set("current_version", metrics.getCurrentVersion());
 
         //Consumer specific metrics
-        set("refresh_failed", metrics.refreshFailed)
-        set("refresh_succeeded", metrics.getRefreshSucceded())
+        set("refresh_failed", metrics.getRefreshFailed());
+        set("refresh_succeeded", metrics.getRefreshSucceded());
     }
 }
 ```
