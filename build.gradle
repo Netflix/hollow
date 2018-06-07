@@ -13,8 +13,10 @@ subprojects {
   apply plugin: 'nebula.netflixoss'
   apply plugin: 'checkstyle'
 
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  tasks.withType(JavaCompile) {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  }
 
   group = 'com.netflix.hollow'
   checkstyle {
