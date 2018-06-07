@@ -101,7 +101,11 @@ public class HollowAPIGenerator {
         /**
          * Sets the path the files with be generated in.
          */
-        pathToGeneratedFiles;
+        pathToGeneratedFiles,
+        /**
+         * Parameterizes all methods that return a HollowObject.
+         */
+        parameterizeAllClassNames;
     }
 
     protected final String apiClassname;
@@ -257,6 +261,9 @@ public class HollowAPIGenerator {
                 case pathToGeneratedFiles:
                     builder.withDestination(arg.getValue());
                     break;
+                case parameterizeAllClassNames:
+                    builder.withParameterizeAllClassNames(Boolean.valueOf(arg.getValue()));
+                    break;
                 default:
                     throw new IllegalArgumentException("Unhandled argument " + arg.getKey());
             }
@@ -345,7 +352,7 @@ public class HollowAPIGenerator {
     }
 
     /**
-     * If setRestrictApiToFieldType is true, api code only generates get<FieldName> with return type as per schema
+     * If setRestrictApiToFieldType is true, api code only generates {@code get<FieldName>} with return type as per schema
      *
      * Defaults to false to be backwards compatible
      */
@@ -500,8 +507,8 @@ public class HollowAPIGenerator {
 
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
         @Override
-        protected HollowAPIGenerator  instantiateGenerator() {
-            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts, destinationPath);
+        protected HollowAPIGenerator instantiateGenerator() {
+            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassNames, useErgonomicShortcuts, destinationPath);
         }
 
         @Override

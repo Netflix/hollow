@@ -17,11 +17,11 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;

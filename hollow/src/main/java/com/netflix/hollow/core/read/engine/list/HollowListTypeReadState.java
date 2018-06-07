@@ -90,7 +90,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         if(shards.length > 1)
             maxOrdinal = VarInt.readVInt(dis);
 
-        for(int i=0;i<shards.length;i++) {
+        for(int i=0; i<shards.length; i++) {
             HollowListTypeDataElements deltaData = new HollowListTypeDataElements(memoryRecycler);
             HollowListTypeDataElements nextData = new HollowListTypeDataElements(memoryRecycler);
             deltaData.readDelta(dis);
@@ -180,7 +180,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
     HollowListTypeDataElements[] currentDataElements() {
         HollowListTypeDataElements currentDataElements[] = new HollowListTypeDataElements[shards.length];
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             currentDataElements[i] = shards[i].currentDataElements();
         
         return currentDataElements;
@@ -200,7 +200,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         
         BitSet populatedOrdinals = getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             shards[i].applyToChecksum(checksum, populatedOrdinals, i, shards.length);
     }
 
@@ -208,7 +208,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
 	public long getApproximateHeapFootprintInBytes() {
         long totalApproximateHeapFootprintInBytes = 0;
         
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             totalApproximateHeapFootprintInBytes += shards[i].getApproximateHeapFootprintInBytes();
         
         return totalApproximateHeapFootprintInBytes;
@@ -220,7 +220,7 @@ public class HollowListTypeReadState extends HollowCollectionTypeReadState imple
         
         BitSet populatedOrdinals = getPopulatedOrdinals();
 
-        for(int i=0;i<shards.length;i++)
+        for(int i=0; i<shards.length; i++)
             totalApproximateHoleCostInBytes += shards[i].getApproximateHoleCostInBytes(populatedOrdinals, i, shards.length);
         
         return totalApproximateHoleCostInBytes;

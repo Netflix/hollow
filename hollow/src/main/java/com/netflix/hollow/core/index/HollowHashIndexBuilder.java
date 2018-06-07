@@ -69,7 +69,7 @@ public class HollowHashIndexBuilder {
         this.preindexer = new HollowPreindexer(stateEngine, type, selectField, matchFields);
         preindexer.buildFieldSpecifications();
 
-        this.memoryRecycler = WastefulRecycler.DEFAULT_INSTANCE; //stateEngine.getMemoryRecycler();
+        this.memoryRecycler = WastefulRecycler.DEFAULT_INSTANCE;
 
         HollowIndexerValueTraverser traverser = preindexer.getTraverser();
 
@@ -119,9 +119,6 @@ public class HollowHashIndexBuilder {
 
             for(int i=0;i<traverser.getNumMatches();i++) {
                 int matchHash = getMatchHash(i);
-
-                //if((ordinal & 4095) == 0)
-                //    System.out.println("ORDINAL: " + ordinal + " HASH: " + matchHash);
 
                 long bucket = matchHash & intermediateMatchHashMask;
                 long hashBucketBit = bucket * bitsPerIntermediateMatchHashEntry;
@@ -267,7 +264,7 @@ public class HollowHashIndexBuilder {
 
             while(!rehashBucketIsEmpty) {
                 rehashBucket = (rehashBucket + 1) & newMatchHashMask;
-                rehashBucketBit = (long)rehashBucket * newBitsPerMatchHashEntry;
+                rehashBucketBit = rehashBucket * newBitsPerMatchHashEntry;
                 rehashBucketIsEmpty = newMatchHashTable.getElementValue(rehashBucketBit, bitsPerTraverserField[0]) == 0;
             }
 
@@ -351,7 +348,7 @@ public class HollowHashIndexBuilder {
             int hashOrdinal = (int)intermediateMatchHashTable.getElementValue(hashBucketBit + offsetPerTraverserField[field.getBaseIteratorFieldIdx()], bitsPerTraverserField[field.getBaseIteratorFieldIdx()]) - 1;
 
             HollowTypeReadState readState = field.getBaseDataAccess();
-            int fieldPath[] = field.getSchemaFieldPositionPath();
+            int[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 if(matchOrdinal != hashOrdinal)
@@ -367,13 +364,17 @@ public class HollowHashIndexBuilder {
                 if(matchOrdinal != hashOrdinal) {
                     HollowObjectTypeReadState objectAccess = (HollowObjectTypeReadState)readState;
                     int fieldIdx = fieldPath[fieldPath.length-1];
-                    if(!HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
+                    if(isAnyFieldNull(matchOrdinal, hashOrdinal) || !HollowReadFieldUtils.fieldsAreEqual(objectAccess, matchOrdinal, fieldIdx, objectAccess, hashOrdinal, fieldIdx))
                         return false;
                 }
             }
         }
 
         return true;
+    }
+
+    private boolean isAnyFieldNull(int matchOrdinal, int hashOrdinal) {
+        return matchOrdinal == -1 || hashOrdinal == -1;
     }
 
     private int getMatchHash(int matchIdx) {
@@ -383,7 +384,7 @@ public class HollowHashIndexBuilder {
             HollowHashIndexField field = preindexer.getMatchFieldSpecs()[i];
             int ordinal = preindexer.getTraverser().getMatchOrdinal(matchIdx, field.getBaseIteratorFieldIdx());
             HollowTypeReadState readState = field.getBaseDataAccess();
-            int fieldPath[] = field.getSchemaFieldPositionPath();
+            int[] fieldPath = field.getSchemaFieldPositionPath();
 
             if(fieldPath.length == 0) {
                 matchHash ^= HashCodes.hashInt(ordinal);

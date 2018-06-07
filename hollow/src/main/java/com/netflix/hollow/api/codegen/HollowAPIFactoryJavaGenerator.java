@@ -76,6 +76,9 @@ public class HollowAPIFactoryJavaGenerator extends HollowConsumerJavaFileGenerat
 
         builder.append("    @Override\n");
         builder.append("    public HollowAPI createAPI(HollowDataAccess dataAccess, HollowAPI previousCycleAPI) {\n");
+        builder.append("        if (!(previousCycleAPI instanceof ").append(apiClassname).append(")) {\n");
+        builder.append("            throw new ClassCastException(previousCycleAPI.getClass() + \" not instance of ").append(apiClassname).append("\");");
+        builder.append("        }\n");
         builder.append("        return new ").append(apiClassname).append("(dataAccess, cachedTypes, Collections.<String, HollowFactory<?>>emptyMap(), (").append(apiClassname).append(") previousCycleAPI);\n");
         builder.append("    }\n\n");
 

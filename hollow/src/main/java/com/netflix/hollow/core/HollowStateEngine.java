@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core;
 
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -41,11 +42,14 @@ public interface HollowStateEngine extends HollowDataset {
 
     @Override
     List<HollowSchema> getSchemas();
-    
+
     @Override
     HollowSchema getSchema(String typeName);
-    
+
+    @Override
+    HollowSchema getNonNullSchema(String typeName) throws SchemaNotFoundException;
+
     Map<String, String> getHeaderTags();
-    
+
     String getHeaderTag(String name);
 }

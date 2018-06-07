@@ -20,9 +20,9 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
 import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import com.netflix.hollow.core.HollowConstants;
 import java.util.EventListener;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}.
  */
 public interface HollowProducerListener extends EventListener {
+    // TODO(hollow3): replace (long,TimeUnit) pair with java.time.Duration
 
     /**
      * Called after the {@code HollowProducer} has initialized its data model.
@@ -137,6 +138,7 @@ public interface HollowProducerListener extends EventListener {
      * @param elapsed       time taken to publish the blob
      * @param unit          unit of elapsed.
      */
+    // TODO(hollow3): "artifact" as a term is redundant with "blob", probably don't need both. #onBlobPublish(...)?
     void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
 
     /**

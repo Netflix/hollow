@@ -74,6 +74,11 @@ public class HollowDisabledDataAccess implements HollowDataAccess {
     }
 
     @Override
+    public HollowSchema getNonNullSchema(String name) {
+        throw new IllegalStateException("Data Access is Disabled");
+    }
+
+    @Override
     public void resetSampling() { }
 
     @Override

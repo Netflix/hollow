@@ -139,7 +139,6 @@ public class HollowWriteStateCreator {
      * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
      * 
      * @param readEngine
-     * @return
      */
     public static void populateUsingReadEngine(final HollowWriteStateEngine writeEngine, final HollowReadStateEngine readEngine) {
         SimultaneousExecutor executor = new SimultaneousExecutor();

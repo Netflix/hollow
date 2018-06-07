@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core.read.engine;
 
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.RecyclingRecycler;
@@ -198,6 +199,15 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
     public HollowSchema getSchema(String type) {
         HollowTypeReadState typeState = getTypeState(type);
         return typeState == null ? null : typeState.getSchema();
+    }
+
+    @Override
+    public HollowSchema getNonNullSchema(String type) {
+        HollowSchema schema = getSchema(type);
+        if (schema == null) {
+            throw new SchemaNotFoundException(type, getAllTypes());
+        }
+        return schema;
     }
 
     protected void afterInitialization() { }
