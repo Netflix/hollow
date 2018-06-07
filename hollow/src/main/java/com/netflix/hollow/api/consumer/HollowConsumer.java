@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -27,6 +26,7 @@ import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
@@ -69,43 +69,41 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <dl>
  * <dt>{@link HollowConsumer.BlobRetriever}</dt>
  * <dd>Implementations of this class define how to retrieve blob data from the blob store.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.AnnouncementWatcher}</dt>
  * <dd>Implementations of this class define the announcement mechanism, which is used to track the version of the
  * currently announced state.  It's also expected that implementations will trigger a refresh each time current
  * data version is updated.</dd>
- * <p>
+ *
  * <dt>a List of {@link HollowConsumer.RefreshListener}s</dt>
  * <dd>RefreshListener implementations will define what to do when various events happen before, during, and after updating
  * local in-memory copies of hollow data sets.</dd>
- * <p>
+ *
  * <dt>the Class representing a generated Hollow API</dt>
  * <dd>Defines how to create a {@link HollowAPI} for the dataset, useful when wrapping a dataset with an api which has
  * been generated (via the {@link HollowAPIClassJavaGenerator})</dd>
- * <p>
+ *
  * <dt>{@link HollowFilterConfig}</dt>
  * <dd>Defines what types and fields to load (or not load) into memory from hollow datasets.  Generally useful to reduce
  * heap footprint on consumers which do not require visibility of an entire dataset.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.DoubleSnapshotConfig}</dt>
  * <dd>Defines whether this consumer may attempt a double snapshot, and how many deltas will be attempted during a single refresh.
  * A double snapshot will allow your consumer to update in case of a broken delta chain, but will also result in a doubling of
  * the heap footprint while the double snapshot is occurring.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.ObjectLongevityConfig}</dt>
  * <dd>Object longevity is used to guarantee that Hollow objects which are backed by removed records will remain usable and
  * consistent until old references are discarded.  This behavior is turned off by default.  Implementations of this config
  * can be used to enable and configure this behavior.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.ObjectLongevityDetector}</dt>
  * <dd>Implementations of this config will be notified when usage of expired Hollow object references is attempted.</dd>
- * <p>
+ *
  * <dt>An Executor</dt>
  * <dd>The Executor which will be used to perform updates when {@link #triggerAsyncRefresh()} is called.  This will
  * default to a new fixed thread pool with a single refresh thread.</dd>
- * <p>
- * <p>
- * <p>
+ *
  * </dl>
  */
 public class HollowConsumer {
@@ -349,10 +347,10 @@ public class HollowConsumer {
      * <dt>The "from" version</dt>
      * <dd>The unique identifier of the state to which a delta transition should be applied.  If
      * this is a snapshot, then this value is HollowConstants.VERSION_NONE.</dd>
-     * <p>
+     *
      * <dt>The "to" version</dt>
      * <dd>The unique identifier of the state at which a dataset will arrive after this blob is applied.</dd>
-     * <p>
+     *
      * <dt>The actual blob data</dt>
      * <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
      * </dl>

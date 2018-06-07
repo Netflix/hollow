@@ -132,6 +132,11 @@ public class HollowProxyDataAccess implements HollowDataAccess {
     }
 
     @Override
+    public HollowSchema getNonNullSchema(String name) {
+        return currentDataAccess.getNonNullSchema(name);
+    }
+
+    @Override
     public void resetSampling() {
         currentDataAccess.resetSampling();
     }

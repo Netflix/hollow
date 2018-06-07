@@ -358,8 +358,8 @@ public class HollowCodeGenerationUtils {
      * Convert field path into Param name
      *
      * Eg:
-     *  - Actor -> actor
-     *  - Actor.name -> actorName
+     *  - Actor {@literal->} actor
+     *  - Actor.name {@literal->} actorName
      */
     public static String normalizeFieldPathToParamName(String fieldPath) {
         String result = null;

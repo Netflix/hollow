@@ -28,6 +28,8 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * This class is used to generate java code which defines POJOs, which can in turn be used to populate a 
@@ -128,6 +130,13 @@ public class HollowPOJOGenerator {
     }
 
     public void generateFiles(File directory) throws IOException {
+        Path destinationPath = directory.toPath();
+        Path packagePath = Paths.get(packageName.replace(".", File.separator));
+        if (!destinationPath.toAbsolutePath().endsWith(packagePath)) {
+            destinationPath = destinationPath.resolve(packagePath);
+        }
+        directory = destinationPath.toFile();
+        if (!directory.exists()) directory.mkdirs();
         for (HollowSchema schema : dataset.getSchemas()) {
             if (schema instanceof HollowObjectSchema && !isPrimitiveType(schema.getName())) {
                 HollowPOJOClassGenerator generator = new HollowPOJOClassGenerator(dataset, (HollowObjectSchema) schema,

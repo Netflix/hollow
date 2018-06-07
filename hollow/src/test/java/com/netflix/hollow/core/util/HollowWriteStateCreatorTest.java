@@ -155,7 +155,7 @@ public class HollowWriteStateCreatorTest {
     public void testReadSchemaFileIntoWriteState() throws Exception {
         HollowWriteStateEngine engine = new HollowWriteStateEngine();
         Assert.assertEquals("Should have no type states", 0, engine.getOrderedTypeStates().size());
-        HollowWriteStateCreator.readSchemaFileIntoWriteState("/schema1.txt", engine);
+        HollowWriteStateCreator.readSchemaFileIntoWriteState("schema1.txt", engine);
         Assert.assertEquals("Should now have types", 2, engine.getOrderedTypeStates().size());
     }
     

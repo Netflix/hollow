@@ -20,7 +20,6 @@ package com.netflix.hollow.api.producer;
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
 import static java.lang.System.currentTimeMillis;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
 import com.netflix.hollow.api.metrics.HollowProducerMetrics;
@@ -37,6 +36,7 @@ import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidat
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus;
 import com.netflix.hollow.api.producer.validation.SingleValidationStatus.SingleValidationStatusBuilder;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -494,7 +494,10 @@ public class HollowProducer {
         listeners.remove(listener);
     }
 
-    private void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
+    /**
+     * Publish the write state, storing the artifacts in the provided object. Visible for testing.
+     */
+    protected void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
         ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
         try {
             stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
@@ -950,11 +953,11 @@ public class HollowProducer {
         }
     }
 
-    public static interface Announcer {
-        public void announce(long stateVersion);
+    public interface Announcer {
+        void announce(long stateVersion);
     }
 
-    private static final class Artifacts {
+    protected static final class Artifacts {
         Blob snapshot = null;
         Blob delta = null;
         Blob reverseDelta = null;

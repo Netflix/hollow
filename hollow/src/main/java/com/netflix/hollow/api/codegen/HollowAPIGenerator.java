@@ -87,13 +87,25 @@ public class HollowAPIGenerator {
          */
         apiClassName,
         /**
+         * Sets the class postfix for the generated types.
+         */
+        classPostfix,
+        /**
+         * Sets the getter prefix to the provided string.
+         */
+        getterPrefix,
+        /**
          * Sets the package name for the generated files.
          */
         packageName,
         /**
          * Sets the path the files with be generated in.
          */
-        pathToGeneratedFiles;
+        pathToGeneratedFiles,
+        /**
+         * Parameterizes all methods that return a HollowObject.
+         */
+        parameterizeAllClassNames;
     }
 
     protected final String apiClassname;
@@ -237,11 +249,20 @@ public class HollowAPIGenerator {
                 case apiClassName:
                     builder.withAPIClassname(arg.getValue());
                     break;
+                case classPostfix:
+                    builder.withClassPostfix(arg.getValue());
+                    break;
+                case getterPrefix:
+                    builder.withGetterPrefix(arg.getValue());
+                    break;
                 case packageName:
                     builder.withPackageName(arg.getValue());
                     break;
                 case pathToGeneratedFiles:
                     builder.withDestination(arg.getValue());
+                    break;
+                case parameterizeAllClassNames:
+                    builder.withParameterizeAllClassNames(Boolean.valueOf(arg.getValue()));
                     break;
                 default:
                     throw new IllegalArgumentException("Unhandled argument " + arg.getKey());
@@ -331,7 +352,7 @@ public class HollowAPIGenerator {
     }
 
     /**
-     * If setRestrictApiToFieldType is true, api code only generates get<FieldName> with return type as per schema
+     * If setRestrictApiToFieldType is true, api code only generates {@code get<FieldName>} with return type as per schema
      *
      * Defaults to false to be backwards compatible
      */
@@ -486,8 +507,8 @@ public class HollowAPIGenerator {
 
     public static class Builder extends AbstractHollowAPIGeneratorBuilder<Builder, HollowAPIGenerator> {
         @Override
-        protected HollowAPIGenerator  instantiateGenerator() {
-            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassnames, useErgonomicShortcuts, destinationPath);
+        protected HollowAPIGenerator instantiateGenerator() {
+            return new HollowAPIGenerator(apiClassname, packageName, dataset, parameterizedTypes, parameterizeAllClassNames, useErgonomicShortcuts, destinationPath);
         }
 
         @Override

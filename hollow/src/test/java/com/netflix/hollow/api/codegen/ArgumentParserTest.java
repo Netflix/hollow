@@ -31,6 +31,7 @@ public class ArgumentParserTest {
     public void test_missingDash() {
         new ArgumentParser<Commands>(Commands.class, new String[]{"-orderCoffee=f"});
     }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_missingValue() {
         new ArgumentParser<Commands>(Commands.class, new String[]{"--orderCoffee"});
@@ -51,8 +52,8 @@ public class ArgumentParserTest {
         assertEquals(3, new ArgumentParser<Commands>(Commands.class, new String[] {
             "--orderCoffee=first", "--drinkCoffee=next", "--writeArgumentParserClass=yay"}).getParsedArguments().size());
         assertParsedArgument("--orderCoffee=fi.rst", Commands.orderCoffee, "fi.rst");
-        assertParsedArgument("--drinkCoffee=ne/xt", Commands.drinkCoffee, "ne/xt");
-        assertParsedArgument("--writeArgumentParserClass=complete", Commands.writeArgumentParserClass, "complete");
+        assertParsedArgument("--drinkCoffee=ne/x--t", Commands.drinkCoffee, "ne/x--t");
+        assertParsedArgument("--writeArgumentParserClass=compl_ete", Commands.writeArgumentParserClass, "compl_ete");
 
     }
 

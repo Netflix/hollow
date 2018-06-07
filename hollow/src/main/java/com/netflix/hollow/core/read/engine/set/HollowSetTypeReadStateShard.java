@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
@@ -36,7 +38,7 @@ class HollowSetTypeReadStateShard {
 
         do {
             currentData = this.currentData;
-            size = (int)currentData.setPointerAndSizeArray.getElementValue((long)(ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
+            size = (int)currentData.setPointerAndSizeArray.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
         return size;
@@ -114,9 +116,8 @@ class HollowSetTypeReadStateShard {
 
         } while(readWasUnsafe(currentData));
 
-        return -1;
+        return ORDINAL_NONE;
     }
-    
 
     public int relativeBucketValue(int setOrdinal, int bucketIndex) {
         HollowSetTypeDataElements currentData;
@@ -133,7 +134,7 @@ class HollowSetTypeReadStateShard {
             value = absoluteBucketValue(currentData, startBucket + bucketIndex);
 
             if(value == currentData.emptyBucketValue)
-                value = -1;
+                value = ORDINAL_NONE;
         } while(readWasUnsafe(currentData));
 
         return value;
@@ -166,7 +167,7 @@ class HollowSetTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
@@ -187,8 +188,8 @@ class HollowSetTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredBitsForSetPointers = (long)currentData.bitsPerFixedLengthSetPortion * (currentData.maxOrdinal + 1);
-        long requiredBitsForBuckets = (long)currentData.bitsPerElement * currentData.totalNumberOfBuckets;
+        long requiredBitsForSetPointers = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerFixedLengthSetPortion;
+        long requiredBitsForBuckets = currentData.totalNumberOfBuckets * currentData.bitsPerElement;
         long requiredBits = requiredBitsForSetPointers + requiredBitsForBuckets;
         return requiredBits / 8;
     }

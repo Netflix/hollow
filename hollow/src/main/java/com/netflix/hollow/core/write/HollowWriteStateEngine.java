@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -327,6 +328,19 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     @Override
     public HollowSchema getSchema(String schemaName) {
         return hollowSchemas.get(schemaName);
+    }
+
+    @Override
+    public HollowSchema getNonNullSchema(String schemaName) {
+        HollowSchema schema = getSchema(schemaName);
+        if (schema == null) {
+            List<String> schemas = new ArrayList<>();
+            for (HollowSchema s : getSchemas()) {
+                schemas.add(s.getName());
+            }
+            throw new SchemaNotFoundException(schemaName, schemas);
+        }
+        return schema;
     }
 
     @Override

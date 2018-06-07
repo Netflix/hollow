@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.util;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import java.util.BitSet;
@@ -28,7 +30,7 @@ public class RemovedOrdinalIterator {
     private final BitSet previousOrdinals;
     private final BitSet populatedOrdinals;
     private final int previousOrdinalsLength;
-    private int ordinal = -1;
+    private int ordinal = ORDINAL_NONE;
 
     public RemovedOrdinalIterator(PopulatedOrdinalListener listener) {
         this(listener.getPreviousOrdinals(), listener.getPopulatedOrdinals());
@@ -47,11 +49,11 @@ public class RemovedOrdinalIterator {
                 return ordinal;
         }
 
-        return -1;
+        return ORDINAL_NONE;
     }
 
     public void reset() {
-        ordinal = -1;
+        ordinal = ORDINAL_NONE;
     }
 
     public int countTotal() {
@@ -60,7 +62,7 @@ public class RemovedOrdinalIterator {
         reset();
 
         int count = 0;
-        while(next() != -1)
+        while(next() != ORDINAL_NONE)
             count++;
 
         ordinal = bookmark;

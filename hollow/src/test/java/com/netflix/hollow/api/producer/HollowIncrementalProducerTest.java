@@ -25,6 +25,7 @@ import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
+import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
@@ -832,6 +833,49 @@ public class HollowIncrementalProducerTest {
     }
 
     @Test
+    public void writeOnlyWhenPrimary() {
+        FakeSingleProducerEnforcer fakeSingleProducerEnforcer = new FakeSingleProducerEnforcer();
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withVersionMinter(new TestVersionMinter())
+                .withSingleProducerEnforcer(fakeSingleProducerEnforcer)
+                .build();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        long initialVersion = initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        incrementalProducer.addOrModify(new TypeA(1, "one", 100));
+        incrementalProducer.addOrModify(new TypeA(2, "two", 2));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 300));
+        incrementalProducer.addOrModify(new TypeA(3, "three", 3));
+        incrementalProducer.addOrModify(new TypeA(4, "five", 6));
+        incrementalProducer.delete(new TypeA(5, "five", 5));
+
+        incrementalProducer.delete(new TypeB(2, "3"));
+        incrementalProducer.addOrModify(new TypeB(5, "5"));
+        incrementalProducer.addOrModify(new TypeB(5, "6"));
+        incrementalProducer.delete(new RecordPrimaryKey("TypeB", new Object[] { 3 }));
+
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        /// .runCycle() flushes the changes to a new data state.
+        long version = incrementalProducer.runCycle();
+
+        Assert.assertEquals(initialVersion, version);
+        Assert.assertTrue(incrementalProducer.hasChanges());
+
+        //Enable producer as primary
+        fakeSingleProducerEnforcer.force();
+
+        long latestVersion = incrementalProducer.runCycle();
+        Assert.assertFalse(incrementalProducer.hasChanges());
+        Assert.assertEquals(1, latestVersion);
+    }
+
+    @Test
     public void resumeWorkAfterAnnouncementFail() {
         FakeAnnouncer fakeAnnouncer = new FakeAnnouncer();
         FakeAnnouncer fakeAnnouncerSpy = Mockito.spy(fakeAnnouncer);
@@ -1220,7 +1264,7 @@ public class HollowIncrementalProducerTest {
 
         @Override
         public long mint() {
-            return versionCounter++;
+            return ++versionCounter;
         }
     }
 
@@ -1251,8 +1295,8 @@ public class HollowIncrementalProducerTest {
                 .build();
     }
 
-    private void initializeData(HollowProducer producer) {
-        producer.runCycle(new Populator() {
+    private long initializeData(HollowProducer producer) {
+        return producer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
                 state.add(new TypeA(1, "one", 1));
                 state.add(new TypeA(2, "two", 2));
@@ -1379,6 +1423,29 @@ public class HollowIncrementalProducerTest {
 
         public long getFakeVersion() {
             return fakeVersion;
+        }
+    }
+
+    private static class FakeSingleProducerEnforcer implements SingleProducerEnforcer {
+        private boolean primary = false;
+        @Override
+        public void enable() {
+            primary = true;
+        }
+
+        @Override
+        public void disable() {
+            primary = false;
+        }
+
+        @Override
+        public boolean isPrimary() {
+            return primary;
+        }
+
+        @Override
+        public void force() {
+            primary = true;
         }
     }
 }

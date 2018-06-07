@@ -91,7 +91,7 @@ public class HollowMapTypeDataElements {
         if(numShards > 1)
             VarInt.readVInt(dis); /// max ordinal
 
-        for(int i=0;i<numShards;i++) {
+        for(int i=0; i<numShards; i++) {
             VarInt.readVInt(dis); /// max ordinal
 
             if(isDelta) {

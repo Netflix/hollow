@@ -15,8 +15,11 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import edu.umd.cs.findbugs.FindBugs2;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,6 +29,13 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 public class HollowCodeGenerationCompileUtil {
+    private static final String FILENAME_FINDBUGS = "findbugs.xml";
+    private static final String PROPERTY_CLASSPATH = "java.class.path";
+
+    /**
+     * Compiles java source files in the provided source directory, to the provided class directory.
+     * This also runs findbugs on the compiled classes, throwing an exception if findbugs fails.
+     */
     public static void compileSrcFiles(String sourceDirPath, String classDirPath) throws Exception {
         List<String> srcFiles = new ArrayList<>();
         addAllJavaFiles(new File(sourceDirPath), srcFiles);
@@ -33,13 +43,11 @@ public class HollowCodeGenerationCompileUtil {
         File classDir = new File(classDirPath);
         classDir.mkdir();
 
-
         List<String> argList = new ArrayList<>();
         argList.add("-d");
         argList.add(classDir.getAbsolutePath());
-        //argList.add("-Xlint:unchecked");
         argList.add("-classpath");
-        argList.add(System.getProperty("java.class.path") + ":" + classDirPath);
+        argList.add(System.getProperty(PROPERTY_CLASSPATH) + System.getProperty("path.separator") + classDirPath);
         argList.addAll(srcFiles);
 
         // argList.toArray() for large size had trouble
@@ -52,6 +60,30 @@ public class HollowCodeGenerationCompileUtil {
         int err = compiler.run(null, System.out, System.out, args);
         if (err != 0)
             throw new RuntimeException("compiler errors, see system.out");
+        runFindbugs(classDir);
+    }
+
+    /**
+     * Run findbugs on the provided directory. If findbugs fails, the first found bug is printed out as xml.
+     */
+    private static void runFindbugs(File classDir) throws Exception {
+        ClassLoader classLoader = HollowCodeGenerationCompileUtil.class.getClassLoader();
+        FindBugs2.main(new String[]{"-auxclasspath", System.getProperty(PROPERTY_CLASSPATH), "-output",
+                classLoader.getResource("").getFile() + FILENAME_FINDBUGS, classDir.getAbsolutePath()});
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(FILENAME_FINDBUGS)));
+        String line = "";
+        String foundBug = null;
+        while ((line = reader.readLine()) != null) { // poor man's xml parser
+            if (line.contains("<BugInstance")) {
+                foundBug = line;
+            } else if (foundBug != null) {
+                foundBug += "\n" + line;
+            }
+            if (line.contains("</BugInstance>")) {
+                throw new Exception("Findbugs found an error:\n" + foundBug);
+            }
+        }
     }
 
     private static void addAllJavaFiles(File folder, List<String> result) throws IOException {
