@@ -25,6 +25,7 @@ import com.netflix.vms.transformer.hollowinput.RightsHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
@@ -264,7 +265,8 @@ public class VMSAvailabilityWindowModule {
 
                                     boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
                                     boolean ignoreAssetsMissingCheck = false;
-                                    if (grandfatherEnabled && statusHollow._getFlags()._getGrandfatheredLanguages().findElement(language) != null) {
+                                    StringHollow stringHollow = statusHollow._getFlags()._getGrandfatheredLanguages().findElement(language);
+                                    if (grandfatherEnabled && stringHollow != null && stringHollow.getOrdinal() != -1) {
                                         ignoreAssetsMissingCheck = true;
                                     }
 

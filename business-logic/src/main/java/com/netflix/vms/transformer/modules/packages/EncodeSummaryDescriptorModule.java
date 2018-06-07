@@ -79,6 +79,7 @@ public class EncodeSummaryDescriptorModule {
             data.isNative = language != null && language.equals(getNativeLanguage(packageData.video.value));
             data.isSubtitleBurnedIn = isSubtitleBurnedIn(profileType, data.textLanguage);
 
+            // if MUXED or AUDIO
             if(isAudio(profileType)) {
                 EncodeSummaryDescriptorData audioData = data;
                 if(data.textLanguage != null || data.timedTextType != null || data.isSubtitleBurnedIn) {
@@ -92,6 +93,7 @@ public class EncodeSummaryDescriptorModule {
                 addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
 
+            // if TEXT or VIDEO
             if(isText(profileType)) {
                 if(data.timedTextType == null) {
                     data = data.clone();
@@ -102,6 +104,7 @@ public class EncodeSummaryDescriptorModule {
                 addDownloadableIdToDescriptor(key, profileType, stream, descriptorMap);
             }
 
+            // if MUXED
             if(isMuxed(profileType)) {
                 if(data.timedTextType == null && data.textLanguage != null) {
                     data = data.clone();
@@ -112,9 +115,9 @@ public class EncodeSummaryDescriptorModule {
             }
         }
 
-        packageData.textStreamSummary = new HashSet<EncodeSummaryDescriptor>();
-        packageData.audioStreamSummary = new HashSet<EncodeSummaryDescriptor>();
-        packageData.muxAudioStreamSummary = new HashSet<EncodeSummaryDescriptor>();
+        packageData.textStreamSummary = new HashSet<>();
+        packageData.audioStreamSummary = new HashSet<>();
+        packageData.muxAudioStreamSummary = new HashSet<>();
 
         for(Map.Entry<EncodeSummaryDescriptorDataKey, EncodeSummaryDescriptor> entry : descriptorMap.entrySet()) {
             if(entry.getKey().getSummaryType() == SummaryType.TEXT) {
