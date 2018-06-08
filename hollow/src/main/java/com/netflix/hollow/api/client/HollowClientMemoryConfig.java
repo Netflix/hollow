@@ -32,7 +32,7 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
 
     public static final long ONE_HOUR = 60 * 60 * 1000;
 
-    public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, false, ONE_HOUR, ONE_HOUR);
+    public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig( false, false, ONE_HOUR, ONE_HOUR);
 
     /**
      * Whether or not a double snapshot will ever be attempted by the {@link HollowClient}
@@ -48,6 +48,12 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
         private final boolean dropDataAutomatically;
         private final long gracePeriodMillis;
         private final long usageDetectionPeriodMillis;
+
+        public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
+            long gracePeriodMillis, long usageDetectionPeriodMillis) {
+            this(enableLongLivedObjectSupport, dropDataAutomatically, false, gracePeriodMillis,
+                usageDetectionPeriodMillis);
+        }
 
         public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
                                            boolean enableSampling, long gracePeriodMillis,
