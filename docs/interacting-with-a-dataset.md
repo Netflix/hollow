@@ -1,4 +1,4 @@
-# Generated Object API
+## Generated Object API
 
 Each of the examples provided thus far have focused on interaction with the Hollow data set via the generated Hollow Objects API.  
 
@@ -12,7 +12,7 @@ A Hollow Object contains methods to retrieve each of its type's fields in the da
 !!! note "Hollow Objects are 'hollow'"
     The name Hollow is derived from the fact that these objects are 'hollow' -- they _appear_ to contain field accessors, but those are just facades which access the underlying data store.
 
-# Generated Type API
+## Generated Type API
 
 At times, using the Hollow Object API can result in a high rate of Object allocation.  All generated Hollow APIs also provide a way to interact with the data without creating Objects.  This is accomplished by using record [ordinals](diving-deeper.md#ordinals) to query the data store directly.  For example:
 ```java
@@ -39,7 +39,7 @@ In extremely tight loops, it may be more efficient to use the Type API rather th
 !!! warning "Avoid Premature Optimization"
     In all but the tightest, most frequently executed loops, usage of the Type API will be unnecessary.  Its usage should be applied judiciously, since the pattern can be more difficult to maintain.
 
-# Generic Object API
+## Generic Object API
 
 Hollow also includes a generic Hollow Object API which, if sufficient for consumers, obviates the need to provide generated code:
 ```java
