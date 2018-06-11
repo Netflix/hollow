@@ -1443,13 +1443,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -1862,7 +1855,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3698,13 +3691,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -4117,7 +4103,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5953,13 +5939,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -6372,7 +6351,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -8357,13 +8336,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -8776,7 +8748,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -10612,13 +10584,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -11031,7 +10996,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -12869,13 +12834,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -13288,7 +13246,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -15145,13 +15103,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -15564,7 +15515,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -17421,13 +17372,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -17840,7 +17784,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -19697,13 +19641,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -20116,7 +20053,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.342",
+            "locked": "100.0.344",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
