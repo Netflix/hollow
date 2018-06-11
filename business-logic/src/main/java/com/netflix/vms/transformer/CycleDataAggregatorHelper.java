@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Grandfather;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoAssetRights;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
@@ -40,10 +41,14 @@ public class CycleDataAggregatorHelper {
     public static final String LANGUAGE_CATALOG_FILTER_WINDOW_MESSAGE = "Titles for asset rights are not present";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_FILTER_WINDOW_SEVERITY = TaggingLogger.Severity.INFO;
 
-    // titles that do not meet merch requirements (only for for future titles where start window is in next 90 days and any title that has live window but fails the assets check)
+    // titles that do not meet Merch requirements (only for for future titles where start window is in next 90 days and any title that has live window but fails the assets check)
     public static final TaggingLogger.LogTag LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG = Language_Catalog_Title_Availability;
     public static final String LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE = "Future Titles (next 90 days) and current title that miss localized asset requirement check";
     public static final TaggingLogger.Severity LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY = TaggingLogger.Severity.INFO;
+
+    public static final TaggingLogger.LogTag LANGUAGE_CATALOG_GRANDFATHER = Language_Catalog_Grandfather;
+    public static final String LANGUAGE_CATALOG_GRANDFATHER_MESSAGE = "Titles grandfathered in language catalog with missing localized assets";
+    public static final TaggingLogger.Severity LANGUAGE_CATALOG_GRANDFATHER_SEVERITY = TaggingLogger.Severity.INFO;
 
 
     public static void configureLogsTagsForVMSWindowModule(CycleDataAggregator cycleDataAggregator) {
@@ -53,5 +58,6 @@ public class CycleDataAggregatorHelper {
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_WINDOWS_TAG, LANGUAGE_CATALOG_NO_WINDOWS_SEVERITY, LANGUAGE_CATALOG_NO_WINDOWS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_NO_ASSET_RIGHTS, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_SEVERITY, LANGUAGE_CATALOG_NO_ASSET_RIGHTS_MESSAGE);
         cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_TITLE_AVAILABILITY_TAG, LANGUAGE_CATALOG_TITLE_AVAILABILITY_SEVERITY, LANGUAGE_CATALOG_TITLE_AVAILABILITY_MESSAGE);
+        cycleDataAggregator.aggregateForLogTag(LANGUAGE_CATALOG_GRANDFATHER, LANGUAGE_CATALOG_GRANDFATHER_SEVERITY, LANGUAGE_CATALOG_GRANDFATHER_MESSAGE);
     }
 }
