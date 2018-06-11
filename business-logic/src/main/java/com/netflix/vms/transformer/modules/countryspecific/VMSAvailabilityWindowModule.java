@@ -205,10 +205,11 @@ public class VMSAvailabilityWindowModule {
         Collections.sort(sortedWindows, RIGHTS_WINDOW_COMPARATOR);
 
         Set<String> grandfatherLanguages = Sets.newHashSet();
-        if (language != null && statusHollow._getFlags()._getGrandfatheredLanguages() != null) {
+        if (language != null && statusHollow._getFlags()!= null && statusHollow._getFlags()._getGrandfatheredLanguages() != null) {
             Iterator<StringHollow> it = statusHollow._getFlags()._getGrandfatheredLanguages().iterator();
             while (it.hasNext()) grandfatherLanguages.add(it.next()._getValue());
         }
+        boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
 
         for (RightsWindowHollow window : sortedWindows) {
 
@@ -272,7 +273,6 @@ public class VMSAvailabilityWindowModule {
                                 if (packageAvailability == 0 && !readyForPrePromotion) {
 
                                     // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
-                                    boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
                                     boolean skipContract = true;
                                     if (grandfatherEnabled && grandfatherLanguages.contains(language)) {
                                         skipContract = false;
