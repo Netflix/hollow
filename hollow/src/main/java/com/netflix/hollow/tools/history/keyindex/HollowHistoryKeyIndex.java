@@ -151,7 +151,7 @@ public class HollowHistoryKeyIndex {
 
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
         try {
-            Path tmpFile = Files.createTempFile(null, null);
+            Path tmpFile = Files.createTempFile("tmp", "history");
             if (isInitialUpdate || isSnapshot) {
                 FileOutputStream fileOutputStream = new FileOutputStream(tmpFile.toFile());
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
