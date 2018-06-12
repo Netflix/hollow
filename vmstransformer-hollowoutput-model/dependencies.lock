@@ -79,19 +79,19 @@
     },
     "compile": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "compileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "default": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
@@ -246,37 +246,37 @@
     },
     "runtime": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "runtimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "testCompile": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "testCompileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "testRuntime": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     },
     "testRuntimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.0",
+            "locked": "3.0.1",
             "requested": "latest.release"
         }
     }
