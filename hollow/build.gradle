@@ -1,5 +1,5 @@
-apply plugin: 'java'
- 
+apply from: "$rootDir/gradle/javaModule.gradle"
+
 dependencies {
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2.15.0'
