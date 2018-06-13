@@ -1517,7 +1517,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -2299,6 +2302,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -3914,7 +3918,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -4696,6 +4703,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -6311,7 +6319,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -7093,6 +7104,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -7354,30 +7366,30 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
@@ -8857,7 +8869,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -9639,6 +9654,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -11254,7 +11270,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -12036,6 +12055,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -13651,7 +13671,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -14442,6 +14465,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -16057,7 +16081,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -16848,6 +16875,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -18463,7 +18491,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -19254,6 +19285,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },
@@ -20869,7 +20901,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -21660,6 +21695,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
+                "net.sf.scannotation:scannotation",
                 "netflix:platform-dependency-command"
             ]
         },

@@ -1474,7 +1474,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -1905,6 +1908,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -3763,7 +3767,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -4194,6 +4201,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -6052,7 +6060,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -6483,6 +6494,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -7030,30 +7042,30 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.1",
-            "requested": "0.8.1"
+            "locked": "0.8.0",
+            "requested": "0.8.0"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.1",
+            "locked": "0.8.0",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
@@ -8490,7 +8502,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -8921,6 +8936,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -10779,7 +10795,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -11210,6 +11229,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -13068,7 +13088,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -13499,6 +13522,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -15366,7 +15390,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -15797,6 +15824,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -17664,7 +17692,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -18095,6 +18126,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
@@ -19962,7 +19994,10 @@
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "netflix:server-context"
+                "com.netflix.netflix-commons:netflix-infix",
+                "com.netflix.pytheas:pytheas-core",
+                "netflix:server-context",
+                "org.mortbay.jetty:servlet-api"
             ]
         },
         "javax.validation:validation-api": {
@@ -20393,6 +20428,7 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
+                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
