@@ -185,7 +185,7 @@ public class HollowClientUpdater {
     }
 
     public HollowReadStateEngine getStateEngine() {
-        return hollowDataHolder.getStateEngine();
+        return hollowDataHolder == null ? null : hollowDataHolder.getStateEngine();
     }
 
     public HollowAPI getAPI() {
