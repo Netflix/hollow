@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.error.HollowWriteStateException;
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -166,7 +167,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         try {
             executor.awaitSuccessfulCompletion();
         } catch(Exception e){
-            throw new RuntimeException(e);
+            throw new HollowWriteStateException("Unable to restore write state from read state engine", e);
         }
     }
 
@@ -193,7 +194,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
             executor.awaitSuccessfulCompletion();
         } catch(Exception ex) {
-            throw new RuntimeException(ex);
+            throw new HollowWriteStateException("Failed to prepare for write", ex);
         }
 
         preparedForNextCycle = false;
@@ -223,7 +224,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
             executor.awaitSuccessfulCompletion();
         } catch(Exception ex) {
-            throw new RuntimeException(ex);
+            throw new HollowWriteStateException("Failed to prepare for next cycle", ex);
         }
 
         preparedForNextCycle = true;
@@ -262,7 +263,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         try {
             executor.awaitSuccessfulCompletion();
         } catch(Exception ex) {
-            throw new RuntimeException(ex);
+            throw new HollowWriteStateException("Unable to reset to the prior version of the write state", ex);
         }
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
