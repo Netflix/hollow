@@ -1470,6 +1470,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -1915,7 +1922,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -3763,6 +3770,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -4208,7 +4222,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -6056,6 +6070,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -6501,7 +6522,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -8498,6 +8519,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -8943,7 +8971,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -10791,6 +10819,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -11236,7 +11271,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -13084,6 +13119,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -13529,7 +13571,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -15386,6 +15428,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -15831,7 +15880,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -17688,6 +17737,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -18133,7 +18189,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -19990,6 +20046,13 @@
                 "netflix:request-expiry-impl"
             ]
         },
+        "javax.persistence:persistence-api": {
+            "locked": "1.0",
+            "transitive": [
+                "com.netflix.astyanax:astyanax-entity-mapper",
+                "netflix:platform-aws"
+            ]
+        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
@@ -20435,7 +20498,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.349",
+            "locked": "100.0.351",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
