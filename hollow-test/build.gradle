@@ -1,7 +1,7 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 dependencies {
-  compile project(':hollow')
+  implementation project(':hollow')
 
-  testCompile 'junit:junit:4.11'
+  testImplementation 'junit:junit:4.11'
 }
