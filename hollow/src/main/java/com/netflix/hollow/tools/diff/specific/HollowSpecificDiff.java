@@ -161,8 +161,8 @@ public class HollowSpecificDiff {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 

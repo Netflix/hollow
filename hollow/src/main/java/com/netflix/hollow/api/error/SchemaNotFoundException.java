@@ -27,7 +27,7 @@ public class SchemaNotFoundException extends HollowException {
     private final Collection<String> availableTypes;
 
     public SchemaNotFoundException(String typeName, Collection<String> availableTypes) {
-        super("Could not find schema for " + typeName + " - available schemas: " + availableTypes);
+        super("Could not find schema for " + typeName + " - " + getMessageSuffix(availableTypes));
         this.typeName = typeName;
         this.availableTypes = availableTypes;
     }
@@ -38,5 +38,13 @@ public class SchemaNotFoundException extends HollowException {
 
     public Collection<String> getAvailableTypes() {
         return this.availableTypes;
+    }
+
+    private static final String getMessageSuffix(Collection<String> availableTypes) {
+        if (availableTypes.isEmpty()) {
+            return "empty type state, make sure your namespace has published versions";
+        } else {
+            return "available schemas: " + availableTypes;
+        }
     }
 }

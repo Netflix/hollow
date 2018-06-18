@@ -20,6 +20,8 @@ HollowProducer
    .withSnapshotPublishExecutor(e)   /// optional: a java.util.concurrent.Executor
    .withNumStatesBetweenSnapshots(n) /// optional: an int
    .withTargetMaxTypeShardSize(size) /// optional: a long
+   .withBlobStorageCleaner(blobStorageCleaner) //optional: a BlobStorageCleaner
+   .withMetricsCollector(hollowMetricsCollector) //optional: a HollowMetricsCollector<HollowProducerMetrics>
 ```
 
 Let's examine each of the injected configurations into the `HollowProducer`:
@@ -35,6 +37,8 @@ Let's examine each of the injected configurations into the `HollowProducer`:
 * __Number of cycles between snapshots__: Because snapshots are not necessary for a data state to be available and announced, they need not be published every cycle.  If this parameter is specified, then a snapshot will be produced only every `(n+1)th` cycle.
 * `VersionMinter`: Allows for a custom version identifier minting strategy.
 * __Target max type shard size__: Specify a [target max type shard size](advanced-topics.md#type-sharding).  Defaults to 16MB.
+* `BlobStorageCleaner`: Using the [blob storage cleaning](tooling.md#blob-storage-manipulation) capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.
+* `HollowMetricsCollector`: Implementing a [`HollowMetricsCollector`](tooling.md#metrics) allows to either store or publish those metrics to your preferred provider, such as Prometheus.
 
 Each time a new _data state_ should be produced, users should call `.runCycle(Populator)`.  See [Getting Started](getting-started.md) for more basic usage details.
 
@@ -96,6 +100,7 @@ HollowConsumer
    .withObjectLongevityConfig(objectLongevityCfg) /// optional: an ObjectLongevityConfig
    .withObjectLongevityDetector(detector)         /// optional: an ObjectLongevityDetector
    .withRefreshExecutor(refreshExecutor)          /// optional: an Executor
+   .withMetricsCollector(hollowMetricsCollector) //optional: a HollowMetricsCollector<HollowConsumerMetrics>
    .build();
 ```
 
@@ -111,6 +116,7 @@ Let's examine each the injected hooks to the `HollowConsumer`:
 * `ObjectLongevityConfig`: Defines advanced settings related to [object longevity](advanced-topics.md#object-longevity).
 * `ObjectLongevityDetector`: Implementations are notified when stale hollow object existence and usage is detected.
 * `RefreshExecutor`: An `Executor` to use when asynchronous updates are called via `triggerAsyncRefresh()`.
+* `HollowMetricsCollector`: Implementing a [`HollowMetricsCollector`](tooling.md#metrics) allows to either store or publish those metrics to your preferred provider, such as Prometheus.
 
 Each time the identifier of the currently announced state changes, `triggerRefresh()` should be called on the `HollowConsumer`.  This will bring the data up to date.
 
