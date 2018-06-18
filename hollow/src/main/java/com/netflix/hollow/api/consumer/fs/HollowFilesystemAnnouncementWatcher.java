@@ -132,8 +132,11 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
                                 consumer.triggerAsyncRefresh();
                         }
                     }
+                } catch (Exception ex) {
+                    log.log(Level.WARNING, "Exception reading the current announced version", ex);
                 } catch (Throwable th) {
-                    log.log(Level.WARNING, "Exception reading the current announced version", th);
+                    log.log(Level.SEVERE, "Exception reading the current announced version", th);
+                    throw th;
                 }
             }
         }, 0, 1, TimeUnit.SECONDS);
