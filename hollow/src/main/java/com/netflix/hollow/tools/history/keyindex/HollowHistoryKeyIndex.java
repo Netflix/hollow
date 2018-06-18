@@ -27,9 +27,8 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -151,22 +150,22 @@ public class HollowHistoryKeyIndex {
 
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
         try {
-            Path tmpFile = Files.createTempFile("tmp", "history");
+            Path tmpFile = Files.createTempFile("roundtrip", "snapshot");
             if (isInitialUpdate || isSnapshot) {
-                FileOutputStream fileOutputStream = new FileOutputStream(tmpFile.toFile());
+                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
                 writer.writeSnapshot(fileOutputStream);
                 // Use existing readStateEngine on initial update; otherwise, create new one to properly handle double snapshot
                 HollowReadStateEngine newReadStateEngine = isInitialUpdate ? readStateEngine : new HollowReadStateEngine();
                 HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
-                reader.readSnapshot(new FileInputStream(tmpFile.toFile()));
+                reader.readSnapshot(Files.newInputStream(tmpFile));
                 return newReadStateEngine;
             } else {
-                FileOutputStream fileOutputStream = new FileOutputStream(tmpFile.toFile());
+                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
                 writer.writeDelta(fileOutputStream);
                 HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-                reader.applyDelta(new FileInputStream(tmpFile.toFile()));
+                reader.applyDelta(Files.newInputStream(tmpFile));
                 return readStateEngine;
             }
         } catch(IOException e) {
