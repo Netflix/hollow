@@ -1449,21 +1449,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -1867,14 +1857,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3716,21 +3705,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -4134,14 +4113,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -5983,21 +5961,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -6401,14 +6369,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6964,30 +6931,30 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.0",
-            "requested": "0.8.0"
+            "locked": "0.8.1",
+            "requested": "0.8.1"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.0",
-            "requested": "0.8.0"
+            "locked": "0.8.1",
+            "requested": "0.8.1"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
@@ -8399,21 +8366,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -8817,14 +8774,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -10666,21 +10622,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -11084,14 +11030,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -12935,21 +12880,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -13353,14 +13288,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -13653,7 +13587,6 @@
         "org.javassist:javassist": {
             "locked": "3.18.2-GA",
             "transitive": [
-                "net.sf.scannotation:scannotation",
                 "org.reflections:reflections"
             ]
         },
@@ -15223,21 +15156,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -15641,14 +15564,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -15941,7 +15863,6 @@
         "org.javassist:javassist": {
             "locked": "3.18.2-GA",
             "transitive": [
-                "net.sf.scannotation:scannotation",
                 "org.reflections:reflections"
             ]
         },
@@ -17511,21 +17432,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -17929,14 +17840,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -18229,7 +18139,6 @@
         "org.javassist:javassist": {
             "locked": "3.18.2-GA",
             "transitive": [
-                "net.sf.scannotation:scannotation",
                 "org.reflections:reflections"
             ]
         },
@@ -19799,21 +19708,11 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-entity-mapper",
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.0.1",
             "transitive": [
                 "com.netflix.karyon:karyon2-admin",
-                "com.netflix.netflix-commons:netflix-infix",
-                "com.netflix.pytheas:pytheas-core",
-                "netflix:server-context",
-                "org.mortbay.jetty:servlet-api"
+                "netflix:server-context"
             ]
         },
         "javax.validation:validation-api": {
@@ -20217,14 +20116,13 @@
         "netflix:statistics": {
             "locked": "1.7.0",
             "transitive": [
-                "com.netflix.ribbon:ribbon-loadbalancer",
                 "netflix:platform-ipc",
                 "netflix:platform-sla",
                 "netflix:platform-utils"
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.360",
+            "locked": "100.0.361",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -20517,7 +20415,6 @@
         "org.javassist:javassist": {
             "locked": "3.18.2-GA",
             "transitive": [
-                "net.sf.scannotation:scannotation",
                 "org.reflections:reflections"
             ]
         },

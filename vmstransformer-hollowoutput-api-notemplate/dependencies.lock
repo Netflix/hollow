@@ -196,30 +196,30 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.0",
-            "requested": "0.8.0"
+            "locked": "0.8.1",
+            "requested": "0.8.1"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.0",
-            "requested": "0.8.0"
+            "locked": "0.8.1",
+            "requested": "0.8.1"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.0",
+            "locked": "0.8.1",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
