@@ -1430,7 +1430,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -5159,7 +5159,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -8888,7 +8888,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -12701,7 +12701,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -18335,7 +18335,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -22064,7 +22064,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -25793,7 +25793,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -29554,7 +29554,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -33412,7 +33412,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -37270,7 +37270,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -41128,7 +41128,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -44986,7 +44986,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -48844,7 +48844,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -52702,7 +52702,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
@@ -56560,7 +56560,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.23",
+            "locked": "0.12.24",
             "transitive": [
                 "com.netflix.aeneas:aeneas-core",
                 "com.netflix.blitz4j:blitz4j",
