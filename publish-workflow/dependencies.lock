@@ -1258,7 +1258,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -4351,7 +4351,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -7444,7 +7444,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -10686,7 +10686,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -13779,7 +13779,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -16896,7 +16896,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -20062,7 +20062,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -23228,7 +23228,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
@@ -26394,7 +26394,7 @@
             ]
         },
         "com.netflix.servo:servo-core": {
-            "locked": "0.12.24",
+            "locked": "0.12.25",
             "transitive": [
                 "com.netflix.blitz4j:blitz4j",
                 "com.netflix.eureka:eureka-client",
