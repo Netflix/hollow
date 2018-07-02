@@ -2455,7 +2455,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -2948,7 +2948,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6184,7 +6184,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -6677,7 +6677,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9913,7 +9913,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -10406,7 +10406,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13726,7 +13726,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -14219,7 +14219,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19360,7 +19360,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -19853,7 +19853,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23089,7 +23089,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -23582,7 +23582,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26817,7 +26817,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -27310,7 +27310,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30605,7 +30605,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -31099,7 +31099,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34463,7 +34463,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -34957,7 +34957,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38321,7 +38321,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -38815,7 +38815,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42179,7 +42179,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -42673,7 +42673,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46037,7 +46037,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -46531,7 +46531,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49895,7 +49895,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -50389,7 +50389,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53753,7 +53753,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -54247,7 +54247,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -57611,7 +57611,7 @@
             ]
         },
         "netflix:common-data-format": {
-            "locked": "1.3724",
+            "locked": "1.3745",
             "transitive": [
                 "netflix:playback-monkey-model"
             ]
@@ -58105,7 +58105,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.118",
+            "locked": "2.119",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
