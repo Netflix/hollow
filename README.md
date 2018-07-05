@@ -21,7 +21,7 @@ Binaries are available from Maven Central and jcenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
-|com.netflix.hollow|hollow|2.16.4|
+|com.netflix.hollow|hollow|3.0.1|
 
 In a Maven `.pom` file:
 
@@ -29,14 +29,14 @@ In a Maven `.pom` file:
         <dependency>
                 <groupId>com.netflix.hollow</groupId>
                 <artifactId>hollow</artifactId>
-                <version>2.16.4</version>
+                <version>3.0.1</version>
         </dependency>
         ...
 
 In a Gradle `build.gradle` file:
 
         ...
-        compile 'com.netflix.hollow:hollow:2.16.4'
+        compile 'com.netflix.hollow:hollow:3.0.1'
         ...
         
 ## Get Support
