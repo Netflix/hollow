@@ -20,9 +20,6 @@ package com.netflix.hollow.tools.stringifier;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.INDENT;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.NEWLINE;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Arrays;
 
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
@@ -31,6 +28,9 @@ import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.test.model.TestTypeA;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
