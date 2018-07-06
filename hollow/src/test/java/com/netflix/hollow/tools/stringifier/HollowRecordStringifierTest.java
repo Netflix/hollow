@@ -21,6 +21,16 @@ import static com.netflix.hollow.tools.stringifier.HollowStringifier.INDENT;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.NEWLINE;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
+
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.test.model.TestTypeA;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -100,6 +110,31 @@ public class HollowRecordStringifierTest extends AbstractHollowRecordStringifier
                 "foo" + NEWLINE + "bar",
                 stringifyType(TypeWithString.class, false,
                     new TypeWithString("foo"), new TypeWithString("bar")));
+    }
+
+    @Test
+    public void testStringifyIterator() throws IOException {
+        HollowRecordStringifier recordStringifier = new HollowRecordStringifier();
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.useDefaultHashKeys();
+
+        mapper.add(new TestTypeA(1, "one"));
+        mapper.add(new TestTypeA(2, "two"));
+
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+
+        Iterable<HollowRecord> genericHollowObjects = (Iterable) Arrays.asList(new GenericHollowObject(readEngine, "TestTypeA", 0), new GenericHollowObject(readEngine, "TestTypeA", 1));
+
+        StringWriter writer = new StringWriter();
+        recordStringifier.stringify(writer, genericHollowObjects);
+        Assert.assertEquals("Multiple records should be printed correctly",
+                "[\n" +
+                        "  id: 1\n" +
+                        "  name: one,\n" +
+                        "  id: 2\n" +
+                        "  name: two" +
+                        "\n]", writer.toString());
     }
 
     private static <T> String stringifyType(Class<T> clazz, boolean expanded, T... instances) throws IOException {
