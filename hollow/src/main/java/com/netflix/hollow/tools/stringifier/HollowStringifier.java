@@ -49,7 +49,9 @@ public interface HollowStringifier<T extends HollowStringifier> {
      *
      * @throws IOException thrown if there is an error writing to the Writer
      */
-    public void stringify(Writer writer,Iterable<HollowRecord> records) throws IOException;
+    public default void stringify(Writer writer,Iterable<HollowRecord> records) throws IOException {
+        //Do nothing
+    }
 
     /**
      * Create a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
