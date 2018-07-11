@@ -20,9 +20,11 @@ import java.util.Iterator;
 
 public abstract class AbstractHollowOrdinalIterable<T> implements Iterable<T> {
     private final HollowOrdinalIterator iter;
+    private final int firstOrdinal;
 
     public AbstractHollowOrdinalIterable(final HollowOrdinalIterator iter) {
         this.iter = iter;
+        this.firstOrdinal = iter.next();
     }
 
     protected abstract T getData(int ordinal);
@@ -30,7 +32,7 @@ public abstract class AbstractHollowOrdinalIterable<T> implements Iterable<T> {
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-            private int next = iter.next();
+            private int next = firstOrdinal;
 
             @Override
             public boolean hasNext() {
