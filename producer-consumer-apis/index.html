@@ -589,6 +589,8 @@
    <span class="o">.</span><span class="na">withSnapshotPublishExecutor</span><span class="o">(</span><span class="n">e</span><span class="o">)</span>   <span class="c1">/// optional: a java.util.concurrent.Executor</span>
    <span class="o">.</span><span class="na">withNumStatesBetweenSnapshots</span><span class="o">(</span><span class="n">n</span><span class="o">)</span> <span class="c1">/// optional: an int</span>
    <span class="o">.</span><span class="na">withTargetMaxTypeShardSize</span><span class="o">(</span><span class="n">size</span><span class="o">)</span> <span class="c1">/// optional: a long</span>
+   <span class="o">.</span><span class="na">withBlobStorageCleaner</span><span class="o">(</span><span class="n">blobStorageCleaner</span><span class="o">)</span> <span class="c1">//optional: a BlobStorageCleaner</span>
+   <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> <span class="c1">//optional: a HollowMetricsCollector&lt;HollowProducerMetrics&gt;</span>
 </pre></div>
 
 
@@ -605,6 +607,8 @@
 <li><strong>Number of cycles between snapshots</strong>: Because snapshots are not necessary for a data state to be available and announced, they need not be published every cycle.  If this parameter is specified, then a snapshot will be produced only every <code>(n+1)th</code> cycle.</li>
 <li><code>VersionMinter</code>: Allows for a custom version identifier minting strategy.</li>
 <li><strong>Target max type shard size</strong>: Specify a <a href="../advanced-topics/#type-sharding">target max type shard size</a>.  Defaults to 16MB.</li>
+<li><code>BlobStorageCleaner</code>: Using the <a href="../tooling/#blob-storage-manipulation">blob storage cleaning</a> capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.</li>
+<li><code>HollowMetricsCollector</code>: Implementing a <a href="../tooling/#metrics"><code>HollowMetricsCollector</code></a> allows to either store or publish those metrics to your preferred provider, such as Prometheus.</li>
 </ul>
 <p>Each time a new <em>data state</em> should be produced, users should call <code>.runCycle(Populator)</code>.  See <a href="../getting-started/">Getting Started</a> for more basic usage details.</p>
 <h3 id="restoring-at-startup">Restoring At Startup</h3>
@@ -650,6 +654,7 @@
    <span class="o">.</span><span class="na">withObjectLongevityConfig</span><span class="o">(</span><span class="n">objectLongevityCfg</span><span class="o">)</span> <span class="c1">/// optional: an ObjectLongevityConfig</span>
    <span class="o">.</span><span class="na">withObjectLongevityDetector</span><span class="o">(</span><span class="n">detector</span><span class="o">)</span>         <span class="c1">/// optional: an ObjectLongevityDetector</span>
    <span class="o">.</span><span class="na">withRefreshExecutor</span><span class="o">(</span><span class="n">refreshExecutor</span><span class="o">)</span>          <span class="c1">/// optional: an Executor</span>
+   <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> <span class="c1">//optional: a HollowMetricsCollector&lt;HollowConsumerMetrics&gt;</span>
    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 </pre></div>
 
@@ -666,6 +671,7 @@
 <li><code>ObjectLongevityConfig</code>: Defines advanced settings related to <a href="../advanced-topics/#object-longevity">object longevity</a>.</li>
 <li><code>ObjectLongevityDetector</code>: Implementations are notified when stale hollow object existence and usage is detected.</li>
 <li><code>RefreshExecutor</code>: An <code>Executor</code> to use when asynchronous updates are called via <code>triggerAsyncRefresh()</code>.</li>
+<li><code>HollowMetricsCollector</code>: Implementing a <a href="../tooling/#metrics"><code>HollowMetricsCollector</code></a> allows to either store or publish those metrics to your preferred provider, such as Prometheus.</li>
 </ul>
 <p>Each time the identifier of the currently announced state changes, <code>triggerRefresh()</code> should be called on the <code>HollowConsumer</code>.  This will bring the data up to date.</p>
 <p>In general, the only requirement for getting Hollow consumers to work with your specific infrastructure is to implement a <code>BlobRetriever</code> and <code>AnnouncementWatcher</code>, and use them with a <code>HollowConsumer</code>.</p>

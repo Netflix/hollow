@@ -286,6 +286,93 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metrics" title="Metrics" class="md-nav__link">
+    Metrics
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#producer" title="Producer" class="md-nav__link">
+    Producer
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" title="Usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prometheus-example" title="Prometheus Example" class="md-nav__link">
+    Prometheus Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consumer" title="Consumer" class="md-nav__link">
+    Consumer
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" title="Usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prometheus-example_1" title="Prometheus Example" class="md-nav__link">
+    Prometheus Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blob-storage-manipulation" title="Blob Storage Manipulation" class="md-nav__link">
+    Blob Storage Manipulation
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cleaning" title="Cleaning" class="md-nav__link">
+    Cleaning
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hollow-explorer" title="Hollow Explorer" class="md-nav__link">
     Hollow Explorer
   </a>
@@ -571,6 +658,93 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#metrics" title="Metrics" class="md-nav__link">
+    Metrics
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#producer" title="Producer" class="md-nav__link">
+    Producer
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage" title="Usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prometheus-example" title="Prometheus Example" class="md-nav__link">
+    Prometheus Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#consumer" title="Consumer" class="md-nav__link">
+    Consumer
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#usage_1" title="Usage" class="md-nav__link">
+    Usage
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prometheus-example_1" title="Prometheus Example" class="md-nav__link">
+    Prometheus Example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#blob-storage-manipulation" title="Blob Storage Manipulation" class="md-nav__link">
+    Blob Storage Manipulation
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cleaning" title="Cleaning" class="md-nav__link">
+    Cleaning
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#hollow-explorer" title="Hollow Explorer" class="md-nav__link">
     Hollow Explorer
   </a>
@@ -725,6 +899,151 @@
                 
                 <h1 id="insight-tools">Insight Tools</h1>
 <p>Once your data is Hollow, you will be able to gain better insights into it.  Hollow ships with a number of useful tools for quickly gaining insights into your data, from broad patterns at high level, to zooming in to find and inspect specific individual records.</p>
+<h2 id="metrics">Metrics</h2>
+<p>Implementing a <code>HollowMetricsCollector</code> allows to retrieve metrics from your data. Hollow collects metrics for producer and consumers by default which can be accessed by the <code>HollowMetricsCollector</code> on every cycle.</p>
+<p>Common metrics for producer and consumer:</p>
+<ul>
+<li><code>typeHeapFootprint</code>: provides the approximate heap footprint for each Type in your data. This is based on <a href="./#heap-usage-analysis">Heap Usage Analysis</a></li>
+<li><code>typePopulatedOrdinals</code>: provides the number or ordinals per Type in your data.</li>
+<li><code>currentVersion</code>: provides the current version of your data.</li>
+<li><code>totalHeapFootprint</code>: provides the approximate heap footprint for your data. This is based on <a href="./#heap-usage-analysis">Heap Usage Analysis</a></li>
+<li><code>totalPopulatedOrdinals</code>: provides the total number of ordinals in your data.</li>
+</ul>
+<h3 id="producer">Producer</h3>
+<p>In addition to the common metrics, hollow collects the following metrics from a producer:</p>
+<ul>
+<li><code>cyclesCompleted</code></li>
+<li><code>cyclesSucceeded</code></li>
+<li><code>cycleFailed</code> </li>
+<li><code>snapshotsCompleted</code> </li>
+<li><code>snapshotsFailed</code> </li>
+<li><code>deltasCompleted</code> </li>
+<li><code>deltasFailed</code> </li>
+<li><code>reverseDeltasCompleted</code> </li>
+<li><code>reverseDeltasFailed</code> </li>
+</ul>
+<h4 id="usage">Usage</h4>
+<div class="codehilite"><pre><span></span><span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> 
+                                                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+</pre></div>
+
+
+<h4 id="prometheus-example">Prometheus Example</h4>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowProducerMetrics</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.prometheus.client.Gauge</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">MyPrometheusProducerMetricsCollector</span> <span class="kd">extends</span> <span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowProducerMetrics</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Gauge</span> <span class="n">hollowConsumerGauge</span> <span class="o">=</span> <span class="n">Gauge</span>
+            <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="s">&quot;hollowProducerMetrics&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">labelNames</span><span class="o">(</span><span class="s">&quot;metric&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">help</span><span class="o">(</span><span class="s">&quot;Hollow Producer Metrics&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">register</span><span class="o">();</span>
+
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">String</span> <span class="n">metric</span><span class="o">,</span> <span class="n">Double</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">hollowConsumerGauge</span><span class="o">.</span><span class="na">labels</span><span class="o">(</span><span class="n">metric</span><span class="o">).</span><span class="na">set</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">kb</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kt">void</span> <span class="nf">collect</span><span class="o">(</span><span class="n">HollowConsumerMetrics</span> <span class="n">metrics</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//Common hollow metrics</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypeHeapFootprint</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">heapCost</span><span class="o">)</span> <span class="o">-&gt;</span>
+                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">heapCost</span> <span class="o">/</span> <span class="n">kb</span><span class="o">)</span>
+        <span class="o">);</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypePopulatedOrdinals</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">ordinals</span><span class="o">)-&gt;</span>
+                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_domain_object_count&quot;</span><span class="o">,</span> <span class="n">ordinals</span><span class="o">)</span>
+        <span class="o">);</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalHeapFootprint</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;current_version&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCurrentVersion</span><span class="o">());</span>
+
+        <span class="c1">//Producer specific metrics</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCyclesCompleted</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_succeeded&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCyclesSucceeded</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;cycles_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCycleFailed</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;snapshots_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getSnapshotsCompleted</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;snapshotsFailed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getSnapshotsFailed</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;deltas_completed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getDeltasCompleted</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;deltas_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getDeltasFailed</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h3 id="consumer">Consumer</h3>
+<p>In addition to the common metrics, hollow collects the following metrics from a consumer:</p>
+<ul>
+<li><code>refreshFailed</code></li>
+<li><code>refreshSucceeded</code></li>
+</ul>
+<h4 id="usage_1">Usage</h4>
+<div class="codehilite"><pre><span></span><span class="n">HollowConsumer</span>
+   <span class="o">.</span><span class="na">withBlobRetriever</span><span class="o">(</span><span class="n">blobRetriever</span><span class="o">)</span>           
+   <span class="o">.</span><span class="na">withMetricsCollector</span><span class="o">(</span><span class="n">hollowMetricsCollector</span><span class="o">)</span> 
+   <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+</pre></div>
+
+
+<h4 id="prometheus-example_1">Prometheus Example</h4>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowMetricsCollector</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.netflix.hollow.api.metrics.HollowConsumerMetrics</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.prometheus.client.Gauge</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">MyPrometheusConsumerMetricsCollector</span> <span class="kd">extends</span> <span class="n">HollowMetricsCollector</span><span class="o">&lt;</span><span class="n">HollowConsumerMetrics</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="n">Gauge</span> <span class="n">hollowConsumerGauge</span> <span class="o">=</span> <span class="n">Gauge</span>
+            <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">name</span><span class="o">(</span><span class="s">&quot;hollowConsumerMetrics&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">labelNames</span><span class="o">(</span><span class="s">&quot;metric&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">help</span><span class="o">(</span><span class="s">&quot;Hollow Consumer Metrics&quot;</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">register</span><span class="o">();</span>
+
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">String</span> <span class="n">metric</span><span class="o">,</span> <span class="n">Double</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">hollowConsumerGauge</span><span class="o">.</span><span class="na">labels</span><span class="o">(</span><span class="n">metric</span><span class="o">).</span><span class="na">set</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">kb</span> <span class="o">=</span> <span class="mi">1024</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kt">void</span> <span class="nf">collect</span><span class="o">(</span><span class="n">HollowConsumerMetrics</span> <span class="n">metrics</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//Common hollow metrics</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypeHeapFootprint</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">heapCost</span><span class="o">)</span> <span class="o">-&gt;</span>
+                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">heapCost</span> <span class="o">/</span> <span class="n">kb</span><span class="o">)</span>
+        <span class="o">);</span>
+        <span class="n">metrics</span><span class="o">.</span><span class="na">getTypePopulatedOrdinals</span><span class="o">().</span><span class="na">forEach</span><span class="o">((</span><span class="n">String</span> <span class="n">type</span><span class="o">,</span> <span class="n">Long</span> <span class="n">ordinals</span><span class="o">)-&gt;</span>
+                <span class="n">set</span><span class="o">(</span><span class="n">type</span> <span class="o">+</span> <span class="s">&quot;_domain_object_count&quot;</span><span class="o">,</span> <span class="n">ordinals</span><span class="o">)</span>
+        <span class="o">);</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_heap_cost_kb&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalHeapFootprint</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;total_domain_object_count&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getTotalPopulatedOrdinals</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;current_version&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getCurrentVersion</span><span class="o">());</span>
+
+        <span class="c1">//Consumer specific metrics</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;refresh_failed&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getRefreshFailed</span><span class="o">());</span>
+        <span class="n">set</span><span class="o">(</span><span class="s">&quot;refresh_succeeded&quot;</span><span class="o">,</span> <span class="n">metrics</span><span class="o">.</span><span class="na">getRefreshSucceded</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+
+<h2 id="blob-storage-manipulation">Blob Storage Manipulation</h2>
+<h3 id="cleaning">Cleaning</h3>
+<p>Using the <code>BlobStorageCleaner</code> capability, it's possible to free up the blob storage and prevent running out of space because of old snapshots/deltas.</p>
+<p>Hollow ships with <code>HollowFilesystemBlobStorageCleaner</code> which allows to only keep a given number of snapshots. It can be used in the following way:</p>
+<div class="codehilite"><pre><span></span><span class="n">HollowProducer</span><span class="o">.</span><span class="na">Publisher</span> <span class="n">publisher</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemPublisher</span><span class="o">(</span><span class="n">publishDir</span><span class="o">);</span>
+<span class="n">HollowProducer</span><span class="o">.</span><span class="na">BlobStorageCleaner</span> <span class="n">blobStorageCleaner</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowFilesystemBlobStorageCleaner</span><span class="o">(</span><span class="n">publishDir</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+<span class="n">HollowProducer</span> <span class="n">producer</span> <span class="o">=</span> <span class="n">HollowProducer</span><span class="o">.</span><span class="na">withPublisher</span><span class="o">(</span><span class="n">publisher</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">withBlobStorageCleaner</span><span class="o">(</span><span class="n">blobStorageCleaner</span><span class="o">)</span>
+                                                <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+</pre></div>
+
+
+<p>The integer <code>10</code> parameter will set the value for <code>numOfSnapshotsToKeep</code>.</p>
+<p>It is also possible to add your own blob storage cleaner by extending <code>HollowProducer.BlobStorageCleaner</code> class and provide your own mechanism to clean snapshots/deltas/reverse deltas.</p>
 <h2 id="hollow-explorer">Hollow Explorer</h2>
 <p>Hollow ships with a UI which can be used to browse and search records within any dataset.</p>
 <h3 id="explorer-setup">Explorer Setup</h3>

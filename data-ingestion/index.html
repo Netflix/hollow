@@ -623,20 +623,20 @@
 <h3 id="memoizing-pojos-in-the-hollowobjectmapper">Memoizing POJOs in the HollowObjectMapper</h3>
 <p>If a long field named <code>__assigned_ordinal</code> is defined in a POJO class, then <code>HollowObjectMapper</code> will use this field to record the assigned ordinal when Objects of this class are added to the state engine.  </p>
 <p>When the <code>HollowObjectMapper</code> sees this POJO again, it will short-circuit writing to the state engine and discovering or assigning an ordinal -- it will instead return the previously recorded ordinal.  If during processing you can reuse duplicate referenced POJOs, then you can use this effect to greatly speed up adding records to the state engine.</p>
-<p>If the <code>__assigned_ordinal</code> field is present, it should be initialized to -1.  The field may be (but does not have to be) private and/or final.</p>
+<p>If the <code>__assigned_ordinal</code> field is present, it should be initialized to <code>HollowConstants.ORDINAL_NONE</code>.  The field may be (but does not have to be) private and/or final.</p>
 <p>The following example <code>Director</code> class uses the <code>__assigned_ordinal</code> optimization:</p>
 <div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Director</span> <span class="o">{</span>
     <span class="kt">long</span> <span class="n">id</span><span class="o">;</span>
     <span class="n">String</span> <span class="n">directorName</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">__assigned_ordinal</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1L</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">__assigned_ordinal</span> <span class="o">=</span> <span class="n">HollowConstants</span><span class="o">.</span><span class="na">ORDINAL_NONE</span><span class="o">;</span>
 <span class="o">}</span>
 </pre></div>
 
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>If the <code>__assigned_ordinal</code> optimization is used, POJOs should <em>not be modified</em> after they are added to the state engine.  Any modifications after the first time a memoized POJO is added to the state engine will be ignored and any references to these POJOs will always point to the <em>originally</em> added record.</p>
+<p>If the <code>__assigned_ordinal</code> optimization is used, POJOs should <em>not be modified</em> after they are added to the state engine.  Any modifications after the first time a memoized POJO is added to the state engine will be ignored and any references to these POJOs will always point to the <em>originally</em> added record. Using immutable POJOs can help reduce errors.</p>
 </div>
 <h2 id="json-to-hollow">JSON to Hollow</h2>
 <p>The project <em>hollow-jsonadapter</em> contains a component which will automatically parse json into a <code>HollowWriteStateEngine</code>.  The expected format of the json will be defined by the schemas in the <code>HollowWriteStateEngine</code>.  The data model must be pre-initialized.  See the <a href="../advanced-topics/#schema-parser">Schema Parser</a> topic in this document for an easy way to configure the schemas with a text document.</p>

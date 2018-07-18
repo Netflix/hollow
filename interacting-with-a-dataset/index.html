@@ -300,12 +300,49 @@
     
     <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
     
-      
     
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Interacting with a Hollow Dataset
+      </label>
     
     <a href="./" title="Interacting with a Hollow Dataset" class="md-nav__link md-nav__link--active">
       Interacting with a Hollow Dataset
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generated-object-api" title="Generated Object API" class="md-nav__link">
+    Generated Object API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generated-type-api" title="Generated Type API" class="md-nav__link">
+    Generated Type API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generic-object-api" title="Generic Object API" class="md-nav__link">
+    Generic Object API
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
     
   </li>
 
@@ -408,8 +445,34 @@
 <nav class="md-nav md-nav--secondary">
   
   
-    
   
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#generated-object-api" title="Generated Object API" class="md-nav__link">
+    Generated Object API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generated-type-api" title="Generated Type API" class="md-nav__link">
+    Generated Type API
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generic-object-api" title="Generic Object API" class="md-nav__link">
+    Generic Object API
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
   
 </nav>
                   </div>
@@ -424,7 +487,9 @@
                   <a href="https://github.com/Netflix/hollow/edit/master/docs/interacting-with-a-dataset.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                <h1 id="generated-object-api">Generated Object API</h1>
+                  <h1>Interacting with a Hollow Dataset</h1>
+                
+                <h2 id="generated-object-api">Generated Object API</h2>
 <p>Each of the examples provided thus far have focused on interaction with the Hollow data set via the generated Hollow Objects API.  </p>
 <p><em>Hollow Objects</em> are instantiated at the time they are requested.  Each Hollow Object references a single record of a specific type, and holds two things:</p>
 <ul>
@@ -436,7 +501,7 @@
 <p class="admonition-title">Hollow Objects are 'hollow'</p>
 <p>The name Hollow is derived from the fact that these objects are 'hollow' -- they <em>appear</em> to contain field accessors, but those are just facades which access the underlying data store.</p>
 </div>
-<h1 id="generated-type-api">Generated Type API</h1>
+<h2 id="generated-type-api">Generated Type API</h2>
 <p>At times, using the Hollow Object API can result in a high rate of Object allocation.  All generated Hollow APIs also provide a way to interact with the data without creating Objects.  This is accomplished by using record <a href="../diving-deeper/#ordinals">ordinals</a> to query the data store directly.  For example:</p>
 <div class="codehilite"><pre><span></span><span class="n">MovieTypeAPI</span> <span class="n">movieTypeAPI</span> <span class="o">=</span> <span class="n">movieAPI</span><span class="o">.</span><span class="na">getMovieTypeAPI</span><span class="o">();</span>
 <span class="n">ListOfActorTypeAPI</span> <span class="n">listOfActorTypeAPI</span> <span class="o">=</span> <span class="n">movieAPI</span><span class="o">.</span><span class="na">getListOfActorTypeAPI</span><span class="o">();</span>
@@ -462,7 +527,7 @@
 <p class="admonition-title">Avoid Premature Optimization</p>
 <p>In all but the tightest, most frequently executed loops, usage of the Type API will be unnecessary.  Its usage should be applied judiciously, since the pattern can be more difficult to maintain.</p>
 </div>
-<h1 id="generic-object-api">Generic Object API</h1>
+<h2 id="generic-object-api">Generic Object API</h2>
 <p>Hollow also includes a generic Hollow Object API which, if sufficient for consumers, obviates the need to provide generated code:</p>
 <div class="codehilite"><pre><span></span><span class="kt">int</span> <span class="n">movieOrdinal</span> <span class="o">=</span> <span class="n">movieIdx</span><span class="o">.</span><span class="na">getMatchingOrdinal</span><span class="o">(</span><span class="mi">1</span><span class="o">);</span>
 
