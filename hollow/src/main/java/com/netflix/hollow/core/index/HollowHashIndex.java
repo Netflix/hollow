@@ -203,6 +203,22 @@ public class HollowHashIndex implements HollowTypeStateListener {
        reindexHashIndex();
     }
 
+    public HollowReadStateEngine getStateEngine() {
+        return stateEngine;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getSelectField() {
+        return selectField;
+    }
+
+    public String[] getMatchFields() {
+        return matchFields;
+    }
+
     protected static class HollowHashIndexState {
 
         final FixedLengthElementArray selectHashArray;
