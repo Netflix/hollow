@@ -50,7 +50,7 @@ public interface HollowStringifier<T extends HollowStringifier> {
      * @throws IOException thrown if there is an error writing to the Writer
      */
     public default void stringify(Writer writer,Iterable<HollowRecord> records) throws IOException {
-        //Do nothing
+        throw new UnsupportedOperationException("not implemented");
     }
 
     /**
