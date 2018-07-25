@@ -343,11 +343,11 @@ public class HollowProducer {
         return new HollowObjectMapper(writeEngine);
     }
 
-    protected HollowWriteStateEngine getWriteEngine() {
+    public HollowWriteStateEngine getWriteEngine() {
         return objectMapper.getStateEngine();
     }
-    
-    protected HollowObjectMapper getObjectMapper() {
+
+    public HollowObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
