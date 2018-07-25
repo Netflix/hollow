@@ -243,6 +243,20 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         // an iterator doesn't update itself if it was retrieved prior to an update being applied
         assertIteratorContainsAll(preUpdateIterator, 4, 5);
     }
+    
+    @Test
+    public void testGettingPropertiesValues() throws Exception {
+        mapper.add(new TypeInlinedString(null));
+        mapper.add(new TypeInlinedString("onez:"));
+        mapper.add(new TypeInlinedString(null));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeInlinedString", "", "data");
+        Assert.assertEquals(index.getMatchFields().length, 1);
+        Assert.assertEquals(index.getMatchFields()[0], "data");
+        Assert.assertEquals(index.getType(), "TypeInlinedString");
+        Assert.assertEquals(index.getSelectField(), "");
+    }
 
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
         Set<Integer> ordinalSet = new HashSet<Integer>();
