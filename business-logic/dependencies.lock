@@ -12194,7 +12194,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-test",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12204,7 +12204,7 @@
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "requested": "latest.release"
         },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-avro": {
@@ -14470,7 +14470,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-test",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -14480,7 +14480,7 @@
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "requested": "latest.release"
         },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-avro": {
@@ -16746,7 +16746,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-test",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -16756,7 +16756,7 @@
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "requested": "latest.release"
         },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-avro": {
@@ -19022,7 +19022,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-test",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -19032,7 +19032,7 @@
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "3.0.2",
+            "locked": "3.1.0",
             "requested": "latest.release"
         },
         "com.netflix.jaxrs:netflix-jaxrs-extensions-avro": {
