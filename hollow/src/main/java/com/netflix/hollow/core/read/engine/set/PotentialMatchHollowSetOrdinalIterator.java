@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
@@ -45,7 +47,7 @@ public class PotentialMatchHollowSetOrdinalIterator implements HollowOrdinalIter
         int currentBucketValue;
 
         currentBucketValue = dataAccess.relativeBucketValue(setOrdinal, currentBucket);
-        if(currentBucketValue == -1) {
+        if(currentBucketValue == ORDINAL_NONE) {
             return NO_MORE_ORDINALS;
         }
 

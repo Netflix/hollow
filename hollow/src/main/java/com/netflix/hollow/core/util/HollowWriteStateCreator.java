@@ -65,7 +65,7 @@ public class HollowWriteStateCreator {
             throws IOException {
         InputStream input = null;
         try {
-            input = HollowWriteStateCreator.class.getResourceAsStream(schemaFilePath);
+            input = HollowWriteStateCreator.class.getClassLoader().getResourceAsStream(schemaFilePath);
             Collection<HollowSchema> schemas =
                 HollowSchemaParser.parseCollectionOfSchemas(new BufferedReader(new InputStreamReader(input)));
             populateStateEngineWithTypeWriteStates(engine, schemas);
@@ -139,7 +139,6 @@ public class HollowWriteStateCreator {
      * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
      * 
      * @param readEngine
-     * @return
      */
     public static void populateUsingReadEngine(final HollowWriteStateEngine writeEngine, final HollowReadStateEngine readEngine) {
         SimultaneousExecutor executor = new SimultaneousExecutor();

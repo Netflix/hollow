@@ -16,7 +16,6 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +23,7 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
 
     @Override
     @Before
-    public void setup() throws IOException {
+    public void setup() {
     }
 
     @Override

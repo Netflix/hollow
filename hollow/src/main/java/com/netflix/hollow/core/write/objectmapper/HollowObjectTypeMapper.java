@@ -290,6 +290,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 fieldType = MappedFieldType.FLOAT;
             } else if(type == double.class) {
                 fieldType = MappedFieldType.DOUBLE;
+            } else if (type == byte[].class && clazz == String.class) {
+                fieldType = MappedFieldType.STRING;
             } else if(type == byte[].class) {
                 fieldType = MappedFieldType.BYTES;
             } else if(type == char[].class) {
@@ -399,7 +401,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case STRING:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
-                        rec.setString(fieldName, new String((char[])fieldObject));
+                        rec.setString(fieldName, getStringFromField(obj, fieldObject));
                     break;
                 case BYTES:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
@@ -469,7 +471,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
             }
         }
-        
+
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
             Object fieldObject;
 
@@ -508,7 +510,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 return Float.valueOf(f);
             case STRING:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : new String((char[])fieldObject);
+                return fieldObject == null ? null : getStringFromField(obj, fieldObject);
             case BYTES:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
                 return fieldObject == null ? null : (byte[])fieldObject;
@@ -538,6 +540,15 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             default:
                 throw new IllegalArgumentException("Cannot extract POJO primary key from a " + fieldType + " mapped field type");
             }
+        }
+
+        private String getStringFromField(Object obj, Object fieldObject) {
+            if (obj instanceof String) {
+                return (String) obj;
+            } else if (fieldObject instanceof char[]) {
+                return new String((char[]) fieldObject);
+            }
+            throw new IllegalArgumentException("Expected char[] or String value container for STRING.");
         }
     }
     

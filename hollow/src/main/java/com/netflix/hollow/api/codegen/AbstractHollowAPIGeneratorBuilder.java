@@ -33,7 +33,7 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
     protected String packageName;
     protected HollowDataset dataset;
     protected Set<String> parameterizedTypes = Collections.emptySet();
-    protected boolean parameterizeAllClassnames = false;
+    protected boolean parameterizeAllClassNames = false;
     protected boolean useErgonomicShortcuts = false;
     protected Path destinationPath;
 
@@ -73,8 +73,8 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
         return getBuilder();
     }
 
-    public B withParameterizeAllClassNames(boolean parameterizeAllClassnames) {
-        this.parameterizeAllClassnames = parameterizeAllClassnames;
+    public B withParameterizeAllClassNames(boolean parameterizeAllClassNames) {
+        this.parameterizeAllClassNames = parameterizeAllClassNames;
         return getBuilder();
     }
 

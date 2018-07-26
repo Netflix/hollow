@@ -27,11 +27,11 @@ import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycle
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -74,21 +74,21 @@ final class ListenerSupport {
     }
 
     void fireProducerInit(long elapsedMillis) {
-        for(final HollowProducerListener l : listeners) {
+        for (final HollowProducerListener l : listeners) {
             try {
                 l.onProducerInit(elapsedMillis, MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
 
     void fireProducerRestoreStart(long version) {
-        for(final HollowProducerListener l : listeners) {
+        for (final HollowProducerListener l : listeners) {
             try {
                 l.onProducerRestoreStart(version);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -97,8 +97,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onProducerRestoreComplete(status, elapsedMillis, MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -107,8 +107,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onNewDeltaChain(version);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -119,8 +119,8 @@ final class ListenerSupport {
             if (l instanceof HollowProducerListenerV2) {
                 try {
                     ((HollowProducerListenerV2) l).onCycleSkip(reason);
-                } catch(Throwable t) {
-                    LOG.warning("Error executing listener" + t);
+                } catch (RuntimeException e) {
+                    LOG.log(Level.WARNING, "Error executing listener", e);
                 }
             }
         }
@@ -132,8 +132,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onCycleStart(version);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return psb;
@@ -144,8 +144,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onCycleComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -154,8 +154,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onNoDeltaAvailable(psb.version());
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -165,8 +165,8 @@ final class ListenerSupport {
         for (final HollowProducerListener l : listeners) {
             try {
                 l.onPopulateStart(version);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return builder;
@@ -177,8 +177,8 @@ final class ListenerSupport {
         for (final HollowProducerListener l : listeners) {
             try {
                 l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -188,8 +188,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onPublishStart(version);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return psb;
@@ -200,8 +200,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -211,8 +211,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -222,8 +222,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onIntegrityCheckStart(psb.version());
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return psb;
@@ -234,8 +234,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onIntegrityCheckComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -248,8 +248,8 @@ final class ListenerSupport {
             try {
                 l.onValidationStart(version);
                 firedListeners.add(l);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
 
         }
@@ -258,8 +258,8 @@ final class ListenerSupport {
                 if (!firedListeners.contains(vl)) {
                     vl.onValidationStart(version);
                 }
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return psb;
@@ -270,8 +270,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         
@@ -279,8 +279,8 @@ final class ListenerSupport {
         for(final HollowValidationListener vl : validationListeners) {
             try {
                 vl.onValidationComplete(valStatus, psb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -290,8 +290,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onAnnouncementStart(psb.version());
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
         return psb;
@@ -302,8 +302,8 @@ final class ListenerSupport {
         for(final HollowProducerListener l : listeners) {
             try {
                 l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -313,8 +313,8 @@ final class ListenerSupport {
         for(final IncrementalCycleListener l : incrementalCycleListeners) {
             try {
                 l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (RuntimeException e) {
+                LOG.log(Level.WARNING, "Error executing listener", e);
             }
         }
     }
@@ -324,8 +324,8 @@ final class ListenerSupport {
         for(final IncrementalCycleListener l : incrementalCycleListeners) {
             try {
                 l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch(Throwable t) {
-                LOG.warning("Error executing listener" + t);
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "Error executing listener", ex);
             }
         }
     }

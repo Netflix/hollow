@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.object;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
@@ -80,7 +82,7 @@ class HollowObjectTypeReadStateShard {
         } while(readWasUnsafe(currentData));
 
         if(refOrdinal == currentData.nullValueForField[fieldIndex])
-            return -1;
+            return ORDINAL_NONE;
         return (int)refOrdinal;
     }
 
@@ -397,7 +399,7 @@ class HollowObjectTypeReadStateShard {
         }
         
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 checksum.applyInt(ordinal);

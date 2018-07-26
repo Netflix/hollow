@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.set;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowSampler;
 import com.netflix.hollow.api.sampling.HollowSamplingDirector;
@@ -154,12 +156,12 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
         sampler.recordGet();
         
         if(keyDeriver == null)
-            return -1;
+            return ORDINAL_NONE;
         
         FieldType[] fieldTypes = keyDeriver.getFieldTypes();
         
         if(hashKey.length != fieldTypes.length)
-            return -1;
+            return ORDINAL_NONE;
 
         return shards[ordinal & shardNumberMask].findElement(ordinal >> shardOrdinalShift, hashKey);
     }

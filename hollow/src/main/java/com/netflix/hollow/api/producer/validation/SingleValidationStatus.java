@@ -32,6 +32,8 @@ import java.util.Map;
  * In next iteration this might be directly returned by validators.
  */
 public class SingleValidationStatus {
+    // TODO(hollow3): don't rely on toString() to get validation status details, use the explicit methods here
+
     private final String name;
     private final Status status;
     private final String message;

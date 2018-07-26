@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.iterator;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 
@@ -38,8 +40,8 @@ public class HollowSetOrdinalIterator implements HollowOrdinalIterator {
     public int next() {
         int bucketValue;
 
-        bucketValue = -1;
-        while(bucketValue == -1) {
+        bucketValue = ORDINAL_NONE;
+        while(bucketValue == ORDINAL_NONE) {
             currentBucket++;
             if(currentBucket >= numBuckets)
                 return NO_MORE_ORDINALS;

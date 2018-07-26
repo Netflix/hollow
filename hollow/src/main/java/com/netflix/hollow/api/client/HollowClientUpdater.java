@@ -17,11 +17,11 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
@@ -80,7 +80,7 @@ public class HollowClientUpdater {
     public synchronized boolean updateTo(long version) throws Throwable {
         if (version == getCurrentVersionId()) {
             if (version == HollowConstants.VERSION_NONE && hollowDataHolder == null) {
-                LOG.info("No versions to update to, initializing to empty state");
+                LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolder = newHollowDataHolder();
                 forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
@@ -185,7 +185,7 @@ public class HollowClientUpdater {
     }
 
     public HollowReadStateEngine getStateEngine() {
-        return hollowDataHolder.getStateEngine();
+        return hollowDataHolder == null ? null : hollowDataHolder.getStateEngine();
     }
 
     public HollowAPI getAPI() {

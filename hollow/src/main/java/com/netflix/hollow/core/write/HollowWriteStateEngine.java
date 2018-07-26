@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.error.HollowWriteStateException;
+import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
@@ -165,7 +167,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         try {
             executor.awaitSuccessfulCompletion();
         } catch(Exception e){
-            throw new RuntimeException(e);
+            throw new HollowWriteStateException("Unable to restore write state from read state engine", e);
         }
     }
 
@@ -191,8 +193,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Failed to prepare for write", ex);
         }
 
         preparedForNextCycle = false;
@@ -221,8 +223,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Failed to prepare for next cycle", ex);
         }
 
         preparedForNextCycle = true;
@@ -260,8 +262,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable th) {
-            throw new RuntimeException(th);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Unable to reset to the prior version of the write state", ex);
         }
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
@@ -327,6 +329,19 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     @Override
     public HollowSchema getSchema(String schemaName) {
         return hollowSchemas.get(schemaName);
+    }
+
+    @Override
+    public HollowSchema getNonNullSchema(String schemaName) {
+        HollowSchema schema = getSchema(schemaName);
+        if (schema == null) {
+            List<String> schemas = new ArrayList<>();
+            for (HollowSchema s : getSchemas()) {
+                schemas.add(s.getName());
+            }
+            throw new SchemaNotFoundException(schemaName, schemas);
+        }
+        return schema;
     }
 
     @Override

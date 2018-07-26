@@ -189,7 +189,8 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
             break;
         case BYTES:
             builder.append("    public byte[] get").append(uppercase(fieldName)).append("(int ordinal) {\n");
-            builder.append("        return ").append(fieldName).append(";\n");
+            // we need the cast to get around http://findbugs.sourceforge.net/bugDescriptions.html#EI_EXPOSE_REP
+            builder.append("        return (byte[]) ").append(fieldName).append(";\n");
             builder.append("    }\n\n");
             break;
         case DOUBLE:

@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.HollowConstants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

@@ -1,8 +1,10 @@
 apply plugin: 'java'
  
 dependencies {
+    testCompile project(":hollow-test")
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2.15.0'
+    testCompile 'com.google.code.findbugs:findbugs:3.0.1'
 }
 
 // quiet warnings about sun.misc.Unsafe
@@ -14,4 +16,8 @@ compileJava {
 
 javadoc {
     options.addStringOption('XDignore.symbol.file', '-quiet')
+}
+
+test {
+    environment 'FB_NO_UPDATE_CHECKS', 'true' // https://github.com/findbugsproject/findbugs/issues/137#issuecomment-256604616
 }

@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.read.engine.list;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
@@ -35,7 +37,7 @@ class HollowListTypeReadStateShard {
             do {
                 currentData = this.currentData;
 
-                long fixedLengthOffset = currentData.bitsPerListPointer * ordinal;
+                long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
                 startAndEndElement = ordinal == 0 ?
                         currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
@@ -64,7 +66,7 @@ class HollowListTypeReadStateShard {
         do {
             currentData = this.currentData;
 
-            long fixedLengthOffset = currentData.bitsPerListPointer * ordinal;
+            long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
             long startAndEndElement = ordinal == 0 ?
                     currentData.listPointerArray.getElementValue(fixedLengthOffset, currentData.bitsPerListPointer) << currentData.bitsPerListPointer :
@@ -98,7 +100,7 @@ class HollowListTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         int ordinal = populatedOrdinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int size = size(shardOrdinal);
@@ -113,8 +115,8 @@ class HollowListTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
-        long requiredListPointerBits = ((long)currentData.bitsPerListPointer * (currentData.maxOrdinal + 1));
-        long requiredElementBits = (currentData.totalNumberOfElements * currentData.bitsPerElement);
+        long requiredListPointerBits = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
+        long requiredElementBits = currentData.totalNumberOfElements * currentData.bitsPerElement;
         long requiredBits = requiredListPointerBits + requiredElementBits;
         return requiredBits / 8;
     }

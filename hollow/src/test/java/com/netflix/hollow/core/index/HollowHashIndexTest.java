@@ -19,6 +19,7 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.AbstractStateEngineTest;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,11 +30,15 @@ import org.junit.Test;
 
 
 public class HollowHashIndexTest extends AbstractStateEngineTest {
+    private HollowObjectMapper mapper;
+
+    @Override
+    protected void initializeTypeStates() {
+        mapper = new HollowObjectMapper(writeStateEngine);
+    }
 
     @Test
     public void testBasicHashIndexFunctionality() throws Exception {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
         mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("twenty"), new TypeB("two hundred")));
@@ -43,7 +48,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
 
         roundTripSnapshot();
 
-        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "a1", new String[] {"a1", "ab.element.b1.value"});
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeA", "a1", new String[]{"a1", "ab.element.b1.value"});
 
         Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0, "notfound"));
         assertIteratorContainsAll(index.findMatches(1, "one").iterator(), 0);
@@ -54,42 +59,156 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         assertIteratorContainsAll(index.findMatches(3, "three").iterator(), 3);
         assertIteratorContainsAll(index.findMatches(3, "thirty").iterator(), 3);
         assertIteratorContainsAll(index.findMatches(3, "three hundred").iterator(), 3);
-        assertIteratorContainsAll(index.findMatches(4, "four").iterator(), 4,5);
+        assertIteratorContainsAll(index.findMatches(4, "four").iterator(), 4, 5);
         assertIteratorContainsAll(index.findMatches(4, "forty").iterator(), 5);
-        
+
     }
 
     @Test
-    public void testIndexingNullFieldValues() throws Exception {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-
-        mapper.add(new TypeB("one"));
+    public void testIndexingStringTypeFieldWithNullValues() throws Exception {
         mapper.add(new TypeB(null));
+        mapper.add(new TypeB("onez:"));
 
         roundTripSnapshot();
-
         HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
 
-        assertIteratorContainsAll(index.findMatches("one").iterator(), 0);
+        Assert.assertNull(index.findMatches("one:"));
+        assertIteratorContainsAll(index.findMatches("onez:").iterator(), 1);
+    }
 
-        try {
-            index.findMatches(new Object[] { null });
-            Assert.fail("exception expected");
-        } catch(IllegalArgumentException ex) {
-            Assert.assertEquals("querying by null unsupported; i=0", ex.getMessage());
-        }
+    @Test
+    public void testIndexingBytesTypeFieldWithNullValues() throws Exception {
+        byte[] bytes = {-120,0,0,0};
+        mapper.add(new TypeBytes(null));
+        mapper.add(new TypeBytes(bytes));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeBytes", "", "data");
+
+        byte[] nonExistingBytes = {1};
+        Assert.assertNull(index.findMatches(nonExistingBytes));
+        assertIteratorContainsAll(index.findMatches(bytes).iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingStringTypeFieldsWithNullValues() throws Exception {
+        mapper.add(new TypeTwoStrings(null, "onez:"));
+        mapper.add(new TypeTwoStrings("onez:", "onez:"));
+        mapper.add(new TypeTwoStrings(null, null));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeTwoStrings", "", "b1.value", "b2.value");
+
+        Assert.assertNull(index.findMatches("one"));
+        Assert.assertNull(index.findMatches("one", "onez:"));
+        assertIteratorContainsAll(index.findMatches("onez:", "onez:").iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingStringTypeFieldsWithNullValuesInDifferentOrder() throws Exception {
+        mapper.add(new TypeTwoStrings(null, null));
+        mapper.add(new TypeTwoStrings(null, "onez:"));
+        mapper.add(new TypeTwoStrings("onez:", "onez:"));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeTwoStrings", "", "b1.value", "b2.value");
+
+        Assert.assertNull(index.findMatches("one"));
+        Assert.assertNull(index.findMatches("one", "onez:"));
+        assertIteratorContainsAll(index.findMatches("onez:", "onez:").iterator(), 2);
+    }
+
+    @Test
+    public void testIndexingBooleanTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeBoolean(null));
+        mapper.add(new TypeBoolean(true));
+        mapper.add(new TypeBoolean(false));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeBoolean", "", "data.value");
+
+        assertIteratorContainsAll(index.findMatches(Boolean.FALSE).iterator(), 2);
+        assertIteratorContainsAll(index.findMatches(Boolean.TRUE).iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingInlinedStringTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeInlinedString(null));
+        mapper.add(new TypeInlinedString("onez:"));
+        mapper.add(new TypeInlinedString(null));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeInlinedString", "", "data");
+
+        Assert.assertNull(index.findMatches("one:"));
+        assertIteratorContainsAll(index.findMatches("onez:").iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingLongTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeLong(null));
+        mapper.add(new TypeLong(3L));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeLong", "", "data.value");
+
+        Assert.assertNull(index.findMatches(2L));
+        assertIteratorContainsAll(index.findMatches(3L).iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingDoubleTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeDouble(null));
+        mapper.add(new TypeDouble(-8.0));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeDouble", "", "data.value");
+
+        Assert.assertNull(index.findMatches(2.0));
+        assertIteratorContainsAll(index.findMatches(-8.0).iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingIntegerTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeInteger(null));
+        mapper.add(new TypeInteger(-1));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeInteger", "", "data.value");
+
+        Assert.assertNull(index.findMatches(2));
+        assertIteratorContainsAll(index.findMatches(-1).iterator(), 1);
+    }
+
+    @Test
+    public void testIndexingFloatTypeFieldWithNullValues() throws Exception {
+        mapper.add(new TypeFloat(null));
+        mapper.add(new TypeFloat(-1.0f));
+
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeFloat", "", "data.value");
+
+        Assert.assertNull(index.findMatches(2.0f));
+        assertIteratorContainsAll(index.findMatches(-1.0f).iterator(), 1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFindingMatchForNullQueryValue() throws Exception {
+        mapper.add(new TypeB("one:"));
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeB", "", "b1.value");
+        index.findMatches(new Object[]{null});
+        Assert.fail("exception expected");
     }
 
     @Test
     public void testUpdateListener() throws Exception {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-
         mapper.add(new TypeA(1, 1.1d, new TypeB("one")));
         mapper.add(new TypeA(1, 1.1d, new TypeB("1")));
         mapper.add(new TypeA(2, 2.2d, new TypeB("two"), new TypeB("twenty"), new TypeB("two hundred")));
         mapper.add(new TypeA(3, 3.3d, new TypeB("three"), new TypeB("thirty"), new TypeB("three hundred")));
         mapper.add(new TypeA(4, 4.4d, new TypeB("four")));
-        mapper.add(new TypeA(4, 4.5d, new TypeB("four"), new TypeB("forty")));        
+        mapper.add(new TypeA(4, 4.5d, new TypeB("four"), new TypeB("forty")));
 
         roundTripSnapshot();
 
@@ -98,10 +217,10 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
 
         // spot check initial mapper state
         Assert.assertNull("An entry that doesn't have any matches has a null iterator", index.findMatches(0));
-        assertIteratorContainsAll(index.findMatches(1).iterator(), 1,0);
+        assertIteratorContainsAll(index.findMatches(1).iterator(), 1, 0);
         assertIteratorContainsAll(index.findMatches(2).iterator(), 2);
         assertIteratorContainsAll(index.findMatches(3).iterator(), 3);
-        assertIteratorContainsAll(index.findMatches(4).iterator(), 4,5);
+        assertIteratorContainsAll(index.findMatches(4).iterator(), 4, 5);
 
         HollowOrdinalIterator preUpdateIterator = index.findMatches(4).iterator();
 
@@ -116,16 +235,27 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         roundTripDelta();
 
         // verify the ordinals we get from the index match our new expected ones.
-        assertIteratorContainsAll(index.findMatches(1).iterator(), 1,0);
+        assertIteratorContainsAll(index.findMatches(1).iterator(), 1, 0);
         Assert.assertNull("A removed entry that doesn't have any matches", index.findMatches(2));
         assertIteratorContainsAll(index.findMatches(3).iterator(), 3);
-        assertIteratorContainsAll(index.findMatches(4).iterator(), 5,6,7);
+        assertIteratorContainsAll(index.findMatches(4).iterator(), 5, 6, 7);
 
         // an iterator doesn't update itself if it was retrieved prior to an update being applied
-        assertIteratorContainsAll(preUpdateIterator, 4,5);
+        assertIteratorContainsAll(preUpdateIterator, 4, 5);
+    }
+    
+    @Test
+    public void testGettingPropertiesValues() throws Exception {
+        mapper.add(new TypeInlinedString(null));
+        mapper.add(new TypeInlinedString("onez:"));
+        mapper.add(new TypeInlinedString(null));
 
-
-
+        roundTripSnapshot();
+        HollowHashIndex index = new HollowHashIndex(readStateEngine, "TypeInlinedString", "", "data");
+        Assert.assertEquals(index.getMatchFields().length, 1);
+        Assert.assertEquals(index.getMatchFields()[0], "data");
+        Assert.assertEquals(index.getType(), "TypeInlinedString");
+        Assert.assertEquals(index.getSelectField(), "");
     }
 
     private void assertIteratorContainsAll(HollowOrdinalIterator iter, int... expectedOrdinals) {
@@ -136,7 +266,7 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
             ordinal = iter.next();
         }
 
-        for (int ord: expectedOrdinals) {
+        for (int ord : expectedOrdinals) {
             Assert.assertTrue(ordinalSet.contains(ord));
         }
         Assert.assertTrue(ordinalSet.size() == expectedOrdinals.length);
@@ -171,7 +301,78 @@ public class HollowHashIndexTest extends AbstractStateEngineTest {
         }
     }
 
-    @Override
-    protected void initializeTypeStates() { }
+    @SuppressWarnings("unused")
+    private static class TypeTwoStrings {
+        private final String b1;
+        private final String b2;
 
+        public TypeTwoStrings(String b1, String b2) {
+            this.b1 = b1;
+            this.b2 = b2;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeBoolean {
+        private final Boolean data;
+
+        public TypeBoolean(Boolean data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeInlinedString {
+        @HollowInline
+        private final String data;
+
+        public TypeInlinedString(String data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeLong {
+        private final Long data;
+
+        public TypeLong(Long data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeDouble {
+        private final Double data;
+
+        public TypeDouble(Double data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeInteger {
+        private final Integer data;
+
+        public TypeInteger(Integer data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeFloat {
+        private final Float data;
+
+        public TypeFloat(Float data) {
+            this.data = data;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class TypeBytes {
+        private final byte[] data;
+
+        public TypeBytes(byte[] data) {
+            this.data = data;
+        }
+    }
 }
