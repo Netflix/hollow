@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.modules.packages.contracts;
+	package com.netflix.vms.transformer.modules.packages.contracts;
 
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
@@ -127,7 +127,7 @@ public class ContractRestrictionModule {
                     Map<Integer, Boolean> contractIds = new HashMap<>();
                     if (window._getContractIdsExt() != null) {
                         for (RightsWindowContractHollow contract : window._getContractIdsExt()) {
-                            contractIds.put(Integer.valueOf((int) contract._getContractId()), Boolean.valueOf(contract._getDownload()));
+                            contractIds.put(Integer.valueOf((int) contract._getDealId()), Boolean.valueOf(contract._getDownload()));
                         }
                     }
 
@@ -187,7 +187,7 @@ public class ContractRestrictionModule {
         List<RightsWindowContractHollow> applicableContracts = new ArrayList<>(windowContracts.size());
 
         for (RightsWindowContractHollow windowContract : windowContracts) {
-            Integer contractId = Integer.valueOf((int) windowContract._getContractId());
+            Integer contractId = Integer.valueOf((int) windowContract._getDealId());
             Boolean isAvailableForDownload = contractIds.get(contractId);
             if (isAvailableForDownload != null && contractIsApplicableForPackage(windowContract, packages._getPackageId())) {
                 applicableContracts.add(windowContract);
@@ -227,7 +227,7 @@ public class ContractRestrictionModule {
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, contractAssets, STREAM);
 
         // get contract data from Contract feed published by beehive. This contract data has information on title, country, prepromotion and cup tokens and others.
-        ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, windowContractHollow._getContractId());
+        ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, windowContractHollow._getDealId());
 
         if (contract != null) {
             // Contract feed also has data on disAllowedBundles
@@ -282,7 +282,7 @@ public class ContractRestrictionModule {
         RightsWindowContractHollow selectedRightsContract = firstContract;
         for (RightsWindowContractHollow thisRightsContract : applicableRightsContracts) {
             // for unmerged fields, select the contract with the highest ID.
-            if (thisRightsContract._getContractId() > selectedRightsContract._getContractId())
+            if (thisRightsContract._getDealId() > selectedRightsContract._getDealId())
                 selectedRightsContract = thisRightsContract;
             if (thisRightsContract._getDownload() != firstContract._getDownload())
                 downloadRightsDifferentForContracts = true;
@@ -305,7 +305,7 @@ public class ContractRestrictionModule {
             restriction.offlineViewingRestrictions.downloadLanguageBcp47RestrictionsMap = offlineViewingContractRestriction.languageBcp47RestrictionsMap;
         }
 
-        ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract._getContractId());
+        ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, selectedRightsContract._getDealId());
         finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
 
         return restriction;
@@ -325,7 +325,7 @@ public class ContractRestrictionModule {
         for (RightsWindowContractHollow thisRightsContract : applicableRightsContracts) {
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, thisRightsContract._getAssets(), viewing);
 
-            long contractId = thisRightsContract._getContractId();
+            long contractId = thisRightsContract._getDealId();
             ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
             if (contract != null) {
                 for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
@@ -372,7 +372,7 @@ public class ContractRestrictionModule {
                 // merge the disallowed text languages, AND all available text languages
                 // which were *not* disallowed, are allowed.
                 Set<String> bundleRestrictedAudioLanguagesFromThisContract = new HashSet<String>();
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getDealId());
                 if (contract != null) {
                     for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
                         String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
@@ -413,7 +413,7 @@ public class ContractRestrictionModule {
             for (RightsWindowContractHollow rightsContract : applicableRightsContracts) {
                 Set<String> forcedSubtitleLanguagesForThisContract = new HashSet<String>();
 
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, rightsContract._getDealId());
                 if (contract != null) {
                     for (DisallowedAssetBundleHollow assetBundle : contract._getDisallowedAssetBundles()) {
                         if (assetBundle._getForceSubtitle())

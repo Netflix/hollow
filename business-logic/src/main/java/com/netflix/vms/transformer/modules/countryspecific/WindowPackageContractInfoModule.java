@@ -59,7 +59,7 @@ public class WindowPackageContractInfoModule {
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getContractId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
         info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
         assignContractInfo(info, contract, videoId);
@@ -98,7 +98,7 @@ public class WindowPackageContractInfoModule {
     public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow, ContractHollow contract, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getContractId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.primaryPackageId = packageId;
         assignContractInfo(info, contract, videoId);
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
@@ -114,7 +114,7 @@ public class WindowPackageContractInfoModule {
             info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
             info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast(); // NOTE: DAB and hasRollingEpisodes means the same
             info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.singletonList(
-                    cupTokenFetcher.getCupToken(videoId, contract)));
+            		cupTokenFetcher.getCupToken(videoId, contract)));
         } else {
             info.videoContractInfo.cupTokens = new LinkedHashSetOfStrings(Collections.emptyList());
         }

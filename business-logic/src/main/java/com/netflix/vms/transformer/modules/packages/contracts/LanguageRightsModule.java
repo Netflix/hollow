@@ -62,10 +62,10 @@ public class LanguageRightsModule extends AbstractTransformModule {
             }
 
             for (RightsWindowContractHollow windowContract : windowContracts) {
-                int contractId = (int) windowContract._getContractId();
+                int contractId = (int) windowContract._getDealId();
                 Pair<Integer, Integer> rightsKey = new Pair<>(contractId, movieId);
 
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, movieId, countryCode, windowContract._getContractId());
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, movieId, countryCode, windowContract._getDealId());
                 DisallowedAssetBundlesListHollow disallowedBundleList_ = contract == null ? null : contract._getDisallowedAssetBundles();
                 if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
                     continue;
