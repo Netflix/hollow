@@ -15,7 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.producer.experimental;
+
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,20 +28,30 @@ import java.util.logging.Logger;
  *
  * Allows a producer to publish to multiple cloud/regions at the same time
  */
-public class SingleHollowMultiPublisher extends AbstractHollowMultiPublisher {
+public class ParallelHollowMultiPublisher extends AbstractHollowMultiPublisher {
 
-    private static final Logger LOG = Logger.getLogger(SingleHollowMultiPublisher.class.getName());
+    private static final Logger LOG = Logger.getLogger(ParallelHollowMultiPublisher.class.getName());
 
-    public SingleHollowMultiPublisher(List<HollowProducer.Publisher> publishers) {
+    private final double threadsPerCpu;
+
+    public ParallelHollowMultiPublisher(List<HollowProducer.Publisher> publishers, double threadsPerCpu) {
         super(publishers);
+        this.threadsPerCpu = threadsPerCpu;
     }
 
     @Override
     public void publish(final HollowProducer.Blob blob) {
+        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+        for(final HollowProducer.Publisher publisher : publishers) {
+            executor.execute(new Runnable() {
+                public void run() {
+                    publisher.publish(blob);
+                }
+            });
+        }
+
         try {
-            for(final HollowProducer.Publisher publisher : publishers) {
-                publisher.publish(blob);
-            }
+            executor.awaitSuccessfulCompletion();
         } catch(Throwable t) {
             LOG.warning("Could not publish blob" + t);
             throw new RuntimeException(t);

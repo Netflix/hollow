@@ -15,45 +15,41 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.producer.experimental;
 
-import com.netflix.hollow.core.util.SimultaneousExecutor;
+import com.netflix.hollow.api.producer.HollowProducer;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Warning: This is a BETA API and is subject to breaking changes.
- *
+ * <p>
  * Allows a producer to publish to multiple cloud/regions at the same time
  */
-public class ParallelHollowMultiPublisher extends AbstractHollowMultiPublisher {
+public class SingleHollowMultiPublisher extends AbstractHollowMultiPublisher {
 
-    private static final Logger LOG = Logger.getLogger(ParallelHollowMultiPublisher.class.getName());
+    private static final Logger LOG = Logger.getLogger(SingleHollowMultiPublisher.class.getName());
 
-    private final double threadsPerCpu;
-
-    public ParallelHollowMultiPublisher(List<HollowProducer.Publisher> publishers, double threadsPerCpu) {
+    public SingleHollowMultiPublisher(List<HollowProducer.Publisher> publishers) {
         super(publishers);
-        this.threadsPerCpu = threadsPerCpu;
     }
 
     @Override
     public void publish(final HollowProducer.Blob blob) {
-        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
-        for(final HollowProducer.Publisher publisher : publishers) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    publisher.publish(blob);
+        Exception cause = null;
+        for (final HollowProducer.Publisher publisher : publishers) {
+            try {
+                publisher.publish(blob);
+            } catch (Exception ex) {
+                if (cause == null) {
+                    cause = ex;
                 }
-            });
+            }
         }
-
-        try {
-            executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            LOG.warning("Could not publish blob" + t);
-            throw new RuntimeException(t);
+        if(cause != null) {
+            LOG.warning("Could not publish blob" + cause);
+            throw new RuntimeException(cause);
         }
     }
 }

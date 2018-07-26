@@ -15,7 +15,9 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.producer.experimental;
+
+import com.netflix.hollow.api.producer.HollowProducer;
 
 import java.util.List;
 
