@@ -37,6 +37,7 @@ ospackage {
     packageName = 'vmstransformer'
     requires('nflx-ezconfig')
     requires('nflx-base-www')
+    requires('ulog-jatins')
 }
 
 dependencies {
