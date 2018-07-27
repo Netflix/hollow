@@ -18,6 +18,11 @@ subprojects {
     targetCompatibility = JavaVersion.VERSION_1_8
   }
 
+  tasks.withType(JavaCompile) {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  }
+
   group = 'com.netflix.hollow'
   checkstyle {
     configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
