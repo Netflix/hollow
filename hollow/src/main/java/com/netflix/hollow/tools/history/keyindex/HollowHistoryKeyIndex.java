@@ -26,9 +26,11 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -148,21 +150,22 @@ public class HollowHistoryKeyIndex {
 
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
         try {
+            Path tmpFile = Files.createTempFile("roundtrip", "snapshot");
             if (isInitialUpdate || isSnapshot) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-                writer.writeSnapshot(baos);
+                writer.writeSnapshot(fileOutputStream);
                 // Use existing readStateEngine on initial update; otherwise, create new one to properly handle double snapshot
                 HollowReadStateEngine newReadStateEngine = isInitialUpdate ? readStateEngine : new HollowReadStateEngine();
                 HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
-                reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
+                reader.readSnapshot(Files.newInputStream(tmpFile));
                 return newReadStateEngine;
             } else {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
                 HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-                writer.writeDelta(baos);
+                writer.writeDelta(fileOutputStream);
                 HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-                reader.applyDelta(new ByteArrayInputStream(baos.toByteArray()));
+                reader.applyDelta(Files.newInputStream(tmpFile));
                 return readStateEngine;
             }
         } catch(IOException e) {

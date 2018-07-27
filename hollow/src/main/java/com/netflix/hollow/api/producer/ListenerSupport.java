@@ -324,8 +324,8 @@ final class ListenerSupport {
         for(final IncrementalCycleListener l : incrementalCycleListeners) {
             try {
                 l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch (Throwable t) {
-                LOG.log(Level.WARNING, "Error executing listener", t);
+            } catch (Exception ex) {
+                LOG.log(Level.WARNING, "Error executing listener", ex);
             }
         }
     }

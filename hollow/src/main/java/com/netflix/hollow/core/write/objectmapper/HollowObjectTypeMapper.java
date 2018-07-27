@@ -401,7 +401,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case STRING:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
-                        rec.setString(fieldName, getStringFromField(fieldObject));
+                        rec.setString(fieldName, getStringFromField(obj, fieldObject));
                     break;
                 case BYTES:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
@@ -510,7 +510,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 return Float.valueOf(f);
             case STRING:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : getStringFromField(fieldObject);
+                return fieldObject == null ? null : getStringFromField(obj, fieldObject);
             case BYTES:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
                 return fieldObject == null ? null : (byte[])fieldObject;
@@ -542,12 +542,13 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             }
         }
 
-        private String getStringFromField(Object fieldObject) {
-            if (fieldObject instanceof char[])
+        private String getStringFromField(Object obj, Object fieldObject) {
+            if (obj instanceof String) {
+                return (String) obj;
+            } else if (fieldObject instanceof char[]) {
                 return new String((char[]) fieldObject);
-            if (fieldObject instanceof byte[])
-                return new String((byte[]) fieldObject);
-            throw new IllegalArgumentException("Expected char[] or byte[] value container for STRING.");
+            }
+            throw new IllegalArgumentException("Expected char[] or String value container for STRING.");
         }
     }
     
