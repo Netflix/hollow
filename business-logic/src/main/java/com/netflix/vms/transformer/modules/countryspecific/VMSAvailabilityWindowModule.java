@@ -237,11 +237,29 @@ public class VMSAvailabilityWindowModule {
 
                 // get contract id from window contract and contract data from VideoContract feed.
                 long contractId = windowContractHollow._getDealId();
-                ContractHollow contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
+
+                List<ContractHollow> contracts = VideoContractUtil.getContracts(api, indexer, videoId, country, contractId);
                 
+                ContractHollow contractData = null;
+                if(contracts != null && !contracts.isEmpty()) {
+                	contractData = contracts.get(0);                	
+                }
+
                 // Get pre-promo days, DAB flag and DOB flag
-                int minPrePromoDays = 42;
+                int minPrePromoDays = Integer.MAX_VALUE;
+                boolean dabFlag = false;
+                boolean dobFlag = false;
+                
+                // Loop through the contracts and get the min prepromo date
+                if(!contracts.isEmpty() && contracts != null) {
+                    for(ContractHollow contract : contracts) {
+                    	if((int)contract._getPrePromotionDays() < minPrePromoDays)
+                    		minPrePromoDays = (int) contract._getPrePromotionDays();
+                    	dabFlag |= contract._getDayAfterBroadcast();
+                    	dobFlag |= contract._getDayOfBroadcast();
+                    }                	
+                }
 
                 // check if there are any assets & packages associated with this contract
                 if (windowContractHollow._getPackageIdBoxed() != null || (windowContractHollow._getAssets() != null && !windowContractHollow._getAssets().isEmpty()) || (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty())) {

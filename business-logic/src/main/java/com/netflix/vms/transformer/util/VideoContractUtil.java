@@ -14,7 +14,6 @@ import java.util.List;
 
 public class VideoContractUtil {
     public static ContractHollow getContract(VMSHollowInputAPI api, VMSTransformerIndexer indexer, long videoId, String countryCode, long contractId) {
-    	ContractHollow ret = null;
         HollowHashIndex videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACT_BY_CONTRACTID);
         HollowHashIndexResult results = videoContractsIdx.findMatches(videoId, countryCode, contractId);
         if (results != null) {
@@ -23,15 +22,31 @@ public class VideoContractUtil {
             while (ordinal != NO_MORE_ORDINALS) {
                 ContractHollow data = api.getContractHollow(ordinal);
                 if (data != null) {
-                    ret = data;
+                    return data;
                 }
             }
         }
         
-        // Once we can get this working without a deadlock .. we will start keeping track of pre-promo days DAB and DOB flags
-        // 
+        return null;
+    }
 
-        return ret;
+    
+    public static List<ContractHollow> getContracts(VMSHollowInputAPI api, VMSTransformerIndexer indexer, long videoId, String countryCode, long contractId) {
+    	List<ContractHollow> contracts = new ArrayList<>();
+        HollowHashIndex videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACT_BY_CONTRACTID);
+        HollowHashIndexResult results = videoContractsIdx.findMatches(videoId, countryCode, contractId);
+        if (results != null) {
+            HollowOrdinalIterator iter = results.iterator();
+            int ordinal = iter.next();
+            while (ordinal != NO_MORE_ORDINALS) {
+                ContractHollow data = api.getContractHollow(ordinal);
+                if (data != null) {
+                    contracts.add(data);
+                }
+            }
+        }
+        
+        return contracts;
     }
     
 }
