@@ -19,6 +19,7 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
+
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,8 @@ public class WindowPackageContractInfoModule {
     }
 
     public WindowPackageContractInfo buildWindowPackageContractInfo(int videoId, PackageData packageData,
-            RightsWindowContractHollow windowContractHollow, ContractHollow contract, String country, boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
+            RightsWindowContractHollow windowContractHollow, ContractHollow contract, String country, 
+            boolean isAvailableForDownload, PackageDataCollection packageDataCollection, int prePromoDays) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
 
 
@@ -62,7 +64,7 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
         info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
-        assignContractInfo(info, contract, videoId);
+        assignContractInfo(info, contract, videoId, prePromoDays);
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
 
         // create package info
@@ -95,21 +97,22 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow, ContractHollow contract, int videoId) {
+    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow, 
+    		ContractHollow contract, int videoId, String countryCode, int prePromoDays) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
         info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.primaryPackageId = packageId;
-        assignContractInfo(info, contract, videoId);
+        assignContractInfo(info, contract, videoId, prePromoDays);
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
         info.videoPackageInfo = getFilteredVideoPackageInfo(videoId, packageId);
         return info;
     }
 
-    private void assignContractInfo(WindowPackageContractInfo info, ContractHollow contract, int videoId) {
+    private void assignContractInfo(WindowPackageContractInfo info, ContractHollow contract, int videoId, int prePromoDays) {
         if (contract != null) {
             if (contract._getPrePromotionDays() != Long.MIN_VALUE)
-                info.videoContractInfo.prePromotionDays = (int) contract._getPrePromotionDays();
+                info.videoContractInfo.prePromotionDays = prePromoDays;
             info.videoContractInfo.isDayOfBroadcast = contract._getDayOfBroadcast();
             info.videoContractInfo.isDayAfterBroadcast = contract._getDayAfterBroadcast();
             info.videoContractInfo.hasRollingEpisodes = contract._getDayAfterBroadcast(); // NOTE: DAB and hasRollingEpisodes means the same

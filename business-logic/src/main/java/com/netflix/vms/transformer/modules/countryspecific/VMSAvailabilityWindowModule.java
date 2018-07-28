@@ -239,6 +239,9 @@ public class VMSAvailabilityWindowModule {
                 long contractId = windowContractHollow._getDealId();
                 ContractHollow contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
+                
+                // Get pre-promo days, DAB flag and DOB flag
+                int minPrePromoDays = 42;
 
                 // check if there are any assets & packages associated with this contract
                 if (windowContractHollow._getPackageIdBoxed() != null || (windowContractHollow._getAssets() != null && !windowContractHollow._getAssets().isEmpty()) || (windowContractHollow._getPackages() != null && !windowContractHollow._getPackages().isEmpty())) {
@@ -382,7 +385,7 @@ public class VMSAvailabilityWindowModule {
                                         // package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(
                                                 videoId, packageData, windowContractHollow, contractData, country,
-                                                isAvailableForDownload, packageDataCollection);
+                                                isAvailableForDownload, packageDataCollection, minPrePromoDays);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = contractPackages == null ? true : packageData.isDefaultPackage;
                                         if (!considerForPackageSelection) {
@@ -407,7 +410,7 @@ public class VMSAvailabilityWindowModule {
 
                                     } else {
                                         // package data not available -- use the contract only
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractData, videoId);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractData, videoId, country, minPrePromoDays);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                         // if fist package, then update contract id for the current window
@@ -445,7 +448,7 @@ public class VMSAvailabilityWindowModule {
 
                         if (language == null) {
                             // build info without package data, Use the assets and contract data though
-                            WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
+                            WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId, country, minPrePromoDays);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                             if (packageIdForWindow == 0)
