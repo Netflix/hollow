@@ -22,6 +22,7 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+import com.netflix.vms.transformer.util.ConsolidatedContractInfo;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +66,8 @@ public class LanguageRightsModule extends AbstractTransformModule {
                 int contractId = (int) windowContract._getDealId();
                 Pair<Integer, Integer> rightsKey = new Pair<>(contractId, movieId);
 
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, movieId, countryCode, windowContract._getDealId());
+                ConsolidatedContractInfo ccontractInfo = VideoContractUtil.getContract(api, indexer, movieId, countryCode, windowContract._getDealId());
+                ContractHollow contract = ccontractInfo.getContract();
                 DisallowedAssetBundlesListHollow disallowedBundleList_ = contract == null ? null : contract._getDisallowedAssetBundles();
                 if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
                     continue;

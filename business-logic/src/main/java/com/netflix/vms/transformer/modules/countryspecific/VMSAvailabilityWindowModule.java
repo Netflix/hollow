@@ -43,6 +43,7 @@ import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
+import com.netflix.vms.transformer.util.ConsolidatedContractInfo;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
@@ -148,11 +149,11 @@ public class VMSAvailabilityWindowModule {
         return outputWindow;
     }
 
-    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, ContractHollow contractData, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
+    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, ConsolidatedContractInfo contractData, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
 
         // 1. merge cup token values
         List<Strings> cupTokens = new ArrayList<>();
-        Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData);
+        Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData.getContract());
         if (existingInfo.videoContractInfo.contractId > contractId) {
             cupTokens.addAll(existingInfo.videoContractInfo.cupTokens.ordinals);
             if (!cupTokens.contains(contractCupToken)) cupTokens.add(contractCupToken);
@@ -237,7 +238,8 @@ public class VMSAvailabilityWindowModule {
 
                 // get contract id from window contract and contract data from VideoContract feed.
                 long contractId = windowContractHollow._getDealId();
-                ContractHollow contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                ConsolidatedContractInfo contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
 
 
@@ -705,8 +707,9 @@ public class VMSAvailabilityWindowModule {
         if (!isGoLive) {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
+                ConsolidatedContractInfo ccontractInfo = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+                ContractHollow contract = ccontractInfo.getContract();
+                if (contract != null && (ccontractInfo.isDayOfBroadcast() || ccontractInfo.isDayAfterBroadcast() || ccontractInfo.getPrePromoDays() > 0)) {
                     isWindowDataNeeded = true;
                 }
             }
@@ -773,10 +776,12 @@ public class VMSAvailabilityWindowModule {
         int daysBeforeEarliestWindowWithAssetsAvailability = (int) ((earliestWindowStartDateForTheLanguageWithAssets - ctx.getNowMillis()) / MS_IN_DAY);
         boolean daysBeforeToPromoteCheck = false;
         for (long contractId : contractIds) {
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
-            if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
+            ConsolidatedContractInfo ccontractInfo = 
+            		VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+            ContractHollow hcontract = ccontractInfo.getContract();
+            if (hcontract != null && (ccontractInfo.isDayOfBroadcast() || ccontractInfo.isDayAfterBroadcast() || ccontractInfo.getPrePromoDays() > 0 )) {
 
-                if (daysBeforeEarliestWindowWithAssetsAvailability <= contract._getPrePromotionDays())
+                if (daysBeforeEarliestWindowWithAssetsAvailability <= ccontractInfo.getPrePromoDays())
                     daysBeforeToPromoteCheck = true;
             }
         }
