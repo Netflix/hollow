@@ -83,7 +83,7 @@ HollowAPIGenerator generator =
 generator.generateFiles("/path/to/java/api/files");
 ```
 
-After this code executes, an set of Java files will be written to the location `/path/to/java/api/files`.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.
+After this code executes, a set of Java files will be written to the location `/path/to/java/api/files`.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.
 
 !!! hint "Initializing multiple types"
     If we have multiple top-level types, we should call `initializeTypeState()` multiple times, once for each class.
