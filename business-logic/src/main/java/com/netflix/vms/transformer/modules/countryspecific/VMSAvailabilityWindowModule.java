@@ -159,7 +159,7 @@ public class VMSAvailabilityWindowModule {
         } else {
             cupTokens.add(contractCupToken);
             for (Strings cupToken : existingInfo.videoContractInfo.cupTokens.ordinals) {
-            	 if (!cupToken.equals(contractCupToken)) cupTokens.add(cupToken);
+            	if (!cupToken.equals(contractCupToken)) cupTokens.add(cupToken);
             }
         }
         // 2. merge bcp47 code values
@@ -227,7 +227,12 @@ public class VMSAvailabilityWindowModule {
             List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
             if (window._getContractIdsExt() != null)
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
-            List<Long> contractIds = windowContracts.stream().map(c -> c._getDealId()).collect(Collectors.toList());
+            List<Long> contractIds = new ArrayList<>();
+            if(ctx.getConfig().isUseContractIdInsteadOfDealId()) {
+                contractIds = windowContracts.stream().map(c -> c._getContractId()).collect(Collectors.toList());            	
+            } else {
+                contractIds = windowContracts.stream().map(c -> c._getDealId()).collect(Collectors.toList());            	
+            }
 
             // should use window data? Checks isGoLive flag, start/end dates and if video is ready for pre-promotion (is locale aware)
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, language, isGoLive, contractIds, includedPackageDataCount,
@@ -237,8 +242,8 @@ public class VMSAvailabilityWindowModule {
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
                 // get contract id from window contract and contract data from VideoContract feed.
-                long contractId = windowContractHollow._getDealId();
-                ContractHollow contractData = VideoContractUtil.getContract(api, indexer, videoId, country, contractId);
+                long contractId = (ctx.getConfig().isUseContractIdInsteadOfDealId()) ? windowContractHollow._getContractId() : windowContractHollow._getDealId();
+                ContractHollow contractData = VideoContractUtil.getContract(api, indexer, ctx, videoId, country, contractId);
                 
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
 
@@ -597,8 +602,13 @@ public class VMSAvailabilityWindowModule {
 
                 if (window._getContractIdsExt() != null) {
                     for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                        if ((int) rightsWindowContract._getDealId() > maxContractId)
-                            maxContractId = (int) rightsWindowContract._getDealId();
+                    	if(ctx.getConfig().isUseContractIdInsteadOfDealId()) {
+                            if ((int) rightsWindowContract._getContractId() > maxContractId)
+                                maxContractId = (int) rightsWindowContract._getContractId();
+                    	} else {
+                            if ((int) rightsWindowContract._getDealId() > maxContractId)
+                                maxContractId = (int) rightsWindowContract._getDealId();                    		
+                    	}
                     }
                 }
 
@@ -707,7 +717,7 @@ public class VMSAvailabilityWindowModule {
         if (!isGoLive) {
             boolean isWindowDataNeeded = false;
             for (Long contractId : contractIds) {
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, contractId);
                 if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
                     isWindowDataNeeded = true;
                 }
@@ -775,7 +785,7 @@ public class VMSAvailabilityWindowModule {
         int daysBeforeEarliestWindowWithAssetsAvailability = (int) ((earliestWindowStartDateForTheLanguageWithAssets - ctx.getNowMillis()) / MS_IN_DAY);
         boolean daysBeforeToPromoteCheck = false;
         for (long contractId : contractIds) {
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, videoId, countryCode, contractId);
+            ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, contractId);
             if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
 
                 if (daysBeforeEarliestWindowWithAssetsAvailability <= contract._getPrePromotionDays())

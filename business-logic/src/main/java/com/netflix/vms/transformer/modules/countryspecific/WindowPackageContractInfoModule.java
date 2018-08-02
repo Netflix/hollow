@@ -61,7 +61,8 @@ public class WindowPackageContractInfoModule {
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = 
+        		(ctx.getConfig().isUseContractIdInsteadOfDealId()) ? (int) windowContractHollow._getContractId() : (int) windowContractHollow._getDealId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
         info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
         assignContractInfo(info, contract, videoId);
@@ -101,7 +102,8 @@ public class WindowPackageContractInfoModule {
     		ContractHollow contract, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = 
+        		(ctx.getConfig().isUseContractIdInsteadOfDealId()) ? (int) windowContractHollow._getContractId() : (int) windowContractHollow._getDealId();
         info.videoContractInfo.primaryPackageId = packageId;
         assignContractInfo(info, contract, videoId);
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());

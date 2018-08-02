@@ -26,7 +26,7 @@ public class CupTokenFetcher {
             VMSHollowInputAPI api) {
         this.config = config;
         this.cupTokenCinderIndex = indexer.getPrimaryKeyIndex(IndexSpec.CUP_TOKEN);
-        this.cupTokenCinderHashIndex = indexer.getHashIndex(IndexSpec.CUP_TOKEN_HASH);
+        this.cupTokenCinderHashIndex = indexer.getHashIndex(IndexSpec.CUP_TOKEN_BY_DEALID);
         this.api = api;
     }
     
@@ -39,24 +39,27 @@ public class CupTokenFetcher {
         if (contract == null) {
             return CupKey.DEFAULT;
         }
-        return config.isReadCupTokensFromCinderFeed() ? getCupTokenStringCinder(videoId, contract._getDealId()) :
+        long contractOrDealId = (config.isUseContractIdInsteadOfDealId()) ? contract._getContractId() : contract._getDealId();
+        return config.isReadCupTokensFromCinderFeed() ? getCupTokenStringCinder(videoId, contractOrDealId) :
                 getCupTokenStringBeehive(contract);
     }
     
 
     private String getCupTokenStringCinder(long videoId, long contractOrDealId) {
-    	HollowHashIndexResult result = cupTokenCinderHashIndex.findMatches(videoId, contractOrDealId);
-    	if(result == null) 
-    		return CupKey.DEFAULT;
-    	HollowOrdinalIterator iter = result.iterator();
-    	int ordinal = iter.next();
-    	if(ordinal == HollowOrdinalIterator.NO_MORE_ORDINALS)
-    		return CupKey.DEFAULT;
-    	return api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();
-    	
-    	
-        //int ordinal = cupTokenCinderIndex.getMatchingOrdinal(videoId, contractId);
-        //return ordinal == -1 ? CupKey.DEFAULT : api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();
+    	if(config.isUseContractIdInsteadOfDealId()) {
+            int ordinal = cupTokenCinderIndex.getMatchingOrdinal(videoId, contractOrDealId);
+            return ordinal == -1 ? CupKey.DEFAULT : api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();
+    		
+    	} else {
+        	HollowHashIndexResult result = cupTokenCinderHashIndex.findMatches(videoId, contractOrDealId);
+        	if(result == null) 
+        		return CupKey.DEFAULT;
+        	HollowOrdinalIterator iter = result.iterator();
+        	int ordinal = iter.next();
+        	if(ordinal == HollowOrdinalIterator.NO_MORE_ORDINALS)
+        		return CupKey.DEFAULT;
+        	return api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();    		
+    	}
     }
 
     private String getCupTokenStringBeehive(ContractHollow contract) {
