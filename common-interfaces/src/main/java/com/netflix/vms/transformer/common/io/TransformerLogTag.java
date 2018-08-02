@@ -77,6 +77,7 @@ public enum TransformerLogTag implements LogTag {
 
     //// Debug /////
     ReexploreTags,
+    MultiDealIds,
 
     /// Multi-Locale Catalog ///
     Language_catalog_PrePromote,// title is in pre-promotion phase

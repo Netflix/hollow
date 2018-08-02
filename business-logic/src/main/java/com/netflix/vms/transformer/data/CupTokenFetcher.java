@@ -44,8 +44,8 @@ public class CupTokenFetcher {
     }
     
 
-    private String getCupTokenStringCinder(long videoId, long dealId) {
-    	HollowHashIndexResult result = cupTokenCinderHashIndex.findMatches(videoId, dealId);
+    private String getCupTokenStringCinder(long videoId, long contractOrDealId) {
+    	HollowHashIndexResult result = cupTokenCinderHashIndex.findMatches(videoId, contractOrDealId);
     	if(result == null) 
     		return CupKey.DEFAULT;
     	HollowOrdinalIterator iter = result.iterator();
@@ -55,15 +55,6 @@ public class CupTokenFetcher {
     	return api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();
     	
     	
-    	/*
-    	 This uses iteration everywhere
-    	Collection<CinderCupTokenRecordHollow> tokens = api.getAllCinderCupTokenRecordHollow();
-    	for(CinderCupTokenRecordHollow token : tokens) {
-    		if(token._getDealId()._getValue() == dealId && token._getMovieId()._getValue() == videoId)
-    			return token._getCupTokenId()._getValue();
-    	}
-    	return CupKey.DEFAULT;
-    	*/
         //int ordinal = cupTokenCinderIndex.getMatchingOrdinal(videoId, contractId);
         //return ordinal == -1 ? CupKey.DEFAULT : api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();
     }
