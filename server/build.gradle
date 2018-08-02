@@ -38,7 +38,7 @@ ospackage {
     requires('nflx-ezconfig')
     requires('nflx-base-www')
     // Lets try to add our ulog agent
-    requires('ulog-jatins')
+    requires('ulog-exp')
 }
 
 dependencies {
