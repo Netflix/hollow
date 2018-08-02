@@ -20,7 +20,6 @@ package com.netflix.hollow.test;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,17 +30,14 @@ import java.util.Collections;
  * multiple HollowReadStateEngine objects with the same builder.
  */
 public class HollowReadStateEngineBuilder {
-    private final HollowWriteStateEngine writeEngine;
-    private final HollowObjectMapper objectMapper;
-
-    private boolean built;
+    private final HollowWriteStateEngineBuilder writeEngineBuilder;
 
     /**
      * Create a HollowReadStateEngineBuilder with an empty initial type state. Adding objects will
      * add their types, if not already present.
      */
     public HollowReadStateEngineBuilder() {
-        this(Collections.<Class<?>>emptyList());
+        this(Collections.emptyList());
     }
 
     /**
@@ -49,11 +45,7 @@ public class HollowReadStateEngineBuilder {
      * provided types. Adding objects will add their types, if not already present.
      */
     public HollowReadStateEngineBuilder(Collection<Class<?>> types) {
-        writeEngine = new HollowWriteStateEngine();
-        objectMapper = new HollowObjectMapper(writeEngine);
-        for (Class<?> type : types) {
-            objectMapper.initializeTypeState(type);
-        }
+        writeEngineBuilder = new HollowWriteStateEngineBuilder(types);
     }
 
     /**
@@ -61,12 +53,7 @@ public class HollowReadStateEngineBuilder {
      * objects after calling build().
      */
     public HollowReadStateEngineBuilder add(Object... objects) {
-        if (built) {
-            throw new IllegalArgumentException("Cannot add after building HollowReadStateEngine");
-        }
-        for (Object o : objects) {
-            objectMapper.add(o);
-        }
+        writeEngineBuilder.add(objects);
         return this;
     }
 
@@ -74,7 +61,7 @@ public class HollowReadStateEngineBuilder {
      * Build a HollowReadStateEngine. You cannot add() any more objects after calling this.
      */
     public HollowReadStateEngine build() {
-        built = true;
+        HollowWriteStateEngine writeEngine = writeEngineBuilder.build();
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
         try {
             StateEngineRoundTripper.roundTripSnapshot(writeEngine, readEngine, null);

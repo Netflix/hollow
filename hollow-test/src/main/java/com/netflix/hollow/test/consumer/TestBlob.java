@@ -15,23 +15,31 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.consumer;
+package com.netflix.hollow.test.consumer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import java.io.IOException;
 import java.io.InputStream;
 
-class FakeBlob extends Blob {
+public class TestBlob extends Blob {
+    private final InputStream inputStream;
 
-    public FakeBlob(long toVersion) {
+    public TestBlob(long toVersion) {
         super(toVersion);
+        this.inputStream = null;
     }
 
-    public FakeBlob(long fromVersion, long toVersion) {
+    public TestBlob(long toVersion, InputStream inputStream) {
+        super(toVersion);
+        this.inputStream = inputStream;
+    }
+
+    public TestBlob(long fromVersion, long toVersion) {
         super(fromVersion, toVersion);
+        this.inputStream = null;
     }
 
     public InputStream getInputStream() throws IOException {
-        return null;
+        return inputStream;
     }
 }
