@@ -97,7 +97,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, cycleConstants, indexer, cupTokenFetcher);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, cupTokenFetcher);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
         this.hdrProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "HDR");

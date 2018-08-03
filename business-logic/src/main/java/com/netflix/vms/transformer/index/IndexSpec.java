@@ -49,6 +49,7 @@ public enum IndexSpec {
     ALL_VIDEO_STATUS(HASH, "Status", "", "movieId"),
     VIDEO_CONTRACTS(HASH, "Contracts", "", "movieId", "countryCode.value"),
     VIDEO_CONTRACT_BY_CONTRACTID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.contractId"),
+    VIDEO_CONTRACT_BY_DEALID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.dealId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
     SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
     MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID(HASH, "MovieCharacterPerson", "", "characters.element.personId"),
@@ -63,6 +64,7 @@ public enum IndexSpec {
 
     // Merch-language-dates
     MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
+    CUP_TOKEN_BY_DEALID(HASH, "CinderCupTokenRecord", "", "movieId.value", "dealId.value"),    
     CUP_TOKEN(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "contractId.value");
 
 
