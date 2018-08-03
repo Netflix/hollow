@@ -1561,19 +1561,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -1608,7 +1608,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -1622,7 +1622,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -1641,14 +1641,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -1692,7 +1692,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -1701,7 +1701,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -1725,20 +1725,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -1751,20 +1751,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -1775,40 +1775,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -1835,7 +1835,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -1856,7 +1856,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -3811,19 +3811,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -3858,7 +3858,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -3872,7 +3872,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -3891,14 +3891,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -3942,7 +3942,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -3951,7 +3951,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -3975,20 +3975,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -4001,20 +4001,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -4025,40 +4025,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -4085,7 +4085,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -4106,7 +4106,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -6061,19 +6061,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -6108,7 +6108,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -6122,7 +6122,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -6141,14 +6141,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -6192,7 +6192,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -6201,7 +6201,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -6225,20 +6225,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -6251,20 +6251,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -6275,40 +6275,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -6335,7 +6335,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -6356,7 +6356,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -8457,19 +8457,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -8504,7 +8504,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -8518,7 +8518,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -8537,14 +8537,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -8588,7 +8588,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -8597,7 +8597,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -8621,20 +8621,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -8647,20 +8647,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -8671,40 +8671,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -8731,7 +8731,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -8752,7 +8752,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -10707,19 +10707,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -10754,7 +10754,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -10768,7 +10768,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -10787,14 +10787,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -10838,7 +10838,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -10847,7 +10847,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -10871,20 +10871,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -10897,20 +10897,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -10921,40 +10921,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -10981,7 +10981,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -11002,7 +11002,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -12965,19 +12965,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -13012,7 +13012,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -13026,7 +13026,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -13045,14 +13045,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -13096,7 +13096,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -13105,7 +13105,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -13129,20 +13129,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -13155,20 +13155,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -13179,40 +13179,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -13239,7 +13239,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -13260,7 +13260,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -15241,19 +15241,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -15288,7 +15288,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -15302,7 +15302,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -15321,14 +15321,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -15372,7 +15372,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -15381,7 +15381,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -15405,20 +15405,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -15431,20 +15431,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -15455,40 +15455,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -15515,7 +15515,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -15536,7 +15536,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -17517,19 +17517,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -17564,7 +17564,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -17578,7 +17578,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -17597,14 +17597,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -17648,7 +17648,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -17657,7 +17657,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -17681,20 +17681,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -17707,20 +17707,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -17731,40 +17731,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -17791,7 +17791,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -17812,7 +17812,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
@@ -19793,19 +19793,19 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.21.6",
+            "locked": "2.21.8",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:base-explorer": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -19840,7 +19840,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.162.0",
+            "locked": "1.168.0",
             "transitive": [
                 "netflix:nsac-client"
             ]
@@ -19854,7 +19854,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
@@ -19873,14 +19873,14 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:nf-archaius2-platform-bridge",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.146.0",
+            "locked": "1.153.0",
             "transitive": [
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -19924,7 +19924,7 @@
             "locked": "2.129"
         },
         "netflix:nflibrary": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:nf-archaius2-platform-bridge",
@@ -19933,7 +19933,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -19957,20 +19957,20 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.19",
+            "locked": "0.6.21",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.66.0",
+            "locked": "1.68.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -19983,20 +19983,20 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:base-explorer",
@@ -20007,40 +20007,40 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -20067,7 +20067,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.5.57",
+            "locked": "4.5.58",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -20088,7 +20088,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.414",
+            "locked": "100.0.415",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces"
             ]
