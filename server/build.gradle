@@ -37,6 +37,8 @@ ospackage {
     packageName = 'vmstransformer'
     requires('nflx-ezconfig')
     requires('nflx-base-www')
+    requires('nflx-ulog-tomcat')
+    postInstall('mkdir /etc/nflx-ulog/; echo "ulog.stream=vms" > /etc/nflx-ulog/ulog.conf')
 }
 
 dependencies {
