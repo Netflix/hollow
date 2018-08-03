@@ -39,7 +39,7 @@ ospackage {
     requires('nflx-base-www')
     // Lets try to add our ulog agent
     requires('nflx-ulog-tomcat')
-    postInstall('mkdir /etc/nflx-ulog/; echo "ulog_stream=vms" > /etc/nflx-ulog/ulog.conf')
+    postInstall('mkdir /etc/nflx-ulog/; echo "ulog.stream=vms" > /etc/nflx-ulog/ulog.conf')
 }
 
 dependencies {
