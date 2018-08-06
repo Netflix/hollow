@@ -2558,7 +2558,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6287,7 +6287,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10016,7 +10016,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13829,7 +13829,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19463,7 +19463,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23192,7 +23192,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26920,7 +26920,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30708,7 +30708,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34566,7 +34566,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -38424,7 +38424,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42282,7 +42282,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46140,7 +46140,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49998,7 +49998,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53856,7 +53856,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -57714,7 +57714,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "1.220.1",
+            "locked": "1.220.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
