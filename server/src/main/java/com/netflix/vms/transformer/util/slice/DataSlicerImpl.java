@@ -244,6 +244,12 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int)inputAPI.getDeployablePackagesHollow(ordinal)._getMovieId());
                 }
             });
+            findIncludedOrdinals(stateEngine, "PackageMovieDealCountryGroup", videoIdsToInclude, new VideoIdDeriver() {
+                @Override
+                public Integer deriveId(int ordinal) {
+                    return Integer.valueOf((int)inputAPI.getPackageMovieDealCountryGroupHollow(ordinal)._getMovieId()._getValue());
+                }
+            });
             findIncludedOrdinals(stateEngine, "Episodes", videoIdsToInclude, new VideoIdDeriver() {
                 @Override
                 public Integer deriveId(int ordinal) {
@@ -382,7 +388,9 @@ public class DataSlicerImpl implements DataSlicer {
         }
 
         private BitSet findIncludedOrdinals(HollowReadStateEngine stateEngine, String type, Set<Integer> includedVideoIds, VideoIdDeriver idDeriver) {
-            if (excludedTypes.contains(type)) return new BitSet();
+            if (excludedTypes.contains(type) || stateEngine.getTypeState(type) == null) {
+                return new BitSet();
+            }
 
             int maxOrdinal = stateEngine.getTypeState(type).maxOrdinal();
             BitSet populatedOrdinals = new BitSet(maxOrdinal + 1);

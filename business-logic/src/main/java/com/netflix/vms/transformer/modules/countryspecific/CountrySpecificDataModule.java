@@ -11,6 +11,7 @@ import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
@@ -72,7 +73,7 @@ public class CountrySpecificDataModule {
 
     public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper,
             CycleConstants constants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
-            CupTokenFetcher cupTokenFetcher) {
+            CupTokenFetcher cupTokenFetcher, DeployablePackagesFetcher deployablePackagesFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
@@ -85,7 +86,7 @@ public class CountrySpecificDataModule {
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer,
-                cycleDataAggregator, cupTokenFetcher);
+                cycleDataAggregator, cupTokenFetcher, deployablePackagesFetcher);
     }
 
     @VisibleForTesting

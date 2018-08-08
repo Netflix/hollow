@@ -2,7 +2,7 @@ package com.netflix.vms.transformer;
 
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
+import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.EpisodesHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -24,17 +24,17 @@ import java.util.Set;
 public class VideoHierarchyGrouper {
 
     private final VMSHollowInputAPI api;
+    private final DeployablePackagesFetcher deployablePackagesFetcher;
     private final TransformerContext ctx;
-    private final Map<Integer, Set<Integer>> topParentMap;
-    private final Map<Integer, Set<ShowSeasonEpisodeHollow>> displaySetsByVideoId;
-    private final List<Set<VideoHierarchyGroup>> processGroups;
+    private final Map<Integer, Set<Integer>> topParentMap = new HashMap<>();
+    private final Map<Integer, Set<ShowSeasonEpisodeHollow>> displaySetsByVideoId = new HashMap<>();
+    private final List<Set<VideoHierarchyGroup>> processGroups = new ArrayList<>();
 
-    public VideoHierarchyGrouper(VMSHollowInputAPI api, TransformerContext ctx) {
+    public VideoHierarchyGrouper(VMSHollowInputAPI api,
+            DeployablePackagesFetcher deployablePackagesFetcher, TransformerContext ctx) {
         this.api = api;
         this.ctx = ctx;
-        this.topParentMap = new HashMap<>();
-        this.displaySetsByVideoId = new HashMap<>();
-        this.processGroups = new ArrayList<>();
+        this.deployablePackagesFetcher = deployablePackagesFetcher;
         group();
     }
 
@@ -170,9 +170,7 @@ public class VideoHierarchyGrouper {
         // NOTE: TODO need to follow up with beehive to make sure this are part of VideoGeneral
         if (ctx.getConfig().shouldProcessExtraNonVideoGeneralVideoIds()) {
             // Make sure to include videoIds from DeployablePackage feed - for PackageData parity
-            for (DeployablePackagesHollow dp : api.getAllDeployablePackagesHollow()) {
-                potentialOrphans.add((int) dp._getMovieId());
-            }
+            potentialOrphans.addAll(deployablePackagesFetcher.getAllMovieIds());
 
             // Make sure to include videoIds from l10n feeds - for L10n Parity
             for (EpisodesHollow item : api.getAllEpisodesHollow()) {

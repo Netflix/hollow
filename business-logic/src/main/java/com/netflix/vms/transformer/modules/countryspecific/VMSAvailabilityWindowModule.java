@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.FeedMovieCountryLanguagesHollow;
@@ -87,7 +88,8 @@ public class VMSAvailabilityWindowModule {
     private final CupTokenFetcher cupTokenFetcher;
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
-                                       VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {
+            VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
+            CupTokenFetcher cupTokenFetcher, DeployablePackagesFetcher deployablePackagesFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;
@@ -95,7 +97,8 @@ public class VMSAvailabilityWindowModule {
         this.merchLanguageDateIdx = indexer.getPrimaryKeyIndex(IndexSpec.MERCH_LANGUAGE_DATE);
         this.cupTokenFetcher = cupTokenFetcher;
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher, ctx);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher,
+                deployablePackagesFetcher, ctx);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
         this.cycleDataAggregator = cycleDataAggregator;
 
