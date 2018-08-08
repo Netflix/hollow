@@ -37,7 +37,7 @@ ospackage {
     packageName = 'vmstransformer'
     requires('nflx-ezconfig')
     requires('nflx-base-www')
-    requires('ulog-jatins')
+    requires('nflx-ulog-jatins')
     postInstall('mkdir /etc/nflx-ulog/; echo "ulog.stream=vms" > /etc/nflx-ulog/ulog.conf')
 }
 
