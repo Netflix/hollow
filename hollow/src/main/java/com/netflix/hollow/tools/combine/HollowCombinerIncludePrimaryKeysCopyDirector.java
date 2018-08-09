@@ -52,8 +52,6 @@ public class HollowCombinerIncludePrimaryKeysCopyDirector implements HollowCombi
 
     @Override
     public boolean shouldCopy(HollowTypeReadState typeState, int ordinal) {
-        if(typeState.getSchema().getName().equals("CompleteVideo") && ordinal == 2000896)
-            System.out.println("asdf");
         return !inverseCopyDirector.shouldCopy(typeState, ordinal);
     }
 
