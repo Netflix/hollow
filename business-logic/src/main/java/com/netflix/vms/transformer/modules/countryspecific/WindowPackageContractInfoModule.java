@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
@@ -28,22 +28,23 @@ public class WindowPackageContractInfoModule {
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
-    private final HollowPrimaryKeyIndex deployablePackageIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowPrimaryKeyIndex timecodeAnnotationIdx;
 
     private final CupTokenFetcher cupTokenFetcher;
+    private final DeployablePackagesFetcher deployablePackagesFetcher;
     private final PackageMomentDataModule packageMomentDataModule;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer,
-            CupTokenFetcher cupTokenFetcher, TransformerContext ctx) {
+            CupTokenFetcher cupTokenFetcher, DeployablePackagesFetcher deployablePackagesFetcher,
+            TransformerContext ctx) {
         this.api = api;
         this.ctx = ctx;
         this.cupTokenFetcher = cupTokenFetcher;
+        this.deployablePackagesFetcher = deployablePackagesFetcher;
         this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
-        this.deployablePackageIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         if(ctx.getConfig().isTimecodeAnnotationFeedEnabled())
         	this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
@@ -71,9 +72,8 @@ public class WindowPackageContractInfoModule {
         // create package info
         info.videoPackageInfo = newEmptyVideoPackageInfo();
         info.videoPackageInfo.packageId = packageData.id;
-        int deployablePackageOrdinal = deployablePackageIdx.getMatchingOrdinal((long) packageData.id);
-        DeployablePackagesHollow deployablePackage = deployablePackageOrdinal == -1 ? null : api.getDeployablePackagesHollow(deployablePackageOrdinal);
-        if (deployablePackage != null) info.videoPackageInfo.isDefaultPackage = deployablePackage._getDefaultPackage();
+        info.videoPackageInfo.isDefaultPackage = deployablePackagesFetcher.isDefaultPackage(
+                (long) packageData.id, videoId);
 
         // package moment data
         TimecodeAnnotationHollow inputTimecodeAnnotation = null;

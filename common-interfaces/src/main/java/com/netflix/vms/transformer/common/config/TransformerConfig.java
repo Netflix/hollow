@@ -244,4 +244,7 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     public boolean isReadCupTokensFromCinderFeed();
+
+    @DefaultValue("false")
+    public boolean isReadDeployablePackagesFromCinderFeed();
 }

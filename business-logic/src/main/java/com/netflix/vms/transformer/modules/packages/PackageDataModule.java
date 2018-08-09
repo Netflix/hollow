@@ -10,14 +10,13 @@ import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
-import com.netflix.vms.transformer.hollowinput.DeployablePackagesHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
-import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
@@ -68,7 +67,6 @@ public class PackageDataModule {
     private final CycleConstants cycleConstants;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowHashIndex packagesByVideoIdx;
-    private final HollowPrimaryKeyIndex deployablePackagesIdx;
 
     private final Map<Integer, Object> drmKeysByGroupId;
     private final Map<Integer, DrmInfo> drmInfoByGroupId;
@@ -80,21 +78,24 @@ public class PackageDataModule {
 
     private final StreamDataModule streamDataModule;
     private final ContractRestrictionModule contractRestrictionModule;
+    private final DeployablePackagesFetcher deployablePackagesFetcher;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
     private final TransformerContext ctx;
 
-    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper objectMapper,
-            CycleConstants cycleConstants, VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
+    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx,
+            HollowObjectMapper objectMapper, CycleConstants cycleConstants,
+            VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher,
+            DeployablePackagesFetcher deployablePackagesFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = objectMapper;
         this.cycleConstants = cycleConstants;
+        this.deployablePackagesFetcher = deployablePackagesFetcher;
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
-        this.deployablePackagesIdx = indexer.getPrimaryKeyIndex(IndexSpec.DEPLOYABLE_PACKAGES);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
-        this.drmKeysByGroupId = new HashMap<Integer, Object>();
-        this.drmInfoByGroupId = new HashMap<Integer, DrmInfo>();
+        this.drmKeysByGroupId = new HashMap<>();
+        this.drmInfoByGroupId = new HashMap<>();
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
         this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, cupTokenFetcher);
@@ -182,8 +183,9 @@ public class PackageDataModule {
     }
 
     private PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
-        int deployablePackagesOrdinal = deployablePackagesIdx.getMatchingOrdinal(packages._getPackageId());
-        if (deployablePackagesOrdinal == -1) return null; // Pre-condition, package must exist in deployablePackagesFeed
+        if (!deployablePackagesFetcher.isPackageExists(packages._getPackageId(), videoId)) {
+            return null; // Pre-condition, package must exist in deployablePackagesFeed
+        }
 
         PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
         PackageData pkg = packageDataCollection.getPackageData();
@@ -221,23 +223,22 @@ public class PackageDataModule {
         calculateRuntimeInSeconds(pkg);
 
         //////////// DEPLOYABLE PACKAGES //////////////
-        pkg.tags = new ArrayList<Strings>();
-        pkg.packageTags = new HashSet<Strings>();
-        if (deployablePackagesOrdinal != -1) {
-            pkg.allDeployableCountries = new HashSet<ISOCountry>();
-            DeployablePackagesHollow deployablePackages = api.getDeployablePackagesHollow(deployablePackagesOrdinal);
-            pkg.isDefaultPackage = deployablePackages._getDefaultPackage();
-            ListOfPackageTagsHollow packageTags = deployablePackages._getTags();
-            if (packageTags != null) {
-                for (StringHollow tag : packageTags) {
-                    ctx.getLogger().info(TransformerLogTag.InteractivePackage, "package={}, video={}, tag={}", pkg.id, pkg.video.value, tag._getValue());
-                    pkg.tags.add(new Strings(tag._getValue()));
-                    pkg.packageTags.add(new Strings(tag._getValue()));
-                }
+        pkg.tags = new ArrayList<>();
+        pkg.packageTags = new HashSet<>();
+        pkg.allDeployableCountries = new HashSet<>();
+        pkg.isDefaultPackage =
+            deployablePackagesFetcher.isDefaultPackage(packages._getPackageId(), videoId);
+        ListOfPackageTagsHollow packageTags =
+            deployablePackagesFetcher.getTags(packages._getPackageId(), videoId);
+        if (packageTags != null) {
+            for (StringHollow tag : packageTags) {
+                ctx.getLogger().info(TransformerLogTag.InteractivePackage, "package={}, video={}, tag={}", pkg.id, pkg.video.value, tag._getValue());
+                pkg.tags.add(new Strings(tag._getValue()));
+                pkg.packageTags.add(new Strings(tag._getValue()));
             }
-            for (ISOCountryHollow isoCountry : deployablePackages._getCountryCodes()) {
-                pkg.allDeployableCountries.add(cycleConstants.getISOCountry(isoCountry._getValue()));
-            }
+        }
+        for (String isoCountry : deployablePackagesFetcher.getCountryCodes(packages._getPackageId(), videoId)) {
+            pkg.allDeployableCountries.add(cycleConstants.getISOCountry(isoCountry));
         }
 
         //////////// ENCODE SUMMARY DESCRIPTORS /////////////////
