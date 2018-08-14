@@ -214,9 +214,12 @@ public class RolloutVideoModule extends AbstractTransformModule {
         phase.phaseType = phaseHollow._getPhaseType() == null ? null :  phaseHollow._getPhaseType()._getValue().toCharArray();
 
         // add artwork source fields
-        RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork()._getSourceFileIds();
-        for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
-            phase.sourceFileIds.add(new ArtworkSourceString(sourceFieldHollow._getValue()._getValue()));
+        if (phaseHollow._getElements() != null && phaseHollow._getElements()._getArtwork() != null && phaseHollow._getElements()._getArtwork()._getSourceFileIds() != null) {
+
+            RolloutPhaseArtworkSourceFileIdListHollow artworkSourceFieldList = phaseHollow._getElements()._getArtwork()._getSourceFileIds();
+            for (RolloutPhaseArtworkSourceFileIdHollow sourceFieldHollow : artworkSourceFieldList) {
+                phase.sourceFileIds.add(new ArtworkSourceString(sourceFieldHollow._getValue()._getValue()));
+            }
         }
     }
 
