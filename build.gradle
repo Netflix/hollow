@@ -4,7 +4,7 @@ allprojects {
 }
 
 dependencyRecommendations {
-    mavenBom module: 'netflix:runtime-platform-recommendations:latest.release'
+    mavenBom module: 'netflix.bom:runtime-platform-recommendations:latest.release'
 }
 
 subprojects {

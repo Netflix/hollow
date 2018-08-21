@@ -5,9 +5,6 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
-import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.MultiValuePassthroughMapHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdListHollow;
@@ -17,8 +14,6 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
-import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
@@ -245,25 +240,29 @@ public class RolloutVideoModule extends AbstractTransformModule {
     private void copy(IndividualSupplementalHollow indivTrailerHollow, SupplementalVideo sv) {
         sv.id = new Video((int) indivTrailerHollow._getMovieId());
         sv.attributes = new HashMap<Strings, Strings>();
-        SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();
-        for (Map.Entry<MapKeyHollow, StringHollow> entry : singleValPassthrough.entrySet()) {
-            sv.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
-        }
+        // Supplemental passthrough does not exists anymore
+//        SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();
+//        for (Map.Entry<MapKeyHollow, StringHollow> entry : singleValPassthrough.entrySet()) {
+//            sv.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
+//        }
 
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
-        StringHollow identifier = indivTrailerHollow._getIdentifier();
-        if(identifier != null)
-            sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
+        // There is no identifier field anymore
+//        StringHollow identifier = indivTrailerHollow._getIdentifier();
+//        if(identifier != null)
+//            sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
 
         sv.multiValueAttributes = new HashMap<Strings, List<Strings>>();
-        MultiValuePassthroughMapHollow multiValPassthrough = indivTrailerHollow._getPassthrough()._getMultiValues();
-        for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : multiValPassthrough.entrySet()) {
-            List<Strings> vals = new ArrayList<>();
-            for (StringHollow val : entry.getValue()) {
-                vals.add(new Strings(val._getValue()));
-            }
-            sv.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), vals);
-        }
+
+        // There are no passthrough attributes anymore.
+//        MultiValuePassthroughMapHollow multiValPassthrough = indivTrailerHollow._getPassthrough()._getMultiValues();
+//        for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : multiValPassthrough.entrySet()) {
+//            List<Strings> vals = new ArrayList<>();
+//            for (StringHollow val : entry.getValue()) {
+//                vals.add(new Strings(val._getValue()));
+//            }
+//            sv.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), vals);
+//        }
 
     }
 }

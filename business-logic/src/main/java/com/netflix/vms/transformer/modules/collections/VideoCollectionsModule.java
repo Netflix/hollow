@@ -7,10 +7,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
-import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
-import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -108,27 +104,28 @@ public class VideoCollectionsModule {
                 supp.attributes = new HashMap<Strings, Strings>();
                 supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
 
-                PassthroughDataHollow passthrough = supplemental._getPassthrough();
+                // There are no passthrough attributes in supplemental feed
+//                PassthroughDataHollow passthrough = supplemental._getPassthrough();
+//
+//                for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
+//                    List<Strings> valueList = new ArrayList<Strings>();
+//                    for (StringHollow str : entry.getValue()) {
+//                        valueList.add(new Strings(str._getValue()));
+//                    }
+//
+//                    supp.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), valueList);
+//                }
 
-                for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
-                    List<Strings> valueList = new ArrayList<Strings>();
-                    for (StringHollow str : entry.getValue()) {
-                        valueList.add(new Strings(str._getValue()));
-                    }
-
-                    supp.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), valueList);
-                }
-
-                for (Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
-                    supp.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
-                }
+//                for (Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
+//                    supp.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
+//                }
 
                 supp.attributes.put(TYPE, TRAILER);
 
-                ////TODO: This should just be a passthrough.
-                if (supplemental._getIdentifier() != null) {
-                    supp.attributes.put(IDENTIFIER, new Strings(supplemental._getIdentifier()._getValue()));
-                }
+                // There are no identifier attributes in supplemental feed
+//                if (supplemental._getIdentifier() != null) {
+//                    supp.attributes.put(IDENTIFIER, new Strings(supplemental._getIdentifier()._getValue()));
+//                }
 
                 supplementalVideos.add(supp);
             }
