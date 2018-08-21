@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseListHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseLocalizedMetadataHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.ArtworkSourceString;
@@ -45,6 +46,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class RolloutVideoModule extends AbstractTransformModule {
+
+    public static final String POST_PLAY_ATTR = "postPlay";
+    public static final String GENERAL_ATTR = "general";
+    public static final String THEMATIC_ATTR = "thematic";
+    public static final String SUB_TYPE_ATTR = "subType";
+
+    public static final String IDENTIFIERS_ATTR = "identifiers";
+    public static final String THEMES_ATTR = "themes";
+
 
     public RolloutVideoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
         super(api, ctx, cycleConstants, mapper);
@@ -239,30 +249,32 @@ public class RolloutVideoModule extends AbstractTransformModule {
     // src -> dest
     private void copy(IndividualSupplementalHollow indivTrailerHollow, SupplementalVideo sv) {
         sv.id = new Video((int) indivTrailerHollow._getMovieId());
-        sv.attributes = new HashMap<Strings, Strings>();
-        // Supplemental passthrough does not exists anymore
-//        SingleValuePassthroughMapHollow singleValPassthrough = indivTrailerHollow._getPassthrough()._getSingleValues();
-//        for (Map.Entry<MapKeyHollow, StringHollow> entry : singleValPassthrough.entrySet()) {
-//            sv.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
-//        }
 
+        sv.attributes = new HashMap<>();
+        // Supplemental pass-through does not exists anymore, each field in the schema needs to be added.
+        sv.attributes.put(new Strings(POST_PLAY_ATTR), new Strings(String.valueOf(indivTrailerHollow._getPostplay())));
+        sv.attributes.put(new Strings(GENERAL_ATTR), new Strings(String.valueOf(indivTrailerHollow._getGeneral())));
+        sv.attributes.put(new Strings(THEMATIC_ATTR), new Strings(String.valueOf(indivTrailerHollow._getThematic())));
+        sv.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(indivTrailerHollow._getSubType()._getValue()));
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
-        // There is no identifier field anymore
-//        StringHollow identifier = indivTrailerHollow._getIdentifier();
-//        if(identifier != null)
-//            sv.attributes.put(new Strings("identifier"), new Strings(indivTrailerHollow._getIdentifier()._getValue()));
 
-        sv.multiValueAttributes = new HashMap<Strings, List<Strings>>();
+        // There are only two multi-values attributes in input.
+        sv.multiValueAttributes = new HashMap<>();
+        // process themes
+        List<Strings> themes = new ArrayList<>();
+        Iterator<StringHollow> it = indivTrailerHollow._getThemes().iterator();
+        while (it.hasNext()) {
+            themes.add(new Strings(it.next()._getValue()));
+        }
+        sv.multiValueAttributes.put(new Strings(THEMES_ATTR), themes);
 
-        // There are no passthrough attributes anymore.
-//        MultiValuePassthroughMapHollow multiValPassthrough = indivTrailerHollow._getPassthrough()._getMultiValues();
-//        for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : multiValPassthrough.entrySet()) {
-//            List<Strings> vals = new ArrayList<>();
-//            for (StringHollow val : entry.getValue()) {
-//                vals.add(new Strings(val._getValue()));
-//            }
-//            sv.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), vals);
-//        }
+        // process identifiers
+        List<Strings> identifiers = new ArrayList<>();
+        it = indivTrailerHollow._getIdentifiers().iterator();
+        while (it.hasNext()) {
+            identifiers.add(new Strings(it.next()._getValue()));
+        }
+        sv.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
 
     }
 }
