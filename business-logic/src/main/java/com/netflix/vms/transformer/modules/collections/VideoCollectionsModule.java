@@ -7,9 +7,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
-import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.PassthroughDataHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -18,11 +15,13 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +30,15 @@ public class VideoCollectionsModule {
 
     private final Strings TYPE = new Strings("type");
     private final Strings TRAILER = new Strings("trailer");
-    private final Strings IDENTIFIER = new Strings("identifier");
+
+    public static final String POST_PLAY_ATTR = "postPlay";
+    public static final String GENERAL_ATTR = "general";
+    public static final String THEMATIC_ATTR = "thematic";
+    public static final String SUB_TYPE_ATTR = "subType";
+
+    public static final String IDENTIFIERS_ATTR = "identifiers";
+    public static final String THEMES_ATTR = "themes";
+    public static final String USAGES_ATTR = "usages";
 
     private final VMSHollowInputAPI videoAPI;
     private final TransformerContext ctx;
@@ -105,30 +112,53 @@ public class VideoCollectionsModule {
                 if (supplementalSeasonSeqNumMap.containsKey(supplementalId)) {
                     supp.seasonNumber = supplementalSeasonSeqNumMap.get(supplementalId);
                 }
-                supp.attributes = new HashMap<Strings, Strings>();
-                supp.multiValueAttributes = new HashMap<Strings, List<Strings>>();
 
-                PassthroughDataHollow passthrough = supplemental._getPassthrough();
 
-                for (Map.Entry<MapKeyHollow, ListOfStringHollow> entry : passthrough._getMultiValues().entrySet()) {
-                    List<Strings> valueList = new ArrayList<Strings>();
-                    for (StringHollow str : entry.getValue()) {
-                        valueList.add(new Strings(str._getValue()));
-                    }
-
-                    supp.multiValueAttributes.put(new Strings(entry.getKey()._getValue()), valueList);
+                supp.attributes = new HashMap<>();
+                // Supplemental pass-through does not exists anymore, each field in the schema needs to be added.
+                supp.attributes.put(new Strings(POST_PLAY_ATTR), new Strings(String.valueOf(supplemental._getPostplay())));
+                supp.attributes.put(new Strings(GENERAL_ATTR), new Strings(String.valueOf(supplemental._getGeneral())));
+                supp.attributes.put(new Strings(THEMATIC_ATTR), new Strings(String.valueOf(supplemental._getThematic())));
+                if (supplemental._getSubType() != null && supplemental._getSubType()._getValue() != null) {
+                    supp.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(supplemental._getSubType()._getValue()));
                 }
-
-                for (Map.Entry<MapKeyHollow, StringHollow> entry : passthrough._getSingleValues().entrySet()) {
-                    supp.attributes.put(new Strings(entry.getKey()._getValue()), new Strings(entry.getValue()._getValue()));
-                }
-
                 supp.attributes.put(TYPE, TRAILER);
 
-                ////TODO: This should just be a passthrough.
-                if (supplemental._getIdentifier() != null) {
-                    supp.attributes.put(IDENTIFIER, new Strings(supplemental._getIdentifier()._getValue()));
+                if (RolloutVideoModule.ADD_ASPECT_RATIO.get()) {
+                    supp.attributes.put(new Strings("aspectRation"), new Strings(""));
                 }
+
+                // There are only two multi-values attributes in input.
+                supp.multiValueAttributes = new HashMap<>();
+                // process themes
+                List<Strings> themes = new ArrayList<>();
+                if (supplemental._getThemes() != null) {
+                    Iterator<StringHollow> it = supplemental._getThemes().iterator();
+                    while (it.hasNext()) {
+                        themes.add(new Strings(it.next()._getValue()));
+                    }
+                }
+                supp.multiValueAttributes.put(new Strings(THEMES_ATTR), themes);
+
+                // process identifiers
+                List<Strings> identifiers = new ArrayList<>();
+                if (supplemental._getIdentifiers() != null) {
+                    Iterator<StringHollow> it = supplemental._getIdentifiers().iterator();
+                    while (it.hasNext()) {
+                        identifiers.add(new Strings(it.next()._getValue()));
+                    }
+                }
+                supp.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
+
+                // process usages
+                List<Strings> usages = new ArrayList<>();
+                if (supplemental._getUsages() != null) {
+                    Iterator<StringHollow> it = supplemental._getUsages().iterator();
+                    while (it.hasNext()) {
+                        usages.add(new Strings(it.next()._getValue()));
+                    }
+                }
+                supp.multiValueAttributes.put(new Strings(USAGES_ATTR), usages);
 
                 supplementalVideos.add(supp);
             }
