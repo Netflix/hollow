@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
 import com.netflix.config.FastProperty;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
@@ -92,7 +93,7 @@ public class StreamDataModule {
         this.assetTypeDescriptorMap = getAssetTypeDescriptorMap();
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
         this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
-        this.tagsLists = new HashMap<String, List<Strings>>();
+        this.tagsLists = new HashMap<>();
         this.drmKeysByGroupId = drmKeysByGroupId;
         this.drmInfoByGroupId = drmInfoByGroupId;
 
@@ -111,10 +112,10 @@ public class StreamDataModule {
         int encodingProfileId = (int) inputStream._getStreamProfileId();
         int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(Long.valueOf(encodingProfileId));
         StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);
-        if(streamProfile == null)
+        if(streamProfileOrdinal == HollowConstants.ORDINAL_NONE || streamProfile == null)
             return null;
 
-        if(streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
+        if (streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
         }
 
