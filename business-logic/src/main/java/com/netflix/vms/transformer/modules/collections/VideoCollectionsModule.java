@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.hollowoutput.SupplementalVideo;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,6 +38,7 @@ public class VideoCollectionsModule {
 
     public static final String IDENTIFIERS_ATTR = "identifiers";
     public static final String THEMES_ATTR = "themes";
+    public static final String USAGES_ATTR = "usages";
 
     private final VMSHollowInputAPI videoAPI;
     private final TransformerContext ctx;
@@ -122,6 +124,10 @@ public class VideoCollectionsModule {
                 }
                 supp.attributes.put(TYPE, TRAILER);
 
+                if (RolloutVideoModule.ADD_ASPECT_RATIO.get()) {
+                    supp.attributes.put(new Strings("aspectRation"), new Strings(""));
+                }
+
                 // There are only two multi-values attributes in input.
                 supp.multiValueAttributes = new HashMap<>();
                 // process themes
@@ -143,6 +149,16 @@ public class VideoCollectionsModule {
                     }
                 }
                 supp.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
+
+                // process usages
+                List<Strings> usages = new ArrayList<>();
+                if (supplemental._getUsages() != null) {
+                    Iterator<StringHollow> it = supplemental._getUsages().iterator();
+                    while (it.hasNext()) {
+                        usages.add(new Strings(it.next()._getValue()));
+                    }
+                }
+                supp.multiValueAttributes.put(new Strings(USAGES_ATTR), usages);
 
                 supplementalVideos.add(supp);
             }

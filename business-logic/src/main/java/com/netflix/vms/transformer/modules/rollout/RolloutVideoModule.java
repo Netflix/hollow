@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.modules.rollout;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -54,6 +55,9 @@ public class RolloutVideoModule extends AbstractTransformModule {
 
     public static final String IDENTIFIERS_ATTR = "identifiers";
     public static final String THEMES_ATTR = "themes";
+    public static final String USAGES_ATTR = "usages";
+
+    public static FastProperty.BooleanProperty ADD_ASPECT_RATIO = new FastProperty.BooleanProperty("transformer.supplementalAttributes.aspectRatio", true);
 
 
     public RolloutVideoModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
@@ -260,7 +264,10 @@ public class RolloutVideoModule extends AbstractTransformModule {
         }
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
 
-        // There are only two multi-values attributes in input.
+        if (ADD_ASPECT_RATIO.get()) {
+            sv.attributes.put(new Strings("aspectRation"), new Strings(""));
+        }
+
         sv.multiValueAttributes = new HashMap<>();
         // process themes
         List<Strings> themes = new ArrayList<>();
@@ -282,5 +289,14 @@ public class RolloutVideoModule extends AbstractTransformModule {
         }
         sv.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
 
+        // process usages
+        List<Strings> usages = new ArrayList<>();
+        if (indivTrailerHollow._getUsages() != null) {
+            Iterator<StringHollow> it = indivTrailerHollow._getUsages().iterator();
+            while (it.hasNext()) {
+                usages.add(new Strings(it.next()._getValue()));
+            }
+        }
+        sv.multiValueAttributes.put(new Strings(USAGES_ATTR), usages);
     }
 }
