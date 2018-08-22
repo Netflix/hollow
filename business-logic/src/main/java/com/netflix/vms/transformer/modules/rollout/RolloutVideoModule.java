@@ -255,24 +255,30 @@ public class RolloutVideoModule extends AbstractTransformModule {
         sv.attributes.put(new Strings(POST_PLAY_ATTR), new Strings(String.valueOf(indivTrailerHollow._getPostplay())));
         sv.attributes.put(new Strings(GENERAL_ATTR), new Strings(String.valueOf(indivTrailerHollow._getGeneral())));
         sv.attributes.put(new Strings(THEMATIC_ATTR), new Strings(String.valueOf(indivTrailerHollow._getThematic())));
-        sv.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(indivTrailerHollow._getSubType()._getValue()));
+        if (indivTrailerHollow._getSubType() != null && indivTrailerHollow._getSubType()._getValue() != null) {
+            sv.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(indivTrailerHollow._getSubType()._getValue()));
+        }
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
 
         // There are only two multi-values attributes in input.
         sv.multiValueAttributes = new HashMap<>();
         // process themes
         List<Strings> themes = new ArrayList<>();
-        Iterator<StringHollow> it = indivTrailerHollow._getThemes().iterator();
-        while (it.hasNext()) {
-            themes.add(new Strings(it.next()._getValue()));
+        if (indivTrailerHollow._getThemes() != null) {
+            Iterator<StringHollow> it = indivTrailerHollow._getThemes().iterator();
+            while (it.hasNext()) {
+                themes.add(new Strings(it.next()._getValue()));
+            }
         }
         sv.multiValueAttributes.put(new Strings(THEMES_ATTR), themes);
 
         // process identifiers
         List<Strings> identifiers = new ArrayList<>();
-        it = indivTrailerHollow._getIdentifiers().iterator();
-        while (it.hasNext()) {
-            identifiers.add(new Strings(it.next()._getValue()));
+        if (indivTrailerHollow._getIdentifiers() != null) {
+            Iterator<StringHollow> it = indivTrailerHollow._getIdentifiers().iterator();
+            while (it.hasNext()) {
+                identifiers.add(new Strings(it.next()._getValue()));
+            }
         }
         sv.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
 

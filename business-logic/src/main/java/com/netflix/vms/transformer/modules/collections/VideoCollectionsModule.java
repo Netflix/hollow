@@ -117,24 +117,30 @@ public class VideoCollectionsModule {
                 supp.attributes.put(new Strings(POST_PLAY_ATTR), new Strings(String.valueOf(supplemental._getPostplay())));
                 supp.attributes.put(new Strings(GENERAL_ATTR), new Strings(String.valueOf(supplemental._getGeneral())));
                 supp.attributes.put(new Strings(THEMATIC_ATTR), new Strings(String.valueOf(supplemental._getThematic())));
-                supp.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(supplemental._getSubType()._getValue()));
+                if (supplemental._getSubType() != null && supplemental._getSubType()._getValue() != null) {
+                    supp.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(supplemental._getSubType()._getValue()));
+                }
                 supp.attributes.put(TYPE, TRAILER);
 
                 // There are only two multi-values attributes in input.
                 supp.multiValueAttributes = new HashMap<>();
                 // process themes
                 List<Strings> themes = new ArrayList<>();
-                Iterator<StringHollow> it = supplemental._getThemes().iterator();
-                while (it.hasNext()) {
-                    themes.add(new Strings(it.next()._getValue()));
+                if (supplemental._getThemes() != null) {
+                    Iterator<StringHollow> it = supplemental._getThemes().iterator();
+                    while (it.hasNext()) {
+                        themes.add(new Strings(it.next()._getValue()));
+                    }
                 }
                 supp.multiValueAttributes.put(new Strings(THEMES_ATTR), themes);
 
                 // process identifiers
                 List<Strings> identifiers = new ArrayList<>();
-                it = supplemental._getIdentifiers().iterator();
-                while (it.hasNext()) {
-                    identifiers.add(new Strings(it.next()._getValue()));
+                if (supplemental._getIdentifiers() != null) {
+                    Iterator<StringHollow> it = supplemental._getIdentifiers().iterator();
+                    while (it.hasNext()) {
+                        identifiers.add(new Strings(it.next()._getValue()));
+                    }
                 }
                 supp.multiValueAttributes.put(new Strings(IDENTIFIERS_ATTR), identifiers);
 
