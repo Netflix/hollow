@@ -265,7 +265,7 @@ public class RolloutVideoModule extends AbstractTransformModule {
         sv.attributes.put(new Strings("type"), new Strings("trailer"));
 
         if (ADD_ASPECT_RATIO.get()) {
-            sv.attributes.put(new Strings("aspectRation"), new Strings(""));
+            sv.attributes.put(new Strings("aspectRatio"), new Strings(""));
         }
 
         sv.multiValueAttributes = new HashMap<>();

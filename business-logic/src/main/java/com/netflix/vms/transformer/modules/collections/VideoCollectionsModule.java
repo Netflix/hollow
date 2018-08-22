@@ -125,7 +125,7 @@ public class VideoCollectionsModule {
                 supp.attributes.put(TYPE, TRAILER);
 
                 if (RolloutVideoModule.ADD_ASPECT_RATIO.get()) {
-                    supp.attributes.put(new Strings("aspectRation"), new Strings(""));
+                    supp.attributes.put(new Strings("aspectRatio"), new Strings(""));
                 }
 
                 // There are only two multi-values attributes in input.
