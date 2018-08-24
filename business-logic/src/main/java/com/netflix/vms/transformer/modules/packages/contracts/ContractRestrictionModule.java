@@ -373,14 +373,19 @@ public class ContractRestrictionModule {
                 // find the set of allowed text languages from this contract.
                 Set<String> overallContractAllowedTextLanguages = new HashSet<String>();
                 for (RightsContractAssetHollow assetInput : rightsContract._getAssets()) {
-                    ContractAsset asset = cycleConstants.rightsContractAssetCache.getResult(assetInput.getOrdinal());
-                    if (asset == null) {
-                        asset = new ContractAsset(assetInput);
-                        cycleConstants.rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
-                    }
+                    try {
+                        ContractAsset asset = cycleConstants.rightsContractAssetCache.getResult(assetInput.getOrdinal());
+                        if (asset == null) {
+                            asset = new ContractAsset(assetInput);
+                            cycleConstants.rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
+                        }
 
-                    if (asset.getType() == ContractAssetType.SUBTITLES) {
-                        overallContractAllowedTextLanguages.add(asset.getLanguage());
+                        if (asset.getType() == ContractAssetType.SUBTITLES) {
+                            overallContractAllowedTextLanguages.add(asset.getLanguage());
+                        }
+                    } catch (RuntimeException e) {
+                        throw new RuntimeException("Error getting assets for videoId " + videoId
+                                + " and rightsContract " + rightsContract, e);
                     }
                 }
 

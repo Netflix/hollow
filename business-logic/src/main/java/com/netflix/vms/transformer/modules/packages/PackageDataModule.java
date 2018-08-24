@@ -111,32 +111,35 @@ public class PackageDataModule {
 
         Set<Integer> videoIds = gatherVideoIds(showHierarchiesByCountry, extraVideoIds);
         for (Integer videoId : videoIds) {
+            try {
+                HollowHashIndexResult packagesForVideo = packagesByVideoIdx.findMatches((long) videoId);
+                if (packagesForVideo != null) {
+                    HollowOrdinalIterator iter = packagesForVideo.iterator();
+                    Set<PackageDataCollection> allPackageDataCollection = new HashSet<>();
 
-            HollowHashIndexResult packagesForVideo = packagesByVideoIdx.findMatches((long) videoId);
-            if (packagesForVideo != null) {
-                HollowOrdinalIterator iter = packagesForVideo.iterator();
-                Set<PackageDataCollection> allPackageDataCollection = new HashSet<>();
-
-                int packageOrdinal = iter.next();
-                while (packageOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    drmKeysByGroupId.clear();
-                    drmInfoByGroupId.clear();
-                    PackageHollow packages = api.getPackageHollow(packageOrdinal);
-                    populateDrmKeysByGroupId(packages, videoId);
-                    PackageDataCollection packageDataCollection = convertPackage(packages, videoId);
-                    if (packageDataCollection != null) {
-                        allPackageDataCollection.add(packageDataCollection);
-                        mapper.add(packageDataCollection.getPackageData());
+                    int packageOrdinal = iter.next();
+                    while (packageOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
+                        drmKeysByGroupId.clear();
+                        drmInfoByGroupId.clear();
+                        PackageHollow packages = api.getPackageHollow(packageOrdinal);
+                        populateDrmKeysByGroupId(packages, videoId);
+                        PackageDataCollection packageDataCollection = convertPackage(packages, videoId);
+                        if (packageDataCollection != null) {
+                            allPackageDataCollection.add(packageDataCollection);
+                            mapper.add(packageDataCollection.getPackageData());
+                        }
+                        packageOrdinal = iter.next();
                     }
-                    packageOrdinal = iter.next();
+
+                    VideoPackageData videoPackageData = new VideoPackageData();
+                    videoPackageData.videoId = new Video(videoId);
+                    videoPackageData.packages = allPackageDataCollection.stream().map(c -> c.getPackageData()).collect(Collectors.toSet());
+
+                    mapper.add(videoPackageData);
+                    transformedVideoData.getTransformedPackageData(videoId).setPackageDataCollectionMap(allPackageDataCollection);
                 }
-
-                VideoPackageData videoPackageData = new VideoPackageData();
-                videoPackageData.videoId = new Video(videoId);
-                videoPackageData.packages = allPackageDataCollection.stream().map(c -> c.getPackageData()).collect(Collectors.toSet());
-
-                mapper.add(videoPackageData);
-                transformedVideoData.getTransformedPackageData(videoId).setPackageDataCollectionMap(allPackageDataCollection);
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Error transforming video " + videoId, e);
             }
         }
     }
