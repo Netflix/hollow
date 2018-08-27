@@ -27,6 +27,7 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class HollowMapTypeMapper extends HollowTypeMapper {
@@ -72,9 +73,11 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
         HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
         for(Map.Entry<?, ?>entry : m.entrySet()) {
-            int keyOrdinal = keyMapper.write(entry.getKey());
-            int valueOrdinal = valueMapper.write(entry.getValue());
-            int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, entry.getKey());
+            Object key = Objects.requireNonNull(entry.getKey(), "Null key. Maps cannot contain null keys or values");
+            Object value = Objects.requireNonNull(entry.getValue(), "Null value. Maps cannot contain null keys or values");
+            int keyOrdinal = keyMapper.write(key);
+            int valueOrdinal = valueMapper.write(value);
+            int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);
 
             rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
         }

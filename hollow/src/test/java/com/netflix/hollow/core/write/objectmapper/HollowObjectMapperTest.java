@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,6 +56,47 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         //System.out.println("---------------------------------");
         //System.out.println(new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 1));
+    }
+
+    @Test
+    public void testNullElements() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        // Lists cannot contain null elements
+        try {
+            mapper.add(new TypeWithList("a", null, "c"));
+            Assert.fail("NullPointerException not thrown from List containing null elements");
+        } catch (NullPointerException e) {
+            Assert.assertNotNull(e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("Lists"));
+        }
+
+        // Sets cannot contain null elements
+        try {
+            mapper.add(new TypeWithSet("a", null, "c"));
+            Assert.fail("NullPointerException not thrown from Set containing null elements");
+        } catch (NullPointerException e) {
+            Assert.assertNotNull(e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("Sets"));
+        }
+
+        // Maps cannot contain null keys
+        try {
+            mapper.add(new TypeWithMap("a", "a", null, "b", "c", "c"));
+            Assert.fail("NullPointerException not thrown from Map containing null keys");
+        } catch (NullPointerException e) {
+            Assert.assertNotNull(e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("Maps"));
+        }
+
+        // Maps cannot contain null values
+        try {
+            mapper.add(new TypeWithMap("a", "a", "b", null, "c", "c"));
+            Assert.fail("NullPointerException not thrown from Map containing null values");
+        } catch (NullPointerException e) {
+            Assert.assertNotNull(e.getMessage());
+            Assert.assertTrue(e.getMessage().contains("Maps"));
+        }
     }
 
     @Test
@@ -312,7 +354,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @SuppressWarnings("unused")
-    private static enum TestEnum {
+    private enum TestEnum {
         ONE(1),
         TWO(2),
         THREE(3);
@@ -397,7 +439,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         }
     }
 
-
     @SuppressWarnings("unused")
     private static class TestClassImplementingInterface implements TestInterface {
         int val1;
@@ -409,6 +450,33 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         @Override
         public int test() {
             return 0;
+        }
+    }
+
+    static class TypeWithSet {
+        Set<String> c;
+
+        TypeWithSet(String... c) {
+            this.c = new HashSet<>(Arrays.asList(c));
+        }
+    }
+
+    static class TypeWithList {
+        List<String> c;
+
+        TypeWithList(String... c) {
+            this.c = new ArrayList<>(Arrays.asList(c));
+        }
+    }
+
+    static class TypeWithMap {
+        Map<String, String> m;
+
+        TypeWithMap(String... kv) {
+            m = new HashMap<>();
+            for (int i = 0; i < kv.length; i += 2) {
+                m.put(kv[i], kv[i + 1]);
+            }
         }
     }
 }

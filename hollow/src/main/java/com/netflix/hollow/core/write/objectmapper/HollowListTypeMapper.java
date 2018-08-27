@@ -26,6 +26,7 @@ import com.netflix.hollow.core.write.HollowWriteRecord;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class HollowListTypeMapper extends HollowTypeMapper {
@@ -68,6 +69,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         if(ignoreListOrdering) {
             IntList ordinalList = getIntList();
             for(Object o : l) {
+                Objects.requireNonNull(o, "Null element. Lists cannot contain null elements");
                 int ordinal = elementMapper.write(o);
                 ordinalList.add(ordinal);
             }
@@ -76,6 +78,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
                 rec.addElement(ordinalList.get(i));
         } else {
             for(Object o : l) {
+                Objects.requireNonNull(o, "Null element. Lists cannot contain null elements");
                 int ordinal = elementMapper.write(o);
                 rec.addElement(ordinal);
             }

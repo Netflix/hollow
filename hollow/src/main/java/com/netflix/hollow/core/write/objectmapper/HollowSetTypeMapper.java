@@ -26,6 +26,7 @@ import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Objects;
 import java.util.Set;
 
 public class HollowSetTypeMapper extends HollowTypeMapper {
@@ -69,6 +70,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
 
         HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
         for(Object o : s) {
+            Objects.requireNonNull(o, "Null element. Sets cannot contain null elements");
             int ordinal = elementMapper.write(o);
             int hashCode = hashCodeFinder.hashCode(elementMapper.getTypeName(), ordinal, o);
             rec.addElement(ordinal, hashCode);
