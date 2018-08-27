@@ -26,10 +26,12 @@ import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Objects;
 import java.util.Set;
 
 public class HollowSetTypeMapper extends HollowTypeMapper {
+
+    private static final String NULL_ELEMENT_MESSAGE =
+            "Null element contained in instance of a Set with schema \"%s\". Sets cannot contain null elements";
 
     private final HollowSetSchema schema;
     private final HollowSetTypeWriteState writeState;
@@ -70,7 +72,9 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
 
         HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
         for(Object o : s) {
-            Objects.requireNonNull(o, "Null element. Sets cannot contain null elements");
+            if(o == null) {
+                throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
+            }
             int ordinal = elementMapper.write(o);
             int hashCode = hashCodeFinder.hashCode(elementMapper.getTypeName(), ordinal, o);
             rec.addElement(ordinal, hashCode);

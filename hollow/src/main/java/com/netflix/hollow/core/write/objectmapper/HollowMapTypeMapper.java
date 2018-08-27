@@ -27,10 +27,15 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class HollowMapTypeMapper extends HollowTypeMapper {
+
+    private static final String NULL_KEY_MESSAGE =
+            "Null key contained in instance of a Map with schema \"%s\". Maps cannot contain null keys or values";
+
+    private static final String NULL_VALUE_MESSAGE =
+            "Null value contained in instance of a Map with schema \"%s\". Maps cannot contain null keys or values";
 
     private final HollowMapSchema schema;
     private final HollowMapTypeWriteState writeState;
@@ -73,8 +78,14 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
         HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
         for(Map.Entry<?, ?>entry : m.entrySet()) {
-            Object key = Objects.requireNonNull(entry.getKey(), "Null key. Maps cannot contain null keys or values");
-            Object value = Objects.requireNonNull(entry.getValue(), "Null value. Maps cannot contain null keys or values");
+            Object key = entry.getKey();
+            if(key == null) {
+                throw new NullPointerException(String.format(NULL_KEY_MESSAGE, schema));
+            }
+            Object value = entry.getValue();
+            if(value == null) {
+                throw new NullPointerException(String.format(NULL_VALUE_MESSAGE, schema));
+            }
             int keyOrdinal = keyMapper.write(key);
             int valueOrdinal = valueMapper.write(value);
             int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);

@@ -67,8 +67,9 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             mapper.add(new TypeWithList("a", null, "c"));
             Assert.fail("NullPointerException not thrown from List containing null elements");
         } catch (NullPointerException e) {
-            Assert.assertNotNull(e.getMessage());
-            Assert.assertTrue(e.getMessage().contains("Lists"));
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Lists"));
         }
 
         // Sets cannot contain null elements
@@ -76,8 +77,9 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             mapper.add(new TypeWithSet("a", null, "c"));
             Assert.fail("NullPointerException not thrown from Set containing null elements");
         } catch (NullPointerException e) {
-            Assert.assertNotNull(e.getMessage());
-            Assert.assertTrue(e.getMessage().contains("Sets"));
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Sets"));
         }
 
         // Maps cannot contain null keys
@@ -85,8 +87,10 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             mapper.add(new TypeWithMap("a", "a", null, "b", "c", "c"));
             Assert.fail("NullPointerException not thrown from Map containing null keys");
         } catch (NullPointerException e) {
-            Assert.assertNotNull(e.getMessage());
-            Assert.assertTrue(e.getMessage().contains("Maps"));
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Maps"));
+            Assert.assertTrue(m.contains("key"));
         }
 
         // Maps cannot contain null values
@@ -94,8 +98,10 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             mapper.add(new TypeWithMap("a", "a", "b", null, "c", "c"));
             Assert.fail("NullPointerException not thrown from Map containing null values");
         } catch (NullPointerException e) {
-            Assert.assertNotNull(e.getMessage());
-            Assert.assertTrue(e.getMessage().contains("Maps"));
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Maps"));
+            Assert.assertTrue(m.contains("value"));
         }
     }
 
