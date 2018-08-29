@@ -364,6 +364,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#testhollowconsumer" title="TestHollowConsumer" class="md-nav__link">
+    TestHollowConsumer
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -448,6 +455,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#testhollowconsumer" title="TestHollowConsumer" class="md-nav__link">
+    TestHollowConsumer
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -468,11 +482,30 @@
                 <h1 id="unit-testing-with-hollow-objects">Unit testing with Hollow objects</h1>
 <p>Hollow provides a <code>hollow-test</code> jar that contains some testing utilities to facilitate unit testing with Hollow objects.</p>
 <h3 id="hollowreadstateenginebuilder">HollowReadStateEngineBuilder</h3>
-<p>This class allows easy creation of <code>HollowReadStateEngine</code> objects for use in unit tests.</p>
+<p>This class allows easy creation of <code>HollowReadStateEngine</code> objects for use in unit tests. This is useful when paired with a <code>TestHollowConsumer</code> (see below), by itself while using lower-level Hollow APIs, or as a mechanism to create Hollow objects for use in test cases.</p>
 <div class="codehilite"><pre><span></span><span class="n">HollowReadStateEngine</span> <span class="n">engine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowReadStateEngineBuilder</span><span class="o">()</span>
     <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Movie</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">))</span>
     <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Actor</span><span class="o">(</span><span class="s">&quot;bar&quot;</span><span class="o">))</span>
     <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+</pre></div>
+
+
+<h3 id="testhollowconsumer">TestHollowConsumer</h3>
+<p>A common pattern during unit or integration tests is to require an instance of a HollowConsumer that can be manipulated, similar to how test fixtures or mocks are manipulated. <code>hollow-test</code> provides a <code>TestHollowConsumer</code> class to facilitate this.</p>
+<p>A simple example is shown below. See the unit tests in <code>TestHollowConsumerTest</code> for further examples.</p>
+<div class="codehilite"><pre><span></span><span class="n">HollowWriteStateEngine</span> <span class="n">stateEngine</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HollowWriteStateEngineBuilder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;somedata&quot;</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">MyDataModelType</span><span class="o">(</span><span class="s">&quot;somestuff&quot;</span><span class="o">,</span> <span class="mi">2</span><span class="o">))</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="c1">// we will add the snapshot with a version, and make the announcementWatcher see this version</span>
+<span class="kt">long</span> <span class="n">latestVersion</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+<span class="n">TestHollowConsumer</span> <span class="n">consumer</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TestHollowConsumer</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
+       <span class="o">.</span><span class="na">withAnnouncementWatcher</span><span class="o">(</span><span class="k">new</span> <span class="n">TestAnnouncementWatcher</span><span class="o">().</span><span class="na">setLatestVersion</span><span class="o">(</span><span class="n">latestVersion</span><span class="o">))</span>
+       <span class="o">.</span><span class="na">withBlobRetriever</span><span class="o">(</span><span class="k">new</span> <span class="n">TestBlobRetriever</span><span class="o">())</span>
+       <span class="o">.</span><span class="na">withGeneratedAPIClass</span><span class="o">(</span><span class="n">MyApiClass</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+       <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="n">consumer</span><span class="o">.</span><span class="na">addSnapshot</span><span class="o">(</span><span class="n">latestVersion</span><span class="o">,</span> <span class="n">stateEngine</span><span class="o">);</span>
+<span class="n">consumer</span><span class="o">.</span><span class="na">triggerRefresh</span><span class="o">();</span>
 </pre></div>
                 
                   
