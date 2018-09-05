@@ -23,6 +23,8 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementations of this class are responsible for two things:
@@ -39,7 +41,7 @@ import java.util.concurrent.ThreadFactory;
  */
 @Deprecated
 public abstract class HollowAnnouncementWatcher {
-
+    private static final Logger log = Logger.getLogger(HollowAnnouncementWatcher.class.getName());
     private final ExecutorService refreshExecutor;
 
     /**
@@ -133,7 +135,7 @@ public abstract class HollowAnnouncementWatcher {
                         Thread.sleep(delay);
                     client.triggerRefresh();
                 } catch(Throwable th) {
-                    th.printStackTrace();
+                    log.log(Level.SEVERE, "Async refresh failed", th);
                 }
             }
         });

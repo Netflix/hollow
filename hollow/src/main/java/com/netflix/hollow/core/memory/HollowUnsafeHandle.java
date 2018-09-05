@@ -18,11 +18,14 @@
 package com.netflix.hollow.core.memory;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class HollowUnsafeHandle {
-
+    private static final Logger log = Logger.getLogger(HollowUnsafeHandle.class.getName());
     private static Unsafe unsafe;
 
     static {
@@ -32,7 +35,7 @@ public class HollowUnsafeHandle {
             theUnsafe.setAccessible(true);
             unsafe = (Unsafe) theUnsafe.get(null);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Unsafe access failed", e);
         }
     }
 
