@@ -125,11 +125,11 @@ public class HollowClientUpdater {
             return getCurrentVersionId() == version;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
-            for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
-                refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
             metrics.updateRefreshFailed();
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
+            for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+                refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
             throw th;
         }
     }
