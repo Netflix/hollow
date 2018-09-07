@@ -40,8 +40,7 @@ public class CupTokenFetcher {
             return CupKey.DEFAULT;
         }
         long contractOrDealId = (config.isUseContractIdInsteadOfDealId()) ? contract._getContractId() : contract._getDealId();
-        return config.isReadCupTokensFromCinderFeed() ? getCupTokenStringCinder(videoId, contractOrDealId) :
-                getCupTokenStringBeehive(contract);
+        return getCupTokenStringCinder(videoId, contractOrDealId);
     }
     
 
@@ -60,9 +59,5 @@ public class CupTokenFetcher {
         		return CupKey.DEFAULT;
         	return api.getCinderCupTokenRecordHollow(ordinal)._getCupTokenId()._getValue();    		
     	}
-    }
-
-    private String getCupTokenStringBeehive(ContractHollow contract) {
-        return contract._getCupToken() == null ? CupKey.DEFAULT : contract._getCupToken()._getValue();
     }
 }
