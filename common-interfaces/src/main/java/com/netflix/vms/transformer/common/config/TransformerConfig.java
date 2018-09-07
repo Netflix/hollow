@@ -243,8 +243,5 @@ public interface TransformerConfig {
     boolean isGrandfatherEnabled();
 
     @DefaultValue("true")
-    public boolean isReadCupTokensFromCinderFeed();
-
-    @DefaultValue("true")
     public boolean isReadDeployablePackagesFromCinderFeed();
 }
