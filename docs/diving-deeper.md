@@ -263,4 +263,4 @@ if(result != null) {
 }
 ```
 
-The `HollowHashIndex` does not yet have a facility for listening for delta updates.  If an index is necessary across multiple states, currently the index must be recreated on each update.
+The `HollowHashIndex` has the same facility for listening for delta updates as `HollowPrimaryKeyIndex`, however unlike primary key index, hash index does a full re-index even on delta updates whereas primary key index refreshes more efficiently on delta updates.
