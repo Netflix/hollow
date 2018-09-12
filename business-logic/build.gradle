@@ -1,6 +1,7 @@
 dependencies {
     compile project(':vmstransformer-hollowoutput-model')
     compile project(':vmstransformer-common-interfaces')
+    compile 'javax.validation:validation-api'
     compile 'com.netflix.archaius:archaius2-core'
     compile 'com.netflix.vms.logging:vmslogging-core:latest.release'
     compile 'com.google.guava:guava'
