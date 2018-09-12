@@ -834,7 +834,7 @@
 </pre></div>
 
 
-<p>The <code>HollowHashIndex</code> does not yet have a facility for listening for delta updates.  If an index is necessary across multiple states, currently the index must be recreated on each update.</p>
+<p>The <code>HollowHashIndex</code> has the same facility for listening for delta updates as <code>HollowPrimaryKeyIndex</code>, however unlike primary key index, hash index does a full re-index even on delta updates whereas primary key index refreshes more efficiently on delta updates.</p>
                 
                   
                 
