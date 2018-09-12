@@ -690,6 +690,7 @@ public class HollowProducer {
     		for(Validator validator: validators) {
     			Throwable throwable = null;
     			try {
+    			    validator.lockSettings();
     				validator.validate(readState);
 	    		} catch (Throwable th) {
 	    			throwable = th;
@@ -920,6 +921,7 @@ public class HollowProducer {
     
     public static interface Validator {
         void validate(HollowProducer.ReadState readState);
+        default void lockSettings() { }
     
         @SuppressWarnings("serial")
         public static class ValidationException extends RuntimeException {

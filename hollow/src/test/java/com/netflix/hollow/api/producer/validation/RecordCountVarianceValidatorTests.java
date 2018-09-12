@@ -127,6 +127,57 @@ public class RecordCountVarianceValidatorTests {
 		consumer.triggerRefresh();
 		Assert.assertEquals(3,consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals().cardinality());
 	}
+
+	@Test
+	public void changeVarianceInRuntime() {
+    	try {
+    	RecordCountVarianceValidator validator = new RecordCountVarianceValidator("TypeWithPrimaryKey", 50f);
+		HollowProducer producer = HollowProducer.withPublisher(blobStore).withBlobStager(new HollowInMemoryBlobStager())
+				.withValidator(validator).build();
+
+		// runCycle(producer, 1);
+		producer.runCycle(new Populator() {
+
+			public void populate(WriteState newState) throws Exception {
+				newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+				newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+			}
+		});
+
+		producer.runCycle(new Populator() {
+
+			public void populate(WriteState newState) throws Exception {
+				newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+				newState.add(new TypeWithPrimaryKey(2, "Angelina Jolie", "as;dlkfjasd;l"));
+				newState.add(new TypeWithPrimaryKey(7, "Bruce Willis", "as;dlkfjasd;l"));
+			}
+		});
+
+
+		//Update variance percent
+		validator.updateVariancePercent(30f);
+
+
+		producer.runCycle(new Populator() {
+
+			public void populate(WriteState newState) throws Exception {
+				newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+				newState.add(new TypeWithPrimaryKey(2, "Angelina Jolie", "as;dlkfjasd;l"));
+				newState.add(new TypeWithPrimaryKey(7, "Bruce Willis", "as;dlkfjasd;l"));
+				newState.add(new TypeWithPrimaryKey(8, "Leonardo DiCaprio", "klsdjfla;sdjkfdasdas"));
+
+			}
+		});
+
+		Assert.fail();
+
+		} catch (ValidationException expected) {
+			//System.out.println("Message:"+expected.getIndividualFailures().get(0).getMessage());
+			Assert.assertEquals(1, expected.getIndividualFailures().size());
+			Assert.assertTrue(expected.getIndividualFailures().get(0).getMessage()
+					.startsWith("Record count validation for type"));
+		}
+	}
 	
 	@Test
 	public void testGetChangePercent(){
