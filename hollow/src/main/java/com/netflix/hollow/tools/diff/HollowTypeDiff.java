@@ -32,11 +32,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states.
  */
 public class HollowTypeDiff {
+    private static final Logger log = Logger.getLogger(HollowTypeDiff.class.getName());
     private final HollowDiff rootDiff;
     private final HollowObjectTypeReadState from;
     private final HollowObjectTypeReadState to;
@@ -212,7 +215,7 @@ public class HollowTypeDiff {
 
                         results[threadId] = rootNode.getFieldDiffs();
                     } catch(Exception e) {
-                        e.printStackTrace();
+                        log.log(Level.SEVERE, "Diffs calculation failed", e);
                     }
                 }
 

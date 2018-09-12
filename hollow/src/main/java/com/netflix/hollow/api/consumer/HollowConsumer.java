@@ -32,6 +32,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -107,6 +110,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * </dl>
  */
 public class HollowConsumer {
+    private static final Logger log = Logger.getLogger(HollowConsumer.class.getName());
 
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
@@ -210,7 +214,7 @@ public class HollowConsumer {
                         Thread.sleep(delay);
                     triggerRefresh();
                 } catch (Throwable th) {
-                    th.printStackTrace();
+                    log.log(Level.SEVERE, "Async refresh failed", th);
                 }
             }
         });

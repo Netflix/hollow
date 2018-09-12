@@ -28,13 +28,15 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A HollowObjectCacheProvider caches and returns Object representations (presumably {@link HollowRecord}s) of 
  * records of a specific type. 
  */
 public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implements HollowTypeStateListener {
-
+    private static final Logger log = Logger.getLogger(HollowObjectCacheProvider.class.getName());
     private final List<T> cachedItems;
 
     private HollowFactory<T> factory;
@@ -104,7 +106,7 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
         try {
             return factory.newCachedHollowObject(typeDataAccess, typeAPI, ordinal);
         } catch(Throwable th) {
-            th.printStackTrace();
+            log.log(Level.SEVERE, "Cached object instantiation failed", th);
             return null;
         }
     }

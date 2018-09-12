@@ -38,6 +38,8 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The TransitiveSetTraverser can be used to find children and parent references for a selected set of records.  
@@ -72,6 +74,7 @@ import java.util.Map;
  *
  */
 public class TransitiveSetTraverser {
+    private static final Logger log = Logger.getLogger(TransitiveSetTraverser.class.getName());
 
     /**
      * Augment the given selection by adding the references, and the <i>transitive</i> references, of our selection.
@@ -189,7 +192,7 @@ public class TransitiveSetTraverser {
                     elementOrdinal = iter.next();
                 }
             } catch(Exception e) {
-                e.printStackTrace();
+                log.log(Level.SEVERE, "Add transitive matches failed", e);
             }
 
             ordinal = matchingOrdinals.nextSetBit(ordinal + 1);

@@ -52,13 +52,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Used to create a historical {@link HollowDataAccess}, even in the absence of a {@link HollowHistory}.
  *
  */
 public class HollowHistoricalStateCreator {
-
+    private static final Logger log = Logger.getLogger(HollowHistoricalStateCreator.class.getName());
     private final HollowHistory totalHistory;
 
     public HollowHistoricalStateCreator() {
@@ -316,7 +318,7 @@ public class HollowHistoricalStateCreator {
             HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
             reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
         } catch(Exception e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "State engine round trip failed", e);
         }
         return removedRecordCopies;
     }
