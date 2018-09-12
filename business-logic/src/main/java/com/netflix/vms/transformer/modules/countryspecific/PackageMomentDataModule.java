@@ -71,7 +71,23 @@ public class PackageMomentDataModule {
         if(inputTimecodeAnnotation != null) {
         	// Get the list of moments
         	TimecodeAnnotationsListHollow moments = inputTimecodeAnnotation._getTimecodeAnnotations();
+        	
+        	
         	if(moments != null) {
+        		
+        		if(moments.size() > 2) {
+        			System.out.println("=========================");
+                	System.out.println(inputTimecodeAnnotation._getMovieIdBoxed().toString());
+                	System.out.println(inputTimecodeAnnotation._getPackageIdBoxed().toString());
+
+        			for(TimecodedMomentAnnotationHollow moment : moments) {
+            			System.out.println(moment._getType()._getValue());
+            			System.out.println(moment._getStartMillisBoxed().toString());
+            			System.out.println(moment._getEndMillisBoxed().toString());
+            		}
+        			System.out.println("=========================");        			
+        		}
+        		
                 boolean startFound = false;
                 boolean endFound = false;
 
