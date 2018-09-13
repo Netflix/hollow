@@ -32,14 +32,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states.
  */
 public class HollowTypeDiff {
-    private static final Logger log = Logger.getLogger(HollowTypeDiff.class.getName());
     private final HollowDiff rootDiff;
     private final HollowObjectTypeReadState from;
     private final HollowObjectTypeReadState to;
@@ -191,32 +189,28 @@ public class HollowTypeDiff {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
-                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
+                    DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
+                    HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
 
-                        DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
-                        boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);
+                    DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
+                    boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);
 
-                        LongList matches = matcher.getMatchedOrdinals();
-                        for(int i=threadId;i<matches.size();i+=numThreads) {
-                            int fromOrdinal = (int)(matches.get(i) >> 32);
-                            int toOrdinal = (int)matches.get(i);
+                    LongList matches = matcher.getMatchedOrdinals();
+                    for(int i=threadId;i<matches.size();i+=numThreads) {
+                        int fromOrdinal = (int)(matches.get(i) >> 32);
+                        int toOrdinal = (int)matches.get(i);
 
-                            if(rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) == -1
-                                    || rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) != rootNodeOrdinalMap.getIdentityToOrdinal(toOrdinal)) {
-                                rootNode.prepare(fromOrdinal, toOrdinal);
-                                rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                            } else if(requiresMissingFieldTraversal) {
-                                rootNode.prepare(fromOrdinal, toOrdinal);
-                                rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                            }
+                        if(rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) == -1
+                                || rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) != rootNodeOrdinalMap.getIdentityToOrdinal(toOrdinal)) {
+                            rootNode.prepare(fromOrdinal, toOrdinal);
+                            rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
+                        } else if(requiresMissingFieldTraversal) {
+                            rootNode.prepare(fromOrdinal, toOrdinal);
+                            rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
                         }
-
-                        results[threadId] = rootNode.getFieldDiffs();
-                    } catch(Exception e) {
-                        log.log(Level.SEVERE, "Diffs calculation failed", e);
                     }
+
+                    results[threadId] = rootNode.getFieldDiffs();
                 }
 
                 private final IntList fromIntList = new IntList(1);
@@ -236,7 +230,11 @@ public class HollowTypeDiff {
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         this.calculatedFieldDiffs = combineResults(results);
     }
