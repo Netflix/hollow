@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 /**
@@ -151,25 +152,21 @@ public class HollowDiff {
     private void prepareForDiffCalculation() {
         SimultaneousExecutor executor = new SimultaneousExecutor(1 + typeDiffs.size(), "hollow-diff-prepare");
 
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                for(HollowTypeDiff typeDiff : typeDiffs.values()) {
-                    equalityMapping.getEqualOrdinalMap(typeDiff.getTypeName());
-                }
+        executor.execute(() -> {
+            for(HollowTypeDiff typeDiff : typeDiffs.values()) {
+                equalityMapping.getEqualOrdinalMap(typeDiff.getTypeName());
             }
         });
 
         for(final HollowTypeDiff typeDiff : typeDiffs.values()) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    typeDiff.calculateMatches();
-                }
-            });
+            executor.execute(typeDiff::calculateMatches);
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         equalityMapping.markPrepared();
     }

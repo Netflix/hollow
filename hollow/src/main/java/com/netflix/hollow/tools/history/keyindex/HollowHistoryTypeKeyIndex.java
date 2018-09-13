@@ -90,7 +90,9 @@ public class HollowHistoryTypeKeyIndex {
 
     public void update(HollowObjectTypeReadState latestTypeState, boolean isDelta) {
         copyExistingKeys();
-        if(isDelta)
+        if (latestTypeState == null) return;
+
+        if (isDelta)
             populateNewCurrentRecordKeys(latestTypeState);
         else
             populateAllCurrentRecordKeys(latestTypeState);
@@ -328,6 +330,8 @@ public class HollowHistoryTypeKeyIndex {
 
     private void copyExistingKeys() {
         HollowTypeWriteState typeState = writeStateEngine.getTypeState(primaryKey.getType());
+        if (typeState == null) return;
+
         typeState.addAllObjectsFromPreviousCycle();
     }
 

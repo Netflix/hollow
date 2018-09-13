@@ -27,12 +27,13 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class HollowHistoryKeyIndex {
 
@@ -137,56 +138,87 @@ public class HollowHistoryKeyIndex {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
-                    entry.getValue().update(typeState, isDelta);
-                }
+            executor.execute(() -> {
+                HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestStateEngine.getTypeState(entry.getKey());
+                entry.getValue().update(typeState, isDelta);
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private HollowReadStateEngine roundTripStateEngine(boolean isInitialUpdate, boolean isSnapshot) {
-        try {
-            Path tmpFile = Files.createTempFile("roundtrip", "snapshot");
+        HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
+        // Use existing readStateEngine on initial update or delta;
+        // otherwise, create new one to properly handle double snapshot
+        HollowReadStateEngine newReadStateEngine = (isInitialUpdate || !isSnapshot)
+                ? readStateEngine : new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
+
+        // Use a pipe to write and read concurrently to avoid writing
+        // to temporary files or allocating memory
+        // @@@ for small states it's more efficient to sequentially write to
+        // and read from a byte array but it is tricky to estimate the size
+        SimultaneousExecutor executor = new SimultaneousExecutor(1);
+        Exception pipeException = null;
+        // Ensure read-side is closed after completion of read
+        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
+            PipedOutputStream out = new PipedOutputStream(in);
+            executor.execute(() -> {
+                // Ensure write-side is closed after completion of write
+                try (Closeable ac = out) {
+                    if (isInitialUpdate || isSnapshot) {
+                        writer.writeSnapshot(out);
+                    } else {
+                        writer.writeDelta(out);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
             if (isInitialUpdate || isSnapshot) {
-                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
-                HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-                writer.writeSnapshot(fileOutputStream);
-                // Use existing readStateEngine on initial update; otherwise, create new one to properly handle double snapshot
-                HollowReadStateEngine newReadStateEngine = isInitialUpdate ? readStateEngine : new HollowReadStateEngine();
-                HollowBlobReader reader = new HollowBlobReader(newReadStateEngine);
-                reader.readSnapshot(Files.newInputStream(tmpFile));
-                return newReadStateEngine;
+                reader.readSnapshot(in);
             } else {
-                OutputStream fileOutputStream = Files.newOutputStream(tmpFile);
-                HollowBlobWriter writer = new HollowBlobWriter(writeStateEngine);
-                writer.writeDelta(fileOutputStream);
-                HollowBlobReader reader = new HollowBlobReader(readStateEngine);
-                reader.applyDelta(Files.newInputStream(tmpFile));
-                return readStateEngine;
+                reader.applyDelta(in);
             }
-        } catch(IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            writeStateEngine.prepareForNextCycle();
+        } catch (Exception e) {
+            pipeException = e;
         }
+
+        // Ensure no underlying writer exception is lost due to broken pipe
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            if (pipeException == null) {
+                throw new RuntimeException(e);
+            }
+
+            pipeException.addSuppressed(e);
+        }
+        if (pipeException != null)
+            throw new RuntimeException(pipeException);
+
+        writeStateEngine.prepareForNextCycle();
+        return newReadStateEngine;
     }
 
     private void rehashKeys() {
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    entry.getValue().hashRecordKeys();
-                }
-            });
+            executor.execute(() -> entry.getValue().hashRecordKeys());
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

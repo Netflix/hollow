@@ -25,6 +25,7 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.tools.diff.exact.CombinedMatchPairResultsIterator;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import java.util.BitSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 /**
@@ -64,16 +65,14 @@ public abstract class DiffEqualityTypeMapper {
         for(int i=0;i<numThreads;i++) {
             final int threadNumber = i;
 
-            executor.execute(new Runnable() {
-                public void run() {
-                    for(int i=threadNumber;i<ordinalSpaceLength;i+=numThreads) {
-                        if(toPopulatedOrdinals.get(i)) {
-                            int hashCode = toRecordHashCode(i);
-                            if(hashCode != -1) {
-                                int bucket = hashCode & (hashedToOrdinals.length() - 1);
-                                while(!hashedToOrdinals.compareAndSet(bucket, -1, i)) {
-                                    bucket = (bucket + 1) & (hashedToOrdinals.length() - 1);
-                                }
+            executor.execute(() -> {
+                for(int t=threadNumber;t<ordinalSpaceLength;t+=numThreads) {
+                    if(toPopulatedOrdinals.get(t)) {
+                        int hashCode = toRecordHashCode(t);
+                        if(hashCode != -1) {
+                            int bucket = hashCode & (hashedToOrdinals.length() - 1);
+                            while(!hashedToOrdinals.compareAndSet(bucket, -1, t)) {
+                                bucket = (bucket + 1) & (hashedToOrdinals.length() - 1);
                             }
                         }
                     }
@@ -81,7 +80,11 @@ public abstract class DiffEqualityTypeMapper {
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         int arr[] = new int[hashedToOrdinals.length()];
         for(int i=0;i<arr.length;i++) {
@@ -102,21 +105,19 @@ public abstract class DiffEqualityTypeMapper {
         for(int i=0;i<numThreads;i++) {
             final int threadNumber = i;
             matchPairResults[threadNumber] = new LongList();
-            executor.execute(new Runnable() {
-                public void run() {
-                    EqualityDeterminer equalityDeterminer = getEqualityDeterminer();
+            executor.execute(() -> {
+                EqualityDeterminer equalityDeterminer = getEqualityDeterminer();
 
-                    for(int i=threadNumber;i<ordinalSpaceLength;i+=numThreads) {
-                        if(fromPopulatedOrdinals.get(i)) {
-                            int hashCode = fromRecordHashCode(i);
-                            if(hashCode != -1) {
-                                int bucket = hashCode & (hashedToOrdinals.length - 1);
-                                while(hashedToOrdinals[bucket] != -1) {
-                                    if(equalityDeterminer.recordsAreEqual(i, hashedToOrdinals[bucket])) {
-                                        matchPairResults[threadNumber].add(((long)i << 32) | hashedToOrdinals[bucket]);
-                                    }
-                                    bucket = (bucket + 1) & (hashedToOrdinals.length - 1);
+                for(int t=threadNumber;t <ordinalSpaceLength;t+=numThreads) {
+                    if(fromPopulatedOrdinals.get(t)) {
+                        int hashCode = fromRecordHashCode(t);
+                        if(hashCode != -1) {
+                            int bucket = hashCode & (hashedToOrdinals.length - 1);
+                            while(hashedToOrdinals[bucket] != -1) {
+                                if(equalityDeterminer.recordsAreEqual(t, hashedToOrdinals[bucket])) {
+                                    matchPairResults[threadNumber].add(((long) t << 32) | hashedToOrdinals[bucket]);
                                 }
+                                bucket = (bucket + 1) & (hashedToOrdinals.length - 1);
                             }
                         }
                     }
@@ -124,7 +125,11 @@ public abstract class DiffEqualityTypeMapper {
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         int numMatches = 0;
         for(int i=0;i<matchPairResults.length;i++) {

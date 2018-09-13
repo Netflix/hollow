@@ -37,6 +37,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Retains, in memory, the changes in a dataset over many states.  Indexes data for efficient retrieval from any
@@ -226,19 +227,20 @@ public class HollowHistory {
 
         for(int i=0;i<executor.getCorePoolSize();i++) {
             final int threadNumber = i;
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i=threadNumber;i<historicalStates.size();i+=numThreads) {
-                        HollowHistoricalState historicalStateToRemap = historicalStates.get(i);
-                        remappedDataAccesses[i] = creator.copyButRemapOrdinals(historicalStateToRemap.getDataAccess(), remapper);
-                        remappedKeyOrdinalMappings[i] = historicalStateToRemap.getKeyOrdinalMapping().remap(remapper);
-                    }
+            executor.execute(() -> {
+                for(int t=threadNumber;t<historicalStates.size();t+=numThreads) {
+                    HollowHistoricalState historicalStateToRemap = historicalStates.get(t);
+                    remappedDataAccesses[t] = creator.copyButRemapOrdinals(historicalStateToRemap.getDataAccess(), remapper);
+                    remappedKeyOrdinalMappings[t] = historicalStateToRemap.getKeyOrdinalMapping().remap(remapper);
                 }
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta() {
