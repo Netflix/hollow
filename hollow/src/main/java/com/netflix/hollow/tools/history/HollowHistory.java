@@ -249,7 +249,13 @@ public class HollowHistory {
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
             HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
-            if (typeState==null) continue;
+            if (typeState==null) {
+                // The type is present in the history's primary key index but is not present
+                // in the latest read state; ensure the mapping is initialized to the default state
+                typeMapping.prepare(0, 0);
+                typeMapping.finish();
+                continue;
+            }
 
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
