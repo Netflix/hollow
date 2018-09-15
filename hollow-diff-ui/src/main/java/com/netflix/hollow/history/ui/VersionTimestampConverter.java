@@ -24,7 +24,8 @@ import java.util.TimeZone;
 
 public class VersionTimestampConverter {
 
-    private static final TimeZone PACIFIC_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
+    public static final TimeZone PACIFIC_TIMEZONE = TimeZone.getTimeZone("America/Los_Angeles");
+
     private static final TimeZone UTC_TIMEZONE = TimeZone.getTimeZone("UTC");
 
     private static long ADD_MILLIS_TO_TIMESTAMP = 0;
@@ -33,7 +34,7 @@ public class VersionTimestampConverter {
         ADD_MILLIS_TO_TIMESTAMP = millis;
     }
 
-    public static String getTimestamp(long versionLong) {
+    public static String getTimestamp(long versionLong, TimeZone timeZone) {
         String version = String.valueOf(versionLong);
         SimpleDateFormat utcFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         utcFormat.setTimeZone(UTC_TIMEZONE);
@@ -44,7 +45,7 @@ public class VersionTimestampConverter {
             Date adjustedDate = new Date(date.getTime() + ADD_MILLIS_TO_TIMESTAMP);
 
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd HH:mm");
-            sdf.setTimeZone(PACIFIC_TIMEZONE);
+            sdf.setTimeZone(timeZone);
 
             return sdf.format(adjustedDate);
         } catch (ParseException ignore) { }
