@@ -83,7 +83,7 @@ public class AllValidationStatus {
 		private AllValidationStatusBuilder() {
 		}
 		
-		public void addSingelValidationStatus(SingleValidationStatus validationStatus) {
+		public void addSingleValidationStatus(SingleValidationStatus validationStatus) {
 			validationStatusList.add(validationStatus);
 		}
 

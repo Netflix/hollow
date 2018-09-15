@@ -676,7 +676,7 @@ public class HollowProducer {
 	    			throwable = th;
 	    			exceptions.add(th);
 	    		}
-    			valStatus.addSingelValidationStatus(getValidationStatus(readState, validator, throwable));
+    			valStatus.addSingleValidationStatus(getValidationStatus(readState, validator, throwable));
     		}
 	    	
 	    	if(!exceptions.isEmpty()) {
