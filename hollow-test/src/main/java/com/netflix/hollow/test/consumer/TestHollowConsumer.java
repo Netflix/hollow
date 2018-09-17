@@ -61,7 +61,7 @@ public class TestHollowConsumer extends HollowConsumer {
 
     protected TestHollowConsumer(BlobRetriever blobRetriever,
             AnnouncementWatcher announcementWatcher,
-            List<RefreshListener> updateListeners,
+            List<RefreshListener> refreshListeners,
             HollowAPIFactory apiFactory,
             HollowFilterConfig dataFilter,
             ObjectLongevityConfig objectLongevityConfig,
@@ -70,7 +70,7 @@ public class TestHollowConsumer extends HollowConsumer {
             HollowObjectHashCodeFinder hashCodeFinder,
             Executor refreshExecutor,
             HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
-        super(blobRetriever, announcementWatcher, updateListeners, apiFactory, dataFilter, objectLongevityConfig,
+        super(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter, objectLongevityConfig,
                 objectLongevityDetector, doubleSnapshotConfig, hashCodeFinder, refreshExecutor, metricsCollector);
         this.blobRetriever = blobRetriever;
     }

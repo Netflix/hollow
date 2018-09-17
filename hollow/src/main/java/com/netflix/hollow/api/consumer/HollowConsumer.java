@@ -36,11 +36,10 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -121,7 +120,7 @@ public class HollowConsumer {
 
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
-                             List<RefreshListener> updateListeners,
+                             List<RefreshListener> refreshListeners,
                              HollowAPIFactory apiFactory,
                              HollowFilterConfig dataFilter,
                              ObjectLongevityConfig objectLongevityConfig,
@@ -129,12 +128,14 @@ public class HollowConsumer {
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
                              Executor refreshExecutor) {
-        this(blobRetriever, announcementWatcher, updateListeners, apiFactory, dataFilter, objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig, hashCodeFinder, refreshExecutor, null);
+        this(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter,
+                objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig
+                , hashCodeFinder, refreshExecutor, null);
     }
 
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
-                             List<RefreshListener> updateListeners,
+                             List<RefreshListener> refreshListeners,
                              HollowAPIFactory apiFactory,
                              HollowFilterConfig dataFilter,
                              ObjectLongevityConfig objectLongevityConfig,
@@ -146,7 +147,7 @@ public class HollowConsumer {
 
         this.metrics = new HollowConsumerMetrics();
         this.updater = new HollowClientUpdater(blobRetriever,
-                updateListeners,
+                refreshListeners,
                 apiFactory,
                 doubleSnapshotConfig,
                 hashCodeFinder,
@@ -341,18 +342,17 @@ public class HollowConsumer {
         /**
          * Returns the snapshot for the state with the greatest version identifier which is equal to or less than the desired version
          */
-        public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
+        HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
 
         /**
          * Returns a delta transition which can be applied to the specified version identifier
          */
-        public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion);
+        HollowConsumer.Blob retrieveDeltaBlob(long currentVersion);
 
         /**
          * Returns a reverse delta transition which can be applied to the specified version identifier
          */
-        public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
-
+        HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
     }
 
     /**
@@ -430,16 +430,16 @@ public class HollowConsumer {
      * <p>
      * If an AnnouncementWatcher is provided to a HollowConsumer, then calling HollowConsumer#triggerRefreshTo() is unsupported.
      */
-    public static interface AnnouncementWatcher {
+    public interface AnnouncementWatcher {
 
-        public static final long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
+        long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
 
         /**
          * Return the latest announced version.
          *
          * @return
          */
-        public long getLatestVersion();
+        long getLatestVersion();
 
         /**
          * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
@@ -447,16 +447,16 @@ public class HollowConsumer {
          * When announcements are received via a push mechanism, or polling reveals a new version, a call should be placed to one
          * of the flavors of {@link HollowConsumer#triggerRefresh()} on the provided HollowConsumer.
          */
-        public abstract void subscribeToUpdates(HollowConsumer consumer);
+        void subscribeToUpdates(HollowConsumer consumer);
     }
 
-    public static interface DoubleSnapshotConfig {
+    public interface DoubleSnapshotConfig {
 
-        public boolean allowDoubleSnapshot();
+        boolean allowDoubleSnapshot();
 
-        public int maxDeltasBeforeDoubleSnapshot();
+        int maxDeltasBeforeDoubleSnapshot();
 
-        public static DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
+        DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
                 return 32;
@@ -482,9 +482,9 @@ public class HollowConsumer {
          * <p>
          * These reserved copies are backed by the {@link HollowHistory} data structure.
          */
-        public boolean enableLongLivedObjectSupport();
+        boolean enableLongLivedObjectSupport();
 
-        public boolean enableExpiredUsageStackTraces();
+        boolean enableExpiredUsageStackTraces();
 
         /**
          * If long-lived object support is enabled, this returns the number of milliseconds before the {@link StaleHollowReferenceDetector}
@@ -492,7 +492,7 @@ public class HollowConsumer {
          *
          * @return
          */
-        public long gracePeriodMillis();
+        long gracePeriodMillis();
 
         /**
          * If long-lived object support is enabled, this defines the number of milliseconds, after the grace period, during which
@@ -503,7 +503,7 @@ public class HollowConsumer {
          *
          * @return
          */
-        public long usageDetectionPeriodMillis();
+        long usageDetectionPeriodMillis();
 
         /**
          * Whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
@@ -511,16 +511,16 @@ public class HollowConsumer {
          *
          * @return
          */
-        public boolean dropDataAutomatically();
+        boolean dropDataAutomatically();
 
         /**
          * Drop data even if flagged during the usage detection period.
          *
          * @return
          */
-        public boolean forceDropData();
+        boolean forceDropData();
 
-        public static final ObjectLongevityConfig DEFAULT_CONFIG = new ObjectLongevityConfig() {
+        ObjectLongevityConfig DEFAULT_CONFIG = new ObjectLongevityConfig() {
             @Override
             public boolean enableLongLivedObjectSupport() {
                 return false;
@@ -565,7 +565,7 @@ public class HollowConsumer {
          * <p>
          * This signal can be noisy, and a nonzero value indicates that some reference to stale data exists somewhere.
          */
-        public void staleReferenceExistenceDetected(int count);
+        void staleReferenceExistenceDetected(int count);
 
         /**
          * Stale reference USAGE detection.  This will be called every ~30 seconds.
@@ -574,9 +574,9 @@ public class HollowConsumer {
          * <p>
          * This signal is noiseless, and a nonzero value indicates that some reference to stale data is USED somewhere.
          */
-        public void staleReferenceUsageDetected(int count);
+        void staleReferenceUsageDetected(int count);
 
-        public static ObjectLongevityDetector DEFAULT_DETECTOR = new ObjectLongevityDetector() {
+        ObjectLongevityDetector DEFAULT_DETECTOR = new ObjectLongevityDetector() {
             @Override
             public void staleReferenceUsageDetected(int count) {
             }
@@ -585,7 +585,6 @@ public class HollowConsumer {
             public void staleReferenceExistenceDetected(int count) {
             }
         };
-
     }
 
     /**
@@ -608,7 +607,7 @@ public class HollowConsumer {
          * @param currentVersion   the current state version
          * @param requestedVersion the version to which the refresh is progressing
          */
-        public void refreshStarted(long currentVersion, long requestedVersion);
+        void refreshStarted(long currentVersion, long requestedVersion);
 
         /**
          * This method is called when either data was initialized for the first time, <i>or</i> an update occurred across a
@@ -625,7 +624,7 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * This method is called whenever a live state engine's data is updated with a delta.  This method is <i>not</i>
@@ -644,14 +643,14 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * Called to indicate a blob was loaded (either a snapshot or delta).  Generally useful for logging or tracing of applied updates.
          *
          * @param transition The transition which was applied.
          */
-        public void blobLoaded(HollowConsumer.Blob transition);
+        void blobLoaded(HollowConsumer.Blob transition);
 
         /**
          * Indicates that a refresh completed successfully.
@@ -660,7 +659,7 @@ public class HollowConsumer {
          * @param afterVersion     - The version when the refresh completed
          * @param requestedVersion - The specific version which was requested
          */
-        public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion);
+        void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion);
 
 
         /**
@@ -671,7 +670,7 @@ public class HollowConsumer {
          * @param requestedVersion - The specific version which was requested
          * @param failureCause     - The Exception which caused the failure.
          */
-        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
+        void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
 
     }
 
@@ -688,7 +687,7 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * This method is called <i>whenever</i> a delta is processed.  In the case of first time initialization or an update
@@ -702,7 +701,7 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
     }
 
@@ -758,12 +757,13 @@ public class HollowConsumer {
         return builder.withLocalBlobStore(localBlobStoreDir);
     }
 
+    @SuppressWarnings("unchecked")
     public static class Builder<B extends HollowConsumer.Builder> {
 
         protected HollowConsumer.BlobRetriever blobRetriever = null;
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
         protected HollowFilterConfig filterConfig = null;
-        protected List<HollowConsumer.RefreshListener> refreshListeners = new CopyOnWriteArrayList<HollowConsumer.RefreshListener>();
+        protected List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<>();
         protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
@@ -800,7 +800,7 @@ public class HollowConsumer {
         }
 
         public <T extends HollowAPI> B withGeneratedAPIClass(Class<T> generatedAPIClass) {
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<T>(generatedAPIClass);
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
             return (B)this;
         }
 
@@ -851,14 +851,11 @@ public class HollowConsumer {
 
 
             if (refreshExecutor == null)
-                refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                    @Override
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r);
-                        t.setName("hollow-consumer-refresh");
-                        t.setDaemon(true);
-                        return t;
-                    }
+                refreshExecutor = Executors.newSingleThreadExecutor(r -> {
+                    Thread t = new Thread(r);
+                    t.setName("hollow-consumer-refresh");
+                    t.setDaemon(true);
+                    return t;
                 });
         }
 

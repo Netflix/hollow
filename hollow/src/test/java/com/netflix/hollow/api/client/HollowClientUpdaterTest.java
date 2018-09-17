@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class HollowClientUpdaterTest {
     public void setUp() {
         mockDoubleSnapshotConfig = mock(HollowConsumer.DoubleSnapshotConfig.class);
 
-        hollowClientUpdater = new HollowClientUpdater(null, null, null, mockDoubleSnapshotConfig,
+        hollowClientUpdater = new HollowClientUpdater(null, Collections.emptyList(), null, mockDoubleSnapshotConfig,
                 null, null, null, null, null);
     }
 
