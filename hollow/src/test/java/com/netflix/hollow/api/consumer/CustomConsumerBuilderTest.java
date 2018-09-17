@@ -29,7 +29,7 @@ public class CustomConsumerBuilderTest {
         HollowConsumer consumer = new AugmentedBuilder()
                 .withBlobRetriever(blobStore)
                 .build();
-        Assert.assertTrue(consumer instanceof HollowConsumer);
+        Assert.assertNotNull(consumer);
         Assert.assertFalse(consumer instanceof AugmentedConsumer);
     }
 

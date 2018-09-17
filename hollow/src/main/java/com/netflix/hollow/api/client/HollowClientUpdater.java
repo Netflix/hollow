@@ -47,24 +47,24 @@ public class HollowClientUpdater {
     private final HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
     private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final HollowConsumerMetrics metrics;
-    private final HollowMetricsCollector metricsCollector;
+    private final HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
 
     private HollowFilterConfig filter;
 
     public HollowClientUpdater(HollowConsumer.BlobRetriever transitionCreator,
-                               List<HollowConsumer.RefreshListener> updateListeners,
+                               List<HollowConsumer.RefreshListener> refreshListeners,
                                HollowAPIFactory apiFactory,
                                HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                                HollowObjectHashCodeFinder hashCodeFinder,
                                HollowConsumer.ObjectLongevityConfig objectLongevityConfig,
                                HollowConsumer.ObjectLongevityDetector objectLongevityDetector,
                                HollowConsumerMetrics metrics,
-                               HollowMetricsCollector metricsCollector) {
+                               HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
 
-        this.refreshListeners = updateListeners;
+        this.refreshListeners = refreshListeners;
         this.apiFactory = apiFactory;
         this.hashCodeFinder = hashCodeFinder;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
