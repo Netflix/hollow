@@ -110,7 +110,7 @@ import java.util.logging.Logger;
  * </dl>
  */
 public class HollowConsumer {
-    private static final Logger log = Logger.getLogger(HollowConsumer.class.getName());
+    private static final Logger LOG = Logger.getLogger(HollowConsumer.class.getName());
 
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
@@ -175,8 +175,10 @@ public class HollowConsumer {
         refreshLock.writeLock().lock();
         try {
             updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         } finally {
             refreshLock.writeLock().unlock();
         }
@@ -205,17 +207,24 @@ public class HollowConsumer {
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
-        refreshExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    long delay = targetBeginTime - System.currentTimeMillis();
-                    if (delay > 0)
-                        Thread.sleep(delay);
-                    triggerRefresh();
-                } catch (Throwable th) {
-                    log.log(Level.SEVERE, "Async refresh failed", th);
-                }
+        refreshExecutor.execute(() -> {
+            try {
+                long delay = targetBeginTime - System.currentTimeMillis();
+                if (delay > 0)
+                    Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                // Interrupting, such as shutting down the executor pool,
+                // cancels the trigger
+                LOG.log(Level.INFO, "Async refresh interrupted before trigger, refresh cancelled", e);
+                return;
+            }
+
+            try {
+                triggerRefresh();
+            } catch (Error | RuntimeException e) {
+                // Ensure exceptions are propagated to the executor
+                LOG.log(Level.SEVERE, "Async refresh failed", e);
+                throw e;
             }
         });
     }
@@ -236,8 +245,10 @@ public class HollowConsumer {
 
         try {
             updater.updateTo(version);
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
     }
 
