@@ -87,6 +87,7 @@ public class WindowPackageContractInfoModule {
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
+        info.videoPackageInfo.timecodes = packageMomentData.timecodes;
 
         info.videoPackageInfo.trickPlayMap = packageDataCollection.getTrickPlayItemMap();
         info.videoPackageInfo.formats = packageDataCollection.getVideoDescriptorFormats();

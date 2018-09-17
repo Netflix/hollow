@@ -16,6 +16,7 @@ public class VideoPackageInfo implements Cloneable {
     public Map<TrickPlayType, TrickPlayItem> trickPlayMap = null;
     public long startMomentOffsetInMillis = -1;
     public long endMomentOffsetInMillis = -1;
+    public List<TimecodeAnnotation> timecodes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -41,6 +42,9 @@ public class VideoPackageInfo implements Cloneable {
         if (o.startMomentOffsetInMillis!=this.startMomentOffsetInMillis) return false;
         if (o.endMomentOffsetInMillis!=endMomentOffsetInMillis) return false;
         if (o.isDefaultPackage!=this.isDefaultPackage) return false;
+        if(o.timecodes == null) {
+        	if(timecodes != null) return false;
+        } else if(!o.timecodes.equals(timecodes)) return false;
         return true;
     }
 

@@ -8,6 +8,8 @@ import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationsListHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodedMomentAnnotationHollow;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.TimecodeAnnotation;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,17 +77,12 @@ public class PackageMomentDataModule {
         	
         	if(moments != null) {
         		
-        		if(moments.size() > 2) {
-        			System.out.println("=========================");
-                	System.out.println(inputTimecodeAnnotation._getMovieIdBoxed().toString());
-                	System.out.println(inputTimecodeAnnotation._getPackageIdBoxed().toString());
-
-        			for(TimecodedMomentAnnotationHollow moment : moments) {
-            			System.out.println(moment._getType()._getValue());
-            			System.out.println(moment._getStartMillisBoxed().toString());
-            			System.out.println(moment._getEndMillisBoxed().toString());
-            		}
-        			System.out.println("=========================");        			
+        		for(TimecodedMomentAnnotationHollow moment : moments) {
+        			TimecodeAnnotation annotation = new TimecodeAnnotation();
+        			annotation.type = moment._getType().toString().toCharArray();
+        			annotation.startMillis = moment._getStartMillis();
+        			annotation.endMillis = moment._getEndMillis();
+        			data.timecodes.add(annotation);
         		}
         		
                 boolean startFound = false;
