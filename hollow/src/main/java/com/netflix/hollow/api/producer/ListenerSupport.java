@@ -27,12 +27,14 @@ import com.netflix.hollow.api.producer.IncrementalCycleListener.IncrementalCycle
 import com.netflix.hollow.api.producer.validation.AllValidationStatus;
 import com.netflix.hollow.api.producer.validation.AllValidationStatus.AllValidationStatusBuilder;
 import com.netflix.hollow.api.producer.validation.HollowValidationListener;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 /**
  * Beta API subject to change.
@@ -42,7 +44,7 @@ import java.util.logging.Logger;
 final class ListenerSupport {
 
     private static final Logger LOG = Logger.getLogger(ListenerSupport.class.getName());
-    
+
     private final Set<HollowProducerListener> listeners;
     private final Set<HollowValidationListener> validationListeners;
     private final Set<IncrementalCycleListener> incrementalCycleListeners;
@@ -56,9 +58,9 @@ final class ListenerSupport {
     void add(HollowProducerListener listener) {
         listeners.add(listener);
     }
-    
+
     void add(HollowValidationListener listener) {
-    	validationListeners.add(listener);
+        validationListeners.add(listener);
     }
 
     void add(IncrementalCycleListener listener) {
@@ -73,261 +75,158 @@ final class ListenerSupport {
         incrementalCycleListeners.remove(listener);
     }
 
-    void fireProducerInit(long elapsedMillis) {
-        for (final HollowProducerListener l : listeners) {
+    private void fire(Consumer<? super HollowProducerListener> r) {
+        fire(listeners.stream(), r);
+    }
+
+    private <T> void fire(Collection<T> ls, Consumer<? super T> r) {
+        fire(ls.stream(), r);
+    }
+
+    private <T> void fire(Stream<T> ls, Consumer<? super T> r) {
+        ls.forEach(l -> {
             try {
-                l.onProducerInit(elapsedMillis, MILLISECONDS);
+                r.accept(l);
             } catch (RuntimeException e) {
                 LOG.log(Level.WARNING, "Error executing listener", e);
             }
-        }
+        });
+    }
+
+    void fireProducerInit(long elapsedMillis) {
+        fire(l -> l.onProducerInit(elapsedMillis, MILLISECONDS));
     }
 
     void fireProducerRestoreStart(long version) {
-        for (final HollowProducerListener l : listeners) {
-            try {
-                l.onProducerRestoreStart(version);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onProducerRestoreStart(version));
     }
 
     void fireProducerRestoreComplete(RestoreStatus status, long elapsedMillis) {
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onProducerRestoreComplete(status, elapsedMillis, MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onProducerRestoreComplete(status, elapsedMillis, MILLISECONDS));
     }
 
     void fireNewDeltaChain(long version) {
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onNewDeltaChain(version);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onNewDeltaChain(version));
     }
 
     ProducerStatus.Builder fireCycleSkipped(CycleSkipReason reason) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder();
-        for (final HollowProducerListener l : listeners) {
-            if (l instanceof HollowProducerListenerV2) {
-                try {
-                    ((HollowProducerListenerV2) l).onCycleSkip(reason);
-                } catch (RuntimeException e) {
-                    LOG.log(Level.WARNING, "Error executing listener", e);
-                }
-            }
-        }
-        return psb;
+        fire(listeners.stream()
+                        .filter(l -> l instanceof HollowProducerListenerV2)
+                        .map(l -> (HollowProducerListenerV2) l),
+                l -> l.onCycleSkip(reason));
+
+        return new ProducerStatus.Builder();
     }
 
     ProducerStatus.Builder fireCycleStart(long version) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(version);
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onCycleStart(version);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return psb;
+        fire(l -> l.onCycleStart(version));
+
+        return new ProducerStatus.Builder().version(version);
     }
 
     void fireCycleComplete(ProducerStatus.Builder psb) {
         ProducerStatus st = psb.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onCycleComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onCycleComplete(st, psb.elapsed(), MILLISECONDS));
     }
 
     void fireNoDelta(ProducerStatus.Builder psb) {
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onNoDeltaAvailable(psb.version());
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onNoDeltaAvailable(psb.version()));
     }
 
     ProducerStatus.Builder firePopulateStart(long version) {
-        ProducerStatus.Builder builder = new ProducerStatus.Builder().version(version);
-        for (final HollowProducerListener l : listeners) {
-            try {
-                l.onPopulateStart(version);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return builder;
+        fire(l -> l.onPopulateStart(version));
+
+        return new ProducerStatus.Builder().version(version);
     }
 
     void firePopulateComplete(ProducerStatus.Builder builder) {
         ProducerStatus st = builder.build();
-        for (final HollowProducerListener l : listeners) {
-            try {
-                l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onPopulateComplete(st, builder.elapsed(), MILLISECONDS));
     }
 
     ProducerStatus.Builder firePublishStart(long version) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(version);
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onPublishStart(version);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return psb;
+        fire(l -> l.onPublishStart(version));
+
+        return new ProducerStatus.Builder().version(version);
     }
 
     void firePublishComplete(ProducerStatus.Builder builder) {
         ProducerStatus status = builder.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onPublishComplete(status, builder.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onPublishComplete(status, builder.elapsed(), MILLISECONDS));
     }
 
     void fireArtifactPublish(PublishStatus.Builder builder) {
         PublishStatus status = builder.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onArtifactPublish(status, builder.elapsed(), MILLISECONDS));
     }
 
     ProducerStatus.Builder fireIntegrityCheckStart(HollowProducer.ReadState readState) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onIntegrityCheckStart(psb.version());
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return psb;
+        long version = readState.getVersion();
+        fire(l -> l.onIntegrityCheckStart(version));
+
+        return new ProducerStatus.Builder().version(readState);
     }
 
     void fireIntegrityCheckComplete(ProducerStatus.Builder psb) {
         ProducerStatus st = psb.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onIntegrityCheckComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onIntegrityCheckComplete(st, psb.elapsed(), MILLISECONDS));
     }
 
     ProducerStatus.Builder fireValidationStart(HollowProducer.ReadState readState) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
         long version = readState.getVersion();
-        Set<Object> firedListeners = new HashSet<>();
-        for (final HollowProducerListener l : listeners) {
-            try {
-                l.onValidationStart(version);
-                firedListeners.add(l);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
+        fire(l -> l.onValidationStart(version));
 
-        }
-        for (final HollowValidationListener vl: validationListeners){
-            try {
-                if (!firedListeners.contains(vl)) {
-                    vl.onValidationStart(version);
-                }
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return psb;
+        // HollowValidationListener and HollowProducerListener both have the same
+        // method signature for onValidationStart. If an instance implements both
+        // interfaces and is registered as both then the even is only fired once
+        // @@@ Arguably even if the methods are aliased calling twice would be
+        // consistent with validation completion.
+
+        fire(validationListeners.stream()
+                        // Ok to use contains with an instance whose class differs from collection's type
+                        .filter(l -> !listeners.contains(l)),
+                l -> l.onValidationStart(version));
+
+        return new ProducerStatus.Builder().version(readState);
     }
 
     void fireValidationComplete(ProducerStatus.Builder psb, AllValidationStatusBuilder valStatusBuilder) {
         ProducerStatus st = psb.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onValidationComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        
+        fire(l -> l.onValidationComplete(st, psb.elapsed(), MILLISECONDS));
+
         AllValidationStatus valStatus = valStatusBuilder.build();
-        for(final HollowValidationListener vl : validationListeners) {
-            try {
-                vl.onValidationComplete(valStatus, psb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(validationListeners, l -> l.onValidationComplete(valStatus, psb.elapsed(), MILLISECONDS));
     }
 
     ProducerStatus.Builder fireAnnouncementStart(HollowProducer.ReadState readState) {
-        ProducerStatus.Builder psb = new ProducerStatus.Builder().version(readState);
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onAnnouncementStart(psb.version());
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
-        return psb;
+        long version = readState.getVersion();
+        fire(l -> l.onAnnouncementStart(version));
+
+        return new ProducerStatus.Builder().version(readState);
     }
 
     void fireAnnouncementComplete(ProducerStatus.Builder psb) {
         ProducerStatus st = psb.build();
-        for(final HollowProducerListener l : listeners) {
-            try {
-                l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+        fire(l -> l.onAnnouncementComplete(st, psb.elapsed(), MILLISECONDS));
     }
 
-    void fireIncrementalCycleComplete(long version, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
-        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().success(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
-        for(final IncrementalCycleListener l : incrementalCycleListeners) {
-            try {
-                l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch (RuntimeException e) {
-                LOG.log(Level.WARNING, "Error executing listener", e);
-            }
-        }
+    void fireIncrementalCycleComplete(
+            long version, long recordsAddedOrModified, long recordsRemoved,
+            Map<String, Object> cycleMetadata) {
+        // @@@ This behaviour appears incomplete, the build is created and built
+        // for each listener.  The start time (builder creation) and end time (builder built)
+        // results in an effectively meaningless elasped time.
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder()
+                .success(version, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+        fire(incrementalCycleListeners, l -> l.onCycleComplete(icsb.build(), icsb.elapsed(), MILLISECONDS));
     }
 
-    void fireIncrementalCycleFail(Throwable cause, long recordsAddedOrModified, long recordsRemoved, Map<String, Object> cycleMetadata) {
-        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder().fail(cause, recordsAddedOrModified, recordsRemoved, cycleMetadata);
-        for(final IncrementalCycleListener l : incrementalCycleListeners) {
-            try {
-                l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS);
-            } catch (Exception ex) {
-                LOG.log(Level.WARNING, "Error executing listener", ex);
-            }
-        }
+    void fireIncrementalCycleFail(
+            Throwable cause, long recordsAddedOrModified, long recordsRemoved,
+            Map<String, Object> cycleMetadata) {
+        IncrementalCycleStatus.Builder icsb = new IncrementalCycleStatus.Builder()
+                .fail(cause, recordsAddedOrModified, recordsRemoved, cycleMetadata);
+        fire(incrementalCycleListeners, l -> l.onCycleFail(icsb.build(), icsb.elapsed(), MILLISECONDS));
     }
 
 }
