@@ -18,6 +18,13 @@ subprojects {
     targetCompatibility = 1.8
   }
 
+  tasks.withType(Javadoc) {
+    options.tags(
+        'apiNote:a:API Note:',
+        'implSpec:a:Implementation Requirements:',
+        'implNote:a:Implementation Note:')
+  }
+
   group = 'com.netflix.hollow'
   checkstyle {
     configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
