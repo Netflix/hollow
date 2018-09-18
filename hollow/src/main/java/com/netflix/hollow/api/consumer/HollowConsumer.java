@@ -313,16 +313,32 @@ public class HollowConsumer {
 
     /**
      * Add a {@link RefreshListener} to this consumer.
+     *
+     * @implNote this implementation will first acquire the {@link #getRefreshLock() refresh lock} before adding
+     * the new refresh listener. This ensures the listener will receive events for a complete cycle.
      */
     public void addRefreshListener(RefreshListener listener) {
-        updater.addRefreshListener(listener);
+        getRefreshLock().lock();
+        try {
+            updater.addRefreshListener(listener);
+        } finally {
+            getRefreshLock().unlock();
+        }
     }
 
     /**
      * Remove a {@link RefreshListener} from this consumer.
+     *
+     * @implNote this implementation will first acquire the {@link #getRefreshLock() refresh lock} before removing
+     * the refresh listener. This ensures the listener will receive events for a complete cycle.
      */
     public void removeRefreshListener(RefreshListener listener) {
-        updater.removeRefreshListener(listener);
+        getRefreshLock().lock();
+        try {
+            updater.removeRefreshListener(listener);
+        } finally {
+            getRefreshLock().unlock();
+        }
     }
 
     /**

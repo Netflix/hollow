@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static java.util.stream.Collectors.toList;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -63,8 +65,8 @@ public class HollowClientUpdater {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
-
-        this.refreshListeners = refreshListeners;
+        // Create a copy of the listeners, removing any duplicates
+        this.refreshListeners = refreshListeners.stream().distinct().collect(toList());
         this.apiFactory = apiFactory;
         this.hashCodeFinder = hashCodeFinder;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
@@ -135,7 +137,9 @@ public class HollowClientUpdater {
     }
     
     public void addRefreshListener(HollowConsumer.RefreshListener refreshListener) {
-        refreshListeners.add(refreshListener);
+        if (!refreshListeners.contains(refreshListener)) {
+            refreshListeners.add(refreshListener);
+        }
     }
 
     public void removeRefreshListener(HollowConsumer.RefreshListener refreshListener) {
