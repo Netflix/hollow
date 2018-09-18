@@ -62,7 +62,59 @@ public class HollowRefreshListenerTests {
                                  })
                                  .build();
     }
-    
+
+    @Test
+    public void testRemoveDuplicateRefreshListeners() {
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .withRefreshListener(listener)
+                .withRefreshListener(listener)
+                .build();
+
+        long v1 = runCycle(producer, 1);
+        consumer.triggerRefreshTo(v1+1);
+
+        Assert.assertEquals(1, listener.cycles);
+
+        listener.clear();
+
+        long v2 = runCycle(producer, 2);
+
+        consumer.addRefreshListener(listener);
+        consumer.triggerRefreshTo(v2+1);
+
+        Assert.assertEquals(1, listener.cycles);
+    }
+
+    @Test
+    public void testCopyRefreshListeners() {
+        List<HollowConsumer.RefreshListener> listeners = new ArrayList<>();
+        listeners.add(listener);
+
+        HollowConsumer.Builder<HollowConsumer.Builder> b = new HollowConsumer.Builder<HollowConsumer.Builder>() {
+            @Override
+            public HollowConsumer build() {
+                return new HollowConsumer(blobRetriever,
+                        announcementWatcher,
+                        listeners,
+                        apiFactory,
+                        filterConfig,
+                        objectLongevityConfig,
+                        objectLongevityDetector,
+                        doubleSnapshotConfig,
+                        hashCodeFinder,
+                        refreshExecutor,
+                        metricsCollector);
+            }
+        };
+        HollowConsumer consumer = b.withBlobRetriever(blobStore).build();
+
+        long v1 = runCycle(producer, 1);
+        listeners.clear();
+        consumer.triggerRefreshTo(v1+1);
+
+        Assert.assertEquals(1, listener.cycles);
+    }
+
     @Test
     public void testMethodSemanticsOnInitialRefresh() {
         long v1 = runCycle(producer, 1);
@@ -188,6 +240,7 @@ public class HollowRefreshListenerTests {
     }
     
     private class RecordingRefreshListener extends AbstractRefreshListener {
+        long cycles;
 
         long refreshStartCurrentVersion;
         long refreshStartRequestedVersion;
@@ -206,6 +259,7 @@ public class HollowRefreshListenerTests {
         
         @Override
         public void refreshStarted(long currentVersion, long requestedVersion) {
+            cycles++;
             this.refreshStartCurrentVersion = currentVersion;
             this.refreshStartRequestedVersion = requestedVersion;
         }
@@ -247,6 +301,7 @@ public class HollowRefreshListenerTests {
         }
         
         public void clear() {
+            cycles = 0;
             snapshotUpdateOccurredVersions.clear();
             deltaUpdateOccurredVersions.clear();
             blobsLoadedVersions.clear();
