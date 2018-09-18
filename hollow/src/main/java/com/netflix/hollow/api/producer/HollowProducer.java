@@ -489,7 +489,7 @@ public class HollowProducer {
     }
 
     public void removeListener(HollowProducerListener listener) {
-        // @@@ This is not safe with regards to adding a removing during a cycle
+        // @@@ This is not safe with regards to removing a listener during a cycle
         // since the listener may receive a partial sequence of events
         listeners.remove(listener);
     }
