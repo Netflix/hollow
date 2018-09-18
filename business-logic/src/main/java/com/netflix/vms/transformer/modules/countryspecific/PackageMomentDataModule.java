@@ -79,7 +79,7 @@ public class PackageMomentDataModule {
         		
         		for(TimecodedMomentAnnotationHollow moment : moments) {
         			TimecodeAnnotation annotation = new TimecodeAnnotation();
-        			annotation.type = moment._getType().toString().toCharArray();
+        			annotation.type = moment._getType()._getValue().toCharArray();
         			annotation.startMillis = moment._getStartMillis();
         			annotation.endMillis = moment._getEndMillis();
         			data.timecodes.add(annotation);
