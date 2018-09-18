@@ -32,12 +32,12 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.tools.history.HollowHistory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
@@ -265,6 +265,10 @@ public class HollowConsumer {
      */
     public long getCurrentVersionId() {
         return updater.getCurrentVersionId();
+    }
+
+    public CompletableFuture<Long> getInitialLoad() {
+        return updater.getInitialLoad();
     }
 
     /**

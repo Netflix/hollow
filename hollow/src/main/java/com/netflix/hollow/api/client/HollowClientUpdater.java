@@ -29,6 +29,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 /**
@@ -38,6 +39,7 @@ public class HollowClientUpdater {
     private static final Logger LOG = Logger.getLogger(HollowClientUpdater.class.getName());
 
     private final HollowUpdatePlanner planner;
+    private final CompletableFuture<Long> initialLoad;
     private HollowDataHolder hollowDataHolder;
     private boolean forceDoubleSnapshot = false;
     private final FailedTransitionTracker failedTransitionTracker;
@@ -74,6 +76,7 @@ public class HollowClientUpdater {
         this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
+        this.initialLoad = new CompletableFuture<>();
     }
 
     /**
@@ -124,6 +127,8 @@ public class HollowClientUpdater {
             metrics.updateTypeStateMetrics(getStateEngine(), version);
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
+
+            initialLoad.complete(getCurrentVersionId()); // only set the first time
             return getCurrentVersionId() == version;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
@@ -132,6 +137,10 @@ public class HollowClientUpdater {
                 metricsCollector.collect(metrics);
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
                 refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
+
+            // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
+            // that write often a consumer has a chance to try another snapshot that might succeed
+
             throw th;
         }
     }
@@ -219,5 +228,13 @@ public class HollowClientUpdater {
      */
     public void clearFailedTransitions() {
         this.failedTransitionTracker.clear();
+    }
+
+    /**
+     * Returns a future that will be completed with the version of data loaded when the initial load of data
+     * has completed.
+     */
+    public CompletableFuture<Long> getInitialLoad() {
+        return this.initialLoad;
     }
 }
