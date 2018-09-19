@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.hollowoutput;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class TimecodeAnnotation implements Cloneable {
