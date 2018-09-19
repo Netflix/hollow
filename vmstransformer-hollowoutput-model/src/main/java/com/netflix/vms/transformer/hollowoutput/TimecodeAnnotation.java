@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class TimecodeAnnotation implements Cloneable {
 
@@ -9,13 +10,9 @@ public class TimecodeAnnotation implements Cloneable {
 	public long endMillis;
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (endMillis ^ (endMillis >>> 32));
-		result = prime * result + (int) (startMillis ^ (startMillis >>> 32));
-		result = prime * result + ((type == null) ? 0 : Arrays.hashCode(type));
-		return result;
+		return Objects.hash(type, startMillis, endMillis);
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -25,16 +22,8 @@ public class TimecodeAnnotation implements Cloneable {
 		if (getClass() != obj.getClass())
 			return false;
 		TimecodeAnnotation other = (TimecodeAnnotation) obj;
-		if (endMillis != other.endMillis)
-			return false;
-		if (startMillis != other.startMillis)
-			return false;
-		if (type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!Arrays.equals(other.type, type))
-			return false;
-		return true;
+		return Objects.equals(type, other.type) && Objects.equals(startMillis, other.startMillis)
+				&& Objects.equals(endMillis, other.endMillis);
 	}
 	@Override
 	public String toString() {
