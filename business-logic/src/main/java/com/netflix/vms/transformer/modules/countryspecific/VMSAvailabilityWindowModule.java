@@ -38,7 +38,6 @@ import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -53,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -810,26 +810,19 @@ public class VMSAvailabilityWindowModule {
      * the WindowPackageContractInfo#videoContractInfo may be null, but
      * WindowPackageContractInfo#videoPackageInfo cannot be null.
      */
-    private static WindowPackageContractInfo getMaxPackageContractInfo(TransformerContext ctx,
+    protected static WindowPackageContractInfo getMaxPackageContractInfo(TransformerContext ctx,
             Integer videoId, String country, Collection<WindowPackageContractInfo> windowInfos) {
-        int maxPackageId = Integer.MIN_VALUE;
-        WindowPackageContractInfo maxPackageContractInfo = null;
-        for (WindowPackageContractInfo entry : windowInfos) {
-            VideoPackageInfo videoPackageInfo = entry.videoPackageInfo;
-            boolean considerForPackageSelection = videoPackageInfo == null
-                    ? true : videoPackageInfo.isDefaultPackage;
-
-            if (!considerForPackageSelection && windowInfos.size() == 1) {
-                considerForPackageSelection = true;
-                ctx.getLogger().warn(InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
-            }
-
-            if (considerForPackageSelection && entry.videoPackageInfo.packageId > maxPackageId) {
-                maxPackageId = entry.videoPackageInfo.packageId;
-                maxPackageContractInfo = entry;
-            }
+        Optional<WindowPackageContractInfo> maxDefaultPackage = windowInfos.stream()
+                .filter(info -> info.videoPackageInfo.isDefaultPackage)
+                .max(Comparator.comparing(info -> info.videoPackageInfo.packageId));
+        if (maxDefaultPackage.isPresent()) {
+            return maxDefaultPackage.get();
+        } else {
+            ctx.getLogger().warn(InteractivePackage, "Only non-default packages found for video={}, country={}",
+                    videoId, country);
+            return windowInfos.stream()
+                    .max(Comparator.comparing(info -> info.videoPackageInfo.packageId)).orElse(null);
         }
-        return maxPackageContractInfo;
     }
 
 
