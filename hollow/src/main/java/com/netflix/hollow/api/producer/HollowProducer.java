@@ -729,6 +729,7 @@ public class HollowProducer {
         long mint();
     }
 
+    @FunctionalInterface
     public interface Populator {
         void populate(HollowProducer.WriteState newState) throws Exception;
     }
