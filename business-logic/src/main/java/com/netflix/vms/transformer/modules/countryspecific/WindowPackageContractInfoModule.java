@@ -46,10 +46,7 @@ public class WindowPackageContractInfoModule {
         this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
-        if(ctx.getConfig().isTimecodeAnnotationFeedEnabled())
-        	this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
-        else
-        	this.timecodeAnnotationIdx = null;
+        this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -78,15 +75,16 @@ public class WindowPackageContractInfoModule {
         // package moment data
         TimecodeAnnotationHollow inputTimecodeAnnotation = null;
         // Extract the timecode annotation if it is enabled
-        if(this.ctx.getConfig().isTimecodeAnnotationFeedEnabled()) {
-            int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
-            if(ordinal != -1)
-              inputTimecodeAnnotation = api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));
+        int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
+        if(ordinal != -1) {
+            inputTimecodeAnnotation = 
+            		api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));        	
         }
 
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
+        info.videoPackageInfo.timecodes = packageMomentData.timecodes;
 
         info.videoPackageInfo.trickPlayMap = packageDataCollection.getTrickPlayItemMap();
         info.videoPackageInfo.formats = packageDataCollection.getVideoDescriptorFormats();

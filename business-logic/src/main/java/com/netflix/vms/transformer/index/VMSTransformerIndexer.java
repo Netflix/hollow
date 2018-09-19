@@ -46,8 +46,6 @@ public class VMSTransformerIndexer {
 
     private void submitIndexingJobs(HollowReadStateEngine stateEngine, ExecutorService executor, Map<IndexSpec, Object> indexMap) {
         for(IndexSpec spec : IndexSpec.values()) {
-        	if(!this.ctx.getConfig().isTimecodeAnnotationFeedEnabled() && spec == IndexSpec.TIMECODE_ANNOTATIONS)
-        		continue;
             switch(spec.getIndexType()) {
             case PRIMARY_KEY:
                 indexMap.put(spec, primaryKeyIdx(executor, stateEngine, spec));
