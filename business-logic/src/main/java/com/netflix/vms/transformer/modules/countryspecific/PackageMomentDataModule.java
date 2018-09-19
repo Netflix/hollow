@@ -2,8 +2,6 @@ package com.netflix.vms.transformer.modules.countryspecific;
 
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
-import com.netflix.vms.transformer.hollowinput.PackageMomentHollow;
-import com.netflix.vms.transformer.hollowinput.PackageMomentListHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationsListHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodedMomentAnnotationHollow;
@@ -27,85 +25,37 @@ public class PackageMomentDataModule {
             return packageMomentData;
         
         // Determine if timecode annotation is enabled
-        if(ctx.getConfig().isTimecodeAnnotationFeedEnabled()) {
-            packageMomentData = findStartAndEndMomentOffsets(inputTimecodeAnnotation);        	
-        } else {
-        	packageMomentData = findStartAndEndMomentOffsets(inputPackage);
-        }
+        packageMomentData = createPackageMomentData(inputTimecodeAnnotation);        	
         packageMomentDataByPackageId.put(Integer.valueOf(packageData.id), packageMomentData);
         return packageMomentData;
     }
-
-    private PackageMomentData findStartAndEndMomentOffsets(PackageHollow inputPackage) {
-        PackageMomentData data = new PackageMomentData();
-
-        PackageMomentListHollow moments = inputPackage._getMoments();
-
-        if (moments != null) {
-            boolean startFound = false;
-            boolean endFound = false;
-
-            for (PackageMomentHollow packageMoment : inputPackage._getMoments()) {
-                String momentType = packageMoment._getMomentType()._getValue();
-
-                if ("Start".equals(momentType)) {
-                    long offsetMillis = packageMoment._getOffsetMillis();
-                    data.startMomentOffsetInMillis = offsetMillis;
-                    if (endFound)
-                        break;
-                    startFound = true;
-                } else if ("Ending".equals(momentType)) {
-                    long offsetMillis = packageMoment._getOffsetMillis();
-                    data.endMomentOffsetInMillis = offsetMillis;
-                    if (startFound)
-                        break;
-                    endFound = true;
-                }
-            }
-        }
-        return data;
-    }
     
-    
-    private PackageMomentData findStartAndEndMomentOffsets(TimecodeAnnotationHollow inputTimecodeAnnotation) {
-        PackageMomentData data = new PackageMomentData();
-        
-        if(inputTimecodeAnnotation != null) {
-        	// Get the list of moments
-        	TimecodeAnnotationsListHollow moments = inputTimecodeAnnotation._getTimecodeAnnotations();
-        	
-        	
-        	if(moments != null) {
-        		
-        		for(TimecodedMomentAnnotationHollow moment : moments) {
+    private PackageMomentData createPackageMomentData(TimecodeAnnotationHollow inputTimecodeAnnotation) {
+    	PackageMomentData data = new PackageMomentData();
+    	
+    	if(inputTimecodeAnnotation != null) {
+    		TimecodeAnnotationsListHollow moments = inputTimecodeAnnotation._getTimecodeAnnotations();
+    		
+    		if(moments != null) {
+    			for(TimecodedMomentAnnotationHollow moment : moments) {
+    				// If we find start or end moment, record that as well
+    				if(moment._getType()._getValue().equals("Start"))
+    					data.startMomentOffsetInMillis = moment._getStartMillis();
+    				if(moment._getType()._getValue().equals("Ending"))
+    					data.endMomentOffsetInMillis = moment._getStartMillis();
+    				    				
         			TimecodeAnnotation annotation = new TimecodeAnnotation();
         			annotation.type = moment._getType()._getValue().toCharArray();
         			annotation.startMillis = moment._getStartMillis();
         			annotation.endMillis = moment._getEndMillis();
-        			data.timecodes.add(annotation);
-        		}
-        		
-                boolean startFound = false;
-                boolean endFound = false;
-
-        		for(TimecodedMomentAnnotationHollow moment : moments) {
-        			String momentType = moment._getType()._getValue();
-        			if("Start".equals(momentType)) {
-        				data.startMomentOffsetInMillis = moment._getStartMillis();
-        				if(endFound)
-        					break;
-        				startFound = true;
-        			} else if("Ending".equals(momentType)) {
-        				data.endMomentOffsetInMillis = moment._getEndMillis();
-        				if(startFound)
-        					break;
-        				endFound = true;
-        			}
-        		}
-        	}
-        }
-        return data;
+        			data.timecodes.add(annotation);    				
+    			}
+    		}
+    	}
+    	
+    	return data;
     }
+
 
     public void reset() {
         this.packageMomentDataByPackageId.clear();
