@@ -19,16 +19,20 @@ package com.netflix.hollow.api.producer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-import com.netflix.hollow.api.producer.validation.HollowValidationListener;
+import com.netflix.hollow.api.producer.listener.CycleListener;
+import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
+import java.time.Duration;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class ListenerSupportTest {
-    interface ProducerAndValidationListener
-            extends HollowProducerListenerV2, HollowValidationListener {
+    interface ProducerAndValidationStatusListener
+            extends HollowProducerListenerV2, ValidationStatusListener {
     }
 
     private ListenerSupport listenerSupport;
@@ -36,18 +40,144 @@ public class ListenerSupportTest {
     @Mock
     private HollowProducerListenerV2 listener;
     @Mock
-    private HollowValidationListener validationListener;
+    private ValidationStatusListener validationStatusListener;
     @Mock
-    private ProducerAndValidationListener producerAndValidationListener;
+    private ProducerAndValidationStatusListener producerAndValidationStatusListener;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         listenerSupport = new ListenerSupport();
-        listenerSupport.add(listener);
-        listenerSupport.add(validationListener);
-        listenerSupport.add((HollowValidationListener) producerAndValidationListener);
-        listenerSupport.add((HollowProducerListenerV2) producerAndValidationListener);
+        listenerSupport.addListener(listener);
+        listenerSupport.addListener(validationStatusListener);
+        listenerSupport.addListener(producerAndValidationStatusListener);
+    }
+
+    @Test
+    public void testDuplicates() {
+        ListenerSupport ls = new ListenerSupport();
+        CycleListener l = Mockito.mock(CycleListener.class);
+        ls.addListener(l);
+        ls.addListener(l);
+
+        ListenerSupport.Listeners s = ls.listeners();
+        s.fireCycleStart(1);
+
+        Mockito.verify(l, Mockito.times(1)).onCycleStart(1);
+    }
+
+    @Test
+    public void testAddDuringCycle() {
+        ListenerSupport ls = new ListenerSupport();
+
+        class SecondCycleListener implements CycleListener {
+            int cycleStart;
+            int cycleComplete;
+
+            @Override public void onCycleSkip(CycleSkipReason reason) {
+            }
+
+            @Override public void onNewDeltaChain(long version) {
+            }
+
+            @Override public void onCycleStart(long version) {
+                cycleStart++;
+            }
+
+            @Override public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
+                cycleComplete++;
+            }
+        }
+
+        class FirstCycleListener extends SecondCycleListener {
+            SecondCycleListener scl = new SecondCycleListener();
+
+            @Override public void onCycleStart(long version) {
+                super.onCycleStart(version);
+                ls.addListener(scl);
+            }
+        }
+
+        FirstCycleListener fcl = new FirstCycleListener();
+        ls.addListener(fcl);
+
+        ListenerSupport.Listeners s = ls.listeners();
+        s.fireCycleStart(1);
+        s.fireCycleComplete(new Status.StageWithStateBuilder());
+
+        Assert.assertEquals(1, fcl.cycleStart);
+        Assert.assertEquals(1, fcl.cycleComplete);
+        Assert.assertEquals(0, fcl.scl.cycleStart);
+        Assert.assertEquals(0, fcl.scl.cycleComplete);
+
+        s = ls.listeners();
+        s.fireCycleStart(1);
+        s.fireCycleComplete(new Status.StageWithStateBuilder());
+
+        Assert.assertEquals(2, fcl.cycleStart);
+        Assert.assertEquals(2, fcl.cycleComplete);
+        Assert.assertEquals(1, fcl.scl.cycleStart);
+        Assert.assertEquals(1, fcl.scl.cycleComplete);
+    }
+
+    @Test
+    public void testRemoveDuringCycle() {
+        ListenerSupport ls = new ListenerSupport();
+
+        class SecondCycleListener implements CycleListener {
+            int cycleStart;
+            int cycleComplete;
+
+            @Override public void onCycleSkip(CycleSkipReason reason) {
+            }
+
+            @Override public void onNewDeltaChain(long version) {
+            }
+
+            @Override public void onCycleStart(long version) {
+                cycleStart++;
+            }
+
+            @Override public void onCycleComplete(Status status, HollowProducer.ReadState rs, long version, Duration elapsed) {
+                cycleComplete++;
+            }
+        }
+
+        class FirstCycleListener extends SecondCycleListener {
+            SecondCycleListener scl = new SecondCycleListener();
+
+            FirstCycleListener(SecondCycleListener scl) {
+                this.scl = scl;
+            }
+
+            @Override public void onCycleStart(long version) {
+                super.onCycleStart(version);
+                ls.removeListener(scl);
+            }
+        }
+
+        SecondCycleListener scl = new SecondCycleListener();
+        FirstCycleListener fcl = new FirstCycleListener(scl);
+        ls.addListener(fcl);
+        ls.addListener(scl);
+
+        ListenerSupport.Listeners s = ls.listeners();
+        s.fireCycleStart(1);
+        s.fireCycleComplete(new Status.StageWithStateBuilder());
+
+        Assert.assertEquals(1, fcl.cycleStart);
+        Assert.assertEquals(1, fcl.cycleComplete);
+        Assert.assertEquals(1, fcl.scl.cycleStart);
+        Assert.assertEquals(1, fcl.scl.cycleComplete);
+
+        s = ls.listeners();
+        s.fireCycleStart(1);
+        s.fireCycleComplete(new Status.StageWithStateBuilder());
+
+        Assert.assertEquals(2, fcl.cycleStart);
+        Assert.assertEquals(2, fcl.cycleComplete);
+        Assert.assertEquals(1, fcl.scl.cycleStart);
+        Assert.assertEquals(1, fcl.scl.cycleComplete);
     }
 
     @Test
@@ -55,10 +185,10 @@ public class ListenerSupportTest {
         long version = 31337;
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
-        listenerSupport.fireValidationStart(readState);
+        listenerSupport.listeners().fireValidationStart(readState);
         Mockito.verify(listener).onValidationStart(version);
-        Mockito.verify(validationListener).onValidationStart(version);
-        Mockito.verify(producerAndValidationListener).onValidationStart(version);
+        Mockito.verify(validationStatusListener).onValidationStatusStart(version);
+        Mockito.verify(producerAndValidationStatusListener).onValidationStart(version);
     }
 
     @Test
@@ -66,10 +196,24 @@ public class ListenerSupportTest {
         long version = 31337;
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
-        Mockito.doThrow(RuntimeException.class).when(validationListener).onValidationStart(version);
-        listenerSupport.fireValidationStart(readState);
+        Mockito.doThrow(RuntimeException.class).when(validationStatusListener).onValidationStatusStart(version);
+        listenerSupport.listeners().fireValidationStart(readState);
         Mockito.verify(listener).onValidationStart(version);
-        Mockito.verify(producerAndValidationListener).onValidationStart(version);
+        Mockito.verify(validationStatusListener).onValidationStatusStart(version);
+        Mockito.verify(producerAndValidationStatusListener).onValidationStart(version);
+    }
+
+    @Test
+    public void testFireValidationStartDontStopWhenOneFails2() {
+        long version = 31337;
+        HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
+        Mockito.when(readState.getVersion()).thenReturn(version);
+
+        Mockito.doThrow(RuntimeException.class).when(validationStatusListener).onValidationStatusStart(version);
+        listenerSupport.listeners().fireValidationStart(readState);
+        Mockito.verify(listener).onValidationStart(version);
+        Mockito.verify(validationStatusListener).onValidationStatusStart(version);
+        Mockito.verify(producerAndValidationStatusListener).onValidationStart(version);
     }
 
     @Test
@@ -78,8 +222,8 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onProducerInit(1L, MILLISECONDS);
-        listenerSupport.fireProducerInit(1L);
-        Mockito.verify(listener).onProducerInit(1L, MILLISECONDS);
+        listenerSupport.listeners().fireProducerInit(1L);
+        Mockito.verify(listener).onProducerInit(Duration.ofMillis(1L));
     }
 
     @Test
@@ -88,8 +232,19 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onProducerRestoreStart(version);
-        listenerSupport.fireProducerRestoreComplete(null, 1L);
-        Mockito.verify(listener).onProducerRestoreComplete(null, 1L, MILLISECONDS);
+        Status.RestoreStageBuilder b = new Status.RestoreStageBuilder();
+        listenerSupport.listeners().fireProducerRestoreComplete(b);
+        ArgumentCaptor<Status> status = ArgumentCaptor.forClass(
+                Status.class);
+        ArgumentCaptor<Long> desired = ArgumentCaptor.forClass(
+                long.class);
+        ArgumentCaptor<Long> reached = ArgumentCaptor.forClass(
+                long.class);
+        ArgumentCaptor<Duration> elapsed = ArgumentCaptor.forClass(
+                Duration.class);
+        Mockito.verify(listener).onProducerRestoreComplete(status.capture(), desired.capture(), reached.capture(), elapsed.capture());
+        Assert.assertNotNull(status.getValue());
+        Assert.assertNotNull(elapsed.getValue());
     }
 
     @Test
@@ -98,7 +253,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onNewDeltaChain(version);
-        listenerSupport.fireNewDeltaChain(version);
+        listenerSupport.listeners().fireNewDeltaChain(version);
         Mockito.verify(listener).onNewDeltaChain(version);
 
     }
@@ -109,7 +264,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onCycleStart(version);
-        listenerSupport.fireCycleStart(version);
+        listenerSupport.listeners().fireCycleStart(version);
         Mockito.verify(listener).onCycleStart(version);
     }
 
@@ -119,7 +274,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onPopulateStart(version);
-        listenerSupport.firePopulateStart(version);
+        listenerSupport.listeners().firePopulateStart(version);
         Mockito.verify(listener).onPopulateStart(version);
     }
 
@@ -129,7 +284,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onPublishStart(version);
-        listenerSupport.firePublishStart(version);
+        listenerSupport.listeners().firePublishStart(version);
         Mockito.verify(listener).onPublishStart(version);
     }
 
@@ -139,7 +294,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onIntegrityCheckStart(version);
-        listenerSupport.fireIntegrityCheckStart(readState);
+        listenerSupport.listeners().fireIntegrityCheckStart(readState);
         Mockito.verify(listener).onIntegrityCheckStart(version);
     }
 
@@ -150,7 +305,7 @@ public class ListenerSupportTest {
         HollowProducer.ReadState readState = Mockito.mock(HollowProducer.ReadState.class);
         Mockito.when(readState.getVersion()).thenReturn(version);
         Mockito.doThrow(RuntimeException.class).when(listener).onAnnouncementStart(version);
-        listenerSupport.fireAnnouncementStart(readState);
+        listenerSupport.listeners().fireAnnouncementStart(readState);
         Mockito.verify(listener).onAnnouncementStart(version);
     }
 }

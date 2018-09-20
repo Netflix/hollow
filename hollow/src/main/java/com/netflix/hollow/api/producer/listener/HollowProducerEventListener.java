@@ -15,21 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.error;
+package com.netflix.hollow.api.producer.listener;
 
 /**
- * An exception thrown when the write state is unable to advance, revert, or otherwise fails.
+ * The top-level type for all producer listeners.
  */
-public class HollowWriteStateException extends HollowException {
-    public HollowWriteStateException(String message) {
-        super(message);
-    }
+public interface HollowProducerEventListener {
 
-    public HollowWriteStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public HollowWriteStateException(Throwable cause) {
-        super(cause);
-    }
 }
