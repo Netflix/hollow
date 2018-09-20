@@ -15,21 +15,23 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.error;
+package com.netflix.hollow.api.producer.validation;
 
 /**
- * An exception thrown when the write state is unable to advance, revert, or otherwise fails.
+ * The type of validation result.
  */
-public class HollowWriteStateException extends HollowException {
-    public HollowWriteStateException(String message) {
-        super(message);
-    }
-
-    public HollowWriteStateException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public HollowWriteStateException(Throwable cause) {
-        super(cause);
-    }
+public enum ValidationResultType {
+    /**
+     * The validation passed.
+     */
+    // @@@ Skipping might be considered a sub-state of PASSED with details in ValidationResult
+    PASSED,
+    /**
+     * The validation failed.
+     */
+    FAILED,
+    /**
+     * The validator failed with an unexpected error and could not perform the validation
+     */
+    ERROR
 }

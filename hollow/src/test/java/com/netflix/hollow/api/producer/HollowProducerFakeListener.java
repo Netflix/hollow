@@ -2,14 +2,14 @@ package com.netflix.hollow.api.producer;
 
 import java.util.concurrent.TimeUnit;
 
-public class HollowProducerFakeListener  implements HollowProducerListener {
+public class HollowProducerFakeListener implements HollowProducerListener {
 
     public ProducerStatus getSuccessFakeStatus(long version) {
-        return HollowProducerFakeListener.ProducerStatus.success(version);
+        return new ProducerStatus(Status.SUCCESS, null, version, null);
     }
 
     public ProducerStatus getFailFakeStatus(long version) {
-        return HollowProducerFakeListener.ProducerStatus.fail(version);
+        return new ProducerStatus(Status.FAIL, null, version, null);
     }
 
     @Override

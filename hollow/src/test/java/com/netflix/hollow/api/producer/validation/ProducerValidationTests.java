@@ -21,7 +21,6 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Populator;
-import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
@@ -31,69 +30,70 @@ import org.junit.Test;
 
 public class ProducerValidationTests {
     private InMemoryBlobStore blobStore;
-    
+
     @Before
     public void setUp() {
         blobStore = new InMemoryBlobStore();
     }
-    
+
     @Test
     public void duplicateDetectionFailureTest() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                                                .withBlobStager(new HollowInMemoryBlobStager())
-                                                .withValidator(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
-                                                .build();
-        
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
+                .build();
+
         try {
             //runCycle(producer, 1);
-        	producer.runCycle(new Populator() {
-				
-				public void populate(WriteState newState) throws Exception {
-					newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
-					newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
-					newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "as;dlkfjasd;l"));
-				}
-			});
+            producer.runCycle(new Populator() {
+
+                public void populate(WriteState newState) throws Exception {
+                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                    newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "as;dlkfjasd;l"));
+                }
+            });
             Assert.fail();
-        } catch(ValidationException expected) {
-            Assert.assertEquals(1, expected.getIndividualFailures().size());
-            //System.out.println("Message: "+expected.getIndividualFailures().get(0).getMessage());
-            Assert.assertTrue(expected.getIndividualFailures().get(0).getMessage().startsWith("Duplicate keys found for type TypeWithPrimaryKey"));
+        } catch (ValidationStatusException expected) {
+            Assert.assertEquals(1, expected.getValidationStatus().getResults().size());
+            Assert.assertTrue(expected.getValidationStatus().getResults().get(0).getMessage()
+                    .startsWith("Duplicate keys found for type TypeWithPrimaryKey"));
         }
     }
-    
+
     @Test
     public void duplicateDetectionSuccessTest() {
         HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                                                .withBlobStager(new HollowInMemoryBlobStager())
-                                                .withValidator(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
-                                                .build();
-        
-            //runCycle(producer, 1);
-        	producer.runCycle(new Populator() {
-				
-				public void populate(WriteState newState) throws Exception {
-					newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
-					newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
-				}
-			});
-        	
-        	HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
-        	consumer.triggerRefresh();
-        	Assert.assertEquals(2, consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals().cardinality());
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
+                .build();
+
+        //runCycle(producer, 1);
+        producer.runCycle(new Populator() {
+
+            public void populate(WriteState newState) throws Exception {
+                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+            }
+        });
+
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefresh();
+        Assert.assertEquals(2, consumer.getStateEngine().getTypeState("TypeWithPrimaryKey").getPopulatedOrdinals()
+                .cardinality());
     }
-    
-    
-    @HollowPrimaryKey(fields={"id","name"})
-    static class TypeWithPrimaryKey{
-    	int id;
-    	String name;
-    	String desc;
-    	
-    	TypeWithPrimaryKey(int id, String name, String desc){
-    		this.id=id;
-    		this.name=name;
-    		this.desc = desc;
-    	}
+
+
+    @HollowPrimaryKey(fields = {"id", "name"})
+    static class TypeWithPrimaryKey {
+        int id;
+        String name;
+        String desc;
+
+        TypeWithPrimaryKey(int id, String name, String desc) {
+            this.id = id;
+            this.name = name;
+            this.desc = desc;
+        }
     }
 }

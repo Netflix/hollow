@@ -20,7 +20,6 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.Validator;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -41,93 +40,89 @@ import java.util.function.Function;
  * marked as failed and the producer cycle fails.
  * Note that the filter function is not called with any objects that were added or removed.
  * Also note that this validator can only be used on types that have a primary key.
- * Example construction - note that {@code Movie} and {@code MovieAPI} are generated classes:
- * <code>
- *     new ObjectModificationValidator&lt;MovieAPI, Movie&gt;(
+ *
+ * @apiNote Example construction - note that {@code Movie} and {@code MovieAPI} are generated classes:
+ * <pre>{@code
+ *     new ObjectModificationValidator<MovieAPI, Movie>(
  *         "Movie",
- *         (oldMovie, newMovie) -&gt; oldMovie.getName().equals(newMovie.getName()),
+ *         (oldMovie, newMovie) -> oldMovie.getName().equals(newMovie.getName()),
  *         MovieAPI::new,
- *         (api, ordinal) -&gt; api.getMovie(ordinal));
- * </code>
+ *         (api, ordinal) -> api.getMovie(ordinal));
+ * }</pre>
  */
 public class ObjectModificationValidator<A extends HollowAPI, T extends HollowObject>
-        implements Validator {
+        implements ValidatorListener {
     private final String typeName;
     private final Function<HollowDataAccess, A> apiFunction;
     private final BiFunction<A, Integer, T> hollowObjectFunction;
     private final BiPredicate<T, T> filter;
 
-    private SingleValidationStatus.SingleValidationStatusBuilder statusBuilder;
-
     @SuppressWarnings("WeakerAccess")
-    public ObjectModificationValidator(String typeName, BiPredicate<T, T> filter,
+    public ObjectModificationValidator(
+            String typeName, BiPredicate<T, T> filter,
             Function<HollowDataAccess, A> apiFunction,
             BiFunction<A, Integer, T> hollowObjectFunction) {
-		this.typeName = typeName;
-		this.filter = filter;
-		this.apiFunction = apiFunction;
-		this.hollowObjectFunction = hollowObjectFunction;
-        this.statusBuilder = SingleValidationStatus.builder(ObjectModificationValidator.class.getSimpleName())
-                .addAdditionalInfo("typeName", typeName);
+        this.typeName = typeName;
+        this.filter = filter;
+        this.apiFunction = apiFunction;
+        this.hollowObjectFunction = hollowObjectFunction;
     }
 
     @Override
-	public void validate(ReadState readState) throws ValidationException {
-        try {
-            HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
-            if (typeState == null) {
-                throw new ValidationException("Cannot execute ObjectModificationValidator on missing type "
-                        + typeName);
-            } else if (typeState.getSchema().getSchemaType() != SchemaType.OBJECT) {
-                throw new ValidationException("Cannot execute ObjectModificationValidator on type " + typeName
-                        + " because it is not a HollowObjectSchema - it is a "
-                        + typeState.getSchema().getSchemaType());
-            }
-            BitSet latestOrdinals = typeState.getPopulatedOrdinals();
-            BitSet previousOrdinals = typeState.getPreviousOrdinals();
-            if (previousOrdinals.isEmpty()) {
-                statusBuilder.withMessage(ObjectModificationValidator.class.getSimpleName()
-                        + " has nothing to do because previous cycle has no " + typeName).success();
-                return;
-            }
-            BitSet removedAndModified = calculateRemovedAndModifiedOrdinals(latestOrdinals, previousOrdinals);
-            if (removedAndModified.isEmpty()) {
-                statusBuilder.withMessage(ObjectModificationValidator.class.getSimpleName()
-                        + " has nothing to do because " + typeName
-                        + " has no removals or modifications").success();
-                return;
-            }
-            A hollowApi = apiFunction.apply(readState.getStateEngine());
-            HollowObjectTypeReadState objectTypeState = (HollowObjectTypeReadState) typeState;
-            PrimaryKey key = objectTypeState.getSchema().getPrimaryKey();
-            // this is guaranteed to give us items from the most recent cycle, not the last one
-            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(readState.getStateEngine(), key);
-            int fromOrdinal = removedAndModified.nextSetBit(0);
-            while (fromOrdinal != HollowConstants.ORDINAL_NONE) {
-                Object[] candidateKey = index.getRecordKey(fromOrdinal);
-                int matchedOrdinal = index.getMatchingOrdinal(candidateKey);
-                if (matchedOrdinal != HollowConstants.ORDINAL_NONE) {
-                    T fromObject = hollowObjectFunction.apply(hollowApi, fromOrdinal);
-                    T toObject = hollowObjectFunction.apply(hollowApi, matchedOrdinal);
-                    if (!filter.test(fromObject, toObject)) {
-                        throw new ValidationException("Validation failed for key " + Arrays.toString(candidateKey));
-                    }
-                }
-                fromOrdinal = removedAndModified.nextSetBit(fromOrdinal + 1);
-            }
-            statusBuilder.success();
-        } catch (RuntimeException e) {
-            statusBuilder.withMessage(e.getMessage()).fail(e);
-            throw e;
-        }
+    public String getName() {
+        return getClass().getSimpleName() + "_" + typeName;
     }
 
-	@Override
-	public String toString() {
-        SingleValidationStatus status = statusBuilder.build();
-        return getClass().getSimpleName() + "<typeName=" + typeName + ", status=" + status.getStatus()
-                + ", message=" + status.getMessage() + ", additionalInfo=" + status.getAdditionalInfo()
-                + ", exception=" + status.getThrowable() + ">";
+    @Override
+    public ValidationResult onValidate(ReadState readState) {
+        ValidationResult.ValidationResultBuilder vrb = ValidationResult.from(this)
+                .detail("Typename", typeName);
+
+        HollowTypeReadState typeState = readState.getStateEngine().getTypeState(typeName);
+        if (typeState == null) {
+            return vrb.failed("Cannot execute ObjectModificationValidator on missing type " + typeName);
+        } else if (typeState.getSchema().getSchemaType() != SchemaType.OBJECT) {
+            return vrb.failed("Cannot execute ObjectModificationValidator on type " + typeName
+                    + " because it is not a HollowObjectSchema - it is a "
+                    + typeState.getSchema().getSchemaType());
+        }
+
+        BitSet latestOrdinals = typeState.getPopulatedOrdinals();
+        BitSet previousOrdinals = typeState.getPreviousOrdinals();
+        if (previousOrdinals.isEmpty()) {
+            return vrb.detail("skipped", Boolean.TRUE)
+                    .passed("Nothing to do because previous cycle has no " + typeName);
+        }
+
+        BitSet removedAndModified = calculateRemovedAndModifiedOrdinals(latestOrdinals, previousOrdinals);
+        if (removedAndModified.isEmpty()) {
+            return vrb.detail("skipped", Boolean.TRUE)
+                    .passed("Nothing to do because " + typeName + " has no removals or modifications");
+        }
+
+        A hollowApi = apiFunction.apply(readState.getStateEngine());
+        HollowObjectTypeReadState objectTypeState = (HollowObjectTypeReadState) typeState;
+        PrimaryKey key = objectTypeState.getSchema().getPrimaryKey();
+        // this is guaranteed to give us items from the most recent cycle, not the last one
+        HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(readState.getStateEngine(), key);
+        int fromOrdinal = removedAndModified.nextSetBit(0);
+        while (fromOrdinal != HollowConstants.ORDINAL_NONE) {
+            Object[] candidateKey = index.getRecordKey(fromOrdinal);
+            int matchedOrdinal = index.getMatchingOrdinal(candidateKey);
+            if (matchedOrdinal != HollowConstants.ORDINAL_NONE) {
+                T fromObject = hollowObjectFunction.apply(hollowApi, fromOrdinal);
+                T toObject = hollowObjectFunction.apply(hollowApi, matchedOrdinal);
+                if (!filter.test(fromObject, toObject)) {
+                    return vrb.detail("candidateKey", Arrays.toString(candidateKey))
+                            .detail("fromOrdinal", fromOrdinal)
+                            .detail("toOrdinal", matchedOrdinal)
+                            .failed("Validation failed for candidate key");
+                }
+            }
+            fromOrdinal = removedAndModified.nextSetBit(fromOrdinal + 1);
+        }
+
+        return vrb.passed();
     }
 
     private static BitSet calculateRemovedAndModifiedOrdinals(BitSet latestOrdinals, BitSet previousOrdinals) {
