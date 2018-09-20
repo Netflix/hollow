@@ -38,8 +38,6 @@ import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VMSAvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
-import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
-import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
@@ -54,7 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -504,53 +502,25 @@ public class VMSAvailabilityWindowModule {
 
 
         if (currentOrFirstFutureWindow != null) {
-
-            // this basically gets the following data from max packageId across windows
-            maxPackageId = Integer.MIN_VALUE;
-            Set<Strings> assetBcp47CodesFromMaxPackageId = null;
-            Set<VideoFormatDescriptor> videoFormatDescriptorsFromMaxPackageId = null;
-            int prePromoDays = 0;
-            boolean isDayOfBroadcast = false;
-            boolean hasRollingEpisodes = false;
-            boolean isAvailableForDownload = false;
-            LinkedHashSetOfStrings cupTokens = null;
-
-            for (Map.Entry<com.netflix.vms.transformer.hollowoutput.Integer, WindowPackageContractInfo> entry : currentOrFirstFutureWindow.windowInfosByPackageId.entrySet()) {
-                VideoPackageInfo videoPackageInfo = entry.getValue().videoPackageInfo;
-                boolean considerForPackageSelection = videoPackageInfo == null ? true : videoPackageInfo.isDefaultPackage;
-
-                if (!considerForPackageSelection && currentOrFirstFutureWindow.windowInfosByPackageId.size() == 1) {
-                    considerForPackageSelection = true;
-                    ctx.getLogger().warn(InteractivePackage, "Only one non-default package found for video={}, country={}", videoId, country);
-                }
-
-                if (considerForPackageSelection && (entry.getKey().val > maxPackageId)) {
-                    maxPackageId = entry.getKey().val;
-                    assetBcp47CodesFromMaxPackageId = entry.getValue().videoContractInfo.assetBcp47Codes;
-                    videoFormatDescriptorsFromMaxPackageId = entry.getValue().videoPackageInfo.formats;
-                    prePromoDays = minValueToZero(entry.getValue().videoContractInfo.prePromotionDays);
-                    isDayOfBroadcast = entry.getValue().videoContractInfo.isDayOfBroadcast;
-                    hasRollingEpisodes = entry.getValue().videoContractInfo.hasRollingEpisodes;
-                    isAvailableForDownload = entry.getValue().videoContractInfo.isAvailableForDownload;
-                    cupTokens = entry.getValue().videoContractInfo.cupTokens;
-                }
+            WindowPackageContractInfo maxPackageContractInfo =
+                    getMaxPackageContractInfo(ctx, videoId, country,
+                            currentOrFirstFutureWindow.windowInfosByPackageId.values());
+            if (maxPackageContractInfo == null || maxPackageContractInfo.videoContractInfo == null
+                    || maxPackageContractInfo.videoPackageInfo == null) {
+                throw new RuntimeException("Invalid maxPackageContractInfo for video=" + videoId
+                        + " country= " + country + " info=" + maxPackageContractInfo);
             }
-
-            // once all the data is available then rollup the asset bcp 47 codes and pre-promo days.
-
-            rollup.newAssetBcp47Codes(assetBcp47CodesFromMaxPackageId);
-            rollup.newPrePromoDays(prePromoDays);
-
-            if (isDayOfBroadcast)
+            rollup.newAssetBcp47Codes(maxPackageContractInfo.videoContractInfo.assetBcp47Codes);
+            rollup.newPrePromoDays(minValueToZero(maxPackageContractInfo.videoContractInfo.prePromotionDays));
+            if (maxPackageContractInfo.videoContractInfo.isDayOfBroadcast)
                 rollup.foundDayOfBroadcast();
-            if (hasRollingEpisodes)
+            if (maxPackageContractInfo.videoContractInfo.hasRollingEpisodes)
                 rollup.foundRollingEpisodes();
-            if (isAvailableForDownload)
+            if (maxPackageContractInfo.videoContractInfo.isAvailableForDownload)
                 rollup.foundAvailableForDownload();
-
             if (isGoLive && isInWindow) {
-                rollup.newVideoFormatDescriptors(videoFormatDescriptorsFromMaxPackageId);
-                rollup.newCupTokens(cupTokens);
+                rollup.newVideoFormatDescriptors(maxPackageContractInfo.videoPackageInfo.formats);
+                rollup.newCupTokens(maxPackageContractInfo.videoContractInfo.cupTokens);
             }
 
             rollup.newEpisodeData(isGoLive, currentOrFirstFutureWindow.bundledAssetsGroupId);
@@ -833,6 +803,26 @@ public class VMSAvailabilityWindowModule {
 
         }
         return null;
+    }
+
+    /**
+     * Return the max WindowPackageContractInfo (by package ID) from a collection of them. Note that
+     * the WindowPackageContractInfo#videoContractInfo may be null, but
+     * WindowPackageContractInfo#videoPackageInfo cannot be null.
+     */
+    protected static WindowPackageContractInfo getMaxPackageContractInfo(TransformerContext ctx,
+            Integer videoId, String country, Collection<WindowPackageContractInfo> windowInfos) {
+        Optional<WindowPackageContractInfo> maxDefaultPackage = windowInfos.stream()
+                .filter(info -> info.videoPackageInfo.isDefaultPackage)
+                .max(Comparator.comparing(info -> info.videoPackageInfo.packageId));
+        if (maxDefaultPackage.isPresent()) {
+            return maxDefaultPackage.get();
+        } else {
+            ctx.getLogger().warn(InteractivePackage, "Only non-default packages found for video={}, country={}",
+                    videoId, country);
+            return windowInfos.stream()
+                    .max(Comparator.comparing(info -> info.videoPackageInfo.packageId)).orElse(null);
+        }
     }
 
 
