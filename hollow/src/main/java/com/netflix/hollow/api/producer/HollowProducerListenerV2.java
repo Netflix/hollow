@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.producer;
 
+import com.netflix.hollow.api.producer.listener.CycleListener;
+
 /**
  * An extension of {@link HollowProducerListener} to allow adding new methods without
  * breaking backwards compatability.
@@ -27,6 +29,14 @@ package com.netflix.hollow.api.producer;
 public interface HollowProducerListenerV2 extends HollowProducerListener {
     enum CycleSkipReason {
         NOT_PRIMARY_PRODUCER;
+    }
+
+    // CycleListener
+
+    @Override
+    default void onCycleSkip(CycleListener.CycleSkipReason reason) {
+        CycleSkipReason r = reason == null ? null : CycleSkipReason.NOT_PRIMARY_PRODUCER;
+        onCycleSkip(r);
     }
 
     /**

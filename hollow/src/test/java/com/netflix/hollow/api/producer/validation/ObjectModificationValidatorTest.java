@@ -29,7 +29,6 @@ import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.api.producer.HollowProducer;
-import com.netflix.hollow.api.producer.HollowProducer.Validator.ValidationException;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.util.function.BiPredicate;
@@ -37,7 +36,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 public class ObjectModificationValidatorTest {
-    @HollowPrimaryKey(fields =  {"id", "code"})
+    @HollowPrimaryKey(fields = {"id", "code"})
     private static class TypeA {
         @SuppressWarnings("unused")
         private final int id;
@@ -69,6 +68,7 @@ public class ObjectModificationValidatorTest {
         verify(filter, never()).test(
                 any(GenericHollowObject.class), any(GenericHollowObject.class));
     }
+
     @Test
     public void testValidate_onlyRemovals() {
         @SuppressWarnings("unchecked")
@@ -125,14 +125,15 @@ public class ObjectModificationValidatorTest {
         try {
             producer.runCycle(writeState -> writeState.add(new TypeA(1, "fo", "ba")));
             fail("Expected validation exception");
-        } catch (ValidationException e) { // expected
+        } catch (ValidationStatusException e) { // expected
         }
     }
 
     private static HollowProducer getProducer(ObjectModificationValidator validator) {
         return HollowProducer.withPublisher(new InMemoryBlobStore())
-            .withBlobStager(new HollowInMemoryBlobStager())
-            .withValidator(validator).build();
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withListener(validator)
+                .build();
     }
 
     @SuppressWarnings("unchecked")
@@ -144,6 +145,6 @@ public class ObjectModificationValidatorTest {
             BiPredicate<GenericHollowObject, GenericHollowObject> filter) {
         return new ObjectModificationValidator<>(TypeA.class.getSimpleName(), filter,
                 HollowAPI::new, (api, ordinal) -> new GenericHollowObject(api.getDataAccess(),
-                    TypeA.class.getSimpleName(), ordinal));
+                TypeA.class.getSimpleName(), ordinal));
     }
 }

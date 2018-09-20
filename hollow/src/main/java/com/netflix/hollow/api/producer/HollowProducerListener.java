@@ -17,13 +17,15 @@
  */
 package com.netflix.hollow.api.producer;
 
-import static com.netflix.hollow.api.producer.HollowProducerListener.Status.FAIL;
-import static com.netflix.hollow.api.producer.HollowProducerListener.Status.SUCCESS;
-
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
-import com.netflix.hollow.core.HollowConstants;
-import java.util.EventListener;
+import com.netflix.hollow.api.producer.listener.AnnouncementListener;
+import com.netflix.hollow.api.producer.listener.CycleListener;
+import com.netflix.hollow.api.producer.listener.DataModelInitializationListener;
+import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
+import com.netflix.hollow.api.producer.listener.PopulateListener;
+import com.netflix.hollow.api.producer.listener.PublishListener;
+import com.netflix.hollow.api.producer.listener.RestoreListener;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,13 +35,36 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}.
  */
-public interface HollowProducerListener extends EventListener {
-    // TODO(hollow3): replace (long,TimeUnit) pair with java.time.Duration
+public interface HollowProducerListener extends
+        DataModelInitializationListener,
+        RestoreListener,
+        CycleListener,
+        PopulateListener,
+        PublishListener,
+        IntegrityCheckListener,
+        AnnouncementListener {
+
+
+    ///////////////////////////
+    // DataModelInitializationListener
+    ///////////////////////////
+
+    // Called when HollowProducer.initializeDataModel is called
+
+    @Override
+    default void onProducerInit(Duration elapsed) {
+        onProducerInit(elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called after the {@code HollowProducer} has initialized its data model.
      */
     void onProducerInit(long elapsed, TimeUnit unit);
+
+
+    ///////////////////////////
+    // RestoreListener
+    ///////////////////////////
 
     /**
      * Called after the {@code HollowProducer} has restored its data state to the indicated version.
@@ -47,18 +72,38 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param restoreVersion Version from which the state for {@code HollowProducer} was restored.
      */
+    @Override
     void onProducerRestoreStart(long restoreVersion);
+
+    @Override
+    default void onProducerRestoreComplete(com.netflix.hollow.api.producer.Status status, long versionDesired, long versionReached, Duration elapsed) {
+        onProducerRestoreComplete(new RestoreStatus(status, versionDesired, versionReached),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called after the {@code HollowProducer} has restored its data state to the indicated version.
      * If previous state is not available to restore from, then this callback will not be called.
      *
      * @param status of the restore. {@link RestoreStatus#getStatus()} will return {@code SUCCESS} when
-     *   the desired version was reached during restore, otheriwse {@code FAIL} will be returned.
+     * the desired version was reached during restore, otheriwse {@code FAIL} will be returned.
      * @param elapsed duration of the restore in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
     void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit);
+
+
+    ///////////////////////////
+    // CycleListener
+    ///////////////////////////
+
+    // See also HollowProducerListenerV2.onCycleSkip
+
+    @Override
+    default void onCycleSkip(CycleSkipReason reason) {
+    }
+
+    // This is called just before onCycleStart, can the two be merged with additional arguments
 
     /**
      * Indicates that the next state produced will begin a new delta chain.
@@ -68,6 +113,7 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param version the version of the state that will become the first of a new delta chain
      */
+    @Override
     void onNewDeltaChain(long version);
 
     /**
@@ -75,33 +121,45 @@ public interface HollowProducerListener extends EventListener {
      *
      * @param version Version produced by the {@code HollowProducer} for new cycle about to start.
      */
+    @Override
     void onCycleStart(long version);
+
+    @Override
+    default void onCycleComplete(com.netflix.hollow.api.producer.Status status, ReadState readState, long version, Duration elapsed) {
+        onCycleComplete(new ProducerStatus(status, readState, version),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called after {@code HollowProducer} has completed a cycle normally or abnormally. A {@code SUCCESS} status indicates that the
      * entire cycle was successful and the producer is available to begin another cycle.
      *
      * @param status ProducerStatus of this cycle. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
-     *   when the a new data state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
-     *   when any stage failed or any other failure occured during the cycle.
+     * when the a new data state has been announced to consumers or when there were no changes to the data; it will return @{code FAIL}
+     * when any stage failed or any other failure occured during the cycle.
      * @param elapsed duration of the cycle in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
     void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
-    /**
-     * Called after the new state has been populated if the {@code HollowProducer} detects that no data has changed, thus no snapshot nor delta should be produced.<p>
-     *
-     * @param version Current version of the cycle.
-     */
-    void onNoDeltaAvailable(long version);
+
+    ///////////////////////////
+    // PopulateListener
+    ///////////////////////////
 
     /**
      * Called before starting to execute the task to populate data into Hollow.
      *
      * @param version Current version of the cycle
      */
+    @Override
     void onPopulateStart(long version);
+
+    @Override
+    default void onPopulateComplete(com.netflix.hollow.api.producer.Status status, long version, Duration elapsed) {
+        onPopulateComplete(new ProducerStatus(status, version),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called once populating task stage has finished successfully or failed. Use {@code ProducerStatus#getStatus()} to get status of the task.
@@ -112,52 +170,109 @@ public interface HollowProducerListener extends EventListener {
      */
     void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit);
 
+
+    ///////////////////////////
+    // PublishListener
+    ///////////////////////////
+
+    // Called after populate
+
+    // Called after populateComplete and instead of publish
+    // Can be merged in to PublishListener?
+
+    /**
+     * Called after the new state has been populated if the {@code HollowProducer} detects that no data has changed, thus no snapshot nor delta should be produced.<p>
+     *
+     * @param version Current version of the cycle.
+     */
+    @Override
+    void onNoDeltaAvailable(long version);
+
     /**
      * Called when the {@code HollowProducer} has begun publishing the {@code HollowBlob}s produced this cycle.
      *
      * @param version Version to be published.
      */
+    @Override
     void onPublishStart(long version);
 
-    /**
-     * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
-     * the {@code HollowBlob}s produced this cycle has been published to the blob store.
-     *
-     * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
-     *   when the publish was successful; @{code FAIL} otherwise.
-     * @param elapsed duration of the publish stage in {@code unit} units
-     * @param unit units of the {@code elapsed} duration
-     */
-    void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+    // Called during publish start-complete cycle for each blob
+    // Can be merged in to PublishListener?
+
+    @Override
+    default void onBlobPublish(com.netflix.hollow.api.producer.Status status, HollowProducer.Blob blob, Duration elapsed) {
+        onArtifactPublish(new PublishStatus(status, blob),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called once a blob has been published successfully or failed to published. Use {@link PublishStatus#getBlob()} to get more details on blob type and size.
      * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that was published.
      *
      * @param publishStatus Status of publishing. {@link PublishStatus#getStatus()} returns {@code SUCCESS} or {@code FAIL}.
-     * @param elapsed       time taken to publish the blob
-     * @param unit          unit of elapsed.
+     * @param elapsed time taken to publish the blob
+     * @param unit unit of elapsed.
      */
     // TODO(hollow3): "artifact" as a term is redundant with "blob", probably don't need both. #onBlobPublish(...)?
     void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit);
+
+    @Override
+    default void onPublishComplete(com.netflix.hollow.api.producer.Status status, long version, Duration elapsed) {
+        onPublishComplete(new ProducerStatus(status, version), elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
+     * the {@code HollowBlob}s produced this cycle has been published to the blob store.
+     *
+     * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
+     * when the publish was successful; @{code FAIL} otherwise.
+     * @param elapsed duration of the publish stage in {@code unit} units
+     * @param unit units of the {@code elapsed} duration
+     */
+    void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+
+    ///////////////////////////
+    // IntegrityCheckListener
+    ///////////////////////////
+
+    // This is effectively a validator that is executed before any other validators
+    // Called after publish start-complete cycle
 
     /**
      * Called when the {@code HollowProducer} has begun checking the integrity of the {@code HollowBlob}s produced this cycle.
      *
      * @param version Version to be checked
      */
+    @Override
     void onIntegrityCheckStart(long version);
+
+    @Override
+    default void onIntegrityCheckComplete(com.netflix.hollow.api.producer.Status status, ReadState readState, long version, Duration elapsed) {
+        onIntegrityCheckComplete(new ProducerStatus(status, readState, version),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called after the integrity check stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
      * the previous snapshot, current snapshot, delta, and reverse-delta {@code HollowBlob}s are all internally consistent.
      *
      * @param status CycleStatus of the integrity check stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
-     *   when the blobs are internally consistent; @{code FAIL} otherwise.
+     * when the blobs are internally consistent; @{code FAIL} otherwise.
      * @param elapsed duration of the integrity check stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
     void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+
+    ///////////////////////////
+    ///////////////////////////
+
+    // See also HollowValidationListener (deprecated) and Validators.ValidationStatusListener
+
+    // Called after integrity check cycle
+    // Validators will be called during the validation start-complete cycle
 
     /**
      * Called when the {@code HollowProducer} has begun validating the new data state produced this cycle.
@@ -171,29 +286,44 @@ public interface HollowProducerListener extends EventListener {
      * the newly published data state is considered valid.
      *
      * @param status CycleStatus of the publish stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
-     *   when the publish was successful; @{code FAIL} otherwise.
+     * when the publish was successful; @{code FAIL} otherwise.
      * @param elapsed duration of the validation stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
     void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
+
+    ///////////////////////////
+    // AnnouncementListener
+    ///////////////////////////
+
+    // Called after a successful validation start-complete cycle
 
     /**
      * Called when the {@code HollowProducer} has begun announcing the {@code HollowBlob} published this cycle.
      *
      * @param version of {@code HollowBlob} that will be announced.
      */
+    @Override
     void onAnnouncementStart(long version);
+
+    @Override
+    default void onAnnouncementComplete(com.netflix.hollow.api.producer.Status status, ReadState readState, long version, Duration elapsed) {
+        onAnnouncementComplete(new ProducerStatus(status, readState, version),
+                elapsed.toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     /**
      * Called after the announcement stage finishes normally or abnormally. A {@code SUCCESS} status indicates
      * that the {@code HollowBlob} published this cycle has been announced to consumers.
      *
      * @param status CycleStatus of the announcement stage. {@link ProducerStatus#getStatus()} will return {@code SUCCESS}
-     *   when the announce was successful; @{code FAIL} otherwise.
+     * when the announce was successful; @{code FAIL} otherwise.
      * @param elapsed duration of the announcement stage in {@code unit} units
      * @param unit units of the {@code elapsed} duration
      */
     void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit);
+
 
     /**
      * This class represents information on details when {@link HollowProducer} has finished executing a particular stage.
@@ -202,38 +332,23 @@ public interface HollowProducerListener extends EventListener {
      * @author Kinesh Satiya {@literal kineshsatiya@gmail.com}
      */
     class ProducerStatus {
-
         private final long version;
         private final Status status;
         private final Throwable throwable;
         private final HollowProducer.ReadState readState;
 
-
-        static ProducerStatus success(long version) {
-            return new ProducerStatus(Status.SUCCESS, version, null, null);
+        ProducerStatus(com.netflix.hollow.api.producer.Status s, long version) {
+            this(s, null, version);
         }
 
-        static ProducerStatus success(HollowProducer.ReadState readState) {
-            return new ProducerStatus(Status.SUCCESS, readState.getVersion(), readState, null);
+        ProducerStatus(com.netflix.hollow.api.producer.Status s, ReadState readState, long version) {
+            this.status = Status.of(s.getType());
+            this.throwable = s.getCause();
+            this.readState = readState;
+            this.version = version;
         }
 
-        static ProducerStatus unknownFailure() {
-            return new ProducerStatus(Status.FAIL, HollowConstants.VERSION_NONE, null, null);
-        }
-
-        static ProducerStatus fail(long version) {
-            return new ProducerStatus(Status.FAIL, version, null, null);
-        }
-
-        static ProducerStatus fail(long version, Throwable th) {
-            return new ProducerStatus(Status.FAIL, version, null, th);
-        }
-
-        static ProducerStatus fail(HollowProducer.ReadState readState, Throwable th) {
-            return new ProducerStatus(Status.FAIL, readState.getVersion(), readState, th);
-        }
-
-        private ProducerStatus(Status status, long version, HollowProducer.ReadState readState, Throwable throwable) {
+        ProducerStatus(Status status, Throwable throwable, long version, HollowProducer.ReadState readState) {
             this.status = status;
             this.version = version;
             this.readState = readState;
@@ -275,62 +390,6 @@ public interface HollowProducerListener extends EventListener {
         public ReadState getReadState() {
             return readState;
         }
-
-        public static final class Builder {
-            private final long start;
-            private long end;
-
-            private long version = HollowConstants.VERSION_NONE;
-            private Status status = FAIL;
-            private Throwable cause = null;
-            private ReadState readState = null;
-
-            Builder() {
-                start = System.currentTimeMillis();
-            }
-
-            ProducerStatus.Builder version(long version) {
-                this.version = version;
-                return this;
-            }
-
-            ProducerStatus.Builder version(WriteState writeState) {
-                return version(writeState.getVersion());
-            }
-
-            ProducerStatus.Builder version(ReadState readState) {
-                this.readState = readState;
-                return version(readState.getVersion());
-            }
-
-            ProducerStatus.Builder success() {
-                this.status = SUCCESS;
-                return this;
-            }
-
-            ProducerStatus.Builder fail() {
-                return this;
-            }
-
-            ProducerStatus.Builder fail(Throwable cause) {
-                this.status = FAIL;
-                this.cause = cause;
-                return this;
-            }
-
-            ProducerStatus build() {
-                end = System.currentTimeMillis();
-                return new ProducerStatus(status, version, readState, cause);
-            }
-
-            long elapsed() {
-                return end - start;
-            }
-
-            long version() {
-                return version;
-            }
-        }
     }
 
     /**
@@ -339,29 +398,17 @@ public interface HollowProducerListener extends EventListener {
      *
      * @author Tim Taylor {@literal tim@toolbear.io}
      */
-    public class RestoreStatus {
+    class RestoreStatus {
         private final Status status;
         private final long versionDesired;
         private final long versionReached;
         private final Throwable throwable;
 
-        static RestoreStatus success(long versionDesired, long versionReached) {
-            return new RestoreStatus(Status.SUCCESS, versionDesired, versionReached, null);
-        }
-
-        static RestoreStatus unknownFailure() {
-            return new RestoreStatus(Status.FAIL, HollowConstants.VERSION_NONE, HollowConstants.VERSION_NONE, null);
-        }
-
-        static RestoreStatus fail(long versionDesired, long versionReached, Throwable cause) {
-            return new RestoreStatus(Status.FAIL, versionDesired, versionReached, cause);
-        }
-
-        private RestoreStatus(Status status, long versionDesired, long versionReached, Throwable throwable) {
-            this.status = status;
+        RestoreStatus(com.netflix.hollow.api.producer.Status s, long versionDesired, long versionReached) {
+            this.status = Status.of(s.getType());
+            this.throwable = s.getCause();
             this.versionDesired = versionDesired;
             this.versionReached = versionReached;
-            this.throwable = throwable;
         }
 
         /**
@@ -413,48 +460,10 @@ public interface HollowProducerListener extends EventListener {
         private final HollowProducer.Blob blob;
         private final Throwable throwable;
 
-        private PublishStatus(Status status, HollowProducer.Blob blob, Throwable throwable) {
-            this.status = status;
+        PublishStatus(com.netflix.hollow.api.producer.Status s, HollowProducer.Blob blob) {
+            this.status = Status.of(s.getType());
+            this.throwable = s.getCause();
             this.blob = blob;
-            this.throwable = throwable;
-        }
-
-        static class Builder {
-            private final long start;
-            private long elapsed;
-            private Status status;
-            private HollowProducer.Blob blob;
-            private Throwable throwable;
-
-            Builder() {
-                this.start = System.currentTimeMillis();
-            }
-
-            PublishStatus.Builder blob(final HollowProducer.Blob blob) {
-                this.blob = blob;
-                return this;
-            }
-
-            PublishStatus.Builder success() {
-                this.status = SUCCESS;
-                return this;
-            }
-
-            PublishStatus.Builder fail(Throwable throwable) {
-                this.status = FAIL;
-                this.throwable = throwable;
-                return this;
-            }
-
-            long elapsed() {
-                return elapsed;
-            }
-
-            PublishStatus build() {
-                this.elapsed = System.currentTimeMillis() - start;
-                return new PublishStatus(status, blob, throwable);
-            }
-
         }
 
         /**
@@ -485,6 +494,22 @@ public interface HollowProducerListener extends EventListener {
     }
 
     enum Status {
-        SUCCESS, FAIL, SKIP
+        SUCCESS, FAIL,
+        // This is currently only used to report skipping of a validator
+        // with SingleValidationStatusBuilder and SingleValidationStatus
+        @Deprecated
+        SKIP;
+
+        static Status of(com.netflix.hollow.api.producer.Status.StatusType st) {
+            return st == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS
+                    ? Status.SUCCESS
+                    : Status.FAIL;
+        }
+
+        static com.netflix.hollow.api.producer.Status.StatusType from(Status s) {
+            return s == Status.SUCCESS
+                    ? com.netflix.hollow.api.producer.Status.StatusType.SUCCESS
+                    : com.netflix.hollow.api.producer.Status.StatusType.FAIL;
+        }
     }
 }

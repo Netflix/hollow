@@ -8,6 +8,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
 /**
  * Unit tests to verify that HollowProducerListener objects provided to HollowProducers
@@ -16,10 +17,14 @@ import org.mockito.MockitoAnnotations;
 public class HollowProducerListenerTest {
     private HollowProducer producer;
 
-    @Mock
+    // Spy on the listeners to only mock the abstract methods, otherwise
+    // the default (non-abstract) methods will be mocked which changes the
+    // behaviour
+    @Spy
     private HollowProducerListener listener;
-    @Mock
+    @Spy
     private HollowProducerListenerV2 listenerV2;
+
     @Mock
     private SingleProducerEnforcer singleProducerEnforcer;
 
