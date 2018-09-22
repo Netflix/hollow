@@ -79,7 +79,7 @@
     },
     "compile": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -90,7 +90,7 @@
     },
     "compileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -101,7 +101,7 @@
     },
     "default": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -261,7 +261,7 @@
     },
     "runtime": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -272,7 +272,7 @@
     },
     "runtimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -283,7 +283,7 @@
     },
     "testCompile": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -294,7 +294,7 @@
     },
     "testCompileClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -305,7 +305,7 @@
     },
     "testRuntime": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
@@ -316,7 +316,7 @@
     },
     "testRuntimeClasspath": {
         "com.netflix.hollow:hollow": {
-            "locked": "3.2.0",
+            "locked": "3.3.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
