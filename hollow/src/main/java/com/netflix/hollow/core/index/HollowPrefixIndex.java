@@ -18,6 +18,7 @@
 package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
+import com.netflix.hollow.core.memory.encoding.FixedLengthMultipleOccurrenceElementArray;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -31,20 +32,21 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class builds a prefix index. A prefix index can be used to build applications like auto-complete, spell checker.
  */
 public class HollowPrefixIndex implements HollowTypeStateListener {
 
-    private HollowReadStateEngine readStateEngine;
-    private String type;
+    private final FieldPath fieldPath;
+    private final HollowReadStateEngine readStateEngine;
+    private final String type;
+    private final int estimatedMaxStringDuplicates;
 
     private TST prefixIndex;
     private volatile TST prefixIndexVolatile;
     private ArraySegmentRecycler memoryRecycle;
-
-    private FieldPath fieldPath;
 
     private int totalWords;
     private int averageWordLen;
@@ -53,24 +55,46 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private boolean buildIndexOnUpdate;
 
     /**
-     * Initializes a new prefix index.
-     *
-     * @param readStateEngine state engine to read data from
-     * @param type            type in the read state engine. Ordinals for this type will be returned when queried for a prefix.
-     * @param fieldPath       fieldPath should ultimately lead to a string field.
-     *                        The fields in the path could reference another Object, List, Set or a Map.
-     *                        The fields should be separated by ".".
+     * @see #HollowPrefixIndex(HollowReadStateEngine, String, String)
+     * This constructor defaults the estimatedMaxStringDuplicates to 4. If you expect a large
+     * number of duplicate strings across your type, you should provide your own estimate for
+     * estimatedMaxStringDuplicates.
      */
     @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
+        // pass in a hardcoded estimate of 4 for now - in the future we could calculate this
+        this(readStateEngine, type, fieldPath, 4);
+    }
+
+    /**
+     * Initializes a new prefix index.
+     *
+     * @param readStateEngine              state engine to read data from
+     * @param type                         type in the read state engine. Ordinals for this type
+     *                                     will be returned when queried for a prefix.
+     * @param fieldPath                    fieldPath should ultimately lead to a string field.
+     *                                     The fields in the path could reference another Object,
+     *                                     List, Set or a Map. The fields should be separated by ".".
+     * @param estimatedMaxStringDuplicates The estimated number of strings that are duplicated
+     *                                     across instances of your type. Note that this means an
+     *                                     exactly matching string, not a prefix match. This
+     *                                     parameter affects the efficiency of the index building.
+     */
+    @SuppressWarnings("WeakerAccess")
+    public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath,
+            int estimatedMaxStringDuplicates) {
 
         if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
         if (type == null) throw new IllegalArgumentException("type cannot be null");
         if (fieldPath == null || fieldPath.isEmpty())
             throw new IllegalArgumentException("fieldPath cannot be null or empty");
+        if (estimatedMaxStringDuplicates < 1) {
+            throw new IllegalArgumentException("estimatedMaxStringDuplicates cannot be < 1");
+        }
 
         this.readStateEngine = readStateEngine;
         this.type = type;
+        this.estimatedMaxStringDuplicates = estimatedMaxStringDuplicates;
         this.fieldPath = new FieldPath(readStateEngine, type, fieldPath);
         if (!this.fieldPath.getLastFieldType().equals(HollowObjectSchema.FieldType.STRING))
             throw new IllegalArgumentException("Field path should lead to a string type");
@@ -114,7 +138,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         if (prefixIndex != null) prefixIndex.recycleMemory(memoryRecycle);
 
         long estimatedNumberOfNodes = estimateNumNodes(totalWords, averageWordLen);
-        TST tst = new TST(estimatedNumberOfNodes, maxOrdinalOfType, memoryRecycle);
+        TST tst = new TST(estimatedNumberOfNodes, estimatedMaxStringDuplicates, maxOrdinalOfType,
+                memoryRecycle);
         BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
@@ -259,20 +284,22 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         private long maxNodes;
         private FixedLengthElementArray nodes;
-        private FixedLengthElementArray ordinalSet;
+        private FixedLengthMultipleOccurrenceElementArray ordinalSet;
         private long indexTracker;
 
         /**
          * Create new prefix index. Represents a ternary search tree.
          *
-         * @param estimateNumNodes estimate number of max nodes that will created.
+         * @param estimatedNumNodes estimate number of max nodes that will created.
+         * @param estimatedMaxStringDuplicates estimated number string duplicates across all nodes
          * @param maxOrdinalValue  max ordinal that can be referenced
          * @param memoryRecycler   to reuse arrays from memory pool
          */
-        private TST(long estimateNumNodes, int maxOrdinalValue, ArraySegmentRecycler memoryRecycler) {
+        private TST(long estimatedNumNodes, int estimatedMaxStringDuplicates, int maxOrdinalValue,
+                ArraySegmentRecycler memoryRecycler) {
 
             // best guess
-            maxNodes = estimateNumNodes;
+            maxNodes = estimatedNumNodes;
 
             // bits for pointers in a single node:
             bitsPerKey = 16;// key
@@ -283,7 +310,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             bitsPerNode = bitsPerKey + (3 * bitsForChildPointer) + 1;
 
             nodes = new FixedLengthElementArray(memoryRecycler, bitsPerNode * maxNodes);
-            ordinalSet = new FixedLengthElementArray(memoryRecycler, maxNodes * bitsPerOrdinal);
+            ordinalSet = new FixedLengthMultipleOccurrenceElementArray(memoryRecycler,
+                    maxNodes, bitsPerOrdinal, estimatedMaxStringDuplicates);
             indexTracker = 0;
 
             // initialize offsets
@@ -296,7 +324,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         // tell memory recycler to use these long array on next long array request from memory ONLY AFTER swap is called on memory recycler
         private void recycleMemory(ArraySegmentRecycler memoryRecycler) {
             nodes.destroy(memoryRecycler);
-            ordinalSet.destroy(memoryRecycler);
+            ordinalSet.destroy();
         }
 
         private long getChildOffset(NodeType nodeType) {
@@ -330,14 +358,13 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         }
 
         private void addOrdinal(long nodeIndex, long ordinal) {
-            long ordinalIndex = nodeIndex * bitsPerOrdinal;
-            ordinalSet.setElementValue(ordinalIndex, bitsPerOrdinal, ordinal);
+            ordinalSet.addElement(nodeIndex, ordinal);
             nodes.setElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1, 1);
         }
 
-        private int getOrdinal(long nodeIndex) {
-            long ordinalIndex = nodeIndex * bitsPerOrdinal;
-            return (int) ordinalSet.getElementValue(ordinalIndex, bitsPerOrdinal);
+        private Set<Integer> getOrdinals(long nodeIndex) {
+            return ordinalSet.getElements(nodeIndex).stream()
+                    .map(Long::intValue).collect(Collectors.toSet());
         }
 
         /**
@@ -429,7 +456,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             if (currentNodeIndex >= 0) {
 
                 if (isLeafNode(currentNodeIndex))
-                    ordinals.add(getOrdinal(currentNodeIndex));
+                    ordinals.addAll(getOrdinals(currentNodeIndex));
 
                 // go to all leaf nodes from current node mid pointer
                 long subTree = getChildIndex(currentNodeIndex, NodeType.Middle);
@@ -443,7 +470,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
                         long right = getChildIndex(nodeIndex, NodeType.Right);
 
                         if (left == 0 && mid == 0 && right == 0) {
-                            if (isLeafNode(nodeIndex)) ordinals.add(getOrdinal(nodeIndex));
+                            if (isLeafNode(nodeIndex)) ordinals.addAll(getOrdinals(nodeIndex));
                         }
                         if (left != 0) queue.add(left);
                         if (mid != 0) queue.add(mid);

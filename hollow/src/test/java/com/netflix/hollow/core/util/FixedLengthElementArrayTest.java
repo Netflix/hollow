@@ -46,6 +46,13 @@ public class FixedLengthElementArrayTest {
     }
 
     @Test
+    public void testGetEmpty() {
+        FixedLengthElementArray arr = new FixedLengthElementArray(
+                WastefulRecycler.SMALL_ARRAY_RECYCLER, 17000);
+        Assert.assertEquals(0, arr.getElementValue(0, 4));
+    }
+
+    @Test
     public void testSetAndGetLargeValues() {
         long testValue = 1913684435138312210L;
         int numBitsPerElement = 61;
