@@ -61,6 +61,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      *                        The fields in the path could reference another Object, List, Set or a Map.
      *                        The fields should be separated by ".".
      */
+    @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
 
         if (readStateEngine == null) throw new IllegalArgumentException("Read state engine cannot be null");
@@ -117,11 +118,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         BitSet ordinals = readStateEngine.getTypeState(type).getPopulatedOrdinals();
         int ordinal = ordinals.nextSetBit(0);
         while (ordinal != -1) {
-            String[] keys = getKeys(ordinal);
-            if (keys != null) {
-                for (String key : keys) {
-                    tst.insert(key, ordinal);
-                }
+            for (String key : getKeys(ordinal)) {
+                tst.insert(key, ordinal);
             }
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
@@ -135,11 +133,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     /**
      * This method estimates the total number of nodes that will required to create the index.
      * Override this method if lower/higher estimate is needed compared to the default implementation.
-     *
-     * @param totalWords
-     * @param averageWordLen
-     * @return
      */
+    @SuppressWarnings("WeakerAccess")
     protected long estimateNumNodes(long totalWords, long averageWordLen) {
         return totalWords * averageWordLen;
     }
@@ -179,6 +174,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * @param prefix findKeysWithPrefix prefix.
      * @return An instance of HollowOrdinalIterator to iterate over ordinals that match the given findKeysWithPrefix.
      */
+    @SuppressWarnings("WeakerAccess")
     public HollowOrdinalIterator findKeysWithPrefix(String prefix) {
         TST current = this.prefixIndex;
         HollowOrdinalIterator it;
@@ -191,7 +187,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     /**
      * Check if the given exists in the index.
      *
-     * @param key
      * @return boolean value indicating if the key exists in the index.
      */
     public boolean contains(String key) {
@@ -209,6 +204,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      * Remember to call detachFromDeltaUpdates to stop the delta changes.
      * NOTE: Each delta updates creates a new prefix index and swaps the new with current.
      */
+    @SuppressWarnings("WeakerAccess")
     public void listenForDeltaUpdates() {
         readStateEngine.getTypeState(type).addListener(this);
     }
@@ -216,6 +212,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     /**
      * Stop delta updates for this index.
      */
+    @SuppressWarnings("WeakerAccess")
     public void detachFromDeltaUpdates() {
         readStateEngine.getTypeState(type).removeListener(this);
     }
@@ -264,8 +261,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         private FixedLengthElementArray nodes;
         private FixedLengthElementArray ordinalSet;
         private long indexTracker;
-
-        private long size;
 
         /**
          * Create new prefix index. Represents a ternary search tree.
@@ -331,9 +326,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         }
 
         private boolean isLeafNode(long nodeIndex) {
-            if (nodes.getElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1) == 1)
-                return true;
-            return false;
+            return nodes.getElementValue((nodeIndex * bitsPerNode) + isLeafNodeFlagOffset, 1) == 1;
         }
 
         private void addOrdinal(long nodeIndex, long ordinal) {
@@ -347,15 +340,8 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             return (int) ordinalSet.getElementValue(ordinalIndex, bitsPerOrdinal);
         }
 
-        private long size() {
-            return size;
-        }
-
         /**
          * Insert into ternary search tree for the given key and ordinal.
-         *
-         * @param key
-         * @param ordinal
          */
         private void insert(String key, int ordinal) {
             if (key == null) throw new IllegalArgumentException("Null key cannot be indexed");
@@ -394,13 +380,11 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
                 }
             }
             addOrdinal(currentNodeIndex, ordinal);
-            size++;
         }
 
         /**
          * This functions checks if the given key exists in the trie.
          *
-         * @param key
          * @return index of the node that findNodeWithKey the last character of the key, if not found then returns -1.
          */
         private long findNodeWithKey(String key) {
@@ -431,15 +415,11 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
 
         private boolean contains(String key) {
             long nodeIndex = findNodeWithKey(key);
-            if (nodeIndex >= 0 && isLeafNode(nodeIndex)) return true;
-            return false;
+            return nodeIndex >= 0 && isLeafNode(nodeIndex);
         }
 
         /**
          * Find all the ordinals that match the given prefix.
-         *
-         * @param prefix
-         * @return
          */
         private HollowOrdinalIterator findKeysWithPrefix(String prefix) {
             if (prefix == null) throw new IllegalArgumentException("Cannot findKeysWithPrefix null prefix");
@@ -472,8 +452,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
                 }
             }
 
-            HollowOrdinalIterator iterator = new HollowOrdinalIterator() {
-
+            return new HollowOrdinalIterator() {
                 private Iterator<Integer> it = ordinals.iterator();
 
                 @Override
@@ -482,8 +461,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
                     return NO_MORE_ORDINALS;
                 }
             };
-
-            return iterator;
         }
     }
 }
