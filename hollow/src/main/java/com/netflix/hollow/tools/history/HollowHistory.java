@@ -135,6 +135,13 @@ public class HollowHistory {
     }
 
     /**
+     * @return the number of historical states
+     */
+    public int getNumberOfHistoricalStates() {
+        return historicalStates.size();
+    }
+
+    /**
      * @param version A version in the past
      * @return The {@link HollowHistoricalState} for the specified version, if it exists.
      */
@@ -343,9 +350,32 @@ public class HollowHistory {
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
+            removeHistoricalStates(1);
+        }
+    }
+
+    /**
+     * Removes the last {@code n} historical states.
+     *
+     * @param n the number of historical states to remove
+     * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
+     * greater than the {@link #getNumberOfHistoricalStates() number} of historical
+     * states.
+     */
+    public void removeHistoricalStates(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove is negative: %d", n));
+        }
+        if (n > historicalStates.size()) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove, %d, is greater than the number of states. %d",
+                    n, historicalStates.size()));
+        }
+
+        while (n-- > 0) {
             HollowHistoricalState removedState = historicalStates.remove(historicalStates.size() - 1);
             historicalStateLookupMap.remove(removedState.getVersion());
         }
     }
-
 }
