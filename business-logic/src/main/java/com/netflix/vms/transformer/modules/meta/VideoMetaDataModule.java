@@ -402,7 +402,12 @@ public class VideoMetaDataModule {
             if (inputEpisodeTypes != null) {
                 Set<Strings> epTypes = new HashSet<>();
                 for (VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
-                    epTypes.add(new Strings(epType._getValue()._getValue()));
+                	// the episode type with the non-null country code are country specific
+                	// they are handled seperately
+                	if(epType._getCountry()._getValue() == null) {
+                		System.out.println(videoId.toString() + ":" + epType._getValue()._getValue());
+                		epTypes.add(new Strings(epType._getValue()._getValue()));                		
+                	}
                 }
 
                 vmd.episodeTypes = epTypes;
