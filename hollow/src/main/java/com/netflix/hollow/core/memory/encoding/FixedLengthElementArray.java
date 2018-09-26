@@ -36,9 +36,28 @@ import sun.misc.Unsafe;
  * <p>
  * The value 100100 in binary, or 36 in base 10, would be returned.
  * <p>
- * Note that for performance reasons, this class makes use of sun.misc.Unsafe to perform unaligned
- * memory reads.  This is designed exclusively for little-endian architectures, and has only been 
- * fully battle-tested on x86-64. 
+ * Note that for performance reasons, this class makes use of {@code sun.misc.Unsafe} to perform
+ * unaligned memory reads.  This is designed exclusively for little-endian architectures, and has only been
+ * fully battle-tested on x86-64.
+ * As a result there two ways to obtain an element value from the bit string at a given bit index.  The first,
+ * using {@link #getElementValue(long, int)} or {@link #getElementValue(long, int, long)}, leverages unsafe unaligned
+ * (or misaligned) memory reads of {@code long} values from {@code long[]} array segments at byte index offsets within
+ * the arrays.
+ * The second, using {@link #getLargeElementValue(long, int)} or
+ * {@link #getLargeElementValue(long, int, long)}, leverages safe access to {@code long[]} array segments but
+ * requires more work to compose an element value from bits that cover two underlying elements in {@code long[]} array
+ * segments.
+ * The first approach needs to ensure a segmentation fault (SEGV) does not occur when when reading a {@code long} value
+ * at the last byte of the last index in a {@code long[]} array segment.  A {@code long[]} array segment is allocated
+ * with a length that is one plus the desired length to ensure such access is safe (see the implementations of
+ * {@link ArraySegmentRecycler#getLongArray()}.
+ * In addition, the value of the last underlying element is the same as the value of the first underlying element in the
+ * subsequent array segment (see {@link SegmentedLongArray#set}).  This ensures that an element (n-bit) value can be
+ * correctly returned when performing an unaligned read that would otherwise cross an array segment boundary.
+ * Furthermore, there is an additional constraint that first method can only support element values of 60-bits or less.
+ * Two 60-bit values in sequence can be represented exactly in 15 bytes.  Two 61-bit values in sequence require 16
+ * bytes.  For such a bit string performing an unaligned read at byte index 7 to obtain the second 61-bit value will
+ * result in missing the 2 most significant bits located at byte index 15.
  */
 @SuppressWarnings("restriction")
 public class FixedLengthElementArray extends SegmentedLongArray {
@@ -80,10 +99,32 @@ public class FixedLengthElementArray extends SegmentedLongArray {
             set(whichLong + 1, get(whichLong + 1) | (value >>> bitsRemaining));
     }
 
+    /**
+     * Gets an element value, comprising of {@code bitsPerElement} bits, at the given
+     * bit {@code index}.
+     *
+     * @param index the bit index
+     * @param bitsPerElement bits per element, must be less than 61 otherwise
+     * the result is undefined
+     * @return the element value
+     */
     public long getElementValue(long index, int bitsPerElement) {
         return getElementValue(index, bitsPerElement, ((1L << bitsPerElement) - 1));
     }
 
+    /**
+     * Gets a masked element value, comprising of {@code bitsPerElement} bits, at the given
+     * bit {@code index}.
+     *
+     * @param index the bit index
+     * @param bitsPerElement bits per element, must be less than 61 otherwise
+     * the result is undefined
+     * @param mask the mask to apply to an element value before it is returned.
+     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
+     * guarantee that one or more (possibly) partial element values occurring
+     * before and after the desired element value are not included in the returned value.
+     * @return the masked element value
+     */
     public long getElementValue(long index, int bitsPerElement, long mask) {
         long whichByte = index >>> 3;
         int whichBit = (int) (index & 0x07);
@@ -97,11 +138,37 @@ public class FixedLengthElementArray extends SegmentedLongArray {
         return l & mask;
     }
 
+    /**
+     * Gets a large element value, comprising of {@code bitsPerElement} bits, at the given
+     * bit {@code index}.
+     * <p>
+     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
+     * otherwise the method {@link #getLargeElementValue(long, int)} can be utilized instead.
+     *
+     * @param index the bit index
+     * @param bitsPerElement bits per element, may be greater than 60
+     * @return the large element value
+     */
     public long getLargeElementValue(long index, int bitsPerElement) {
         long mask = bitsPerElement == 64 ? -1 : ((1L << bitsPerElement) - 1);
         return getLargeElementValue(index, bitsPerElement, mask);
     }
 
+    /**
+     * Gets a masked large element value, comprising of {@code bitsPerElement} bits, at the given
+     * bit {@code index}.
+     * <p>
+     * This method should be utilized if the {@code bitsPerElement} may exceed {@code 60} bits,
+     * otherwise the method {@link #getLargeElementValue(long, int, long)} can be utilized instead.
+     *
+     * @param index the bit index
+     * @param bitsPerElement bits per element, may be greater than 60
+     * @param mask the mask to apply to an element value before it is returned.
+     * The mask should be less than or equal to {@code (1L << bitsPerElement) - 1} to
+     * guarantee that one or more (possibly) partial element values occurring
+     * before and after the desired element value are not included in the returned value.
+     * @return the masked large element value
+     */
     public long getLargeElementValue(long index, int bitsPerElement, long mask) {
         long whichLong = index >>> 6;
         int whichBit = (int) (index & 0x3F);
