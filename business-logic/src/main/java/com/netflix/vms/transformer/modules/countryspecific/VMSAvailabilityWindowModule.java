@@ -450,6 +450,12 @@ public class VMSAvailabilityWindowModule {
 
 
                     } else {
+
+                        //Do not lose sight of the fact that the rollingEpisode flag could be set even if the packages are not present
+                        if (contractData != null && contractData._getDayAfterBroadcast()) {
+                            rollup.foundRollingEpisodes();
+                        }
+
                         // package list is empty for the given contract -- use the contract only. Applicable only for non multi-locale country that is if locale is not passed
 
                         if (language == null) {
