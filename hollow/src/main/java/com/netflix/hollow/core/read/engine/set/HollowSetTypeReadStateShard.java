@@ -27,7 +27,6 @@ import java.util.BitSet;
 
 class HollowSetTypeReadStateShard {
 
-    private HollowSetTypeDataElements currentData;
     private volatile HollowSetTypeDataElements currentDataVolatile;
 
     private HollowPrimaryKeyValueDeriver keyDeriver;
@@ -37,7 +36,7 @@ class HollowSetTypeReadStateShard {
         int size;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             size = (int)currentData.setPointerAndSizeArray.getElementValue(((long)ordinal * currentData.bitsPerFixedLengthSetPortion) + currentData.bitsPerSetPointer, currentData.bitsPerSetSizeValue);
         } while(readWasUnsafe(currentData));
 
@@ -54,7 +53,7 @@ class HollowSetTypeReadStateShard {
             long endBucket;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
                 endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
@@ -92,7 +91,7 @@ class HollowSetTypeReadStateShard {
             long endBucket;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, ordinal);
                 endBucket = currentData.setPointerAndSizeArray.getElementValue((long)ordinal * currentData.bitsPerFixedLengthSetPortion, currentData.bitsPerSetPointer);
@@ -126,7 +125,7 @@ class HollowSetTypeReadStateShard {
         do {
             long startBucket;
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 startBucket = getAbsoluteBucketStart(currentData, setOrdinal);
             } while(readWasUnsafe(currentData));
@@ -153,7 +152,7 @@ class HollowSetTypeReadStateShard {
     }
 
     HollowSetTypeDataElements currentDataElements() {
-        return currentData;
+        return currentDataVolatile;
     }
 
     private boolean readWasUnsafe(HollowSetTypeDataElements data) {
@@ -161,11 +160,11 @@ class HollowSetTypeReadStateShard {
     }
 
     void setCurrentData(HollowSetTypeDataElements data) {
-        this.currentData = data;
         this.currentDataVolatile = data;
     }
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
+        HollowSetTypeDataElements currentData = currentDataVolatile;
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
@@ -188,6 +187,7 @@ class HollowSetTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
+        HollowSetTypeDataElements currentData = currentDataVolatile;
         long requiredBitsForSetPointers = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerFixedLengthSetPortion;
         long requiredBitsForBuckets = currentData.totalNumberOfBuckets * currentData.bitsPerElement;
         long requiredBits = requiredBitsForSetPointers + requiredBitsForBuckets;
@@ -195,6 +195,7 @@ class HollowSetTypeReadStateShard {
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
+        HollowSetTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
