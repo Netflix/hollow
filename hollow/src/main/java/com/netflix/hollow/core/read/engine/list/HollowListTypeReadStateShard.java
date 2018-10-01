@@ -24,7 +24,6 @@ import java.util.BitSet;
 
 class HollowListTypeReadStateShard {
 
-    private HollowListTypeDataElements currentData;
     private volatile HollowListTypeDataElements currentDataVolatile;
 
     public int getElementOrdinal(int ordinal, int listIndex) {
@@ -35,7 +34,7 @@ class HollowListTypeReadStateShard {
             long startAndEndElement;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
@@ -64,7 +63,7 @@ class HollowListTypeReadStateShard {
         int size;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
 
             long fixedLengthOffset = (long)ordinal * currentData.bitsPerListPointer;
 
@@ -86,7 +85,7 @@ class HollowListTypeReadStateShard {
     }
 
     HollowListTypeDataElements currentDataElements() {
-        return currentData;
+        return currentDataVolatile;
     }
 
     private boolean readWasUnsafe(HollowListTypeDataElements data) {
@@ -94,7 +93,6 @@ class HollowListTypeReadStateShard {
     }
 
     void setCurrentData(HollowListTypeDataElements data) {
-        this.currentData = data;
         this.currentDataVolatile = data;
     }
 
@@ -115,6 +113,7 @@ class HollowListTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
+        HollowListTypeDataElements currentData = currentDataVolatile;
         long requiredListPointerBits = ((long)currentData.maxOrdinal + 1) * currentData.bitsPerListPointer;
         long requiredElementBits = currentData.totalNumberOfElements * currentData.bitsPerElement;
         long requiredBits = requiredListPointerBits + requiredElementBits;
@@ -122,6 +121,7 @@ class HollowListTypeReadStateShard {
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
+        HollowListTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);

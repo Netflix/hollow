@@ -36,7 +36,6 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
  */
 public class HollowHashIndex implements HollowTypeStateListener {
 
-    protected HollowHashIndexState hashState;
     private volatile HollowHashIndexState hashStateVolatile;
 
     private final HollowReadStateEngine stateEngine;
@@ -72,9 +71,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
         builder.buildIndex();
 
-        HollowHashIndexState hollowHashIndexState = new HollowHashIndexState(builder);
-        this.hashState = hollowHashIndexState;
-        this.hashStateVolatile = hollowHashIndexState;
+        this.hashStateVolatile = new HollowHashIndexState(builder);
     }
 
 
@@ -92,8 +89,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
         }
 
         HollowHashIndexResult result;
+        HollowHashIndexState hashState;
         do {
             result = null;
+            hashState = hashStateVolatile;
             long bucket = hashCode & hashState.getMatchHashMask();
             long hashBucketBit = bucket * hashState.getBitsPerMatchHashEntry();
             boolean bucketIsEmpty = hashState.getMatchHashTable().getElementValue(hashBucketBit, hashState.getBitsPerTraverserField()[0]) == 0;
@@ -103,7 +102,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
                     int selectSize = (int) hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey(), hashState.getBitsPerSelectTableSize());
                     long selectBucketPointer = hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey() + hashState.getBitsPerSelectTableSize(), hashState.getBitsPerSelectTablePointer());
 
-                    result = new HollowHashIndexResult(this.hashState, selectBucketPointer, selectSize);
+                    result = new HollowHashIndexResult(hashState, selectBucketPointer, selectSize);
                     break;
                 }
 
@@ -117,6 +116,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     private int keyHashCode(Object key, int fieldIdx) {
+        HollowHashIndexState hashState = hashStateVolatile;
         switch(hashState.getMatchFields()[fieldIdx].getFieldType()) {
         case BOOLEAN:
             return HollowReadFieldUtils.booleanHashCode((Boolean)key);
@@ -140,6 +140,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     private boolean matchIsEqual(FixedLengthElementArray matchHashTable, long hashBucketBit, Object[] query) {
+        HollowHashIndexState hashState = hashStateVolatile;
         for(int i = 0; i< hashState.getMatchFields().length; i++) {
             HollowHashIndexField field = hashState.getMatchFields()[i];
             int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + hashState.getOffsetPerTraverserField()[field.getBaseIteratorFieldIdx()], hashState.getBitsPerTraverserField()[field.getBaseIteratorFieldIdx()]) - 1;

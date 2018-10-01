@@ -34,7 +34,6 @@ import java.util.List;
 
 class HollowObjectTypeReadStateShard {
 
-    private HollowObjectTypeDataElements currentData;
     private volatile HollowObjectTypeDataElements currentDataVolatile;
 
     private final HollowObjectSchema schema;
@@ -48,7 +47,7 @@ class HollowObjectTypeReadStateShard {
         long fixedLengthValue;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
 
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
@@ -77,7 +76,7 @@ class HollowObjectTypeReadStateShard {
         long refOrdinal;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             refOrdinal = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
         } while(readWasUnsafe(currentData));
 
@@ -91,7 +90,7 @@ class HollowObjectTypeReadStateShard {
         long value;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
         } while(readWasUnsafe(currentData));
 
@@ -105,7 +104,7 @@ class HollowObjectTypeReadStateShard {
         int value;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             value = (int)readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
         } while(readWasUnsafe(currentData));
 
@@ -119,7 +118,7 @@ class HollowObjectTypeReadStateShard {
         long value;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             value = currentData.fixedLengthData.getLargeElementValue(bitOffset, 64, -1L);
         } while(readWasUnsafe(currentData));
@@ -134,7 +133,7 @@ class HollowObjectTypeReadStateShard {
         long value;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             long bitOffset = fieldOffset(currentData, ordinal, fieldIndex);
             int numBitsForField = currentData.bitsPerField[fieldIndex];
             value = currentData.fixedLengthData.getLargeElementValue(bitOffset, numBitsForField);
@@ -150,7 +149,7 @@ class HollowObjectTypeReadStateShard {
         long value;
 
         do {
-            currentData = this.currentData;
+            currentData = this.currentDataVolatile;
             value = readFixedLengthFieldValue(currentData, ordinal, fieldIndex);
         } while(readWasUnsafe(currentData));
 
@@ -178,7 +177,7 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
@@ -211,7 +210,7 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
@@ -242,7 +241,7 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
 
@@ -275,7 +274,7 @@ class HollowObjectTypeReadStateShard {
             long startByte;
 
             do {
-                currentData = this.currentData;
+                currentData = this.currentDataVolatile;
 
                 numBitsForField = currentData.bitsPerField[fieldIndex];
                 long currentBitOffset = fieldOffset(currentData, ordinal, fieldIndex);
@@ -301,7 +300,7 @@ class HollowObjectTypeReadStateShard {
      */
     public int bitsRequiredForField(String fieldName) {
         int fieldIndex = schema.getPosition(fieldName);
-        return fieldIndex == -1 ? 0 : currentData.bitsPerField[fieldIndex];
+        return fieldIndex == -1 ? 0 : currentDataVolatile.bitsPerField[fieldIndex];
     }
 
     private long fieldOffset(HollowObjectTypeDataElements currentData, int ordinal, int fieldIndex) {
@@ -370,7 +369,7 @@ class HollowObjectTypeReadStateShard {
     }
 
     HollowObjectTypeDataElements currentDataElements() {
-        return currentData;
+        return currentDataVolatile;
     }
 
     private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
@@ -378,7 +377,6 @@ class HollowObjectTypeReadStateShard {
     }
 
     void setCurrentData(HollowObjectTypeDataElements data) {
-        this.currentData = data;
         this.currentDataVolatile = data;
     }
 
@@ -397,7 +395,8 @@ class HollowObjectTypeReadStateShard {
         for(int i=0;i<commonFieldNames.size();i++) {
             fieldIndexes[i] = schema.getPosition(commonFieldNames.get(i));
         }
-        
+
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
@@ -427,6 +426,7 @@ class HollowObjectTypeReadStateShard {
     }
 
     public long getApproximateHeapFootprintInBytes() {
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         long bitsPerFixedLengthData = (long)currentData.bitsPerRecord * (currentData.maxOrdinal + 1);
         
         long requiredBytes = bitsPerFixedLengthData / 8;
@@ -440,6 +440,7 @@ class HollowObjectTypeReadStateShard {
     }
     
     public long getApproximateHoleCostInBytes(BitSet populatedOrdinals, int shardNumber, int numShards) {
+        HollowObjectTypeDataElements currentData = currentDataVolatile;
         long holeBits = 0;
         
         int holeOrdinal = populatedOrdinals.nextClearBit(0);
