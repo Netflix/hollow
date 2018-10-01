@@ -34,7 +34,6 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     private final FieldPath fieldPath;
     private final IndexPredicate predicate;
 
-    protected SparseBitSet sparseBitSet;
     protected volatile SparseBitSet sparseBitSetVolatile;
 
     private Set<Integer> valuesToSet;
@@ -88,7 +87,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         build();
     }
 
-    protected synchronized void build() {
+    protected void build() {
 
         // initialize an instance of SparseBitSet
         initSet(Integer.MAX_VALUE);
@@ -106,24 +105,24 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     }
 
     protected void initSet(int maxValue) {
-        sparseBitSet = new SparseBitSet(maxValue);
-        sparseBitSetVolatile = sparseBitSet;
+        sparseBitSetVolatile = new SparseBitSet(maxValue);
     }
 
     protected void set(int ordinal) {
         if (predicate.shouldIndex(ordinal)) {
             Object[] values = fieldPath.findValues(ordinal);
             if (values != null && values.length > 0) {
+                SparseBitSet bitSet = sparseBitSetVolatile;
                 for (Object value : values) {
-                    sparseBitSet.set((int) value);
+                    bitSet.set((int) value);
                 }
             }
         }
     }
 
     protected void compact() {
-        SparseBitSet compactedSet = SparseBitSet.compact(sparseBitSet);
-        sparseBitSet = compactedSet;
+        SparseBitSet current = sparseBitSetVolatile;
+        SparseBitSet compactedSet = SparseBitSet.compact(current);
         sparseBitSetVolatile = compactedSet;
     }
 
@@ -135,9 +134,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * @return boolean value.
      */
     public boolean get(int i) {
-        SparseBitSet current = sparseBitSet;
+        SparseBitSet current;
         boolean result;
         do {
+            current = sparseBitSetVolatile;
             result = current.get(i);
         } while (current != sparseBitSetVolatile);
         return result;
@@ -149,9 +149,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * @return Calculates the total number of bits used by longs in underlying data structure.
      */
     public long size() {
-        SparseBitSet current = sparseBitSet;
+        SparseBitSet current;
         long size;
         do {
+            current = sparseBitSetVolatile;
             size = current.estimateBitsUsed();
         } while (current != sparseBitSetVolatile);
         return size;
@@ -163,9 +164,10 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
      * @return
      */
     public int cardinality() {
-        SparseBitSet current = sparseBitSet;
+        SparseBitSet current;
         int cardinality;
         do {
+            current = sparseBitSetVolatile;
             cardinality = current.cardinality();
         } while (current != sparseBitSetVolatile);
         return cardinality;
@@ -214,12 +216,12 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
 
     @Override
     public void endUpdate() {
-        boolean swap = false;
-        SparseBitSet updated = sparseBitSet;
+        boolean didSomeWork = false;
+        SparseBitSet updated = sparseBitSetVolatile;
         // first check if the max value among the new values to be added is more than the max value of the existing sparse bit set.
-        if (valuesToSet.size() > 0 && maxValueToSet > sparseBitSet.findMaxValue()) {
-            updated = SparseBitSet.resize(sparseBitSet, maxValueToSet);
-            swap = true;
+        if (valuesToSet.size() > 0 && maxValueToSet > updated.findMaxValue()) {
+            updated = SparseBitSet.resize(updated, maxValueToSet);
+            didSomeWork = true;
         }
 
         // when applying delta, check for duplicates, increment counts if duplicate values are found else set them
@@ -232,10 +234,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
             updated.clear(value);
         }
 
-
-        // switch the data structures
-        if (swap) {
-            sparseBitSet = updated;
+        if (didSomeWork) {
             sparseBitSetVolatile = updated;
         }
     }
@@ -274,7 +273,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
         SparseBitSet(int maxValue) {
             int totalBuckets = maxValue >>> BUCKET_SHIFT;
             this.maxValue = maxValue;
-            this.buckets = new AtomicReferenceArray<Bucket>(totalBuckets + 1);
+            this.buckets = new AtomicReferenceArray<>(totalBuckets + 1);
         }
 
         private SparseBitSet(int maxValue, AtomicReferenceArray<Bucket> buckets) {
