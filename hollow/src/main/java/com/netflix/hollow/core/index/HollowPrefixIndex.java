@@ -44,7 +44,6 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private final String type;
     private final int estimatedMaxStringDuplicates;
 
-    private TST prefixIndex;
     private volatile TST prefixIndexVolatile;
     private ArraySegmentRecycler memoryRecycle;
 
@@ -130,12 +129,13 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
         build();
     }
 
-    private synchronized void build() {
+    private void build() {
 
         if (!buildIndexOnUpdate) return;
         // tell memory recycler to use current tst's long arrays next time when long array is requested.
         // note reuse only happens once swap is called and bits are reset
-        if (prefixIndex != null) prefixIndex.recycleMemory(memoryRecycle);
+        TST current = prefixIndexVolatile;
+        if (current != null) current.recycleMemory(memoryRecycle);
 
         long estimatedNumberOfNodes = estimateNumNodes(totalWords, averageWordLen);
         TST tst = new TST(estimatedNumberOfNodes, estimatedMaxStringDuplicates, maxOrdinalOfType,
@@ -148,7 +148,7 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
             }
             ordinal = ordinals.nextSetBit(ordinal + 1);
         }
-        prefixIndex = tst;
+
         prefixIndexVolatile = tst;
         // safe to return previous long arrays on next request for long array.
         memoryRecycle.swap();
@@ -201,9 +201,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      */
     @SuppressWarnings("WeakerAccess")
     public HollowOrdinalIterator findKeysWithPrefix(String prefix) {
-        TST current = this.prefixIndex;
+        TST current;
         HollowOrdinalIterator it;
         do {
+            current = prefixIndexVolatile;
             it = current.findKeysWithPrefix(prefix);
         } while (current != this.prefixIndexVolatile);
         return it;
@@ -216,9 +217,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
      */
     public boolean contains(String key) {
         if (key == null) throw new IllegalArgumentException("key cannot be null");
-        TST current = this.prefixIndex;
+        TST current;
         boolean result;
         do {
+            current = prefixIndexVolatile;
             result = current.contains(key);
         } while (current != this.prefixIndexVolatile);
         return result;
