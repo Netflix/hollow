@@ -42,6 +42,7 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
         isGenSimpleConstructor = true;
         isParameterizedConstructorPublic = false;
         isAutoListenToDataRefresh = false;
+        isImplementsUniqueKeyIndex = false;
     }
 
     @Override
