@@ -27,6 +27,8 @@ import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.history.HollowHistory;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -167,7 +169,7 @@ public class HollowHistoryKeyIndex {
         Exception pipeException = null;
         // Ensure read-side is closed after completion of read
         try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-            PipedOutputStream out = new PipedOutputStream(in);
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
             executor.execute(() -> {
                 // Ensure write-side is closed after completion of write
                 try (Closeable ac = out) {
@@ -181,10 +183,11 @@ public class HollowHistoryKeyIndex {
                 }
             });
 
+            BufferedInputStream bin = new BufferedInputStream(in);
             if (isInitialUpdate || isSnapshot) {
-                reader.readSnapshot(in);
+                reader.readSnapshot(bin);
             } else {
-                reader.applyDelta(in);
+                reader.applyDelta(bin);
             }
         } catch (Exception e) {
             pipeException = e;
