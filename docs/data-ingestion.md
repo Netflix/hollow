@@ -92,7 +92,7 @@ public class Director {
     long id;
     String directorName;
 
-    private final int __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    private transient final long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
 }
 ```
 
