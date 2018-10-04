@@ -428,11 +428,10 @@ public class HollowProducer {
         try {
             // 1a. Prepare the write state
             writeEngine.prepareForNextCycle();
-            WriteState writeState = new WriteStateImpl(toVersion, objectMapper, readStates.current());
 
             // 2. Populate the state
             ProducerStatus.Builder populateStatus = listeners.firePopulateStart(toVersion);
-            try {
+            try(CloseableWriteState writeState = new CloseableWriteState(toVersion, objectMapper, readStates.current())) {
                 task.populate(writeState);
                 populateStatus.success();
             } catch (Throwable th) {
@@ -445,9 +444,9 @@ public class HollowProducer {
             // 3. Produce a new state if there's work to do
             if(writeEngine.hasChangedSinceLastCycle()) {
                 // 3a. Publish, run checks & validation, then announce new state consumers
-                publish(writeState, artifacts);
+                publish(toVersion, artifacts);
 
-                ReadStateHelper candidate = readStates.roundtrip(writeState);
+                ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.version(candidate.pending());
                 candidate = checkIntegrity(candidate, artifacts);
 
@@ -497,14 +496,14 @@ public class HollowProducer {
     /**
      * Publish the write state, storing the artifacts in the provided object. Visible for testing.
      */
-    protected void publish(final WriteState writeState, final Artifacts artifacts) throws IOException {
-        ProducerStatus.Builder psb = listeners.firePublishStart(writeState.getVersion());
+    protected void publish(long toVersion, Artifacts artifacts) throws IOException {
+        ProducerStatus.Builder psb = listeners.firePublishStart(toVersion);
         try {
-            stageBlob(writeState, artifacts, Blob.Type.SNAPSHOT);
+            stageBlob(toVersion, artifacts, Blob.Type.SNAPSHOT);
 
             if (readStates.hasCurrent()) {
-                stageBlob(writeState, artifacts, Blob.Type.DELTA);
-                stageBlob(writeState, artifacts, Blob.Type.REVERSE_DELTA);
+                stageBlob(toVersion, artifacts, Blob.Type.DELTA);
+                stageBlob(toVersion, artifacts, Blob.Type.REVERSE_DELTA);
                 publishBlob(artifacts, Blob.Type.DELTA);
                 publishBlob(artifacts, Blob.Type.REVERSE_DELTA);
 
@@ -531,19 +530,19 @@ public class HollowProducer {
         }
     }
 
-    private void stageBlob(WriteState writeState, Artifacts artifacts, Blob.Type blobType) throws IOException {
+    private void stageBlob(long toVersion, Artifacts artifacts, Blob.Type blobType) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
         switch (blobType) {
             case SNAPSHOT:
-                artifacts.snapshot = blobStager.openSnapshot(writeState.getVersion());
+                artifacts.snapshot = blobStager.openSnapshot(toVersion);
                 artifacts.snapshot.write(writer);
                 break;
             case DELTA:
-                artifacts.delta = blobStager.openDelta(readStates.current().getVersion(), writeState.getVersion());
+                artifacts.delta = blobStager.openDelta(readStates.current().getVersion(), toVersion);
                 artifacts.delta.write(writer);
                 break;
             case REVERSE_DELTA:
-                artifacts.reverseDelta = blobStager.openReverseDelta(writeState.getVersion(), readStates.current().getVersion());
+                artifacts.reverseDelta = blobStager.openReverseDelta(toVersion, readStates.current().getVersion());
                 artifacts.reverseDelta.write(writer);
                 break;
             default:
@@ -733,16 +732,74 @@ public class HollowProducer {
         void populate(HollowProducer.WriteState newState) throws Exception;
     }
 
-    public interface WriteState {
-        int add(Object o);
+    public interface WriteState extends AutoCloseable {
+        /**
+         * Adds the specified POJO to the state engine. See {@link HollowObjectMapper#add(Object)} for details.
+         *
+         * <p>Calling this method after the producer's populate stage has completed is an error.
+         *
+         * @throws IllegalStateException if called after the populate stage has completed (see
+         * {@link Populator} for details on the contract)
+         */
+        int add(Object o) throws IllegalStateException;
 
-        HollowObjectMapper getObjectMapper();
+        /**
+         * For advanced use-cases, access the underlying {@link HollowObjectMapper}. Prefer using {@link #add(Object)}
+         * on this class instead.
+         *
+         * <p>Calling this method after the producer's populate stage has completed is an error. Exercise caution when
+         * saving the returned reference in a local variable that is closed over by an asynchronous task as that
+         * circumvents this guard. It is safest to call {@code writeState.getObjectMapper()} within the closure.
+         *
+         * @throws IllegalStateException if called after the populate stage has completed (see
+         * {@link Populator} for details on the contract)
+         */
+        HollowObjectMapper getObjectMapper() throws IllegalStateException;
 
-        HollowWriteStateEngine getStateEngine();
+        /**
+         * For advanced use-cases, access the underlying {@link HollowWriteStateEngine}. Prefer using
+         * {@link #add(Object)} on this class instead.
+         *
+         * <p>Calling this method after the producer's populate stage has completed is an error. Exercise caution when
+         * saving the returned reference in a local variable that is closed over by an asynchronous task as that
+         * circumvents this guard. It is safest to call {@code writeState.getStateEngine()} within the closure.
+         *
+         * @throws IllegalStateException if called after the populate stage has completed (see
+         * {@link Populator} for details on the contract)
+         */
+        HollowWriteStateEngine getStateEngine() throws IllegalStateException;
 
-        ReadState getPriorState();
+        /**
+         * For advanced use-cases, access the ReadState of the prior successful cycle.
+         *
+         * <p>Calling this method after the producer's populate stage has completed is an error. Exercise caution when
+         * saving the returned reference in a local variable that is closed over by an asynchronous task as that
+         * circumvents this guard. It is safest to call {@code writeState.getPriorState()} within the closure.
+         *
+         * @throws IllegalStateException if called after the populate stage has completed (see
+         * {@link Populator} for details on the contract)
+         */
+        ReadState getPriorState() throws IllegalStateException;
 
-        long getVersion();
+        /**
+         * Returns the version of the current producer cycle being populated.
+         *
+         * <p>Calling this method after the producer's populate stage has completed is an error.
+         *
+         * @throws IllegalStateException if called after the populate stage has completed (see
+         * {@link Populator} for details on the contract)
+         */
+        long getVersion() throws IllegalStateException;
+
+        /**
+         * Closes this write state making it inoperable.
+         *
+         * <p>Once closed, calling any other method (aside from {@link #close()} will throw
+         * {@code IllegalStateException}. The producer closes the current cycle's write state after the populate
+         * stage is complete.
+         */
+        @Override
+        void close();
     }
 
     public interface ReadState {

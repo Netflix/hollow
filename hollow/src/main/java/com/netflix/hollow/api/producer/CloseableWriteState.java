@@ -19,45 +19,65 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import java.util.function.Function;
 
 /**
  * Beta API subject to change.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-final class WriteStateImpl implements HollowProducer.WriteState {
+final class CloseableWriteState implements HollowProducer.WriteState {
+    private static final Function<Long,String> LATE_USAGE_MSG = version -> String.format(
+            "attempt to use WriteState after populate stage complete; version=%d", version);
+
     private final long version;
     private final HollowObjectMapper objectMapper;
     private final HollowProducer.ReadState priorReadState;
+    private volatile boolean closed = false;
 
-    protected WriteStateImpl(long version, HollowObjectMapper objectMapper, HollowProducer.ReadState priorReadState) {
+    CloseableWriteState(long version, HollowObjectMapper objectMapper, HollowProducer.ReadState priorReadState) {
         this.version = version;
         this.objectMapper = objectMapper;
         this.priorReadState = priorReadState;
     }
 
     @Override
-    public int add(Object o) {
+    public int add(Object o) throws IllegalStateException {
+        if (closed)
+            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
         return objectMapper.add(o);
     }
 
     @Override
-    public HollowObjectMapper getObjectMapper() {
+    public HollowObjectMapper getObjectMapper() throws IllegalStateException {
+        if (closed)
+            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
         return objectMapper;
     }
 
     @Override
-    public HollowWriteStateEngine getStateEngine() {
+    public HollowWriteStateEngine getStateEngine() throws IllegalStateException {
+        if (closed)
+            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
         return objectMapper.getStateEngine();
     }
 
     @Override
-    public long getVersion() {
+    public long getVersion() throws IllegalStateException {
+        if (closed)
+            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
         return version;
     }
 
     @Override
-    public HollowProducer.ReadState getPriorState() {
+    public HollowProducer.ReadState getPriorState() throws IllegalStateException {
+        if (closed)
+            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
         return priorReadState;
+    }
+
+    @Override
+    public void close() {
+        closed = true;
     }
 }
