@@ -172,9 +172,13 @@ prefixIndex.detachFromDeltaUpdates();
 
 A field path indicates how to traverse through a type hierarchy. It contains multiple parts delimited by `.`, and we need one part per type through which we're traversing. Each part corresponding to an `OBJECT` type should be equal to the name of a field in that type.
 
+### Primary and hash keys
+
 Primary key and hash key field paths may only span through `OBJECT` types.  These field paths will be automatically expanded if they end in a `REFERENCE` field which points to a type that has only a single field, or a type which has a primary key with only a single field defined.  If auto-expansion is not desired, the field path should terminate with a `!` character.  For example, in our data model example above, the following field paths for the type `Movie` are equivalent: `title`, `title.value`.  If we actually want the field path to terminate at the `REFERENCE` field `title`, we can specify the field path as `title!`.
 
-Hash _index_ field paths may span through any type.  Each part corresponding to a `LIST` or `SET` type should be specified as `element`. Similarly, each part corresponding to a `MAP` type should be specified as either `key` or `value`.  Hash index field paths are never auto-expanded.
+### Hash indexes
+
+Hash index field paths may span through any type.  Each part corresponding to a `LIST` or `SET` type should be specified as `element`. Similarly, each part corresponding to a `MAP` type should be specified as either `key` or `value`.  Hash index field paths are never auto-expanded.
 
 ## Hash Keys
 
