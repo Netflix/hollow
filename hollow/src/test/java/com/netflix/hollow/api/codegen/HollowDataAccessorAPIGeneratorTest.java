@@ -15,6 +15,7 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import com.netflix.hollow.core.write.objectmapper.DeprecatedApi;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.IOException;
 import org.junit.Before;
@@ -44,6 +45,9 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
     static class Movie {
         int id;
 
+        @DeprecatedApi("@deprecated use {@link #getNewName} instead")
         String name;
+
+        String newName;
     }
 }

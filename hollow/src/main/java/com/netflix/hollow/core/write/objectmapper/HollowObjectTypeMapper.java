@@ -104,9 +104,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         for(MappedField field : mappedFields) {
             if(field.getFieldType() == MappedFieldType.REFERENCE) {
-                schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType(), field.getReferencedTypeName());
+                schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType(), field.getReferencedTypeName(), field.getDeprecatedApiAnnotation());
             } else {
-                schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType());
+                schema.addField(field.getFieldName(), field.getFieldType().getSchemaFieldType(), field.getDeprecatedApiAnnotation());
             }
         }
 
@@ -256,6 +256,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         private final HollowHashKey hashKeyAnnotation;
         private final HollowShardLargeType numShardsAnnotation;
         private final boolean isInlinedField;
+        private final DeprecatedApi deprecatedApiAnnotation;
 
         private MappedField(Field f) {
             this(f, new HashSet<Type>());
@@ -270,7 +271,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.hashKeyAnnotation = f.getAnnotation(HollowHashKey.class);
             this.numShardsAnnotation = f.getAnnotation(HollowShardLargeType.class);
             this.isInlinedField = f.isAnnotationPresent(HollowInline.class);
-            
+            this.deprecatedApiAnnotation = f.getAnnotation(DeprecatedApi.class);
 
             HollowTypeMapper subTypeMapper = null;
             
@@ -349,6 +350,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
             this.fieldType = specialField;
             this.subTypeMapper = null;
             this.isInlinedField = false;
+            this.deprecatedApiAnnotation = null;
         }
 
         public String getFieldName() {
@@ -357,6 +359,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
         public MappedFieldType getFieldType() {
             return fieldType;
+        }
+
+        public DeprecatedApi getDeprecatedApiAnnotation() {
+            return deprecatedApiAnnotation;
         }
 
         public String getReferencedTypeName() {
