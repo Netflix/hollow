@@ -182,6 +182,11 @@ public class VideoMetaDataModule {
         VideoMetaData countryAgnosticVMD = getCountryAgnosticClone(videoId);
         /// clone the country agnostic data
         countrySpecificClone = countryAgnosticVMD.clone();
+        
+        // Add the episode type override for the country if it exists
+        Strings epTypeOverride = getEpisodeTypeOverride(videoId, countryCode);
+        if(epTypeOverride != null)
+        	countrySpecificClone.episodeTypes.add(epTypeOverride);
 
         /// set the country specific data
         countrySpecificClone.isSearchOnly = countrySpecificKey.isSearchOnly;
@@ -200,6 +205,27 @@ public class VideoMetaDataModule {
         /// return the country specific clone
         countrySpecificMap.put(countrySpecificKey, countrySpecificClone);
         videoDataCollection.addVideoMetaData(videoId, countrySpecificClone);
+    }
+    
+    private Strings getEpisodeTypeOverride(Integer videoId, String countryCode) {
+        int ordinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
+        if (ordinal != -1) {
+            VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
+            
+            List<VideoGeneralEpisodeTypeHollow> inputEpisodeTypes = general._getEpisodeTypes();
+
+            if (inputEpisodeTypes != null && !inputEpisodeTypes.isEmpty()) {
+                for (VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
+                	// Country is non null and also matches the country code 
+                	if(epType._getCountry() != null && epType._getCountry()._getValue().equals(countryCode)) {
+                		return new Strings(epType._getValue()._getValue());                		
+                	}
+                }
+            }            
+        }
+        
+        return null;
+	
     }
 
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
@@ -402,7 +428,11 @@ public class VideoMetaDataModule {
             if (inputEpisodeTypes != null) {
                 Set<Strings> epTypes = new HashSet<>();
                 for (VideoGeneralEpisodeTypeHollow epType : inputEpisodeTypes) {
-                    epTypes.add(new Strings(epType._getValue()._getValue()));
+                	// the episode type with the non-null country code are country specific
+                	// they are handled seperately
+                	if(epType._getCountry() == null) {
+                		epTypes.add(new Strings(epType._getValue()._getValue()));                		
+                	}
                 }
 
                 vmd.episodeTypes = epTypes;
