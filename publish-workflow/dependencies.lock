@@ -805,13 +805,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -824,21 +824,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -852,31 +852,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -884,7 +884,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -980,7 +980,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -1247,7 +1247,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -1255,7 +1255,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -1263,13 +1263,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -2179,7 +2179,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -2213,14 +2213,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -2310,7 +2310,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -2350,26 +2350,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2385,7 +2385,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -2430,7 +2430,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -2453,7 +2453,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -2461,7 +2461,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:platform-chukwaClient",
@@ -2505,7 +2505,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -2517,16 +2517,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -2534,7 +2533,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -2546,7 +2545,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -2558,14 +2557,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -2578,13 +2577,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -2603,7 +2602,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -2613,14 +2612,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -2652,7 +2651,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -2667,41 +2666,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -2710,7 +2709,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -2735,7 +2734,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -2785,14 +2784,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -2819,12 +2818,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -2857,21 +2850,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -2917,7 +2910,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -3044,7 +3037,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -4154,13 +4147,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -4173,21 +4166,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -4201,31 +4194,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -4233,7 +4226,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -4329,7 +4322,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -4596,7 +4589,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -4604,7 +4597,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -4612,13 +4605,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -5528,7 +5521,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -5562,14 +5555,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -5659,7 +5652,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -5699,26 +5692,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5734,7 +5727,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -5779,7 +5772,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -5802,7 +5795,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -5810,7 +5803,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:platform-chukwaClient",
@@ -5854,7 +5847,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -5866,16 +5859,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -5883,7 +5875,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -5895,7 +5887,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -5907,14 +5899,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -5927,13 +5919,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -5952,7 +5944,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -5962,14 +5954,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -6001,7 +5993,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -6016,41 +6008,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -6059,7 +6051,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -6084,7 +6076,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -6134,14 +6126,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6168,12 +6160,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -6206,21 +6192,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -6266,7 +6252,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -6393,7 +6379,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -7503,13 +7489,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -7522,21 +7508,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -7550,31 +7536,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -7582,7 +7568,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -7678,7 +7664,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -7945,7 +7931,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -7953,7 +7939,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -7961,13 +7947,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -8877,7 +8863,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -8911,14 +8897,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -9008,7 +8994,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -9048,26 +9034,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -9083,7 +9069,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -9128,7 +9114,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -9151,7 +9137,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -9159,7 +9145,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:platform-chukwaClient",
@@ -9203,7 +9189,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -9215,16 +9201,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -9232,7 +9217,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -9244,7 +9229,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -9256,14 +9241,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -9276,13 +9261,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -9301,7 +9286,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -9311,14 +9296,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -9350,7 +9335,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -9365,41 +9350,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -9408,7 +9393,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -9433,7 +9418,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -9483,14 +9468,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9517,12 +9502,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -9555,21 +9534,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -9615,7 +9594,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -9742,7 +9721,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -10998,13 +10977,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -11017,21 +10996,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -11045,31 +11024,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -11077,7 +11056,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -11173,7 +11152,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -11440,7 +11419,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -11448,7 +11427,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -11456,13 +11435,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -12372,7 +12351,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -12406,14 +12385,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -12503,7 +12482,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -12543,26 +12522,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -12578,7 +12557,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -12623,7 +12602,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -12646,7 +12625,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -12654,7 +12633,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:platform-chukwaClient",
@@ -12698,7 +12677,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -12710,16 +12689,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -12727,7 +12705,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -12739,7 +12717,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -12751,14 +12729,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -12771,13 +12749,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -12796,7 +12774,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -12806,14 +12784,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -12845,7 +12823,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -12860,41 +12838,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -12903,7 +12881,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -12928,7 +12906,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -12978,14 +12956,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -13012,12 +12990,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -13050,21 +13022,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -13110,7 +13082,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -13237,7 +13209,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -14347,13 +14319,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -14366,21 +14338,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -14394,31 +14366,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -14426,7 +14398,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -14522,7 +14494,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -14789,7 +14761,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -14797,7 +14769,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -14805,13 +14777,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -15721,7 +15693,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -15755,14 +15727,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -15852,7 +15824,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -15892,26 +15864,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -15927,7 +15899,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -15972,7 +15944,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -15995,7 +15967,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -16003,7 +15975,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:platform-chukwaClient",
@@ -16047,7 +16019,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -16059,16 +16031,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -16076,7 +16047,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -16088,7 +16059,7 @@
             ]
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -16100,14 +16071,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -16120,13 +16091,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -16145,7 +16116,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -16155,14 +16126,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -16194,7 +16165,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -16209,41 +16180,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -16252,7 +16223,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -16277,7 +16248,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -16327,14 +16298,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16361,12 +16332,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -16399,21 +16364,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -16459,7 +16424,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -16586,7 +16551,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -17705,13 +17670,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -17724,21 +17689,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -17752,31 +17717,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -17784,7 +17749,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -17880,7 +17845,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -18162,7 +18127,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -18170,7 +18135,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -18178,13 +18143,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -19102,7 +19067,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -19136,14 +19101,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -19233,7 +19198,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -19273,26 +19238,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -19308,7 +19273,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -19353,7 +19318,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -19376,7 +19341,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -19384,7 +19349,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -19429,7 +19394,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -19441,16 +19406,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -19458,7 +19422,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -19471,10 +19435,10 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.7.8"
+            "locked": "4.7.9"
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -19486,14 +19450,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -19506,13 +19470,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -19531,7 +19495,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -19541,14 +19505,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -19580,7 +19544,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -19595,41 +19559,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -19638,7 +19602,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -19663,7 +19627,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -19725,14 +19689,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -19759,12 +19723,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -19797,21 +19755,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -19857,7 +19815,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -19984,7 +19942,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -21127,13 +21085,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -21146,21 +21104,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -21174,31 +21132,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -21206,7 +21164,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -21302,7 +21260,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -21584,7 +21542,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -21592,7 +21550,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -21600,13 +21558,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -22524,7 +22482,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -22558,14 +22516,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -22655,7 +22613,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -22695,26 +22653,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -22730,7 +22688,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -22775,7 +22733,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -22798,7 +22756,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -22806,7 +22764,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -22851,7 +22809,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -22863,16 +22821,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -22880,7 +22837,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -22893,10 +22850,10 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.7.8"
+            "locked": "4.7.9"
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -22908,14 +22865,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -22928,13 +22885,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -22953,7 +22910,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -22963,14 +22920,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -23002,7 +22959,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -23017,41 +22974,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -23060,7 +23017,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -23085,7 +23042,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -23147,14 +23104,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -23181,12 +23138,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -23219,21 +23170,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -23279,7 +23230,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -23406,7 +23357,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -24549,13 +24500,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -24568,21 +24519,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -24596,31 +24547,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -24628,7 +24579,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -24724,7 +24675,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -25006,7 +24957,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -25014,7 +24965,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -25022,13 +24973,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -25946,7 +25897,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -25980,14 +25931,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -26077,7 +26028,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -26117,26 +26068,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -26152,7 +26103,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -26197,7 +26148,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -26220,7 +26171,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -26228,7 +26179,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -26273,7 +26224,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -26285,16 +26236,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -26302,7 +26252,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -26315,10 +26265,10 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.7.8"
+            "locked": "4.7.9"
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -26330,14 +26280,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -26350,13 +26300,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -26375,7 +26325,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -26385,14 +26335,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -26424,7 +26374,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -26439,41 +26389,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -26482,7 +26432,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -26507,7 +26457,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -26569,14 +26519,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -26603,12 +26553,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -26641,21 +26585,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -26701,7 +26645,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -26828,7 +26772,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
@@ -27971,13 +27915,13 @@
             ]
         },
         "com.netflix.astyanax:astyanax": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "netflix:nfastyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cql",
@@ -27990,21 +27934,21 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cassandra-all-shaded": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra"
             ]
         },
         "com.netflix.astyanax:astyanax-contrib": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-examples"
             ]
         },
         "com.netflix.astyanax:astyanax-core": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -28018,31 +27962,31 @@
             ]
         },
         "com.netflix.astyanax:astyanax-cql": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-entity-mapper": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-examples": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-queue": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax"
             ]
         },
         "com.netflix.astyanax:astyanax-recipes": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-entity-mapper",
@@ -28050,7 +27994,7 @@
             ]
         },
         "com.netflix.astyanax:astyanax-thrift": {
-            "locked": "3.10.1",
+            "locked": "3.10.2",
             "transitive": [
                 "com.netflix.astyanax:astyanax",
                 "com.netflix.astyanax:astyanax-contrib",
@@ -28146,7 +28090,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.133.0",
+            "locked": "4.135.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -28428,7 +28372,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -28436,7 +28380,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -28444,13 +28388,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.7",
+            "locked": "1.2.9",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -29368,7 +29312,7 @@
             ]
         },
         "netflix:akmsclient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws"
             ]
@@ -29402,14 +29346,14 @@
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:platform-chukwaClient"
             ]
         },
         "netflix:base-server": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:awsutils",
                 "netflix:concurrent"
@@ -29499,7 +29443,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.186.0",
+            "locked": "4.189.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:geoip-client",
@@ -29539,26 +29483,26 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.2.0",
+            "locked": "3.2.1",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "1.221.0",
+            "locked": "1.222.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -29574,7 +29518,7 @@
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.181.0",
+            "locked": "1.184.0",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nsac-client"
@@ -29619,7 +29563,7 @@
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -29642,7 +29586,7 @@
             ]
         },
         "netflix:nf-archaius2": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nf-archaius2-platform-bridge",
@@ -29650,7 +29594,7 @@
             ]
         },
         "netflix:nf-archaius2-platform-bridge": {
-            "locked": "1.189.0",
+            "locked": "1.191.0",
             "transitive": [
                 "netflix:cryptexclient-standalone",
                 "netflix:nflibrary-junit-util",
@@ -29695,7 +29639,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-server"
             ]
@@ -29707,16 +29651,15 @@
             ]
         },
         "netflix:nfastyanax": {
-            "locked": "1.56.1",
+            "locked": "1.56.3",
             "transitive": [
                 "netflix:awsutils",
-                "netflix:gutenberg-common",
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.136",
+            "locked": "2.137",
             "transitive": [
                 "netflix:base-server",
                 "netflix:country-launch",
@@ -29724,7 +29667,7 @@
             ]
         },
         "netflix:nflibrary": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:akmsclient",
                 "netflix:concurrent",
@@ -29737,10 +29680,10 @@
             ]
         },
         "netflix:nflibrary-junit-util": {
-            "locked": "4.7.8"
+            "locked": "4.7.9"
         },
         "netflix:nflibrary-slim": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:nflibrary"
             ]
@@ -29752,14 +29695,14 @@
             ]
         },
         "netflix:nfzookeeper": {
-            "locked": "1.53.0",
+            "locked": "1.56.0",
             "transitive": [
                 "netflix:hermes",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
         "netflix:ngl": {
-            "locked": "0.8.0",
+            "locked": "0.10.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -29772,13 +29715,13 @@
             ]
         },
         "netflix:nsac-client": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:platform-aws"
             ]
         },
         "netflix:nsac-common": {
-            "locked": "1.70.0",
+            "locked": "2.1.0",
             "transitive": [
                 "netflix:nsac-client",
                 "netflix:platform-aws"
@@ -29797,7 +29740,7 @@
             ]
         },
         "netflix:platform-aws": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:epic-plugin",
@@ -29807,14 +29750,14 @@
             ]
         },
         "netflix:platform-chukwaClient": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:simone-common"
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -29846,7 +29789,7 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix.ipc.metrics:ipc-metrics-niws",
                 "netflix:akmsclient",
@@ -29861,41 +29804,41 @@
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-management",
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-management": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:evcache-client2",
                 "netflix:nfastyanax"
             ]
         },
         "netflix:platform-messaging": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc",
                 "netflix:platform-management"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -29904,7 +29847,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.134",
+            "locked": "2.135",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -29929,7 +29872,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:concurrent",
                 "netflix:fit",
@@ -29991,14 +29934,14 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.499",
+            "locked": "100.0.519",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.0.3",
+            "locked": "61.1.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -30025,12 +29968,6 @@
             "locked": "3.2.1",
             "transitive": [
                 "org.antlr:antlr-runtime"
-            ]
-        },
-        "org.apache.cassandra:cassandra-all": {
-            "locked": "2.0.17",
-            "transitive": [
-                "com.netflix.astyanax:astyanax-cassandra-all-shaded"
             ]
         },
         "org.apache.cassandra:cassandra-thrift": {
@@ -30063,21 +30000,21 @@
             ]
         },
         "org.apache.curator:curator-client": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-framework"
             ]
         },
         "org.apache.curator:curator-framework": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper",
                 "org.apache.curator:curator-recipes"
             ]
         },
         "org.apache.curator:curator-recipes": {
-            "locked": "2.10.0",
+            "locked": "2.12.0",
             "transitive": [
                 "netflix:nfzookeeper"
             ]
@@ -30123,7 +30060,7 @@
             ]
         },
         "org.apache.kafka:kafka-clients": {
-            "locked": "0.10.2.2-nflx.10",
+            "locked": "0.10.2.2-nflx.11",
             "transitive": [
                 "com.netflix.ksclient:ksclient-api-kafka",
                 "com.netflix.ksclient:ksclient-core-kafka",
@@ -30250,7 +30187,7 @@
             ]
         },
         "org.apache.zookeeper:zookeeper": {
-            "locked": "3.4.6",
+            "locked": "3.4.8",
             "transitive": [
                 "org.apache.curator:curator-client"
             ]
