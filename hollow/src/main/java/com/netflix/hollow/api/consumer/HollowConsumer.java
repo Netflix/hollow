@@ -279,6 +279,15 @@ public class HollowConsumer {
     }
 
     /**
+     * Equivalent to calling {@link #getAPI()} and casting to the specified API.
+     *
+     * @return the API which wraps the underlying dataset
+     */
+    public <T extends HollowAPI> T getAPI(Class<T> apiClass) {
+        return apiClass.cast(updater.getAPI());
+    }
+
+    /**
      * Will force a double snapshot refresh on the next update.
      */
     public void forceDoubleSnapshotNextUpdate() {
@@ -767,18 +776,18 @@ public class HollowConsumer {
         }
     }
 
-    public static <B extends HollowConsumer.Builder<B>> HollowConsumer.Builder<B> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
-        HollowConsumer.Builder builder = new Builder();
+    public static HollowConsumer.Builder<?> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+        HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withBlobRetriever(blobRetriever);
     }
 
-    public static HollowConsumer.Builder withLocalBlobStore(File localBlobStoreDir) {
-        HollowConsumer.Builder builder = new Builder();
+    public static HollowConsumer.Builder<?> withLocalBlobStore(File localBlobStoreDir) {
+        HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withLocalBlobStore(localBlobStoreDir);
     }
 
     @SuppressWarnings("unchecked")
-    public static class Builder<B extends HollowConsumer.Builder> {
+    public static class Builder<B extends HollowConsumer.Builder<B>> {
 
         protected HollowConsumer.BlobRetriever blobRetriever = null;
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
@@ -819,7 +828,19 @@ public class HollowConsumer {
             return (B)this;
         }
 
-        public <T extends HollowAPI> B withGeneratedAPIClass(Class<T> generatedAPIClass) {
+        /**
+         * Provide the code generated API class that extends {@link HollowAPI}.
+         *
+         * The instance returned from {@link HollowConsumer#getAPI()} will be of the provided type and can be cast
+         * to access generated methods.
+         *
+         * @param generatedAPIClass the code generated API class
+         * @return this builder
+         * @throws IllegalArgumentException if provided API class is {@code HollowAPI} instead of a subclass
+         */
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
+            if (HollowAPI.class.equals(generatedAPIClass))
+                throw new IllegalArgumentException("must provide a code generated API class");
             this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
             return (B)this;
         }
