@@ -69,7 +69,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> ");
         if (isImplementsUniqueKeyIndex) {
-            builder.append("implements " + HollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> ");
+            builder.append("implements " + HollowUniqueKeyIndex.class.getSimpleName() + "<" + hollowImplClassname(type) + "> ");
         }
         builder.append("{\n\n");
         {

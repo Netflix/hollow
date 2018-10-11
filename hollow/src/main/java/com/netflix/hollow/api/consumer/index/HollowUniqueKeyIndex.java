@@ -15,6 +15,6 @@
  */
 package com.netflix.hollow.api.consumer.index;
 
-public interface HollowUniqueKeyIndex<API, T> {
+public interface HollowUniqueKeyIndex<T> {
     T findMatch(Object... keys);
 }

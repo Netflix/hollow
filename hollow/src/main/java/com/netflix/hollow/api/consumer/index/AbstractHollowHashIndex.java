@@ -25,7 +25,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  *,
  * @author dsu
  */
-public abstract class AbstractHollowHashIndex<API> {
+public abstract class AbstractHollowHashIndex<API extends HollowAPI> {
     protected final HollowConsumer consumer;
     protected final String queryType;
     protected final String selectFieldPath;
