@@ -90,7 +90,7 @@ public class HollowRefreshListenerTests {
         List<HollowConsumer.RefreshListener> listeners = new ArrayList<>();
         listeners.add(listener);
 
-        HollowConsumer.Builder<HollowConsumer.Builder> b = new HollowConsumer.Builder<HollowConsumer.Builder>() {
+        HollowConsumer.Builder<?> b = new HollowConsumer.Builder() {
             @Override
             public HollowConsumer build() {
                 return new HollowConsumer(blobRetriever,

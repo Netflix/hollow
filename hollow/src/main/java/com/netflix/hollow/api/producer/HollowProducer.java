@@ -1081,8 +1081,8 @@ public class HollowProducer {
         }
     }
 
-    public static HollowProducer.Builder withPublisher(HollowProducer.Publisher publisher) {
-        Builder builder = new Builder();
+    public static HollowProducer.Builder<?> withPublisher(HollowProducer.Publisher publisher) {
+        Builder<?> builder = new Builder<>();
         return builder.withPublisher(publisher);
     }
 
