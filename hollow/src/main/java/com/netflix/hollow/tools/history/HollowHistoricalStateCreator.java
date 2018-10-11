@@ -45,6 +45,8 @@ import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -323,7 +325,7 @@ public class HollowHistoricalStateCreator {
         Exception pipeException = null;
         // Ensure read-side is closed after completion of read
         try (PipedInputStream in = new PipedInputStream(1 << 15)) {
-            PipedOutputStream out = new PipedOutputStream(in);
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
             executor.execute(() -> {
                 // Ensure write-side is closed after completion of write
                 try (Closeable ac = out) {
@@ -333,7 +335,7 @@ public class HollowHistoricalStateCreator {
                 }
             });
 
-            reader.readSnapshot(in);
+            reader.readSnapshot(new BufferedInputStream(in));
         } catch (Exception e) {
             pipeException = e;
         }

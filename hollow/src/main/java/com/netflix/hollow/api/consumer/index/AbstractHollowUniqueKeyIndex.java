@@ -25,7 +25,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  *,
  * @author dsu
  */
-public abstract class AbstractHollowUniqueKeyIndex<API, T> {
+public abstract class AbstractHollowUniqueKeyIndex<API extends HollowAPI, T> {
     protected final HollowConsumer consumer;
     protected HollowPrimaryKeyIndex idx;
     protected API api;

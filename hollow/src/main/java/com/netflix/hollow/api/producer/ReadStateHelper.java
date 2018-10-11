@@ -61,9 +61,9 @@ final class ReadStateHelper {
         this.pending = pending;
     }
 
-    ReadStateHelper roundtrip(HollowProducer.WriteState writeState) {
+    ReadStateHelper roundtrip(long version) {
         if(pending != null) throw new IllegalStateException();
-        return new ReadStateHelper(this.current, newReadState(writeState.getVersion(), new HollowReadStateEngine()));
+        return new ReadStateHelper(this.current, newReadState(version, new HollowReadStateEngine()));
     }
 
     /**
