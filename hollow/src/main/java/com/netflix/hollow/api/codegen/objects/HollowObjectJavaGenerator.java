@@ -154,11 +154,17 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
     private static String generateFieldAccessorDeprecatedApiAnnotation(DeprecatedApi deprecatedApiAnnotation) {
         StringBuilder builder = new StringBuilder();
+
         if (deprecatedApiAnnotation != null) {
-            builder.append("    /**\n")
-                    .append("    * " + deprecatedApiAnnotation.value() + "\n")
-                    .append("    */\n")
-                    .append("    @Deprecated\n");
+            String annotationValue = deprecatedApiAnnotation.value();
+
+            if (!annotationValue.isEmpty()) {
+                builder.append("    /**\n")
+                        .append("     * @deprecated ").append(annotationValue).append("\n")
+                        .append("     */\n");
+            }
+
+            builder.append("    @Deprecated\n");
         }
         return builder.toString();
     }

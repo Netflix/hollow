@@ -45,7 +45,10 @@ public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGenerat
     static class Movie {
         int id;
 
-        @DeprecatedApi("@deprecated use {@link #getNewName} instead")
+        @DeprecatedApi
+        int age;
+
+        @DeprecatedApi("Use {@link #getNewName} instead")
         String name;
 
         String newName;
