@@ -32,6 +32,10 @@ public class AbstractHollowAPIGeneratorTest {
     public void setup() throws IOException {}
 
     protected void runGenerator(String apiClassName, String packageName, Class<?> clazz) throws Exception {
+        runGenerator(apiClassName, packageName, clazz, true);
+    }
+
+    protected void runGenerator(String apiClassName, String packageName, Class<?> clazz, boolean runFindbugs) throws Exception {
         System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s", this.getClass().getSimpleName(), sourceFolder, clazzFolder));
 
         // Setup Folders
@@ -45,7 +49,7 @@ public class AbstractHollowAPIGeneratorTest {
         generator.generateFiles(sourceFolder);
 
         // Compile to validate generated files
-        HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
+        HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder, false);
     }
 
     @After
