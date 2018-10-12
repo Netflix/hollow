@@ -25,7 +25,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  *,
  * @author dsu
  */
-public abstract class AbstractHollowHashIndex<API extends HollowAPI> {
+// TODO(timt): how to move to `API extends HollowAPI` without binary incompatiblity of access to the `api`
+//             field in generated subclasses, e.g. `find*Matches(...)`
+public abstract class AbstractHollowHashIndex<API> {
     protected final HollowConsumer consumer;
     protected final String queryType;
     protected final String selectFieldPath;
