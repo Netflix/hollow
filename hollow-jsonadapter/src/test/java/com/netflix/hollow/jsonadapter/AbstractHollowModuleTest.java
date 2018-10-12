@@ -11,9 +11,6 @@ import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import org.junit.Assert;
-import org.junit.Before;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
 
 /**
  * End-to-end tests to ensure generated API remains compatible with {@link HollowModule}.
