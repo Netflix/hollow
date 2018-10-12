@@ -1,6 +1,7 @@
 package com.netflix.hollow.jsonadapter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hollow.api.codegen.AbstractHollowAPIGeneratorTest;
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -176,6 +177,7 @@ public abstract class AbstractHollowModuleTest extends AbstractHollowAPIGenerato
         Double d;
         String s;
 
+        @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
         int __assignedOrdinal = HollowConstants.ORDINAL_NONE;
 
         @Override
