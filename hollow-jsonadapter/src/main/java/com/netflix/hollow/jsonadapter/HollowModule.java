@@ -115,7 +115,7 @@ class HollowModule extends SimpleModule {
         public JsonSerializer<?> modifyKeySerializer(SerializationConfig config, JavaType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer) {
             if (serializer.handledType() == Object.class) {
                 //noinspection unchecked
-                return new HollowObjectKeySerializer((JsonSerializer<Object>) serializer);
+                return new SinglePropertyWriterKeySerializer((JsonSerializer<Object>) serializer);
             }
             return serializer;
         }
@@ -179,12 +179,12 @@ class HollowModule extends SimpleModule {
     }
 
     /**
-     * Map key serializer supporting single property {@link HollowObject}s.
+     * Key serializer to accompany {@link SinglePropertyWriterSerializer}, so that when a single property can be written, it's used as the field value.
      */
-    private static class HollowObjectKeySerializer extends JsonSerializer {
+    private static class SinglePropertyWriterKeySerializer extends JsonSerializer {
         private JsonSerializer<Object> defaultSerializer;
 
-        HollowObjectKeySerializer(JsonSerializer<Object> defaultSerializer) {
+        SinglePropertyWriterKeySerializer(JsonSerializer<Object> defaultSerializer) {
             this.defaultSerializer = defaultSerializer;
         }
 
