@@ -15,29 +15,6 @@ public final class ConsumerIndexCache<I extends AbstractHollowUniqueKeyIndex<?,?
         this.consumer = consumer;
     }
 
-    public I uniqueKeyIndex(Class<?> indexClass, String name, String... fieldPaths) {
-        return cache.computeIfAbsent(new CacheKey(indexClass, name), k -> {{
-            try {
-                // TODO(timt): gross
-                Class<I> clazz = (Class<I>) indexClass;
-
-                Constructor<I> ctor = clazz.getConstructor(HollowConsumer.class, String[].class);
-                I index = ctor.newInstance(consumer, fieldPaths);
-                index.listenToDataRefresh();
-                return index;
-            } catch (NoSuchMethodException e) {
-                throw new IllegalArgumentException(
-                        "expected an index class with a constructor that accepts (HollowConsumer, String[]); class="
-                                + indexClass.getName());
-            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                throw new IllegalArgumentException("error constructing index; class=" + indexClass.getName(), e);
-            }
-        }
-
-        });
-    }
-
-
     public I uniqueKeyIndex(Class<?> indexClass) {
         return cache.computeIfAbsent(new CacheKey(indexClass, "<default>"), k -> {
             try {
@@ -51,6 +28,33 @@ public final class ConsumerIndexCache<I extends AbstractHollowUniqueKeyIndex<?,?
             } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException(
                         "expected an index class with a constructor that accepts (HollowConsumer); class="
+                                + indexClass.getName());
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                throw new IllegalArgumentException("error constructing index; class=" + indexClass.getName(), e);
+            }
+        });
+    }
+
+    public I uniqueKeyIndex(Class<?> indexClass, String name) {
+        // TODO(timt): throw a more specific exception if no index with the specified name is cached
+        return uniqueKeyIndex(indexClass, name, new String[0]);
+    }
+
+    public I uniqueKeyIndex(Class<?> indexClass, String name, String... fieldPaths) {
+        // FIXME(timt): it should be an error to call this method a second time with the same index class and name, but
+        //              with different field paths, except when fieldPaths is empty
+        return cache.computeIfAbsent(new CacheKey(indexClass, name), k -> {
+            try {
+                // TODO(timt): gross
+                Class<I> clazz = (Class<I>) indexClass;
+
+                Constructor<I> ctor = clazz.getConstructor(HollowConsumer.class, String[].class);
+                I index = ctor.newInstance(consumer, fieldPaths);
+                index.listenToDataRefresh();
+                return index;
+            } catch (NoSuchMethodException e) {
+                throw new IllegalArgumentException(
+                        "expected an index class with a constructor that accepts (HollowConsumer, String[]); class="
                                 + indexClass.getName());
             } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
                 throw new IllegalArgumentException("error constructing index; class=" + indexClass.getName(), e);

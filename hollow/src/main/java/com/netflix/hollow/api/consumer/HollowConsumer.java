@@ -388,6 +388,13 @@ public class HollowConsumer {
     }
 
     public <I extends AbstractHollowUniqueKeyIndex<?,?>> I uniqueKeyIndex(Class<I> indexClass,
+            String name) {
+        AbstractHollowUniqueKeyIndex<?, ?> index = indexCache.uniqueKeyIndex(indexClass, name);
+        // TODO(timt): gross
+        return indexClass.cast(index);
+    }
+
+    public <I extends AbstractHollowUniqueKeyIndex<?,?>> I uniqueKeyIndex(Class<I> indexClass,
             String name,
             String... fieldPaths) {
         AbstractHollowUniqueKeyIndex<?, ?> index = indexCache.uniqueKeyIndex(indexClass, name, fieldPaths);
