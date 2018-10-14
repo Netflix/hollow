@@ -1,10 +1,25 @@
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+    }
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.4.7'
+    }
+}
+
 apply plugin: 'java'
- 
+apply plugin: 'me.champeau.gradle.jmh'
+
 dependencies {
     testCompile project(":hollow-test")
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2.15.0'
     testCompile 'com.google.code.findbugs:findbugs:3.0.1'
+
+    jmh 'org.openjdk.jmh:jmh-core:1.21'
+    jmh 'org.openjdk.jmh:jmh-generator-annprocess:1.21'
 }
 
 // quiet warnings about sun.misc.Unsafe
