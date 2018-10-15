@@ -4,6 +4,9 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.LogManager;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
@@ -11,10 +14,6 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-
-import java.io.IOException;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.LogManager;
 
 /**
  * Abstract benchmark class for Hollow indexes. Uses integer keys to avoid mixing in the overhead of individual hash functions.

@@ -1,5 +1,6 @@
 package com.netflix.hollow.core.index;
 
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
@@ -8,8 +9,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-
-import java.util.concurrent.TimeUnit;
 
 public class HollowHashIndexBenchmark extends AbstractHollowIndexBenchmark<HollowHashIndex> {
     @Param({"1", "1000", "10000", "100000"})
