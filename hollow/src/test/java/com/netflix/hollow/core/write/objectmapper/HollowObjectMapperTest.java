@@ -19,10 +19,14 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,8 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
@@ -286,7 +288,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to circular references, confirming the exception message is correct.
      *
-     * @param clazz     class to initialize
+     * @param clazz class to initialize
      * @param fieldName the name of the field that should trip the circular reference detection
      */
     protected void assertExpectedFailureMappingType(Class<?> clazz, String fieldName) {
@@ -304,7 +306,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to fields that are interfaces, confirming the exception message is correct.
      *
-     * @param clazz          class to initialize
+     * @param clazz class to initialize
      * @param interfaceClazz interface class that breaks the initialization
      */
     protected void assertExpectedFailureMappingInterfaceType(Class<?> clazz, Class<?> interfaceClazz) {
@@ -322,7 +324,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to fields that are arrays, confirming the exception message is correct.
      *
-     * @param clazz      class to initialize
+     * @param clazz class to initialize
      * @param arrayClass interface class that breaks the initialization
      */
     protected void assertExpectedFailureMappingArraysType(Class<?> clazz, Class<?> arrayClass) {
@@ -334,6 +336,48 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         } catch (IllegalArgumentException e) {
             Assert.assertTrue(String.format("trying to generate schema based on array %s, was %s", arrayClass.getSimpleName(), e.getMessage()), e.getMessage().contains(expected));
         }
+    }
+
+    @Test
+    public void testAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        Assert.assertNotEquals(1, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        Assert.assertNotEquals(1, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testFinalAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithFinalAssignedOrdinal o = new TypeWithFinalAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
     }
 
     private Map<String, List<Integer>> map(Object... keyValues) {
@@ -484,5 +528,17 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
                 m.put(kv[i], kv[i + 1]);
             }
         }
+    }
+
+    static class TypeWithAssignedOrdinal {
+        long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
+    static class TypeWithIntAssignedOrdinal {
+        int __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
+    static class TypeWithFinalAssignedOrdinal {
+        final long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
     }
 }
