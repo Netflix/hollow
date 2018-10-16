@@ -2,6 +2,7 @@ package com.netflix.hollow.core.index.key;
 
 import com.netflix.hollow.core.index.AbstractHollowIndexBenchmark;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.runner.Runner;
@@ -9,8 +10,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-
-import java.util.concurrent.TimeUnit;
 
 public class HollowPrimaryKeyIndexBenchmark {
     public static class BuildHollowPrimaryKeyIndexBenchmark extends AbstractHollowPrimaryKeyIndexBenchmark {
