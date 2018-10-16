@@ -1,6 +1,7 @@
 package com.netflix.hollow.core.index;
 
 import java.util.concurrent.TimeUnit;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Param;
@@ -10,32 +11,47 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-public class HollowHashIndexBenchmark extends AbstractHollowIndexBenchmark<HollowHashIndex> {
-    @Param({"1", "1000", "10000", "100000"})
-    public int cardinality;
+public class HollowHashIndexBenchmark{
+    public static class BuildHollowHashIndexBenchmark extends AbstractHollowHashIndexBenchmark {
+        @Override
+        protected boolean shouldCreateIndexes() {
+            return false;
+        }
 
-    @Override
-    protected int cardinality() {
-        return cardinality;
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.SECONDS)
+        public HollowHashIndex buildIndex() {
+            return createIndex();
+        }
     }
 
-    @Override
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public HollowHashIndex createIndex() {
-        return new HollowHashIndex(readStateEngine, IntType.class.getSimpleName(), "", matchFields);
+    public static class LoadHollowHashIndexBenchmark extends AbstractHollowHashIndexBenchmark {
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.NANOSECONDS)
+        public HollowHashIndexResult findMatches() {
+            return nextIndex().findMatches(nextKeys());
+        }
+
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.NANOSECONDS)
+        public HollowHashIndexResult findMatchesMissing() {
+            return nextIndex().findMatches(missingKeys());
+        }
     }
 
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    public HollowHashIndexResult findMatches() {
-        return index.findMatches(nextKeys());
-    }
+    public static class AbstractHollowHashIndexBenchmark extends AbstractHollowIndexBenchmark<HollowHashIndex> {
+        @Param({"1", "1000", "10000", "100000"})
+        public int cardinality;
 
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    public HollowHashIndexResult findMatchesMissing() {
-        return index.findMatches(missingKeys());
+        @Override
+        protected int cardinality() {
+            return cardinality;
+        }
+
+        @Override
+        public HollowHashIndex createIndex() {
+            return new HollowHashIndex(readStateEngine, IntType.class.getSimpleName(), "", matchFields);
+        }
     }
 
     public static void main(String[] args) throws RunnerException {

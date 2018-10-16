@@ -5,6 +5,7 @@ import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.LogManager;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -21,23 +22,27 @@ import org.openjdk.jmh.annotations.State;
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
 public abstract class AbstractHollowIndexBenchmark<T> {
+    private static final int TARGET_SIZE_MB = 30 * 1024 * 1024;
+    private static final int ENTRY_OVERHEAD_BYTES = 16;
+
     private HollowWriteStateEngine writeStateEngine = new HollowWriteStateEngine();
     private HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
     private ThreadLocalRandom random = ThreadLocalRandom.current();
+    private T[] indexes;
 
     protected HollowReadStateEngine readStateEngine = new HollowReadStateEngine();
-    protected T index;
     protected String[] matchFields;
 
-    @Param({"1", "10000", "100000", "1000000", "10000000", "100000000"})
+    @Param({"1", "10", "100", "1000", "10000", "100000", "1000000"})
     public int size;
 
     @Param({"1", "2", "3", "5", "8"})
-    public int querySize;
+    public int querySize = 1;
 
     @Param({"false", "true"})
-    public boolean nested;
+    public boolean nested = false;
 
+    @SuppressWarnings("unchecked")
     @Setup(Level.Trial)
     public void setup() throws IOException {
         LogManager.getLogManager().reset();
@@ -57,7 +62,21 @@ public abstract class AbstractHollowIndexBenchmark<T> {
             matchFields[i] = nested ? "nested." + fieldName : fieldName;
         }
 
-        index = createIndex();
+        if (!shouldCreateIndexes()) return;
+        int length = TARGET_SIZE_MB / (ENTRY_OVERHEAD_BYTES * size);
+        T index = createIndex();
+        indexes = (T[]) Array.newInstance(index.getClass(), length);
+        for (int i = 0; i < indexes.length; i++) {
+            indexes[i] = createIndex();
+        }
+    }
+
+    protected boolean shouldCreateIndexes() {
+        return true;
+    }
+
+    protected T nextIndex() {
+        return indexes[random.nextInt(indexes.length)];
     }
 
     protected Object[] nextKeys() {

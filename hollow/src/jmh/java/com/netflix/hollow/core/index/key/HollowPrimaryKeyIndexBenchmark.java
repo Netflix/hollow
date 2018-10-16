@@ -2,7 +2,6 @@ package com.netflix.hollow.core.index.key;
 
 import com.netflix.hollow.core.index.AbstractHollowIndexBenchmark;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
-import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.runner.Runner;
@@ -11,24 +10,41 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
-public class HollowPrimaryKeyIndexBenchmark extends AbstractHollowIndexBenchmark<HollowPrimaryKeyIndex> {
-    @Override
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.SECONDS)
-    public HollowPrimaryKeyIndex createIndex() {
-        return new HollowPrimaryKeyIndex(readStateEngine, IntType.class.getSimpleName(), matchFields);
+import java.util.concurrent.TimeUnit;
+
+public class HollowPrimaryKeyIndexBenchmark {
+    public static class BuildHollowPrimaryKeyIndexBenchmark extends AbstractHollowPrimaryKeyIndexBenchmark {
+        @Override
+        protected boolean shouldCreateIndexes() {
+            return false;
+        }
+
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.SECONDS)
+        public HollowPrimaryKeyIndex buildIndex() {
+            return createIndex();
+        }
     }
 
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    public int getMatchingOrdinal() {
-        return index.getMatchingOrdinal(nextKeys());
+    public static class LoadHollowPrimaryKeyIndexBenchmark extends AbstractHollowPrimaryKeyIndexBenchmark {
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.NANOSECONDS)
+        public int getMatchingOrdinal() {
+            return nextIndex().getMatchingOrdinal(nextKeys());
+        }
+
+        @Benchmark
+        @OutputTimeUnit(TimeUnit.NANOSECONDS)
+        public int getMatchingOrdinalMissing() {
+            return nextIndex().getMatchingOrdinal(missingKeys());
+        }
     }
 
-    @Benchmark
-    @OutputTimeUnit(TimeUnit.NANOSECONDS)
-    public int getMatchingOrdinalMissing() {
-        return index.getMatchingOrdinal(missingKeys());
+    public static class AbstractHollowPrimaryKeyIndexBenchmark extends AbstractHollowIndexBenchmark<HollowPrimaryKeyIndex> {
+        @Override
+        public HollowPrimaryKeyIndex createIndex() {
+            return new HollowPrimaryKeyIndex(readStateEngine, IntType.class.getSimpleName(), matchFields);
+        }
     }
 
     public static void main(String[] args) throws RunnerException {
