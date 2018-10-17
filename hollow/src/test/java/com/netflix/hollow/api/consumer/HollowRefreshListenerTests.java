@@ -209,7 +209,7 @@ public class HollowRefreshListenerTests {
         final List<GenericHollowObject> deltaOrdinal0Objects = new ArrayList<GenericHollowObject>();
         final List<GenericHollowObject> deltaOrdinal1Objects = new ArrayList<GenericHollowObject>();
 
-        AbstractRefreshListener longevityListener = new AbstractRefreshListener() {
+        HollowConsumer.RefreshListener longevityListener = new AbstractRefreshListener() {
             public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
                 snapshotOrdinal0Objects.add(new GenericHollowObject(api.getDataAccess(), "Integer", 0));
             }
@@ -230,7 +230,107 @@ public class HollowRefreshListenerTests {
         Assert.assertEquals(4, deltaOrdinal1Objects.get(2).getInt("value"));
         Assert.assertEquals(5, deltaOrdinal0Objects.get(3).getInt("value"));
     }
-    
+
+    @Test
+    public void testAddListenerDuringRefresh() {
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .build();
+
+        class SecondRefreshListener extends AbstractRefreshListener {
+            int refreshStarted;
+            int refreshSuccessful;
+            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+                refreshStarted++;
+            }
+
+            @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+                refreshSuccessful++;
+            }
+        };
+
+        class FirstRefreshListener extends SecondRefreshListener {
+            SecondRefreshListener srl = new SecondRefreshListener();
+
+            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+                super.refreshStarted(currentVersion, requestedVersion);
+                // Add the second listener concurrently during a refresh
+                consumer.addRefreshListener(srl);
+            }
+        };
+
+        FirstRefreshListener frl = new FirstRefreshListener();
+        consumer.addRefreshListener(frl);
+
+        long v1 = runCycle(producer, 1);
+        consumer.triggerRefreshTo(v1+1);
+
+        Assert.assertEquals(1, frl.refreshStarted);
+        Assert.assertEquals(1, frl.refreshSuccessful);
+        Assert.assertEquals(0, frl.srl.refreshStarted);
+        Assert.assertEquals(0, frl.srl.refreshSuccessful);
+
+        long v2 = runCycle(producer, 2);
+        consumer.triggerRefreshTo(v2+1);
+
+        Assert.assertEquals(2, frl.refreshStarted);
+        Assert.assertEquals(2, frl.refreshSuccessful);
+        Assert.assertEquals(1, frl.srl.refreshStarted);
+        Assert.assertEquals(1, frl.srl.refreshSuccessful);
+    }
+
+    @Test
+    public void testRemoveListenerDuringRefresh() {
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore)
+                .build();
+
+        class SecondRefreshListener extends AbstractRefreshListener {
+            int refreshStarted;
+            int refreshSuccessful;
+            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+                refreshStarted++;
+            }
+
+            @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+                refreshSuccessful++;
+            }
+        };
+
+        class FirstRefreshListener extends SecondRefreshListener {
+            SecondRefreshListener srl;
+
+            FirstRefreshListener(SecondRefreshListener srl) {
+                this.srl = srl;
+            }
+
+            @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+                super.refreshStarted(currentVersion, requestedVersion);
+                // Remove the second listener concurrently during a refresh
+                consumer.removeRefreshListener(srl);
+            }
+        };
+
+        SecondRefreshListener srl = new SecondRefreshListener();
+        FirstRefreshListener frl = new FirstRefreshListener(srl);
+        consumer.addRefreshListener(frl);
+        consumer.addRefreshListener(srl);
+
+        long v1 = runCycle(producer, 1);
+        consumer.triggerRefreshTo(v1+1);
+
+        Assert.assertEquals(1, frl.refreshStarted);
+        Assert.assertEquals(1, frl.refreshSuccessful);
+        Assert.assertEquals(1, frl.srl.refreshStarted);
+        Assert.assertEquals(1, frl.srl.refreshSuccessful);
+
+        long v2 = runCycle(producer, 2);
+        consumer.triggerRefreshTo(v2+1);
+
+        Assert.assertEquals(2, frl.refreshStarted);
+        Assert.assertEquals(2, frl.refreshSuccessful);
+        Assert.assertEquals(1, frl.srl.refreshStarted);
+        Assert.assertEquals(1, frl.srl.refreshSuccessful);
+    }
+
     private long runCycle(HollowProducer producer, final int cycleNumber) {
         return producer.runCycle(new Populator() {
             public void populate(WriteState state) throws Exception {
