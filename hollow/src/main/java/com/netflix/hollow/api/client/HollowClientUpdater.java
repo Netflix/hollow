@@ -17,8 +17,6 @@
  */
 package com.netflix.hollow.api.client;
 
-import static java.util.stream.Collectors.toList;
-
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
@@ -30,6 +28,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -45,7 +44,7 @@ public class HollowClientUpdater {
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
 
-    private final List<HollowConsumer.RefreshListener> refreshListeners;
+    private final CopyOnWriteArrayList<HollowConsumer.RefreshListener> refreshListeners;
     private final HollowAPIFactory apiFactory;
     private final HollowObjectHashCodeFinder hashCodeFinder;
     private final HollowConsumer.ObjectLongevityConfig objectLongevityConfig;
@@ -68,7 +67,8 @@ public class HollowClientUpdater {
         this.failedTransitionTracker = new FailedTransitionTracker();
         this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
         // Create a copy of the listeners, removing any duplicates
-        this.refreshListeners = refreshListeners.stream().distinct().collect(toList());
+        this.refreshListeners = new CopyOnWriteArrayList<>(
+                refreshListeners.stream().distinct().toArray(HollowConsumer.RefreshListener[]::new));
         this.apiFactory = apiFactory;
         this.hashCodeFinder = hashCodeFinder;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
@@ -89,15 +89,18 @@ public class HollowClientUpdater {
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolder = newHollowDataHolder();
                 forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
-                return true;
-            } else { // already up to date
-                return true;
             }
+            return true;
         }
+
+        // Take a snapshot of the listeners to ensure additions or removals may occur concurrently
+        // but will not take effect until a subsequent refresh
+        final HollowConsumer.RefreshListener[] localListeners =
+                refreshListeners.toArray(new HollowConsumer.RefreshListener[0]);
 
         long beforeVersion = getCurrentVersionId();
 
-        for (HollowConsumer.RefreshListener listener : refreshListeners)
+        for (HollowConsumer.RefreshListener listener : localListeners)
             listener.refreshStarted(beforeVersion, version);
 
         try {
@@ -112,16 +115,15 @@ public class HollowClientUpdater {
 
             if (updatePlan.isSnapshotPlan()) {
                 if (hollowDataHolder == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
-                    HollowDataHolder newHollowDataHolder = newHollowDataHolder();
-                    newHollowDataHolder.update(updatePlan);
-                    hollowDataHolder = newHollowDataHolder;
+                    hollowDataHolder = newHollowDataHolder();
+                    hollowDataHolder.update(updatePlan, localListeners);
                     forceDoubleSnapshot = false;
                 }
             } else {
-                hollowDataHolder.update(updatePlan);
+                hollowDataHolder.update(updatePlan, localListeners);
             }
 
-            for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+            for(HollowConsumer.RefreshListener refreshListener : localListeners)
                 refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), version);
 
             metrics.updateTypeStateMetrics(getStateEngine(), version);
@@ -135,7 +137,7 @@ public class HollowClientUpdater {
             metrics.updateRefreshFailed();
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
-            for(HollowConsumer.RefreshListener refreshListener : refreshListeners)
+            for(HollowConsumer.RefreshListener refreshListener : localListeners)
                 refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
 
             // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
@@ -146,9 +148,7 @@ public class HollowClientUpdater {
     }
     
     public void addRefreshListener(HollowConsumer.RefreshListener refreshListener) {
-        if (!refreshListeners.contains(refreshListener)) {
-            refreshListeners.add(refreshListener);
-        }
+        refreshListeners.addIfAbsent(refreshListener);
     }
 
     public void removeRefreshListener(HollowConsumer.RefreshListener refreshListener) {
@@ -180,7 +180,7 @@ public class HollowClientUpdater {
 
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory,
-                failedTransitionTracker, staleReferenceDetector, refreshListeners,
+                failedTransitionTracker, staleReferenceDetector,
                 objectLongevityConfig).setFilter(filter);
     }
 

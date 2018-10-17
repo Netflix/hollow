@@ -325,33 +325,29 @@ public class HollowConsumer {
     }
 
     /**
-     * Add a {@link RefreshListener} to this consumer.
-     *
-     * @implNote this implementation will first acquire the {@link #getRefreshLock() refresh lock} before adding
-     * the new refresh listener. This ensures the listener will receive events for a complete cycle.
+     * Adds a {@link RefreshListener} to this consumer.
+     * <p>
+     * If the listener was previously added to this consumer, as determined by reference equality or {@code Object}
+     * equality, then this method does nothing.
+     * <p>
+     * If a listener is added, concurrently, during the occurrence of a refresh then the listener will not receive
+     * events until the next refresh.  The listener may also be removed concurrently.
      */
     public void addRefreshListener(RefreshListener listener) {
-        getRefreshLock().lock();
-        try {
-            updater.addRefreshListener(listener);
-        } finally {
-            getRefreshLock().unlock();
-        }
+        updater.addRefreshListener(listener);
     }
 
     /**
-     * Remove a {@link RefreshListener} from this consumer.
-     *
-     * @implNote this implementation will first acquire the {@link #getRefreshLock() refresh lock} before removing
-     * the refresh listener. This ensures the listener will receive events for a complete cycle.
+     * Removes a {@link RefreshListener} from this consumer.
+     * <p>
+     * If the listener was not previously added to this consumer, as determined by reference equality or {@code Object}
+     * equality, then this method does nothing.
+     * <p>
+     * If a listener is removed, concurrently, during  the occurrence of a refresh then the listener will receive all
+     * events for that refresh but not receive events for subsequent any refreshes.
      */
     public void removeRefreshListener(RefreshListener listener) {
-        getRefreshLock().lock();
-        try {
-            updater.removeRefreshListener(listener);
-        } finally {
-            getRefreshLock().unlock();
-        }
+        updater.removeRefreshListener(listener);
     }
 
     /**
