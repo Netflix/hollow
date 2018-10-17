@@ -39,7 +39,8 @@ public class VideoCollectionsModule {
     public static final String IDENTIFIERS_ATTR = "identifiers";
     public static final String THEMES_ATTR = "themes";
     public static final String USAGES_ATTR = "usages";
-
+    public static final String APPROVED_FOR_EXPLOIT = "approvedForExploit";
+    
     private final VMSHollowInputAPI videoAPI;
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex supplementalIndex;
@@ -119,6 +120,7 @@ public class VideoCollectionsModule {
                 supp.attributes.put(new Strings(POST_PLAY_ATTR), new Strings(String.valueOf(supplemental._getPostplay())));
                 supp.attributes.put(new Strings(GENERAL_ATTR), new Strings(String.valueOf(supplemental._getGeneral())));
                 supp.attributes.put(new Strings(THEMATIC_ATTR), new Strings(String.valueOf(supplemental._getThematic())));
+                supp.attributes.put(new Strings(APPROVED_FOR_EXPLOIT), new Strings(String.valueOf(supplemental._getApprovedForExploit())));
                 if (supplemental._getSubType() != null && supplemental._getSubType()._getValue() != null) {
                     supp.attributes.put(new Strings(SUB_TYPE_ATTR), new Strings(supplemental._getSubType()._getValue()));
                 }
