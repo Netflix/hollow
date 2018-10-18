@@ -3,7 +3,7 @@ package com.netflix.hollow.jsonadapter;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import org.junit.Test;
 
-public class HollowModuleErgonomicTest extends AbstractHollowModuleTest {
+public class HollowModuleErgonomicSerializationTest extends AbstractHollowModuleSerializationTest {
     @Override
     protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
         builder.withErgonomicShortcuts();

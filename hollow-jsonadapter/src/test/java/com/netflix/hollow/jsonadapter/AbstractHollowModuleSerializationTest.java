@@ -29,7 +29,7 @@ import org.junit.Before;
 /**
  * End-to-end tests to ensure generated API remains compatible with {@link HollowModule}.
  */
-public abstract class AbstractHollowModuleTest extends AbstractHollowAPIGeneratorTest {
+public abstract class AbstractHollowModuleSerializationTest extends AbstractHollowAPIGeneratorTest {
     private InMemoryBlobStore blobStore;
     private ObjectMapper objectMapper;
     private String apiName;
@@ -42,20 +42,26 @@ public abstract class AbstractHollowModuleTest extends AbstractHollowAPIGenerato
         apiClassName = packageName + "." + apiName;
         blobStore = new InMemoryBlobStore();
         objectMapper = new ObjectMapper()
-                .registerModule(new HollowModule(true));
+                .registerModule(new HollowModule(true, false));
         objectMapper.setVisibility(objectMapper.getVisibilityChecker()
                 .withFieldVisibility(JsonAutoDetect.Visibility.NON_PRIVATE)
         );
     }
 
     public void emptyMovieTest() throws Exception {
-        Movie movie = new Movie();
-
         // Hollow Maps and Sets are unordered, so we compare strings for the empty use case to check we get all null fields, and have the correct property order
-        testSerialization(movie, true);
+        testSerialization(createEmptyMovie(), true);
     }
 
     public void fullMovieTest() throws Exception {
+        testSerialization(createFullMovie(), false);
+    }
+
+    public static Movie createEmptyMovie() {
+        return new Movie();
+    }
+
+    public static Movie createFullMovie() {
         Actor actor1 = new Actor("Jack Black", new Role(1, "Jan Lewan"), ActorType.CLASSICAL);
         Actor actor2 = new Actor("Jenny Slate", new Role(1, "Marla Lewan"), ActorType.METHOD);
         List<Actor> actors = Arrays.asList(actor1, actor2);
@@ -77,8 +83,7 @@ public abstract class AbstractHollowModuleTest extends AbstractHollowAPIGenerato
 
         Movie movie = new Movie(Integer.MAX_VALUE, actors, map, intMap, boolMap, floatMap, doubleMap, rankings, 1, 2L, true, 3f, 4d, "Some string");
         movie.__assignedOrdinal = 123456;
-
-        testSerialization(movie, false);
+        return movie;
     }
 
     private void testSerialization(Movie originalMovie, boolean compareStrings) throws Exception {
