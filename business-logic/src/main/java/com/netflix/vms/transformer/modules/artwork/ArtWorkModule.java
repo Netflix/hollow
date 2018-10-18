@@ -447,6 +447,13 @@ public abstract class ArtWorkModule extends AbstractTransformModule{
             // NOTE: Need to manually make approval_state to NullablePrimitiveBoolean (public NullablePrimitiveBoolean approval_state = null)
             getBasicPassthrough(artwork).approval_state = java.lang.Boolean.valueOf(approvalState) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
         }
+
+        String unbranded = keyValues.get("UNBRANDED");
+        if(unbranded != null) {
+            // NOTE: Need to manually make unbranded to NullablePrimitiveBoolean (public NullablePrimitiveBoolean unbranded = null)
+            getBasicPassthrough(artwork).unbranded = java.lang.Boolean.valueOf(unbranded) ? NullablePrimitiveBoolean.TRUE : NullablePrimitiveBoolean.FALSE;
+        }
+
         if (keyValues.containsKey("REEXPLORE_TIME") && keyValues.get("REEXPLORE_TIME") != null) {
             long timestamp = Long.valueOf(keyValues.get("REEXPLORE_TIME"));
             // Warn on timestamps older than 36 days, since explore (ab testing) of images only spans 35 days at most.

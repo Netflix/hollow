@@ -75,6 +75,7 @@ public class TransformerOutputBlobHeaderPopulator {
                                 + "SOURCE_MOVIE_ID:source_movie_id(PassthroughVideo).id(INT)\n"
                                 + "IDENTIFIERS:basic_passthrough(ArtworkBasicPassthrough).identifiers(STRING[])\n"
                                 + "ACQUISITION_SOURCE:acquisitionSource(AcquisitionSource).value(STRING)\n"
+                                + "UNBRANDED:basic_passthrough(ArtworkBasicPassthrough).unbranded(BOOLEAN)\n"
                                 + "SCREENSAVER_START_X:basic_passthrough(ArtworkBasicPassthrough).screensaverPassthrough(ArtworkScreensaverPassthrough).startX(INT)\n"
                                 + "SCREENSAVER_END_X:basic_passthrough(ArtworkBasicPassthrough).screensaverPassthrough(ArtworkScreensaverPassthrough).endX(INT)\n"
                                 + "SCREENSAVER_OFFSET_Y:basic_passthrough(ArtworkBasicPassthrough).screensaverPassthrough(ArtworkScreensaverPassthrough).offsetY(INT)\n"

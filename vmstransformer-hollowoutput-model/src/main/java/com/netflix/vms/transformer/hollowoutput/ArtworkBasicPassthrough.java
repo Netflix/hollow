@@ -18,6 +18,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
     public PassthroughString branding_alignment = null;
     public List<__passthrough_string> personIdStrs = null;
     public NullablePrimitiveBoolean approval_state = null;
+    public NullablePrimitiveBoolean unbranded = null;
     public ArtworkReExploreLongTimestamp reExploreLongTimestamp = null;
     public ArtworkScreensaverPassthrough screensaverPassthrough = null;
 
@@ -64,6 +65,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
             if(personIdStrs != null) return false;
         } else if(!o.personIdStrs.equals(personIdStrs)) return false;
         if(o.approval_state != approval_state) return false;
+        if(o.unbranded != unbranded) return false;
         if (o.reExploreLongTimestamp == null) {
             if (reExploreLongTimestamp != null) return false;
         } else if (!o.reExploreLongTimestamp.equals(reExploreLongTimestamp)) return false;
@@ -88,6 +90,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         hashCode = hashCode * 31 + (branding_alignment == null ? 1237 : branding_alignment.hashCode());
         hashCode = hashCode * 31 + (personIdStrs == null ? 1237 : personIdStrs.hashCode());
         hashCode = hashCode * 31 + (approval_state == null ? 1231 : approval_state.hashCode());
+        hashCode = hashCode * 31 + (unbranded == null ? 1231 : unbranded.hashCode());
         hashCode = hashCode * 31 + (reExploreLongTimestamp == null ? 1231 : reExploreLongTimestamp.hashCode());
         hashCode = hashCode * 31 + (screensaverPassthrough == null ? 1231 : screensaverPassthrough.hashCode());
         return hashCode;
@@ -108,6 +111,7 @@ public class ArtworkBasicPassthrough implements Cloneable {
         builder.append(",branding_alignment=").append(branding_alignment);
         builder.append(",personIdStrs=").append(personIdStrs);
         builder.append(",approval_state=").append(approval_state);
+        builder.append(",unbranded=").append(unbranded);
         builder.append(",re_explore_timestamp=").append(reExploreLongTimestamp.toString());
         builder.append(",screensaverPassthrough=").append(screensaverPassthrough);
         builder.append("}");
