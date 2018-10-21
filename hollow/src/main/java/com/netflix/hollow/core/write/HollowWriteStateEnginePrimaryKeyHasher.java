@@ -85,7 +85,7 @@ class HollowWriteStateEnginePrimaryKeyHasher {
     
     private long navigateToField(HollowObjectSchema schema, int fieldIdx, SegmentedByteArray data, long offset) {
         for(int i=0;i<fieldIdx;i++) {
-            switch(schema.getFieldType(fieldIdx)) {
+            switch(schema.getFieldType(i)) {
             case INT:
             case LONG:
             case REFERENCE:
