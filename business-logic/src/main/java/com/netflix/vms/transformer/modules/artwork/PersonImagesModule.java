@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.artwork;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFallbackMissing;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
 
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -37,11 +39,12 @@ public class PersonImagesModule extends ArtWorkModule {
             return;
 
         Map<Integer, Set<Artwork>> artMap = new HashMap<>();
-        for(PersonArtworkSourceHollow artworkHollowInput : api.getAllPersonArtworkSourceHollow()) {
-            if(!artworkHollowInput._getIsFallback()) {
-                Set<ArtworkLocaleHollow> locales = getLocalTerritories(artworkHollowInput._getLocales());
-                processArtworkWithFallback(artMap, artworkHollowInput, locales);
-            }
+        boolean failCycle = api.getAllPersonArtworkSourceHollow().stream()
+                .filter(i -> !i._getIsFallback())
+                .map(i -> processArtworkWithFallback(artMap, i, getLocalTerritories(i._getLocales())))
+                .reduce(Boolean::logicalOr).orElse(false);
+        if (failCycle) {
+            throw new RuntimeException("Error processing artwork - see logs for ArtworkFallbackMissing");
         }
 
         for (Map.Entry<Integer, Set<Artwork>> entry : artMap.entrySet()) {
@@ -53,30 +56,45 @@ public class PersonImagesModule extends ArtWorkModule {
         }
     }
 
-    private void processArtworkWithFallback(Map<Integer, Set<Artwork>> artMap, PersonArtworkSourceHollow artworkHollowInput, Set<ArtworkLocaleHollow> localeSet) {
+    /**
+     * Processes artwork, falling back to fallback data if necessary. This method returns true if
+     * there was an error that should cause us to fail the cycle after running through all the
+     * artwork. Note that we wait until going through all the artwork so that we log all the artwork
+     * that caused issues.
+     */
+    private boolean processArtworkWithFallback(Map<Integer, Set<Artwork>> artMap,
+            PersonArtworkSourceHollow artworkHollowInput, Set<ArtworkLocaleHollow> localeSet) {
         String sourceFileId = artworkHollowInput._getSourceFileId()._getValue();
         HollowHashIndexResult derivativeSetMatches = artworkDerivativeSetIdx.findMatches(artworkHollowInput._getSourceFileId()._getValue());
             
-        if(derivativeSetMatches != null) {
+        if (derivativeSetMatches != null) {
             int entityId = (int) artworkHollowInput._getPersonId();
-            if(localeSet.isEmpty()) {
+            if (localeSet.isEmpty()) {
                 ctx.getLogger().error(MissingLocaleForArtwork, "Missing artwork locale for {} with id={}; data will be dropped.", entityType, entityId);
-                return;
+                return false;
             }
             
-            int ordinalPriority = (int) artworkHollowInput._getOrdinalPriority();
-            int seqNum = (int) artworkHollowInput._getSeqNum();
+            int ordinalPriority = artworkHollowInput._getOrdinalPriority();
+            int seqNum = artworkHollowInput._getSeqNum();
             ArtworkAttributesHollow attributes = artworkHollowInput._getAttributes();
 
             Set<Artwork> artworkSet = getArtworkSet(entityId, artMap);
             transformArtworks(entityId, sourceFileId, ordinalPriority, seqNum, attributes, derivativeSetMatches, localeSet, artworkSet);
         } else {
             StringHollow fallbackSourceId = artworkHollowInput._getFallbackSourceFileId();
-            if(fallbackSourceId != null) {
+            if (fallbackSourceId != null) {
                 int fallbackOrdinal = personArtworkIdx.getMatchingOrdinal(fallbackSourceId._getValue());
+                if (fallbackOrdinal == ORDINAL_NONE) {
+                    ctx.getLogger().error(ArtworkFallbackMissing,
+                            "Missing fallback artwork for sourceId={}:{}, fallback sourceId={}",
+                            artworkHollowInput._getPersonId(), artworkHollowInput._getSourceFileId()._getValue(),
+                            fallbackSourceId._getValue());
+                    return true;
+                }
                 PersonArtworkSourceHollow fallbackSource = api.getPersonArtworkSourceHollow(fallbackOrdinal);
-                processArtworkWithFallback(artMap, fallbackSource, localeSet);
+                return processArtworkWithFallback(artMap, fallbackSource, localeSet);
             }
         }
+        return false;
     }
 }
