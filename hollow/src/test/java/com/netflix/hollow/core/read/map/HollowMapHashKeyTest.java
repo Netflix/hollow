@@ -24,6 +24,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.StateEngineRoundTripper;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowHashKey;
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.io.IOException;
@@ -40,7 +41,8 @@ public class HollowMapHashKeyTest {
         HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
         mapper.useDefaultHashKeys();
         
-        mapper.add(new TestTopLevelObject(1, new Obj(1, "US", 100), new Obj(2, "CA", 200), new Obj(3, "IT", 300), new Obj(4, "GB", 400), new Obj(5, "IT", 500)));
+        mapper.add(new TestTopLevelObject(1, new Obj(1, "New York", "US", 100), new Obj(2, "Ottawa", "CA", 200),
+            new Obj(3, "Rome", "IT", 300), new Obj(4, "London", "GB", 400), new Obj(5, "Turin", "IT", 500)));
         
         HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
         
@@ -67,7 +69,17 @@ public class HollowMapHashKeyTest {
         Assert.assertEquals(4, key.getInt("id"));
         key = (GenericHollowObject)obj.getMap("mapByIdCountry").findKey(5, "IT");
         Assert.assertEquals(5, key.getInt("id"));
-        
+
+        key = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findKey(1, "New York", "US");
+        Assert.assertEquals(1, key.getInt("id"));
+        key = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findKey(2, "Ottawa", "CA");
+        Assert.assertEquals(2, key.getInt("id"));
+        key = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findKey(3, "Rome", "IT");
+        Assert.assertEquals(3, key.getInt("id"));
+        key = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findKey(4, "London", "GB");
+        Assert.assertEquals(4, key.getInt("id"));
+        key = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findKey(5, "Turin", "IT");
+        Assert.assertEquals(5, key.getInt("id"));
         
         GenericHollowObject value = (GenericHollowObject) obj.getMap("mapById").findValue(1);
         Assert.assertEquals(100, value.getInt("value"));
@@ -89,6 +101,17 @@ public class HollowMapHashKeyTest {
         value = (GenericHollowObject)obj.getMap("mapByIdCountry").findValue(4, "GB");
         Assert.assertEquals(400, value.getInt("value"));
         value = (GenericHollowObject)obj.getMap("mapByIdCountry").findValue(5, "IT");
+        Assert.assertEquals(500, value.getInt("value"));
+
+        value = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findValue(1, "New York", "US");
+        Assert.assertEquals(100, value.getInt("value"));
+        value = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findValue(2, "Ottawa", "CA");
+        Assert.assertEquals(200, value.getInt("value"));
+        value = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findValue(3, "Rome", "IT");
+        Assert.assertEquals(300, value.getInt("value"));
+        value = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findValue(4, "London", "GB");
+        Assert.assertEquals(400, value.getInt("value"));
+        value = (GenericHollowObject) obj.getMap("mapByIdCityCountry").findValue(5, "Turin", "IT");
         Assert.assertEquals(500, value.getInt("value"));
         
         Map.Entry<HollowRecord, HollowRecord> entry = obj.getMap("mapById").findEntry(1);
@@ -116,8 +139,7 @@ public class HollowMapHashKeyTest {
         value = (GenericHollowObject) entry.getValue();
         Assert.assertEquals(5, key.getInt("id"));
         Assert.assertEquals(500, value.getInt("value"));
-        
-        
+
         entry = obj.getMap("mapByIdCountry").findEntry(1, "US");
         key = (GenericHollowObject) entry.getKey();
         value = (GenericHollowObject) entry.getValue();
@@ -139,6 +161,32 @@ public class HollowMapHashKeyTest {
         Assert.assertEquals(4, key.getInt("id"));
         Assert.assertEquals(400, value.getInt("value"));
         entry = obj.getMap("mapByIdCountry").findEntry(5, "IT");
+        key = (GenericHollowObject) entry.getKey();
+        value = (GenericHollowObject) entry.getValue();
+        Assert.assertEquals(5, key.getInt("id"));
+        Assert.assertEquals(500, value.getInt("value"));
+
+        entry = obj.getMap("mapByIdCityCountry").findEntry(1, "New York", "US");
+        key = (GenericHollowObject) entry.getKey();
+        value = (GenericHollowObject) entry.getValue();
+        Assert.assertEquals(1, key.getInt("id"));
+        Assert.assertEquals(100, value.getInt("value"));
+        entry = obj.getMap("mapByIdCityCountry").findEntry(2, "Ottawa", "CA");
+        key = (GenericHollowObject) entry.getKey();
+        value = (GenericHollowObject) entry.getValue();
+        Assert.assertEquals(2, key.getInt("id"));
+        Assert.assertEquals(200, value.getInt("value"));
+        entry = obj.getMap("mapByIdCityCountry").findEntry(3, "Rome", "IT");
+        key = (GenericHollowObject) entry.getKey();
+        value = (GenericHollowObject) entry.getValue();
+        Assert.assertEquals(3, key.getInt("id"));
+        Assert.assertEquals(300, value.getInt("value"));
+        entry = obj.getMap("mapByIdCityCountry").findEntry(4, "London", "GB");
+        key = (GenericHollowObject) entry.getKey();
+        value = (GenericHollowObject) entry.getValue();
+        Assert.assertEquals(4, key.getInt("id"));
+        Assert.assertEquals(400, value.getInt("value"));
+        entry = obj.getMap("mapByIdCityCountry").findEntry(5, "Turin", "IT");
         key = (GenericHollowObject) entry.getKey();
         value = (GenericHollowObject) entry.getValue();
         Assert.assertEquals(5, key.getInt("id"));
@@ -168,17 +216,23 @@ public class HollowMapHashKeyTest {
         @HollowHashKey(fields={"id", "country.value"})
         Map<Obj, Integer> mapByIdCountry;
         
+        @HollowTypeName(name="MapByIdCityCountry")
+        @HollowHashKey(fields={"id", "city", "country.value"})
+        Map<Obj, Integer> mapByIdCityCountry;
+        
         Map<Integer, Integer> intMap;
         
         public TestTopLevelObject(int id, Obj... elements) {
             this.id = id;
             this.mapById = new HashMap<Obj, Integer>();
             this.mapByIdCountry = new HashMap<Obj, Integer>();
+            this.mapByIdCityCountry = new HashMap<>();
             this.intMap = new HashMap<Integer, Integer>();
             
             for(int i=0;i<elements.length;i++) {
                 mapById.put(elements[i], (int)elements[i].extraValue);
                 mapByIdCountry.put(elements[i], (int)elements[i].extraValue);
+                mapByIdCityCountry.put(elements[i],  (int)elements[i].extraValue);
                 intMap.put(elements[i].id, (int)elements[i].extraValue);
             }
         }
@@ -187,11 +241,14 @@ public class HollowMapHashKeyTest {
     @SuppressWarnings("unused")
     private static class Obj {
         int id;
+        @HollowInline
+        String city;
         String country;
         long extraValue;
         
-        public Obj(int id, String country, long extraValue) {
+        public Obj(int id, String city, String country, long extraValue) {
             this.id = id;
+            this.city = city;
             this.country = country;
             this.extraValue = extraValue;
         }
