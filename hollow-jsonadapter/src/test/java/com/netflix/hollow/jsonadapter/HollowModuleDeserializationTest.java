@@ -1,15 +1,15 @@
 package com.netflix.hollow.jsonadapter;
 
-import java.io.IOException;
+import static com.netflix.hollow.jsonadapter.AbstractHollowModuleSerializationTest.createEmptyMovie;
+import static com.netflix.hollow.jsonadapter.AbstractHollowModuleSerializationTest.createFullMovie;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.hollow.jsonadapter.AbstractHollowModuleSerializationTest.Movie;
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static com.netflix.hollow.jsonadapter.AbstractHollowModuleSerializationTest.createEmptyMovie;
-import static com.netflix.hollow.jsonadapter.AbstractHollowModuleSerializationTest.createFullMovie;
 
 public class HollowModuleDeserializationTest {
     private ObjectMapper objectMapper;
