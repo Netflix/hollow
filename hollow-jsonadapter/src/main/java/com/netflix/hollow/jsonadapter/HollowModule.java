@@ -39,7 +39,7 @@ import org.objectweb.asm.Opcodes;
 /**
  * Jackson module allowing serialization of generated {@link HollowObject} beans.
  */
-class HollowModule extends SimpleModule {
+public class HollowModule extends SimpleModule {
     private boolean preservePropertyOrder;
     private boolean internMemoizable;
 
