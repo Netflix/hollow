@@ -731,11 +731,6 @@ public class VMSAvailabilityWindowModule {
             return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
         }
 
-        if (!ctx.getConfig().isAssetAvailabilityIntentForPrePromoEnabled()) {
-            // if checking of assets availability intended date for a locale feature is not enabled. use old logic where anything is in pre-promo window, we pre-promo
-            return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
-        }
-
         // language is not null -> use earliest window start date for that language (best estimate the assets will be available)
 
         // window has ended, then filter it
