@@ -759,13 +759,22 @@ public class VMSAvailabilityWindowModule {
 
     private boolean shouldPrePromote(long videoId, String countryCode, Collection<Long> contractIds, Long earliestWindowStartDateForTheLanguageWithAssets) {
 
-        if (earliestWindowStartDateForTheLanguageWithAssets == null) return false;
+        // enabled by default
+        boolean assetDeliveryIntentEnabled = ctx.getConfig().isAssetAvailabilityIntentForPrePromoEnabled();
 
-        int daysBeforeEarliestWindowWithAssetsAvailability = (int) ((earliestWindowStartDateForTheLanguageWithAssets - ctx.getNowMillis()) / MS_IN_DAY);
+        if (assetDeliveryIntentEnabled && earliestWindowStartDateForTheLanguageWithAssets == null) return false;
+
+        int daysBeforeEarliestWindowWithAssetsAvailability = 0;
+        if (assetDeliveryIntentEnabled)
+            daysBeforeEarliestWindowWithAssetsAvailability = (int) ((earliestWindowStartDateForTheLanguageWithAssets - ctx.getNowMillis()) / MS_IN_DAY);
+
         boolean daysBeforeToPromoteCheck = false;
         for (long contractId : contractIds) {
             ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, contractId);
             if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0 )) {
+
+                // if using asset delivery intent feature is not enabled then pre-promote in all language catalogs if start date is in pre-promo window
+                if (!assetDeliveryIntentEnabled) return true;
 
                 if (daysBeforeEarliestWindowWithAssetsAvailability <= contract._getPrePromotionDays())
                     daysBeforeToPromoteCheck = true;
