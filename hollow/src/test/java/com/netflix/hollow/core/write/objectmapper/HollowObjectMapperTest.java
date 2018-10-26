@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -282,6 +283,49 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         assertExpectedFailureMappingType(IndirectCircularReference.TypeE.class, "f");
     }
 
+    @Test
+    public void testAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testFinalAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithFinalAssignedOrdinal o = new TypeWithFinalAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        Assert.assertNotEquals(1, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        // int fields are ignored
+        Assert.assertEquals(1, o.__assigned_ordinal);
+    }
+
     /**
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to circular references, confirming the exception message is correct.
@@ -485,4 +529,23 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             }
         }
     }
+
+    static class TypeWithAssignedOrdinal {
+        long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
+    static class TypeWithFinalAssignedOrdinal {
+        // Cannot assign directly to this field otherwise javac may
+        // assume the value is a constant when accessed.
+        final long __assigned_ordinal;
+
+        TypeWithFinalAssignedOrdinal() {
+            this.__assigned_ordinal = HollowConstants.ORDINAL_NONE;
+        };
+    }
+
+    static class TypeWithIntAssignedOrdinal {
+        int __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
 }
