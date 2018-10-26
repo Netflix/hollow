@@ -46,7 +46,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final HollowObjectSchema schema;
     private final HollowObjectTypeWriteState writeState;
 
-    private final AssignedOrdinalType assignedOrdinalType;
+    private final boolean hasAssignedOrdinalField;
     private final long assignedOrdinalFieldOffset;
 
     private final List<MappedField> mappedFields;
@@ -58,7 +58,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         this.clazz = clazz;
         this.typeName = declaredTypeName != null ? declaredTypeName : getDefaultTypeName(clazz);
         this.mappedFields = new ArrayList<MappedField>();
-        
+
+        boolean hasAssignedOrdinalField = false;
+        long assignedOrdinalFieldOffset = -1;
         if(clazz == String.class) {
             try {
                 mappedFields.add(new MappedField(clazz.getDeclaredField("value")));
@@ -74,7 +76,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         } else {
             /// gather fields from type hierarchy
             Class<?> currentClass = clazz;
-            
+
             while(currentClass != Object.class && currentClass != Enum.class) {
                 if(currentClass.isInterface()) {
                     throw new IllegalArgumentException("Unexpected interface " + currentClass.getSimpleName() + " passed as field.");
@@ -84,15 +86,23 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 Field[] declaredFields = currentClass.getDeclaredFields();
     
                 for(int i=0;i<declaredFields.length;i++) {
-                    if(!Modifier.isTransient(declaredFields[i].getModifiers()) &&
-                       !Modifier.isStatic(declaredFields[i].getModifiers()) && 
-                       !"__assigned_ordinal".equals(declaredFields[i].getName()) &&
-                       declaredFields[i].getAnnotation(HollowTransient.class) == null) {
+                    Field declaredField = declaredFields[i];
+                    int modifiers = declaredField.getModifiers();
+                    if(!Modifier.isTransient(modifiers) && !Modifier.isStatic(modifiers) &&
+                            !"__assigned_ordinal".equals(declaredField.getName()) &&
+                            !declaredField.isAnnotationPresent(HollowTransient.class)) {
 
-                        mappedFields.add(new MappedField(declaredFields[i], visited));
+                        mappedFields.add(new MappedField(declaredField, visited));
+                    } else if("__assigned_ordinal".equals(declaredField.getName()) &&
+                            currentClass == clazz) {
+                        // If there is a field of name __assigned_ordinal on clazz
+                        if(declaredField.getType() == long.class) {
+                            assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
+                            hasAssignedOrdinalField = true;;
+                        }
                     }
                 }
-    
+
                 if(currentClass.isEnum())
                     mappedFields.add(new MappedField(MappedFieldType.ENUM_NAME));
                 
@@ -113,20 +123,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
         this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
-        AssignedOrdinalType assignedOrdinalType = AssignedOrdinalType.NONE;
-        long assignedOrdinalFieldOffset = -1;
-        try {
-            Field declaredField = clazz.getDeclaredField("__assigned_ordinal");
-            if(declaredField.getType() == int.class || declaredField.getType() == long.class)
-                assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
-            if(declaredField.getType() == long.class)
-                assignedOrdinalType = AssignedOrdinalType.LONG;
-            else if(declaredField.getType() == int.class)
-                assignedOrdinalType = AssignedOrdinalType.INT;
-            
-        } catch (Exception ignore) { }
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
-        this.assignedOrdinalType = assignedOrdinalType;
+        this.hasAssignedOrdinalField = hasAssignedOrdinalField;
     }
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
@@ -152,19 +150,10 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
-        switch(assignedOrdinalType) {
-        case LONG:
+        if (hasAssignedOrdinalField) {
             long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
-            break;
-        case INT:
-            int intAssignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
-            if(intAssignedOrdinal != -1)
-                return intAssignedOrdinal;
-            break;
-        case NONE:
-            break;
         }
 
         if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
@@ -177,15 +166,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         int assignedOrdinal = writeState.add(rec);
-        switch(assignedOrdinalType) {
-        case LONG:
+        if (hasAssignedOrdinalField) {
             unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
-            break;
-        case INT:
-            unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
-            break;
-        case NONE:
-            break;
         }
         return assignedOrdinal;
     }
@@ -552,12 +534,6 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
     }
     
-    private static enum AssignedOrdinalType {
-        INT,
-        LONG,
-        NONE
-    }
-
     private static enum MappedFieldType {
         BOOLEAN(FieldType.BOOLEAN),
         NULLABLE_PRIMITIVE_BOOLEAN(FieldType.BOOLEAN),
