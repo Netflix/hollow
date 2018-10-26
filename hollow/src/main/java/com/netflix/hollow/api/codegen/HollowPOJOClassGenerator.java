@@ -103,7 +103,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("    }\n\n");
 
         if (memoizeOrdinal) {
-            classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
+            classBodyBuilder.append("    private long __assigned_ordinal = -1;\n");
         }
 
         classBodyBuilder.append("}");
