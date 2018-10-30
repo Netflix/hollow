@@ -201,6 +201,8 @@ public interface TransformerConfig {
     boolean isElasticSearchNoWaitingEnabled();
 
     ///////////// TEMPORARY FEATURE-BASED //////////////////
+    @DefaultValue("false")
+    boolean usePackagesFeedForTimecodes();
 
     ////////////// BUSINESS LOGIC  ////////////////////////
 
