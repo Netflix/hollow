@@ -36,6 +36,7 @@ import java.time.Duration;
 public interface DataModelInitializationListener extends HollowProducerEventListener {
     /**
      * Called after the {@code HollowProducer} has initialized its data model.
+     * @param elapsed the elapsed duration
      */
     void onProducerInit(Duration elapsed);
 }

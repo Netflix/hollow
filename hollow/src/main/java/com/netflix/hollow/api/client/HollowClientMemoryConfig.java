@@ -30,18 +30,17 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
  */
 public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevityConfig {
 
-    public static final long ONE_HOUR = 60 * 60 * 1000;
+    long ONE_HOUR = 60 * 60 * 1000;
 
-    public static final HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, ONE_HOUR, ONE_HOUR);
+    HollowClientMemoryConfig DEFAULT_CONFIG = new SpecifiedConfig(false, false, ONE_HOUR, ONE_HOUR);
 
     /**
-     * Whether or not a double snapshot will ever be attempted by the {@link HollowClient}
-     * @return
+     * @return whether or not a double snapshot will ever be attempted by the {@link HollowClient}
      */
-    public boolean allowDoubleSnapshot();
+    boolean allowDoubleSnapshot();
 
 
-    public static class SpecifiedConfig implements HollowClientMemoryConfig {
+    class SpecifiedConfig implements HollowClientMemoryConfig {
 
         private final boolean enableLongLivedObjectSupport;
         private final boolean dropDataAutomatically;

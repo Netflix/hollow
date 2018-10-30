@@ -87,6 +87,9 @@ public class HollowPOJOGenerator {
     /**
      * Usage: java HollowPOJOGenerator --argName1=argValue1 --argName2==argValue2. See {@link GeneratorArguments}
      * for available arguments.
+     * @param args the arguments
+     * @throws IOException if the POJOs cannot be created
+     * @throws ClassNotFoundException if the class for a data type cannot be loaded
      */
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         if (args.length == 0) {

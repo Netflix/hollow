@@ -49,6 +49,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     /**
      * Add a {@link HollowTypeStateListener} to this type.
+     * @param listener the listener to add
      */
     public void addListener(HollowTypeStateListener listener) {
         HollowTypeStateListener newListeners[] = new HollowTypeStateListener[stateListeners.length + 1];
@@ -59,6 +60,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
 
     /**
      * Remove a specific {@link HollowTypeStateListener} from this type.
+     * @param listener the listener to remove
      */
     public void removeListener(HollowTypeStateListener listener) {
         if(stateListeners.length == 0)
@@ -89,8 +91,10 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     }
 
     /**
+     * @param listenerClazz the listener class
      * @return a {@link HollowTypeStateListener} of the specified class currently associated with this type, or
      * null if none is currently attached.
+     * @param <T> the type of the listener
      */
     @SuppressWarnings("unchecked")
     public <T extends HollowTypeStateListener> T getListener(Class<T> listenerClazz) {
@@ -107,7 +111,8 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
     /**
      * Returns the BitSet containing the currently populated ordinals in this type state.
      * <p>
-     * WARNING: Do not modify the returned BitSet.  
+     * WARNING: Do not modify the returned BitSet.
+     * @return the bit containing the currently populated ordinals
      */
     public BitSet getPopulatedOrdinals() {
         return getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
@@ -117,6 +122,7 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      * Returns the BitSet containing the populated ordinals in this type state prior to the previous delta transition.
      * <p>
      * WARNING: Do not modify the returned BitSet.
+     * @return the bit containing the previously populated ordinals
      */
     public BitSet getPreviousOrdinals() {
         return getListener(PopulatedOrdinalListener.class).getPreviousOrdinals();

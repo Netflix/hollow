@@ -41,6 +41,7 @@ public interface HollowProducerListenerV2 extends HollowProducerListener {
 
     /**
      * Called when a cycle is skipped.
+     * @param reason the reason a cycle is skipped
      */
     void onCycleSkip(CycleSkipReason reason);
 }

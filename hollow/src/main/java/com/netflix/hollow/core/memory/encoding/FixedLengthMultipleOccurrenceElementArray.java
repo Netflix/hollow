@@ -68,6 +68,9 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * the element already exists, another instance of it will be added.
      * This method is not thread-safe - you cannot call this method concurrently with itself or with
      * {@link #getElements}.
+     *
+     * @param nodeIndex the node index
+     * @param element the element to add
      */
     public void addElement(long nodeIndex, long element) {
         if (element > elementMask) {
@@ -107,6 +110,9 @@ public class FixedLengthMultipleOccurrenceElementArray {
      * duplicates.
      * This method not thread-safe - the caller must ensure that no one calls {@link #addElement}
      * concurrently with this method, but calling this method concurrently with itself is safe.
+     *
+     * @param nodeIndex the node index
+     * @return a list of element at the node index
      */
     public List<Long> getElements(long nodeIndex) {
         long bucketStart = nodeIndex * maxElementsPerNode * bitsPerElement;

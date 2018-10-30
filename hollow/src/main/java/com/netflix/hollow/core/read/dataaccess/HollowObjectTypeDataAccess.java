@@ -29,61 +29,84 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
  */
 public interface HollowObjectTypeDataAccess extends HollowTypeDataAccess {
 
-    public HollowObjectSchema getSchema();
+    HollowObjectSchema getSchema();
 
     /**
-     * @return whether or not the record with the specified ordinal's field at the specified field index is null. 
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
+     * @return whether or not the record with the specified ordinal's field at the specified field index is null.
      */
-    public boolean isNull(int ordinal, int fieldIndex);
+    boolean isNull(int ordinal, int fieldIndex);
 
     /**
-     * @return the {@link FieldType#REFERENCE} field's value at the specified fieldIndex for the specified ordinal. 
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
+     * @return the {@link FieldType#REFERENCE} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public int readOrdinal(int ordinal, int fieldIndex);
+    int readOrdinal(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#INT} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public int readInt(int ordinal, int fieldIndex);
+    int readInt(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#FLOAT} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public float readFloat(int ordinal, int fieldIndex);
+    float readFloat(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#DOUBLE} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public double readDouble(int ordinal, int fieldIndex);
+    double readDouble(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#LONG} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public long readLong(int ordinal, int fieldIndex);
+    long readLong(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#BOOLEAN} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public Boolean readBoolean(int ordinal, int fieldIndex);
+    Boolean readBoolean(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#BYTES} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public byte[] readBytes(int ordinal, int fieldIndex);
+    byte[] readBytes(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return the {@link FieldType#STRING} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public String readString(int ordinal, int fieldIndex);
+    String readString(int ordinal, int fieldIndex);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
+     * @param testValue the value to get against
      * @return whether or not the {@link FieldType#STRING} field's value at the specified fieldIndex for the specified ordinal is exactly equal to the given value.
      */
-    public boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue);
+    boolean isStringFieldEqual(int ordinal, int fieldIndex, String testValue);
 
     /**
+     * @param ordinal the ordinal
+     * @param fieldIndex the field index
      * @return a hashCode for the {@link FieldType#BYTES} or {@link FieldType#STRING} field's value at the specified fieldIndex for the specified ordinal.
      */
-    public int findVarLengthFieldHashCode(int ordinal, int fieldIndex);
+    int findVarLengthFieldHashCode(int ordinal, int fieldIndex);
 
 }

@@ -81,7 +81,13 @@ public class HollowClientUpdater {
     }
 
     /**
-     * Updates the state to the provided version. Returns true if the update was successful.
+     * Updates the state to the provided version
+     *
+     * @param version the version to update to
+     * @return true if the update was successful
+     * @throws Throwable if the client cannot be updated
+     */
+    /*
      * Note that this method is synchronized and it is the only method that modifies the
      * {@code hollowDataHolderVolatile}, so we don't need to worry about it changing out from
      * under us.
@@ -215,14 +221,14 @@ public class HollowClientUpdater {
     }
 
     /**
-     * Returns the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedSnapshotTransitions() {
         return failedTransitionTracker.getNumFailedSnapshotTransitions();
     }
 
     /**
-     * Returns the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedDeltaTransitions() {
         return failedTransitionTracker.getNumFailedDeltaTransitions();
@@ -236,7 +242,7 @@ public class HollowClientUpdater {
     }
 
     /**
-     * Returns a future that will be completed with the version of data loaded when the initial load of data
+     * @return a future that will be completed with the version of data loaded when the initial load of data
      * has completed.
      */
     public CompletableFuture<Long> getInitialLoad() {

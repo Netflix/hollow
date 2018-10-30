@@ -36,6 +36,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     }
 
     /**
+     * @param publishPath the path to publish to
      * @since 2.12.0
      */
     public HollowFilesystemAnnouncer(Path publishPath) {

@@ -196,7 +196,7 @@ public class HollowIncrementalProducer {
     /**
      * Runs a Hollow Cycle, if successful, cleans the mutations map.
      *
-     * @return
+     * @return the version of the cycle if successful, otherwise the {@link #FAILED_VERSION}
      * @since 2.9.9
      */
     public long runCycle() {

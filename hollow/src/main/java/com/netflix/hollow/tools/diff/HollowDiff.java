@@ -98,7 +98,7 @@ public class HollowDiff {
      *
      * @param type the type name
      * @param primaryKeyPaths the path(s) to the field(s) which comprise the type's primary key
-     * @return
+     * @return the diff type
      */
     public HollowTypeDiff addTypeDiff(String type, String... primaryKeyPaths) {
         HollowTypeDiff typeDiff = new HollowTypeDiff(this, type, primaryKeyPaths);
@@ -114,7 +114,7 @@ public class HollowDiff {
     /**
      * Retrieve a diff report for a specific type in order to inspect the calculated differences
      * @param type the type name
-     * @return
+     * @return the diff type
      */
     public HollowTypeDiff getTypeDiff(String type) {
         return typeDiffs.get(type);

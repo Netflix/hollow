@@ -201,6 +201,8 @@ public class HollowObjectTypeReadState extends HollowTypeReadState implements Ho
 
     /**
      * Warning:  Not thread-safe.  Should only be called within the update thread.
+     * @param fieldName the field name
+     * @return the number of bits required for the field
      */
     public int bitsRequiredForField(String fieldName) {
         int maxBitsRequiredForField = shards[0].bitsRequiredForField(fieldName);

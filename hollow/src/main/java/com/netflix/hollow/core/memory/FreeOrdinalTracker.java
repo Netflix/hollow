@@ -59,7 +59,7 @@ public class FreeOrdinalTracker {
     /**
      * Return an ordinal to the pool after the object to which it was assigned is discarded.
      *
-     * @param ordinal
+     * @param ordinal the ordinal
      */
     public void returnOrdinalToPool(int ordinal) {
         if(size == freeOrdinals.length) {
@@ -72,6 +72,8 @@ public class FreeOrdinalTracker {
 
     /**
      * Specify the next ordinal to return after the reusable pool is exhausted
+     *
+     * @param nextEmptyOrdinal the next empty ordinal
      */
     public void setNextEmptyOrdinal(int nextEmptyOrdinal) {
         this.nextEmptyOrdinal = nextEmptyOrdinal;

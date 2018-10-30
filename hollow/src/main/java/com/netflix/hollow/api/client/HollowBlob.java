@@ -47,13 +47,18 @@ public abstract class HollowBlob {
 
     /**
      * Instantiate a snapshot to a specified data state version.
+     *
+     * @param toVersion the version to end from
      */
     public HollowBlob(long toVersion) {
         this(HollowConstants.VERSION_NONE, toVersion);
     }
 
     /**
-     * Instantiate a delta from one data state version to another. 
+     * Instantiate a delta from one data state version to another.
+     *
+     * @param fromVersion the version to start from
+     * @param toVersion the version to end from
      */
     public HollowBlob(long fromVersion, long toVersion) {
         this.fromVersion = fromVersion;
@@ -66,8 +71,8 @@ public abstract class HollowBlob {
      * It is expected that the returned InputStream will not be interrupted.  For this reason, it is a good idea to
      * retrieve the entire blob (e.g. to disk) from a remote datastore prior to returning this stream.
      *     
-     * @return
-     * @throws IOException
+     * @return the input stream to the blob
+     * @throws IOException if the input stream to the blob cannot be obtained
      */
     public abstract InputStream getInputStream() throws IOException;
 

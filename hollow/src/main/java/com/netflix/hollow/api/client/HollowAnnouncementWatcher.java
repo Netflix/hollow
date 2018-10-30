@@ -67,8 +67,7 @@ public abstract class HollowAnnouncementWatcher {
     }
 
     /**
-     * Return the latest announced version.
-     * @return
+     * @return the latest announced version.
      */
     public abstract long getLatestVersion();
 
@@ -82,6 +81,8 @@ public abstract class HollowAnnouncementWatcher {
 
     /**
      * Override this method ONLY if it is legal to explicitly update to a specific version.
+     *
+     * @param latestVersion the latest version
      */
     public void setLatestVersion(long latestVersion) {
         throw new UnsupportedOperationException("Cannot explicitly set latest version on a " + this.getClass());
@@ -108,7 +109,7 @@ public abstract class HollowAnnouncementWatcher {
      * Any subsequent calls for async refresh will not begin until after the specified delay
      * has completed.
      *
-     * @param maxDelayMillis
+     * @param maxDelayMillis the maximum delay in milliseconds
      */
     public void triggerAsyncRefreshWithRandomDelay(int maxDelayMillis) {
         Random rand = new Random();
@@ -122,6 +123,7 @@ public abstract class HollowAnnouncementWatcher {
      * Any subsequent calls for async refresh will not begin until after the specified delay
      * has completed.
      *
+     * @param delayMillis the delay in milliseconds
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final HollowClient client = this.client;

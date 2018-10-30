@@ -76,7 +76,7 @@ public class FilteredHollowBlobWriter {
      * 
      * Specifying multiple configs will allow for the writing of multiple filtered blobs in parallel.
      * 
-     * @param configs
+     * @param configs the filter configurations
      */
     public FilteredHollowBlobWriter(HollowFilterConfig... configs) {
         this.configs = configs;
@@ -93,9 +93,9 @@ public class FilteredHollowBlobWriter {
      * 
      * The number of provided OutputStreams should be equal to the number of provided HollowFilterConfigs at instantiation.
      * 
-     * @param in
-     * @param out
-     * @throws IOException
+     * @param in the input stream to the snapshot
+     * @param out the output streams to write the filtered snapshot
+     * @throws IOException if the snapshot cannot be filtered
      */
     public void filterSnapshot(InputStream in, OutputStream... out) throws IOException {
         filter(false, in, out);
@@ -105,10 +105,10 @@ public class FilteredHollowBlobWriter {
      * Filter a delta (or reversedelta), provided via the InputStream, to each of the OutputStreams.
      * 
      * The number of provided OutputStreams should be equal to the number of provided HollowFilterConfigs at instantiation.
-     * 
-     * @param in
-     * @param out
-     * @throws IOException
+     *
+     * @param in the input stream to the delta
+     * @param out the output streams to write the filtered delta
+     * @throws IOException if the delta cannot be filtered
      */
     public void filterDelta(InputStream in, OutputStream... out) throws IOException {
         filter(true, in, out);

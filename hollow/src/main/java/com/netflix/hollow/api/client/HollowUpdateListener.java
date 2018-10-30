@@ -40,10 +40,12 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
      *
      * This method should be used to initialize any indexing which is critical to keep in-sync with the data.
      *
-     * @param stateEngine
-     * @throws Exception
+     * @param api the API
+     * @param stateEngine the state engine
+     * @param version the version
+     * @throws Exception if there was an error processing this event
      */
-    public void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+    void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
 
     /**
@@ -51,17 +53,20 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
      *
      * This method should be used to update any indexing which is critical to keep in-sync with the data.
      *
-     * @param stateEngine
-     * @throws Exception
+     * @param api the API
+     * @param stateEngine the state engine
+     * @param version the version
+     * @throws Exception if there was an error processing this event
      */
-    public void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+    void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
     /**
      * Indicates that a refresh has begun.  Generally useful for logging.
-     * @param currentVersion
-     * @param requestedVersion
+     *
+     * @param currentVersion the current version
+     * @param requestedVersion the requested version
      */
-    public void refreshStarted(long currentVersion, long requestedVersion);
+    void refreshStarted(long currentVersion, long requestedVersion);
 
     /**
      * Indicates that a refresh completed successfully.
@@ -70,7 +75,7 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
      * @param afterVersion - The version when the refresh completed
      * @param requestedVersion - The specific version which was requested
      */
-    public void refreshCompleted(long beforeVersion, long afterVersion, long requestedVersion);
+    void refreshCompleted(long beforeVersion, long afterVersion, long requestedVersion);
 
 
     /**
@@ -81,7 +86,7 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
      * @param requestedVersion - The specific version which was requested
      * @param failureCause - The Exception which caused the failure.
      */
-    public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
+    void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
 
 
     /**
@@ -89,9 +94,9 @@ public interface HollowUpdateListener extends HollowConsumer.ObjectLongevityDete
      * 
      * @param transition The transition which was applied.
      */
-    public void transitionApplied(HollowBlob transition);
+    void transitionApplied(HollowBlob transition);
 
-    public static HollowUpdateListener DEFAULT_LISTENER = new HollowUpdateListener() {
+    HollowUpdateListener DEFAULT_LISTENER = new HollowUpdateListener() {
         @Override public void dataInitialized(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
         @Override public void dataUpdated(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception { }
         @Override public void transitionApplied(HollowBlob transition) { }

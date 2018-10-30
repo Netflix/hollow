@@ -33,7 +33,9 @@ import java.io.InputStream;
 public class StateEngineRoundTripper {
 
     /**
-     * Create a brand-new {@link HollowReadStateEngine} with the dataset populated in the provided {@link HollowWriteStateEngine} 
+     * @param writeEngine the write state engine
+     * @return a brand-new {@link HollowReadStateEngine} with the dataset populated in the provided {@link HollowWriteStateEngine}
+     * @throws IOException if the round trip from write to read state failed
      */
     public static HollowReadStateEngine roundTripSnapshot(HollowWriteStateEngine writeEngine) throws IOException {
         HollowReadStateEngine readEngine = new HollowReadStateEngine();
@@ -42,7 +44,11 @@ public class StateEngineRoundTripper {
     }
 
     /**
-     * Populate the provided {@link HollowReadStateEngine} with the dataset currently in the provided {@link HollowWriteStateEngine} 
+     * Populate the provided {@link HollowReadStateEngine} with the dataset currently in the provided {@link HollowWriteStateEngine}
+     *
+     * @param writeEngine the write state engine
+     * @param readEngine the read state engine
+     * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripSnapshot(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) throws IOException {
         roundTripSnapshot(writeEngine, readEngine, null);
@@ -52,6 +58,11 @@ public class StateEngineRoundTripper {
      * Populate the provided {@link HollowReadStateEngine} with the dataset currently in the provided {@link HollowWriteStateEngine}.
      * <p>
      * Apply the provided {@link HollowFilterConfig}.
+     *
+     * @param writeEngine the write state engine
+     * @param readEngine the read state engine
+     * @param filter the filter configuration
+     * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripSnapshot(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, HollowFilterConfig filter) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -72,6 +83,10 @@ public class StateEngineRoundTripper {
      * Update the provided {@link HollowReadStateEngine} with the new state currently available in the {@link HollowWriteStateEngine}.
      * <p>
      * It is assumed that the readEngine is currently populated with the prior state from the writeEngine.
+     *
+     * @param writeEngine the write state engine
+     * @param readEngine the read state engine
+     * @throws IOException if the round trip from write to read state failed
      */
     public static void roundTripDelta(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

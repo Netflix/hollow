@@ -90,6 +90,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     /**
      * Add a record to the state. 
+     * @param type the type name
+     * @param rec the record
+     * @return the ordinal of the added record
      */
     public int add(String type, HollowWriteRecord rec) {
         HollowTypeWriteState hollowTypeWriteState = writeStates.get(type);
@@ -100,6 +103,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     /**
      * Add a type to the dataset.  Should be called during the first cycle, before writing the first state.
+     * @param writeState the write state to add
      */
     public synchronized void addTypeState(HollowTypeWriteState writeState) {
         HollowSchema schema = writeState.getSchema();
@@ -123,6 +127,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * <li>calling {@link HollowObjectMapper#initializeTypeState(Class)} with each of the top-level classes in the data model</li>
      * <li>adding the types via {@link #addTypeState(HollowTypeWriteState)}</li>
      * </ul>
+     * @param readStateEngine the read state to restore from
      */
     public void restoreFrom(HollowReadStateEngine readStateEngine) {
         if(!readStateEngine.isListenToAllPopulatedOrdinals())
@@ -309,6 +314,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     }
 
     /**
+     * @param typeName the type name
      * @return the specified {@link HollowTypeWriteState}
      */
     public HollowTypeWriteState getTypeState(String typeName) {
@@ -389,7 +395,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * something reasonably small, for example 25MB.
      * 
      * In a future release, this value will default to  (25 * 1024 * 1024).  It is currently set to Long.MAX_VALUE to retain backwards
-     * compatibility with pre v2.1.0 consumers. 
+     * compatibility with pre v2.1.0 consumers.
+     *
+     * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;

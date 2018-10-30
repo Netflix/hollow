@@ -28,11 +28,13 @@ import com.netflix.hollow.core.schema.HollowListSchema;
  */
 public interface HollowListTypeDataAccess extends HollowCollectionTypeDataAccess {
 
-    public HollowListSchema getSchema();
+    HollowListSchema getSchema();
 
     /**
+     * @param ordinal the oridinal
+     * @param listIndex the list index
      * @return the element at the specified listIndex from the list record at the specified ordinal  
      */
-    public int getElementOrdinal(int ordinal, int listIndex);
+    int getElementOrdinal(int ordinal, int listIndex);
 
 }

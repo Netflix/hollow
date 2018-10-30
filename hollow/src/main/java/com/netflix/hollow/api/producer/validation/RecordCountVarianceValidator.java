@@ -50,6 +50,7 @@ public class RecordCountVarianceValidator implements ValidatorListener {
     private final float allowableVariancePercent;
 
     /**
+     * @param typeName type name
      * @param allowableVariancePercent: Used to validate if the cardinality change in current cycle is with in the
      * allowed percent.
      * Ex: 0% allowableVariancePercent ensures type cardinality does not vary at all for cycle to cycle.

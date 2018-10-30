@@ -56,14 +56,14 @@ public class FailedTransitionTracker {
     }
 
     /**
-     * Returns the number of failed snapshot transitions.
+     * @return the number of failed snapshot transitions.
      */
     public int getNumFailedSnapshotTransitions() {
         return this.failedSnapshotTransitions.size();
     }
 
     /**
-     * Returns the number of failed delta transitions.
+     * @return the number of failed delta transitions.
      */
     public int getNumFailedDeltaTransitions() {
         return this.failedDeltaTransitions.size();

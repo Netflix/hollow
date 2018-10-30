@@ -54,10 +54,14 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     private boolean buildIndexOnUpdate;
 
     /**
-     * @see #HollowPrefixIndex(HollowReadStateEngine, String, String)
      * This constructor defaults the estimatedMaxStringDuplicates to 4. If you expect a large
      * number of duplicate strings across your type, you should provide your own estimate for
      * estimatedMaxStringDuplicates.
+     *
+     * @param readStateEngine the read state
+     * @param type the type name
+     * @param fieldPath the field path
+     * @see #HollowPrefixIndex(HollowReadStateEngine, String, String)
      */
     @SuppressWarnings("WeakerAccess")
     public HollowPrefixIndex(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
@@ -156,8 +160,12 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     }
 
     /**
-     * This method estimates the total number of nodes that will required to create the index.
+     * Estimates the total number of nodes that will required to create the index.
      * Override this method if lower/higher estimate is needed compared to the default implementation.
+     *
+     * @param totalWords the total number of words
+     * @param averageWordLen the average word length
+     * @return the estimated total number of nodes
      */
     @SuppressWarnings("WeakerAccess")
     protected long estimateNumNodes(long totalWords, long averageWordLen) {
@@ -211,9 +219,10 @@ public class HollowPrefixIndex implements HollowTypeStateListener {
     }
 
     /**
-     * Check if the given exists in the index.
+     * Check if the given key exists in the index.
      *
-     * @return boolean value indicating if the key exists in the index.
+     * @param key the key
+     * @return {@code true} if the key exists, otherwise {@code false}
      */
     public boolean contains(String key) {
         if (key == null) throw new IllegalArgumentException("key cannot be null");

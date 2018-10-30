@@ -101,7 +101,10 @@ public class HollowIndexerValueTraverser {
     /**
      * This method assumes the other traverser has the same match fields specified in the same order.
      *
-     * @return
+     * @param matchIdx the match index
+     * @param otherTraverser the other traverser
+     * @param otherMatchIdx the other match index
+     * @return true if this and the other traverser are equal
      */
     public boolean isMatchEqual(int matchIdx, HollowIndexerValueTraverser otherTraverser, int otherMatchIdx) {
         for(int i=0;i<getNumFieldPaths();i++) {

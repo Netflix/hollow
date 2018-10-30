@@ -34,6 +34,7 @@ import java.util.List;
 public interface HollowDataAccess extends HollowDataset {
 
     /**
+     * @param typeName the type name
      * @return The handle to data for a specific type in this dataset.
      */
     public HollowTypeDataAccess getTypeDataAccess(String typeName);

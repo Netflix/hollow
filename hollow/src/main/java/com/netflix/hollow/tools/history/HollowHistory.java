@@ -81,6 +81,7 @@ public class HollowHistory {
      * @param initialHollowStateEngine The HollowReadStateEngine at an initial (earliest) state.
      * @param initialVersion The initial version of the HollowReadStateEngine
      * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
+     * @param isAutoDiscoverTypeIndex true if scheme types are auto-discovered from the initiate state engine
      */
     public HollowHistory(HollowReadStateEngine initialHollowStateEngine, long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
         this.keyIndex = new HollowHistoryKeyIndex(this);
@@ -179,8 +180,8 @@ public class HollowHistory {
      * new {@link HollowReadStateEngine}, and create a new {@link HollowHistoricalState} to represent
      * the transition.
      *
-     * @param newHollowStateEngine
-     * @param newVersion
+     * @param newHollowStateEngine the new state engine
+     * @param newVersion the new version
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
         if(!keyIndex.isInitialized())

@@ -138,6 +138,7 @@ public class HollowCombiner {
      * Further, if any record <i>references</i> another record which was omitted because it would have been duplicate based on this rule, then that reference is
      * remapped in the destination state to the matching record which was chosen to be included.
      *
+     * @param newKeys the new primary keys
      */
     public void setPrimaryKeys(PrimaryKey... newKeys) {
         /// deduplicate new keys with existing keys
@@ -192,7 +193,10 @@ public class HollowCombiner {
     }
 
     /**
-     * Specify a set of types not to copy.  Be careful: if any included types reference any of the specified types, behavior is undefined.
+     * Specify a set of types not to copy.  Be careful: if any included types reference any of the specified types,
+     * behavior is undefined.
+     *
+     * @param typeNames the type names to be ignored
      */
     public void addIgnoredTypes(String... typeNames) {
         for(String typeName : typeNames)
@@ -351,8 +355,7 @@ public class HollowCombiner {
 
 
     /**
-     * Get the destination {@link HollowWriteStateEngine}
-     * @return
+     * @return the destination {@link HollowWriteStateEngine}
      */
     public HollowWriteStateEngine getCombinedStateEngine() {
         return output;

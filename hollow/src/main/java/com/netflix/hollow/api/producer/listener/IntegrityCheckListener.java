@@ -43,6 +43,7 @@ public interface IntegrityCheckListener extends HollowProducerEventListener {
      *
      * @param status CycleStatus of the integrity check stage. {@link Status#getType()} will return {@code SUCCESS}
      * when the blobs are internally consistent; @{code FAIL} otherwise.
+     * @param readState the read state
      * @param version version that was checked
      * @param elapsed duration of the integrity check stage in {@code unit} units
      */
