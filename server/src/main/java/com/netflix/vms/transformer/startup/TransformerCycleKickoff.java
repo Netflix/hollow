@@ -11,11 +11,16 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.NFHollowBlobRetriever;
+import com.netflix.cinder.producer.NFHollowPublisher;
+import com.netflix.gutenberg.GutenbergIdentifiers;
+import com.netflix.gutenberg.api.publisher.GutenbergFilePublisher;
+import com.netflix.gutenberg.api.publisher.GutenbergValuePublisher;
+import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
-import com.netflix.internal.hollow.factory.HollowAnnouncerFactory;
-import com.netflix.internal.hollow.factory.HollowPublisherFactory;
+import com.netflix.cinder.producer.NFHollowAnnouncer;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -52,8 +57,9 @@ public class TransformerCycleKickoff {
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
-            HollowPublisherFactory publisherFactory,
-            HollowAnnouncerFactory announcerFactory,
+            GutenbergFilePublisher gutenbergFilePublisher,
+            GutenbergFileConsumer gutenbergFileConsumer,
+            GutenbergValuePublisher gutenbergValuePublisher,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             TransformerConfig transformerConfig,
             Config config,
@@ -63,10 +69,17 @@ public class TransformerCycleKickoff {
             TransformerServerHealthIndicator healthIndicator) {
         FileStore.useMultipartUploadWhenApplicable(true);
 
-        Publisher publisher = publisherFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
-        Publisher nostreamsPublisher = publisherFactory.getForNamespace("vms-" + VipNameUtil.getNoStreamsVip(transformerConfig));
-        Announcer announcer = announcerFactory.getForNamespace("vms-" + transformerConfig.getTransformerVip());
-        Announcer nostreamsAnnouncer = announcerFactory.getForNamespace("vms-" + VipNameUtil.getNoStreamsVip(transformerConfig));
+        String outputNamespace = "vms-" + transformerConfig.getTransformerVip();
+        String nostreamsOutputNamespace = "vms-" + VipNameUtil.getNoStreamsVip(transformerConfig);
+
+        Publisher publisher = new NFHollowPublisher(gutenbergFilePublisher, outputNamespace,
+                GutenbergIdentifiers.DEFAULT_REGIONS);
+        Publisher nostreamsPublisher = new NFHollowPublisher(gutenbergFilePublisher, nostreamsOutputNamespace,
+                GutenbergIdentifiers.DEFAULT_REGIONS);
+        Announcer announcer = new NFHollowAnnouncer(gutenbergValuePublisher,
+                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), outputNamespace);
+        Announcer nostreamsAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
+                new NFHollowBlobRetriever(gutenbergFileConsumer, nostreamsOutputNamespace), nostreamsOutputNamespace);
 
         TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
@@ -172,7 +185,7 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private final TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
                 cycleInterrupter,
                 new TransformerServerLogger(transformerConfig, esClient),
@@ -182,13 +195,11 @@ public class TransformerCycleKickoff {
                 new AtlasTransformerMetricRecorder(),
                 cassandraHelper,
                 new LZ4VMSTransformerFiles(),
-                (history) -> {
-                    VMSPublishWorkflowHistoryAdmin.history = history;
-                });
+                history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static final PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
-        Supplier<ServerUploadStatus> uploadStatus = () -> VMSServerUploadStatus.get();
+    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
+        Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
         if (isFastlane)
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
