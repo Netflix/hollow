@@ -243,5 +243,8 @@ public interface TransformerConfig {
     boolean isGrandfatherEnabled();
 
     @DefaultValue("true")
+    boolean isAssetAvailabilityIntentForPrePromoEnabled();
+
+    @DefaultValue("true")
     public boolean isReadDeployablePackagesFromCinderFeed();
 }
