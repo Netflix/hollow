@@ -54,9 +54,9 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     /**
      * Create a index for integer values pointed by the given field path.
      *
-     * @param readStateEngine
-     * @param type
-     * @param fieldPath
+     * @param readStateEngine the read state
+     * @param type the type name
+     * @param fieldPath the field path
      */
     public HollowSparseIntegerSet(HollowReadStateEngine readStateEngine, String type, String fieldPath) {
         this(readStateEngine, type, fieldPath, DEFAULT_PREDICATE);
@@ -130,8 +130,8 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     /**
      * Check if the given value is contained in the set (or if the given value satisfies the predicate condition.)
      *
-     * @param i
-     * @return boolean value.
+     * @param i the integer value
+     * @return {@code true} if the value is present
      */
     public boolean get(int i) {
         SparseBitSet current;
@@ -159,9 +159,7 @@ public class HollowSparseIntegerSet implements HollowTypeStateListener {
     }
 
     /**
-     * Get total number of integers added to the set.
-     *
-     * @return
+     * @return the total number of integers added to the set.
      */
     public int cardinality() {
         SparseBitSet current;

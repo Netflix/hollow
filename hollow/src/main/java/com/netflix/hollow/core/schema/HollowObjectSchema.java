@@ -98,6 +98,9 @@ public class HollowObjectSchema extends HollowSchema {
      * Returns the position of a field previously added to the map, or -1 if the field has not been added to the map.
      *
      * The positions of the fields are hashed into the <code>hashedPositionArray</code> by the hashCode of the fieldName.
+     *
+     * @param fieldName the field name
+     * @return the position
      */
     public int getPosition(String fieldName) {
         Integer index = nameFieldIndexLookup.get(fieldName);

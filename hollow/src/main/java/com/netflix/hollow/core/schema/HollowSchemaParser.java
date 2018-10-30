@@ -37,6 +37,10 @@ public class HollowSchemaParser {
 
     /**
      * Parse a collection of {@link HollowSchema}s from the provided Reader.
+     *
+     * @param reader the reader
+     * @return the list of schema
+     * @throws IOException if the schema cannot be parsed
      */
     public static List<HollowSchema> parseCollectionOfSchemas(Reader reader) throws IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(reader);
@@ -54,6 +58,10 @@ public class HollowSchemaParser {
 
     /**
      * Parse a collection of {@link HollowSchema}s from the provided String.
+     *
+     * @param schemas the schemas as a string
+     * @return the list of schema
+     * @throws IOException if the schema cannot be parsed
      */
     public static List<HollowSchema> parseCollectionOfSchemas(String schemas) throws IOException {
         return parseCollectionOfSchemas(new StringReader(schemas));
@@ -61,6 +69,10 @@ public class HollowSchemaParser {
 
     /**
      * Parse a single {@link HollowSchema} from the provided String.
+     *
+     * @param schema the schema as a string
+     * @return the schema
+     * @throws IOException if the schema cannot be parsed
      */
     public static HollowSchema parseSchema(String schema) throws IOException {
         StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(schema));

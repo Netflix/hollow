@@ -36,7 +36,7 @@ public class HollowProducerMetrics extends HollowMetrics {
     /**
      * Updates the producer metrics:
      * cycles completed, version and type's footprint and ordinals.
-     * @param producerStatus
+     * @param producerStatus the producer status
      */
     public void updateCycleMetrics(HollowProducerListener.ProducerStatus producerStatus) {
         Status.StatusType st = producerStatus.getStatus() == HollowProducerListener.Status.SUCCESS
@@ -49,7 +49,9 @@ public class HollowProducerMetrics extends HollowMetrics {
     /**
      * Updates the producer metrics:
      * cycles completed, version and type's footprint and ordinals.
-     * @param status
+     * @param status the status
+     * @param readState the read state
+     * @param version the version
      */
     public void updateCycleMetrics(Status status, HollowProducer.ReadState readState, long version) {
         cyclesCompleted++;

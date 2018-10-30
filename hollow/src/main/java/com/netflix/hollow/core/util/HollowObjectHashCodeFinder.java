@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public interface HollowObjectHashCodeFinder {
 
-    public static final String DEFINED_HASH_CODES_HEADER_NAME = "DEFINED_HASH_CODES";
+    String DEFINED_HASH_CODES_HEADER_NAME = "DEFINED_HASH_CODES";
 
     /**
      * For look-up at runtime.
@@ -37,8 +37,11 @@ public interface HollowObjectHashCodeFinder {
      * objectToHash.getOrdinal();
      * <p>
      * Otherwise, the hash code is determined with exactly the same logic as was used during serialization.
+     *
+     * @param objectToHash the object to hash
+     * @return the hash code
      */
-    public int hashCode(Object objectToHash);
+    int hashCode(Object objectToHash);
     
     /**
      * For serialization.
@@ -47,17 +50,21 @@ public interface HollowObjectHashCodeFinder {
      * which is being serialized, which is necessary for Sets and Maps.
      * <p>
      * If using simple ordinal-based hashing, the ordinal will be returned.  Otherwise, the return value will be calculated based on the objectToHash.
+     *
+     * @param typeName the type name
+     * @param ordinal the ordinal
+     * @param objectToHash the object to hash
+     * @return the hash code
      */
-    public int hashCode(String typeName, int ordinal, Object objectToHash);
+    int hashCode(String typeName, int ordinal, Object objectToHash);
     
     /**
-     * Returns the set of types which have hash codes defined (i.e. hash codes which are not simply each record's ordinal)
-     * @return
+     * @return the set of types which have hash codes defined (i.e. hash codes which are not simply each record's ordinal)
      */
-    public Set<String> getTypesWithDefinedHashCodes();
+    Set<String> getTypesWithDefinedHashCodes();
     
 
     @Deprecated
-    public int hashCode(int ordinal, Object objectToHash);
+    int hashCode(int ordinal, Object objectToHash);
 
 }

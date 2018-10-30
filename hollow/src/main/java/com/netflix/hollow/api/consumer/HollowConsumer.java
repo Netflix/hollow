@@ -54,7 +54,6 @@ import java.util.logging.Logger;
  * are provided to this class.
  * <p>
  * To obtain a HollowConsumer, you should use a builder pattern, for example:
- * <p>
  * <pre>
  * {@code
  *
@@ -67,7 +66,6 @@ import java.util.logging.Logger;
  * <p>
  * The following components are injectable, but only an implementation of the HollowConsumer.BlobRetriever is
  * required to be injected, all other components are optional. :
- * <p>
  * <dl>
  * <dt>{@link HollowConsumer.BlobRetriever}</dt>
  * <dd>Implementations of this class define how to retrieve blob data from the blob store.</dd>
@@ -204,6 +202,8 @@ public class HollowConsumer {
      * <p>
      * Any subsequent calls for async refresh will not begin until after the specified delay
      * has completed.
+     *
+     * @param delayMillis the delay, in millseconds, before triggering the refresh
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
@@ -238,7 +238,7 @@ public class HollowConsumer {
      * <p>
      * This is a blocking call.
      *
-     * @param version
+     * @param version the version to refresh to
      */
     public void triggerRefreshTo(long version) {
         if (announcementWatcher != null)
@@ -281,6 +281,8 @@ public class HollowConsumer {
     /**
      * Equivalent to calling {@link #getAPI()} and casting to the specified API.
      *
+     * @param apiClass the class of the API
+     * @param <T> the type of the API
      * @return the API which wraps the underlying dataset
      */
     public <T extends HollowAPI> T getAPI(Class<T> apiClass) {
@@ -302,23 +304,24 @@ public class HollowConsumer {
     }
 
     /**
-     * Returns the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedSnapshotTransitions() {
         return updater.getNumFailedSnapshotTransitions();
     }
 
     /**
-     * Returns the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedDeltaTransitions() {
         return updater.getNumFailedDeltaTransitions();
     }
 
     /**
-     * Returns a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
+     * @return a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
      * <p>
-     * This is useful if performing long-running operations which require a consistent view of the entire dataset in a single data state, to guarantee that updates do not happen while the operation runs.
+     * This is useful if performing long-running operations which require a consistent view of the entire dataset in a
+     * single data state, to guarantee that updates do not happen while the operation runs.
      */
     public Lock getRefreshLock() {
         return refreshLock.readLock();
@@ -332,6 +335,8 @@ public class HollowConsumer {
      * <p>
      * If a listener is added, concurrently, during the occurrence of a refresh then the listener will not receive
      * events until the next refresh.  The listener may also be removed concurrently.
+     *
+     * @param listener the refresh listener to add
      */
     public void addRefreshListener(RefreshListener listener) {
         updater.addRefreshListener(listener);
@@ -345,13 +350,15 @@ public class HollowConsumer {
      * <p>
      * If a listener is removed, concurrently, during  the occurrence of a refresh then the listener will receive all
      * events for that refresh but not receive events for subsequent any refreshes.
+     *
+     * @param listener the refresh listener to remove
      */
     public void removeRefreshListener(RefreshListener listener) {
         updater.removeRefreshListener(listener);
     }
 
     /**
-     * Returns the metrics for this consumer
+     * @return the metrics for this consumer
      */
     public HollowConsumerMetrics getMetrics() {
         return metrics;
@@ -366,23 +373,28 @@ public class HollowConsumer {
 
         /**
          * Returns the snapshot for the state with the greatest version identifier which is equal to or less than the desired version
+         * @param desiredVersion the desired version
+         * @return the blob of the snapshot
          */
         HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
 
         /**
          * Returns a delta transition which can be applied to the specified version identifier
+         * @param currentVersion the current version
+         * @return the blob of the delta
          */
         HollowConsumer.Blob retrieveDeltaBlob(long currentVersion);
 
         /**
          * Returns a reverse delta transition which can be applied to the specified version identifier
+         * @param currentVersion the current version
+         * @return the blob of the reverse delta
          */
         HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
     }
 
     /**
      * A Blob, which is either a snapshot or a delta, defines three things:
-     * <p>
      * <dl>
      * <dt>The "from" version</dt>
      * <dd>The unique identifier of the state to which a delta transition should be applied.  If
@@ -402,6 +414,8 @@ public class HollowConsumer {
 
         /**
          * Instantiate a snapshot to a specified data state version.
+         *
+         * @param toVersion the version
          */
         public Blob(long toVersion) {
             this(HollowConstants.VERSION_NONE, toVersion);
@@ -409,6 +423,9 @@ public class HollowConsumer {
 
         /**
          * Instantiate a delta from one data state version to another.
+         *
+         * @param fromVersion the version to start the delta from
+         * @param toVersion the version to end the delta from
          */
         public Blob(long fromVersion, long toVersion) {
             this.fromVersion = fromVersion;
@@ -421,8 +438,8 @@ public class HollowConsumer {
          * It is expected that the returned InputStream will not be interrupted.  For this reason, it is a good idea to
          * retrieve the entire blob (e.g. to disk) from a remote datastore prior to returning this stream.
          *
-         * @return
-         * @throws IOException
+         * @return the input stream to the blob
+         * @throws IOException if the input stream to the blob cannot be obtained
          */
         public abstract InputStream getInputStream() throws IOException;
 
@@ -460,9 +477,7 @@ public class HollowConsumer {
         long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
 
         /**
-         * Return the latest announced version.
-         *
-         * @return
+         * @return the latest announced version.
          */
         long getLatestVersion();
 
@@ -471,6 +486,8 @@ public class HollowConsumer {
          * <p>
          * When announcements are received via a push mechanism, or polling reveals a new version, a call should be placed to one
          * of the flavors of {@link HollowConsumer#triggerRefresh()} on the provided HollowConsumer.
+         *
+         * @param consumer the hollow consumer
          */
         void subscribeToUpdates(HollowConsumer consumer);
     }
@@ -498,7 +515,7 @@ public class HollowConsumer {
     public interface ObjectLongevityConfig {
 
         /**
-         * Whether or not long-lived object support is enabled.
+         * @return whether or not long-lived object support is enabled.
          * <p>
          * Because Hollow reuses pooled memory, if references to Hollow records are held too long, the underlying data may
          * be overwritten.  When long-lived object support is enabled, Hollow records referenced via a {@link HollowAPI} will,
@@ -512,36 +529,28 @@ public class HollowConsumer {
         boolean enableExpiredUsageStackTraces();
 
         /**
-         * If long-lived object support is enabled, this returns the number of milliseconds before the {@link StaleHollowReferenceDetector}
+         * @return if long-lived object support is enabled, the number of milliseconds before the {@link StaleHollowReferenceDetector}
          * will begin flagging usage of stale objects.
-         *
-         * @return
          */
         long gracePeriodMillis();
 
         /**
-         * If long-lived object support is enabled, this defines the number of milliseconds, after the grace period, during which
+         * @return if long-lived object support is enabled, the number of milliseconds, after the grace period, during which
          * data is still available in stale references, but usage will be flagged by the {@link StaleHollowReferenceDetector}.
          * <p>
          * After the grace period + usage detection period have expired, the data from stale references will become inaccessible if
          * dropDataAutomatically() is enabled.
-         *
-         * @return
          */
         long usageDetectionPeriodMillis();
 
         /**
-         * Whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
+         * @return whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
          * that no usage was detected during the usage detection period.
-         *
-         * @return
          */
         boolean dropDataAutomatically();
 
         /**
-         * Drop data even if flagged during the usage detection period.
-         *
-         * @return
+         * @return whether data is dropped even if flagged during the usage detection period.
          */
         boolean forceDropData();
 
@@ -589,6 +598,8 @@ public class HollowConsumer {
          * If a nonzero value is reported, then stale references to Hollow objects may be cached somewhere in your codebase.
          * <p>
          * This signal can be noisy, and a nonzero value indicates that some reference to stale data exists somewhere.
+         *
+         * @param count the count of stale references
          */
         void staleReferenceExistenceDetected(int count);
 
@@ -598,6 +609,8 @@ public class HollowConsumer {
          * If a nonzero value is reported, then stale references to Hollow objects are being accessed from somewhere in your codebase.
          * <p>
          * This signal is noiseless, and a nonzero value indicates that some reference to stale data is USED somewhere.
+         *
+         * @param count the count of stale references
          */
         void staleReferenceUsageDetected(int count);
 

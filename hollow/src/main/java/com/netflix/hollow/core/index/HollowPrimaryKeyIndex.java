@@ -45,8 +45,6 @@ import java.util.List;
  * <p>
  * A primary key index can be used to index and query a type by a {@link PrimaryKey}.  The provided {@link PrimaryKey} does
  * not have to be the same as declared as the default in the data model.
- * <p>
- *
  */
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
@@ -80,6 +78,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     /**
      * This initializer can be used to create a HollowPrimaryKeyIndex which will only index a subset of the records in the specified type.
+     *
+     * @param stateEngine the read state engine
+     * @param primaryKey the primary key
+     * @param memoryRecycler the memory recycler
+     * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
         if (primaryKey==null) throw new IllegalArgumentException("primaryKey can't not be null");
@@ -154,6 +157,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with a single specified field.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key the field key
+     * @return the matching ordinal for the key, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
@@ -185,6 +191,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with two specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key1 the first field key
+     * @param key2 the second field key
+     * @return the matching ordinal for the two keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
@@ -217,6 +227,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with three specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key1 the first field key
+     * @param key2 the second field key
+     * @param key3 the third field key
+     * @return the matching ordinal for the three keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
@@ -250,6 +265,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * Query an index with four or more specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
      * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param keys the field keys
+     * @return the matching ordinal for the keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object... keys) {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
@@ -311,14 +329,14 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     /**
-     * Returns whether or not this index contains duplicate records (two or more records mapping to a single primary key).
+     * @return whether or not this index contains duplicate records (two or more records mapping to a single primary key).
      */
     public boolean containsDuplicates() {
         return !getDuplicateKeys().isEmpty();
     }
 
     /**
-     * Returns any keys which are mapped to two or more records.
+     * @return any keys which are mapped to two or more records.
      */
     public synchronized Collection<Object[]> getDuplicateKeys() {
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;

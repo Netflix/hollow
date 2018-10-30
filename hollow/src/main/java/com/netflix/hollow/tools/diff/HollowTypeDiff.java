@@ -70,7 +70,7 @@ public class HollowTypeDiff {
 
     /**
      * Add a field path to a component of the primary key
-     * @param path
+     * @param path the field path
      */
     public void addMatchPath(String path) {
         matcher.addMatchPath(path);
@@ -80,17 +80,15 @@ public class HollowTypeDiff {
      * Shortcut the diff detail when encountering a specific type.  This can be done to improve the performance
      * of diff calculation -- at the expense of some detail.
      *
-     * @param type
+     * @param type the type name
      */
     public void addShortcutType(String type) {
         shortcutTypes.add(type);
     }
 
     /**
-     * Returns whether or not this type diff will shortcut at the specified type.
-     *
-     * @param type
-     * @return
+     * @param type the type name
+     * @return whether or not this type diff will shortcut at the specified type.
      */
     public boolean isShortcutType(String type) {
         return shortcutTypes.contains(type);
@@ -99,7 +97,7 @@ public class HollowTypeDiff {
     /**
      * Get the differences broken down by specific field paths
      *
-     * @return
+     * @return the field differences
      */
     public List<HollowFieldDiff> getFieldDiffs() {
         return calculatedFieldDiffs;

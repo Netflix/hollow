@@ -202,7 +202,7 @@ public class HollowProducer {
     }
 
     /**
-     * Returns the metrics for this producer
+     * @return the metrics for this producer
      */
     public HollowProducerMetrics getMetrics() {
         return this.metrics;
@@ -340,6 +340,7 @@ public class HollowProducer {
     /**
      * Each cycle produces a single data state.
      *
+     * @param task the populating task
      * @return the version identifier of the produced state.
      */
     // @@@ Should this be marked as synchronized?
@@ -457,7 +458,7 @@ public class HollowProducer {
         }
     }
 
-    /*
+    /**
      * Adds a listener to this producer.
      * <p>
      * If the listener was previously added to this consumer, as determined by reference equality or {@code Object}
@@ -465,12 +466,14 @@ public class HollowProducer {
      * <p>
      * If a listener is added, concurrently, during the occurrence of a cycle or restore then the listener will not
      * receive events until the next cycle or restore.  The listener may also be removed concurrently.
+     *
+     * @param listener the listener to add
      */
     public void addListener(HollowProducerListener listener) {
         listeners.addListener(listener);
     }
 
-    /*
+    /**
      * Adds a listener to this producer.
      * <p>
      * If the listener was previously added to this consumer, as determined by reference equality or {@code Object}
@@ -478,6 +481,8 @@ public class HollowProducer {
      * <p>
      * If a listener is added, concurrently, during the occurrence of a cycle or restore then the listener will not
      * receive events until the next cycle or restore.  The listener may also be removed concurrently.
+     *
+     * @param listener the listener to add
      */
     public void addListener(HollowProducerEventListener listener) {
         listeners.addListener(listener);
@@ -491,6 +496,8 @@ public class HollowProducer {
      * <p>
      * If a listener is removed, concurrently, during the occurrence of a cycle or restore then the listener will
      * receive all events for that cycle or restore but not receive events for a subsequent cycle or restore.
+     *
+     * @param listener the listener to remove
      */
     public void removeListener(HollowProducerListener listener) {
         listeners.removeListener(listener);
@@ -504,12 +511,14 @@ public class HollowProducer {
      * <p>
      * If a listener is removed, concurrently, during the occurrence of a cycle or restore then the listener will
      * receive all events for that cycle or restore but not receive events for a subsequent cycle or restore.
+     *
+     * @param listener the listener to remove
      */
     public void removeListener(HollowProducerEventListener listener) {
         listeners.removeListener(listener);
     }
 
-    /**
+    /*
      * Publish the write state, storing the artifacts in the provided object. Visible for testing.
      */
     void publish(ListenerSupport.Listeners listeners, long toVersion, Artifacts artifacts) throws IOException {
@@ -735,7 +744,7 @@ public class HollowProducer {
 
     public interface VersionMinter {
         /**
-         * Create a new state version.<p>
+         * Create a new state version.
          * <p>
          * State versions should be ascending -- later states have greater versions.<p>
          *
@@ -748,7 +757,7 @@ public class HollowProducer {
      * Represents a procedure that populates a new data state within a {@link HollowProducer} cycle.
      *
      * <p>This is a functional interface whose functional method is
-     * {@link #populate(WriteState)}.
+     * {@link #populate(HollowProducer.WriteState)}.
      */
     @FunctionalInterface
     public interface Populator {
@@ -781,13 +790,17 @@ public class HollowProducer {
          * <li>the {@code WriteState} is thread safe</li>
          * </ul>
          *
-         * <p></p>Populating asynchronously has these additional requirements:
+         * <p>
+         * Populating asynchronously has these additional requirements:
          * <ul>
          * <li>MUST NOT return from this method until all workers have completed – either normally
          * or exceptionally – or have been cancelled</li>
          * <li>MUST throw an exception if any worker completed exceptionally. MAY cancel remaining tasks
          * <em>or</em> wait for the remainder to complete.</li>
          * </ul>
+         *
+         * @param newState the new state to add objects to
+         * @throws Exception if population fails
          */
         void populate(HollowProducer.WriteState newState) throws Exception;
     }
@@ -798,8 +811,10 @@ public class HollowProducer {
          *
          * <p>Calling this method after the producer's populate stage has completed is an error.
          *
+         * @param o the POJO to add
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
+         * @return the ordinal associated with the added POJO
          */
         int add(Object o) throws IllegalStateException;
 
@@ -813,6 +828,7 @@ public class HollowProducer {
          *
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
+         * @return the object mapper
          */
         HollowObjectMapper getObjectMapper() throws IllegalStateException;
 
@@ -826,6 +842,7 @@ public class HollowProducer {
          *
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
+         * @return the write state engine
          */
         HollowWriteStateEngine getStateEngine() throws IllegalStateException;
 
@@ -836,6 +853,7 @@ public class HollowProducer {
          * saving the returned reference in a local variable that is closed over by an asynchronous task as that
          * circumvents this guard. It is safest to call {@code writeState.getPriorState()} within the closure.
          *
+         * @return the prior read state
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
          */
@@ -846,6 +864,7 @@ public class HollowProducer {
          *
          * <p>Calling this method after the producer's populate stage has completed is an error.
          *
+         * @return the version of the current producer cycle
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
          */
@@ -871,9 +890,9 @@ public class HollowProducer {
 
     public interface BlobStager {
         /**
-         * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.<p>
+         * Returns a blob with which a {@code HollowProducer} will write a snapshot for the version specified.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
          *
          * @param version the blob version
          * @return a {@link HollowProducer.Blob} representing a snapshot for the {@code version}
@@ -882,9 +901,9 @@ public class HollowProducer {
 
         /**
          * Returns a blob with which a {@code HollowProducer} will write a forward delta from the version specified to
-         * the version specified, i.e. {@code fromVersion => toVersion}.<p>
+         * the version specified, i.e. {@code fromVersion => toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -896,9 +915,9 @@ public class HollowProducer {
 
         /**
          * Returns a blob with which a {@code HollowProducer} will write a reverse delta from the version specified to
-         * the version specified, i.e. {@code fromVersion <= toVersion}.<p>
+         * the version specified, i.e. {@code fromVersion <= toVersion}.
          * <p>
-         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(Blob)}.
+         * The producer will pass the returned blob back to this publisher when calling {@link Publisher#publish(HollowProducer.Blob)}.
          * <p>
          * In the delta chain {@code fromVersion} is the older version such that {@code fromVersion < toVersion}.
          *
@@ -924,11 +943,17 @@ public class HollowProducer {
 
         /**
          * This method provides an opportunity to wrap the OutputStream used to write the blob (e.g. with a GZIPOutputStream).
+         *
+         * @param is the uncompressed output stream
+         * @return the compressed output stream
          */
         OutputStream compress(OutputStream is);
 
         /**
          * This method provides an opportunity to wrap the InputStream used to write the blob (e.g. with a GZIPInputStream).
+         *
+         * @param is the compressed input stream
+         * @return the uncompressed input stream
          */
         InputStream decompress(InputStream is);
     }
@@ -937,7 +962,7 @@ public class HollowProducer {
     public interface Publisher {
 
         /**
-         * Publish the blob specified to this publisher's blobstore.<p>
+         * Publish the blob specified to this publisher's blobstore.
          * <p>
          * It is guaranteed that {@code blob} was created by calling one of
          * {@link BlobStager#openSnapshot(long)}, {@link BlobStager#openDelta(long, long)}, or

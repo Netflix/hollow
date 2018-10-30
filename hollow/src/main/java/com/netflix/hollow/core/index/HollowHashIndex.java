@@ -32,7 +32,6 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
  * The field definitions in a hash key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
  * the field definition <i>actors.element.actorId</i> may be used to traverse a child <b>LIST</b> or <b>SET</b> type record referenced by the field
  * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field.
- * <p>
  */
 public class HollowHashIndex implements HollowTypeStateListener {
 
@@ -76,8 +75,11 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
 
     /**
-     * Query the index.  The returned {@link HollowHashIndexResult} will be null if no matches were found.  Otherwise, may be used
-     * to gather the matched ordinals.
+     * Query the index.
+     *
+     * @param query the query
+     * @return the hash index result to gather the matched ordinals. A {@code null} value indicated no matches were
+     * found.
      */
     public HollowHashIndexResult findMatches(Object... query) {
         int hashCode = 0;

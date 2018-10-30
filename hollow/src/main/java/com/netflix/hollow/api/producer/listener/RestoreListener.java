@@ -42,8 +42,10 @@ public interface RestoreListener extends HollowProducerEventListener {
      * Called after the {@code HollowProducer} has restored its data state to the indicated version.
      * If previous state is not available to restore from, then this callback will not be called.
      *
-     * @param status of the restore. {@link Status.RestoreStage#getType()} will return {@code SUCCESS} when
-     * the desired version was reached during restore, otheriwse {@code FAIL} will be returned.
+     * @param status of the restore. {@link Status#getType()} will return {@code SUCCESS} when
+     * the desired version was reached during restore, otherwise {@code FAIL} will be returned.
+     * @param versionDesired the desired version to restore to
+     * @param versionReached the actual version restored to
      * @param elapsed duration of the restore in {@code unit} units
      */
     void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed);

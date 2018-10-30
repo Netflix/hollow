@@ -87,6 +87,7 @@ public class HollowCompactor {
     
     /**
      * Determine whether a compaction is necessary, based on the criteria specified in the constructor.
+     * @return {@code true} if compaction is necessary, otherwise {@code false}
      */
     public boolean needsCompaction() {
         return !findCompactionTargets().isEmpty();

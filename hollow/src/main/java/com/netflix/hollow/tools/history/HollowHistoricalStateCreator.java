@@ -81,6 +81,7 @@ public class HollowHistoricalStateCreator {
      * 
      * @param version The state's version
      * @param stateEngine The current {@link HollowReadStateEngine} to which a delta has been applied.
+     * @return a data access for history
      */
     public HollowHistoricalStateDataAccess createBasedOnNewDelta(long version, HollowReadStateEngine stateEngine) {
         IntMapOrdinalRemapper typeRemovedOrdinalMapping = new IntMapOrdinalRemapper();
@@ -122,7 +123,12 @@ public class HollowHistoricalStateCreator {
     }
 
     /**
-     * Create a {@link HollowDataAccess} for a {@link HollowHistory}.  Remap ordinal spaces for all prior historical versions in the {@link HollowHistory} for consistency.
+     * Create a {@link HollowDataAccess} for a {@link HollowHistory}.  Remap ordinal spaces for all prior historical
+     * versions in the {@link HollowHistory} for consistency.
+     *
+     * @param version the version
+     * @param previous the prior read state
+     * @return the data access for a history
      */
     public HollowHistoricalStateDataAccess createConsistentOrdinalHistoricalStateFromDoubleSnapshot(long version, HollowReadStateEngine previous) {
         return new HollowHistoricalStateDataAccess(totalHistory, version, previous, IdentityOrdinalRemapper.INSTANCE, Collections.<String, HollowHistoricalSchemaChange>emptyMap());
@@ -130,6 +136,12 @@ public class HollowHistoricalStateCreator {
 
     /**
      * Create a {@link HollowDataAccess} for a historical state after a double snapshot occurs, without a {@link HollowHistory}. 
+     *
+     * @param version the version
+     * @param previous the previous state
+     * @param current the current state
+     * @param ordinalRemapper the ordinal remapper
+     * @return the data access for a history
      */
     public HollowHistoricalStateDataAccess createHistoricalStateFromDoubleSnapshot(long version, HollowReadStateEngine previous, HollowReadStateEngine current, DiffEqualityMappingOrdinalRemapper ordinalRemapper) {
         HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemasWithoutKeys(previous.getSchemas()));

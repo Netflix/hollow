@@ -30,17 +30,20 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 public interface HollowBlobRetriever {
 
     /**
-     * Returns the snapshot for the state with an identifier equal to or less than the desired version
+     * @param desiredVersion the desired version
+     * @return the snapshot for the state with an identifier equal to or less than the desired version
      */
     public HollowBlob retrieveSnapshotBlob(long desiredVersion);
 
     /**
-     * Returns a delta transition which can be applied to the currentVersion
+     * @param currentVersion the current version
+     * @return a delta transition which can be applied to the currentVersion
      */
     public HollowBlob retrieveDeltaBlob(long currentVersion);
 
     /**
-     * Returns a reverse delta transition which can be applied to the currentVersion
+     * @param currentVersion the current version
+     * @return a reverse delta transition which can be applied to the currentVersion
      */
     public HollowBlob retrieveReverseDeltaBlob(long currentVersion);
 

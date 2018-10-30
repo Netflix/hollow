@@ -149,7 +149,7 @@ public class HollowClient {
      *
      * This is a blocking call.
      *
-     * @param version
+     * @param version the version to update to
      */
     public void triggerRefreshTo(long version) {
         announcementWatcher.setLatestVersion(version);
@@ -166,6 +166,8 @@ public class HollowClient {
     /**
      * Will apply the filter (i.e. not load the excluded types and fields) on the next snapshot update.
      * Subsequent updates will also ignore the types and fields.
+     *
+     * @param filter the filter configuration
      */
     public void setFilter(HollowFilterConfig filter) {
         updater.setFilter(filter);
@@ -179,6 +181,8 @@ public class HollowClient {
      *      <li>Will do a double snapshot if enabled, otherwise</li>
      *      <li>will traverse up to the specified number of deltas towards the desired state, then stop</li>
      * </ul>
+     *
+     * @param maxDeltas the maximum number of deltas
      */
     public void setMaxDeltas(int maxDeltas) {
         doubleSnapshotConfig.setMaxDeltasBeforeDoubleSnapshot(maxDeltas);

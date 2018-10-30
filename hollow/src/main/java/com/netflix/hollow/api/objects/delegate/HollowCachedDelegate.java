@@ -29,7 +29,8 @@ public interface HollowCachedDelegate extends HollowRecordDelegate {
 
     /**
      * Called by the {@link HollowObjectCacheProvider} when the api is updated.
+     * @param typeAPI the type api that is updated
      */
-    public void updateTypeAPI(HollowTypeAPI typeAPI);
+    void updateTypeAPI(HollowTypeAPI typeAPI);
 
 }

@@ -43,6 +43,10 @@ public class HollowFieldDiff implements Comparable<HollowFieldDiff> {
 
     /**
      * Should be called exclusively from the {@link HollowDiff} -- not intended for external consumption
+     *
+     * @param fromOrdinal the from ordinal
+     * @param toOrdinal the to ordinal
+     * @param score the score
      */
     public void addDiff(int fromOrdinal, int toOrdinal, int score) {
         if(isSameDiffAsLastAdd(fromOrdinal, toOrdinal)) {
@@ -110,6 +114,7 @@ public class HollowFieldDiff implements Comparable<HollowFieldDiff> {
 
     /**
      * This should be called exclusively from the {@link HollowDiff}.  Not for external consumption.
+     * @param otherFieldDiff the field diff to add
      */
     public void addResults(HollowFieldDiff otherFieldDiff) {
         for(int i=0;i<otherFieldDiff.getNumDiffs();i++) {

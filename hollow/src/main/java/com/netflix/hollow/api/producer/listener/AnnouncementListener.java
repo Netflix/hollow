@@ -43,6 +43,7 @@ public interface AnnouncementListener extends HollowProducerEventListener {
      *
      * @param status CycleStatus of the announcement stage. {@link Status#getType()} will return {@code SUCCESS}
      * when the announce was successful; @{code FAIL} otherwise.
+     * @param readState the read state
      * @param version of {@code HollowBlob} that was announced.
      * @param elapsed duration of the announcement stage in {@code unit} units
      */

@@ -31,13 +31,15 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 public interface HollowCombinerCopyDirector {
 
     /**
+     * @param typeState the read state
+     * @param ordinal the ordinal to copy
      * @return whether or not to include the specified ordinal from the supplied {@link HollowTypeReadState} in the output.
      * If this method returns false, then the copier will not attempt to directly copy the matching record.  However, if 
      * the matching record is referenced via <i>another</i> record for which this method returns true, then it will still be copied.  
      */
-    public boolean shouldCopy(HollowTypeReadState typeState, int ordinal);
+    boolean shouldCopy(HollowTypeReadState typeState, int ordinal);
 
-    public static final HollowCombinerCopyDirector DEFAULT_DIRECTOR = new HollowCombinerCopyDirector() {
+    HollowCombinerCopyDirector DEFAULT_DIRECTOR = new HollowCombinerCopyDirector() {
         public boolean shouldCopy(HollowTypeReadState typeName, int ordinal) {
             return true;
         }

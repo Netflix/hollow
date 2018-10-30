@@ -25,6 +25,9 @@ public class SnapshotPopulatedOrdinalsReader {
     /**
      * Read populated ordinals as a bit set from a stream, and notify a listener for each populated ordinal.
      *
+     * @param dis the data input stream
+     * @param listeners the type state listeners
+     * @throws IOException if the ordinals cannot be read
      * @author dkoszewnik
      */
     public static void readOrdinals(DataInputStream dis, HollowTypeStateListener[] listeners) throws IOException {

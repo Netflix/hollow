@@ -27,21 +27,23 @@ public interface HollowTypeStateListener {
     /**
      * Called immediately before a delta update is applied to the state engine
      */
-    public void beginUpdate();
+    void beginUpdate();
 
     /**
      * Called once for each record which is added to the registered type.
+     * @param ordinal the ordinal of an object that was added
      */
-    public void addedOrdinal(int ordinal);
+    void addedOrdinal(int ordinal);
 
     /**
      * Called once for each record which is removed from the registered type.
+     * @param ordinal the ordinal of an object that was removed
      */
-    public void removedOrdinal(int ordinal);
+    void removedOrdinal(int ordinal);
 
     /**
      * Called immediately after a delta update is applied to the state engine.
      */
-    public void endUpdate();
+    void endUpdate();
 
 }

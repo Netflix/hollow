@@ -39,7 +39,6 @@ import java.util.Map;
  * <b>Hint:</b> The returned Map&lt;String, BitSet&gt; may be in turn passed to the {@link TransitiveSetTraverser} to be augmented with any records
  * which reference matched records.  For example, we can imagine a data model for which the following code would provide a 
  * selection which includes the Actor record for "Tom Hanks", plus any Movie records in which he stars:
- * <p>
  * <pre>
  * {@code
  * HollowFieldMatchQuery query = new HollowFieldMatchQuery(myStateEngine);
@@ -59,8 +58,10 @@ public class HollowFieldMatchQuery {
     
     /**
      * Match any records which include a field with the provided fieldName and value.
-     * 
-     * The fieldValue is provided as a String, but will be parsed as the type of the field to match.
+     *
+     * @param fieldName the field name
+     * @param fieldValue the field value as a string that will be parsed as the type of the field to match.
+     * @return the matching records
      */
     public Map<String, BitSet> findMatchingRecords(String fieldName, String fieldValue) {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();
@@ -75,7 +76,10 @@ public class HollowFieldMatchQuery {
     /**
      * Match any records of the specified type, which have the specified field set to the specified value.
      * 
-     * The fieldValue is provided as a String, but will be parsed as the type of the field to match.
+     * @param typeName the type name
+     * @param fieldName the field name
+     * @param fieldValue the field value as a string that will be parsed as the type of the field to match.
+     * @return the matching records
      */
     public Map<String, BitSet> findMatchingRecords(String typeName, String fieldName, String fieldValue) {
         Map<String, BitSet> matches = new HashMap<String, BitSet>();

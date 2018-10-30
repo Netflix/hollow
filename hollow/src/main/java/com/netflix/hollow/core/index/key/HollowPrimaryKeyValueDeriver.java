@@ -59,6 +59,10 @@ public class HollowPrimaryKeyValueDeriver {
 
     /**
      * Determine whether or not the specified ordinal contains the provided primary key value.
+     *
+     * @param ordinal the oridinal
+     * @param keys the primary keys
+     * @return true if the ordinal contains the primary keys
      */
     public boolean keyMatches(int ordinal, Object... keys) {
         if(keys.length != fieldPathIndexes.length)
@@ -115,6 +119,9 @@ public class HollowPrimaryKeyValueDeriver {
     
     /**
      * Retrieve the primary key value for the specified ordinal.
+     *
+     * @param ordinal the oridinal
+     * @return the primary keys
      */
     public Object[] getRecordKey(int ordinal) {
         Object[] results = new Object[fieldPathIndexes.length];

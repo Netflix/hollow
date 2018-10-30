@@ -29,7 +29,6 @@ import sun.misc.Unsafe;
  * are held in long arrays using the class FixedLengthElementArray.  This class allows for storage 
  * and retrieval of fixed-length data in a range of bits.  For example, if a FixedLengthElementArray 
  * was queried for the 6-bit value starting at bit 7 in the following example range of bits:
- * <p>
  * <pre>
  *     0001000100100001101000010100101001111010101010010010101
  * </pre>

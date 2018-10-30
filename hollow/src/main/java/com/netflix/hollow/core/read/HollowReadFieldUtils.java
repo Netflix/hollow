@@ -29,7 +29,12 @@ import java.util.Arrays;
 public class HollowReadFieldUtils {
 
     /**
-     * Hash a field in an OBJECT record. 
+     * Hash a field in an OBJECT record.
+     *
+     * @param typeAccess the data access
+     * @param ordinal the ordinal
+     * @param fieldPosition the field position
+     * @return the hash code
      */
     public static int fieldHashCode(HollowObjectTypeDataAccess typeAccess, int ordinal, int fieldPosition) {
         HollowObjectSchema schema = typeAccess.getSchema();
@@ -60,7 +65,16 @@ public class HollowReadFieldUtils {
     }
 
     /**
-     * Determine whether two OBJECT field records are exactly equal. 
+     * Determine whether two OBJECT field records are exactly equal.
+     *
+     * @param typeAccess1 the first type access
+     * @param ordinal1 the first ordinal
+     * @param fieldPosition1 the first field positiom
+     * @param typeAccess2 the second type access
+     * @param ordinal2 the second ordinal
+     * @param fieldPosition2 the second field position
+     *
+     * @return if the two OBJECT field records are exactly equal
      */
     public static boolean fieldsAreEqual(HollowObjectTypeDataAccess typeAccess1, int ordinal1, int fieldPosition1, HollowObjectTypeDataAccess typeAccess2, int ordinal2, int fieldPosition2) {
         HollowObjectSchema schema1 = typeAccess1.getSchema();
@@ -103,6 +117,9 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param typeAccess the type access
+     * @param ordinal the ordinal
+     * @param fieldPosition the field position
      * @return a displayable String for a field from an OBJECT record. 
      */
     public static String displayString(HollowObjectTypeDataAccess typeAccess, int ordinal, int fieldPosition) {
@@ -133,6 +150,9 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param typeAccess the type access
+     * @param ordinal the ordinal
+     * @param fieldPosition the field position
      * @return an appropriate Object representing a Hollow OBJECT record field's value
      */
     public static Object fieldValueObject(HollowObjectTypeDataAccess typeAccess, int ordinal, int fieldPosition) {
@@ -173,6 +193,10 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param typeAccess the type access
+     * @param ordinal the ordinal
+     * @param fieldPosition the field position
+     * @param testObject the object to test
      * @return whether the provided Object matches a Hollow OBJECT record's value.
      */
     public static boolean fieldValueEquals(HollowObjectTypeDataAccess typeAccess, int ordinal, int fieldPosition, Object testObject) {
@@ -214,6 +238,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param data the byte array
      * @return The hash code for a byte array which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int byteArrayHashCode(byte[] data) {
@@ -221,6 +246,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param str the string value
      * @return The hash code for a String which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int stringHashCode(String str) {
@@ -228,6 +254,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param bool the boolean value
      * @return The hash code for a boolean which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int booleanHashCode(Boolean bool) {
@@ -235,6 +262,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param l the long value
      * @return The hash code for a long which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int longHashCode(long l) {
@@ -242,6 +270,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param i the int value
      * @return The hash code for an int which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int intHashCode(int i) {
@@ -249,6 +278,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param f the float value
      * @return The hash code for a float which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int floatHashCode(float f) {
@@ -256,6 +286,7 @@ public class HollowReadFieldUtils {
     }
 
     /**
+     * @param d the double value
      * @return The hash code for a double which would be returned from {@link #fieldHashCode(HollowObjectTypeDataAccess, int, int)}
      */
     public static int doubleHashCode(double d) {

@@ -30,8 +30,6 @@ import java.util.Arrays;
  * The field definitions in a primary key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
  * the field definition <i>movie.country.id</i> may be used to traverse a child record referenced by the field <i>movie</i>, its child
  * record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
- * <p>
- *
  */
 public class PrimaryKey {
 
@@ -41,7 +39,7 @@ public class PrimaryKey {
     /**
      * Define a PrimaryKey, which specifies a set of one or more field(s) which should be unique for each record of the given type.
      *
-     * @param type
+     * @param type the type name
      * @param fieldPaths  The field definitions in a primary key may be hierarchical (traverse multiple record types) via dot-notation.
      * For example, the field definition <i>movie.country.id</i> may be used to traverse a child record referenced by the field <i>movie</i>,
      * its child record referenced by the field <i>country</i>, and finally the country's field <i>id</i>.
@@ -79,6 +77,10 @@ public class PrimaryKey {
 
     /**
      * The field path index is the object schemas' field positions for a particular field path.
+     *
+     * @param dataset the data set
+     * @param fieldPathIdx the index to a field path string
+     * @return the field path index
      */
     public int[] getFieldPathIndex(HollowDataset dataset, int fieldPathIdx) {
         return getFieldPathIndex(dataset, type, fieldPaths[fieldPathIdx]);
@@ -86,6 +88,11 @@ public class PrimaryKey {
 
     /**
      * Returns the ultimate field type of the specified type/field path in the provided dataset.
+     *
+     * @param dataAccess the data set
+     * @param type the type name
+     * @param fieldPath the field path
+     * @return the field type
      */
     public static FieldType getFieldType(HollowDataset dataAccess, String type, String fieldPath) {
         HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
@@ -97,6 +104,11 @@ public class PrimaryKey {
 
     /**
      * Returns the ultimate field Schema of the specified type/field path in the provided dataset.
+     *
+     * @param dataAccess the data set
+     * @param type the type name
+     * @param fieldPath the field path
+     * @return the field schema
      */
     public static HollowObjectSchema getFieldSchema(HollowDataset dataAccess, String type, String fieldPath) {
         HollowObjectSchema schema = (HollowObjectSchema)dataAccess.getSchema(type);
@@ -107,7 +119,13 @@ public class PrimaryKey {
     }
 
     /**
-     * Returns a separated field path, which has been auto-expanded if necessary based on the provided primary key field path.
+     * Returns a separated field path, which has been auto-expanded if necessary based on the provided primary key field
+     * path.
+     *
+     * @param dataset the data access
+     * @param type the type name
+     * @param fieldPath the field path
+     * @return the separated field path
      */
     public static String[] getCompleteFieldPathParts(HollowDataset dataset, String type, String fieldPath) {
         int fieldPathIdx[] = getFieldPathIndex(dataset, type, fieldPath);
@@ -124,6 +142,11 @@ public class PrimaryKey {
 
     /**
      * The field path index is the object schemas' field positions for a particular field path.
+     *
+     * @param dataset the data set
+     * @param type the type name
+     * @param fieldPath the field path string
+     * @return the field path index
      */
     public static int[] getFieldPathIndex(HollowDataset dataset, String type, String fieldPath) {
         boolean isReferenceFieldPath = fieldPath.endsWith("!");

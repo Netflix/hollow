@@ -212,8 +212,8 @@ public class ThreadSafeBitSet {
      *
      * In other words, return a new bit set, which is a bitwise and with the bitwise not of the other bit set.
      *
-     * @param other
-     * @return
+     * @param other the other bit set
+     * @return the resulting bit set
      */
     public ThreadSafeBitSet andNot(ThreadSafeBitSet other) {
         if(other.log2SegmentSize != log2SegmentSize)
@@ -244,8 +244,8 @@ public class ThreadSafeBitSet {
     /**
      * Return a new bit set which contains all bits which are contained in *any* of the specified bit sets.
      *
-     * @param bitSets
-     * @return
+     * @param bitSets the other bit sets
+     * @return the resulting bit set
      */
     public static ThreadSafeBitSet orAll(ThreadSafeBitSet... bitSets) {
         if(bitSets.length == 0)
@@ -295,8 +295,8 @@ public class ThreadSafeBitSet {
     /**
      * Get the segment at <code>segmentIndex</code>.  If this segment does not yet exist, create it.
      *
-     * @param segmentIndex
-     * @return
+     * @param segmentIndex the segment index
+     * @return the segment
      */
     private AtomicLongArray getSegment(int segmentIndex) {
         ThreadSafeBitSetSegments visibleSegments = segments.get();
@@ -413,7 +413,7 @@ public class ThreadSafeBitSet {
     }
 
     /**
-     * create new BitSet with same bits set
+     * @return a new BitSet with same bits set
      */
     public BitSet toBitSet() {
         BitSet resultSet = new BitSet();

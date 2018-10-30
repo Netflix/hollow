@@ -46,7 +46,6 @@ import java.util.logging.Logger;
  * A selection is represented with a Map&lt;String, BitSet&gt;, where each key in the map represents a type, and the corresponding BitSet
  * represents the ordinals of the selected records.  
  * Entries in this Map will indicate a type, plus the ordinals of the selected records:
- * <p>
  * <pre>
  * {@code
  * Map&lt;String, BitSet&gt; selection = new HashMap&lt;String, BitSet&gt;();
@@ -62,7 +61,6 @@ import java.util.logging.Logger;
  * <p>
  * We can add the references, and the <i>transitive</i> references, of our selection.  
  * After the following call returns, our selection will be augmented with these matches:
- * <p>
  * <pre>
  * {@code TransitiveSetTraverser.addTransitiveMatches(readEngine, selection);}
  * </pre>
@@ -78,6 +76,8 @@ public class TransitiveSetTraverser {
 
     /**
      * Augment the given selection by adding the references, and the <i>transitive</i> references, of our selection.
+     * @param stateEngine the state engine
+     * @param matches the map to which matches are placed
      */
     public static void addTransitiveMatches(HollowReadStateEngine stateEngine, Map<String, BitSet> matches) {
         List<HollowSchema> schemaList = HollowSchemaSorter.dependencyOrderedSchemaList(stateEngine);
@@ -93,6 +93,8 @@ public class TransitiveSetTraverser {
     
     /**
      * Remove any records from the given selection which are referenced by other records not in the selection.
+     * @param stateEngine the state engine
+     * @param matches the matches
      */
     public static void removeReferencedOutsideClosure(HollowReadStateEngine stateEngine, Map<String, BitSet> matches) {
         List<HollowSchema> orderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(stateEngine);
@@ -115,6 +117,8 @@ public class TransitiveSetTraverser {
     /**
      * Augment the given selection with any records outside the selection which reference 
      * (or transitively reference) any records in the selection. 
+     * @param stateEngine the state engine
+     * @param matches the matches
      */
     public static void addReferencingOutsideClosure(HollowReadStateEngine stateEngine, Map<String, BitSet> matches) {
         List<HollowSchema> orderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(stateEngine);

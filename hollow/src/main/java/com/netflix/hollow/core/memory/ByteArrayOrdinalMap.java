@@ -94,6 +94,10 @@ public class ByteArrayOrdinalMap {
    /**
     * Add a sequence of bytes to this map.  If the sequence of bytes has already been added to this map, return the originally assigned ordinal.
     * If the sequence of bytes has not been added to this map, assign and return a new ordinal.  This operation is thread-safe.
+    *
+    * @param serializedRepresentation the serialized representation
+    * @param preferredOrdinal the preferred ordinal
+    * @return the assigned ordinal
     */
    public int getOrAssignOrdinal(ByteDataBuffer serializedRepresentation, int preferredOrdinal) {
        int hash = HashCodes.hashCode(serializedRepresentation);
@@ -172,7 +176,10 @@ public class ByteArrayOrdinalMap {
     * Assign a predefined ordinal to a serialized representation.<p>
     *
     * WARNING: THIS OPERATION IS NOT THREAD-SAFE.<p>
-    * WARNING: THIS OPERATION WILL NOT UPDATE THE FreeOrdinalTracker.<p>
+    * WARNING: THIS OPERATION WILL NOT UPDATE THE FreeOrdinalTracker.
+    *
+    * @param serializedRepresentation the serialized representation
+    * @param ordinal the ordinal
     */
    public void put(ByteDataBuffer serializedRepresentation, int ordinal) {
        if(size > sizeBeforeGrow)
@@ -244,7 +251,7 @@ public class ByteArrayOrdinalMap {
     *
     * This is intended for use in the client-side heap-safe double snapshot load.
     *
-    * @param serializedRepresentation
+    * @param serializedRepresentation the serialized representation
     * @return The ordinal for this serialized representation, or -1.
     */
    public int get(ByteDataBuffer serializedRepresentation) {

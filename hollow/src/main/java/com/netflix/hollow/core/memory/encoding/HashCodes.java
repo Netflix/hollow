@@ -95,6 +95,10 @@ public class HashCodes {
      *  <p>
      *  See http://github.com/yonik/java_util for future updates to this file.
      *
+     * @param data the data to hash
+     * @param offset the offset
+     * @param len the length
+     * @return the hash code
      */
     public static int hashCode(ByteData data, long offset, int len) {
 

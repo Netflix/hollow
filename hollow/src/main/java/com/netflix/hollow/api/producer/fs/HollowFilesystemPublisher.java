@@ -36,6 +36,7 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     }
 
     /**
+     * @param blobStorePath the path to store blobs
      * @since 2.12.0
      */
     public HollowFilesystemPublisher(Path blobStorePath) {

@@ -28,8 +28,9 @@ import java.util.Map;
 public class HollowBlobHeaderWriter {
     /**
      * Write the header to the data output stream
-     * @param header
-     * @param dos
+     * @param header the blob header
+     * @param dos the data output stream to write the blov header
+     * @throws IOException if the blob header could not be written
      */
     public void writeHeader(HollowBlobHeader header, DataOutputStream dos) throws IOException {
         /// save 4 bytes to indicate FastBlob version header.  This will be changed to indicate backwards incompatibility.
