@@ -73,8 +73,8 @@ public class HollowObjectMapper {
     /**
      * Extracts the primary key from the specified POJO.
      * 
-     * @param o
-     * @return
+     * @param o the POJO
+     * @return the primary key
      */
     public RecordPrimaryKey extractPrimaryKey(Object o) {
         HollowObjectTypeMapper typeMapper = (HollowObjectTypeMapper)getTypeMapper(o.getClass(), null, null);
@@ -83,6 +83,8 @@ public class HollowObjectMapper {
 
     /**
      * @deprecated use {@link #add(Object)} instead.
+     * @param o the object to add
+     * @return the ordinal assigned to the newly added object
      */
     @Deprecated
     public int addObject(Object o) {

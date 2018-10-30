@@ -361,6 +361,9 @@ public class HollowCodeGenerationUtils {
      * Eg:
      *  - Actor {@literal->} actor
      *  - Actor.name {@literal->} actorName
+     *
+     * @param fieldPath the field path
+     * @return the param name
      */
     public static String normalizeFieldPathToParamName(String fieldPath) {
         String result = null;

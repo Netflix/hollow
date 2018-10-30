@@ -48,7 +48,8 @@ public class HollowHashIndexResult {
     }
 
     /**
-     * @return whether or not the matches contain the specified ordinal.
+     * @param value the ordinal
+     * @return {@code true} if the ordinal is matched, otherwise {@code false}
      */
     public boolean contains(int value) {
         int hash = HashCodes.hashInt(value);

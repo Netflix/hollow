@@ -60,9 +60,10 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     /**
-     * since 2.12.0
+     * Creates a file system announcement watcher.
      *
-     * @param publishPath
+     * @param publishPath the publish path
+     * @since 2.12.0
      */
     public HollowFilesystemAnnouncementWatcher(Path publishPath) {
         this(publishPath,
@@ -87,8 +88,11 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     }
 
     /**
-     * since 2.12.0
-     * @param publishPath
+     * Creates a file system announcement watcher.
+     *
+     * @param publishPath the publish path
+     * @param executor the executor from which watching is executed
+     * @since 2.12.0
      */
     public HollowFilesystemAnnouncementWatcher(Path publishPath, ScheduledExecutorService executor) {
         this.publishPath = publishPath;

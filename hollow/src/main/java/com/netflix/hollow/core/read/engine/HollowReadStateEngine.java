@@ -109,6 +109,9 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     /**
      * Add a {@link HollowTypeStateListener} to a type.
+     *
+     * @param typeName the type name
+     * @param listener the listener to add
      */
     public void addTypeListener(String typeName, HollowTypeStateListener listener) {
         List<HollowTypeStateListener> list = listeners.get(typeName);

@@ -42,7 +42,9 @@ public class HollowBlobWriter {
     }
 
     /**
-     * Write the current state as a snapshot blob.  
+     * Write the current state as a snapshot blob.
+     * @param os the output stream to write the snapshot blob
+     * @throws IOException if the snapshot blob could not be written
      */
     public void writeSnapshot(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
@@ -82,6 +84,8 @@ public class HollowBlobWriter {
     /**
      * Serialize the changes necessary to transition a consumer from the previous state
      * to the current state as a delta blob.
+     * @param os the output stream to write the delta blob
+     * @throws IOException if the delta blob could not be written
      */
     public void writeDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
@@ -129,6 +133,8 @@ public class HollowBlobWriter {
     /**
      * Serialize the changes necessary to transition a consumer from the current state to the
      * previous state as a delta blob. 
+     * @param os the output stream to write the reverse delta blob
+     * @throws IOException if the reverse delta blob could not be written
      */
     public void writeReverseDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();

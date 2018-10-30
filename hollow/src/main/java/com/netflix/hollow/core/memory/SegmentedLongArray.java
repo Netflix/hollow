@@ -66,6 +66,9 @@ public class SegmentedLongArray {
 
     /**
      * Set the byte at the given index to the specified value
+     *
+     * @param index the index
+     * @param value the byte value
      */
     public void set(long index, long value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
@@ -79,6 +82,9 @@ public class SegmentedLongArray {
 
     /**
      * Get the value of the byte at the specified index.
+     *
+     * @param index the index
+     * @return the byte value
      */
     public long get(long index) {
         int segmentIndex = (int)(index >>> log2OfSegmentSize);

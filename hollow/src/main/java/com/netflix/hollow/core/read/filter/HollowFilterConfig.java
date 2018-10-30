@@ -79,6 +79,8 @@ public class HollowFilterConfig {
     /**
      * Add a type.  All fields in the type will be either excluded or included, depending on
      * whether this is an exclude or include filter, respectively.
+     *
+     * @param type the type name
      */
     public void addType(String type) {
         specifiedTypes.add(type);
@@ -89,7 +91,6 @@ public class HollowFilterConfig {
      * 
      * All fields in these types will be either excluded or included, depending on whether
      * this is an exclude or include filter, respectively.
-     * 
      * 
      * @param type A type from the data model.
      * @param schemas All schemas from the data model.
@@ -283,6 +284,9 @@ public class HollowFilterConfig {
      * <li>&lt;typeName&gt;</li>
      * <li>&lt;typeName&gt;.&lt;fieldName&gt;</li>
      * </ul>
+     *
+     * @param conf the configuration as a string
+     * @return the filter configuration
      */
     public static HollowFilterConfig fromString(String conf) {
         String lines[] = conf.split("\n");

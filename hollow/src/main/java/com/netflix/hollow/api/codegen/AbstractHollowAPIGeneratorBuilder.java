@@ -115,6 +115,7 @@ public abstract class AbstractHollowAPIGeneratorBuilder<B extends AbstractHollow
 
     /**
      * NOTE: Have to be enabled with withErgonomicShortcuts
+     * @return this builder
      */
     public B withRestrictApiToFieldType() {
         config.setRestrictApiToFieldType(true);

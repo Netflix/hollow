@@ -33,6 +33,8 @@ public class VarInt {
 
     /**
      * Write a 'null' variable length integer into the supplied {@link ByteDataBuffer}
+     *
+     * @param buf the buffer to write to
      */
     public static void writeVNull(ByteDataBuffer buf) {
         buf.write((byte)0x80);
@@ -40,7 +42,10 @@ public class VarInt {
     }
 
     /**
-     * Encode the specifed long as a variable length integer into the supplied {@link ByteDataBuffer}
+     * Encode the specified long as a variable length integer into the supplied {@link ByteDataBuffer}
+     *
+     * @param buf the buffer to write to
+     * @param value the long value
      */
     public static void writeVLong(ByteDataBuffer buf, long value) {
         if(value < 0)                                buf.write((byte)0x81);
@@ -57,7 +62,11 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified long as a variable length integer into the supplied OuputStream 
+     * Encode the specified long as a variable length integer into the supplied OuputStream
+     *
+     * @param out the output stream to write to
+     * @param value the long value
+     * @throws IOException if the value cannot be written to the output stream
      */
     public static void writeVLong(OutputStream out, long value) throws IOException {
         if(value < 0)                                out.write((byte)0x81);
@@ -74,7 +83,10 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified int as a variable length integer into the supplied {@link ByteDataBuffer} 
+     * Encode the specified int as a variable length integer into the supplied {@link ByteDataBuffer}
+     *
+     * @param buf the buffer to write to
+     * @param value the int value
      */
     public static void writeVInt(ByteDataBuffer buf, int value) {
         if(value > 0x0FFFFFFF || value < 0) buf.write((byte)(0x80 | ((value >>> 28))));
@@ -86,7 +98,11 @@ public class VarInt {
     }
 
     /**
-     * Encode the specified int as a variable length integer into the supplied OutputStream 
+     * Encode the specified int as a variable length integer into the supplied OutputStream
+     *
+     * @param out the output stream to write to
+     * @param value the int value
+     * @throws IOException if the value cannot be written to the output stream
      */
     public static void writeVInt(OutputStream out, int value) throws IOException {
         if(value > 0x0FFFFFFF || value < 0) out.write((byte)(0x80 | ((value >>> 28))));
@@ -99,8 +115,11 @@ public class VarInt {
     
     /**
      * Write the value as a VarInt into the array, starting at the specified position.
-     * 
-     * Returns the next position after the VarInt has been written.
+     *
+     * @param data the byte array to write to
+     * @param pos the position in the byte array
+     * @param value the int value
+     * @return the next position after the VarInt has been written.
      */
     public static int writeVInt(byte data[], int pos, int value) {
         if(value > 0x0FFFFFFF || value < 0) data[pos++] = ((byte)(0x80 | ((value >>> 28))));
@@ -116,6 +135,10 @@ public class VarInt {
     /**
      * Determine whether or not the value at the specified position in the supplied {@link ByteData} is 
      * a 'null' variable length integer.
+     *
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return true if the value is null
      */
     public static boolean readVNull(ByteData arr, long position) {
         return arr.get(position) == (byte)0x80;
@@ -123,6 +146,9 @@ public class VarInt {
 
     /**
      * Read a variable length integer from the supplied {@link ByteData} starting at the specified position.
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the int value
      */
     public static int readVInt(ByteData arr, long position) {
         byte b = arr.get(position++);
@@ -142,6 +168,9 @@ public class VarInt {
 
     /**
      * Read a variable length integer from the supplied InputStream
+     * @param in the input stream to read from
+     * @return the int value
+     * @throws IOException if the value cannot be read from the input stream
      */
     public static int readVInt(InputStream in) throws IOException {
         byte b = (byte)in.read();
@@ -161,6 +190,9 @@ public class VarInt {
 
     /**
      * Read a variable length long from the supplied {@link ByteData} starting at the specified position. 
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the long value
      */
     public static long readVLong(ByteData arr, long position) {
         byte b = arr.get(position++);
@@ -180,6 +212,9 @@ public class VarInt {
 
     /**
      * Determine the size (in bytes) of the variable length long in the supplied {@link ByteData}, starting at the specified position.  
+     * @param arr the byte data to read from
+     * @param position the position in the byte data to read from
+     * @return the long value
      */
     public static int nextVLongSize(ByteData arr, long position) {
         byte b = arr.get(position++);
@@ -199,6 +234,9 @@ public class VarInt {
 
     /**
      * Read a variable length long from the supplied InputStream.
+     * @param in the input stream to read from
+     * @return the long value
+     * @throws IOException if the value cannot be read from the input stream
      */
     public static long readVLong(InputStream in) throws IOException {
         byte b = (byte)in.read();
@@ -219,6 +257,8 @@ public class VarInt {
 
     /**
      * Determine the size (in bytes) of the specified value when encoded as a variable length integer.
+     * @param value the int value
+     * @return the size (int bytes) of the value when encoded
      */
     public static int sizeOfVInt(int value) {
         if(value < 0)
@@ -236,6 +276,8 @@ public class VarInt {
 
     /**
      * Determine the size (in bytes) of the specified value when encoded as a variable length integer.
+     * @param value the long value
+     * @return the size (int bytes) of the value when encoded
      */
     public static int sizeOfVLong(long value) {
         if(value < 0L)
@@ -261,6 +303,10 @@ public class VarInt {
 
     /**
      * Count the number of variable length integers encoded in the supplied {@link ByteData} in the specified range.
+     * @param byteData the byte data
+     * @param fieldPosition the field position
+     * @param length the length
+     * @return number of variable length integers encoded over a range in the byte data
      */
     public static int countVarIntsInRange(ByteData byteData, long fieldPosition, int length) {
         int numInts = 0;

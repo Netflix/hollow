@@ -26,8 +26,8 @@ public class HollowConsumerMetrics extends HollowMetrics {
     /**
      * Updates the consumer metrics:
      * refresh succeeded, version and type's footprint and ordinals.
-     * @param hollowReadStateEngine
-     * @param version
+     * @param hollowReadStateEngine the state engine
+     * @param version the version
      */
     public void updateTypeStateMetrics(HollowReadStateEngine hollowReadStateEngine, long version) {
         this.refreshSucceeded++;

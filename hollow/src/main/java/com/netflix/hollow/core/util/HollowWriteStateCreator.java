@@ -60,6 +60,10 @@ public class HollowWriteStateCreator {
 
     /**
      * Reads a schema file into the provided HollowWriteStateEngine. The schema file must be on the classpath.
+     *
+     * @param schemaFilePath the path to the schema
+     * @param engine the write state engine
+     * @throws IOException if the schema could not be read
      */
     public static void readSchemaFileIntoWriteState(String schemaFilePath, HollowWriteStateEngine engine)
             throws IOException {
@@ -111,8 +115,8 @@ public class HollowWriteStateCreator {
      * The returned state engine will be ready to write a snapshot which will exactly recreate the data in the supplied {@link HollowReadStateEngine}.
      * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
      * 
-     * @param readEngine
-     * @return
+     * @param readEngine the read state engine
+     * @return the write state engine
      */
     public static HollowWriteStateEngine recreateAndPopulateUsingReadEngine(final HollowReadStateEngine readEngine) {
         final HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
@@ -125,7 +129,6 @@ public class HollowWriteStateCreator {
 
     /**
      * Populate the supplied {@link HollowWriteStateEngine} with all of the records from the supplied {@link HollowReadStateEngine}.
-     * <p>
      * <ul>
      *   <li>If fields or types have been removed, then those are ignored when copying records.</li>
      *   <li>If fields have been added to existing types, those fields will be null in the copied records.</li>
@@ -137,8 +140,9 @@ public class HollowWriteStateCreator {
      * except with the data model which was initialized.
      * <p>
      * A delta chain may be continued from this state by calling {@link HollowWriteStateEngine#prepareForNextCycle()}.
-     * 
-     * @param readEngine
+     *
+     * @param writeEngine the write state engine
+     * @param readEngine the read state engine
      */
     public static void populateUsingReadEngine(final HollowWriteStateEngine writeEngine, final HollowReadStateEngine readEngine) {
         SimultaneousExecutor executor = new SimultaneousExecutor();

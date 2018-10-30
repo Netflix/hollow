@@ -73,7 +73,9 @@ public abstract class HollowTypeWriteState {
     
     /**
      * Add an object to this state.  We will create a serialized representation of this object, then
-     * assign or retrieve the ordinal for this serialized representation in our {@link ByteArrayOrdinalMap}<p>
+     * assign or retrieve the ordinal for this serialized representation in our {@link ByteArrayOrdinalMap}.
+     * @param rec the record to add to this state
+     * @return the ordinal of the added record
      */
     public int add(HollowWriteRecord rec) {
         if(!ordinalMap.isReadyForAddingObjects())
@@ -188,7 +190,11 @@ public abstract class HollowTypeWriteState {
      * WARNING: This method will not automatically update the ByteArrayOrdinalMap's free ordinals.  This will corrupt 
      * the state unless all remapped ordinals are *also* removed from the free ordinal list using recalculateFreeOrdinals()
      * after all calls to mapOrdinal() are complete.
-     *  
+     *
+     * @param rec the record
+     * @param newOrdinal the new ordinal
+     * @param markPreviousCycle true if the previous populated cycle should be updated
+     * @param markCurrentCycle true if the current populated cycle should be updated
      */
     public void mapOrdinal(HollowWriteRecord rec, int newOrdinal, boolean markPreviousCycle, boolean markCurrentCycle) {
         if(!ordinalMap.isReadyForAddingObjects())
@@ -336,6 +342,7 @@ public abstract class HollowTypeWriteState {
     /**
      * Get or create a scratch byte array.  Each thread will need its own array, so these
      * are referenced via a ThreadLocal variable.
+     * @return the scratch byte array
      */
     protected ByteDataBuffer scratch() {
         ByteDataBuffer scratch = serializedScratchSpace.get();

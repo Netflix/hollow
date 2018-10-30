@@ -109,8 +109,10 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      *
      * After this call completes, the thread pool will be shut down.
      *
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws ExecutionException if a computation threw an
+     * exception
+     * @throws InterruptedException if the current thread was interrupted
+     * while waiting
      */
     public void awaitSuccessfulCompletion() throws InterruptedException, ExecutionException {
         awaitUninterruptibly();
@@ -125,8 +127,10 @@ public class SimultaneousExecutor extends ThreadPoolExecutor {
      *
      * After this call completes, the thread pool will <i>not</i> be shut down and can be reused.
      *
-     * @throws ExecutionException
-     * @throws InterruptedException
+     * @throws ExecutionException if a computation threw an
+     * exception
+     * @throws InterruptedException if the current thread was interrupted
+     * while waiting
      */
     public void awaitSuccessfulCompletionOfCurrentTasks() throws InterruptedException, ExecutionException {
         for(Future<?> f : futures) {

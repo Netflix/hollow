@@ -200,7 +200,7 @@ public class FieldPath {
     /**
      * Recursively find a value following the path. If the path contains a collection, then the first value is picked.
      *
-     * @param ordinal
+     * @param ordinal the ordinal used to find a value
      * @return A value found at the field path for the given ordinal record in the type.
      */
     public Object findValue(int ordinal) {

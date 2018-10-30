@@ -48,7 +48,7 @@ public class HollowObjectWriteRecord implements HollowWriteRecord {
      * Concatenates all fields, in order, to the ByteDataBuffer supplied.  This concatenation is the
      * verbatim serialized representation in the FastBlob.
      *
-     * @param buf
+     * @param buf the data buffer to write data to
      */
     public void writeDataTo(ByteDataBuffer buf) {
         for (int i = 0; i < fieldData.length; i++) {

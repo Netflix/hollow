@@ -58,6 +58,8 @@ public interface HollowProducerListener extends
 
     /**
      * Called after the {@code HollowProducer} has initialized its data model.
+     * @param elapsed the elapsed duration
+     * @param unit the units of duration
      */
     void onProducerInit(long elapsed, TimeUnit unit);
 

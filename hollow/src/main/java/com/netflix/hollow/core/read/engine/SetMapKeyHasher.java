@@ -31,6 +31,7 @@ public class SetMapKeyHasher {
      * 
      * @param key the key
      * @param fieldType the respective FieldTypes of each key.
+     * @return the hash code
      */
     public static int hash(Object key[], FieldType fieldType[]) {
         int hash = 0;
@@ -45,6 +46,10 @@ public class SetMapKeyHasher {
     
     /**
      * Hash a single key field
+     *
+     * @param key the key
+     * @param fieldType the FieldType of the key.
+     * @return the hash code
      */
     public static int hash(Object key, FieldType fieldType) {
         switch(fieldType) {

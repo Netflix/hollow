@@ -33,15 +33,17 @@ import com.netflix.hollow.core.schema.HollowSetSchema;
 public interface HollowCollectionTypeDataAccess extends HollowTypeDataAccess {
 
     /**
+     * @param ordinal the ordinal
      * @return the number of elements contained in the set at the specified ordinal.
      */
-    public int size(int ordinal);
+    int size(int ordinal);
     
     /**
+     * @param ordinal the ordinal
      * @return an iterator over all elements in the collection.
      */
-    public HollowOrdinalIterator ordinalIterator(int ordinal);
+    HollowOrdinalIterator ordinalIterator(int ordinal);
 
-    public HollowCollectionSchema getSchema();
+    HollowCollectionSchema getSchema();
 
 }
