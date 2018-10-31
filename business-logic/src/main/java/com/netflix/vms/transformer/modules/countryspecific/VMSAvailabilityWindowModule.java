@@ -275,11 +275,9 @@ public class VMSAvailabilityWindowModule {
                                         skipContract = false;
                                     }
 
-                                    // check for intention to get localized assets
-                                    if (skipContract) {
-                                        // if there is intention to get localized assets then do not skip the contract.
-                                        if (getEarliestWindowStartDateForTheLanguage(videoId, country, language) != null) skipContract = false;
-                                    }
+                                    // if there is an intention to get localized assets and this is a future window only then do not skip the contract
+                                    if (skipContract && window._getStartDate() > ctx.getNowMillis() && getEarliestWindowStartDateForTheLanguage(videoId, country, language) != null) skipContract = false;
+
 
                                     // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
                                     if (skipContract) {
@@ -476,16 +474,19 @@ public class VMSAvailabilityWindowModule {
             // assign the highest contract Id recorded for the highest package Id in the current window
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            // add the window to output window list
-            availabilityWindows.add(outputWindow);
+            // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
+            // Basically - Do not add: outputWindow to availabilityWindows list if evaluating country-language catalog and empty info is present.
+            if (language == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
+                availabilityWindows.add(outputWindow);
 
-            // if evaluating episode and isGoLive is true, then roll up the windows to season.
-            if (rollup.doEpisode()) {
+                // if evaluating episode and isGoLive is true, then roll up the windows to season.
+                if (rollup.doEpisode()) {
 
-                if (isMulticatalogRollup) rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
-                if (isGoLive)
-                    rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup
-                            .getSeasonSequenceNumber());
+                    if (isMulticatalogRollup)
+                        rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
+                    if (isGoLive)
+                        rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup.getSeasonSequenceNumber());
+                }
             }
 
         } // end of for loop for iterating through windows for this video
@@ -669,10 +670,10 @@ public class VMSAvailabilityWindowModule {
      */
     private boolean shouldFilterOutWindowInfo(long startDate, long endDate) {
 
-        // window has ended, then filter it
+        // window has ended, then filter it out the package contract info
         if (endDate < ctx.getNowMillis()) return true;
 
-        // filter all windows that have startDate that are releasing after a year from current time.
+        // filter all windows info that have startDate that are releasing after a year from current time.
         if (startDate > (ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)) return true;
 
         return false;
