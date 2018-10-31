@@ -227,7 +227,7 @@ public class VMSAvailabilityWindowModule {
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
 
             // should use window data?
-            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(outputWindow.startDate.val, outputWindow.endDate.val);
+            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(window._getStartDate(), window._getEndDate());
             
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
@@ -651,6 +651,7 @@ public class VMSAvailabilityWindowModule {
             TitleAvailabilityForMultiCatalog notAvailable = new TitleAvailabilityForMultiCatalog(videoId, windowStart, windowEnd, packageId, contractId, assetsMissing);
             return notAvailable;
         }
+
         return null;
     }
 
