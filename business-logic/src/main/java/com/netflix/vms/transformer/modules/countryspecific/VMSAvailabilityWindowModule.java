@@ -228,13 +228,13 @@ public class VMSAvailabilityWindowModule {
 
             // should use window data?
             boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(window._getStartDate(), window._getEndDate());
-            
+
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
                 long dealId = windowContractHollow._getDealId();
                 ContractHollow contractData = VideoContractUtil.getContract(api, indexer, ctx, videoId, country, dealId);
-                
+
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
 
 
@@ -492,22 +492,15 @@ public class VMSAvailabilityWindowModule {
 
 
         if (currentOrFirstFutureWindow != null) {
-            WindowPackageContractInfo maxPackageContractInfo =
-                    getMaxPackageContractInfo(ctx, videoId, country,
-                            currentOrFirstFutureWindow.windowInfosByPackageId.values());
-            if (maxPackageContractInfo == null || maxPackageContractInfo.videoContractInfo == null
-                    || maxPackageContractInfo.videoPackageInfo == null) {
-                throw new RuntimeException("Invalid maxPackageContractInfo for video=" + videoId
-                        + " country= " + country + " info=" + maxPackageContractInfo);
+            WindowPackageContractInfo maxPackageContractInfo = getMaxPackageContractInfo(ctx, videoId, country, currentOrFirstFutureWindow.windowInfosByPackageId.values());
+            if (maxPackageContractInfo == null || maxPackageContractInfo.videoContractInfo == null || maxPackageContractInfo.videoPackageInfo == null) {
+                throw new RuntimeException("Invalid maxPackageContractInfo for video=" + videoId + " country= " + country + " info=" + maxPackageContractInfo);
             }
             rollup.newAssetBcp47Codes(maxPackageContractInfo.videoContractInfo.assetBcp47Codes);
             rollup.newPrePromoDays(minValueToZero(maxPackageContractInfo.videoContractInfo.prePromotionDays));
-            if (maxPackageContractInfo.videoContractInfo.isDayOfBroadcast)
-                rollup.foundDayOfBroadcast();
-            if (maxPackageContractInfo.videoContractInfo.hasRollingEpisodes)
-                rollup.foundRollingEpisodes();
-            if (maxPackageContractInfo.videoContractInfo.isAvailableForDownload)
-                rollup.foundAvailableForDownload();
+            if (maxPackageContractInfo.videoContractInfo.isDayOfBroadcast) rollup.foundDayOfBroadcast();
+            if (maxPackageContractInfo.videoContractInfo.hasRollingEpisodes) rollup.foundRollingEpisodes();
+            if (maxPackageContractInfo.videoContractInfo.isAvailableForDownload) rollup.foundAvailableForDownload();
             if (isGoLive && isInWindow) {
                 rollup.newVideoFormatDescriptors(maxPackageContractInfo.videoPackageInfo.formats);
                 rollup.newCupTokens(maxPackageContractInfo.videoContractInfo.cupTokens);
@@ -517,17 +510,14 @@ public class VMSAvailabilityWindowModule {
 
             // for multi-catalog country, rollup the local audio and text values
             if (language != null) {
-                if (currentOrFirstFutureWindowFoundLocalAudio)
-                    rollup.foundLocalAudio();
-                if (currentOrFirstFutureWindowFoundLocalText)
-                    rollup.foundLocalText();
+                if (currentOrFirstFutureWindowFoundLocalAudio) rollup.foundLocalAudio();
+                if (currentOrFirstFutureWindowFoundLocalText) rollup.foundLocalText();
             }
 
         } else if (language == null) {
             // if no current or future window found, then do this, but why?
             rollup.newEpisodeData(isGoLive, contractIdForMaxPackageId);
-            if (rollup.doEpisode())
-                rollup.newPrePromoDays(0);
+            if (rollup.doEpisode()) rollup.newPrePromoDays(0);
         }
 
         if (language != null && (availabilityWindows == null || availabilityWindows.isEmpty())) {
@@ -570,7 +560,7 @@ public class VMSAvailabilityWindowModule {
                                 maxContractId = (int) rightsWindowContract._getContractId();
                     	} else {
                             if ((int) rightsWindowContract._getDealId() > maxContractId)
-                                maxContractId = (int) rightsWindowContract._getDealId();                    		
+                                maxContractId = (int) rightsWindowContract._getDealId();
                     	}
                     }
                 }
@@ -683,7 +673,7 @@ public class VMSAvailabilityWindowModule {
         if (endDate < ctx.getNowMillis()) return true;
 
         // filter all windows that have startDate that are releasing after a year from current time.
-        if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS) return true;
+        if (startDate > (ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)) return true;
 
         return false;
     }
