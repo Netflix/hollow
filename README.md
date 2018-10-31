@@ -17,7 +17,7 @@ We recommend jumping into the [quick start guide](http://hollow.how/quick-start)
 
 ## Get Hollow
 
-Binaries are available from Maven Central and jcenter.
+Release binaries are available from Maven Central and jCenter.
 
 |GroupID/Org|ArtifactID/Name|Latest Stable Version|
 |-----------|---------------|---------------------|
@@ -39,6 +39,16 @@ In a Gradle `build.gradle` file:
         compile 'com.netflix.hollow:hollow:3.0.1'
         ...
         
+Release candidate binaries, matching the `-rc\.*` pattern for an artifact's version, are available from the jCenter [oss-candidate](https://dl.bintray.com/netflixoss/oss-candidate/) repository, which may be declared in a `build.gradle` file:
+
+        ...
+        repositories {
+            maven {
+                url 'https://dl.bintray.com/netflixoss/oss-candidate/'
+            }
+        }
+        ...
+
 ## Get Support
 
 Hollow is maintained by the Platform Data Technologies team at Netflix.  Support can be obtained directly from us or from fellow users through [Gitter](https://gitter.im/Netflix/hollow) or by opening an issue in this project.
