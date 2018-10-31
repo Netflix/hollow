@@ -197,7 +197,6 @@ public class VMSAvailabilityWindowModule {
         boolean currentOrFirstFutureWindowFoundLocalText = false;
         boolean isInWindow = false;
 
-        int includedPackageDataCount = 0;
         int maxPackageId = 0;
         int contractIdForMaxPackageId = 0;
 
@@ -216,7 +215,6 @@ public class VMSAvailabilityWindowModule {
             int packageIdForWindow = 0;
             int thisWindowBundledAssetsGroupId = 0;
 
-            boolean includedWindowPackageData = false;
             boolean thisWindowFoundLocalAudio = false;
             boolean thisWindowFoundLocalText = false;
 
@@ -378,8 +376,6 @@ public class VMSAvailabilityWindowModule {
                                 } else {
 
                                     // if windowPackageContractInfo is not present in outputWindow.windowInfosByPackageId for the given packageId and window data is not to be filtered
-                                    includedWindowPackageData = true;
-
                                     if (packageData != null) {
                                         // package data is available
                                         windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(
@@ -491,10 +487,6 @@ public class VMSAvailabilityWindowModule {
                     rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup
                             .getSeasonSequenceNumber());
             }
-
-
-            if (includedWindowPackageData)
-                includedPackageDataCount++;
 
         } // end of for loop for iterating through windows for this video
 
@@ -645,7 +637,7 @@ public class VMSAvailabilityWindowModule {
      */
     private TitleAvailabilityForMultiCatalog shouldReportMissingAssets(int videoId, long packageId, long contractId, long windowStart, long windowEnd, boolean thisWindowFoundLocalText, boolean thisWindowFoundLocalAudio) {
 
-        // if anyone asset if present then return null
+        // if any asset is present, then do not report
         if (thisWindowFoundLocalAudio || thisWindowFoundLocalText) return null;
 
         boolean isLiveWindow = windowStart < ctx.getNowMillis() && windowEnd > ctx.getNowMillis();
