@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.framework;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishWorkflowFailed;
+
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJobQueue;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -60,9 +62,10 @@ public abstract class PublishWorkflowPublicationJob implements PublicationJob {
             } else{
                 notifyCompleted();
             }
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             failedWithException = true;
             notifyFailed();
+            ctx.getLogger().error(PublishWorkflowFailed, "Failure processing job {}", this, t);
             throw t;
         }
     }
