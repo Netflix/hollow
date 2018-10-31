@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InteractivePackage;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_PrePromote;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_Skip_Contract_No_Assets;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
 
@@ -228,16 +227,9 @@ public class VMSAvailabilityWindowModule {
             List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
             if (window._getContractIdsExt() != null)
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
-            List<Long> contractIds = new ArrayList<>();
-            if(ctx.getConfig().isUseContractIdInsteadOfDealId()) {
-                contractIds = windowContracts.stream().map(c -> c._getContractId()).collect(Collectors.toList());            	
-            } else {
-                contractIds = windowContracts.stream().map(c -> c._getDealId()).collect(Collectors.toList());            	
-            }
 
-            // should use window data? Checks isGoLive flag, start/end dates and if video is ready for pre-promotion (is locale aware)
-            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(videoId, country, language, isGoLive, contractIds, includedPackageDataCount,
-                                                                          outputWindow.startDate.val, outputWindow.endDate.val);
+            // should use window data?
+            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(outputWindow.startDate.val, outputWindow.endDate.val);
             
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
@@ -276,15 +268,20 @@ public class VMSAvailabilityWindowModule {
                             // Language filtering rules starts here..
                             if (language != null) {
                                 long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
-                                boolean readyForPrePromotion = readyForPrePromotionInLanguageCatalog(videoId, country, language, contractIds, outputWindow.startDate.val);
 
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
-                                if (packageAvailability == 0 && !readyForPrePromotion) {
+                                if (packageAvailability == 0) {
 
                                     // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
                                     boolean skipContract = true;
                                     if (grandfatherEnabled && grandfatherLanguages.contains(language)) {
                                         skipContract = false;
+                                    }
+
+                                    // check for intention to get localized assets
+                                    if (skipContract) {
+                                        // if there is intention to get localized assets then do not skip the contract.
+                                        if (getEarliestWindowStartDateForTheLanguage(videoId, country, language) != null) skipContract = false;
                                     }
 
                                     // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
@@ -295,9 +292,6 @@ public class VMSAvailabilityWindowModule {
                                             cycleDataAggregator.collect(country, language, titleMissingAssets, Language_Catalog_Title_Availability);
                                         }
                                         continue;
-                                    } else {
-                                        // should we collect this info?
-                                        //cycleDataAggregator.collect(country, language, videoId, Language_Catalog_Grandfather);
                                     }
                                 }
 
@@ -456,9 +450,10 @@ public class VMSAvailabilityWindowModule {
                             rollup.foundRollingEpisodes();
                         }
 
-                        // package list is empty for the given contract -- use the contract only. Applicable only for non multi-locale country that is if locale is not passed
+                        // package list is empty for the given contract -- use the contract only.
+                        // Applicable to country catalog and also for country-language catalog if only goLive is false. (goLive will be false if package info is not there)
 
-                        if (language == null) {
+                        if (language == null || (language != null && !isGoLive)) {
                             // build info without package data, Use the assets and contract data though
                             WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
@@ -470,7 +465,7 @@ public class VMSAvailabilityWindowModule {
                         }
                     }
                 } else {
-                    if (language == null) {
+                    if (language == null || (language != null && !isGoLive)) {
                         // if no assets and no associated package available then build info using just contract ID and video ID
                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
 
@@ -486,20 +481,18 @@ public class VMSAvailabilityWindowModule {
             // assign the highest contract Id recorded for the highest package Id in the current window
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
 
-            // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
-            // Basically - Do not add: outputWindow to availabilityWindows list if multi-language catalog and empty info is present.
-            if (language == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
-                availabilityWindows.add(outputWindow);
+            // add the window to output window list
+            availabilityWindows.add(outputWindow);
 
-                // if evaluating episode and isGoLive is true, then roll up the windows to season.
-                if (rollup.doEpisode()) {
+            // if evaluating episode and isGoLive is true, then roll up the windows to season.
+            if (rollup.doEpisode()) {
 
-                    if (isMulticatalogRollup)
-                        rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
-                    if (isGoLive)
-                        rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup.getSeasonSequenceNumber());
-                }
+                if (isMulticatalogRollup) rollup.windowFound(outputWindow.startDate.val, outputWindow.endDate.val);
+                if (isGoLive)
+                    rollup.newSeasonWindow(outputWindow.startDate.val, outputWindow.endDate.val, outputWindow.onHold, rollup
+                            .getSeasonSequenceNumber());
             }
+
 
             if (includedWindowPackageData)
                 includedPackageDataCount++;
@@ -686,72 +679,18 @@ public class VMSAvailabilityWindowModule {
         return transformedVideoData.getTransformedPackageData(videoId).getPackageDataCollection((int) packageId);
     }
 
-    // old logic for checking if window should be filtered out in country catalog
-    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
-
-        // window has ended, then filter it
-        if (endDate < ctx.getNowMillis())
-            return true;
-
-        if (!isGoLive) {
-            boolean isWindowDataNeeded = false;
-            for (Long contractId : contractIds) {
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, contractId);
-                if (contract != null && (contract._getDayOfBroadcast() || contract._getDayAfterBroadcast() || contract._getPrePromotionDays() > 0)) {
-                    isWindowDataNeeded = true;
-                }
-            }
-
-            if (!isWindowDataNeeded)
-                return true;
-        }
-
-        if (unfilteredCount < 3 && endDate > ctx.getNowMillis())
-            return false;
-
-        if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS)
-            return true;
-
-        return false;
-    }
-
     /**
-     * This function checks if the given window should be filtered.
-     * - If the window end data is less than now, meaning window has already passed, then answer is yes.
-     * - if isGoLive flag is false, then check if window data is needed. This is mainly for video (check all contracts) that are in pre-promotion stage or in days after broadcast.
-     * - if isGoLive is true, then check if window is open, endDate is greater than now
-     * - if isGoLive is true and endDate is > now, then check is window start is not in far future.
-     *
-     * @return false means do not filter out the window
+     * Filter out windows that have ended or have startDate after a year from current time.
+     * @param startDate
+     * @param endDate
+     * @return Boolean
      */
-    private boolean shouldFilterOutWindowInfo(long videoId, String countryCode, String language, boolean isGoLive, Collection<Long> contractIds, int unfilteredCount, long startDate, long endDate) {
-
-        if (language == null) {
-            // use old logic
-            return shouldFilterOutWindowInfo(videoId, countryCode, isGoLive, contractIds, unfilteredCount, startDate, endDate);
-        }
-
-        // language is not null -> use earliest window start date for that language (best estimate the assets will be available)
+    private boolean shouldFilterOutWindowInfo(long startDate, long endDate) {
 
         // window has ended, then filter it
         if (endDate < ctx.getNowMillis()) return true;
 
-        if (!isGoLive) {
-            Long earliestWindowStartDateForTheLanguageWithAssets = getEarliestWindowStartDateForTheLanguage(videoId, countryCode, language);
-            boolean isWindowDataNeeded = false;
-            if (startDate > ctx.getNowMillis()) {
-                boolean shouldPrePromote = shouldPrePromote(videoId, countryCode, contractIds, earliestWindowStartDateForTheLanguageWithAssets);
-                if (shouldPrePromote) {
-                    cycleDataAggregator.collect(countryCode, language, (int) videoId, Language_catalog_PrePromote);
-                    isWindowDataNeeded = true;
-                }
-            }
-
-            if (!isWindowDataNeeded) return true;
-        }
-
-        if (unfilteredCount < 3 && endDate > ctx.getNowMillis()) return false;
-
+        // filter all windows that have startDate that are releasing after a year from current time.
         if (startDate > ctx.getNowMillis() + FUTURE_CUTOFF_IN_MILLIS) return true;
 
         return false;
