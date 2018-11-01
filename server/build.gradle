@@ -106,13 +106,6 @@ configurations.grettyRunnerTomcat8 {
     exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
 }
 
-configurations.all {
-  resolutionStrategy {
-    force 'netflix:gutenberg-common:3.3.0','netflix:gutenberg-consumer-library:3.3.0','netflix:gutenberg-publishing-library:3.3.0'
-  }
-}
-
-
 war {
   into('WEB-INF/classes') {
     from 'src/main/java'

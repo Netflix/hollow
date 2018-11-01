@@ -24,12 +24,6 @@ configurations {
   all*.exclude group: 'netflix', module: 'mantis-realtime-events'
 }
 
-configurations.all {
-  resolutionStrategy {
-    force 'netflix:gutenberg-common:3.3.0','netflix:gutenberg-consumer-library:3.3.0','netflix:gutenberg-publishing-library:3.3.0'
-  }
-}
-
 jar {
   from 'src/main/java'
 }
