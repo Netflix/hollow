@@ -220,6 +220,7 @@ public class VMSAvailabilityWindowModule {
 
             // create new window
             VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
+            boolean isFutureWindow = window._getStartDate() > ctx.getNowMillis();
 
             // collect all contracts for the window
             List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
@@ -227,8 +228,7 @@ public class VMSAvailabilityWindowModule {
                 windowContracts = window._getContractIdsExt().stream().collect(Collectors.toList());
 
             // should use window data?
-            boolean shouldFilterOutWindowInfo = shouldFilterOutWindowInfo(window._getStartDate(), window._getEndDate());
-
+            boolean shouldPopulateWindowPackageContractData = shouldPopulateWindowPackageContractData(window._getStartDate(), window._getEndDate());
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
@@ -269,14 +269,11 @@ public class VMSAvailabilityWindowModule {
                                 // if no localized assets available and title is not ready for promotion -> skip the contract
                                 if (packageAvailability == 0) {
 
-                                    // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
-                                    boolean skipContract = true;
-                                    if (grandfatherEnabled && grandfatherLanguages.contains(language)) {
-                                        skipContract = false;
-                                    }
-
-                                    // if there is an intention to get localized assets and this is a future window only then do not skip the contract
-                                    if (skipContract && window._getStartDate() > ctx.getNowMillis() && getEarliestWindowStartDateForTheLanguage(videoId, country, language) != null) skipContract = false;
+                                    // Do not skip the contract -
+                                    // if grandfathering the title, that is forcing its availability without localized assets
+                                    // OR if it's a future window and there is intention to get localized assets
+                                    boolean skipContract = !((grandfatherEnabled && grandfatherLanguages.contains(language))
+                                            || (window._getStartDate() > ctx.getNowMillis() && intentionToGetLocalizedAssets(videoId, country, language)));
 
 
                                     // skip contract, if assets are missing, and no override needed (no grandfathering/back-filling of existing tiles) and title not ready for pre-promotion.
@@ -315,7 +312,7 @@ public class VMSAvailabilityWindowModule {
 
                                 // For existing windowPackageContractInfo object
                                 // check if this window data should be filtered
-                                if (shouldFilterOutWindowInfo) {
+                                if (shouldPopulateWindowPackageContractData) {
                                     // if contract is greater than previous contract for this package id then update the windowContractInfo.contractId to use higher value for contractId
                                     if (dealId > windowPackageContractInfo.videoContractInfo.contractId) {
                                         // update contract id, since it is higher value.
@@ -353,7 +350,7 @@ public class VMSAvailabilityWindowModule {
                                 // if windowPackageContractInfo is not present in outputWindow.windowInfosByPackageId for the given packageId
                                 // then create a new one
 
-                                if (shouldFilterOutWindowInfo) {
+                                if (shouldPopulateWindowPackageContractData) {
                                     // if previously filtered window package contract info exists the update the contract id in that to use higher value
                                     WindowPackageContractInfo alreadyFilteredWindowPackageContractInfo = outputWindow.windowInfosByPackageId.get(ZERO);
                                     if (alreadyFilteredWindowPackageContractInfo != null) {
@@ -446,7 +443,7 @@ public class VMSAvailabilityWindowModule {
                         // package list is empty for the given contract -- use the contract only.
                         // Applicable to country catalog and also for country-language catalog if only goLive is false. (goLive will be false if package info is not there)
 
-                        if (language == null || (language != null && !isGoLive)) {
+                        if (language == null || (!isGoLive && isFutureWindow && intentionToGetLocalizedAssets(videoId, country, language))) {
                             // build info without package data, Use the assets and contract data though
                             WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
                             outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
@@ -458,7 +455,7 @@ public class VMSAvailabilityWindowModule {
                         }
                     }
                 } else {
-                    if (language == null || (language != null && !isGoLive)) {
+                    if (language == null || (!isGoLive && isFutureWindow && intentionToGetLocalizedAssets(videoId, country, language))) {
                         // if no assets and no associated package available then build info using just contract ID and video ID
                         outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) dealId, videoId));
 
@@ -476,7 +473,22 @@ public class VMSAvailabilityWindowModule {
 
             // if locale is not null and windowInfosByPackageId is empty then the code in if block is not executed.
             // Basically - Do not add: outputWindow to availabilityWindows list if evaluating country-language catalog and empty info is present.
-            if (language == null || !outputWindow.windowInfosByPackageId.isEmpty()) {
+            boolean outputWindowHasPackageContractData = !outputWindow.windowInfosByPackageId.isEmpty();// almost all the cases, this map is not empty, except when language is present and a live window does not have package/assets the whole contract is skipped.
+
+            boolean addWindow = false;
+            if (language != null) {
+
+                // if it is future window, then make sure there is intention to get data, regardless of package,assets, contract present or not
+                if (isFutureWindow && intentionToGetLocalizedAssets(videoId, country, language)) {
+                    addWindow = true;
+                }
+
+                // if not future window, and window has valid package, contract data (that, is we checked for assets and added data for window) -> add the window to output.
+                if (!isFutureWindow && outputWindowHasPackageContractData) addWindow = true;
+
+            } else if (outputWindowHasPackageContractData) addWindow = true;
+
+            if (addWindow) {
                 availabilityWindows.add(outputWindow);
 
                 // if evaluating episode and isGoLive is true, then roll up the windows to season.
@@ -663,12 +675,12 @@ public class VMSAvailabilityWindowModule {
     }
 
     /**
-     * Filter out windows that have ended or have startDate after a year from current time.
+     * Filter out window information that have ended or have startDate after a year from current time.
      * @param startDate
      * @param endDate
      * @return Boolean
      */
-    private boolean shouldFilterOutWindowInfo(long startDate, long endDate) {
+    private boolean shouldPopulateWindowPackageContractData(long startDate, long endDate) {
 
         // window has ended, then filter it out the package contract info
         if (endDate < ctx.getNowMillis()) return true;
@@ -679,7 +691,7 @@ public class VMSAvailabilityWindowModule {
         return false;
     }
 
-    private Long getEarliestWindowStartDateForTheLanguage(long videoId, String country, String language) {
+    private boolean intentionToGetLocalizedAssets(long videoId, String country, String language) {
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
         if (ordinal != -1) {
 
@@ -688,11 +700,11 @@ public class VMSAvailabilityWindowModule {
             MapOfStringToLongHollow mapOfStringToLongHollow = feedMovieCountryLanguagesHollow._getLanguageToEarliestWindowStartDateMap();
             LongHollow longHollow = mapOfStringToLongHollow.get(language);
             if (longHollow != null) {
-                return longHollow._getValue();
-            } else { return null; }
+                return true;
+            }
 
         }
-        return null;
+        return false;
     }
 
     /**
