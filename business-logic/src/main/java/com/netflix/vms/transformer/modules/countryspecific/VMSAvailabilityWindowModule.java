@@ -251,8 +251,8 @@ public class VMSAvailabilityWindowModule {
                     }
 
 
-                } else if (contractPackages.isEmpty() && !contractAssets.isEmpty()) {
-                    // CASE 2: Assets are available by the contract, but no package available -> Build the info using assets, contractID and videoID and use "0" for package Id
+                } else if (contractPackages.isEmpty()) {
+                    // CASE 2: Packages not available -> Build the info using assets, contractID and videoID and use "0" for package Id
 
                     //Do not lose sight of the fact that the rollingEpisode flag could be set even if the packages are not present
                     if (contractData != null && contractData._getDayAfterBroadcast()) {
