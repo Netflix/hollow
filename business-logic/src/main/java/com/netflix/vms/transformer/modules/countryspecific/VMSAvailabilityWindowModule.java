@@ -242,37 +242,25 @@ public class VMSAvailabilityWindowModule {
                 // CASE 1: NO packages and Assets in the contract -> Build info using only the videoID and contractID
                 if (windowContractHollow._getPackageIdBoxed() == null && contractAssets.isEmpty() && contractPackages.isEmpty()) {
 
-                    if (language == null) {
-
-                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
-
-                        if (maxPackageId == 0) {
-                            contractIdForMaxPackageId = (int) contractId;
-                            thisWindowBundledAssetsGroupId = (int) contractId;
-                        }
+                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) contractId, videoId));
+                    if (maxPackageId == 0) {
+                        contractIdForMaxPackageId = (int) contractId;
+                        thisWindowBundledAssetsGroupId = (int) contractId;
                     }
-
 
                 } else if (contractPackages.isEmpty()) {
                     // CASE 2: Packages not available -> Build the info using assets, contractID and videoID and use "0" for package Id
 
                     //Do not lose sight of the fact that the rollingEpisode flag could be set even if the packages are not present
-                    if (contractData != null && contractData._getDayAfterBroadcast()) {
-                        rollup.foundRollingEpisodes();
-                    }
+                    if (contractData != null && contractData._getDayAfterBroadcast()) rollup.foundRollingEpisodes();
 
-                    // package list is empty for the given contract -- use the contract only. Applicable only for non multi-locale country that is if locale is not passed
+                    // build info without package data, Use the assets and contract data though
+                    WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
+                    outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
-                    if (language == null) {
-                        // build info without package data, Use the assets and contract data though
-                        WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
-                        outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
+                    if (packageIdForWindow == 0) thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
+                    if (maxPackageId == 0) contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
 
-                        if (packageIdForWindow == 0)
-                            thisWindowBundledAssetsGroupId = Math.max((int) contractId, thisWindowBundledAssetsGroupId);
-                        if (maxPackageId == 0)
-                            contractIdForMaxPackageId = Math.max((int) contractId, contractIdForMaxPackageId);
-                    }
                 } else {
 
                         // CASE 3: packages and assets are present for the contract.
@@ -461,10 +449,15 @@ public class VMSAvailabilityWindowModule {
 
             // assign the highest contract Id recorded for the highest package Id in the current window
             outputWindow.bundledAssetsGroupId = thisWindowBundledAssetsGroupId;
-            // Skip the window, when creating language specific availability window list if 1. window is open and no package data was found (with relevant assets) 2. window is future and there is no intention of getting localized assets
+            // Skip the window logic
             boolean skipWindow = false;
-            if (isOpenWindow && !includedWindowPackageData) skipWindow = true;
-            if (isFutureWindow && getEarliestWindowStartDateForTheLanguage(videoId, country, language) == null) skipWindow = true;
+            if (language != null) {
+                // if window is open and no package data was included then skip the window
+                if (isOpenWindow && !includedWindowPackageData) skipWindow = true;
+
+                // if window is future, and no package data was included and also no intention to get assets then skip the window.
+                if (isFutureWindow && !includedWindowPackageData && getEarliestWindowStartDateForTheLanguage(videoId, country, language) == null) skipWindow = true;
+            }
 
             if (!skipWindow) {
                 availabilityWindows.add(outputWindow);
