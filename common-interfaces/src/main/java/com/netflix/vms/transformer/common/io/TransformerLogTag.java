@@ -74,6 +74,7 @@ public enum TransformerLogTag implements LogTag {
     BlobState,
     CreateDevSlice,
     DeletedTmpFile,
+    PublishWorkflowFailed,
 
     //// Debug /////
     ReexploreTags,

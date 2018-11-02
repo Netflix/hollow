@@ -71,7 +71,7 @@ dependencies {
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
-    compile 'netflix:cinder-core:latest.release'
+    compile 'netflix:netflix-internal-hollow:1.+'
 
     // httpclient
     compile 'org.apache.httpcomponents:httpclient'
@@ -105,13 +105,6 @@ configurations.grettyRunnerTomcat7 {
 configurations.grettyRunnerTomcat8 {
     exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
 }
-
-configurations.all {
-  resolutionStrategy {
-    force 'netflix:gutenberg-common:3.3.0','netflix:gutenberg-consumer-library:3.3.0','netflix:gutenberg-publishing-library:3.3.0'
-  }
-}
-
 
 war {
   into('WEB-INF/classes') {
