@@ -141,7 +141,7 @@ public class HollowProducer {
     private HollowProducerMetrics metrics;
     private HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
     private final SingleProducerEnforcer singleProducerEnforcer;
-    private long lastSucessfulCycle = 0;
+    private long lastSuccessfulCycle = 0;
 
     private boolean isInitialized;
 
@@ -338,12 +338,14 @@ public class HollowProducer {
     }
 
     /**
-     * Each cycle produces a single data state.
+     * Runs a cycle to populate, publish, and announce a new single data state.
      *
-     * @param task the populating task
-     * @return the version identifier of the produced state.
-     */
-    // @@@ Should this be marked as synchronized?
+     * @param task the populating task to add state
+     * @return the version identifier of the announced state, otherwise the
+     * last successful announced version if 1) there were no data changes compared to that version;
+     * or 2) the producer is not the primary producer
+     * @throws RuntimeException if the cycle failed
+     */    // @@@ Should this be marked as synchronized?
     public long runCycle(Populator task) {
         ListenerSupport.Listeners localListeners = listeners.listeners();
 
@@ -351,7 +353,7 @@ public class HollowProducer {
             // TODO: minimum time spacing between cycles
             log.log(Level.INFO, "cycle not executed -- not primary");
             localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
-            return lastSucessfulCycle;
+            return lastSuccessfulCycle;
         }
 
         long toVersion = versionMinter.mint();
@@ -362,7 +364,7 @@ public class HollowProducer {
         Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
 
         try {
-            runCycle(localListeners, task, cycleStatus, toVersion);
+            return runCycle(localListeners, task, cycleStatus, toVersion);
         } finally {
             localListeners.fireCycleComplete(cycleStatus);
             metrics.updateCycleMetrics(cycleStatus.build(), cycleStatus.readState, cycleStatus.version);
@@ -370,9 +372,6 @@ public class HollowProducer {
                 metricsCollector.collect(metrics);
             }
         }
-
-        lastSucessfulCycle = toVersion;
-        return toVersion;
     }
 
     /**
@@ -395,7 +394,7 @@ public class HollowProducer {
         return NO_ANNOUNCEMENT_AVAILABLE;
     }
 
-    void runCycle(ListenerSupport.Listeners listeners, Populator task, Status.StageWithStateBuilder cycleStatus, long toVersion) {
+    long runCycle(ListenerSupport.Listeners listeners, Populator task, Status.StageWithStateBuilder cycleStatus, long toVersion) {
         // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
         HollowWriteStateEngine writeEngine = getWriteEngine();
@@ -439,8 +438,15 @@ public class HollowProducer {
                     }
                     throw th;
                 }
+                lastSuccessfulCycle = toVersion;
             } else {
                 // 3b. Nothing to do; reset the effects of Step 2
+                // Return the lastSucessfulCycle to the caller thereby
+                // the callee can track that version against consumers
+                // without having to listen to events.
+                // Consistently report the version that would be used if
+                // data had been published for the events.  This
+                // is for consistency in tracking
                 writeEngine.resetToLastPrepareForNextCycle();
                 cycleStatus.success();
                 listeners.fireNoDelta(toVersion);
@@ -456,6 +462,7 @@ public class HollowProducer {
         } finally {
             artifacts.cleanup();
         }
+        return lastSuccessfulCycle;
     }
 
     /**
