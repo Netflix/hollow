@@ -260,7 +260,9 @@ public class VMSAvailabilityWindowModule {
                             // create packageId, get packageDataCollection and packageData for the given package in the contract
                             com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int) contractPackageHollow._getPackageId());
                             PackageDataCollection packageDataCollection = getPackageDataCollection(videoId, contractPackageHollow._getPackageId());
-                            PackageData packageData = packageDataCollection.getPackageData();
+                            PackageData packageData = null;
+                            if (packageDataCollection != null)
+                                packageData = packageDataCollection.getPackageData();
 
                             if (language != null) {
                                 long contractAssetAvailability = language == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(language, contractAssets);
