@@ -10,7 +10,6 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFa
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
-import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
@@ -30,10 +29,9 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
 	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion,
-			RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
-			CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
+			RegionEnum region, CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
 			ValuableVideoHolder videoRanker) {
-		super(ctx, ctx.getVip(), newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
+		super(ctx, ctx.getVip(), newVersion, region, canaryAnnounceJob);
 		this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();

@@ -37,7 +37,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
             Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValuableVideoHolder videoRanker) {
-        super(ctx, ctx.getVip(), cycleVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
+        super(ctx, ctx.getVip(), cycleVersion, afterCanaryAnnounceJobs);
         this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.validationVideoHolder = videoRanker;
         this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;

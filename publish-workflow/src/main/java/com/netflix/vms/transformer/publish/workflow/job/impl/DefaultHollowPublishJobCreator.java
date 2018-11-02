@@ -122,12 +122,10 @@ public class DefaultHollowPublishJobCreator {
 		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook);
 	}
 
-	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip,
-			long newVersion, RegionEnum region,
-			BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
-			CanaryAnnounceJob canaryAnnounceJob) {
-		return new HollowBlobAfterCanaryAnnounceJob(ctx, newVersion, region, beforeCanaryAnnounceJob,
-				canaryAnnounceJob, playbackMonkeyTester, videoRanker);
+	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(long newVersion, RegionEnum region,
+            CanaryAnnounceJob canaryAnnounceJob) {
+		return new HollowBlobAfterCanaryAnnounceJob(ctx, newVersion, region, canaryAnnounceJob,
+                playbackMonkeyTester, videoRanker);
 	}
 
     public AutoPinbackJob createAutoPinbackJob(AnnounceJob announcement, long waitMillis, long cycleVersion) {

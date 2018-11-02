@@ -59,13 +59,13 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip) {
+    HollowPublishWorkflowStager(TransformerContext ctx, DefaultHollowPublishJobCreator jobCreator, String vip) {
         this.ctx = ctx;
         this.scheduler = new PublicationJobScheduler();
         this.fileNamer = new HollowBlobFileNamer(vip);
         this.vip = vip;
         this.regionProvider = new PublishRegionProvider(ctx.getLogger());
-        this.priorAnnouncedJobs = new HashMap<RegionEnum, AnnounceJob>();
+        this.priorAnnouncedJobs = new HashMap<>();
         this.jobCreator = jobCreator;
 
         exposePublicationHistory();
@@ -132,8 +132,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
 
     private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
-        Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs = new HashMap<RegionEnum, BeforeCanaryAnnounceJob>(3);
-        Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<RegionEnum, AfterCanaryAnnounceJob>(3);
+        Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs = new HashMap<>(3);
+        Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<>(3);
 
         for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
             BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobs);
@@ -142,7 +142,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
             scheduler.submitJob(canaryAnnounceJob);
 
-            AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob, canaryAnnounceJob);
+            AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(newVersion, region, canaryAnnounceJob);
             scheduler.submitJob(afterCanaryAnnounceJob);
 
             beforeCanaryAnnounceJobs.put(region, beforeCanaryAnnounceJob);
@@ -229,10 +229,6 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         }
         return submittedJobs;
 
-    }
-
-    PublicationJobScheduler getExecutor() {
-        return scheduler;
     }
 
     // TODO: use constructor injection
