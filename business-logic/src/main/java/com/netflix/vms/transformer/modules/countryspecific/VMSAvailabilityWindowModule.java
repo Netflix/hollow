@@ -218,6 +218,7 @@ public class VMSAvailabilityWindowModule {
 
             // create new window
             VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
+            boolean isOpenWindow = window._getStartDate() <= ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis();
 
             // collect all contracts for the window
             List<RightsWindowContractHollow> windowContracts = window._getContractIdsExt() != null ?  window._getContractIdsExt().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
@@ -401,9 +402,7 @@ public class VMSAvailabilityWindowModule {
 
                                     if (packageData != null) {
                                         // package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(
-                                                videoId, packageData, windowContractHollow, contractData, country,
-                                                isAvailableForDownload, packageDataCollection);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(videoId, packageData, windowContractHollow, contractData, country, isAvailableForDownload, packageDataCollection);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = contractPackages == null ? true : packageData.isDefaultPackage;
                                         if (!considerForPackageSelection) {
@@ -440,18 +439,16 @@ public class VMSAvailabilityWindowModule {
                                     }
                                 }
 
-                                long windowEndDate = window._getEndDate();
-                                long windowStartDate = window._getStartDate();
                                 // if window is open then rollup the start window availability date and update the flag isInWindow
-                                if (isGoLive && windowEndDate > ctx.getNowMillis() && windowStartDate < ctx.getNowMillis()) {
-                                    rollup.newInWindowAvailabilityDate(windowStartDate);
+                                if (isGoLive && isOpenWindow) {
+                                    rollup.newInWindowAvailabilityDate(window._getStartDate());
                                     isInWindow = true;
                                 }
 
                                 // keep track if minimum window start date, only for windows where end date is greater than now
                                 // also update currentOrFutureWindow and local audio/text values
-                                if (windowEndDate > ctx.getNowMillis() && windowStartDate < minWindowStartDate) {
-                                    minWindowStartDate = windowStartDate;
+                                if (window._getEndDate() > ctx.getNowMillis() && window._getStartDate() < minWindowStartDate) {
+                                    minWindowStartDate = window._getStartDate();
                                     currentOrFirstFutureWindow = outputWindow;
                                     currentOrFirstFutureWindowFoundLocalAudio = thisWindowFoundLocalAudio;
                                     currentOrFirstFutureWindowFoundLocalText = thisWindowFoundLocalText;
