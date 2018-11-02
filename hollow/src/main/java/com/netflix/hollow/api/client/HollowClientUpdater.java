@@ -37,9 +37,10 @@ import java.util.logging.Logger;
 public class HollowClientUpdater {
     private static final Logger LOG = Logger.getLogger(HollowClientUpdater.class.getName());
 
+    private volatile HollowDataHolder hollowDataHolderVolatile;
+
     private final HollowUpdatePlanner planner;
     private final CompletableFuture<Long> initialLoad;
-    private HollowDataHolder hollowDataHolder;
     private boolean forceDoubleSnapshot = false;
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
@@ -81,13 +82,16 @@ public class HollowClientUpdater {
 
     /**
      * Updates the state to the provided version. Returns true if the update was successful.
+     * Note that this method is synchronized and it is the only method that modifies the
+     * {@code hollowDataHolderVolatile}, so we don't need to worry about it changing out from
+     * under us.
      */
     public synchronized boolean updateTo(long version) throws Throwable {
         if (version == getCurrentVersionId()) {
-            if (version == HollowConstants.VERSION_NONE && hollowDataHolder == null) {
+            if (version == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
-                hollowDataHolder = newHollowDataHolder();
+                hollowDataHolderVolatile = newHollowDataHolder();
                 forceDoubleSnapshotNextUpdate(); // intentionally ignore doubleSnapshotConfig
             }
             return true;
@@ -104,7 +108,10 @@ public class HollowClientUpdater {
             listener.refreshStarted(beforeVersion, version);
 
         try {
-            HollowUpdatePlan updatePlan = planUpdate(version);
+            HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
+                ? planner.planInitializingUpdate(version)
+                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), version,
+                        doubleSnapshotConfig.allowDoubleSnapshot());
 
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
                     && version != HollowConstants.VERSION_LATEST)
@@ -114,13 +121,13 @@ public class HollowClientUpdater {
                 return true;
 
             if (updatePlan.isSnapshotPlan()) {
-                if (hollowDataHolder == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
-                    hollowDataHolder = newHollowDataHolder();
-                    hollowDataHolder.update(updatePlan, localListeners);
+                if (hollowDataHolderVolatile == null || doubleSnapshotConfig.allowDoubleSnapshot()) {
+                    hollowDataHolderVolatile = newHollowDataHolder();
+                    hollowDataHolderVolatile.update(updatePlan, localListeners);
                     forceDoubleSnapshot = false;
                 }
             } else {
-                hollowDataHolder.update(updatePlan, localListeners);
+                hollowDataHolderVolatile.update(updatePlan, localListeners);
             }
 
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
@@ -146,7 +153,7 @@ public class HollowClientUpdater {
             throw th;
         }
     }
-    
+
     public void addRefreshListener(HollowConsumer.RefreshListener refreshListener) {
         refreshListeners.addIfAbsent(refreshListener);
     }
@@ -156,7 +163,8 @@ public class HollowClientUpdater {
     }
 
     public long getCurrentVersionId() {
-        return hollowDataHolder != null ? hollowDataHolder.getCurrentVersion()
+        HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        return hollowDataHolderLocal != null ? hollowDataHolderLocal.getCurrentVersion()
             : HollowConstants.VERSION_NONE;
     }
 
@@ -164,17 +172,11 @@ public class HollowClientUpdater {
         this.forceDoubleSnapshot = true;
     }
 
-    private HollowUpdatePlan planUpdate(long version) throws Exception {
-        if(shouldCreateSnapshotPlan())
-            return planner.planInitializingUpdate(version);
-        return planner.planUpdate(hollowDataHolder.getCurrentVersion(), version, doubleSnapshotConfig.allowDoubleSnapshot());
-    }
-
     /**
      * Whether or not a snapshot plan should be created. Visible for testing.
      */
     boolean shouldCreateSnapshotPlan() {
-        return hollowDataHolder == null || getCurrentVersionId() == HollowConstants.VERSION_NONE
+        return getCurrentVersionId() == HollowConstants.VERSION_NONE
             ||  (forceDoubleSnapshot && doubleSnapshotConfig.allowDoubleSnapshot());
     }
 
@@ -185,11 +187,12 @@ public class HollowClientUpdater {
     }
 
     private HollowReadStateEngine newStateEngine() {
-        if(hollowDataHolder != null) {
-            ArraySegmentRecycler existingRecycler = hollowDataHolder.getStateEngine().getMemoryRecycler();
+        HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        if (hollowDataHolderLocal != null) {
+            ArraySegmentRecycler existingRecycler =
+                    hollowDataHolderLocal.getStateEngine().getMemoryRecycler();
             return new HollowReadStateEngine(hashCodeFinder, true, existingRecycler);
         }
-
         return new HollowReadStateEngine(hashCodeFinder);
     }
 
@@ -198,11 +201,13 @@ public class HollowClientUpdater {
     }
 
     public HollowReadStateEngine getStateEngine() {
-        return hollowDataHolder == null ? null : hollowDataHolder.getStateEngine();
+        HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        return hollowDataHolderLocal == null ? null : hollowDataHolderLocal.getStateEngine();
     }
 
     public HollowAPI getAPI() {
-        return hollowDataHolder.getAPI();
+        HollowDataHolder hollowDataHolderLocal = hollowDataHolderVolatile;
+        return hollowDataHolderLocal == null ? null : hollowDataHolderLocal.getAPI();
     }
 
     public void setFilter(HollowFilterConfig filter) {
@@ -222,7 +227,7 @@ public class HollowClientUpdater {
     public int getNumFailedDeltaTransitions() {
         return failedTransitionTracker.getNumFailedDeltaTransitions();
     }
-    
+
     /**
      * Clear any failed transitions from the {@link FailedTransitionTracker}, so that they may be reattempted when an update is triggered.
      */
