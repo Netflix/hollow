@@ -31,6 +31,7 @@ import com.netflix.hollow.api.producer.HollowProducer.ReadState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
+import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -88,6 +89,55 @@ public class HollowProducerTest {
             System.out.println("\t deleting: " + file);
             file.delete();
         }
+    }
+
+    @Test
+    public void testPopulateNoChangesVersion() {
+        HollowProducer producer = createProducer(tmpFolder);
+        long v1 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        // Run cycle with no changes
+        long v2 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        long v3 = producer.runCycle(ws -> {
+            ws.add(2);
+        });
+
+        Assert.assertEquals(v1, v2);
+        Assert.assertTrue(v3 > v2);
+    }
+
+    @Test
+    public void testNotPrimaryProducerVersion() {
+        BasicSingleProducerEnforcer enforcer = new BasicSingleProducerEnforcer();
+        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
+                .withSingleProducerEnforcer(enforcer)
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
+                .build();
+        producer.addListener(new FakeProducerListener());
+
+        long v1 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        enforcer.disable();
+        // Run cycle as not the primary producer
+        long v2 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        // Run cycle as the primary producer
+        enforcer.enable();
+        long v3 = producer.runCycle(ws -> {
+            ws.add(2);
+        });
+
+        Assert.assertEquals(v1, v2);
+        Assert.assertTrue(v3 > v2);
     }
 
     @Test
