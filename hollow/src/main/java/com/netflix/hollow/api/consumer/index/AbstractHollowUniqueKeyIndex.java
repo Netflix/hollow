@@ -88,7 +88,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
 
     private class RefreshListener implements HollowConsumer.RefreshListener {
         @Override
-        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) throws Exception {
+        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
             idx.detachFromDeltaUpdates();
             idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
             idx.listenForDeltaUpdates();
@@ -97,7 +97,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
         }
 
         @Override
-        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) throws Exception {
+        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
             api = castAPI(refreshAPI);
         }
 
