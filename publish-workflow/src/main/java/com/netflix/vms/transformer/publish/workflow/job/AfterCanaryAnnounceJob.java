@@ -8,7 +8,6 @@ import java.util.Map;
 
 public abstract class AfterCanaryAnnounceJob extends PublishWorkflowPublicationJob {
 	private final CanaryAnnounceJob canaryAnnounceJob;
-	protected final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob;
 	protected final String vip;
 	protected final RegionEnum region;
 
@@ -16,12 +15,10 @@ public abstract class AfterCanaryAnnounceJob extends PublishWorkflowPublicationJ
 	        final String vip,
 			final long newVersion,
 			final RegionEnum region,
-			final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
 			final CanaryAnnounceJob canaryAnnounceJob) {
 		super(ctx, "AfterCanaryAnnounce-"+region, newVersion);
 		this.region = region;
 		this.vip = vip;
-		this.beforeCanaryAnnounceJob = beforeCanaryAnnounceJob;
 		this.canaryAnnounceJob = canaryAnnounceJob;
 	}
 

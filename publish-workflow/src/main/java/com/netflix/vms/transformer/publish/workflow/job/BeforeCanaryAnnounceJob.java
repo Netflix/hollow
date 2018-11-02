@@ -46,6 +46,11 @@ public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublication
     @Override
     public boolean isEligible() {
         if(jobExistsAndCompletedSuccessfully(circuitBreakerJob)) {
+            /* If we have delta jobs, then verify that all delta jobs are complete. If we don't
+             * have any delta jobs, then verify that all snapshots are complete.
+             * We don't publish deltas when we're breaking the delta chain (currently only for the
+             * latestcandidate stack), so this means that in most cases delta upload is the only
+             * requirement for a data announcement. */
             if(!deltaPublishJobs.isEmpty()) {
                 for(HollowBlobPublishJob deltaPublishJob : deltaPublishJobs) {
                     if(!jobExistsAndCompletedSuccessfully(deltaPublishJob))
