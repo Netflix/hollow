@@ -1,12 +1,14 @@
 apply plugin: 'java'
- 
+
 dependencies {
     compile project(':hollow')
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.4.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.3'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.6.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.0'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-lang:commons-lang:latest.release'
+    compile 'org.ow2.asm:asm:6.2.1'
 
-    testCompile 'junit:junit:4.11'
+    testCompile project(':hollow').sourceSets.test.output
+    testCompile project(path: ':hollow', configuration: 'testCompile')
 }
