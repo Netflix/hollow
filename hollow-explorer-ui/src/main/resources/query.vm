@@ -34,11 +34,11 @@
 				<select name="type">
 					<option>ANY TYPE</option>
 					#foreach($type in $allTypes)
-						<option#if($type.equals($selectedType)) selected#end>$type</option>
+						<option#if($type.equals($selectedType)) selected#end>$esc.html($type)</option>
 					#end
 				</select>
 			</td>
-			<td><input type="text" name="field"#if($selectedField) value="$selectedField"#end></td>
+			<td><input type="text" name="field"#if($selectedField) value="$esc.html($selectedField)"#end></td>
 			<td><input type="text" name="queryValue" size="85"></td>
 			<td><input type="submit"></td>
 		</tr>
@@ -48,7 +48,7 @@
 
 #if($queryResult)
 
-Current Query: <span style="font-family: monospace;">$queryResult.getQueryDisplayString()</span> <a href="$basePath/query?clear=true">clear</a>
+Current Query: <span style="font-family: monospace;">$esc.html($queryResult.getQueryDisplayString())</span> <a href="$basePath/query?clear=true">clear</a>
 
 <p/>
 
@@ -58,7 +58,7 @@ RESULTS:
 	#foreach($typeMatches in $queryResult.getTypeMatches())
 		<li>
 			<span style="font-family: monospace;">
-				<a href="$basePath/type?type=$typeMatches.getTypeName()">$typeMatches.getTypeName()</a>: $typeMatches.getNumMatches() records match
+				<a href="$basePath/type?type=$esc.url($typeMatches.getTypeName())">$esc.html($typeMatches.getTypeName())</a>: $typeMatches.getNumMatches() records match
 			</span>
 		</li>
 	#end

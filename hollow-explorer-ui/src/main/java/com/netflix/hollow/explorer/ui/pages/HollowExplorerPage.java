@@ -19,6 +19,7 @@ package com.netflix.hollow.explorer.ui.pages;
 
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
 import com.netflix.hollow.ui.HollowUISession;
+import com.netflix.hollow.ui.EscapingTool;
 import java.io.Writer;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.velocity.Template;
@@ -48,6 +49,8 @@ public abstract class HollowExplorerPage {
             ctx.put("stateVersion", ui.getCurrentStateVersion());
         
         ctx.put("basePath", ui.getBaseURLPath());
+
+        ctx.put("esc", new EscapingTool());
 
         setUpContext(req, session, ctx);
 
