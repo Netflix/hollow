@@ -107,7 +107,7 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	public CanaryValidationJob createCanaryValidationJob(String vip,
 			long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
 			Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
-		return new TestCanaryValidationJob(context, vip, cycleVersion, beforeCanaryAnnounceJobs,  afterCanaryAnnounceJobs);
+		return new TestCanaryValidationJob(context, vip, cycleVersion, afterCanaryAnnounceJobs);
 	}
 
 	@Override
