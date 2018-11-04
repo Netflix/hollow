@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import com.netflix.cinder.consumer.NFHollowBlobRetriever;
+import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
@@ -19,7 +21,6 @@ import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
-import com.netflix.internal.hollow.factory.HollowBlobRetrieverFactory;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.ContractsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfContractHollow;
@@ -73,7 +74,7 @@ public class DebugConverterData {
     private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         percentFormat.setMinimumFractionDigits(1);
         for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT, REPRO_DIR)) {
             File workingDir = new File(folder);
@@ -177,7 +178,8 @@ public class DebugConverterData {
         long toVersion = 20170824034503068L;
 
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+        BlobRetriever blobRetriever = new NFHollowBlobRetriever(
+                GutenbergFileConsumer.localProxyForProdEnvironment(), CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).build();
         HollowHistoryUIServer historyUI = new HollowHistoryUIServer(consumer, 7777);
         historyUI.start();
@@ -187,11 +189,12 @@ public class DebugConverterData {
     }
 
     @Test
-    public void walkthroughConverterVersionsWithHollowConsumer() throws Exception {
+    public void walkthroughConverterVersionsWithHollowConsumer() {
         long[] versions = new long[] { 20170824030803390L, 20170824030803390L, 20170824031131543L, 20170824031347430L, 20170824031546123L, 20170824032458038L, 20170824032722275L, 20170824032941389L, 20170824033200595L, 20170824033533733L, 20170824033754309L, 20170824034009909L, 20170824034238345L, 20170824034503068L };
 
         int badPackageStreamOrdinal = 54076780;
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+        BlobRetriever blobRetriever = new NFHollowBlobRetriever(
+                GutenbergFileConsumer.localProxyForProdEnvironment(), CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
         for (long version : versions) {
@@ -297,8 +300,9 @@ public class DebugConverterData {
     }
 
     @Test
-    public void debugConverterBeforeAndAfter() throws Exception {
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+    public void debugConverterBeforeAndAfter() {
+        BlobRetriever blobRetriever = new NFHollowBlobRetriever(
+                GutenbergFileConsumer.localProxyForProdEnvironment(), CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
@@ -320,7 +324,8 @@ public class DebugConverterData {
         long suspeciousStateVersion = 20170824033533733L;
         long badDownloadableId = 572674263L;
 
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+        BlobRetriever blobRetriever = new NFHollowBlobRetriever(
+                GutenbergFileConsumer.localProxyForProdEnvironment(), CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
 
         // Start at good state
@@ -340,7 +345,7 @@ public class DebugConverterData {
         BitSet populatedOrdinals = typeState.getPopulatedOrdinals();
         try (
                 PrintWriter modKeyPW = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve(MODIFIED_PACKAGE_KEY_FILENAME)));
-                PrintWriter impKeyPW = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve(IMPACTED_PACKAGE_KEY_FILENAME)));) {
+                PrintWriter impKeyPW = new PrintWriter(Files.newBufferedWriter(REPRO_PATH.resolve(IMPACTED_PACKAGE_KEY_FILENAME)))) {
             int count = 0;
             Map<String, List<Integer>> modPKMap = new HashMap<>();
             Set<String> dupPKSet = new HashSet<>();
@@ -377,7 +382,7 @@ public class DebugConverterData {
                 for (int o : list) {
                     System.out.printf("%s:%s; ", o, populatedOrdinals.get(o));
                 }
-                System.out.println("");
+                System.out.println();
             }
         }
         System.out.printf("\n\n----\n Total duration=%s\n", OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
@@ -450,7 +455,8 @@ public class DebugConverterData {
 
         long initStart = System.currentTimeMillis();
         long start = initStart;
-        BlobRetriever blobRetriever = HollowBlobRetrieverFactory.localProxyForProdEnvironment().getForNamespace(CONVERTER_NAMESPACE);
+        BlobRetriever blobRetriever = new NFHollowBlobRetriever(
+                GutenbergFileConsumer.localProxyForProdEnvironment(), CONVERTER_NAMESPACE);
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(new File(WORKING_DIR)).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         consumer.triggerRefreshTo(initVersion);
         System.out.printf("\n\n----\n Init to version=%s, duration=%s\n", consumer.getCurrentVersionId(), OutputUtil.formatDuration(System.currentTimeMillis() - start, true));
