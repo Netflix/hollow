@@ -5,9 +5,6 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 
 public abstract class AnnounceJob extends PublishWorkflowPublicationJob {
-    public final static String ANNOUNCE_DELTA_JOB_NAME_PREFIX = "announce_delta_";
-    public final static String ANNOUNCE_SNAPSHOT_JOB_NAME_PREFIX = "announce_snapshot_";
-
     protected final String vip;
     protected final RegionEnum region;
     protected final long priorVersion;
@@ -15,8 +12,10 @@ public abstract class AnnounceJob extends PublishWorkflowPublicationJob {
     private final CanaryValidationJob canaryValidationJob;
     private final DelayJob delayJob;
 
-    public AnnounceJob(PublishWorkflowContext ctx, String vip, long priorVersion, long newVersion, RegionEnum region, CanaryValidationJob canaryValidationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-        super(ctx, "announce-"+region, newVersion);
+    public AnnounceJob(PublishWorkflowContext ctx, String vip, long priorVersion, long newVersion,
+            RegionEnum region, CanaryValidationJob canaryValidationJob, DelayJob delayJob,
+            AnnounceJob previousAnnounceJob) {
+        super(ctx, "announce-" + region, newVersion);
         this.vip = vip;
         this.canaryValidationJob = canaryValidationJob;
         this.previousAnnounceJob = previousAnnounceJob;
@@ -27,32 +26,17 @@ public abstract class AnnounceJob extends PublishWorkflowPublicationJob {
 
     @Override
     protected boolean isFailedBasedOnDependencies() {
-        if(previousAnnounceJobFinished()) {
-            if(jobExistsAndFailed(delayJob) || jobDoesNotExistOrFailed(canaryValidationJob))
-                return true;
-        }
-
-        return false;
+        return previousAnnounceJobFinished()
+                && (jobExistsAndFailed(delayJob) || jobDoesNotExistOrFailed(canaryValidationJob));
     }
 
     @Override
     public boolean isEligible() {
-        if(previousAnnounceJobFinished()) {
-            return jobDoesNotExistOrCompletedSuccessfully(delayJob) && jobExistsAndCompletedSuccessfully(canaryValidationJob);
-        }
-        return false;
+        return previousAnnounceJobFinished() && jobDoesNotExistOrCompletedSuccessfully(delayJob)
+                && jobExistsAndCompletedSuccessfully(canaryValidationJob);
     }
 
     private boolean previousAnnounceJobFinished() {
         return previousAnnounceJob == null || previousAnnounceJob.isComplete() || previousAnnounceJob.hasJobFailed();
     }
-
-    public String getVip() {
-        return vip;
-    }
-
-    public RegionEnum getRegion() {
-        return region;
-    }
-
 }
