@@ -248,11 +248,12 @@ public class TransformCycle {
         pinTitleMgr.prepareForNextCycle();
     }
 
-    private static ExecuteFutureResult executeRestore(String name, TransformerContext ctx, SimultaneousExecutor executor, VMSOutputDataClient outputClient, long restoreVersion) {
+    private static ExecuteFutureResult executeRestore(String name, TransformerContext ctx,
+            SimultaneousExecutor executor, VMSOutputDataClient outputClient, long restoreVersion) {
         ExecuteFutureResult restoreResult = new ExecuteFutureResult(ctx, name);
         executor.execute(() -> {
             try {
-                restoreResult.started();;
+                restoreResult.started();
 
                 // Spot to trigger Cycle Monkey if enabled
                 ctx.getCycleMonkey().doMonkeyBusiness(restoreResult.getName());
@@ -262,8 +263,9 @@ public class TransformCycle {
 
                 ctx.getLogger().info(Arrays.asList(TransformRestore, BlobState), "Restored {} version={}, duration={}, header={}", name, restoreVersion, (System.currentTimeMillis() - start), BlobMetaDataUtil.fetchCoreHeaders(outputClient.getStateEngine()));
                 restoreResult.completed();
-            } catch (Exception ex) {
-                restoreResult.failed(ex);
+            } catch (RuntimeException e) {
+                ctx.getLogger().error(TransformRestore, "Failed to restore {} version={}", name, restoreVersion, e);
+                restoreResult.failed(e);
             }
         });
 
@@ -324,7 +326,7 @@ public class TransformCycle {
         ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
         executor.execute(() -> {
             try {
-                inputProcessingResult.started();;
+                inputProcessingResult.started();
 
                 // Spot to trigger Cycle Monkey if enabled
                 ctx.getCycleMonkey().doMonkeyBusiness(inputProcessingResult.getName());
@@ -382,7 +384,7 @@ public class TransformCycle {
                 nowMillis = followVipPin.getNowMillis();
             if(nowMillis == null)
                 nowMillis = System.currentTimeMillis();
-            ctx.setNowMillis(nowMillis.longValue());
+            ctx.setNowMillis(nowMillis);
 
             ctx.getLogger().info(InputDataConverterVersionId, inputClient.getCurrentVersionId());
             ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
@@ -568,10 +570,7 @@ public class TransformCycle {
     }
 
     private boolean hasConverterVipChanged() {
-        if(!this.previouslyResolvedConverterVip.equals(resolveConverterVip(this.ctx, this.converterVip))) {
-            return true;
-        }
-        return false;
+        return !this.previouslyResolvedConverterVip.equals(resolveConverterVip(this.ctx, this.converterVip));
     }
 
     @SuppressWarnings("unchecked")
@@ -585,10 +584,7 @@ public class TransformCycle {
         map = gson.fromJson(json, map.getClass());
 
         // See if we have an entry for converterVip
-        if(map.containsKey(converterVip))
-            return map.get(converterVip);
-        else
-            return converterVip;
+        return map.containsKey(converterVip) ? map.get(converterVip) : converterVip;
     }
 
     public static class ExecuteFutureResult {
