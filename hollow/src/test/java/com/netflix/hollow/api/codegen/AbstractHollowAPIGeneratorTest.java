@@ -16,33 +16,28 @@
 package com.netflix.hollow.api.codegen;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.function.UnaryOperator;
 import org.junit.After;
-import org.junit.Before;
 
 public class AbstractHollowAPIGeneratorTest {
-    protected boolean isForParity = false;
-    protected boolean isCleanupBeforeEnabled = isForParity ? false : true;
-    protected boolean isCleanupAfterEnabled = isForParity ? false : true;
-    protected String tmpFolder = System.getProperty("java.io.tmpdir");
-    protected String sourceFolder = String.format("%s/src", tmpFolder);
-    protected String clazzFolder = String.format("%s/classes", tmpFolder);
+    private String tmpFolder = System.getProperty("java.io.tmpdir");
+    private String sourceFolder = String.format("%s/src", tmpFolder);
+    private String clazzFolder = String.format("%s/classes", tmpFolder);
 
-    @Before
-    public void setup() throws IOException {}
-
-    protected void runGenerator(String apiClassName, String packageName, Class<?> clazz) throws Exception {
-        System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s", this.getClass().getSimpleName(), sourceFolder, clazzFolder));
+    void runGenerator(String apiClassName, String packageName, Class<?> clazz,
+            UnaryOperator<HollowAPIGenerator.Builder> generatorCustomizer) throws Exception {
+        System.out.println(String.format("Folders (%s) : \n\tsource=%s \n\tclasses=%s",
+                    getClass().getSimpleName(), sourceFolder, clazzFolder));
 
         // Setup Folders
-        if (isCleanupBeforeEnabled) {
-            HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
-            HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
-        }
+        HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
+        HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
 
         // Run Generator
-        HollowAPIGenerator generator = initGenerator(new HollowAPIGenerator.Builder().withDataModel(clazz).withAPIClassname(apiClassName).withPackageName(packageName));
-        generator.generateFiles(sourceFolder);
+        HollowAPIGenerator generator = generatorCustomizer.apply(new HollowAPIGenerator.Builder())
+                .withDataModel(clazz).withAPIClassname(apiClassName).withPackageName(packageName)
+                .withDestination(sourceFolder).build();
+        generator.generateSourceFiles();
 
         // Compile to validate generated files
         HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
@@ -50,17 +45,7 @@ public class AbstractHollowAPIGeneratorTest {
 
     @After
     public void cleanup() {
-        if (isCleanupAfterEnabled) {
-            HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
-            HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
-        } else {
-            System.out.println("Cleanup skipped:");
-            System.out.println("\t sourceFolder=" + sourceFolder);
-            System.out.println("\t clazzFolder=" + clazzFolder);
-        }
-    }
-
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        return builder.build();
+        HollowCodeGenerationCompileUtil.cleanupFolder(new File(sourceFolder), null);
+        HollowCodeGenerationCompileUtil.cleanupFolder(new File(clazzFolder), null);
     }
 }

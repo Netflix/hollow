@@ -16,41 +16,29 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Before;
+import java.util.function.UnaryOperator;
 import org.junit.Test;
 
 public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
+    private static final String API_CLASS_NAME = "PackageErgoTestAPI";
 
-    @Override
-    @Before
-    public void setup() throws IOException {
-    }
-
-    @Override
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        builder.withErgonomicShortcuts();
-        builder.withPackageGrouping();
-        return super.initGenerator(builder);
-    }
+    private static final UnaryOperator<HollowAPIGenerator.Builder> customizeBuilder =
+            builder -> builder.withErgonomicShortcuts().withPackageGrouping();
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "PackageErgoTestAPI";
-        String packageName = "codegen.subpackage.grouping";
-        runGenerator(apiClassName, packageName, Movie.class);
+        runGenerator(API_CLASS_NAME, "codegen.subpackage.grouping", Movie.class, customizeBuilder);
     }
 
     @Test
     public void testDefaultPackage() throws Exception {
-        String apiClassName = "PackageErgoTestAPI";
-        String packageName = "";
-        runGenerator(apiClassName, packageName, Movie.class);
+        runGenerator(API_CLASS_NAME, "", Movie.class, b -> b);
     }
 
+    @SuppressWarnings("unused")
     @HollowPrimaryKey(fields = { "id" })
     static class Movie {
         int id;
@@ -69,12 +57,14 @@ public class HollowPackageErgonomicsAPIGeneratorTest extends AbstractHollowAPIGe
         String s;
     }
 
+    @SuppressWarnings("unused")
     static class Actor {
         String name;
 
         Role role;
     }
 
+    @SuppressWarnings("unused")
     static class Role {
         Integer id;
 

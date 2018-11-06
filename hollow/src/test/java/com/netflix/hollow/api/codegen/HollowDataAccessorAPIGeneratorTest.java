@@ -16,28 +16,22 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import java.io.IOException;
-import org.junit.Before;
 import org.junit.Test;
 
 public class HollowDataAccessorAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
-
-    @Override
-    @Before
-    public void setup() throws IOException {
-    }
-
-    @Override
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        builder.withAggressiveSubstitutions(true);
-        return super.initGenerator(builder);
-    }
+    private static final String API_CLASS_NAME = "DataAccessorTestAPI";
+    private static final String PACKAGE_NAME = "codegen.data.accessor";
 
     @Test
     public void test() throws Exception {
-        String apiClassName = "DataAccessorTestAPI";
-        String packageName = "codegen.data.accessor";
-        runGenerator(apiClassName, packageName, Movie.class);
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Movie.class,
+                builder -> builder.withAggressiveSubstitutions(true));
+    }
+
+    @Test
+    public void testGenerateWithPostfix() throws Exception {
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Movie.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
     @HollowPrimaryKey(fields="id")

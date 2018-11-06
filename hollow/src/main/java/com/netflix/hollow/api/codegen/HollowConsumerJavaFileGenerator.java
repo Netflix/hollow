@@ -68,12 +68,12 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     }
 
     protected void appendPackageAndCommonImports(StringBuilder builder) {
-        appendPackageAndCommonImports(builder, null, new ArrayList<HollowSchema>());
+        appendPackageAndCommonImports(builder, null, new ArrayList<>());
     }
 
     protected void appendPackageAndCommonImports(StringBuilder builder,
             String apiClassname) {
-        appendPackageAndCommonImports(builder, apiClassname, new ArrayList<HollowSchema>());
+        appendPackageAndCommonImports(builder, apiClassname, new ArrayList<>());
     }
 
     protected void appendPackageAndCommonImports(StringBuilder builder,
@@ -117,7 +117,7 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
                     }
                 }
                 for (String schemaName : schemaNameSet) {
-                    appendImportFromBasePackage(builder, schemaName);
+                    appendImportFromBasePackage(builder, schemaName + config.getClassPostfix());
                 }
                 appendImportFromBasePackage(builder, "core.*");
                 if (useCollectionsImport) {
