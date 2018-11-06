@@ -25,14 +25,14 @@
 		<tr>
 			<td class="nav"><a href="$basePath/home">[ Hollow Data Explorer ]</a></td>
 			#if($headerDisplayString)
-				<td class="nav">[ $headerDisplayString ]</td>
+				<td class="nav">[ $esc.html($headerDisplayString) ]</td>
 			#end
 			#if($stateVersion)
 				<td class="nav">[ State Version: $stateVersion ]</td>
 			#end			
 			#if($type)
-				<td class="nav">[ Type: <span style="font-family: monospace;">$type</span> ]</td>
-				<td class="nav">[ <a href="$basePath/type?type=$type">Browse Data</a> | <a href="$basePath/schema?type=$type">Browse Schema</a> ]</td>
+				<td class="nav">[ Type: <span style="font-family: monospace;">$esc.html($type)</span> ]</td>
+				<td class="nav">[ <a href="$basePath/type?type=$esc.url($type)">Browse Data</a> | <a href="$basePath/schema?type=$esc.url($type)">Browse Schema</a> ]</td>
 			#end
 			<td class="nav">[ <a href="$basePath/query">SEARCH</a> ]</td>
 		</tr>
