@@ -166,23 +166,20 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String hollowFactoryClassname(String typeName) {
-        return hollowImplClassname(typeName, "Hollow", false) + "Factory";
+        return substituteInvalidChars(uppercase(typeName)) + "HollowFactory";
     }
 
     public static String hollowObjectProviderName(String typeName) {
         return substituteInvalidChars(lowercase(typeName)) + "Provider";
     }
 
-    public static String hollowImplClassname(String typeName, String classPostfix, boolean useAggressiveSubstitutions) {
-        String classname = substituteInvalidChars(uppercase(typeName)) + classPostfix;
-
+    public static String hollowImplClassname(String typeName, String classPostfix,
+            boolean useAggressiveSubstitutions) {
+        String classname = substituteInvalidChars(uppercase(typeName));
         String sub = useAggressiveSubstitutions ?
-                AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
-                    DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
-                if(sub != null)
-                    return sub;
-
-                return classname;
+            AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
+            DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
+        return sub == null ? classname + classPostfix : sub;
     }
 
     public static String delegateInterfaceName(String typeName) {
