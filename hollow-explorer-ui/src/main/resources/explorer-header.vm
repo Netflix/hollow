@@ -13,9 +13,14 @@
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
 *#
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+	#if($headerDisplayString)
+		<title>$esc.html($headerDisplayString)</title>
+	#else
+		<title>Hollow Explorer</title>
+	#end
 	<style>
 		.nav { text-align: left; padding-left: 5px; padding-right: 80px; border-left:1px solid #DCDCDC; }
 	</style>

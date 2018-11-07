@@ -75,16 +75,16 @@ public class HollowExplorerUI extends HollowUIRouter {
         HollowUISession session = HollowUISession.getSession(req, resp);
         
         if("".equals(pageName) || "home".equals(pageName)) {
-            showAllTypesPage.render(req, session, resp.getWriter());
+            showAllTypesPage.render(req, resp, session);
             return true;
         } else if("type".equals(pageName)) {
-            browseTypePage.render(req, session, resp.getWriter());
+            browseTypePage.render(req, resp, session);
             return true;
         } else if("schema".equals(pageName)) {
-            browseSchemaPage.render(req, session, resp.getWriter());
+            browseSchemaPage.render(req, resp, session);
             return true;
         } else if("query".equals(pageName)) {
-            queryPage.render(req, session, resp.getWriter());
+            queryPage.render(req, resp, session);
             return true;
         }
         
