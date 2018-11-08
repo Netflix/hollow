@@ -14,9 +14,6 @@ Owned by: vms-support@netflix.com
     - Jobs:
         - [Build Master](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-build-master)
         - [Build Pull Request](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-build-pull-request)
-        - [Promote Candidate](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-promote-candidate)
-        - [Trigger Spinnaker](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-trigger-spinnaker)
-        - [Update Gradle wrapper](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-update-gradlew)
         - [Update dependencies](https://vms.builds.test.netflix.net/job/VMS-vmstransformer-update-dependencies-lock)
     - Server: vms
 - Ci pipeline flowchart: [https://stash.corp.netflix.com/snippets/raw/e1a37a54f882423fafae1f2c9fc10269/Generated_ci_pipeline_flowchart.txt](https://stash.corp.netflix.com/snippets/raw/e1a37a54f882423fafae1f2c9fc10269/Generated_ci_pipeline_flowchart.txt)
