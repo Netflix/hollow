@@ -10,14 +10,14 @@ GRADLE="./gradlew --info --stacktrace clean"
 
 if [ "$ROCKET_TAG_TYPE" = "CANDIDATE" ]; then
     # a tag ending in `-rc.#` was pushed
-    $GRADLE -Prelease.useLastTag=true integTest jacocoTestReport buildDeb candidate
+    $GRADLE -Prelease.useLastTag=true check jacocoTestReport buildDeb candidate
 
 elif [ "$ROCKET_TAG_TYPE" = "FINAL" ]; then
     # a tag like `v1.0.0` was pushed
-    $GRADLE -Prelease.useLastTag=true integTest jacocoTestReport buildDeb final
+    $GRADLE -Prelease.useLastTag=true check jacocoTestReport buildDeb final
 
 else
     # run something safe for all other cases
-    $GRADLE check integTest jacocoTestReport javadoc buildDeb
+    $GRADLE check check jacocoTestReport javadoc buildDeb
 
 fi
