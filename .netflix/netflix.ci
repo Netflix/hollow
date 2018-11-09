@@ -18,6 +18,10 @@ elif [ "$ROCKET_TAG_TYPE" = "FINAL" ]; then
 
 else
     # run something safe for all other cases
-    $GRADLE check check jacocoTestReport javadoc buildDeb
+
+    # TODO: ideally we wouldn't publish to artifactory for everything, but
+    #       `devSnapshot` is necessary to get Spinnaker PR builds to work
+    # $GRADLE check check jacocoTestReport javadoc buildDeb
+    $GRADLE -Prelease.useLastTag=true check jacocoTestReport buildDeb devSnapshot
 
 fi
