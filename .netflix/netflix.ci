@@ -21,7 +21,7 @@ else
 
     # TODO: ideally we wouldn't publish to artifactory for everything, but
     #       `devSnapshot` is necessary to get Spinnaker PR builds to work
-    # $GRADLE check check jacocoTestReport javadoc buildDeb
+    # $GRADLE check jacocoTestReport javadoc buildDeb
     $GRADLE -Prelease.useLastTag=true check jacocoTestReport buildDeb devSnapshot
 
 fi
