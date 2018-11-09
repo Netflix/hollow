@@ -1,3 +1,6 @@
+# Jenkins -> Spinnaker
+trigger.properties
+
 build/
 /bin/
 */bin/
@@ -14,4 +17,3 @@ common-interfaces/out
 io/out
 publish-workflow/out
 server/out
-
