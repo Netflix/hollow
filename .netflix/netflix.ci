@@ -2,6 +2,7 @@
 set -efx
 
 cat <<EOF >trigger.properties
+authorEmail=${ROCKET_AUTHOR_EMAIL}
 branchName=${ROCKET_BRANCH}
 prNumber=${ROCKET_PR_NUMBER}
 EOF
