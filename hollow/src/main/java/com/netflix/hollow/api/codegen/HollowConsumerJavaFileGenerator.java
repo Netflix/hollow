@@ -51,7 +51,8 @@ public abstract class HollowConsumerJavaFileGenerator implements HollowJavaFileG
     }
 
     protected String hollowImplClassname(String typeName) {
-        return  HollowCodeGenerationUtils.hollowImplClassname(typeName, config.getClassPostfix(), config.isUseAggressiveSubstitutions());
+        return HollowCodeGenerationUtils.hollowImplClassname(typeName, config.getClassPostfix(),
+                config.isUseAggressiveSubstitutions(), config.isUseHollowPrimitiveTypes());
     }
 
     public String getSubPackageName() {

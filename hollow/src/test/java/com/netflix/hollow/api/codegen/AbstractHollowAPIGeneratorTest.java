@@ -15,7 +15,11 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.function.UnaryOperator;
 import org.junit.After;
 
@@ -41,6 +45,22 @@ public class AbstractHollowAPIGeneratorTest {
 
         // Compile to validate generated files
         HollowCodeGenerationCompileUtil.compileSrcFiles(sourceFolder, clazzFolder);
+    }
+
+    void assertNonEmptyFileExists(String relativePath) throws IOException {
+        if (relativePath.startsWith("/")) {
+            throw new IllegalArgumentException("Relative paths should not start with /");
+        }
+        File f = new File(sourceFolder + "/" + relativePath);
+        assertTrue("File at " + relativePath + " should exist", f.exists() && f.length() > 0L);
+    }
+
+    void assertFileDoesNotExist(String relativePath) throws IOException {
+        if (relativePath.startsWith("/")) {
+            throw new IllegalArgumentException("Relative paths should not start with /");
+        }
+        assertFalse("File should not exist at " + relativePath,
+                new File(sourceFolder + "/" + relativePath).exists());
     }
 
     @After
