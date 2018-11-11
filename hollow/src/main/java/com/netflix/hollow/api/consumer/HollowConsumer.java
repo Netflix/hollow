@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -106,6 +107,7 @@ import java.util.logging.Logger;
  *
  * </dl>
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class HollowConsumer {
     private static final Logger LOG = Logger.getLogger(HollowConsumer.class.getName());
 
@@ -832,8 +834,7 @@ public class HollowConsumer {
         }
 
         public B withRefreshListeners(HollowConsumer.RefreshListener... refreshListeners) {
-            for (HollowConsumer.RefreshListener refreshListener : refreshListeners)
-                this.refreshListeners.add(refreshListener);
+            Collections.addAll(this.refreshListeners, refreshListeners);
             return (B)this;
         }
 
@@ -897,7 +898,7 @@ public class HollowConsumer {
 
             BlobRetriever blobRetriever = this.blobRetriever;
             if (localBlobStoreDir != null)
-                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir, blobRetriever);
+                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir.toPath(), blobRetriever);
 
 
             if (refreshExecutor == null)
