@@ -20,12 +20,12 @@ package com.netflix.hollow.api.producer;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A trivial implementation of {@link HollowProducerListenerV2} which does nothing.
+ * A trivial implementation of {@link HollowProducerListener} which does nothing.
  * Implementations of HollowProducerListenerV2 should subclass this class for convenience.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class AbstractHollowProducerListener implements HollowProducerListenerV2 {
+public class AbstractHollowProducerListener implements HollowProducerListener {
     // DataModelInitializationListener
     @Override public void onProducerInit(long elapsed, TimeUnit unit) {}
 

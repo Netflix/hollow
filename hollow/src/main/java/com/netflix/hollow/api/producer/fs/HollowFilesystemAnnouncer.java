@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,12 +27,6 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     public static final String ANNOUNCEMENT_FILENAME = "announced.version";
     
     private final Path publishPath;
-
-    // TODO: deprecate in Hollow 3.0.0
-    // @Deprecated
-    public HollowFilesystemAnnouncer(File publishDir) {
-        this(publishDir.toPath());
-    }
 
     /**
      * @param publishPath the path to publish to
@@ -48,7 +41,7 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
         Path announcePath = publishPath.resolve(ANNOUNCEMENT_FILENAME);
         try {
             Files.write(announcePath, String.valueOf(stateVersion).getBytes());
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             throw new RuntimeException("Unable to write to announcement file; path=" + announcePath, ex);
         }
     }

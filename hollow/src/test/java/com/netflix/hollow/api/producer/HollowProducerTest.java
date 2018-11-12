@@ -77,7 +77,7 @@ public class HollowProducerTest {
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder)).build();
+            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
         producer.initializeDataModel(schemas);
         producer.addListener(new FakeProducerListener());
         return producer;
@@ -116,7 +116,7 @@ public class HollowProducerTest {
         BasicSingleProducerEnforcer enforcer = new BasicSingleProducerEnforcer();
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
                 .withSingleProducerEnforcer(enforcer)
-                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder))
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()))
                 .build();
         producer.addListener(new FakeProducerListener());
 
