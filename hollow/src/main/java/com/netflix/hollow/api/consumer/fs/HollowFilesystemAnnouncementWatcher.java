@@ -23,7 +23,6 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -34,7 +33,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +41,6 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private static final Logger log = Logger.getLogger(HollowFilesystemAnnouncementWatcher.class.getName());
 
-    private final Path publishPath;
     private final Path announcePath;
 
     private final List<HollowConsumer> subscribedConsumers;
@@ -53,38 +50,20 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private long latestVersion;
 
-    // TODO: deprecate in Hollow 3.0.0
-    // @Deprecated
-    public HollowFilesystemAnnouncementWatcher(File publishDir) {
-        this(publishDir.toPath());
-    }
-
     /**
      * Creates a file system announcement watcher.
      *
      * @param publishPath the publish path
      * @since 2.12.0
      */
+    @SuppressWarnings("unused")
     public HollowFilesystemAnnouncementWatcher(Path publishPath) {
-        this(publishPath,
-                newScheduledThreadPool(
-                        1 /*corePoolSize*/,
-                        new ThreadFactory() {
-                            @Override
-                            public Thread newThread(Runnable r) {
-                                Thread t = new Thread(r);
-                                t.setDaemon(true);
-                                return t;
-                            }
-                        })
-        );
-
+        this(publishPath, newScheduledThreadPool(1, r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        }));
         ownedExecutor = true;
-    }
-
-    @Deprecated
-    public HollowFilesystemAnnouncementWatcher(File publishDir, ScheduledExecutorService executor) {
-        this(publishDir.toPath(), executor);
     }
 
     /**
@@ -94,11 +73,11 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
      * @param executor the executor from which watching is executed
      * @since 2.12.0
      */
+    @SuppressWarnings("WeakerAccess")
     public HollowFilesystemAnnouncementWatcher(Path publishPath, ScheduledExecutorService executor) {
-        this.publishPath = publishPath;
         this.executor = executor;
 
-        this.announcePath = this.publishPath.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
+        this.announcePath = publishPath.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
         this.subscribedConsumers = new CopyOnWriteArrayList<>();
         this.latestVersion = readLatestVersion();
 

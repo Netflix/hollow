@@ -32,13 +32,13 @@ import org.mockito.MockitoAnnotations;
 
 public class ListenerSupportTest {
     interface ProducerAndValidationStatusListener
-            extends HollowProducerListenerV2, ValidationStatusListener {
+            extends HollowProducerListener, ValidationStatusListener {
     }
 
     private ListenerSupport listenerSupport;
 
     @Mock
-    private HollowProducerListenerV2 listener;
+    private HollowProducerListener listener;
     @Mock
     private ValidationStatusListener validationStatusListener;
     @Mock
@@ -90,7 +90,7 @@ public class ListenerSupportTest {
         }
 
         class FirstCycleListener extends SecondCycleListener {
-            SecondCycleListener scl = new SecondCycleListener();
+            private SecondCycleListener scl = new SecondCycleListener();
 
             @Override public void onCycleStart(long version) {
                 super.onCycleStart(version);
@@ -144,9 +144,9 @@ public class ListenerSupportTest {
         }
 
         class FirstCycleListener extends SecondCycleListener {
-            SecondCycleListener scl = new SecondCycleListener();
+            private SecondCycleListener scl;
 
-            FirstCycleListener(SecondCycleListener scl) {
+            private FirstCycleListener(SecondCycleListener scl) {
                 this.scl = scl;
             }
 
