@@ -174,8 +174,12 @@ public class HollowCodeGenerationUtils {
     }
 
     public static String hollowImplClassname(String typeName, String classPostfix,
-            boolean useAggressiveSubstitutions) {
+            boolean useAggressiveSubstitutions, boolean useHollowPrimitives) {
         String classname = substituteInvalidChars(uppercase(typeName));
+        if (!useHollowPrimitives && !"".equals(classPostfix)) {
+            // skip substitutions here to preserve legacy behaviour
+            return classname + classPostfix;
+        }
         String sub = useAggressiveSubstitutions ?
             AGGRESSIVE_CLASS_NAME_SUBSTITUTIONS.get(classname) :
             DEFAULT_CLASS_NAME_SUBSTITUTIONS.get(classname);
