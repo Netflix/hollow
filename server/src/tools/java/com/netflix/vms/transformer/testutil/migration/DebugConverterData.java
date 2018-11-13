@@ -583,7 +583,7 @@ public class DebugConverterData {
         long reproVersion = 20180101010000000L;
 
         File reporDir = new File(REPRO_DIR);
-        BlobRetriever blobRetriever = new HollowFilesystemBlobRetriever(reporDir);
+        BlobRetriever blobRetriever = new HollowFilesystemBlobRetriever(reporDir.toPath());
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobRetriever).withLocalBlobStore(reporDir).withGeneratedAPIClass(VMSHollowInputAPI.class).build();
         if (isDebugWithDelta) consumer.triggerRefreshTo(goodStateVersion);
         consumer.triggerRefreshTo(reproVersion);
