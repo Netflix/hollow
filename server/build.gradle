@@ -71,7 +71,7 @@ dependencies {
     compile 'com.netflix.vms.logging:vmslogging-slf4j:latest.release'
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
-    compile 'netflix:cinder-core:latest.release'
+    compile 'netflix:cinder-core:latest.candidate'
 
     // httpclient
     compile 'org.apache.httpcomponents:httpclient'
