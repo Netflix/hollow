@@ -2884,7 +2884,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -6327,7 +6327,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -9770,7 +9770,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -13362,7 +13362,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -16805,7 +16805,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -20297,7 +20297,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -23813,7 +23813,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -27329,7 +27329,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
@@ -30845,7 +30845,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "61.2.0",
+            "locked": "61.2.1",
             "requested": "latest.release"
         },
         "netflix:whitecastle": {
