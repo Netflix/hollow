@@ -1,7 +1,7 @@
 {
     "nebulaRecommenderBom": {
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.16",
+            "locked": "4.7.17",
             "requested": "latest.release"
         }
     },
