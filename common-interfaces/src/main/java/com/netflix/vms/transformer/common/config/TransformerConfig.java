@@ -201,7 +201,7 @@ public interface TransformerConfig {
     boolean isElasticSearchNoWaitingEnabled();
 
     ///////////// TEMPORARY FEATURE-BASED //////////////////
-    @DefaultValue("false")
+    @DefaultValue("true")
     boolean usePackagesFeedForTimecodes();
 
     ////////////// BUSINESS LOGIC  ////////////////////////
@@ -241,9 +241,6 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     boolean isGrandfatherEnabled();
-
-    @DefaultValue("true")
-    boolean isAssetAvailabilityIntentForPrePromoEnabled();
 
     @DefaultValue("true")
     public boolean isReadDeployablePackagesFromCinderFeed();
