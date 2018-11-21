@@ -1186,7 +1186,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -1202,13 +1202,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -1218,40 +1218,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -2336,14 +2336,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4629,7 +4629,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -4645,13 +4645,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -4661,40 +4661,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -5779,14 +5779,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8072,7 +8072,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -8088,13 +8088,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -8104,40 +8104,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -9222,14 +9222,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11664,7 +11664,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -11680,13 +11680,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -11696,40 +11696,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -12814,14 +12814,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -15107,7 +15107,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -15123,13 +15123,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -15139,40 +15139,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -16257,14 +16257,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -18574,7 +18574,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -18590,13 +18590,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -18606,40 +18606,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -19732,14 +19732,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -22090,7 +22090,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -22106,13 +22106,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -22122,40 +22122,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -23248,14 +23248,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -25606,7 +25606,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -25622,13 +25622,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -25638,40 +25638,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -26764,14 +26764,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -29122,7 +29122,7 @@
             ]
         },
         "com.netflix.ksclient:ksclient-api": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-config",
                 "com.netflix.ksclient:ksclient-core",
@@ -29138,13 +29138,13 @@
             ]
         },
         "com.netflix.ksclient:ksclient-config": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:platform-chukwaClient-legacy"
             ]
         },
         "com.netflix.ksclient:ksclient-core": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-core-kafka",
                 "com.netflix.ksclient:ksclient-core-ksgw-http",
@@ -29154,40 +29154,40 @@
             ]
         },
         "com.netflix.ksclient:ksclient-core-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.ksclient:ksclient-lifecycle-kafka"
             ]
         },
         "com.netflix.ksclient:ksclient-core-ksgw-http": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-lifecycle-kafka",
                 "netflix:platform-chukwaClient"
             ]
         },
         "com.netflix.ksclient:ksclient-lifecycle-kafka": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "com.netflix.ksclient:ksclient-serializer-proto3",
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:ksclient-serializer-proto3": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.ksclient:platform-chukwaClient-legacy": {
-            "locked": "1.27.3",
+            "locked": "1.27.4",
             "transitive": [
                 "netflix:platform-chukwaClient"
             ]
@@ -30280,14 +30280,14 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "requested": "latest.candidate",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.0.1-rc.1",
+            "locked": "4.0.1-rc.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
