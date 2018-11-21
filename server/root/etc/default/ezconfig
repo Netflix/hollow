@@ -8,7 +8,6 @@ JAVA_GC          = PAROLD
 JAVA_HEAPPERCENT = 70
 JAVA_NEWPERCENT  = 10
 
-JAVA_FLIGHTRECORDER = enabled
 JAVA_FRAME_POINTER  = enabled
 
 JAVA_ARGS           = -XX:+AlwaysPreTouch
