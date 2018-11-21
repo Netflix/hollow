@@ -340,6 +340,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#transient-fields" title="Transient Fields" class="md-nav__link">
+    Transient Fields
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -435,6 +442,18 @@
   <li class="md-nav__item">
     <a href="../data-ingestion/" title="Data Ingestion" class="md-nav__link">
       Data Ingestion
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../validation/" title="Validation" class="md-nav__link">
+      Validation
     </a>
   </li>
 
@@ -570,6 +589,13 @@
           <li class="md-nav__item">
   <a href="#grouping-associated-fields" title="Grouping Associated Fields" class="md-nav__link">
     Grouping Associated Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transient-fields" title="Transient Fields" class="md-nav__link">
+    Transient Fields
   </a>
   
 </li>
@@ -786,6 +812,11 @@ public class MaturityRating {
 
 
 <p>We could have referenced these fields separately.  If we had done so, each <code>Movie</code> record, of which there are probably many, would have had to contain two separate references for these fields.  Instead, by recognizing that these fields were associated and pulling them together, space is saved because each <code>Movie</code> record now only contains one reference for this data.</p>
+<h3 id="transient-fields">Transient Fields</h3>
+<p>A transient field is ignored and will not be included in an <code>Object</code> Schema.  A transient field is a field declared
+with the <code>transient</code> Java keyword or annotated with the <code>@HollowTransient</code> annotation.  The latter may be used for
+cases when the use of the <code>transient</code> Java keyword has unwanted side-effects, such as when POJOs defining the data 
+model are also consumed by tools, other than Hollow, for which the field is not transient.</p>
 <h2 id="list-schemas">List Schemas</h2>
 <p>You can define <code>List</code> schemas by adding a member variable of type <code>List</code> in your data model.  For example:</p>
 <div class="codehilite"><pre><span></span><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Movie</span> <span class="o">{</span>
