@@ -253,7 +253,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                         hashedBucket &= (numBuckets - 1);
                     }
 
-                    long mapEntryBitOffset = bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
+                    long mapEntryBitOffset = (long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
                     entryArray[shardNumber].clearElementValue(mapEntryBitOffset, bitsPerMapEntry);
                     entryArray[shardNumber].setElementValue(mapEntryBitOffset, bitsPerKeyElement, keyElementOrdinal);
                     entryArray[shardNumber].setElementValue(mapEntryBitOffset + bitsPerKeyElement, bitsPerValueElement, valueElementOrdinal);
@@ -420,7 +420,7 @@ public class HollowMapTypeWriteState extends HollowTypeWriteState {
                         hashedBucket &= (numBuckets - 1);
                     }
 
-                    long mapEntryBitOffset = bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
+                    long mapEntryBitOffset = (long)bitsPerMapEntry * (bucketCounter[shardNumber] + hashedBucket);
                     entryArray[shardNumber].clearElementValue(mapEntryBitOffset, bitsPerMapEntry);
                     entryArray[shardNumber].setElementValue(mapEntryBitOffset, bitsPerKeyElement, keyElementOrdinal);
                     entryArray[shardNumber].setElementValue(mapEntryBitOffset + bitsPerKeyElement, bitsPerValueElement, valueElementOrdinal);
