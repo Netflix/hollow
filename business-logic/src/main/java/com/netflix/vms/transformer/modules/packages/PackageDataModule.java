@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.packages;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -10,7 +12,6 @@ import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
-import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
@@ -20,6 +21,7 @@ import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
+import com.netflix.vms.transformer.hollowinput.PackageMovieDealCountryGroupHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfStreamBoxInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamBoxInfoHollow;
@@ -66,6 +68,7 @@ public class PackageDataModule {
     private final HollowObjectMapper mapper;
     private final CycleConstants cycleConstants;
     private final HollowPrimaryKeyIndex streamProfileIdx;
+    private final HollowPrimaryKeyIndex packageMovieDealCountryGroupIndex;
     private final HollowHashIndex packagesByVideoIdx;
 
     private final Map<Integer, Object> drmKeysByGroupId;
@@ -78,19 +81,18 @@ public class PackageDataModule {
 
     private final StreamDataModule streamDataModule;
     private final ContractRestrictionModule contractRestrictionModule;
-    private final DeployablePackagesFetcher deployablePackagesFetcher;
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
     private final TransformerContext ctx;
 
     public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx,
             HollowObjectMapper objectMapper, CycleConstants cycleConstants,
-            VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher,
-            DeployablePackagesFetcher deployablePackagesFetcher) {
+            VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = objectMapper;
         this.cycleConstants = cycleConstants;
-        this.deployablePackagesFetcher = deployablePackagesFetcher;
+        this.packageMovieDealCountryGroupIndex =
+                indexer.getPrimaryKeyIndex(IndexSpec.PACKAGE_MOVIE_DEAL_COUNTRY_GROUP);
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
@@ -186,8 +188,10 @@ public class PackageDataModule {
     }
 
     private PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
-        if (!deployablePackagesFetcher.isPackageExists(packages._getPackageId(), videoId)) {
-            return null; // Pre-condition, package must exist in deployablePackagesFeed
+        int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(
+                videoId, packages._getPackageId());
+        if (packageMovieDealCountryGroupOrdinal == ORDINAL_NONE) {
+            return null; // Pre-condition, package must exist in packageMovieDealCountryGroup feed
         }
 
         PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
@@ -226,13 +230,13 @@ public class PackageDataModule {
         calculateRuntimeInSeconds(pkg);
 
         //////////// DEPLOYABLE PACKAGES //////////////
+        PackageMovieDealCountryGroupHollow packageMovieDealCountryGroup =
+                api.getPackageMovieDealCountryGroupHollow(packageMovieDealCountryGroupOrdinal);
         pkg.tags = new ArrayList<>();
         pkg.packageTags = new HashSet<>();
         pkg.allDeployableCountries = new HashSet<>();
-        pkg.isDefaultPackage =
-            deployablePackagesFetcher.isDefaultPackage(packages._getPackageId(), videoId);
-        ListOfPackageTagsHollow packageTags =
-            deployablePackagesFetcher.getTags(packages._getPackageId(), videoId);
+        pkg.isDefaultPackage = packageMovieDealCountryGroup._getDefaultPackage();
+        ListOfPackageTagsHollow packageTags = packageMovieDealCountryGroup._getTags();
         if (packageTags != null) {
             for (StringHollow tag : packageTags) {
                 ctx.getLogger().info(TransformerLogTag.InteractivePackage, "package={}, video={}, tag={}", pkg.id, pkg.video.value, tag._getValue());
@@ -240,9 +244,19 @@ public class PackageDataModule {
                 pkg.packageTags.add(new Strings(tag._getValue()));
             }
         }
-        for (String isoCountry : deployablePackagesFetcher.getCountryCodes(packages._getPackageId(), videoId)) {
-            pkg.allDeployableCountries.add(cycleConstants.getISOCountry(isoCountry));
+        Set<String> countries = new HashSet<>();
+        if (packageMovieDealCountryGroup != null) {
+            packageMovieDealCountryGroup._getDealCountryGroups().forEach(deal -> {
+                if (deal._getCountryWindow() != null) {
+                    deal._getCountryWindow().forEach((country, deployable) -> {
+                        if (deployable._getValue()) {
+                            countries.add(country._getValue());
+                        }
+                    });
+                }
+            });
         }
+        countries.forEach(c -> pkg.allDeployableCountries.add(cycleConstants.getISOCountry(c)));
 
         //////////// ENCODE SUMMARY DESCRIPTORS /////////////////
 

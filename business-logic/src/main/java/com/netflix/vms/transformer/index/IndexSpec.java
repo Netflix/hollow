@@ -14,7 +14,6 @@ public enum IndexSpec {
     PROTECTION_TYPES(PRIMARY_KEY, "ProtectionTypes", "id"),
     STREAM_PROFILE(PRIMARY_KEY, "StreamProfiles", "id"),
     STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
-    DEPLOYABLE_PACKAGES(PRIMARY_KEY, "DeployablePackages", "packageId"),
     VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
     VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
     CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
