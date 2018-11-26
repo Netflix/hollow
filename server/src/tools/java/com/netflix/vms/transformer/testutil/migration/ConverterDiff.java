@@ -112,7 +112,6 @@ public class ConverterDiff {
         diff.addTypeDiff("ConsolidatedVideoRatings", "videoId");
         diff.addTypeDiff("Contracts", "movieId", "countryCode.value");
         diff.addTypeDiff("CSMReview", "videoId");
-        diff.addTypeDiff("DeployablePackages", "movieId", "packageId");
         diff.addTypeDiff("DrmSystemIdentifiers", "id");
         diff.addTypeDiff("Episodes", "movieId", "episodeId");
         diff.addTypeDiff("Festivals", "festivalId");
@@ -190,7 +189,6 @@ public class ConverterDiff {
          *  DamMerchStills
          *  DamMerchStillsMoment
          *  Date
-         *  DeployablePackages
          *  DisallowedAssetBundle
          *  DisallowedAssetBundlesList
          *  DisallowedSubtitleLangCode

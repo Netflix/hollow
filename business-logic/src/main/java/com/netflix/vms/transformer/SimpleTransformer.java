@@ -17,7 +17,6 @@ import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
-import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
@@ -131,12 +130,9 @@ public class SimpleTransformer {
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
         CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(ctx.getConfig(), indexer, api);
-        // this module can be removed in the future when we have fully migrated to DeployablePackages from Cinder
-        DeployablePackagesFetcher deployablePackagesFetcher =
-                new DeployablePackagesFetcher(ctx.getConfig(), indexer, api);
 
         // Grouper to group by hierarchy.
-        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, deployablePackagesFetcher, ctx);
+        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
         final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
         ctx.getLogger().info(TransformInfo, "topNodes={}", processGroups.size());
 
@@ -156,15 +152,14 @@ public class SimpleTransformer {
 
                 // create new modules for each executor thread
                 PackageDataModule packageDataModule = new PackageDataModule(api, ctx, objectMapper, cycleConstants,
-                        indexer, cupTokenFetcher, deployablePackagesFetcher);
+                        indexer, cupTokenFetcher);
                 VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, ctx, cycleConstants, indexer);
                 VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer);
                 VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer);
                 VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
                 VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer);
                 CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx,
-                        objectMapper, cycleConstants, indexer, cycleDataAggregator, cupTokenFetcher,
-                        deployablePackagesFetcher);
+                        objectMapper, cycleConstants, indexer, cycleDataAggregator, cupTokenFetcher);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
