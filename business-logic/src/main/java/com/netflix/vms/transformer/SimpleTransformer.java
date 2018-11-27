@@ -130,7 +130,7 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
-        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(ctx.getConfig(), indexer, api);
+        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, api);
         // this module can be removed in the future when we have fully migrated to DeployablePackages from Cinder
         DeployablePackagesFetcher deployablePackagesFetcher =
                 new DeployablePackagesFetcher(ctx.getConfig(), indexer, api);

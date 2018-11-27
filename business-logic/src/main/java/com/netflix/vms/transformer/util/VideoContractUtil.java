@@ -14,18 +14,14 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
 public class VideoContractUtil {
 	
-    public static ContractHollow getContract(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx, long videoId, String countryCode, long contractOrDealId) {
+    public static ContractHollow getContract(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx, long videoId, String countryCode, long dealId) {
     	HollowHashIndex videoContractsIdx = null;
-    	if(ctx.getConfig().isUseContractIdInsteadOfDealId()) {
-    		videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACT_BY_CONTRACTID);	
-    	} else {
-    		videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACT_BY_DEALID);
-    	}
+    	videoContractsIdx = indexer.getHashIndex(IndexSpec.VIDEO_CONTRACT_BY_DEALID);
     	
     	if(videoContractsIdx == null)
     		return null;
     	
-        HollowHashIndexResult results = videoContractsIdx.findMatches(videoId, countryCode, contractOrDealId);
+        HollowHashIndexResult results = videoContractsIdx.findMatches(videoId, countryCode, dealId);
         if (results != null) {
             HollowOrdinalIterator iter = results.iterator();
             int ordinal = iter.next();
