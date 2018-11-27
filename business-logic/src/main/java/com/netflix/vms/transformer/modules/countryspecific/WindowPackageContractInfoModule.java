@@ -1,9 +1,10 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
-import com.netflix.vms.transformer.data.DeployablePackagesFetcher;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
@@ -27,27 +28,26 @@ public class WindowPackageContractInfoModule {
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final HollowPrimaryKeyIndex packageIdx;
+    private final HollowPrimaryKeyIndex packageMovieDealCountryGroupIndex;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
 
     private final CupTokenFetcher cupTokenFetcher;
-    private final DeployablePackagesFetcher deployablePackagesFetcher;
     private final PackageMomentDataModule packageMomentDataModule;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
-    public WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer,
-            CupTokenFetcher cupTokenFetcher, DeployablePackagesFetcher deployablePackagesFetcher,
-            TransformerContext ctx) {
+    WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer,
+            CupTokenFetcher cupTokenFetcher, TransformerContext ctx) {
         this.api = api;
         this.ctx = ctx;
         this.cupTokenFetcher = cupTokenFetcher;
-        this.deployablePackagesFetcher = deployablePackagesFetcher;
+        this.packageMovieDealCountryGroupIndex = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGE_MOVIE_DEAL_COUNTRY_GROUP);
         this.packageMomentDataModule = new PackageMomentDataModule(ctx.getConfig());
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
-    public WindowPackageContractInfo buildWindowPackageContractInfo(int videoId, PackageData packageData,
+    WindowPackageContractInfo buildWindowPackageContractInfo(int videoId, PackageData packageData,
             RightsWindowContractHollow windowContractHollow, ContractHollow contract, String country, 
             boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
@@ -63,10 +63,13 @@ public class WindowPackageContractInfoModule {
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
 
         // create package info
+
+        int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(videoId,
+                (long) packageData.id);
         info.videoPackageInfo = newEmptyVideoPackageInfo();
         info.videoPackageInfo.packageId = packageData.id;
-        info.videoPackageInfo.isDefaultPackage = deployablePackagesFetcher.isDefaultPackage(
-                (long) packageData.id, videoId);
+        info.videoPackageInfo.isDefaultPackage =  packageMovieDealCountryGroupOrdinal != ORDINAL_NONE
+                && api.getPackageMovieDealCountryGroupHollow(packageMovieDealCountryGroupOrdinal)._getDefaultPackage();
 
         PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
@@ -83,7 +86,7 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    public WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow, 
+    WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow,
     		ContractHollow contract, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
@@ -109,7 +112,7 @@ public class WindowPackageContractInfoModule {
         }
     }
 
-    public WindowPackageContractInfo buildFilteredWindowPackageContractInfo(int contractId, int videoId) {
+    WindowPackageContractInfo buildFilteredWindowPackageContractInfo(int contractId, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = getFilteredVideoContractInfo(contractId);
         info.videoPackageInfo = getFilteredVideoPackageInfo(videoId);
