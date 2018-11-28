@@ -62,11 +62,11 @@ public class LanguageRightsModule extends AbstractTransformModule {
             }
 
             for (RightsWindowContractHollow windowContract : windowContracts) {
-                int contractId = (ctx.getConfig().isUseContractIdInsteadOfDealId()) ? (int) windowContract._getContractId() : (int) windowContract._getDealId();
-                Pair<Integer, Integer> rightsKey = new Pair<>(contractId, movieId);
+                int intDealId = (int) windowContract._getDealId();
+                Pair<Integer, Integer> rightsKey = new Pair<>(intDealId, movieId);
 
-                long contractOrDealId = (ctx.getConfig().isUseContractIdInsteadOfDealId()) ? windowContract._getContractId() : windowContract._getDealId();
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, movieId, countryCode, contractOrDealId);
+                long dealId = windowContract._getDealId();
+                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, movieId, countryCode, dealId);
                 DisallowedAssetBundlesListHollow disallowedBundleList_ = contract == null ? null : contract._getDisallowedAssetBundles();
                 if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
                     continue;
@@ -75,7 +75,7 @@ public class LanguageRightsModule extends AbstractTransformModule {
                 LanguageRights langRights = contractMovieRights.get(rightsKey);
                 if (langRights == null) {
                     langRights = new LanguageRights();
-                    langRights.contractId = contractId;
+                    langRights.contractId = intDealId;
                     langRights.videoId = new Video(movieId);
                     langRights.languageRestrictionsMap = new HashMap<>();
                     langRights.fallbackRestrictionsMap = new HashMap<>();

@@ -129,7 +129,7 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
-        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(ctx.getConfig(), indexer, api);
+        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, api);
 
         // Grouper to group by hierarchy.
         VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);

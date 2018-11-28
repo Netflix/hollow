@@ -8,7 +8,6 @@ import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
-import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowoutput.LinkedHashSetOfStrings;
@@ -31,7 +30,6 @@ public class WindowPackageContractInfoModule {
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex packageMovieDealCountryGroupIndex;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
-    private final HollowPrimaryKeyIndex timecodeAnnotationIdx;
 
     private final CupTokenFetcher cupTokenFetcher;
     private final PackageMomentDataModule packageMomentDataModule;
@@ -46,7 +44,6 @@ public class WindowPackageContractInfoModule {
         this.packageMomentDataModule = new PackageMomentDataModule(ctx.getConfig());
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
-        this.timecodeAnnotationIdx = indexer.getPrimaryKeyIndex(IndexSpec.TIMECODE_ANNOTATIONS);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -59,8 +56,7 @@ public class WindowPackageContractInfoModule {
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = 
-        		(ctx.getConfig().isUseContractIdInsteadOfDealId()) ? (int) windowContractHollow._getContractId() : (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
         info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
         assignContractInfo(info, contract, videoId);
@@ -75,16 +71,7 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.isDefaultPackage =  packageMovieDealCountryGroupOrdinal != ORDINAL_NONE
                 && api.getPackageMovieDealCountryGroupHollow(packageMovieDealCountryGroupOrdinal)._getDefaultPackage();
 
-        // package moment data
-        TimecodeAnnotationHollow inputTimecodeAnnotation = null;
-        // Extract the timecode annotation if it is enabled
-        int ordinal = timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id);
-        if(ordinal != -1) {
-            inputTimecodeAnnotation = 
-            		api.getTimecodeAnnotationHollow(timecodeAnnotationIdx.getMatchingOrdinal((long)packageData.id));        	
-        }
-
-        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, inputTimecodeAnnotation, ctx);
+        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, ctx);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
         info.videoPackageInfo.timecodes = packageMomentData.timecodes;
@@ -103,8 +90,7 @@ public class WindowPackageContractInfoModule {
     		ContractHollow contract, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = 
-        		(ctx.getConfig().isUseContractIdInsteadOfDealId()) ? (int) windowContractHollow._getContractId() : (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
         info.videoContractInfo.primaryPackageId = packageId;
         assignContractInfo(info, contract, videoId);
         info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());

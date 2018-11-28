@@ -201,8 +201,6 @@ public interface TransformerConfig {
     boolean isElasticSearchNoWaitingEnabled();
 
     ///////////// TEMPORARY FEATURE-BASED //////////////////
-    @DefaultValue("true")
-    boolean usePackagesFeedForTimecodes();
 
     ////////////// BUSINESS LOGIC  ////////////////////////
 
@@ -224,8 +222,6 @@ public interface TransformerConfig {
     @DefaultValue("NEW_EPISODE,NEW_EPISODE_V2,NEW_EPISODE_GLOBAL")
     public String getNewEpisodeOverlayTypes();
     
-    @DefaultValue("false")
-    public boolean isUseContractIdInsteadOfDealId();
 
 
     ////////////// Multi-langauge catalog configs ////////////////////////

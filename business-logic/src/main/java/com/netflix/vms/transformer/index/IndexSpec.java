@@ -47,7 +47,6 @@ public enum IndexSpec {
     PACKAGES_BY_VIDEO(HASH, "Package", "", "movieId"),
     ALL_VIDEO_STATUS(HASH, "Status", "", "movieId"),
     VIDEO_CONTRACTS(HASH, "Contracts", "", "movieId", "countryCode.value"),
-    VIDEO_CONTRACT_BY_CONTRACTID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.contractId"),
     VIDEO_CONTRACT_BY_DEALID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.dealId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
     SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
@@ -59,7 +58,6 @@ public enum IndexSpec {
     MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag.value", "scheduleId.value"),
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
     
-    TIMECODE_ANNOTATIONS(PRIMARY_KEY, "TimecodeAnnotation", "packageId"),
 
     // Merch-language-dates
     MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
