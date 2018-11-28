@@ -189,7 +189,7 @@ public class PackageDataModule {
 
     private PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
         int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(
-                videoId, packages._getPackageId());
+                (long) videoId, packages._getPackageId());
         if (packageMovieDealCountryGroupOrdinal == ORDINAL_NONE) {
             return null; // Pre-condition, package must exist in packageMovieDealCountryGroup feed
         }

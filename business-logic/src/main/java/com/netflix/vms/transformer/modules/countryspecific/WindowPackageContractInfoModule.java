@@ -64,7 +64,7 @@ public class WindowPackageContractInfoModule {
 
         // create package info
 
-        int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(videoId,
+        int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal((long) videoId,
                 (long) packageData.id);
         info.videoPackageInfo = newEmptyVideoPackageInfo();
         info.videoPackageInfo.packageId = packageData.id;

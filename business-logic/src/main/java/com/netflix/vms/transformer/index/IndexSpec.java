@@ -69,7 +69,7 @@ public enum IndexSpec {
     private final IndexType indexType;
     private final String parameters[];
 
-    private IndexSpec(IndexType indexType, String... parameters) {
+    IndexSpec(IndexType indexType, String... parameters) {
         this.indexType = indexType;
         this.parameters = parameters;
     }
@@ -82,7 +82,7 @@ public enum IndexSpec {
         return parameters;
     }
 
-    public static enum IndexType {
+    public enum IndexType {
         PRIMARY_KEY,
         HASH
     }
