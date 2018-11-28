@@ -245,7 +245,7 @@ public class PackageDataModule {
             }
         }
         Set<String> countries = new HashSet<>();
-        if (packageMovieDealCountryGroup != null) {
+        if (packageMovieDealCountryGroup != null && packageMovieDealCountryGroup._getDealCountryGroups() != null) {
             packageMovieDealCountryGroup._getDealCountryGroups().forEach(deal -> {
                 if (deal._getCountryWindow() != null) {
                     deal._getCountryWindow().forEach((country, deployable) -> {
