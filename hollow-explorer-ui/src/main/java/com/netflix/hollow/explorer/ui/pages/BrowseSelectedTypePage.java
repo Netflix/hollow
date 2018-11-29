@@ -240,7 +240,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     }
 
     private Object[] parseKey(PrimaryKey primaryKey, String keyString) {
-        String fields[] = keyString.split(":");
+        // Split by the number of fields of the primary key
+        // This ensures correct extraction of an empty value for the last field
+        String fields[] = keyString.split(":", primaryKey.numFields());
         
         Object key[] = new Object[fields.length];
         
