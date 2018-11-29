@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static org.junit.Assert.assertNull;
+
 import com.netflix.vms.transformer.hollowoutput.DateWindow;
 import org.junit.Assert;
 import org.junit.Before;
@@ -7,7 +9,7 @@ import org.junit.Test;
 
 public class DateWindowAggregatorTest {
 
-    DateWindowAggregator aggregator;
+    private DateWindowAggregator aggregator;
     
     @Before
     public void setUp() {
@@ -77,7 +79,11 @@ public class DateWindowAggregatorTest {
         window = aggregator.matchDateWindowAgainstMergedDateWindows(900, 1200);
         assertDateWindow(window, 1000, 1200);
     }
-    
+
+    @Test
+    public void startEndBeforeFirstWindow() {
+        assertNull(aggregator.matchDateWindowAgainstMergedDateWindows(1, 5));
+    }
     
     private void assertDateWindow(DateWindow window, long startDate, long endDate) {
         Assert.assertEquals(startDate, window.startDateTimestamp);
