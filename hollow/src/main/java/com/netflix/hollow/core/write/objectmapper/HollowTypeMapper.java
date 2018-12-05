@@ -55,6 +55,27 @@ public abstract class HollowTypeMapper {
         return rec;
     }
 
+    /**
+     * Calculates the type name from a given type.
+     * <p>
+     * If the type is annotated with {@link HollowTypeName} then the type name
+     * is the value of the {@code HollowTypeName.name} attribute. Otherwise
+     * the type name is derived from the type itself.
+     * If the type is a {@code Class} then the type name is the simple name of
+     * that class.
+     * If the type is a parameterized type and is assignable to a class of {@code List},
+     * {@code Set}, or {@code Map} then the type name begins with the simple class name of
+     * the parameterized type's raw type, followed by "Of", followed by the result of
+     * calling this method with the associated parameterized types (in order, in-fixed by "To").
+     * Otherwise, the type name is the simple class name of the parameterized type's raw type.
+     * <p>
+     * The translation from type to type name is lossy since the simple class name of a class
+     * is used.  This means that no two types, from different packages, but with the same simple
+     * name can be utilized.
+     *
+     * @param type the type
+     * @return the type name.
+     */
     protected static String getDefaultTypeName(Type type) {
         if(type instanceof Class) {
             Class<?> clazz = (Class<?>)type;

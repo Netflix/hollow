@@ -31,6 +31,7 @@ public class HollowObjectMapper {
 
     private final HollowWriteStateEngine stateEngine;
 
+    private final ConcurrentHashMap<Type, String> typeNameMappers;
     private final ConcurrentHashMap<String, HollowTypeMapper> typeMappers;
 
     private AtomicInteger unassignedTypeCounter = new AtomicInteger(0);
@@ -40,6 +41,7 @@ public class HollowObjectMapper {
 
     public HollowObjectMapper(HollowWriteStateEngine stateEngine) {
         this.stateEngine = stateEngine;
+        this.typeNameMappers = new ConcurrentHashMap<>();
         this.typeMappers = new ConcurrentHashMap<>();
     }
 
@@ -113,14 +115,17 @@ public class HollowObjectMapper {
 
     HollowTypeMapper getTypeMapper(
             Type type, String declaredName, String[] hashKeyFieldPaths, int numShards, Set<Type> visited) {
-        String typeName = declaredName != null ? declaredName : HollowObjectTypeMapper.getDefaultTypeName(type);
 
+        // Compute the type name
+        String typeName = declaredName != null
+                ? declaredName
+                : typeNameMappers.computeIfAbsent(type, HollowObjectTypeMapper::getDefaultTypeName);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
 
         if (typeMapper == null) {
-
             if (visited == null) {
-                // @@@ visted is never operated on
+                // Used to detect circular references in the model
+                // See HollowObjectTypeMapper and MappedField
                 visited = new HashSet<>();
             }
 
@@ -129,20 +134,19 @@ public class HollowObjectMapper {
                 Class<?> clazz = (Class<?>) parameterizedType.getRawType();
 
                 if (List.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowListTypeMapper(this, parameterizedType, declaredName, numShards,
+                    typeMapper = new HollowListTypeMapper(this, parameterizedType, typeName, numShards,
                             ignoreListOrdering, visited);
                 } else if (Set.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowSetTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths,
+                    typeMapper = new HollowSetTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
                             numShards, stateEngine, useDefaultHashKeys, visited);
                 } else if (Map.class.isAssignableFrom(clazz)) {
-                    typeMapper = new HollowMapTypeMapper(this, parameterizedType, declaredName, hashKeyFieldPaths,
+                    typeMapper = new HollowMapTypeMapper(this, parameterizedType, typeName, hashKeyFieldPaths,
                             numShards, stateEngine, useDefaultHashKeys, visited);
                 } else {
-                    return getTypeMapper(clazz, declaredName, hashKeyFieldPaths, -1, visited);
+                    typeMapper = new HollowObjectTypeMapper(this, clazz, typeName, visited);
                 }
-
             } else {
-                typeMapper = new HollowObjectTypeMapper(this, (Class<?>) type, declaredName, visited);
+                typeMapper = new HollowObjectTypeMapper(this, (Class<?>) type, typeName, visited);
             }
 
             HollowTypeMapper existing = typeMappers.putIfAbsent(typeName, typeMapper);
