@@ -12,6 +12,10 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
+import java.io.File;
+import java.io.PrintWriter;
+
+
 /**
  * A helper class to encapsulate extracting Cup tokens from the HollowInputAPI. Once we finish the migration from
  * Beehive cup tokens to Cinder cup tokens, this class can be removed and its functionality inlined.
@@ -21,6 +25,7 @@ public class CupTokenFetcher {
     private final HollowPrimaryKeyIndex cupTokenPrimaryKeyIndex;
     private final VMSHollowInputAPI api;
     private final TransformerConfig config;
+    private PrintWriter out;
 
     public CupTokenFetcher(VMSTransformerIndexer indexer,
             VMSHollowInputAPI api, TransformerConfig config) {
@@ -28,6 +33,32 @@ public class CupTokenFetcher {
         this.cupTokenHashIndex = indexer.getHashIndex(IndexSpec.CUP_TOKEN_HINDEX);
         this.api = api;
         this.config = config;
+    }
+    
+    
+    public void createFile() {
+    	// whats the current millis
+    	Long millis = System.currentTimeMillis();
+    	String filename = "cuptokens-" + millis.toString() + ".txt";
+    	String dir = System.getProperty("java.io.tmpdir");
+    	for(int i = 0; i < 100; i++)
+    		System.out.println(dir);
+    	try {
+        	out = new PrintWriter(dir + File.separator + filename);    		
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		out = null;
+    	}
+    }
+    
+    public void closeFile() {
+    	if(out != null) {
+    		try {
+    			out.close();
+    		} catch(Exception e) {
+    			//eat it
+    		}
+    	}
     }
     
 
@@ -40,7 +71,9 @@ public class CupTokenFetcher {
             return CupKey.DEFAULT;
         }
         long dealId = contract._getDealId();
-        return getCupTokenStringCinder(videoId, dealId);
+        String token = getCupTokenStringCinder(videoId, dealId);
+        out.println(videoId + ":" + dealId + "=" + token);
+        return token;
     }
     
 
