@@ -20,10 +20,9 @@ package com.netflix.hollow.api.producer.validation;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.producer.HollowProducer;
-import com.netflix.hollow.api.producer.HollowProducer.Populator;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,20 +37,40 @@ public class ProducerValidationTests {
 
     @Test
     public void duplicateDetectionFailureTest() {
-        HollowProducer producer = HollowProducer.withPublisher(blobStore)
-                .withBlobStager(new HollowInMemoryBlobStager())
-                .withListener(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"))
-                .build();
+        duplicateDetectionFailureTest(new DuplicateDataDetectionValidator("TypeWithPrimaryKey"));
+        duplicateDetectionFailureTest(
+                new DuplicateDataDetectionValidator("TypeWithPrimaryKey", new String[] {"id", "name"}));
+
+        duplicateDetectionFailureTest(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class));
+        duplicateDetectionFailureTest(new DuplicateDataDetectionValidator(TypeWithPrimaryKey2.class));
+
+        duplicateDetectionFailureTest(null, true);
+        duplicateDetectionFailureTest(new DuplicateDataDetectionValidator(TypeWithPrimaryKey.class), true);
+    }
+
+    void duplicateDetectionFailureTest(DuplicateDataDetectionValidator v) {
+        duplicateDetectionFailureTest(v, false);
+    }
+
+    void duplicateDetectionFailureTest(DuplicateDataDetectionValidator v, boolean auto) {
+        HollowProducer.Builder<?> b = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager());
+        if (v != null) {
+            b.withListener(v);
+        }
+        HollowProducer producer = b.build();
+
+        if (auto) {
+            producer.initializeDataModel(TypeWithPrimaryKey.class);
+            DuplicateDataDetectionValidator.addValidatorsForSchemaWithPrimaryKey(producer);
+        }
 
         try {
             //runCycle(producer, 1);
-            producer.runCycle(new Populator() {
-
-                public void populate(WriteState newState) throws Exception {
-                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
-                    newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
-                    newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "as;dlkfjasd;l"));
-                }
+            producer.runCycle(newState -> {
+                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+                newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
+                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "as;dlkfjasd;l"));
             });
             Assert.fail();
         } catch (ValidationStatusException expected) {
@@ -69,12 +88,9 @@ public class ProducerValidationTests {
                 .build();
 
         //runCycle(producer, 1);
-        producer.runCycle(new Populator() {
-
-            public void populate(WriteState newState) throws Exception {
-                newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
-                newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
-            }
+        producer.runCycle(newState -> {
+            newState.add(new TypeWithPrimaryKey(1, "Brad Pitt", "klsdjfla;sdjkf"));
+            newState.add(new TypeWithPrimaryKey(1, "Angelina Jolie", "as;dlkfjasd;l"));
         });
 
         HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
@@ -83,7 +99,6 @@ public class ProducerValidationTests {
                 .cardinality());
     }
 
-
     @HollowPrimaryKey(fields = {"id", "name"})
     static class TypeWithPrimaryKey {
         int id;
@@ -91,6 +106,20 @@ public class ProducerValidationTests {
         String desc;
 
         TypeWithPrimaryKey(int id, String name, String desc) {
+            this.id = id;
+            this.name = name;
+            this.desc = desc;
+        }
+    }
+
+    @HollowPrimaryKey(fields = {"id", "name"})
+    @HollowTypeName(name = "TypeWithPrimaryKey")
+    static class TypeWithPrimaryKey2 {
+        int id;
+        String name;
+        String desc;
+
+        TypeWithPrimaryKey2(int id, String name, String desc) {
             this.id = id;
             this.name = name;
             this.desc = desc;

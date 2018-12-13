@@ -30,7 +30,7 @@ public abstract class HollowTypeMapper {
 
     public static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF00000000L;
 
-    private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<HollowWriteRecord>();
+    private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<>();
 
     protected abstract String getTypeName();
 
@@ -76,7 +76,7 @@ public abstract class HollowTypeMapper {
      * @param type the type
      * @return the type name.
      */
-    protected static String getDefaultTypeName(Type type) {
+    public static String getDefaultTypeName(Type type) {
         if(type instanceof Class) {
             Class<?> clazz = (Class<?>)type;
             HollowTypeName explicitTypeName = clazz.getAnnotation(HollowTypeName.class);
