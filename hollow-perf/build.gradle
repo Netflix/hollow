@@ -1,0 +1,26 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "4.0.2"
+  id "me.champeau.gradle.jmh" version "0.4.6"
+}
+
+apply plugin: 'java'
+apply plugin: 'me.champeau.gradle.jmh'
+
+dependencies {
+  compile project(':hollow')
+
+  compile 'org.openjdk.jmh:jmh-core:1.21'
+  compileOnly 'org.openjdk.jmh:jmh-generator-annprocess:1.21'
+}
+
+compileJava {
+  options.compilerArgs << '-XDignore.symbol.file'
+  options.fork = true
+  options.forkOptions.executable = 'javac'
+}
+
+jmh {
+  duplicateClassesStrategy = 'warn'
+}
+
+
