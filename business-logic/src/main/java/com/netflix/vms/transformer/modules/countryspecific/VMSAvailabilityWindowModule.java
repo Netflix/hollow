@@ -122,9 +122,10 @@ public class VMSAvailabilityWindowModule {
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, language != null);
         } else {
-            windows = populateEpisodeOrStandaloneWindowData(videoId, country, language, rollup, isGoLive, rights, language != null, videoRights);
-            if (language != null && windows.isEmpty() && isLanguageOverride(videoRights))
+            // todo evaluate languageOverride versus alternate language set
+            if (isLanguageOverride(videoRights))
                 windows = populateEpisodeOrStandaloneWindowData(videoId, country, null, rollup, isGoLive, rights, language != null, videoRights);
+            else windows = populateEpisodeOrStandaloneWindowData(videoId, country, language, rollup, isGoLive, rights, language != null, videoRights);
         }
         return windows;
     }
