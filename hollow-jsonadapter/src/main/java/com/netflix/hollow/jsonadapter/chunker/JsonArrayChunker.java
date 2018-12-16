@@ -19,8 +19,10 @@ package com.netflix.hollow.jsonadapter.chunker;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 
 public class JsonArrayChunker {
@@ -29,7 +31,7 @@ public class JsonArrayChunker {
     private static final int SEGMENT_QUEUE_SIZE = 32;
 
     private final Reader reader;
-    private final Queue<JsonArrayChunkerInputSegment> bufferSegments;
+    private final Queue<CompletableFuture<JsonArrayChunkerInputSegment>> bufferSegments;
     private final Executor executor;
     private final int segmentLength;
     
@@ -42,24 +44,29 @@ public class JsonArrayChunker {
         this(reader, executor, DEFAULT_SEGMENT_LENGTH);
     }
     
-    public JsonArrayChunker(Reader reader, Executor executor, int segmentLength) {
+    JsonArrayChunker(Reader reader, Executor executor, int segmentLength) {
         this.reader = reader;
-        this.bufferSegments = new LinkedList<JsonArrayChunkerInputSegment>();
+        this.bufferSegments = new ArrayDeque<>();
         this.executor = executor;
         this.segmentLength = segmentLength;
     }
 
-    
-    public void initialize() throws IOException, InterruptedException {
-        while(!eofReached && bufferSegments.size() < SEGMENT_QUEUE_SIZE) {
+    /**
+     * Initialize the chunker.
+     * Internally, this buffers an initial set of segments. We buffer until we have reached the end
+     * of the reader or filled up our SEGMENT_QUEUE_SIZE buffer. Adding a segment kicks off a
+     * {@link JsonArrayChunkerInputSegment#findSpecialCharacterOffsets task} that indexes the
+     * locations of all special characters in the segment.
+     */
+    public void initialize() throws IOException {
+        while (!eofReached && bufferSegments.size() < SEGMENT_QUEUE_SIZE) {
             fillOneSegment();
         }
-        
         nextSegment();
     }
     
     @SuppressWarnings("resource")
-    public Reader nextChunk() throws InterruptedException, IOException {
+    public Reader nextChunk() throws IOException {
         while(!currentSegment.nextSpecialCharacter()) {
             if(!nextSegment())
                 return null;
@@ -103,35 +110,34 @@ public class JsonArrayChunker {
                 break;
             }
         }
-        
         chunkReader.setEndOffset(currentSegment.specialCharacterIteratorPosition() + 1);
-        
         return chunkReader;
     }
     
-    private boolean nextSegment() throws InterruptedException, IOException {
-        if(bufferSegments.size() == 0)
+    private boolean nextSegment() throws IOException {
+        if (bufferSegments.isEmpty()) {
             return false;
-
-        if(!eofReached)
+        }
+        if (!eofReached) {
             fillOneSegment();
-
+        }
         currentSegmentStartOffset += segmentLength;
-        currentSegment = bufferSegments.remove();
-        currentSegment.waitForDefinedOffsets();
+        try {
+            currentSegment = bufferSegments.remove().join();
+        } catch (CompletionException e) {
+            Throwable t = e.getCause(); // unwrap
+            if (t instanceof IOException) {
+                throw (IOException) t;
+            } else {
+                throw t instanceof RuntimeException ? (RuntimeException) t : e;
+            }
+        }
         return true;
     }
     
     private void fillOneSegment() throws IOException {
-        final JsonArrayChunkerInputSegment seg = new JsonArrayChunkerInputSegment(segmentLength);
+        JsonArrayChunkerInputSegment seg = new JsonArrayChunkerInputSegment(segmentLength);
         eofReached = seg.fill(reader);
-        bufferSegments.add(seg);
-        
-        executor.execute(new Runnable() {
-            public void run() {
-                seg.findSpecialCharacterOffsets();
-            }
-        });
+        bufferSegments.add(CompletableFuture.supplyAsync(seg::findSpecialCharacterOffsets, executor));
     }
-    
 }
