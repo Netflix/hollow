@@ -1,0 +1,4 @@
+rootProject.name = 'sunjeets-onboarding-root'
+
+include 'sunjeets-onboarding-model'
+// include 'sunjeets-onboarding-core'

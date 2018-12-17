@@ -1,0 +1,25 @@
+{
+  "project_resources": {
+    "Atlas Dashboard": "http://dashboards.prod.netflix.net/show/sunjeetsonboardingroot"
+  },
+  "inputs": {
+    "teamEmail": "sunjeets@netflix.com",
+    "repoOwner": "sunjeets",
+    "repoName": "sunjeets-onboarding-root",
+    "repoOwnerType": "user",
+    "cloudProvider": "aws",
+    "frameworkType": "governator-service",
+    "ipcType": "rest",
+    "generatorTasks": [
+      "generate"
+    ],
+    "projectName": "sunjeets-onboarding-root",
+    "projectClassName": "SunjeetsOnboardingRoot",
+    "applicationName": "sunjeetsonboardingroot",
+    "packageName": "com.netflix.sunjeetsonboardingroot",
+    "testFramework": "junit",
+    "stashUser": "sunjeets"
+  },
+  "generator_user": "sunjeets",
+  "ci_generator_version": "5.6.5"
+}

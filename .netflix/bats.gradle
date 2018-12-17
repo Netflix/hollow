@@ -1,0 +1,28 @@
+final version = '1.1.0'
+
+task downloadBats {
+  final outputFile = file("${buildDir}/Downloads/bats-${version}.tgz")
+
+  outputs.file outputFile
+
+  doLast {
+    outputFile << new URL("https://artifacts.netflix.com/npm-registry-cache/bats/-/bats-${version}.tgz").getBytes()
+  }
+}
+
+task installBats(type: Copy, dependsOn: 'downloadBats') {
+  from tarTree(resources.gzip(tasks.downloadBats.outputs.files.getSingleFile()))
+  into "${buildDir}/opt/bats-${version}"
+  eachFile { fileCopyDetails ->
+    fileCopyDetails.setPath(fileCopyDetails.getPath().replace('package/', ''))
+  }
+}
+
+task runBats(type: Exec, dependsOn: 'installBats') {
+  executable "${tasks.installBats.outputs.files.getSingleFile()}/bin/bats"
+  environment = [:]
+}
+
+if (tasks.findByName('check')) {
+  tasks.check.dependsOn(tasks.runBats)
+}

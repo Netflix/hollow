@@ -1,0 +1,10 @@
+# nflx-ezconfig application configuration file. See http://go/ezconfig
+TOMCAT_VERSION = 8
+
+# The G1GC is now the default in Java9 and CMS is deprecated. The G1GC attempts
+# to have your target pause be 200 milliseconds by default.  Additional configuration
+# can be found in JVM documentation.
+JAVA_GC = G1
+
+# Enables flamegraph generation. Performance impact is negligible. See http://go/flamegraphs
+JAVA_FRAME_POINTER = enabled

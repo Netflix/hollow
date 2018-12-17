@@ -1,0 +1,78 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Logs and databases #
+######################
+*.log
+**/log
+
+# Editor Files #
+################
+*~
+*.swp
+
+# Gradle Files #
+################
+.gradle
+.m2
+
+# Build output directies #
+##########################
+**/target
+**/build
+**/src/generated
+*/bin
+*/integrationTest/bin
+**/classes
+
+# IntelliJ specific files/directories #
+#######################################
+out
+.idea
+*.ipr
+*.iws
+*.iml
+atlassian-ide-plugin.xml
+
+# VSCode #
+##########
+.vscode
+
+# Eclipse specific files/directories #
+######################################
+.classpath
+.project
+.settings
+.metadata
+
+# From local runners #
+######################
+tomcat.8080/
+Tomcat\ 7.launch
+
+# From npm #
+############
+node_modules/
+
+# From generator #
+##################
+.ci/
+.tmp/
+
+# Newt #
+########
+.newt-cache/
+.newt.netflix_environment.sh

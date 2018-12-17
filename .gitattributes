@@ -1,0 +1,21 @@
+* core.autocrlf=true core.safecrlf=true text=auto
+
+gradlew eol=lf
+
+*.bat eol=crlf
+
+.dockerignore text
+.git* text
+*.css text
+*.gradle text
+*.groovy text diff=java
+*.html text diff=html
+*.java text diff=java
+*.js text
+*.json text
+*.lock text
+*.md text
+*.properties text
+*.proto text
+
+*.jar binary

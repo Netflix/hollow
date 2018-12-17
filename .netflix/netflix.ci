@@ -1,0 +1,32 @@
+#!/bin/bash -efx
+
+if [ "$1" == '--no-op' ]
+then
+  echo='echo'
+else
+  echo=
+fi
+
+gradle=./gradlew
+
+export ROCKET_TAG_TYPE
+
+gradle_options='--stacktrace'
+gradle_tasks='clean'
+
+if [ "${ROCKET_TAG_TYPE}" = "FINAL" ]; then
+  # A tag like `v1.0.0` was pushed
+  gradle_options="${gradle_options} -Prelease.useLastTag=true"
+  gradle_tasks="${gradle_tasks} final"
+elif [ "${ROCKET_TAG_TYPE}" = "CANDIDATE" ]; then
+  # a tag ending in `-rc.#` was pushed
+  gradle_options="${gradle_options} -Prelease.useLastTag=true"
+  gradle_tasks="${gradle_tasks} candidate"
+else
+  gradle_options="${gradle_options} -Prelease.scope=patch"
+  gradle_tasks="${gradle_tasks} devSnapshot"
+fi
+
+${echo} ${gradle} ${gradle_options} ${gradle_tasks}
+
+
