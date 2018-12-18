@@ -170,7 +170,7 @@ public class HollowPrefixIndexTest {
         MovieSetReference movieSetReference = new MovieSetReference(1, 1999, "The Matrix", new HashSet<String>(Arrays.asList("Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss")));
         objectMapper.add(movieSetReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.value");
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.element");
         Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }

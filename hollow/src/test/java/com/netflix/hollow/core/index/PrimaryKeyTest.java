@@ -66,46 +66,58 @@ public class PrimaryKeyTest {
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType.nofield");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid field path declaration for type TypeWithTraversablePrimaryKey: subType.nofield.  " +
-                                "At element 1, the field nofield was not found in type SubTypeWithTraversablePrimaryKey.",
-                                expected.getMessage());
+            Assert.fail("IllegalArgumentException expected");
+        } catch (FieldPaths.FieldPathException expected) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_FOUND, expected.error);
+            Assert.assertEquals(1, expected.fieldSegments.size());
+            Assert.assertEquals(1, expected.segmentIndex);
+            Assert.assertEquals("SubTypeWithTraversablePrimaryKey", expected.enclosingSchema.getName());
         }
         
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType.id.value.alldone");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid field path declaration for type TypeWithTraversablePrimaryKey: subType.id.value.alldone.  " +
-                                "No available traversal after element 2: value.",
-                                expected.getMessage());
+            Assert.fail("IllegalArgumentException expected");
+        } catch (FieldPaths.FieldPathException expected) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_TRAVERSABLE, expected.error);
+            Assert.assertEquals(3, expected.fieldSegments.size());
+            Assert.assertEquals(2, expected.segmentIndex);
+            Assert.assertEquals("value", expected.fieldSegments.get(2).getName());
+            Assert.assertEquals("String", expected.enclosingSchema.getName());
         }
         
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "subType2");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid field path declaration for type TypeWithTraversablePrimaryKey: subType2.  " +
-                                "This path ends in a REFERENCE field which is not auto-traversable.  " +
-                                "If this is intended to actually indicate a REFERENCE field, specify the field path as \"subType2!\".",
-                                expected.getMessage());
+            Assert.fail("IllegalArgumentException expected");
+        } catch (FieldPaths.FieldPathException expected) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_EXPANDABLE, expected.error);
+            Assert.assertEquals(1, expected.fieldSegments.size());
+            Assert.assertEquals("subType2", expected.fieldSegments.get(0).getName());
+            Assert.assertEquals("SubTypeWithNonTraversablePrimaryKey", expected.enclosingSchema.getName());
         }
         
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("TypeWithTraversablePrimaryKey", "strList.element.value");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid field path declaration for type TypeWithTraversablePrimaryKey: strList.element.value.  " +
-                                "Field paths may only traverse through OBJECT types, but this declaration passes through a LIST type (ListOfString).",
-                                expected.getMessage());
+            Assert.fail("IllegalArgumentException expected");
+        } catch (FieldPaths.FieldPathException expected) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_TRAVERSABLE, expected.error);
+            Assert.assertEquals(1, expected.fieldSegments.size());
+            Assert.assertEquals(1, expected.segmentIndex);
+            Assert.assertEquals("element", expected.segments[expected.segmentIndex]);
+            Assert.assertEquals("ListOfString", expected.enclosingSchema.getName());
         }
         
         try {
             PrimaryKey invalidFieldDefinition = new PrimaryKey("UnknownType", "id");
             invalidFieldDefinition.getFieldPathIndex(writeEngine, 0);
-        } catch(IllegalArgumentException expected) {
-            Assert.assertEquals("Invalid field path declaration for type UnknownType: id.  The type UnknownType is unavailable.",
-                                expected.getMessage());
+            Assert.fail("IllegalArgumentException expected");
+        } catch (FieldPaths.FieldPathException expected) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_BINDABLE, expected.error);
+            Assert.assertEquals(0, expected.fieldSegments.size());
+            Assert.assertEquals(0, expected.segmentIndex);
+            Assert.assertEquals("UnknownType", expected.rootType);
         }
     }
     
