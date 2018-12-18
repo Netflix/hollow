@@ -231,6 +231,10 @@ public class HollowReadFieldUtils {
                 if(testObject instanceof Long)
                     return testObject.equals(typeAccess.readLong(ordinal, fieldPosition));
                 return testObject == null && typeAccess.readLong(ordinal, fieldPosition) == Long.MIN_VALUE;
+            case REFERENCE:
+                if(testObject instanceof Integer)
+                    return testObject.equals(typeAccess.readOrdinal(ordinal, fieldPosition));
+                return testObject == null && typeAccess.readOrdinal(ordinal, fieldPosition) < 0;
             default:
         }
 

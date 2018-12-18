@@ -22,11 +22,11 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
  * Intended for internal use only - used by API code generator
- *,
- * @author dsu
+ * @deprecated see {@link HashIndex}
  */
 // TODO(timt): how to move to `API extends HollowAPI` without binary incompatiblity of access to the `api`
 //             field in generated subclasses, e.g. `find*Matches(...)`
+@Deprecated
 public abstract class AbstractHollowHashIndex<API> {
     protected final HollowConsumer consumer;
     protected final String queryType;
