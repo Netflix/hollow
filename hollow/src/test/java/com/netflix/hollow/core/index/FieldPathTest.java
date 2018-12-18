@@ -95,8 +95,17 @@ public class FieldPathTest {
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
         //with auto expand
-        new FieldPath(readStateEngine, "IntegerReference", "id", false);
+        try {
+            new FieldPath(readStateEngine, "IntegerReference", "id", false);
+        } catch (FieldPaths.FieldPathException e) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_FULL, e.error);
+            Assert.assertEquals(1, e.fieldSegments.size());
+            Assert.assertEquals("Integer", e.fieldSegments.get(0).getTypeName());
+            Assert.assertEquals("id", e.fieldSegments.get(0).getName());
+            throw e;
+        }
     }
+
 
     @Test
     public void testObjectReference() throws Exception {
@@ -146,8 +155,11 @@ public class FieldPathTest {
         // with partial path
         try {
             new FieldPath(readStateEngine, "ObjectReference", "reference.id", false);
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Incomplete field path at type :Integer. Please enter the field names in type to complete the path.", e.getMessage());
+        } catch (FieldPaths.FieldPathException e) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_FULL, e.error);
+            Assert.assertEquals(2, e.fieldSegments.size());
+            Assert.assertEquals("Integer", e.fieldSegments.get(1).getTypeName());
+            Assert.assertEquals("id", e.fieldSegments.get(1).getName());
             throw e;
         }
     }
@@ -210,8 +222,11 @@ public class FieldPathTest {
         // with auto-expand but incomplete, since reference has two fields, cannot auto-expand
         try {
             new FieldPath(readStateEngine, "ObjectReferenceToMultiValue", "multiValue");
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Incomplete field path at type :MultiValue. Please enter the field names in type to complete the path.", e.getMessage());
+        } catch (FieldPaths.FieldPathException e) {
+            Assert.assertEquals(FieldPaths.FieldPathException.ErrorKind.NOT_EXPANDABLE, e.error);
+            Assert.assertEquals("MultiValue", e.enclosingSchema.getName());
+            Assert.assertEquals(1, e.fieldSegments.size());
+            Assert.assertEquals("multiValue", e.fieldSegments.get(0).getName());
             throw e;
         }
     }
@@ -235,14 +250,8 @@ public class FieldPathTest {
         objectMapper.add(listType);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
-        //with auto expand
-        FieldPath fieldPath = new FieldPath(readStateEngine, "ListType", "intValues");
-        Object[] values = fieldPath.findValues(0);
-        Assert.assertEquals(1, (int) values[0]);
-        Assert.assertEquals(2, (int) values[1]);
-        Assert.assertEquals(3, (int) values[2]);
-        Object value = fieldPath.findValue(0);
-        Assert.assertEquals(1, (int) value);
+        FieldPath fieldPath;
+        Object[] values;
 
         //with partial auto expand
         fieldPath = new FieldPath(readStateEngine, "ListType", "intValues.element");
@@ -264,7 +273,6 @@ public class FieldPathTest {
         Assert.assertEquals(1, (int) values[0]);
         Assert.assertEquals(2, (int) values[1]);
         Assert.assertEquals(3, (int) values[2]);
-
     }
 
     @Test
@@ -280,11 +288,8 @@ public class FieldPathTest {
         objectMapper.add(listType);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
-        //with auto expand
-        FieldPath fieldPath = new FieldPath(readStateEngine, "ListObjectReference", "intValues");
-        Object[] values = fieldPath.findValues(0);
-        Assert.assertEquals(1, (int) values[0]);
-        Assert.assertEquals(2, (int) values[1]);
+        FieldPath fieldPath;
+        Object[] values;
 
         //with partial auto expand
         fieldPath = new FieldPath(readStateEngine, "ListObjectReference", "intValues.element");
@@ -314,32 +319,12 @@ public class FieldPathTest {
         objectMapper.add(setType);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
-        //with auto expand
-        FieldPath fieldPath = new FieldPath(readStateEngine, "SetType", "intValues");
-        Object[] values = fieldPath.findValues(0);
-        Assert.assertEquals(3, values.length);
-        Set<Integer> valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((int) v);
-        Object value = fieldPath.findValue(0);
-        Assert.assertTrue(((int) value == 1) || ((int) value == 2) || ((int) value == 3));
-
-        Assert.assertTrue(valuesAsSet.contains(1));
-        Assert.assertTrue(valuesAsSet.contains(2));
-        Assert.assertTrue(valuesAsSet.contains(3));
+        FieldPath fieldPath;
+        Object[] values;
+        Set<Integer> valuesAsSet;
 
         //with partial auto expand
         fieldPath = new FieldPath(readStateEngine, "SetType", "intValues.element");
-        values = fieldPath.findValues(0);
-        Assert.assertEquals(3, values.length);
-        valuesAsSet = new HashSet<>();
-        for (Object v : values) valuesAsSet.add((int) v);
-
-        Assert.assertTrue(valuesAsSet.contains(1));
-        Assert.assertTrue(valuesAsSet.contains(2));
-        Assert.assertTrue(valuesAsSet.contains(3));
-
-        //with partial auto expand
-        fieldPath = new FieldPath(readStateEngine, "SetType", "intValues.value");
         values = fieldPath.findValues(0);
         Assert.assertEquals(3, values.length);
         valuesAsSet = new HashSet<>();
@@ -454,20 +439,11 @@ public class FieldPathTest {
         objectMapper.add(mapKeyReferenceAsList);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
 
-        // auto-expands the list
-        FieldPath fieldPath = new FieldPath(readStateEngine, "MapKeyReferenceAsList", "mapValues.key");
-        Object[] values = fieldPath.findValues(0);
-        Assert.assertEquals(3, values.length);
-
-        // partial auto-expand list path
-        fieldPath = new FieldPath(readStateEngine, "MapKeyReferenceAsList", "mapValues.key.intValues");
-        values = fieldPath.findValues(0);
-        Assert.assertEquals(3, values.length);
+        FieldPath fieldPath;
+        Object[] values;
 
         fieldPath = new FieldPath(readStateEngine, "MapKeyReferenceAsList", "mapValues.key.intValues.element.value");
         values = fieldPath.findValues(0);
         Assert.assertEquals(3, values.length);
-
     }
-
 }
