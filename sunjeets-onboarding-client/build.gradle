@@ -1,0 +1,26 @@
+buildscript {
+    dependencies {
+        classpath 'netflix:cinder-codegen-plugin:latest.release'
+    }
+}
+
+dependencies {
+    compileOnly 'netflix:cinder-codegen:latest.release'
+    compile     'netflix:cinder-core:latest.release'
+    compileOnly project(':sunjeets-onboarding-model')
+}
+
+// this will make IDEs recognize the generated files
+sourceSets.main.java.srcDir new File(buildDir, 'generated/java')
+
+
+apply plugin: 'netflix.cinder-codegen'
+generateCinderCode {
+    apiClassName          = 'SunjeetsOnboardingAPI'
+    packageName           = 'com.netflix.sunjeetsonboardingroot.api'
+    dataModelClasses      = ['com.netflix.sunjeetsonboardingroot.OnboardingItem']
+
+    defaultNamespace      = 'SunjeetsOnboardingItems.v1'
+    namespacePropertyName = 'com.netflix.cinder.sunjeetsonboardingitems.namespace.override'
+}
+

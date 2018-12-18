@@ -15,20 +15,17 @@ allprojects {
     apply plugin: 'netflix.nebula'
     apply plugin: 'java'
     apply plugin: 'jacoco'
-    // apply plugin: 'netflix.findbugs'
     apply plugin: 'nebula.release'
 
     group = 'com.netflix.sunjeetsonboardingroot'
 
-    // Added
     apply plugin: 'war'
     apply plugin: 'nebula.facet'
     apply plugin: 'netflix.ospackage-tomcat'
 
+    // apply plugin: 'netflix.findbugs'
+    //apply plugin: 'netflix.lumen-dashboard'
 }
-
-//apply plugin: 'netflix.lumen-dashboard'
-
 
 idea {
     project {
@@ -81,6 +78,7 @@ dependencyRecommendations {
 dependencies {
 
     compile project(':sunjeets-onboarding-core')
+    compile project(':sunjeets-onboarding-client')
 
     // Governator wires up all of our dependencies in dependency injection fashion.
     compile "com.netflix.governator:governator-core"
