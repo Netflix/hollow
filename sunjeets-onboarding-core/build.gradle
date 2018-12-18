@@ -2,5 +2,4 @@ dependencies {
 
     compile project(':sunjeets-onboarding-model')
     compile "netflix:cinder-lifecycle:latest.release"
-    // testCompile group: 'junit', name: 'junit', version: '4.12'
 }

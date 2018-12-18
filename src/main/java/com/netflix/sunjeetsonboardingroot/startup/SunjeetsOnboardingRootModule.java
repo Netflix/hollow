@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import javax.inject.Named;
 
 // Server dependencies
+import com.netflix.cinder.lifecycle.CinderProducerModule;
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import javax.inject.Named;
@@ -45,6 +46,8 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
         install(new SwaggerServletModule());
         install(new JaxrsSwaggerModule());
         install(new GuiceServletSwaggerModule());
+
+        install(new CinderProducerModule());
         
         // Uncomment to load the Cassandra client
         // install(new CassandraModule());

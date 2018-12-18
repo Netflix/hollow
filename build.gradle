@@ -80,6 +80,8 @@ dependencyRecommendations {
 
 dependencies {
 
+    compile project(':sunjeets-onboarding-core')
+
     // Governator wires up all of our dependencies in dependency injection fashion.
     compile "com.netflix.governator:governator-core"
     compile "com.netflix.governator:governator-servlet"
@@ -98,9 +100,6 @@ dependencies {
         providedCompile "org.eclipse.jetty:jetty-webapp"
         providedCompile "javax.servlet:javax.servlet-api"
     }
-
-    compile "netflix:cinder-core:latest.release"    // TODO: Required?
-    compile "netflix:cinder-lifecycle:latest.release"
 
     // Runtime lifecycle modules bring in all the essential Netflix platform dependencies.
     compile "com.netflix.runtime:runtime-lifecycle"
