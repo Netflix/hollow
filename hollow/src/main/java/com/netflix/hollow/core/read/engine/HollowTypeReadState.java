@@ -28,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.stream.Stream;
 
 /**
  * A HollowTypeReadState contains and is the root handle to all of the records of a specific type in
@@ -52,9 +53,8 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      * @param listener the listener to add
      */
     public void addListener(HollowTypeStateListener listener) {
-        HollowTypeStateListener newListeners[] = new HollowTypeStateListener[stateListeners.length + 1];
-        System.arraycopy(stateListeners, 0, newListeners, 0, stateListeners.length);
-        newListeners[stateListeners.length] = listener;
+        HollowTypeStateListener[] newListeners = Arrays.copyOf(stateListeners, stateListeners.length + 1);
+        newListeners[newListeners.length - 1] = listener;
         stateListeners = newListeners;
     }
 
@@ -63,24 +63,12 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      * @param listener the listener to remove
      */
     public void removeListener(HollowTypeStateListener listener) {
-        if(stateListeners.length == 0)
+        if (stateListeners.length == 0)
             return;
 
-        HollowTypeStateListener oldListeners[] = stateListeners;
-        HollowTypeStateListener newListeners[] = new HollowTypeStateListener[stateListeners.length - 1];
-        int newListenerIdx = 0;
-        for(int i=0;i<oldListeners.length;i++) {
-            if(newListenerIdx == newListeners.length)
-                return;
-
-            if(oldListeners[i] != listener)
-                newListeners[newListenerIdx++] = oldListeners[i];
-        }
-
-        if(newListenerIdx < newListeners.length)
-            stateListeners = Arrays.copyOf(newListeners, newListenerIdx);
-        else
-            stateListeners = newListeners;
+        stateListeners = Stream.of(stateListeners)
+                .filter(l -> l != listener)
+                .toArray(HollowTypeStateListener[]::new);
     }
 
     /**
@@ -98,10 +86,8 @@ public abstract class HollowTypeReadState implements HollowTypeDataAccess {
      */
     @SuppressWarnings("unchecked")
     public <T extends HollowTypeStateListener> T getListener(Class<T> listenerClazz) {
-        HollowTypeStateListener[] stateListeners = this.stateListeners;
-        for(int i=0;i<stateListeners.length;i++) {
-            HollowTypeStateListener listener = stateListeners[i];
-            if(listenerClazz.isAssignableFrom(listener.getClass())) {
+        for (HollowTypeStateListener listener : stateListeners) {
+            if (listenerClazz.isAssignableFrom(listener.getClass())) {
                 return (T) listener;
             }
         }

@@ -24,7 +24,6 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.Arrays;
@@ -53,7 +52,7 @@ public class HollowPreindexer {
     }
 
     public void buildFieldSpecifications() {
-        Map<String, Integer> baseFieldToIndexMap = new HashMap<String, Integer>();
+        Map<String, Integer> baseFieldToIndexMap = new HashMap<>();
 
         this.typeState = stateEngine.getTypeState(type);
 
@@ -80,13 +79,12 @@ public class HollowPreindexer {
         FieldPaths.FieldPath<FieldPaths.FieldSegment> path = FieldPaths.createFieldPathForHashIndex(
                 stateEngine, type, selectField);
 
-        HollowTypeReadState typeState = originalTypeState;
         HollowTypeReadState baseTypeState = originalTypeState;
 
         int baseFieldPathIdx = 0;
 
         List<FieldPaths.FieldSegment> segments = path.getSegments();
-        int fieldPathIndexes[] = new int[segments.size()];
+        int[] fieldPathIndexes = new int[segments.size()];
         FieldType fieldType = FieldType.REFERENCE;
 
         for (int i = 0; i < segments.size(); i++) {
@@ -99,9 +97,6 @@ public class HollowPreindexer {
                     fieldType = objectSegment.getType();
                     fieldPathIndexes[i] = objectSegment.getIndex();
 
-                    HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-                    typeState = objectSchema.getReferencedTypeState(objectSegment.getIndex());
-
                     if(!truncate)
                         baseFieldPathIdx = i + 1;
                     break;
@@ -110,7 +105,7 @@ public class HollowPreindexer {
                     fieldType = FieldType.REFERENCE;
 
                     HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
-                    baseTypeState = typeState = collectionSchema.getElementTypeState();
+                    baseTypeState = collectionSchema.getElementTypeState();
 
                     baseFieldPathIdx = i + 1;
                     break;
@@ -119,7 +114,7 @@ public class HollowPreindexer {
 
                     HollowMapSchema mapSchema = (HollowMapSchema) schema;
                     boolean isKey = "key".equals(segment.getName());
-                    baseTypeState = typeState = isKey ? mapSchema.getKeyTypeState() : mapSchema.getValueTypeState();
+                    baseTypeState = isKey ? mapSchema.getKeyTypeState() : mapSchema.getValueTypeState();
 
                     baseFieldPathIdx = i + 1;
                     break;

@@ -66,6 +66,10 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
 
         builder.append("\n");
         builder.append("@SuppressWarnings(\"all\")\n");
+        builder.append("@Deprecated\n");
+        builder.append("/**\n");
+        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.HashIndex}\n");
+        builder.append(" */\n");
         builder.append("public class " + className + " extends " + AbstractHollowHashIndex.class.getSimpleName() + "<" + apiClassname + "> {\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");

@@ -18,6 +18,8 @@ package com.netflix.hollow.api.consumer.data;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import java.util.Iterator;
 
+// @@@ AbstractHollowOrdinalIterable is incorrect, it's a one shot iterable that
+//     behaves incorrectly on second and subsequent iterations
 public abstract class AbstractHollowOrdinalIterable<T> implements Iterable<T> {
     private final HollowOrdinalIterator iter;
     private final int firstOrdinal;

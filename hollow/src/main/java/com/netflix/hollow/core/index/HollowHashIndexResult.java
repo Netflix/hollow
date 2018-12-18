@@ -19,9 +19,13 @@ package com.netflix.hollow.core.index;
 
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
+import java.util.Spliterator;
+import java.util.function.IntConsumer;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
 /**
- * A HollowHashIndexResult contains the matches for a query to a {@link HollowHashIndex}. 
+ * A HollowHashIndexResult contains the matches for a query to a {@link HollowHashIndex}.
  *
  */
 public class HollowHashIndexResult {
@@ -89,4 +93,51 @@ public class HollowHashIndexResult {
         };
     }
 
+    /**
+     * Returns a stream of matching ordinals.
+     * <p>
+     * The ordinals may be used with a generated API or the Generic Object API to inspect
+     * the matched records.
+     *
+     * @return an {@code IntStream} of matching ordinals
+     */
+    public IntStream stream() {
+        Spliterator.OfInt si = new Spliterator.OfInt() {
+            final long endBucket = selectTableStartPointer + selectTableBuckets;
+            long currentBucket = selectTableStartPointer;
+
+            @Override
+            public OfInt trySplit() {
+                // @@@ Supporting splitting and therefore enable parallelism
+                return null;
+            }
+
+            @Override
+            public boolean tryAdvance(IntConsumer action) {
+                while (currentBucket < endBucket) {
+                    int selectOrdinal = (int) hashIndexState.getSelectHashArray().getElementValue(
+                            (currentBucket++) * hashIndexState.getBitsPerSelectHashEntry(),
+                            hashIndexState.getBitsPerSelectHashEntry()) - 1;
+                    if (selectOrdinal != -1) {
+                        action.accept(selectOrdinal);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public long estimateSize() {
+                // @@@
+                return 0;
+            }
+
+            @Override
+            public int characteristics() {
+                // @@@ ordinals are distinct?
+                return 0;
+            }
+        };
+        return StreamSupport.intStream(si, false);
+    }
 }
