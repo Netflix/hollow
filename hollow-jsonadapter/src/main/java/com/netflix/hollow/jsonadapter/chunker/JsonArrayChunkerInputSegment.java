@@ -22,66 +22,55 @@ import java.io.IOException;
 import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 
-public class JsonArrayChunkerInputSegment {
+class JsonArrayChunkerInputSegment {
     
     // special characters: 0:{ 1:} 2:" 3:\
     
     private final char[] data;
-    private final IntList specialCharacterOffsets;
+    private final IntList specialCharacterOffsets = new IntList();
+
     private int dataLength;
-    
     private int specialCharacterIteratorPos = -1;
-    
-    private volatile boolean offsetsDefined = false;
-    
-    public JsonArrayChunkerInputSegment(int len) {
+
+    JsonArrayChunkerInputSegment(int len) {
         this.data = new char[len];
-        this.specialCharacterOffsets = new IntList();
     }
     
-    public boolean fill(Reader reader) throws IOException {
+    boolean fill(Reader reader) throws IOException {
         dataLength = IOUtils.read(reader, data);
         return dataLength < data.length;
     }
-    
-    public synchronized void findSpecialCharacterOffsets() {
-        for(int i=0;i<data.length;i++) {
-            switch(data[i]) {
-            case '{':
-                specialCharacterOffsets.add(i);
-                break;
-            case '}':
-                specialCharacterOffsets.add(i | (1 << 30));
-                break;
-            case '\"':
-                specialCharacterOffsets.add(i | (2 << 30));
-                break;
-            case '\\':
-                specialCharacterOffsets.add(i | (3 << 30));
-                break;
-            default:
+
+    JsonArrayChunkerInputSegment findSpecialCharacterOffsets() {
+        for (int i = 0; i < data.length; i++) {
+            switch (data[i]) {
+                case '{':
+                    specialCharacterOffsets.add(i);
+                    break;
+                case '}':
+                    specialCharacterOffsets.add(i | (1 << 30));
+                    break;
+                case '\"':
+                    specialCharacterOffsets.add(i | (2 << 30));
+                    break;
+                case '\\':
+                    specialCharacterOffsets.add(i | (3 << 30));
+                    break;
+                default:
             }
         }
-        
-        offsetsDefined = true;
-        this.notify();
+        return this;
     }
     
-    public synchronized void waitForDefinedOffsets() throws InterruptedException {
-        while(!offsetsDefined) {
-            wait();
-        }
-    }
-    
-    public boolean nextSpecialCharacter() {
+    boolean nextSpecialCharacter() {
         return ++specialCharacterIteratorPos < specialCharacterOffsets.size();
     }
     
-    public int specialCharacterIteratorPosition() {
+    int specialCharacterIteratorPosition() {
         return specialCharacterOffsets.get(specialCharacterIteratorPos) & 0x3FFFFFFF;
     }
     
-    public char specialCharacter() {
+    char specialCharacter() {
         switch(specialCharacterOffsets.get(specialCharacterIteratorPos) >>> 30) {
         case 0: return '{';
         case 1: return '}';
@@ -91,15 +80,15 @@ public class JsonArrayChunkerInputSegment {
         throw new IllegalStateException();
     }
     
-    public int length() {
+    int length() {
         return dataLength;
     }
     
-    public char charAt(int offset) {
+    char charAt(int offset) {
         return data[offset];
     }
     
-    public int copyTo(char[] dest, int srcPos, int destPos, int len, int maxSrcPos) {
+    int copyTo(char[] dest, int srcPos, int destPos, int len, int maxSrcPos) {
         int bytesAvailable = maxSrcPos - srcPos;
         if(bytesAvailable >= len) {
             System.arraycopy(data, srcPos, dest, destPos, len);
