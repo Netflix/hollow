@@ -2,16 +2,8 @@ buildscript {
   repositories { jcenter() }
 }
 
-plugins {
-  id 'nebula.netflixoss' version '6.0.3'
-}
-
 subprojects {
-  apply plugin: 'nebula.netflixoss'
   apply plugin: 'checkstyle'
-
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
 
   tasks.withType(JavaCompile) {
     sourceCompatibility = 1.8
@@ -26,6 +18,7 @@ subprojects {
   }
 
   group = 'com.netflix.hollow'
+
   checkstyle {
     configFile = file("$rootProject.projectDir/config/checkstyle/checkstyle.xml")
   }

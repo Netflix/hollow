@@ -1,10 +1,12 @@
 apply plugin: 'java'
- 
+
 dependencies {
     testCompile project(":hollow-test")
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:2.15.0'
     testCompile 'com.google.code.findbugs:findbugs:3.0.1'
+
+    // compileOnly 'org.projectlombok:lombok:1.16.12' // TODO: get team's buy-in for using Lombok
 }
 
 // quiet warnings about sun.misc.Unsafe

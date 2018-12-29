@@ -20,7 +20,7 @@ package com.netflix.hollow.api.metrics;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 public class HollowConsumerMetrics extends HollowMetrics {
-    private int refreshFailed;
+    private int refreshFailed;      // TODO: Move these metrics over to com.netflix.hollow.api.consumer.metrics.AbstractRefreshMetricsListener
     private int refreshSucceeded;
 
     /**
