@@ -659,7 +659,6 @@ public class HollowIncrementalProducerTest {
         Collection addOrModifyList = Arrays.asList(
                 new TypeA(1, "one", 100),
                 new TypeA(2, "two", 2),
-                new TypeA(3, "three", 300),
                 new TypeA(3, "three", 3),
                 new TypeA(4, "five", 6)
         );

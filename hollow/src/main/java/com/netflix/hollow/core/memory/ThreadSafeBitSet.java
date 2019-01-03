@@ -34,19 +34,21 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ThreadSafeBitSet {
 
+    public static final int DEFAULT_LOG2_SEGMENT_SIZE_IN_BITS = 14;
+
     private final int numLongsPerSegment;
     private final int log2SegmentSize;
     private final int segmentMask;
     private final AtomicReference<ThreadSafeBitSetSegments> segments;
 
     public ThreadSafeBitSet() {
-        this(14); /// 16384 bits, 2048 bytes, 256 longs per segment
+        this(DEFAULT_LOG2_SEGMENT_SIZE_IN_BITS); /// 16384 bits, 2048 bytes, 256 longs per segment
     }
 
     public ThreadSafeBitSet(int log2SegmentSizeInBits) {
         this(log2SegmentSizeInBits, 0);
     }
-    
+
     public ThreadSafeBitSet(int log2SegmentSizeInBits, int numBitsToPreallocate) {
         if(log2SegmentSizeInBits < 6)
             throw new IllegalArgumentException("Cannot specify fewer than 64 bits in each segment!");
