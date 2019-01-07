@@ -3111,13 +3111,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -6855,13 +6855,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -10599,13 +10599,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -14427,13 +14427,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -20076,13 +20076,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -23820,13 +23820,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -27563,13 +27563,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -31402,13 +31402,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -35314,13 +35314,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -39226,13 +39226,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -43138,13 +43138,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -47050,13 +47050,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -50962,13 +50962,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -54874,13 +54874,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
@@ -58786,13 +58786,13 @@
             ]
         },
         "netflix:vmsconverter-hollow-api": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-business-logic"
             ]
         },
         "netflix:vmsconverter-model": {
-            "locked": "1.8.1",
+            "locked": "1.8.2",
             "transitive": [
                 "netflix:vmsconverter-hollow-api"
             ]
