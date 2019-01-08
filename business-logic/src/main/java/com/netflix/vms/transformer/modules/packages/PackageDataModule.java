@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.packages;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -187,11 +188,12 @@ public class PackageDataModule {
         }
     }
 
-    private PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
+    @VisibleForTesting
+    PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
         int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(
                 (long) videoId, packages._getPackageId());
         if (packageMovieDealCountryGroupOrdinal == ORDINAL_NONE) {
-            return null; // Pre-condition, package must exist in packageMovieDealCountryGroup feed
+            return null; // package must exist in packageMovieDealCountryGroup feed
         }
 
         PackageDataCollection packageDataCollection = new PackageDataCollection(ctx, fourKProfileIds, hdrProfileIds, atmosStreamProfileIds, soundTypesMap, cycleConstants);
@@ -255,6 +257,9 @@ public class PackageDataModule {
                     });
                 }
             });
+        }
+        if (countries.isEmpty()) {
+            return null; // no deployable countries, we want to drop the PackageDataCollection
         }
         countries.forEach(c -> pkg.allDeployableCountries.add(cycleConstants.getISOCountry(c)));
 
@@ -360,8 +365,11 @@ public class PackageDataModule {
 
     private Set<Integer> getEncodingProfileIds(VMSHollowInputAPI api, HollowPrimaryKeyIndex index, String type) {
         int ordinal = index.getMatchingOrdinal(type);
-        if (ordinal == -1) return new HashSet<>();
-        return api.getStreamProfileGroupsHollow(ordinal)._getStreamProfileIds().stream().map(id -> (int) id._getValue()).collect(Collectors.toSet());
+        if (ordinal == ORDINAL_NONE) {
+            return new HashSet<>();
+        }
+        return api.getStreamProfileGroupsHollow(ordinal)._getStreamProfileIds().stream()
+            .map(id -> (int) id._getValue()).collect(Collectors.toSet());
     }
 
     private Map<Integer, Strings> getSoundTypesMap() {
