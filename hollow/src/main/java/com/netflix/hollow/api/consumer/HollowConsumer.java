@@ -337,11 +337,15 @@ public class HollowConsumer {
      * <p>
      * If a listener is added, concurrently, during the occurrence of a refresh then the listener will not receive
      * events until the next refresh.  The listener may also be removed concurrently.
+     * <p>
+     * If the listener instance implements {@link RefreshRegistrationListener} then before the listener is added
+     * the {@link RefreshRegistrationListener#onBeforeAddition} method is be invoked.  If that method throws an
+     * exception then that exception will be thrown by this method and the listener will not be added.
      *
      * @param listener the refresh listener to add
      */
     public void addRefreshListener(RefreshListener listener) {
-        updater.addRefreshListener(listener);
+        updater.addRefreshListener(listener, this);
     }
 
     /**
@@ -352,11 +356,15 @@ public class HollowConsumer {
      * <p>
      * If a listener is removed, concurrently, during  the occurrence of a refresh then the listener will receive all
      * events for that refresh but not receive events for subsequent any refreshes.
+     * <p>
+     * If the listener instance implements {@link RefreshRegistrationListener} then after the listener is removed
+     * the {@link RefreshRegistrationListener#onAfterRemoval} method is be invoked.  If that method throws an
+     * exception then that exception will be thrown by this method.
      *
      * @param listener the refresh listener to remove
      */
     public void removeRefreshListener(RefreshListener listener) {
-        updater.removeRefreshListener(listener);
+        updater.removeRefreshListener(listener, this);
     }
 
     /**
@@ -744,6 +752,31 @@ public class HollowConsumer {
         void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
     }
+
+    /**
+     * A listener of refresh listener addition and removal.
+     * <p>
+     * A {@link RefreshListener} implementation may  implement this interface to get notified before
+     * the listener is added (via a call to {@link #addRefreshListener(RefreshListener)} and after a listener
+     * is removed (via a call to {@link #removeRefreshListener(RefreshListener)}.
+     * <p>
+     * An implementation should not add or remove itself in response to addition or removal.  Such actions may result
+     * in a {@link StackOverflowError} or unspecified behaviour.
+     */
+    public interface RefreshRegistrationListener {
+        /**
+         * Called before the refresh listener is added.
+         * @param c the consumer the associated reference listener is being added to
+         */
+        void onBeforeAddition(HollowConsumer c);
+
+        /**
+         * Called after the refresh listener is removed.
+         * @param c the consumer the associated reference listener is being removed from
+         */
+        void onAfterRemoval(HollowConsumer c);
+    }
+
 
     public static class AbstractRefreshListener implements TransitionAwareRefreshListener {
         @Override
