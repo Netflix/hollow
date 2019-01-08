@@ -47,8 +47,8 @@ public class HashIndexUpdatesTest {
         consumer.triggerRefreshTo(v1);
 
         HashIndex<DataModel.Consumer.TypeA, Integer> hi = HashIndex.from(consumer, DataModel.Consumer.TypeA.class)
-                .listenToDataRefresh()
                 .usingPath("i", int.class);
+        consumer.addRefreshListener(hi);
 
         Assert.assertEquals(1L, hi.findMatches(1).count());
 
@@ -65,7 +65,7 @@ public class HashIndexUpdatesTest {
         Assert.assertEquals(2L, hi.findMatches(1).count());
 
 
-        hi.detachFromDataRefresh();
+        consumer.removeRefreshListener(hi);
         long v3 = producer.runCycle(ws -> {
             ws.add(new DataModel.Producer.TypeA(1, "1"));
             ws.add(new DataModel.Producer.TypeA(1, "2"));

@@ -36,27 +36,31 @@ import java.util.stream.Stream;
  * <p>
  * This type of index can map multiple keys to a single matching record,
  * and/or multiple records to a single key.
+ * <p>
+ * If the index is {@link HollowConsumer#addRefreshListener(HollowConsumer.RefreshListener) registered} with its
+ * associated {@link HollowConsumer} then the index will track updates and changes will be reflected in matched results
+ * (performed after such updates).  When a registered index is no longer needed it should be
+ * {@link HollowConsumer#removeRefreshListener(HollowConsumer.RefreshListener) deregistered} to avoid unnecessary
+ * index recalculation and to ensure the index is reclaimed by the garbage collector.
  *
  * @param <T> the root type
  * @param <S> the select and result type
  * @param <Q> the query type
  */
-public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> {
+public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
+        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener {
     final HollowConsumer consumer;
     HollowAPI api;
-    boolean listenToDataRefresh;
     final SelectFieldPathResultExtractor<S> selectField;
     final List<MatchFieldPathArgumentExtractor<Q>> matchFields;
     final String rootTypeName;
     final String selectFieldPath;
     final String[] matchFieldPaths;
     HollowHashIndex hhi;
-    RefreshListener refreshListener;
 
     HashIndexSelect(
             HollowConsumer consumer,
             Class<T> rootType,
-            boolean listenToDataRefresh,
             SelectFieldPathResultExtractor<S> selectField,
             List<MatchFieldPathArgumentExtractor<Q>> matchFields) {
         this.consumer = consumer;
@@ -78,21 +82,15 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
         this.rootTypeName = rootType.getSimpleName();
 
         this.hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
-
-        if (listenToDataRefresh) {
-            listenToDataRefresh();
-        }
     }
 
     HashIndexSelect(
             HollowConsumer consumer,
             Class<T> rootType,
-            boolean listenToDataRefresh,
             Class<S> selectType, String selectField,
             Class<Q> matchFieldsType) {
         this(consumer,
                 rootType,
-                listenToDataRefresh,
                 SelectFieldPathResultExtractor
                         .from(consumer.getAPI().getClass(), consumer.getStateEngine(), rootType, selectField,
                                 selectType),
@@ -104,12 +102,10 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
     HashIndexSelect(
             HollowConsumer consumer,
             Class<T> rootType,
-            boolean listenToDataRefresh,
             Class<S> selectType, String selectField,
             String fieldPath, Class<Q> matchFieldType) {
         this(consumer,
                 rootType,
-                listenToDataRefresh,
                 SelectFieldPathResultExtractor
                         .from(consumer.getAPI().getClass(), consumer.getStateEngine(), rootType, selectField,
                                 selectType),
@@ -117,70 +113,6 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
                         MatchFieldPathArgumentExtractor
                                 .fromPathAndType(consumer.getStateEngine(), rootType, fieldPath, matchFieldType,
                                         FieldPaths::createFieldPathForHashIndex)));
-    }
-
-    /**
-     * Listens to {@code HollowConsumer} version updates.
-     * On an update the index recalculates so updated data will be reflected in the results of a query
-     * (performed after the update).
-     */
-    public void listenToDataRefresh() {
-        if (listenToDataRefresh) {
-            return;
-        }
-        listenToDataRefresh = true;
-
-        if (refreshListener == null) {
-            refreshListener = new RefreshListener();
-        }
-
-        hhi.listenForDeltaUpdates();
-        consumer.addRefreshListener(refreshListener);
-    }
-
-    /**
-     * Disables listening to {@code HollowConsumer} version updates.
-     * Updated data will not be reflected in the results of a query.
-     * <p>
-     * This method should be called before the index is discarded to ensure unnecessary recalculation
-     * is not performed and to ensure the index is reclaimed by the garbage collector.
-     */
-    public void detachFromDataRefresh() {
-        if (!listenToDataRefresh) {
-            return;
-        }
-        listenToDataRefresh = false;
-
-        hhi.detachFromDeltaUpdates();
-        consumer.removeRefreshListener(refreshListener);
-    }
-
-    final class RefreshListener implements HollowConsumer.RefreshListener {
-        @Override
-        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-            hhi.detachFromDeltaUpdates();
-            hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
-            hhi.listenForDeltaUpdates();
-            api = refreshAPI;
-        }
-
-        @Override
-        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-            api = refreshAPI;
-        }
-
-        @Override public void refreshStarted(long currentVersion, long requestedVersion) {
-        }
-
-        @Override public void blobLoaded(HollowConsumer.Blob transition) {
-        }
-
-        @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
-        }
-
-        @Override public void refreshFailed(
-                long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
-        }
     }
 
     /**
@@ -200,6 +132,47 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
         return matches.stream().mapToObj(i -> selectField.extract(api, i));
     }
 
+    // HollowConsumer.RefreshListener
+
+    @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+    }
+
+    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+        HollowHashIndex hhi = this.hhi;
+        hhi.detachFromDeltaUpdates();
+        hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
+        hhi.listenForDeltaUpdates();
+        this.hhi = hhi;
+        this.api = api;
+    }
+
+    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+        this.api = api;
+    }
+
+    @Override public void blobLoaded(HollowConsumer.Blob transition) {
+    }
+
+    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    }
+
+    @Override public void refreshFailed(
+            long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+    }
+
+    // HollowConsumer.RefreshRegistrationListener
+
+    @Override public void onBeforeAddition(HollowConsumer c) {
+        if (c != consumer) {
+            throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
+        }
+        hhi.listenForDeltaUpdates();
+    }
+
+    @Override public void onAfterRemoval(HollowConsumer c) {
+        hhi.detachFromDeltaUpdates();
+    }
+
     /**
      * The builder of a {@link HashIndexSelect}.
      *
@@ -209,17 +182,14 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
     public static class BuilderWithSelect<T extends HollowRecord, S extends HollowRecord> {
         final HollowConsumer consumer;
         final Class<T> rootType;
-        final boolean listenToDataRefresh;
         final String selectFieldPath;
         final Class<S> selectFieldType;
 
         BuilderWithSelect(
                 HollowConsumer consumer, Class<T> rootType,
-                boolean listenToDataRefresh,
                 String selectFieldPath, Class<S> selectFieldType) {
             this.consumer = consumer;
             this.rootType = rootType;
-            this.listenToDataRefresh = listenToDataRefresh;
             this.selectFieldPath = selectFieldPath;
             this.selectFieldType = selectFieldType;
         }
@@ -238,8 +208,8 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
          */
         public <Q> HashIndexSelect<T, S, Q> usingBean(Class<Q> queryType) {
             Objects.requireNonNull(queryType);
-            return new HashIndexSelect<>(consumer, rootType, listenToDataRefresh,
-                    selectFieldType, selectFieldPath, queryType);
+            return new HashIndexSelect<>(consumer, rootType, selectFieldType, selectFieldPath,
+                    queryType);
         }
 
         /**
@@ -261,8 +231,8 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q> 
                 throw new IllegalArgumentException("selectFieldPath argument is an empty String");
             }
             Objects.requireNonNull(queryFieldType);
-            return new HashIndexSelect<>(consumer, rootType, listenToDataRefresh,
-                    selectFieldType, selectFieldPath, queryFieldPath, queryFieldType);
+            return new HashIndexSelect<>(consumer, rootType, selectFieldType, selectFieldPath,
+                    queryFieldPath, queryFieldType);
         }
     }
 }

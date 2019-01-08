@@ -18,26 +18,30 @@ import java.util.stream.Stream;
 
 /**
  * A type safe index for indexing with a unique key (such as a primary key).
+ * <p>
+ * If the index is {@link HollowConsumer#addRefreshListener(HollowConsumer.RefreshListener) registered} with its
+ * associated {@link HollowConsumer} then the index will track updates and changes will be reflected in matched results
+ * (performed after such updates).  When a registered index is no longer needed it should be
+ * {@link HollowConsumer#removeRefreshListener(HollowConsumer.RefreshListener) deregistered} to avoid unnecessary
+ * index recalculation and to ensure the index is reclaimed by the garbage collector.
  *
  * @param <T> the unique type
  * @param <Q> the key type
  */
-public class UniqueKeyIndex<T extends HollowObject, Q> {
+public class UniqueKeyIndex<T extends HollowObject, Q>
+        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener {
     final HollowConsumer consumer;
     HollowAPI api;
-    boolean listenToDataRefresh;
     final SelectFieldPathResultExtractor<T> uniqueTypeExtractor;
     final List<MatchFieldPathArgumentExtractor<Q>> matchFields;
     final String uniqueTypeName;
     final String[] matchFieldPaths;
     HollowPrimaryKeyIndex hpki;
-    RefreshListener refreshListener;
 
     UniqueKeyIndex(
             HollowConsumer consumer,
             Class<T> uniqueType,
             PrimaryKey primaryTypeKey,
-            boolean listenToDataRefresh,
             List<MatchFieldPathArgumentExtractor<Q>> matchFields) {
         this.consumer = consumer;
         this.api = consumer.getAPI();
@@ -56,10 +60,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
                 .toArray(String[]::new);
 
         this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueTypeName, matchFieldPaths);
-
-        if (listenToDataRefresh) {
-            listenToDataRefresh();
-        }
     }
 
     static <Q> List<MatchFieldPathArgumentExtractor<Q>> validatePrimaryKeyFieldPaths(
@@ -94,13 +94,11 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
             HollowConsumer consumer,
             Class<T> uniqueType,
             PrimaryKey primaryTypeKey,
-            boolean listenToDataRefresh,
             Class<Q> matchFieldsType) {
         // @@@ Use FieldPaths.createFieldPathForPrimaryKey
         this(consumer,
                 uniqueType,
                 primaryTypeKey,
-                listenToDataRefresh,
                 MatchFieldPathArgumentExtractor
                         .fromHolderClass(consumer.getStateEngine(), uniqueType, matchFieldsType,
                                 FieldPaths::createFieldPathForPrimaryKey));
@@ -110,81 +108,15 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
             HollowConsumer consumer,
             Class<T> uniqueType,
             PrimaryKey primaryTypeKey,
-            boolean listenToDataRefresh,
             String fieldPath, Class<Q> matchFieldType) {
         // @@@ Use FieldPaths.createFieldPathForPrimaryKey
         this(consumer,
                 uniqueType,
                 primaryTypeKey,
-                listenToDataRefresh,
                 Collections.singletonList(
                         MatchFieldPathArgumentExtractor
                                 .fromPathAndType(consumer.getStateEngine(), uniqueType, fieldPath, matchFieldType,
                                         FieldPaths::createFieldPathForPrimaryKey)));
-    }
-
-    /**
-     * Listens to {@code HollowConsumer} version updates.
-     * On an update the index recalculates so updated data will be reflected in the results of a query
-     * (performed after the update).
-     */
-    public void listenToDataRefresh() {
-        if (listenToDataRefresh) {
-            return;
-        }
-        listenToDataRefresh = true;
-
-        if (refreshListener == null) {
-            refreshListener = new RefreshListener();
-        }
-
-        hpki.listenForDeltaUpdates();
-        consumer.addRefreshListener(refreshListener);
-    }
-
-    /**
-     * Disables listening to {@code HollowConsumer} version updates.
-     * Updated data will not be reflected in the results of a query.
-     * <p>
-     * This method should be called before the index is discarded to ensure unnecessary recalculation
-     * is not performed and to ensure the index is reclaimed by the garbage collector.
-     */
-    public void detachFromDataRefresh() {
-        if (!listenToDataRefresh) {
-            return;
-        }
-        listenToDataRefresh = false;
-
-        hpki.detachFromDeltaUpdates();
-        consumer.removeRefreshListener(refreshListener);
-    }
-
-    final class RefreshListener implements HollowConsumer.RefreshListener {
-        @Override
-        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-            hpki.detachFromDeltaUpdates();
-            hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), hpki.getPrimaryKey());
-            hpki.listenForDeltaUpdates();
-            api = refreshAPI;
-        }
-
-        @Override
-        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-            api = refreshAPI;
-        }
-
-        @Override public void refreshStarted(long currentVersion, long requestedVersion) {
-        }
-
-        @Override public void blobLoaded(HollowConsumer.Blob transition) {
-        }
-
-        @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
-        }
-
-        @Override public void refreshFailed(
-                long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
-        }
     }
 
     /**
@@ -202,6 +134,47 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
         }
 
         return uniqueTypeExtractor.extract(api, ordinal);
+    }
+
+    // HollowConsumer.RefreshListener
+
+    @Override public void refreshStarted(long currentVersion, long requestedVersion) {
+    }
+
+    @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+        HollowPrimaryKeyIndex hpki = this.hpki;
+        hpki.detachFromDeltaUpdates();
+        hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), hpki.getPrimaryKey());
+        hpki.listenForDeltaUpdates();
+        this.hpki = hpki;
+        this.api = api;
+    }
+
+    @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) {
+        this.api = api;
+    }
+
+    @Override public void blobLoaded(HollowConsumer.Blob transition) {
+    }
+
+    @Override public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+    }
+
+    @Override public void refreshFailed(
+            long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+    }
+
+    // HollowConsumer.RefreshRegistrationListener
+
+    @Override public void onBeforeAddition(HollowConsumer c) {
+        if (c != consumer) {
+            throw new IllegalStateException("The index's consumer and the listener's consumer are not the same");
+        }
+        hpki.listenForDeltaUpdates();
+    }
+
+    @Override public void onAfterRemoval(HollowConsumer c) {
+        hpki.detachFromDeltaUpdates();
     }
 
     /**
@@ -227,7 +200,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
         final HollowConsumer consumer;
         final Class<T> uniqueType;
         PrimaryKey primaryTypeKey; // non-null on bindWithPrimaryKeyOnType
-        boolean listenToDataRefresh;
 
         Builder(HollowConsumer consumer, Class<T> uniqueType) {
             this.consumer = consumer;
@@ -256,18 +228,6 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
         }
 
         /**
-         * Configures the unique key index to listen to {@code HollowConsumer} version updates.
-         * On an update the index recalculates so updated data will be reflected in the results of a query
-         * (performed after the update).
-         *
-         * @return this builder
-         */
-        public Builder<T> listenToDataRefresh() {
-            listenToDataRefresh = true;
-            return this;
-        }
-
-        /**
          * Creates a {@link UniqueKeyIndex} for matching with field paths and types declared by
          * {@link FieldPath} annotated fields or methods on the given key type.
          *
@@ -281,7 +241,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
          */
         public <Q> UniqueKeyIndex<T, Q> usingBean(Class<Q> keyType) {
             Objects.requireNonNull(keyType);
-            return new UniqueKeyIndex<>(consumer, uniqueType, primaryTypeKey, listenToDataRefresh,
+            return new UniqueKeyIndex<>(consumer, uniqueType, primaryTypeKey,
                     keyType);
         }
 
@@ -304,7 +264,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q> {
                 throw new IllegalArgumentException("keyFieldPath argument is an empty String");
             }
             Objects.requireNonNull(keyFieldType);
-            return new UniqueKeyIndex<>(consumer, uniqueType, primaryTypeKey, listenToDataRefresh,
+            return new UniqueKeyIndex<>(consumer, uniqueType, primaryTypeKey,
                     keyFieldPath, keyFieldType);
         }
     }
