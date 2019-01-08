@@ -360,7 +360,6 @@ public final class FieldPaths {
      * @param <T> the field segment type
      */
     public final static class FieldPath<T extends FieldSegment> {
-        //        HollowDataset hd;
         final String rootType;
         final List<T> segments;
 
@@ -385,6 +384,32 @@ public final class FieldPaths {
          */
         public List<T> getSegments() {
             return segments;
+        }
+
+        /**
+         * Returns the field path in nominal form.
+         *
+         * @return the field path in nominal form
+         */
+        public String toString() {
+            return segments.stream().map(FieldPaths.FieldSegment::getName)
+                    .collect(joining("."));
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            FieldPath<?> fieldPath = (FieldPath<?>) o;
+            return Objects.equals(rootType, fieldPath.rootType) &&
+                    Objects.equals(segments, fieldPath.segments);
+        }
+
+        @Override public int hashCode() {
+            return Objects.hash(rootType, segments);
         }
     }
 
@@ -428,6 +453,23 @@ public final class FieldPaths {
         public String getTypeName() {
             return typeName;
         }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            FieldSegment that = (FieldSegment) o;
+            return Objects.equals(enclosingSchema, that.enclosingSchema) &&
+                    Objects.equals(name, that.name) &&
+                    Objects.equals(typeName, that.typeName);
+        }
+
+        @Override public int hashCode() {
+            return Objects.hash(enclosingSchema, name, typeName);
+        }
     }
 
     /**
@@ -468,6 +510,25 @@ public final class FieldPaths {
          */
         public HollowObjectSchema.FieldType getType() {
             return type;
+        }
+
+        @Override public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            if (!super.equals(o)) {
+                return false;
+            }
+            ObjectFieldSegment that = (ObjectFieldSegment) o;
+            return index == that.index &&
+                    type == that.type;
+        }
+
+        @Override public int hashCode() {
+            return Objects.hash(super.hashCode(), index, type);
         }
     }
 }

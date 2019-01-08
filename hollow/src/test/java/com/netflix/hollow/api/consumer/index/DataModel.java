@@ -14,6 +14,7 @@ import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.write.objectmapper.HollowInline;
+import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,6 +139,31 @@ public class DataModel {
             }
         }
 
+        @HollowPrimaryKey(fields = {"i", "sub1.s", "sub2.i"})
+        public static class TypeWithPrimaryKey {
+            final int i;
+            final SubTypeOfTypeWithPrimaryKey sub1;
+            final SubTypeOfTypeWithPrimaryKey sub2;
+
+            public TypeWithPrimaryKey(
+                    int i, SubTypeOfTypeWithPrimaryKey sub1,
+                    SubTypeOfTypeWithPrimaryKey sub2) {
+                this.i = i;
+                this.sub1 = sub1;
+                this.sub2 = sub2;
+            }
+        }
+
+        public static class SubTypeOfTypeWithPrimaryKey {
+            final String s;
+            final int i;
+
+            public SubTypeOfTypeWithPrimaryKey(String s, int i) {
+                this.s = s;
+                this.i = i;
+            }
+        }
+
         public static class Sequences {
             final List<Boxes> list;
 
@@ -160,6 +186,7 @@ public class DataModel {
             final MappedReferencesToValues mapped;
             final Sequences sequences;
             final ReferenceWithStrings referenceWithStrings;
+            final TypeWithPrimaryKey typeWithPrimaryKey;
 
             public References() {
                 this.values = new Values();
@@ -168,6 +195,10 @@ public class DataModel {
                 this.mapped = new MappedReferencesToValues();
                 this.sequences = new Sequences();
                 this.referenceWithStrings = new ReferenceWithStrings();
+
+                this.typeWithPrimaryKey = new TypeWithPrimaryKey(1,
+                        new SubTypeOfTypeWithPrimaryKey("1", 1),
+                        new SubTypeOfTypeWithPrimaryKey("2", 2));
             }
         }
     }
@@ -239,6 +270,14 @@ public class DataModel {
                 return new TypeA(null, ordinal);
             }
 
+            public TypeWithPrimaryKey getTypeWithPrimaryKey(int ordinal) {
+                return new TypeWithPrimaryKey(null, ordinal);
+            }
+
+            public SubTypeOfTypeWithPrimaryKey getSubTypeOfTypeWithPrimaryKey(int ordinal) {
+                return new SubTypeOfTypeWithPrimaryKey(null, ordinal);
+            }
+
             public ListOfBoxes getListOfBoxes(int ordinal) {
                 return new ListOfBoxes(null, ordinal);
             }
@@ -308,6 +347,18 @@ public class DataModel {
 
         public static class TypeA extends HollowObject {
             public TypeA(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+        }
+
+        public static class TypeWithPrimaryKey extends HollowObject {
+            public TypeWithPrimaryKey(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+        }
+
+        public static class SubTypeOfTypeWithPrimaryKey extends HollowObject {
+            public SubTypeOfTypeWithPrimaryKey(HollowObjectDelegate delegate, int ordinal) {
                 super(delegate, ordinal);
             }
         }

@@ -62,6 +62,7 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
      * @param consumer the consumer containing instances of the given root type
      * @param rootType the root type to match and select from
      * @param <T> the root type
+     * @return a builder
      */
     public static <T extends HollowRecord> Builder<T> from(HollowConsumer consumer, Class<T> rootType) {
         Objects.requireNonNull(consumer);
@@ -71,10 +72,6 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
 
     /**
      * The builder of a {@link HashIndex} or a {@link HashIndexSelect}.
-     * <p>
-     * The default configuration specifies, unless specified differently by an initiating builder method, that
-     * the hash index listen to {@code HollowConsumer} version updates as if by a call to {@link #listenToDataRefresh}
-     * with a value of {@code true}.
      *
      * @param <T> the root type
      */
@@ -128,13 +125,10 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
          * On an update the index recalculates so updated data will be reflected in the results of a query
          * (performed after the update).
          *
-         * @param listen {@code true} if the index listens to {@code HollowConsumer} version updates,
-         * otherwise {@code false} and the index does not listen to {@code HollowConsumer} updates.  The default
-         * value is {@code true}, unless specified differently by the initiating builder method returning this builder.
          * @return this builder
          */
-        public Builder<T> listenToDataRefresh(boolean listen) {
-            listenToDataRefresh = listen;
+        public Builder<T> listenToDataRefresh() {
+            listenToDataRefresh = true;
             return this;
         }
 
