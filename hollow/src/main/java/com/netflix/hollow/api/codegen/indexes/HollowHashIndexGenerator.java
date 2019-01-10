@@ -65,11 +65,11 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         builder.append("import " + AbstractHollowOrdinalIterable.class.getName() + ";\n\n");
 
         builder.append("\n");
-        builder.append("@SuppressWarnings(\"all\")\n");
-        builder.append("@Deprecated\n");
         builder.append("/**\n");
-        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.HashIndex}\n");
+        genDeprecatedJavaDoc(schemaList, builder);
         builder.append(" */\n");
+        builder.append("@Deprecated\n");
+        builder.append("@SuppressWarnings(\"all\")\n");
         builder.append("public class " + className + " extends " + AbstractHollowHashIndex.class.getSimpleName() + "<" + apiClassname + "> {\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, String queryType, String selectFieldPath, String... matchFieldPaths) {\n");
@@ -96,4 +96,20 @@ public class HollowHashIndexGenerator extends HollowIndexGenerator {
         return builder.toString();
     }
 
+    private void genDeprecatedJavaDoc(List<HollowSchema> schemaList, StringBuilder builder) {
+        if (schemaList.isEmpty()) return;
+
+        HollowSchema schema = schemaList.get(0);
+        String typeName = hollowImplClassname(schema.getName());
+
+        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.HashIndex} which can be built as follows:\n");
+        builder.append(" * <pre>{@code\n");
+        builder.append(String.format(" *     HashIndex<%s, K> uki = HashIndex.from(consumer, %1$s.class)\n", typeName));
+        builder.append(" *         .usingBean(k);\n");
+        builder.append(String.format(" *     Stream<%s> results = uki.findMatches(k);\n", typeName));
+        builder.append(" * }</pre>\n");
+        builder.append(" * where {@code K} is a class declaring key field paths members, annotated with\n");
+        builder.append(" * {@link com.netflix.hollow.api.consumer.index.FieldPath}, and {@code k} is an instance of\n");
+        builder.append(String.format(" * {@code K} that is the query to find the matching {@code %s} objects.\n", typeName));
+    }
 }
