@@ -18,6 +18,8 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -70,6 +72,14 @@ public class HollowObjectMapper {
     public int add(Object o) {
         HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
         return typeMapper.write(o);
+    }
+    
+    /**
+     * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
+     */
+    public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {
+    	HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
+    	typeMapper.writeFlat(o, flatRecordWriter);
     }
 
     /**

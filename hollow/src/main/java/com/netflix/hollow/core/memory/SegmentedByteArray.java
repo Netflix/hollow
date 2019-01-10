@@ -147,6 +147,22 @@ public class SegmentedByteArray implements ByteData {
 
         return dataPosition - destPos;
     }
+    
+    /**
+     * checks equality for a specified range of bytes in two arrays
+     * 
+     * @param rangeStart the start position of the comparison range in this array
+     * @param compareTo the other array to compare
+     * @param cmpStart the start position of the comparison range in the other array
+     * @param length the length of the comparison range
+     * @return
+     */
+    public boolean rangeEquals(long rangeStart, SegmentedByteArray compareTo, long cmpStart, int length) {
+    	for(int i=0;i<length;i++)
+    		if(get(rangeStart + i) != compareTo.get(cmpStart + i))
+    			return false;
+    	return true;
+    }
 
     /**
      * Copies the data from the provided source array into this array, guaranteeing that

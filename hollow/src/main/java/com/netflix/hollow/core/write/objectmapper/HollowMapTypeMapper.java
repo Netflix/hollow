@@ -24,6 +24,8 @@ import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -76,22 +78,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
 
         Map<?, ?> m = (Map<?, ?>)obj;
 
-        HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
-        for(Map.Entry<?, ?>entry : m.entrySet()) {
-            Object key = entry.getKey();
-            if(key == null) {
-                throw new NullPointerException(String.format(NULL_KEY_MESSAGE, schema));
-            }
-            Object value = entry.getValue();
-            if(value == null) {
-                throw new NullPointerException(String.format(NULL_VALUE_MESSAGE, schema));
-            }
-            int keyOrdinal = keyMapper.write(key);
-            int valueOrdinal = valueMapper.write(value);
-            int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);
-
-            rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
-        }
+        HollowMapWriteRecord rec = copyToWriteRecord(m, null);
 
         int assignedOrdinal = writeState.add(rec);
         
@@ -101,6 +88,40 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
         
         return assignedOrdinal;
     }
+    
+    @Override
+    protected int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+    	HollowMapWriteRecord rec = copyToWriteRecord((Map<?,?>)obj, flatRecordWriter);
+    	return flatRecordWriter.write(schema, rec);
+    }
+
+	private HollowMapWriteRecord copyToWriteRecord(Map<?, ?> m, FlatRecordWriter flatRecordWriter) {
+		HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
+        for(Map.Entry<?, ?>entry : m.entrySet()) {
+            Object key = entry.getKey();
+            if(key == null) {
+                throw new NullPointerException(String.format(NULL_KEY_MESSAGE, schema));
+            }
+            Object value = entry.getValue();
+            if(value == null) {
+                throw new NullPointerException(String.format(NULL_VALUE_MESSAGE, schema));
+            }
+            
+            int keyOrdinal, valueOrdinal;
+            if(flatRecordWriter == null) {
+            	keyOrdinal = keyMapper.write(key);
+            	valueOrdinal = valueMapper.write(value);
+            } else {
+            	keyOrdinal = keyMapper.writeFlat(key, flatRecordWriter);
+            	valueOrdinal = valueMapper.writeFlat(value, flatRecordWriter);
+            }
+        	
+        	int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);
+
+            rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
+        }
+		return rec;
+	}
 
     @Override
     protected HollowWriteRecord newWriteRecord() {

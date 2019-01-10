@@ -23,6 +23,8 @@ import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -67,14 +69,31 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
         List<?> l = (List<?>)obj;
 
-        HollowListWriteRecord rec = (HollowListWriteRecord)writeRecord();
+        HollowListWriteRecord rec = copyToWriteRecord(l, null);
+
+        int assignedOrdinal = writeState.add(rec);
+
+        if(obj instanceof MemoizedList) {
+            ((MemoizedList<?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
+        }
+
+        return assignedOrdinal;
+    }
+    
+    public int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+    	HollowListWriteRecord rec = copyToWriteRecord((List<?>)obj, flatRecordWriter);
+    	return flatRecordWriter.write(schema, rec);
+    }
+
+	private HollowListWriteRecord copyToWriteRecord(List<?> l, FlatRecordWriter flatRecordWriter) {
+		HollowListWriteRecord rec = (HollowListWriteRecord)writeRecord();
         if(ignoreListOrdering) {
             IntList ordinalList = getIntList();
             for(Object o : l) {
                 if(o == null) {
                     throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
                 }
-                int ordinal = elementMapper.write(o);
+                int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
                 ordinalList.add(ordinal);
             }
             ordinalList.sort();
@@ -85,19 +104,12 @@ public class HollowListTypeMapper extends HollowTypeMapper {
                 if (o == null) {
                     throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
                 }
-                int ordinal = elementMapper.write(o);
+                int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
                 rec.addElement(ordinal);
             }
         }
-
-        int assignedOrdinal = writeState.add(rec);
-
-        if(obj instanceof MemoizedList) {
-            ((MemoizedList<?>)obj).__assigned_ordinal = (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits();
-        }
-
-        return assignedOrdinal;
-    }
+		return rec;
+	}
 
     @Override
     protected HollowWriteRecord newWriteRecord() {

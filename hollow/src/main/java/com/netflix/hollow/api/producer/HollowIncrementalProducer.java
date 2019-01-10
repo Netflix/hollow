@@ -22,6 +22,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,6 +99,11 @@ public class HollowIncrementalProducer {
         for(Object obj : objList) {
             addOrModify(obj);
         }
+    }
+    
+    public void addOrModify(FlatRecord flatRecord) {
+        RecordPrimaryKey pk = flatRecord.getRecordPrimaryKey();
+        mutations.put(pk, flatRecord);
     }
 
     public void addOrModifyInParallel(Collection<Object> objList) {

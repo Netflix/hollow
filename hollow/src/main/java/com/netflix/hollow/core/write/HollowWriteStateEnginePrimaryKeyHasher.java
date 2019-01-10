@@ -141,10 +141,10 @@ class HollowWriteStateEnginePrimaryKeyHasher {
                 return 0;
             return data.get(offset) == 1 ? 1231 : 1237;
         case DOUBLE:
-            long longBits = HollowObjectTypeWriteState.readLongBits(data, offset);
+            long longBits = HollowWriteFieldUtils.readLongBits(data, offset);
             return (int)(longBits ^ (longBits >>> 32));
         case FLOAT:
-            return HollowObjectTypeWriteState.readIntBits(data, offset);
+            return HollowWriteFieldUtils.readIntBits(data, offset);
         default:
             throw new IllegalArgumentException("Schema "+schema.getName()+" has unknown field type for field " + schema.getFieldName(fieldIdx) + ": " + schema.getFieldType(fieldIdx));
         }

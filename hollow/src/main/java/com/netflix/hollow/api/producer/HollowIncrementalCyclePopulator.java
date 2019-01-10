@@ -25,10 +25,15 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordDumper;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Used by HollowIncrementalProducer for Delta-Based Producer Input
@@ -40,6 +45,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
 
     private final double threadsPerCpu;
     private final Map<RecordPrimaryKey, Object> mutations;
+    
 
     HollowIncrementalCyclePopulator(Map<RecordPrimaryKey, Object> mutations, double threadsPerCpu) {
         this.mutations = mutations;
@@ -128,15 +134,32 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
     }
 
     private void addRecords(final HollowProducer.WriteState newState) {
+        List<Map.Entry<RecordPrimaryKey, Object>> entryList = new ArrayList<>(mutations.entrySet());
+        
+        AtomicInteger nextMutation = new AtomicInteger(0);
+        
         SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
-        for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    if(entry.getValue() != DELETE_RECORD)
-                        newState.add(entry.getValue());
+        executor.execute(() -> {
+            FlatRecordDumper flatRecordDumper = null;
+            int currentMutationIdx = nextMutation.get();
+            
+            while(currentMutationIdx < entryList.size()) {
+                Object currentMutation = entryList.get(currentMutationIdx).getValue();
+                
+                if(currentMutation != DELETE_RECORD) {
+                    if(currentMutation instanceof FlatRecord) {
+                        if(flatRecordDumper == null)
+                            flatRecordDumper = new FlatRecordDumper(newState.getStateEngine());
+                        flatRecordDumper.dump((FlatRecord)currentMutation);
+                    } else {
+                        newState.add(currentMutation);
+                    }
                 }
-            });
-        }
+                
+                currentMutationIdx = nextMutation.get();
+            }
+            
+        });
 
         try {
             executor.awaitSuccessfulCompletion();
