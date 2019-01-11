@@ -120,6 +120,23 @@ public final class Status {
         }
     }
 
+    static final class IncrementalPopulateBuilder extends AbstractStatusBuilder<PublishBuilder> {
+        long version;
+        long removed;
+        long addedOrModified;
+
+        IncrementalPopulateBuilder version(long version) {
+            this.version = version;
+            return this;
+        }
+
+        IncrementalPopulateBuilder changes(long removed, long addedOrModified) {
+            this.removed = removed;
+            this.addedOrModified = addedOrModified;
+            return this;
+        }
+    }
+
     static final class PublishBuilder extends AbstractStatusBuilder<PublishBuilder> {
         HollowProducer.Blob blob;
 

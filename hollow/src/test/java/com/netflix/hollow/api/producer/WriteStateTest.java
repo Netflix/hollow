@@ -22,7 +22,7 @@ public class WriteStateTest {
     @Mock
     private HollowObjectMapper objectMapper;
 
-    private HollowProducer.WriteState subject;
+    private CloseableWriteState subject;
     private long version;
 
     @Before
@@ -80,7 +80,7 @@ public class WriteStateTest {
             code.run();
             fail("should throw");
         } catch (IllegalStateException e) {
-            assertEquals("attempt to use WriteState after populate stage complete; version=" + version, e.getMessage());
+            assertEquals("Write state operated on after the population stage of a cycle; version=" + version, e.getMessage());
         }
     }
 }

@@ -18,21 +18,12 @@ package com.netflix.hollow.api.producer;
 
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import java.util.function.Function;
 
-/**
- * Beta API subject to change.
- *
- * @author Tim Taylor {@literal<tim@toolbear.io>}
- */
-final class CloseableWriteState implements HollowProducer.WriteState {
-    private static final Function<Long,String> LATE_USAGE_MSG = version -> String.format(
-            "attempt to use WriteState after populate stage complete; version=%d", version);
-
+final class CloseableWriteState implements HollowProducer.WriteState, AutoCloseable {
     private final long version;
     private final HollowObjectMapper objectMapper;
     private final HollowProducer.ReadState priorReadState;
-    private volatile boolean closed = false;
+    private volatile boolean closed;
 
     CloseableWriteState(long version, HollowObjectMapper objectMapper, HollowProducer.ReadState priorReadState) {
         this.version = version;
@@ -42,37 +33,44 @@ final class CloseableWriteState implements HollowProducer.WriteState {
 
     @Override
     public int add(Object o) throws IllegalStateException {
-        if (closed)
-            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
+        ensureNotClosed();
+
         return objectMapper.add(o);
     }
 
     @Override
     public HollowObjectMapper getObjectMapper() throws IllegalStateException {
-        if (closed)
-            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
+        ensureNotClosed();
+
         return objectMapper;
     }
 
     @Override
     public HollowWriteStateEngine getStateEngine() throws IllegalStateException {
-        if (closed)
-            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
+        ensureNotClosed();
+
         return objectMapper.getStateEngine();
     }
 
     @Override
     public long getVersion() throws IllegalStateException {
-        if (closed)
-            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
+        ensureNotClosed();
+
         return version;
     }
 
     @Override
     public HollowProducer.ReadState getPriorState() throws IllegalStateException {
-        if (closed)
-            throw new IllegalStateException(LATE_USAGE_MSG.apply(version));
+        ensureNotClosed();
         return priorReadState;
+    }
+
+    private void ensureNotClosed() {
+        if (closed) {
+            throw new IllegalStateException(
+                    String.format("Write state operated on after the population stage of a cycle; version=%d",
+                            version));
+        }
     }
 
     @Override

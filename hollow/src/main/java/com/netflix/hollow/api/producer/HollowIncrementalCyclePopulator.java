@@ -167,7 +167,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
                         else
                             currentMutation = aia.obj;
                     }
-                    
+
                     if(currentMutation != DELETE_RECORD) {
                         if(currentMutation instanceof FlatRecord) {
                             if(flatRecordDumper == null)
@@ -190,15 +190,15 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
             throw new RuntimeException(e);
         }
     }
-    
+
     static final class AddIfAbsent {
         private final Object obj;
         private boolean wasFound;
-        
+
         public AddIfAbsent(Object obj) {
             this.obj = obj;
             this.wasFound = false;
         }
-        
+
     }
 }

@@ -25,6 +25,7 @@ import com.netflix.hollow.api.producer.listener.AnnouncementListener;
 import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.DataModelInitializationListener;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
+import com.netflix.hollow.api.producer.listener.IncrementalPopulateListener;
 import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
 import com.netflix.hollow.api.producer.listener.PopulateListener;
 import com.netflix.hollow.api.producer.listener.PublishListener;
@@ -195,6 +196,23 @@ final class ListenerSupport {
                     l -> l.onCycleComplete(s, readState, version, elapsed));
         }
 
+        Status.IncrementalPopulateBuilder fireIncrementalPopulateStart(long version) {
+            fire(IncrementalPopulateListener.class,
+                    l -> l.onIncrementalPopulateStart(version));
+
+            return new Status.IncrementalPopulateBuilder().version(version);
+        }
+
+        void fireIncrementalPopulateComplete(Status.IncrementalPopulateBuilder b) {
+            Status s = b.build();
+            long version = b.version;
+            Duration elapsed = b.elapsed();
+            long removed = b.removed;
+            long addedOrModified = b.addedOrModified;
+
+            fire(IncrementalPopulateListener.class,
+                    l -> l.onIncrementalPopulateComplete(s, removed, addedOrModified, version, elapsed));
+        }
 
         Status.StageBuilder firePopulateStart(long version) {
             fire(PopulateListener.class,
