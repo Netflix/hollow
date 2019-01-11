@@ -42,6 +42,7 @@ import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.File;
@@ -56,6 +57,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -393,38 +395,29 @@ public class HollowProducer {
     /**
      * Runs a cycle to populate, publish, and announce a new single data state.
      *
-     * @param task the populating task to add state
+     * @param task the populating task to add complete state
      * @return the version identifier of the announced state, otherwise the
      * last successful announced version if 1) there were no data changes compared to that version;
      * or 2) the producer is not the primary producer
      * @throws RuntimeException if the cycle failed
-     */    // @@@ Should this be marked as synchronized?
+     */
+    // @@@ Should this be marked as synchronized?
     public long runCycle(Populator task) {
-        ListenerSupport.Listeners localListeners = listeners.listeners();
+        return runCycle(null, task);
+    }
 
-        if (!singleProducerEnforcer.isPrimary()) {
-            // TODO: minimum time spacing between cycles
-            log.log(Level.INFO, "cycle not executed -- not primary");
-            localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
-            return lastSuccessfulCycle;
-        }
-
-        long toVersion = versionMinter.mint();
-
-        if (!readStates.hasCurrent()) {
-            localListeners.fireNewDeltaChain(toVersion);
-        }
-
-        Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
-        try {
-            return runCycle(localListeners, task, cycleStatus, toVersion);
-        } finally {
-            localListeners.fireCycleComplete(cycleStatus);
-            metrics.updateCycleMetrics(cycleStatus.build(), cycleStatus.readState, cycleStatus.version);
-            if (metricsCollector != null) {
-                metricsCollector.collect(metrics);
-            }
-        }
+    /**
+     * Runs a cycle to incrementally populate, publish, and announce a new single data state.
+     *
+     * @param task the incremental populating task to add changes (additions, modifications, or deletions)
+     * @return the version identifier of the announced state, otherwise the
+     * last successful announced version if 1) there were no data changes compared to that version;
+     * or 2) the producer is not the primary producer
+     * @throws RuntimeException if the cycle failed
+     */
+    // @@@ Should this be marked as synchronized?
+    public long runIncrementalCycle(IncrementalPopulator task) {
+        return runCycle(task, null);
     }
 
     /**
@@ -447,7 +440,37 @@ public class HollowProducer {
         return NO_ANNOUNCEMENT_AVAILABLE;
     }
 
-    long runCycle(ListenerSupport.Listeners listeners, Populator task, Status.StageWithStateBuilder cycleStatus, long toVersion) {
+    long runCycle(IncrementalPopulator incrementalPopulator, Populator populator) {
+        ListenerSupport.Listeners localListeners = listeners.listeners();
+
+        if (!singleProducerEnforcer.isPrimary()) {
+            // TODO: minimum time spacing between cycles
+            log.log(Level.INFO, "cycle not executed -- not primary");
+            localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
+            return lastSuccessfulCycle;
+        }
+
+        long toVersion = versionMinter.mint();
+
+        if (!readStates.hasCurrent()) {
+            localListeners.fireNewDeltaChain(toVersion);
+        }
+
+        Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
+        try {
+            return runCycle(localListeners, incrementalPopulator, populator, cycleStatus, toVersion);
+        } finally {
+            localListeners.fireCycleComplete(cycleStatus);
+            metrics.updateCycleMetrics(cycleStatus.build(), cycleStatus.readState, cycleStatus.version);
+            if (metricsCollector != null) {
+                metricsCollector.collect(metrics);
+            }
+        }
+    }
+
+    long runCycle(ListenerSupport.Listeners listeners,
+            IncrementalPopulator incrementalPopulator, Populator populator,
+            Status.StageWithStateBuilder cycleStatus, long toVersion) {
         // 1. Begin a new cycle
         Artifacts artifacts = new Artifacts();
         HollowWriteStateEngine writeEngine = getWriteEngine();
@@ -456,17 +479,7 @@ public class HollowProducer {
             writeEngine.prepareForNextCycle();
 
             // 2. Populate the state
-            Status.StageBuilder populateStatus = listeners.firePopulateStart(toVersion);
-            try (CloseableWriteState writeState = new CloseableWriteState(toVersion, objectMapper,
-                    readStates.current())) {
-                task.populate(writeState);
-                populateStatus.success();
-            } catch (Throwable th) {
-                populateStatus.fail(th);
-                throw th;
-            } finally {
-                listeners.firePopulateComplete(populateStatus);
-            }
+            populate(listeners, incrementalPopulator, populator, toVersion);
 
             // 3. Produce a new state if there's work to do
             if (writeEngine.hasChangedSinceLastCycle()) {
@@ -576,6 +589,56 @@ public class HollowProducer {
      */
     public void removeListener(HollowProducerEventListener listener) {
         listeners.removeListener(listener);
+    }
+
+    void populate(ListenerSupport.Listeners listeners,
+            IncrementalPopulator incrementalPopulator, Populator populator,
+            long toVersion) throws Exception {
+        assert incrementalPopulator != null ^ populator != null;
+
+        Status.StageBuilder populateStatus = listeners.firePopulateStart(toVersion);
+        try {
+            if (incrementalPopulator != null) {
+                // Incremental population is a sub-stage of the population stage
+                // This ensures good integration with existing population listeners if this sub-stage fails
+                // then the population stage will fail
+                populator = incrementalPopulate(listeners, incrementalPopulator, toVersion);
+            }
+
+            try (CloseableWriteState writeState = new CloseableWriteState(toVersion, objectMapper,
+                    readStates.current())) {
+                populator.populate(writeState);
+                populateStatus.success();
+            }
+        } catch (Throwable th) {
+            populateStatus.fail(th);
+            throw th;
+        } finally {
+            listeners.firePopulateComplete(populateStatus);
+        }
+    }
+
+    Populator incrementalPopulate(ListenerSupport.Listeners listeners,
+            IncrementalPopulator incrementalPopulator,
+            long toVersion) throws Exception {
+        ConcurrentHashMap<RecordPrimaryKey, Object> events = new ConcurrentHashMap<>();
+        Status.IncrementalPopulateBuilder incrementalPopulateStatus = listeners.fireIncrementalPopulateStart(toVersion);
+        try (CloseableIncrementalWriteState iws = new CloseableIncrementalWriteState(events, getObjectMapper())) {
+            incrementalPopulator.populate(iws);
+            incrementalPopulateStatus.success();
+
+            long removed = events.values().stream()
+                    .filter(o -> o == HollowIncrementalCyclePopulator.DELETE_RECORD).count();
+            long addedOrModified = events.size() - removed;
+            incrementalPopulateStatus.changes(removed, addedOrModified);
+        } catch (Throwable th) {
+            incrementalPopulateStatus.fail(th);
+            throw th;
+        } finally {
+            listeners.fireIncrementalPopulateComplete(incrementalPopulateStatus);
+        }
+
+        return new HollowIncrementalCyclePopulator(events, 1.0);
     }
 
     /*
@@ -842,7 +905,7 @@ public class HollowProducer {
     }
 
     /**
-     * Represents a procedure that populates a new data state within a {@link HollowProducer} cycle.
+     * Represents a task that populates a new data state within a {@link HollowProducer} cycle.
      *
      * <p>This is a functional interface whose functional method is
      * {@link #populate(HollowProducer.WriteState)}.
@@ -873,7 +936,7 @@ public class HollowProducer {
          * <li>all data for the new state must be added; data from previous cycles is <em>not</em> carried
          * over automatically</li>
          * <li>caught exceptions that are unrecoverable must be rethrown</li>
-         * <li>the provided {@code WriteState} will be closed and inoperable when this method returns; method
+         * <li>the provided {@code WriteState} will be inoperable when this method returns; method
          * calls against it will throw {@code IllegalStateException}</li>
          * <li>the {@code WriteState} is thread safe</li>
          * </ul>
@@ -888,12 +951,15 @@ public class HollowProducer {
          * </ul>
          *
          * @param newState the new state to add objects to
-         * @throws Exception if population fails
+         * @throws Exception if population fails.  If failure occurs the data from the previous cycle is retained.
          */
         void populate(HollowProducer.WriteState newState) throws Exception;
     }
 
-    public interface WriteState extends AutoCloseable {
+    /**
+     * Representation of new write state.
+     */
+    public interface WriteState {
         /**
          * Adds the specified POJO to the state engine. See {@link HollowObjectMapper#add(Object)} for details.
          *
@@ -957,21 +1023,119 @@ public class HollowProducer {
          * {@link Populator} for details on the contract)
          */
         long getVersion() throws IllegalStateException;
-
-        /**
-         * Closes this write state making it inoperable.
-         *
-         * <p>Once closed, calling any other method (aside from {@link #close()} will throw
-         * {@code IllegalStateException}. The producer closes the current cycle's write state after the populate
-         * stage is complete.
-         */
-        @Override
-        void close();
     }
 
+    /**
+     * Represents a task that incrementally populates a new data state within a {@link HollowProducer} cycle (
+     * more specifically within the population stage)
+     *
+     * <p>This is a functional interface whose functional method is
+     * {@link #populate(IncrementalWriteState)}.
+     */
+    @FunctionalInterface
+    public interface IncrementalPopulator {
+
+        /**
+         * Incrementally populates the provided {@link IncrementalWriteState} with new additions, modifications or
+         * removals of objects. Often written as a lambda passed in to
+         * {@link HollowProducer#runIncrementalCycle(IncrementalPopulator)}:
+         *
+         * <pre>{@code
+         * producer.runIncrementalCycle(incrementalState -> {
+         *     Collection<C> changesA = queryA();
+         *     for (Change c : changesA) {
+         *         if (c.isAddOrModify() {
+         *             incrementalState.addOrModify(c.getObject());
+         *         } else {
+         *             incrementalState.delete(c.getObject());
+         *         }
+         *     }
+         *
+         *     changesB = queryB();
+         *     // ...
+         * });
+         * }</pre>
+         *
+         * <p>Notes:
+         *
+         * <ul>
+         * <li>The data from the previous cycle is carried over with changes (additions, modifications or removals).
+         * <li>caught exceptions that are unrecoverable must be rethrown</li>
+         * <li>the provided {@code IncrementalWriteState} will be inoperable when this method returns; method
+         * calls against it will throw {@code IllegalStateException}</li>
+         * <li>the {@code IncrementalWriteState} is thread safe</li>
+         * </ul>
+         *
+         * <p>
+         * Incrementally populating asynchronously has these additional requirements:
+         * <ul>
+         * <li>MUST NOT return from this method until all workers have completed – either normally
+         * or exceptionally – or have been cancelled</li>
+         * <li>MUST throw an exception if any worker completed exceptionally. MAY cancel remaining tasks
+         * <em>or</em> wait for the remainder to complete.</li>
+         * </ul>
+         *
+         * @param state the state to add, modify or delete objects
+         * @throws Exception if population fails.  If failure occurs the data from the previous cycle is not changed.
+         */
+        void populate(HollowProducer.IncrementalWriteState state) throws Exception;
+    }
+
+    /**
+     * Representation of write state that can be incrementally changed.
+     */
+    public interface IncrementalWriteState {
+
+        /**
+         * Adds a new object or modifies an existing object.  The object must define a primary key.
+         * <p>
+         * Calling this method after the producer's incremental populate stage has completed is an error.
+         *
+         * @param o the object
+         * @throws IllegalArgumentException if the object does not have primary key defined
+         */
+        void addOrModify(Object o);
+
+        /**
+         * Deletes an object.  The object must define a primary key.
+         * <p>
+         * This action is ignored if the object does not exist.
+         * <p>
+         * Calling this method after the producer's incremental populate stage has completed is an error.
+         *
+         * @param o the object
+         * @throws IllegalArgumentException if the object does not have primary key defined
+         */
+        void delete(Object o);
+
+        /**
+         * Deletes an object given its primary key value.
+         * <p>
+         * If the object does not exist (has already been deleted, say) then this action as no effect on the
+         * write state.
+         * <p>
+         * Calling this method after the producer's incremental populate stage has completed is an error.
+         *
+         * @param key the primary key value
+         * @throws IllegalArgumentException if the field path of the primary key is not resolvable
+         */
+        void delete(RecordPrimaryKey key);
+    }
+
+    /**
+     * Representation of read state computed from the population of new write state.
+     */
     public interface ReadState {
+        /**
+         * Returns the version of the read state
+         * @return the version
+         */
         long getVersion();
 
+        /**
+         * Returns the read state engine
+         * @return the read state engine
+         */
         HollowReadStateEngine getStateEngine();
     }
 

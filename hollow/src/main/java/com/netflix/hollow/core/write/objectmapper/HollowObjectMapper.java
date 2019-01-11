@@ -88,6 +88,7 @@ public class HollowObjectMapper {
      *
      * @param o the POJO
      * @return the primary key
+     * @throws IllegalArgumentException if the POJO does not have primary key defined
      */
     public RecordPrimaryKey extractPrimaryKey(Object o) {
         HollowObjectTypeMapper typeMapper = (HollowObjectTypeMapper) getTypeMapper(o.getClass(), null, null);
