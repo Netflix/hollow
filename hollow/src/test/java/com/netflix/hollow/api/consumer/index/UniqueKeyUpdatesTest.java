@@ -64,13 +64,13 @@ public class UniqueKeyUpdatesTest {
                 .build();
         consumer.triggerRefreshTo(v1);
 
-        UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKey, Key> hi = UniqueKeyIndex.from(consumer,
+        UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKey, Key> uki = UniqueKeyIndex.from(consumer,
                 DataModel.Consumer.TypeWithPrimaryKey.class)
-                .listenToDataRefresh()
                 .bindToPrimaryKey()
                 .usingBean(Key.class);
+        consumer.addRefreshListener(uki);
 
-        Assert.assertNotNull(hi.findMatch(new Key(1, "1", 2)));
+        Assert.assertNotNull(uki.findMatch(new Key(1, "1", 2)));
 
 
         long v2 = producer.runCycle(ws -> {
@@ -89,10 +89,11 @@ public class UniqueKeyUpdatesTest {
         }
         consumer.triggerRefreshTo(v2);
 
-        Assert.assertNotNull(hi.findMatch(new Key(1, "1", 2)));
-        Assert.assertNotNull(hi.findMatch(new Key(2, "1", 2)));
+        Assert.assertNotNull(uki.findMatch(new Key(1, "1", 2)));
+        Assert.assertNotNull(uki.findMatch(new Key(2, "1", 2)));
 
-        hi.detachFromDataRefresh();
+
+        consumer.removeRefreshListener(uki);
         long v3 = producer.runCycle(ws -> {
             ws.add(new DataModel.Producer.TypeWithPrimaryKey(
                     1,
@@ -114,9 +115,9 @@ public class UniqueKeyUpdatesTest {
         }
         consumer.triggerRefreshTo(v3);
 
-        Assert.assertNotNull(hi.findMatch(new Key(1, "1", 2)));
-        Assert.assertNotNull(hi.findMatch(new Key(2, "1", 2)));
-        Assert.assertNull(hi.findMatch(new Key(3, "1", 2)));
+        Assert.assertNotNull(uki.findMatch(new Key(1, "1", 2)));
+        Assert.assertNotNull(uki.findMatch(new Key(2, "1", 2)));
+        Assert.assertNull(uki.findMatch(new Key(3, "1", 2)));
     }
 
     @Test

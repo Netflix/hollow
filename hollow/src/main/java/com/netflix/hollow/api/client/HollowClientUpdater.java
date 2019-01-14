@@ -160,12 +160,25 @@ public class HollowClientUpdater {
         }
     }
 
-    public void addRefreshListener(HollowConsumer.RefreshListener refreshListener) {
-        refreshListeners.addIfAbsent(refreshListener);
+    public synchronized void addRefreshListener(HollowConsumer.RefreshListener refreshListener,
+            HollowConsumer c) {
+        if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {
+            if (!refreshListeners.contains(refreshListener)) {
+                ((HollowConsumer.RefreshRegistrationListener)refreshListener).onBeforeAddition(c);
+            }
+            refreshListeners.add(refreshListener);
+        } else {
+            refreshListeners.addIfAbsent(refreshListener);
+        }
     }
 
-    public void removeRefreshListener(HollowConsumer.RefreshListener refreshListener) {
-        refreshListeners.remove(refreshListener);
+    public synchronized void removeRefreshListener(HollowConsumer.RefreshListener refreshListener,
+            HollowConsumer c) {
+        if (refreshListeners.remove(refreshListener)) {
+            if (refreshListener instanceof HollowConsumer.RefreshRegistrationListener) {
+                ((HollowConsumer.RefreshRegistrationListener)refreshListener).onAfterRemoval(c);
+            }
+        }
     }
 
     public long getCurrentVersionId() {

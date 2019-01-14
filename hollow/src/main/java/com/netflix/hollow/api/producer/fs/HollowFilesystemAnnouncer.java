@@ -17,7 +17,10 @@
  */
 package com.netflix.hollow.api.producer.fs;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import com.netflix.hollow.api.producer.HollowProducer;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +28,7 @@ import java.nio.file.Path;
 public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     
     public static final String ANNOUNCEMENT_FILENAME = "announced.version";
+    public static final String ANNOUNCEMENT_FILENAME_TEMPORARY = "announced.version.tmp";
     
     private final Path publishPath;
 
@@ -39,8 +43,10 @@ public class HollowFilesystemAnnouncer implements HollowProducer.Announcer {
     @Override
     public void announce(long stateVersion) {
         Path announcePath = publishPath.resolve(ANNOUNCEMENT_FILENAME);
+        Path announcePathTmp = publishPath.resolve(ANNOUNCEMENT_FILENAME_TEMPORARY);
         try {
-            Files.write(announcePath, String.valueOf(stateVersion).getBytes());
+            Files.write(announcePathTmp, String.valueOf(stateVersion).getBytes());
+            Files.move(announcePathTmp, announcePath, REPLACE_EXISTING);
         } catch (IOException ex) {
             throw new RuntimeException("Unable to write to announcement file; path=" + announcePath, ex);
         }

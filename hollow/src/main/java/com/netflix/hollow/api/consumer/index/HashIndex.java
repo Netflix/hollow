@@ -26,6 +26,12 @@ import java.util.Objects;
  * <p>
  * This type of index can map multiple keys to a single matching record,
  * and/or multiple records to a single key.
+ * <p>
+ * If the index is {@link HollowConsumer#addRefreshListener(HollowConsumer.RefreshListener) registered} with its
+ * associated {@link HollowConsumer} then the index will track updates and changes will be reflected in matched results
+ * (performed after such updates).  When a registered index is no longer needed it should be
+ * {@link HollowConsumer#removeRefreshListener(HollowConsumer.RefreshListener) deregistered} to avoid unnecessary
+ * index recalculation and to ensure the index is reclaimed by the garbage collector.
  *
  * @param <T> the root, select, and result type
  * @param <Q> the query type
@@ -35,11 +41,9 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
     HashIndex(
             HollowConsumer consumer,
             Class<T> rootType,
-            boolean listenToDataRefresh,
             Class<Q> matchedFieldsType) {
         super(consumer,
                 rootType,
-                listenToDataRefresh,
                 rootType, "",
                 matchedFieldsType);
     }
@@ -47,11 +51,9 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
     HashIndex(
             HollowConsumer consumer,
             Class<T> rootType,
-            boolean listenToDataRefresh,
             String fieldPath, Class<Q> matchedFieldType) {
         super(consumer,
                 rootType,
-                listenToDataRefresh,
                 rootType, "",
                 fieldPath, matchedFieldType);
     }
@@ -78,7 +80,6 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
     public static final class Builder<T extends HollowRecord> {
         final HollowConsumer consumer;
         final Class<T> rootType;
-        boolean listenToDataRefresh = true;
 
         Builder(HollowConsumer consumer, Class<T> rootType) {
             this.consumer = consumer;
@@ -97,7 +98,7 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
          */
         public <Q> HashIndex<T, Q> usingBean(Class<Q> queryType) {
             Objects.requireNonNull(queryType);
-            return new HashIndex<>(consumer, rootType, listenToDataRefresh, queryType);
+            return new HashIndex<>(consumer, rootType, queryType);
         }
 
         /**
@@ -117,19 +118,7 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
                 throw new IllegalArgumentException("queryFieldPath argument is an empty String");
             }
             Objects.requireNonNull(queryFieldType);
-            return new HashIndex<>(consumer, rootType, listenToDataRefresh, queryFieldPath, queryFieldType);
-        }
-
-        /**
-         * Configures the hash index to listen to {@code HollowConsumer} version updates.
-         * On an update the index recalculates so updated data will be reflected in the results of a query
-         * (performed after the update).
-         *
-         * @return this builder
-         */
-        public Builder<T> listenToDataRefresh() {
-            listenToDataRefresh = true;
-            return this;
+            return new HashIndex<>(consumer, rootType, queryFieldPath, queryFieldType);
         }
 
         /**
@@ -145,8 +134,7 @@ public final class HashIndex<T extends HollowRecord, Q> extends HashIndexSelect<
                 String selectFieldPath, Class<S> selectFieldType) {
             Objects.requireNonNull(selectFieldPath);
             Objects.requireNonNull(selectFieldType);
-            return new BuilderWithSelect<>(consumer, rootType, listenToDataRefresh, selectFieldPath,
-                    selectFieldType);
+            return new BuilderWithSelect<>(consumer, rootType, selectFieldPath, selectFieldType);
         }
     }
 }
