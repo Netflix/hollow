@@ -17,9 +17,12 @@
  */
 package com.netflix.hollow.core.write.objectmapper;
 
+import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -31,11 +34,15 @@ public abstract class HollowTypeMapper {
     public static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF00000000L;
 
     private final ThreadLocal<HollowWriteRecord> writeRec = new ThreadLocal<>();
+    
+    private final ThreadLocal<ByteDataBuffer> flatRecBuffer = new ThreadLocal<>();
 
     protected abstract String getTypeName();
 
     protected abstract int write(Object obj);
 
+	protected abstract int writeFlat(Object obj, FlatRecordWriter flatRecordWriter);
+    
     protected abstract HollowWriteRecord newWriteRecord();
 
     protected abstract HollowTypeWriteState getTypeWriteState();
@@ -53,6 +60,16 @@ public abstract class HollowTypeMapper {
         }
         rec.reset();
         return rec;
+    }
+    
+    protected ByteDataBuffer flatRecBuffer() {
+    	ByteDataBuffer buf = flatRecBuffer.get();
+    	if(buf == null) {
+    		buf = new ByteDataBuffer();
+    		flatRecBuffer.set(buf);
+    	}
+    	buf.reset();
+    	return buf;
     }
 
     /**
@@ -101,4 +118,5 @@ public abstract class HollowTypeMapper {
     protected long cycleSpecificAssignedOrdinalBits() {
         return getTypeWriteState().getStateEngine().getNextStateRandomizedTag() & ASSIGNED_ORDINAL_CYCLE_MASK;
     }
+
 }

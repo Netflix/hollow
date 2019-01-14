@@ -17,6 +17,9 @@
  */
 package com.netflix.hollow.core.write;
 
+import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readIntBits;
+import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readLongBits;
+
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -441,26 +444,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             buffers[index] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
         }
         return buffers[index];
-    }
-
-    static int readIntBits(ByteData data, long fieldPosition) {
-        int intBits = (data.get(fieldPosition++) & 0xFF) << 24;
-        intBits |= (data.get(fieldPosition++) & 0xFF) << 16;
-        intBits |= (data.get(fieldPosition++) & 0xFF) << 8;
-        intBits |= (data.get(fieldPosition) & 0xFF);
-        return intBits;
-    }
-
-    static long readLongBits(ByteData data, long fieldPosition) {
-        long longBits = (long) (data.get(fieldPosition++) & 0xFF) << 56;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 48;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 40;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 32;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 24;
-        longBits |= (data.get(fieldPosition++) & 0xFF) << 16;
-        longBits |= (data.get(fieldPosition++) & 0xFF) << 8;
-        longBits |= (data.get(fieldPosition) & 0xFF);
-        return longBits;
     }
 
 }

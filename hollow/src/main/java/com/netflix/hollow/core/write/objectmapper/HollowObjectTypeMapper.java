@@ -25,6 +25,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -156,14 +157,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
         }
 
-        if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
-            throw new IllegalArgumentException("Attempting to write unexpected class!  Expected " + clazz + " but object was " + obj.getClass());
-
-        HollowObjectWriteRecord rec = (HollowObjectWriteRecord)writeRecord();
-
-        for(int i=0;i<mappedFields.size();i++) {
-            mappedFields.get(i).copy(obj, rec);
-        }
+        HollowObjectWriteRecord rec = copyToWriteRecord(obj, null);
 
         int assignedOrdinal = writeState.add(rec);
         if (hasAssignedOrdinalField) {
@@ -172,6 +166,24 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return assignedOrdinal;
     }
 
+    @Override
+    public int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+        HollowObjectWriteRecord rec = copyToWriteRecord(obj, flatRecordWriter);
+        return flatRecordWriter.write(schema, rec);
+    }
+    
+	private HollowObjectWriteRecord copyToWriteRecord(Object obj, FlatRecordWriter flatRecordWriter) {
+		if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
+            throw new IllegalArgumentException("Attempting to write unexpected class!  Expected " + clazz + " but object was " + obj.getClass());
+
+        HollowObjectWriteRecord rec = (HollowObjectWriteRecord)writeRecord();
+
+        for(int i=0;i<mappedFields.size();i++) {
+            mappedFields.get(i).copy(obj, rec, flatRecordWriter);
+        }
+		return rec;
+	}
+    
     Object[] extractPrimaryKey(Object obj) {
         int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;
         
@@ -348,7 +360,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         @SuppressWarnings("deprecation")
-        public void copy(Object obj, HollowObjectWriteRecord rec) {
+        public void copy(Object obj, HollowObjectWriteRecord rec, FlatRecordWriter flatRecordWriter) {
             Object fieldObject;
             
             switch(fieldType) {
@@ -448,8 +460,12 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 case REFERENCE:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setReference(fieldName, subTypeMapper.write(fieldObject));
+                    if(fieldObject != null) {
+                    	if(flatRecordWriter == null)
+                    		rec.setReference(fieldName, subTypeMapper.write(fieldObject));
+                    	else
+                    		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
+                    }
                     break;
             }
         }
