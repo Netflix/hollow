@@ -2360,28 +2360,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5653,28 +5653,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -8946,28 +8946,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -12388,28 +12388,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -15681,28 +15681,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -19006,28 +19006,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -22372,28 +22372,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -25738,28 +25738,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -29104,28 +29104,28 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.3",
+            "locked": "3.5.4",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.1",
+            "locked": "2.0.2",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
