@@ -17,6 +17,9 @@
  */
 package com.netflix.hollow.core.write;
 
+import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readIntBits;
+import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readLongBits;
+
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -27,9 +30,6 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readIntBits;
-import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readLongBits;
 
 public class HollowObjectTypeWriteState extends HollowTypeWriteState {
 

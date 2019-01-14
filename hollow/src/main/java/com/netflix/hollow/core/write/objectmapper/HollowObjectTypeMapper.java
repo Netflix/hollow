@@ -18,7 +18,6 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.index.key.PrimaryKey;
-import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
@@ -27,7 +26,6 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;

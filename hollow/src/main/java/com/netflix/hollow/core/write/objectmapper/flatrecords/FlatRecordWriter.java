@@ -1,14 +1,5 @@
 package com.netflix.hollow.core.write.objectmapper.flatrecords;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.ArrayByteData;
@@ -22,6 +13,14 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowHashableWriteRecord;
 import com.netflix.hollow.core.write.HollowHashableWriteRecord.HashBehavior;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
