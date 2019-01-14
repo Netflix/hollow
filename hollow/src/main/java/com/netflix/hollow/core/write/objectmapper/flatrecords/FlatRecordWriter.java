@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
+ * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
  */
 public class FlatRecordWriter {
 	

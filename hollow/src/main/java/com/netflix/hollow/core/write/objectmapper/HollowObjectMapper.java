@@ -75,8 +75,9 @@ public class HollowObjectMapper {
     }
     
     /**
-     * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
+     * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
      */
+    @Deprecated
     public void writeFlat(Object o, FlatRecordWriter flatRecordWriter) {
     	HollowTypeMapper typeMapper = getTypeMapper(o.getClass(), null, null);
     	typeMapper.writeFlat(o, flatRecordWriter);

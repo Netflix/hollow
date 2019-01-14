@@ -12,7 +12,7 @@ import com.netflix.hollow.core.write.HollowWriteFieldUtils;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 
 /**
- * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
+ * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
  */
 public class FlatRecord {
 

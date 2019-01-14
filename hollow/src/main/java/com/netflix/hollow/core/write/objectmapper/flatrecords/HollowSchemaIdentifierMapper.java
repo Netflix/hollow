@@ -4,7 +4,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 
 /**
- * Warning: Experimental.  This is a BETA API and is subject to breaking changes.
+ * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
  */
 public interface HollowSchemaIdentifierMapper {
 	
