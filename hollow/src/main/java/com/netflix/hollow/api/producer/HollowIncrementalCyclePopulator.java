@@ -149,27 +149,29 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         AtomicInteger nextMutation = new AtomicInteger(0);
         
         SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
-        executor.execute(() -> {
-            FlatRecordDumper flatRecordDumper = null;
-            int currentMutationIdx = nextMutation.getAndIncrement();
-            
-            while(currentMutationIdx < entryList.size()) {
-                Object currentMutation = entryList.get(currentMutationIdx).getValue();
+        for(int i=0;i<executor.getCorePoolSize();i++) {
+            executor.execute(() -> {
+                FlatRecordDumper flatRecordDumper = null;
+                int currentMutationIdx = nextMutation.getAndIncrement();
                 
-                if(currentMutation != DELETE_RECORD) {
-                    if(currentMutation instanceof FlatRecord) {
-                        if(flatRecordDumper == null)
-                            flatRecordDumper = new FlatRecordDumper(newState.getStateEngine());
-                        flatRecordDumper.dump((FlatRecord)currentMutation);
-                    } else {
-                        newState.add(currentMutation);
+                while(currentMutationIdx < entryList.size()) {
+                    Object currentMutation = entryList.get(currentMutationIdx).getValue();
+                    
+                    if(currentMutation != DELETE_RECORD) {
+                        if(currentMutation instanceof FlatRecord) {
+                            if(flatRecordDumper == null)
+                                flatRecordDumper = new FlatRecordDumper(newState.getStateEngine());
+                            flatRecordDumper.dump((FlatRecord)currentMutation);
+                        } else {
+                            newState.add(currentMutation);
+                        }
                     }
+                    
+                    currentMutationIdx = nextMutation.getAndIncrement();
                 }
-                
-                currentMutationIdx = nextMutation.getAndIncrement();
-            }
-            
-        });
+
+            });
+        }
 
         try {
             executor.awaitSuccessfulCompletion();
