@@ -151,7 +151,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
         executor.execute(() -> {
             FlatRecordDumper flatRecordDumper = null;
-            int currentMutationIdx = nextMutation.get();
+            int currentMutationIdx = nextMutation.getAndIncrement();
             
             while(currentMutationIdx < entryList.size()) {
                 Object currentMutation = entryList.get(currentMutationIdx).getValue();
@@ -166,7 +166,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
                     }
                 }
                 
-                currentMutationIdx = nextMutation.get();
+                currentMutationIdx = nextMutation.getAndIncrement();
             }
             
         });
