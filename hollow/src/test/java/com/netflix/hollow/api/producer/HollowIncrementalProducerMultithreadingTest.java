@@ -20,7 +20,8 @@ import org.junit.rules.ExpectedException;
 public class HollowIncrementalProducerMultithreadingTest {
 
     private static final int ELEMENTS = 20000;
-    private static final double THREADS = 50.0d;
+    private static final double THREADS = 4.0d;
+    private static final int ITERATIONS = 10;
 
     private InMemoryBlobStore blobStore;
 
@@ -34,63 +35,69 @@ public class HollowIncrementalProducerMultithreadingTest {
 
     @Test
     public void updateAndPublishUsingMultithreading() {
-        HollowProducer producer = createInMemoryProducer();
+        // run within a loop to increase the likelihood of a race condition to occur
+        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+            HollowProducer producer = createInMemoryProducer();
 
-        /// initialize the data -- classic producer creates the first state in the delta chain.
-        initializeData(producer);
+            /// initialize the data -- classic producer creates the first state in the delta chain.
+            initializeData(producer);
 
-        /// now we'll be incrementally updating the state by mutating individual records
-        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, THREADS);
+            /// now we'll be incrementally updating the state by mutating individual records
+            HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, THREADS);
 
-        int[] notModifiedElementIds = IntStream.range(0, ELEMENTS / 2).toArray();
-        int[] modifiedElementIds = IntStream.range(ELEMENTS / 2, ELEMENTS).toArray();
+            int[] notModifiedElementIds = IntStream.range(0, ELEMENTS / 2).toArray();
+            int[] modifiedElementIds = IntStream.range(ELEMENTS / 2, ELEMENTS).toArray();
 
-        incrementalProducer.addOrModify(Arrays.stream(modifiedElementIds).mapToObj(i -> new SimpleType(i, i + 1)).collect(Collectors.toList()));
+            incrementalProducer.addOrModify(Arrays.stream(modifiedElementIds).mapToObj(i -> new SimpleType(i, i + 1)).collect(Collectors.toList()));
 
-        /// .runCycle() flushes the changes to a new data state.
-        long versionAfterUpdate = incrementalProducer.runCycle();
+            /// .runCycle() flushes the changes to a new data state.
+            long versionAfterUpdate = incrementalProducer.runCycle();
 
-        /// now we read the changes and assert
-        HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterUpdate);
-        Assert.assertFalse(idx.containsDuplicates());
-        Assert.assertTrue(Arrays.stream(notModifiedElementIds)
-                                  .boxed()
-                                  .map(elementId -> getHollowObject(idx, elementId))
-                                  .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
-        Assert.assertTrue(Arrays.stream(modifiedElementIds)
-                                  .boxed()
-                                  .map(elementId -> getHollowObject(idx, elementId))
-                                  .allMatch(obj -> obj.getInt("value") != obj.getInt("id")));
+            /// now we read the changes and assert
+            HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterUpdate);
+            Assert.assertFalse(idx.containsDuplicates());
+            Assert.assertTrue(Arrays.stream(notModifiedElementIds)
+                                      .boxed()
+                                      .map(elementId -> getHollowObject(idx, elementId))
+                                      .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
+            Assert.assertTrue(Arrays.stream(modifiedElementIds)
+                                      .boxed()
+                                      .map(elementId -> getHollowObject(idx, elementId))
+                                      .allMatch(obj -> obj.getInt("value") != obj.getInt("id")));
+        }
     }
 
     @Test
     public void removeAndPublishUsingMultithreading() {
-        HollowProducer producer = createInMemoryProducer();
+        // run within a loop to increase the likelihood of a race condition to occur
+        for (int iterationCounter = 0; iterationCounter < ITERATIONS; ++iterationCounter) {
+            HollowProducer producer = createInMemoryProducer();
 
-        /// initialize the data -- classic producer creates the first state in the delta chain.
-        initializeData(producer);
+            /// initialize the data -- classic producer creates the first state in the delta chain.
+            initializeData(producer);
 
-        /// now we'll be incrementally updating the state by mutating individual records
-        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, THREADS);
+            /// now we'll be incrementally updating the state by mutating individual records
+            HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer, THREADS);
 
-        int[] notModifiedElementIds = IntStream.range(0, ELEMENTS / 2).toArray();
-        int[] deletedElementIds = IntStream.range(ELEMENTS / 2, ELEMENTS).toArray();
+            int[] notModifiedElementIds = IntStream.range(0, ELEMENTS / 2).toArray();
+            int[] deletedElementIds = IntStream.range(ELEMENTS / 2, ELEMENTS).toArray();
 
-        incrementalProducer.delete(Arrays.stream(deletedElementIds).mapToObj(i -> new SimpleType(i, i)).collect(Collectors.toList()));
+            incrementalProducer.delete(Arrays.stream(deletedElementIds).mapToObj(i -> new SimpleType(i, i)).collect(Collectors.toList()));
 
-        /// .runCycle() flushes the changes to a new data state.
-        long versionAfterDelete = incrementalProducer.runCycle();
+            /// .runCycle() flushes the changes to a new data state.
+            long versionAfterDelete = incrementalProducer.runCycle();
 
-        /// now we read the changes and assert
-        HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterDelete);
-        Assert.assertTrue(Arrays.stream(notModifiedElementIds)
-                                  .boxed()
-                                  .map(elementId -> getHollowObject(idx, elementId))
-                                  .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
-        Assert.assertTrue(Arrays.stream(deletedElementIds)
-                                  .boxed()
-                                  .map(elementId -> getOrdinal(idx, elementId))
-                                  .allMatch(ordinal -> ordinal == -1));
+            /// now we read the changes and assert
+            HollowPrimaryKeyIndex idx = createPrimaryKeyIndex(versionAfterDelete);
+            Assert.assertTrue(Arrays.stream(notModifiedElementIds)
+                                      .boxed()
+                                      .map(elementId -> getHollowObject(idx, elementId))
+                                      .allMatch(obj -> obj.getInt("value") == obj.getInt("id")));
+            Assert.assertTrue(Arrays.stream(deletedElementIds)
+                                      .boxed()
+                                      .map(elementId -> getOrdinal(idx, elementId))
+                                      .allMatch(ordinal -> ordinal == -1));
+        }
     }
 
     private HollowProducer createInMemoryProducer() {
