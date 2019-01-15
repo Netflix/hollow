@@ -1,7 +1,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
-import java.util.Optional;
+import java.util.OptionalLong;
 
 public class ConsumerRefreshMetrics {
 
@@ -11,7 +11,7 @@ public class ConsumerRefreshMetrics {
     private BlobType overallRefreshType;            // snapshot, delta, or reverse delta
     private UpdatePlanDetails updatePlanDetails;    // details about the update plan such as no. and types of transitions and no. of successful transitions
     private long consecutiveFailures;
-    private Optional<Long> refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
+    private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
 
     public long getDurationMillis() {
         return durationMillis;
@@ -31,12 +31,12 @@ public class ConsumerRefreshMetrics {
     public long getConsecutiveFailures() {
         return consecutiveFailures;
     }
-    public Optional<Long> getRefreshSuccessAgeMillisOptional() {
+    public OptionalLong getRefreshSuccessAgeMillisOptional() {
         return refreshSuccessAgeMillisOptional;
     }
 
     private ConsumerRefreshMetrics(long durationMillis, boolean isRefreshSuccess, boolean isInitialLoad, BlobType overallRefreshType,
-            UpdatePlanDetails updatePlanDetails, long consecutiveFailures, Optional<Long> refreshSuccessAgeMillisOptional) {
+            UpdatePlanDetails updatePlanDetails, long consecutiveFailures, OptionalLong refreshSuccessAgeMillisOptional) {
         this.durationMillis = durationMillis;
         this.isRefreshSuccess = isRefreshSuccess;
         this.isInitialLoad = isInitialLoad;
@@ -53,10 +53,10 @@ public class ConsumerRefreshMetrics {
         private BlobType overallRefreshType;
         private UpdatePlanDetails updatePlanDetails;
         private long consecutiveFailures;
-        private Optional<Long> refreshSuccessAgeMillisOptional;
+        private OptionalLong refreshSuccessAgeMillisOptional;
 
         public Builder() {
-            refreshSuccessAgeMillisOptional = Optional.empty();
+            refreshSuccessAgeMillisOptional = OptionalLong.empty();
         }
 
         public Builder setDurationMillis(long durationMillis) {
@@ -86,7 +86,7 @@ public class ConsumerRefreshMetrics {
             return this;
         }
         public Builder setRefreshSuccessAgeMillisOptional(long refreshSuccessAgeMillis) {
-            this.refreshSuccessAgeMillisOptional = Optional.of(refreshSuccessAgeMillis);
+            this.refreshSuccessAgeMillisOptional = OptionalLong.of(refreshSuccessAgeMillis);
             return this;
         }
 

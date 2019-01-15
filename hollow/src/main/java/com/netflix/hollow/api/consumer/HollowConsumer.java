@@ -777,13 +777,14 @@ public class HollowConsumer {
          * Called after refresh started and update plan has been initialized, but before the update plan starts executing.
          * It is called only once per update plan (and thus only once per consumer refresh). Exposes details of the
          * update plan.
+         * @implSpec The default implementation provided does nothing.
          *
          * @param beforeVersion The version when refresh started
-         * @param requestedVersion The intended version at the end of the refresh
+         * @param desiredVersion The version that the consumer refresh tries update to, even though it might not be attainable eg. HollowConstants.VERSION_LATEST
          * @param isSnapshotPlan Indicates whether the refresh involves a snapshot transition
          * @param transitionSequence List of transitions comprising the refresh
          */
-        void transitionsPlanned(long beforeVersion, long requestedVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence);
+        default void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {}
     }
 
     public static class AbstractRefreshListener implements TransitionAwareRefreshListener {
@@ -793,7 +794,7 @@ public class HollowConsumer {
         }
 
         @Override
-        public void transitionsPlanned(long beforeVersion, long requestedVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
+        public void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
             // no-op
         }
 

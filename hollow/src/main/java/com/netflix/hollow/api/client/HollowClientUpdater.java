@@ -110,9 +110,8 @@ public class HollowClientUpdater {
 
         long beforeVersion = getCurrentVersionId();
 
-        for (HollowConsumer.RefreshListener listener : localListeners) {
+        for (HollowConsumer.RefreshListener listener : localListeners)
             listener.refreshStarted(beforeVersion, version);
-        }
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()

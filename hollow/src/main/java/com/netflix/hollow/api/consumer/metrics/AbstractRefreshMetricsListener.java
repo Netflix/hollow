@@ -8,7 +8,7 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractRefreshMetricsListener extends AbstractRefreshListener implements RefreshMetricsReporting {
 
-    private Optional<Long> lastRefreshTimeNanoOptional;
+    private OptionalLong lastRefreshTimeNanoOptional;
     private long refreshStart;
     private long consecutiveFailures;
     private ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
@@ -33,7 +33,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
 
     public AbstractRefreshMetricsListener() {
-        lastRefreshTimeNanoOptional = Optional.empty();
+        lastRefreshTimeNanoOptional = OptionalLong.empty();
         consecutiveFailures = 0l;
     }
 
@@ -54,28 +54,28 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
      * to troubleshoot issues relating to refresh failure.
      * </p>
      * @param beforeVersion The version when refresh started
-     * @param afterVersion The intended version at the end of the refresh
+     * @param desiredVersion The version that the consumer refresh tries update to, even though it might not be attainable eg. HollowConstants.VERSION_LATEST
      * @param isSnapshotPlan Indicates whether the refresh involves a snapshot transition
      * @param transitionSequence List of transitions comprising the refresh
      */
     @Override
-    public final void transitionsPlanned(long beforeVersion, long afterVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
+    public final void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
 
         updatePlanDetails.beforeVersion = beforeVersion;
-        updatePlanDetails.afterVersion = afterVersion;
+        updatePlanDetails.desiredVersion = desiredVersion;
         updatePlanDetails.numTransitions = transitionSequence.size();
         updatePlanDetails.transitionSequence = transitionSequence;
         if (isSnapshotPlan) {
             overallRefreshType = BlobType.SNAPSHOT;
         } else {
-            overallRefreshType = afterVersion > beforeVersion ? BlobType.DELTA : BlobType.REVERSE_DELTA;
+            overallRefreshType = desiredVersion > beforeVersion ? BlobType.DELTA : BlobType.REVERSE_DELTA;
         }
         refreshMetricsBuilder.setOverallRefreshType(overallRefreshType);
     }
 
     @Override
     public final void blobLoaded(HollowConsumer.Blob transition) {
-        updatePlanDetails.successfulTransitions ++;
+        updatePlanDetails.numSuccessfulTransitions ++;
     }
 
     @Override
@@ -85,8 +85,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEnd - refreshStart);
         consecutiveFailures = 0l;
-        // reset the timer to zero to indicate a refresh happened.
-        lastRefreshTimeNanoOptional = Optional.of(refreshEnd);
+        lastRefreshTimeNanoOptional = OptionalLong.of(refreshEnd);
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
                 .setIsRefreshSuccess(true)
@@ -109,7 +108,7 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
                 .setConsecutiveFailures(consecutiveFailures)
                 .setUpdatePlanDetails(updatePlanDetails);
         if (lastRefreshTimeNanoOptional.isPresent()) {
-            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEnd - lastRefreshTimeNanoOptional.get()));
+            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEnd - lastRefreshTimeNanoOptional.getAsLong()));
         }
         ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
         refreshEndMetricsReporting(refreshMetrics);
