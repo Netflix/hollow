@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static java.util.stream.Collectors.toList;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
 import java.util.ArrayList;
@@ -59,6 +61,16 @@ public class HollowUpdatePlan implements Iterable<HollowConsumer.Blob> {
 
     public HollowConsumer.Blob getTransition(int index) {
         return transitions.get(index);
+    }
+
+    public List<HollowConsumer.Blob> getTransitions() {
+        return transitions;
+    }
+
+    public List<HollowConsumer.Blob.BlobType> getTransitionSequence() {
+        return transitions.stream()
+                .map(t -> t.getBlobType())
+                .collect(toList());
     }
 
     public long destinationVersion(long currentVersion) {

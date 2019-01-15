@@ -1,161 +1,128 @@
 package com.netflix.hollow.api.consumer.metrics;
 
+import static com.netflix.hollow.core.util.Versions.maybeVersion;
+
+import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
+import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Objects;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
-public class AbstractRefreshMetricsListener extends HollowConsumer.AbstractRefreshListener  {
+/**
+ * A class for computing Hollow Consumer refresh metrics, requires plugging in metrics reporting implementation.
+ * <p>
+ * This class computes Hollow Consumer refresh metrics by listening to refresh events. At the end of every refresh, whether
+ * the refresh succeeded or failed, the refresh metrics in {@code ConsumerRefreshMetrics} and refresh details in {@code UpdatePlanDetails}
+ * are reporte using the {@code RefreshMetricsReporting} interface. This interface makes it mandatory for concrete subclasses
+ * to implement custom metrics reporting behavior.
+ */
+public abstract class AbstractRefreshMetricsListener extends AbstractRefreshListener implements RefreshMetricsReporting {
 
-    private long consecutiveSuccesses;
+    private Optional<Long> lastRefreshTimeNanoOptional;
+    private long refreshStart;
     private long consecutiveFailures;
+    private ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
+    private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise of multiple transitions)
+                                            // is classified as snapshot, delta, or reverse delta. Note that if a snapshot
+                                            // transition is present then the overall refresh type is snapshot.
 
-    private Instant lastRefreshInstant;
-    private Instant refreshStart;
-
-    private ConsumerRefreshStatus refreshStatus;                    // success or failure
-    private ConsumerRefreshTransitionType refreshTransitionType;    // snapshot or delta transition
-    private ConsumerRefreshLoadType refreshLoadType;                // "init" indicates first successful load on consumer, "subsequent" indicates subsequent load during refresh
-
-    private long refreshLoadCount;
-
-    // Encapsulate the refresh metrics so that more metrics/properties can be added in future wihtout breaking existing clients.
-    public static class ConsumerRefreshMetrics {
-        private long refreshDurationMillis;
-        private ConsumerRefreshStatus refreshStatus;
-        private ConsumerRefreshTransitionType refreshTransitionType;
-        private ConsumerRefreshLoadType refreshLoadType;
-
-        public ConsumerRefreshMetrics(long refreshDurationMillis, ConsumerRefreshStatus refreshStatus, ConsumerRefreshTransitionType refreshTransitionType, ConsumerRefreshLoadType refreshLoadType) {
-            this.refreshDurationMillis = refreshDurationMillis;
-            this.refreshStatus = Objects.requireNonNull(refreshStatus);
-            this.refreshTransitionType = refreshTransitionType;   // Transition type can be unknown for some failed snapshot or delta transition
-            this.refreshLoadType = Objects.requireNonNull(refreshLoadType);
-        }
-
-        public long getRefreshDurationMillis() {
-            return refreshDurationMillis;
-        }
-        public ConsumerRefreshStatus getRefreshStatus() {
-            return refreshStatus;
-        }
-        public ConsumerRefreshTransitionType getRefreshTransitionType() {
-            return refreshTransitionType;
-        }
-        public ConsumerRefreshLoadType getRefreshLoadType() {
-            return refreshLoadType;
-        }
-    }
-
-    public enum ConsumerRefreshTransitionType {
-        Snapshot("snapshot"),       // refresh involved snapshot transition
-        Delta("delta");             // refresh applied a delta transition
-
-        final private String type;
-        ConsumerRefreshTransitionType(String type) {
-            this.type = type;
-        }
-    }
-
-    public enum ConsumerRefreshLoadType {
-        Init("init"),               // consumer's first-time initialized with a snapshot
-        Subsequent("subsequent");   // consumer subsequent updated with either delta or snapshot
-
-        final private String type;
-        ConsumerRefreshLoadType(String type) {
-            this.type = type;
-        }
-    }
-
-    public enum ConsumerRefreshStatus {
-        Success("success"),
-        Failure("failure");
-
-        final private String status;
-        ConsumerRefreshStatus(String status) {
-            this.status = status;
-        }
-    }
+    private UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh
 
 
     public AbstractRefreshMetricsListener() {
-        lastRefreshInstant = Instant.now(); // TODO: Is this an acceptable value for the first transition?
-        refreshLoadCount = 0l;
-        consecutiveSuccesses = 0l;
+        lastRefreshTimeNanoOptional = Optional.empty();
         consecutiveFailures = 0l;
-        refreshStatus = ConsumerRefreshStatus.Success;  // TODO: Ok to initialize as success for first refresh?
-        refreshLoadType = ConsumerRefreshLoadType.Init;
-        refreshTransitionType = null;
     }
 
     @Override
     public final void refreshStarted(long currentVersion, long requestedVersion) {
-        refreshStart = Instant.now();
-        refreshTransitionType = null;   // Don't assume snapshot or delta transition, since a failed transition might
-                                        // leave the value of this variable in an incorrect state. Hence the value is
-                                        // reset at the start of every refresh.
 
-        // TODO: If this is an init load then we can get visibility into bootstrap time
-        // if (loadType.equals(ConsumerLoadType.Init)) {
-        //
-        // }
+        refreshStart = System.nanoTime();
+        updatePlanDetails = new UpdatePlanDetails();
+
+        refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
+        refreshMetricsBuilder.setIsInitialLoad(!maybeVersion(currentVersion).isPresent());
     }
 
+    /**
+     * This method acquires details of individual transitions that comprise a larger refresh.
+     * <p>
+     * Details of transitions in a refresh such as count and type can be useful to understand consumer performance and
+     * to troubleshoot issues relating to refresh failure.
+     * </p>
+     * @param beforeVersion The version when refresh started
+     * @param afterVersion The intended version at the end of the refresh
+     * @param isSnapshotPlan Indicates whether the refresh involves a snapshot transition
+     * @param transitionSequence List of transitions comprising the refresh
+     */
     @Override
-    public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
-        Instant refreshEnd = Instant.now();
+    public final void transitionsPlanned(long beforeVersion, long afterVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
 
-        long refreshDurationMillis = Duration.between(refreshStart, refreshEnd).toMillis();
-        long timeSinceLastSuccessfulRefreshMillis = 0l;
-
-        consecutiveSuccesses ++;
-        consecutiveFailures = 0l;
-        // reset the timer to zero to indicate a refresh happened.
-        lastRefreshInstant = refreshEnd;
-        refreshStatus = ConsumerRefreshStatus.Success;
-
-        reportRefreshStats(new ConsumerRefreshMetrics(refreshDurationMillis, refreshStatus, refreshTransitionType, refreshLoadType));
-        reportTimeSinceLastSuccessfulRefresh(timeSinceLastSuccessfulRefreshMillis);
-        reportConsecutiveSuccesses(consecutiveSuccesses);
-        reportConsecutiveFailures(consecutiveFailures);
-    }
-
-    @Override
-    public final void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
-        Instant refreshEnd = Instant.now();
-
-        long refreshDurationMillis = Duration.between(refreshStart, refreshEnd).toMillis();
-        long timeSinceLastSuccessfulRefreshMillis = Duration.between(lastRefreshInstant, refreshEnd).toMillis();
-
-        consecutiveSuccesses = 0l;
-        consecutiveFailures ++;
-        refreshStatus = ConsumerRefreshStatus.Failure;
-
-        reportRefreshStats(new ConsumerRefreshMetrics(refreshDurationMillis, refreshStatus, refreshTransitionType, refreshLoadType));
-        reportTimeSinceLastSuccessfulRefresh(timeSinceLastSuccessfulRefreshMillis);
-        reportConsecutiveSuccesses(consecutiveSuccesses);
-        reportConsecutiveFailures(consecutiveFailures);
+        updatePlanDetails.beforeVersion = beforeVersion;
+        updatePlanDetails.afterVersion = afterVersion;
+        updatePlanDetails.numTransitions = transitionSequence.size();
+        updatePlanDetails.transitionSequence = transitionSequence;
+        if (isSnapshotPlan) {
+            overallRefreshType = BlobType.SNAPSHOT;
+        } else {
+            overallRefreshType = afterVersion > beforeVersion ? BlobType.DELTA : BlobType.REVERSE_DELTA;
+        }
+        refreshMetricsBuilder.setOverallRefreshType(overallRefreshType);
     }
 
     @Override
     public final void blobLoaded(HollowConsumer.Blob transition) {
-        refreshLoadCount ++;
+        updatePlanDetails.successfulTransitions ++;
+    }
 
-        if (refreshLoadCount > 1) {
-            refreshLoadType = ConsumerRefreshLoadType.Subsequent;
+    @Override
+    public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
+
+        long refreshEnd = System.nanoTime();
+
+        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEnd - refreshStart);
+        consecutiveFailures = 0l;
+        // reset the timer to zero to indicate a refresh happened.
+        lastRefreshTimeNanoOptional = Optional.of(refreshEnd);
+
+        refreshMetricsBuilder.setDurationMillis(durationMillis)
+                .setIsRefreshSuccess(true)
+                .setConsecutiveFailures(consecutiveFailures)
+                .setRefreshSuccessAgeMillisOptional(0l);
+        ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
+
+        refreshEndMetricsReporting(refreshMetrics);
+    }
+
+    @Override
+    public final void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
+
+        long refreshEnd = System.nanoTime();
+        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEnd - refreshStart);
+        consecutiveFailures ++;
+
+        refreshMetricsBuilder.setDurationMillis(durationMillis)
+                .setIsRefreshSuccess(false)
+                .setConsecutiveFailures(consecutiveFailures)
+                .setUpdatePlanDetails(updatePlanDetails);
+        if (lastRefreshTimeNanoOptional.isPresent()) {
+            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEnd - lastRefreshTimeNanoOptional.get()));
         }
+        ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
+        refreshEndMetricsReporting(refreshMetrics);
     }
 
     @Override
     public final void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        refreshTransitionType = ConsumerRefreshTransitionType.Snapshot;
+        // no-op
     }
 
     @Override
     public final void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
-        refreshTransitionType = ConsumerRefreshTransitionType.Delta;
+        // no-op
     }
 
     @Override
@@ -167,12 +134,5 @@ public class AbstractRefreshMetricsListener extends HollowConsumer.AbstractRefre
     public final void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
         // no-op
     }
-
-    // Below reporting methods can be overridden by classes for custom metric reporting behavior. This way more metrics
-    // can be added without breaking existing clients.
-    public void reportRefreshStats(ConsumerRefreshMetrics refreshStats) { }
-    public void reportTimeSinceLastSuccessfulRefresh(long timeSinceLastSuccessfulRefreshMillis) { }
-    public void reportConsecutiveSuccesses(long consecutiveSuccesses) { }
-    public void reportConsecutiveFailures(long consecutiveFailures) { }
 
 }

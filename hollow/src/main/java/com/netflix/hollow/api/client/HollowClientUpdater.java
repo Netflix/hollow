@@ -110,14 +110,19 @@ public class HollowClientUpdater {
 
         long beforeVersion = getCurrentVersionId();
 
-        for (HollowConsumer.RefreshListener listener : localListeners)
+        for (HollowConsumer.RefreshListener listener : localListeners) {
             listener.refreshStarted(beforeVersion, version);
+        }
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
                 ? planner.planInitializingUpdate(version)
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), version,
                         doubleSnapshotConfig.allowDoubleSnapshot());
+
+            for (HollowConsumer.RefreshListener listener : localListeners)
+                if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
+                    ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, version, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
 
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
                     && version != HollowConstants.VERSION_LATEST)
