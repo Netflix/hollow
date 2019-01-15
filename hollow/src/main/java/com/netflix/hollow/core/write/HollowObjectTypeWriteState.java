@@ -17,9 +17,6 @@
  */
 package com.netflix.hollow.core.write;
 
-import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readIntBits;
-import static com.netflix.hollow.core.write.HollowWriteFieldUtils.readLongBits;
-
 import com.netflix.hollow.core.memory.ByteData;
 import com.netflix.hollow.core.memory.ByteDataBuffer;
 import com.netflix.hollow.core.memory.ThreadSafeBitSet;
@@ -394,12 +391,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             readPointer += 1;
             break;
         case FLOAT:
-            long intValue = readIntBits(data, readPointer) & 0xFFFFFFFFL;
+            long intValue = data.readIntBits(readPointer) & 0xFFFFFFFFL;
             fixedLengthLongArray.setElementValue(fieldBitOffset, 32, intValue);
             readPointer += 4;
             break;
         case DOUBLE:
-            long longValue = readLongBits(data, readPointer);
+            long longValue = data.readLongBits(readPointer);
             fixedLengthLongArray.setElementValue(fieldBitOffset, 64, longValue);
             readPointer += 8;
             break;

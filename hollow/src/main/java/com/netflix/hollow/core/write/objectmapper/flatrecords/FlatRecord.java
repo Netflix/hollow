@@ -8,7 +8,6 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSchema.SchemaType;
-import com.netflix.hollow.core.write.HollowWriteFieldUtils;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
 
 /**
@@ -69,10 +68,10 @@ public class FlatRecord {
         case LONG:
             return ZigZag.decodeLong(VarInt.readVLong(data, location));
         case DOUBLE:
-            long longBits = HollowWriteFieldUtils.readLongBits(data, location);
+            long longBits = data.readLongBits(location);
             return Double.longBitsToDouble(longBits);
         case FLOAT:
-            int intBits = HollowWriteFieldUtils.readIntBits(data, location);
+            int intBits = data.readIntBits(location);
             return Float.intBitsToFloat(intBits);
         case STRING:
             int length = VarInt.readVInt(data, location);

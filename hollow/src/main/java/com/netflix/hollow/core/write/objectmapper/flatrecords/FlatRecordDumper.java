@@ -12,7 +12,6 @@ import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
-import com.netflix.hollow.core.write.HollowWriteFieldUtils;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import java.util.HashMap;
@@ -200,7 +199,7 @@ public class FlatRecordDumper {
             
             return currentRecordPointer;
         case FLOAT:
-            int intBits = HollowWriteFieldUtils.readIntBits(record.data, currentRecordPointer);
+            int intBits = record.data.readIntBits(currentRecordPointer);
             if(intBits != HollowObjectWriteRecord.NULL_FLOAT_BITS) {
                 float value = Float.intBitsToFloat(intBits);
                 if(rec != null)
@@ -209,7 +208,7 @@ public class FlatRecordDumper {
             
             return currentRecordPointer + 4;
         case DOUBLE:
-            long longBits = HollowWriteFieldUtils.readLongBits(record.data, currentRecordPointer);
+            long longBits = record.data.readLongBits(currentRecordPointer);
             if(longBits != HollowObjectWriteRecord.NULL_DOUBLE_BITS) {
                 double value = Double.longBitsToDouble(longBits);
                 if(rec != null)
