@@ -89,8 +89,8 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
     	return flatRecordWriter.write(schema, rec);
     }
 
-	private HollowSetWriteRecord copyToWriteRecord(Set<?> s, FlatRecordWriter flatRecordWriter) {
-		HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
+    private HollowSetWriteRecord copyToWriteRecord(Set<?> s, FlatRecordWriter flatRecordWriter) {
+        HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
         for(Object o : s) {
             if(o == null) {
                 throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
@@ -99,8 +99,8 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
             int hashCode = hashCodeFinder.hashCode(elementMapper.getTypeName(), ordinal, o);
             rec.addElement(ordinal, hashCode);
         }
-		return rec;
-	}
+        return rec;
+    }
 
     @Override
     protected HollowWriteRecord newWriteRecord() {

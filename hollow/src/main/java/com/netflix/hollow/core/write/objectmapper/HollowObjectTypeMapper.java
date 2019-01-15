@@ -172,17 +172,17 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         return flatRecordWriter.write(schema, rec);
     }
     
-	private HollowObjectWriteRecord copyToWriteRecord(Object obj, FlatRecordWriter flatRecordWriter) {
-		if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
+    private HollowObjectWriteRecord copyToWriteRecord(Object obj, FlatRecordWriter flatRecordWriter) {
+        if (obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
             throw new IllegalArgumentException("Attempting to write unexpected class!  Expected " + clazz + " but object was " + obj.getClass());
 
-        HollowObjectWriteRecord rec = (HollowObjectWriteRecord)writeRecord();
+        HollowObjectWriteRecord rec = (HollowObjectWriteRecord) writeRecord();
 
-        for(int i=0;i<mappedFields.size();i++) {
+        for (int i = 0; i < mappedFields.size(); i++) {
             mappedFields.get(i).copy(obj, rec, flatRecordWriter);
         }
-		return rec;
-	}
+        return rec;
+    }
     
     Object[] extractPrimaryKey(Object obj) {
         int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;

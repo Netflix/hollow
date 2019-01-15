@@ -95,33 +95,33 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
     	return flatRecordWriter.write(schema, rec);
     }
 
-	private HollowMapWriteRecord copyToWriteRecord(Map<?, ?> m, FlatRecordWriter flatRecordWriter) {
-		HollowMapWriteRecord rec = (HollowMapWriteRecord)writeRecord();
-        for(Map.Entry<?, ?>entry : m.entrySet()) {
+    private HollowMapWriteRecord copyToWriteRecord(Map<?, ?> m, FlatRecordWriter flatRecordWriter) {
+        HollowMapWriteRecord rec = (HollowMapWriteRecord) writeRecord();
+        for (Map.Entry<?, ?> entry : m.entrySet()) {
             Object key = entry.getKey();
-            if(key == null) {
+            if (key == null) {
                 throw new NullPointerException(String.format(NULL_KEY_MESSAGE, schema));
             }
             Object value = entry.getValue();
-            if(value == null) {
+            if (value == null) {
                 throw new NullPointerException(String.format(NULL_VALUE_MESSAGE, schema));
             }
-            
+
             int keyOrdinal, valueOrdinal;
-            if(flatRecordWriter == null) {
-            	keyOrdinal = keyMapper.write(key);
-            	valueOrdinal = valueMapper.write(value);
+            if (flatRecordWriter == null) {
+                keyOrdinal = keyMapper.write(key);
+                valueOrdinal = valueMapper.write(value);
             } else {
-            	keyOrdinal = keyMapper.writeFlat(key, flatRecordWriter);
-            	valueOrdinal = valueMapper.writeFlat(value, flatRecordWriter);
+                keyOrdinal = keyMapper.writeFlat(key, flatRecordWriter);
+                valueOrdinal = valueMapper.writeFlat(value, flatRecordWriter);
             }
-        	
-        	int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);
+
+            int hashCode = hashCodeFinder.hashCode(keyMapper.getTypeName(), keyOrdinal, key);
 
             rec.addEntry(keyOrdinal, valueOrdinal, hashCode);
         }
-		return rec;
-	}
+        return rec;
+    }
 
     @Override
     protected HollowWriteRecord newWriteRecord() {

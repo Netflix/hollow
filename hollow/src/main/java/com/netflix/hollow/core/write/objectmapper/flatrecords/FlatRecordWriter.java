@@ -26,132 +26,132 @@ import java.util.Map;
  * Warning: Experimental.  the FlatRecord feature is subject to breaking changes.
  */
 public class FlatRecordWriter {
-	
-	private final HollowDataset dataset;
-	private final HollowSchemaIdentifierMapper schemaIdMapper;
-	private final ByteDataBuffer buf;
-	
-	private final Map<Integer, List<RecordLocation>> recordLocationsByHashCode;
-	private final IntList recordLocationsByOrdinal;
-	
-	public FlatRecordWriter(HollowDataset dataset, HollowSchemaIdentifierMapper schemaIdMapper) {
-		this.dataset = dataset;
-		this.schemaIdMapper = schemaIdMapper;
-		this.buf = new ByteDataBuffer();
-		this.recordLocationsByOrdinal = new IntList();
-		this.recordLocationsByHashCode = new HashMap<>();
-	}
 
-	public int write(HollowSchema schema, HollowWriteRecord rec) {
-		int schemaOrdinal = schemaIdMapper.getSchemaId(schema);
-		int nextRecordOrdinal = recordLocationsByOrdinal.size(); 
-		
-		int recStart = (int)buf.length();
-		VarInt.writeVInt(buf, schemaOrdinal);
-		if(rec instanceof HollowHashableWriteRecord)
-		    ((HollowHashableWriteRecord) rec).writeDataTo(buf, HashBehavior.IGNORED_HASHES);
-		else
-		    rec.writeDataTo(buf);
-		int recLen = (int)(buf.length() - recStart);
-		
-		Integer recordHashCode = HashCodes.hashCode(buf.getUnderlyingArray(), recStart, recLen);
-		
-		List<RecordLocation> existingRecLocs = recordLocationsByHashCode.get(recordHashCode);
-		
-		if(existingRecLocs == null) {
-			RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
-			existingRecLocs = Collections.<RecordLocation>singletonList(newRecordLocation);
-			recordLocationsByHashCode.put(recordHashCode, existingRecLocs);
-			recordLocationsByOrdinal.add(recStart);
-			
-			return newRecordLocation.ordinal;
-		} else {
-			for(RecordLocation existing : existingRecLocs) {
-				if(recLen == existing.len && buf.getUnderlyingArray().rangeEquals(recStart, buf.getUnderlyingArray(), existing.start, recLen)) {
-					buf.setPosition(recStart);
-					return existing.ordinal;
-				}
-			}
-			
-			RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
-			
-			if(existingRecLocs.size() == 1) {
-				List<RecordLocation> newRecLocs = new ArrayList<>(2);
-				newRecLocs.add(existingRecLocs.get(0));
-				newRecLocs.add(newRecordLocation);
-				recordLocationsByHashCode.put(recordHashCode, newRecLocs);
-			} else {
-				existingRecLocs.add(newRecordLocation);
-			}
-			
-			return newRecordLocation.ordinal;
-		}
-	}
-	
-	public FlatRecord generateFlatRecord() {
-	    try(ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-	        writeTo(baos);
-	        ArrayByteData recordData = new ArrayByteData(baos.toByteArray());
-	        return new FlatRecord(recordData, schemaIdMapper);
-	    } catch(IOException ioe) {
-	        throw new RuntimeException(ioe);
-	    }
-	}
-	
-	public void writeTo(OutputStream os) throws IOException {
-		if(recordLocationsByOrdinal.size() < 0)
-			throw new IOException("No data to write!");
-		
-		int locationOfTopRecord = recordLocationsByOrdinal.get(recordLocationsByOrdinal.size() - 1);
-		int schemaIdOfTopRecord = VarInt.readVInt(buf.getUnderlyingArray(), locationOfTopRecord);
-		HollowSchema schemaOfTopRecord = schemaIdMapper.getSchema(schemaIdOfTopRecord);
-		
-		VarInt.writeVInt(os, locationOfTopRecord);
+    private final HollowDataset dataset;
+    private final HollowSchemaIdentifierMapper schemaIdMapper;
+    private final ByteDataBuffer buf;
 
-		int pkFieldValueLocations[] = null;
-		if(schemaOfTopRecord.getSchemaType() == SchemaType.OBJECT) {
-			PrimaryKey primaryKey = ((HollowObjectSchema)schemaOfTopRecord).getPrimaryKey();
-			if(primaryKey != null) {
-				pkFieldValueLocations = new int[primaryKey.numFields()];
-				/// encode the locations of the primary key fields
-				for(int i=0;i<primaryKey.numFields();i++) {
-					int[] fieldPathIndex = primaryKey.getFieldPathIndex(dataset, i);
-					
-					pkFieldValueLocations[i] = locatePrimaryKeyField(locationOfTopRecord, fieldPathIndex, 0);
-				}
-			}
-		}
-		
-		VarInt.writeVInt(os, (int)buf.length() - locationOfTopRecord);
-		
-		buf.getUnderlyingArray().writeTo(os, 0, buf.length());
-		
-		if(pkFieldValueLocations != null) {
-			for(int i=0;i<pkFieldValueLocations.length;i++) {
-				VarInt.writeVInt(os, pkFieldValueLocations[i]);
-			}
-		}
-	}
-	
-	private int locatePrimaryKeyField(int locationOfCurrentRecord, int[] fieldPathIndex, int idx) {
-		int schemaIdOfRecord = VarInt.readVInt(buf.getUnderlyingArray(), locationOfCurrentRecord);
-		HollowObjectSchema recordSchema = (HollowObjectSchema)schemaIdMapper.getSchema(schemaIdOfRecord);
-		locationOfCurrentRecord += VarInt.sizeOfVInt(schemaIdOfRecord);
-		
-		int fieldOffset = navigateToField(recordSchema, fieldPathIndex[idx], locationOfCurrentRecord);
-		
-		if(idx == fieldPathIndex.length - 1)
-			return fieldOffset;
-		
-		int ordinalOfNextRecord = VarInt.readVInt(buf.getUnderlyingArray(), fieldOffset);
-		int offsetOfNextRecord = recordLocationsByOrdinal.get(ordinalOfNextRecord);
-		
-		return locatePrimaryKeyField(offsetOfNextRecord, fieldPathIndex, idx+1);
-	}
-	
+    private final Map<Integer, List<RecordLocation>> recordLocationsByHashCode;
+    private final IntList recordLocationsByOrdinal;
+
+    public FlatRecordWriter(HollowDataset dataset, HollowSchemaIdentifierMapper schemaIdMapper) {
+        this.dataset = dataset;
+        this.schemaIdMapper = schemaIdMapper;
+        this.buf = new ByteDataBuffer();
+        this.recordLocationsByOrdinal = new IntList();
+        this.recordLocationsByHashCode = new HashMap<>();
+    }
+
+    public int write(HollowSchema schema, HollowWriteRecord rec) {
+        int schemaOrdinal = schemaIdMapper.getSchemaId(schema);
+        int nextRecordOrdinal = recordLocationsByOrdinal.size();
+
+        int recStart = (int) buf.length();
+        VarInt.writeVInt(buf, schemaOrdinal);
+        if (rec instanceof HollowHashableWriteRecord)
+            ((HollowHashableWriteRecord) rec).writeDataTo(buf, HashBehavior.IGNORED_HASHES);
+        else
+            rec.writeDataTo(buf);
+        int recLen = (int) (buf.length() - recStart);
+
+        Integer recordHashCode = HashCodes.hashCode(buf.getUnderlyingArray(), recStart, recLen);
+
+        List<RecordLocation> existingRecLocs = recordLocationsByHashCode.get(recordHashCode);
+
+        if (existingRecLocs == null) {
+            RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
+            existingRecLocs = Collections.<RecordLocation>singletonList(newRecordLocation);
+            recordLocationsByHashCode.put(recordHashCode, existingRecLocs);
+            recordLocationsByOrdinal.add(recStart);
+
+            return newRecordLocation.ordinal;
+        } else {
+            for (RecordLocation existing : existingRecLocs) {
+                if (recLen == existing.len && buf.getUnderlyingArray().rangeEquals(recStart, buf.getUnderlyingArray(), existing.start, recLen)) {
+                    buf.setPosition(recStart);
+                    return existing.ordinal;
+                }
+            }
+
+            RecordLocation newRecordLocation = new RecordLocation(nextRecordOrdinal, recStart, recLen);
+
+            if (existingRecLocs.size() == 1) {
+                List<RecordLocation> newRecLocs = new ArrayList<>(2);
+                newRecLocs.add(existingRecLocs.get(0));
+                newRecLocs.add(newRecordLocation);
+                recordLocationsByHashCode.put(recordHashCode, newRecLocs);
+            } else {
+                existingRecLocs.add(newRecordLocation);
+            }
+
+            return newRecordLocation.ordinal;
+        }
+    }
+
+    public FlatRecord generateFlatRecord() {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            writeTo(baos);
+            ArrayByteData recordData = new ArrayByteData(baos.toByteArray());
+            return new FlatRecord(recordData, schemaIdMapper);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    public void writeTo(OutputStream os) throws IOException {
+        if (recordLocationsByOrdinal.size() < 0)
+            throw new IOException("No data to write!");
+
+        int locationOfTopRecord = recordLocationsByOrdinal.get(recordLocationsByOrdinal.size() - 1);
+        int schemaIdOfTopRecord = VarInt.readVInt(buf.getUnderlyingArray(), locationOfTopRecord);
+        HollowSchema schemaOfTopRecord = schemaIdMapper.getSchema(schemaIdOfTopRecord);
+
+        VarInt.writeVInt(os, locationOfTopRecord);
+
+        int pkFieldValueLocations[] = null;
+        if (schemaOfTopRecord.getSchemaType() == SchemaType.OBJECT) {
+            PrimaryKey primaryKey = ((HollowObjectSchema) schemaOfTopRecord).getPrimaryKey();
+            if (primaryKey != null) {
+                pkFieldValueLocations = new int[primaryKey.numFields()];
+                /// encode the locations of the primary key fields
+                for (int i = 0; i < primaryKey.numFields(); i++) {
+                    int[] fieldPathIndex = primaryKey.getFieldPathIndex(dataset, i);
+
+                    pkFieldValueLocations[i] = locatePrimaryKeyField(locationOfTopRecord, fieldPathIndex, 0);
+                }
+            }
+        }
+
+        VarInt.writeVInt(os, (int) buf.length() - locationOfTopRecord);
+
+        buf.getUnderlyingArray().writeTo(os, 0, buf.length());
+
+        if (pkFieldValueLocations != null) {
+            for (int i = 0; i < pkFieldValueLocations.length; i++) {
+                VarInt.writeVInt(os, pkFieldValueLocations[i]);
+            }
+        }
+    }
+
+    private int locatePrimaryKeyField(int locationOfCurrentRecord, int[] fieldPathIndex, int idx) {
+        int schemaIdOfRecord = VarInt.readVInt(buf.getUnderlyingArray(), locationOfCurrentRecord);
+        HollowObjectSchema recordSchema = (HollowObjectSchema) schemaIdMapper.getSchema(schemaIdOfRecord);
+        locationOfCurrentRecord += VarInt.sizeOfVInt(schemaIdOfRecord);
+
+        int fieldOffset = navigateToField(recordSchema, fieldPathIndex[idx], locationOfCurrentRecord);
+
+        if (idx == fieldPathIndex.length - 1)
+            return fieldOffset;
+
+        int ordinalOfNextRecord = VarInt.readVInt(buf.getUnderlyingArray(), fieldOffset);
+        int offsetOfNextRecord = recordLocationsByOrdinal.get(ordinalOfNextRecord);
+
+        return locatePrimaryKeyField(offsetOfNextRecord, fieldPathIndex, idx + 1);
+    }
+
     private int navigateToField(HollowObjectSchema schema, int fieldIdx, int offset) {
-    	for(int i=0;i<fieldIdx;i++) {
-            switch(schema.getFieldType(i)) {
+        for (int i = 0; i < fieldIdx; i++) {
+            switch (schema.getFieldType(i)) {
             case INT:
             case LONG:
             case REFERENCE:
@@ -174,26 +174,25 @@ public class FlatRecordWriter {
                 break;
             }
         }
-        
+
         return offset;
     }
-	
-	
-	public void reset() {
-		buf.reset();
-		recordLocationsByHashCode.clear();
-		recordLocationsByOrdinal.clear();
-	}
-	
-	private static class RecordLocation {
-		private final int ordinal;
-		private final long start;
-		private final int len;
-		
-		public RecordLocation(int ordinal, long start, int len) {
-			this.ordinal = ordinal;
-			this.start = start;
-			this.len = len;
-		}
-	}
+
+    public void reset() {
+        buf.reset();
+        recordLocationsByHashCode.clear();
+        recordLocationsByOrdinal.clear();
+    }
+
+    private static class RecordLocation {
+        private final int ordinal;
+        private final long start;
+        private final int len;
+
+        public RecordLocation(int ordinal, long start, int len) {
+            this.ordinal = ordinal;
+            this.start = start;
+            this.len = len;
+        }
+    }
 }

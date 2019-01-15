@@ -85,22 +85,22 @@ public class HollowListTypeMapper extends HollowTypeMapper {
     	return flatRecordWriter.write(schema, rec);
     }
 
-	private HollowListWriteRecord copyToWriteRecord(List<?> l, FlatRecordWriter flatRecordWriter) {
-		HollowListWriteRecord rec = (HollowListWriteRecord)writeRecord();
-        if(ignoreListOrdering) {
+    private HollowListWriteRecord copyToWriteRecord(List<?> l, FlatRecordWriter flatRecordWriter) {
+        HollowListWriteRecord rec = (HollowListWriteRecord) writeRecord();
+        if (ignoreListOrdering) {
             IntList ordinalList = getIntList();
-            for(Object o : l) {
-                if(o == null) {
+            for (Object o : l) {
+                if (o == null) {
                     throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
                 }
                 int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
                 ordinalList.add(ordinal);
             }
             ordinalList.sort();
-            for(int i=0;i<ordinalList.size();i++)
+            for (int i = 0; i < ordinalList.size(); i++)
                 rec.addElement(ordinalList.get(i));
         } else {
-            for(Object o : l) {
+            for (Object o : l) {
                 if (o == null) {
                     throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
                 }
@@ -108,8 +108,8 @@ public class HollowListTypeMapper extends HollowTypeMapper {
                 rec.addElement(ordinal);
             }
         }
-		return rec;
-	}
+        return rec;
+    }
 
     @Override
     protected HollowWriteRecord newWriteRecord() {
