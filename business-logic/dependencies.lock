@@ -12707,7 +12707,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -12720,23 +12720,23 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "requested": "latest.release"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -13227,7 +13227,7 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.10",
+            "locked": "1.11",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -13287,7 +13287,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.6",
             "transitive": [
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
@@ -15079,7 +15079,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -15092,23 +15092,23 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "requested": "latest.release"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -15599,7 +15599,7 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.10",
+            "locked": "1.11",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -15659,7 +15659,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.6",
             "transitive": [
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
@@ -17451,7 +17451,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -17464,23 +17464,23 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "requested": "latest.release"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -17971,7 +17971,7 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.10",
+            "locked": "1.11",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -18031,7 +18031,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.6",
             "transitive": [
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
@@ -19823,7 +19823,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -19836,23 +19836,23 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-test": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "requested": "latest.release"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.0.3",
+            "locked": "4.1.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -20343,7 +20343,7 @@
             ]
         },
         "commons-codec:commons-codec": {
-            "locked": "1.10",
+            "locked": "1.11",
             "transitive": [
                 "com.google.code.typica:typica",
                 "com.netflix.astyanax:astyanax-cassandra",
@@ -20403,7 +20403,7 @@
             ]
         },
         "commons-io:commons-io": {
-            "locked": "2.4",
+            "locked": "2.6",
             "transitive": [
                 "com.netflix.hollow:hollow-ui-tools",
                 "com.netflix.pytheas:pytheas-core",
