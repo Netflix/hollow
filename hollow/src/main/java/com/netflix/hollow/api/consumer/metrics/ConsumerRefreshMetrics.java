@@ -12,6 +12,7 @@ public class ConsumerRefreshMetrics {
     private UpdatePlanDetails updatePlanDetails;    // details about the update plan such as no. and types of transitions and no. of successful transitions
     private long consecutiveFailures;
     private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
+    private long refreshEndTimeNano;                // monotonic system time when refresh ended
 
     public long getDurationMillis() {
         return durationMillis;
@@ -34,9 +35,12 @@ public class ConsumerRefreshMetrics {
     public OptionalLong getRefreshSuccessAgeMillisOptional() {
         return refreshSuccessAgeMillisOptional;
     }
+    public long getRefreshEndTimeNano() {
+        return refreshEndTimeNano;
+    }
 
     private ConsumerRefreshMetrics(long durationMillis, boolean isRefreshSuccess, boolean isInitialLoad, BlobType overallRefreshType,
-            UpdatePlanDetails updatePlanDetails, long consecutiveFailures, OptionalLong refreshSuccessAgeMillisOptional) {
+            UpdatePlanDetails updatePlanDetails, long consecutiveFailures, OptionalLong refreshSuccessAgeMillisOptional, long refreshEndTimeNano) {
         this.durationMillis = durationMillis;
         this.isRefreshSuccess = isRefreshSuccess;
         this.isInitialLoad = isInitialLoad;
@@ -44,6 +48,7 @@ public class ConsumerRefreshMetrics {
         this.updatePlanDetails = updatePlanDetails;
         this.consecutiveFailures = consecutiveFailures;
         this.refreshSuccessAgeMillisOptional = refreshSuccessAgeMillisOptional;
+        this.refreshEndTimeNano = refreshEndTimeNano;
     }
 
     public static final class Builder {
@@ -54,6 +59,7 @@ public class ConsumerRefreshMetrics {
         private UpdatePlanDetails updatePlanDetails;
         private long consecutiveFailures;
         private OptionalLong refreshSuccessAgeMillisOptional;
+        private long refreshEndTimeNano;
 
         public Builder() {
             refreshSuccessAgeMillisOptional = OptionalLong.empty();
@@ -89,10 +95,14 @@ public class ConsumerRefreshMetrics {
             this.refreshSuccessAgeMillisOptional = OptionalLong.of(refreshSuccessAgeMillis);
             return this;
         }
+        public Builder setRefreshEndTimeNano(long refreshEndTimeNano) {
+            this.refreshEndTimeNano = refreshEndTimeNano;
+            return this;
+        }
 
         public ConsumerRefreshMetrics build() {
             return new ConsumerRefreshMetrics(durationMillis, isRefreshSuccess, isInitialLoad, overallRefreshType,
-                    updatePlanDetails, consecutiveFailures, refreshSuccessAgeMillisOptional);
+                    updatePlanDetails, consecutiveFailures, refreshSuccessAgeMillisOptional, refreshEndTimeNano);
         }
     }
 }

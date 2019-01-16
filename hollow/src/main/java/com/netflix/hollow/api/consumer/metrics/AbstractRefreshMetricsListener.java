@@ -1,10 +1,10 @@
 package com.netflix.hollow.api.consumer.metrics;
 
-import static com.netflix.hollow.core.util.Versions.maybeVersion;
+import static com.netflix.hollow.core.HollowConstants.VERSION_NONE;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.AbstractRefreshListener;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
-import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractRefreshMetricsListener extends AbstractRefreshListener implements RefreshMetricsReporting {
 
     private OptionalLong lastRefreshTimeNanoOptional;
-    private long refreshStart;
+    private long refreshStartTimeNano;
     private long consecutiveFailures;
     private ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
     private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise of multiple transitions)
@@ -40,11 +40,11 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     @Override
     public final void refreshStarted(long currentVersion, long requestedVersion) {
 
-        refreshStart = System.nanoTime();
+        refreshStartTimeNano = System.nanoTime();
         updatePlanDetails = new UpdatePlanDetails();
 
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
-        refreshMetricsBuilder.setIsInitialLoad(!maybeVersion(currentVersion).isPresent());
+        refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
     }
 
     /**
@@ -81,16 +81,17 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     @Override
     public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
 
-        long refreshEnd = System.nanoTime();
+        long refreshEndTimeNano = System.nanoTime();
 
-        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEnd - refreshStart);
+        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
         consecutiveFailures = 0l;
-        lastRefreshTimeNanoOptional = OptionalLong.of(refreshEnd);
+        lastRefreshTimeNanoOptional = OptionalLong.of(refreshEndTimeNano);
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
                 .setIsRefreshSuccess(true)
                 .setConsecutiveFailures(consecutiveFailures)
-                .setRefreshSuccessAgeMillisOptional(0l);
+                .setRefreshSuccessAgeMillisOptional(0l)
+                .setRefreshEndTimeNano(refreshEndTimeNano);
         ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
 
         refreshEndMetricsReporting(refreshMetrics);
@@ -99,16 +100,17 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     @Override
     public final void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
 
-        long refreshEnd = System.nanoTime();
-        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEnd - refreshStart);
+        long  refreshEndTimeNano = System.nanoTime();
+        long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
         consecutiveFailures ++;
 
         refreshMetricsBuilder.setDurationMillis(durationMillis)
                 .setIsRefreshSuccess(false)
                 .setConsecutiveFailures(consecutiveFailures)
-                .setUpdatePlanDetails(updatePlanDetails);
+                .setUpdatePlanDetails(updatePlanDetails)
+                .setRefreshEndTimeNano(refreshEndTimeNano);
         if (lastRefreshTimeNanoOptional.isPresent()) {
-            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEnd - lastRefreshTimeNanoOptional.getAsLong()));
+            refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
         }
         ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
         refreshEndMetricsReporting(refreshMetrics);
