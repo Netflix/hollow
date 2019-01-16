@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.InMemoryBlobStore;
 import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.fs.HollowInMemoryBlobStager;
@@ -30,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -398,6 +400,51 @@ public class UniqueKeyIndexTest {
 
         public MatchOnMappedReferencesTest(String path, Class<Q> type, Q value) {
             super(path, type, value, DataModel.Consumer.MappedReferencesToValues.class);
+        }
+    }
+
+    @RunWith(Parameterized.class)
+    public static class MatchOnMappedReferencesNoAutoExpansionTest<Q extends HollowRecord> extends UniqueKeyIndexTest {
+        @Parameterized.Parameters(name = "{index}: {0}[{1} = {2}]")
+        public static Collection<Object[]> data() {
+            return Arrays.asList(
+                    args("values!", DataModel.Consumer.Values.class,
+                            () -> api.getValues(0)),
+                    args("boxes._string!", DataModel.Consumer.HString.class,
+                            () -> api.getHString(0)),
+                    args("referenceWithStrings!", DataModel.Consumer.ReferenceWithStringsRenamed.class,
+                            () -> api.getReferenceWithStringsRenamed(0)),
+                    args("referenceWithStrings._string1!", DataModel.Consumer.HString.class,
+                            () -> api.getHString(0)),
+                    args("referenceWithStrings._string2!", DataModel.Consumer.FieldOfStringRenamed.class,
+                            () -> api.getFieldOfStringRenamed(0))
+            );
+        }
+
+        static <Q extends HollowRecord> Object[] args(String path, Class<Q> type, Supplier<Q> s) {
+            return new Object[] {path, type, s};
+        }
+
+        final String path;
+        final Class<Q> type;
+        final Q value;
+
+        public MatchOnMappedReferencesNoAutoExpansionTest(String path, Class<Q> type, Supplier<Q> value) {
+            this.path = path;
+            this.type = type;
+            this.value = value.get();
+        }
+
+        @Test
+        public void test() {
+            UniqueKeyIndex<DataModel.Consumer.References, Q> uki = UniqueKeyIndex
+                    .from(consumer, DataModel.Consumer.References.class)
+                    .usingPath(path, type);
+
+            DataModel.Consumer.References r = uki.findMatch(value);
+
+            Assert.assertNotNull(r);
+            Assert.assertEquals(0, r.getOrdinal());
         }
     }
 
