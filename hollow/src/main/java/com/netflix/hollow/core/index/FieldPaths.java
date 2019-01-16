@@ -222,7 +222,7 @@ public final class FieldPaths {
                     fieldSegments);
         }
 
-        return new FieldPath<>(type, fieldSegments);
+        return new FieldPath<>(type, fieldSegments, !autoExpand);
     }
 
     /**
@@ -362,10 +362,12 @@ public final class FieldPaths {
     public final static class FieldPath<T extends FieldSegment> {
         final String rootType;
         final List<T> segments;
+        final boolean noAutoExpand;
 
-        FieldPath(String rootType, List<T> segments) {
+        FieldPath(String rootType, List<T> segments, boolean noAutoExpand) {
             this.rootType = rootType;
             this.segments = Collections.unmodifiableList(segments);
+            this.noAutoExpand = noAutoExpand;
         }
 
         /**
@@ -392,8 +394,9 @@ public final class FieldPaths {
          * @return the field path in nominal form
          */
         public String toString() {
-            return segments.stream().map(FieldPaths.FieldSegment::getName)
+            String path = segments.stream().map(FieldPaths.FieldSegment::getName)
                     .collect(joining("."));
+            return noAutoExpand ? path + "!" : path;
         }
 
         @Override public boolean equals(Object o) {
@@ -404,12 +407,13 @@ public final class FieldPaths {
                 return false;
             }
             FieldPath<?> fieldPath = (FieldPath<?>) o;
-            return Objects.equals(rootType, fieldPath.rootType) &&
-                    Objects.equals(segments, fieldPath.segments);
+            return noAutoExpand == fieldPath.noAutoExpand &&
+                    rootType.equals(fieldPath.rootType) &&
+                    segments.equals(fieldPath.segments);
         }
 
         @Override public int hashCode() {
-            return Objects.hash(rootType, segments);
+            return Objects.hash(rootType, segments, noAutoExpand);
         }
     }
 
