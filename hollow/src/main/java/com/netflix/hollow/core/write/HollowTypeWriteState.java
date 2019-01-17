@@ -308,14 +308,14 @@ public abstract class HollowTypeWriteState {
         BitSet populatedOrdinals = listener.getPopulatedOrdinals();
 
         restoredReadState = readState;
-        restoredMap = new ByteArrayOrdinalMap();
         if(schema instanceof HollowObjectSchema)
             restoredSchema = ((HollowObjectSchema)schema).findCommonSchema((HollowObjectSchema)readState.getSchema());
         else
             restoredSchema = readState.getSchema();
         HollowRecordCopier copier = HollowRecordCopier.createCopier(restoredReadState, restoredSchema);
 
-
+        // Size the restore map to avoid resizing when adding ordinals
+        restoredMap = new ByteArrayOrdinalMap(populatedOrdinals.cardinality());
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);

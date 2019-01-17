@@ -56,15 +56,39 @@ public class ByteArrayOrdinalMap {
 
     private BitSet unusedPreviousOrdinals;
 
-    private long pointersByOrdinal[];
+    private long[] pointersByOrdinal;
 
-
+    /**
+     * Creates a byte array ordinal map with a an initial capacity of 256 elements,
+     * and a load factor of 70%.
+     */
     public ByteArrayOrdinalMap() {
+        this(256);
+    }
+
+    /**
+     * Creates a byte array ordinal map with an initial capacity of a given size
+     * rounded up to the nearest power of two, and a load factor of 70%.
+     */
+    public ByteArrayOrdinalMap(int size) {
+        size = bucketSize(size);
+
         this.freeOrdinalTracker = new FreeOrdinalTracker();
         this.byteData = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
-        this.pointersAndOrdinals = emptyKeyArray(256);
-        this.sizeBeforeGrow = 179; /// 70% load factor
+        this.pointersAndOrdinals = emptyKeyArray(size);
+        this.sizeBeforeGrow = (int) (((float) size) * 0.7); /// 70% load factor
         this.size = 0;
+    }
+
+    private static int bucketSize(int x) {
+        // See Hackers Delight Fig. 3-3
+        x = x - 1;
+        x = x | (x >> 1);
+        x = x | (x >> 2);
+        x = x | (x >> 4);
+        x = x | (x >> 8);
+        x = x | (x >> 16);
+        return (x < 256) ? 256 : (x >= 1 << 30) ? 1 << 30 : x + 1;
     }
 
     public int getOrAssignOrdinal(ByteDataBuffer serializedRepresentation) {
@@ -72,31 +96,23 @@ public class ByteArrayOrdinalMap {
     }
 
     /**
-     * Add a sequence of bytes to this map.  If the sequence of bytes has already been added to this map, return the originally assigned ordinal.
-     * If the sequence of bytes has not been added to this map, assign and return a new ordinal.  This operation is thread-safe.
+     * Adds a sequence of bytes to this map.  If the sequence of bytes has previously been added
+     * to this map then its assigned ordinal is returned.
+     * If the sequence of bytes has not been added to this map then a new ordinal is assigned
+     * and returned.
+     * <p>
+     * This operation is thread-safe.
      *
-     * @param serializedRepresentation the serialized representation
-     * @param preferredOrdinal the preferred ordinal
+     * @param serializedRepresentation the sequence of bytes
+     * @param preferredOrdinal the preferred ordinal to assign, if not already assigned to
+     * another sequence of bytes and the given sequence of bytes has not previously been added
      * @return the assigned ordinal
      */
     public int getOrAssignOrdinal(ByteDataBuffer serializedRepresentation, int preferredOrdinal) {
         int hash = HashCodes.hashCode(serializedRepresentation);
 
-        int modBitmask = pointersAndOrdinals.length() - 1;
-        int bucket = hash & modBitmask;
-        long key = pointersAndOrdinals.get(bucket);
-
-        /// linear probing to resolve collisions.
-        while (key != EMPTY_BUCKET_VALUE) {
-            if (compare(serializedRepresentation, key)) {
-                return (int) (key >>> BITS_PER_POINTER);
-            }
-
-            bucket = (bucket + 1) & modBitmask;
-            key = pointersAndOrdinals.get(bucket);
-        }
-
-        return assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
+        int ordinal = get(serializedRepresentation, hash);
+        return ordinal != -1 ? ordinal : assignOrdinal(serializedRepresentation, hash, preferredOrdinal);
     }
 
     /// acquire the lock before writing.
@@ -192,9 +208,10 @@ public class ByteArrayOrdinalMap {
 
     public void recalculateFreeOrdinals() {
         BitSet populatedOrdinals = new BitSet();
+        AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pointersAndOrdinals.length(); i++) {
-            long key = pointersAndOrdinals.get(i);
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
                 populatedOrdinals.set(ordinal);
@@ -237,11 +254,15 @@ public class ByteArrayOrdinalMap {
      * @return The ordinal for this serialized representation, or -1.
      */
     public int get(ByteDataBuffer serializedRepresentation) {
-        int hash = HashCodes.hashCode(serializedRepresentation);
+        return get(serializedRepresentation, HashCodes.hashCode(serializedRepresentation));
+    }
 
-        int modBitmask = pointersAndOrdinals.length() - 1;
+    private int get(ByteDataBuffer serializedRepresentation, int hash) {
+        AtomicLongArray pao = pointersAndOrdinals;
+
+        int modBitmask = pao.length() - 1;
         int bucket = hash & modBitmask;
-        long key = pointersAndOrdinals.get(bucket);
+        long key = pao.get(bucket);
 
         /// linear probing to resolve collisions.
         while (key != EMPTY_BUCKET_VALUE) {
@@ -250,7 +271,7 @@ public class ByteArrayOrdinalMap {
             }
 
             bucket = (bucket + 1) & modBitmask;
-            key = pointersAndOrdinals.get(bucket);
+            key = pao.get(bucket);
         }
 
         return -1;
@@ -262,9 +283,10 @@ public class ByteArrayOrdinalMap {
      */
     public void prepareForWrite() {
         int maxOrdinal = 0;
+        AtomicLongArray pao = pointersAndOrdinals;
 
-        for (int i = 0; i < pointersAndOrdinals.length(); i++) {
-            long key = pointersAndOrdinals.get(i);
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
                 if (ordinal > maxOrdinal) {
@@ -273,16 +295,18 @@ public class ByteArrayOrdinalMap {
             }
         }
 
-        pointersByOrdinal = new long[maxOrdinal + 1];
-        Arrays.fill(pointersByOrdinal, -1);
+        long[] pbo = new long[maxOrdinal + 1];
+        Arrays.fill(pbo, -1);
 
-        for (int i = 0; i < pointersAndOrdinals.length(); i++) {
-            long key = pointersAndOrdinals.get(i);
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
                 int ordinal = (int) (key >>> BITS_PER_POINTER);
-                pointersByOrdinal[ordinal] = key & POINTER_MASK;
+                pbo[ordinal] = key & POINTER_MASK;
             }
         }
+
+        pointersByOrdinal = pbo;
     }
 
     /**
@@ -295,7 +319,7 @@ public class ByteArrayOrdinalMap {
      * @param usedOrdinals a bit set representing the ordinals which are currently referenced by any image.
      */
     public void compact(ThreadSafeBitSet usedOrdinals) {
-        long populatedReverseKeys[] = new long[size];
+        long[] populatedReverseKeys = new long[size];
 
         int counter = 0;
 
@@ -365,10 +389,12 @@ public class ByteArrayOrdinalMap {
 
     public int maxOrdinal() {
         int maxOrdinal = -1;
-        for (int i = 0; i < pointersAndOrdinals.length(); i++) {
-            long key = pointersAndOrdinals.get(i);
+        AtomicLongArray pao = pointersAndOrdinals;
+
+        for (int i = 0; i < pao.length(); i++) {
+            long key = pao.get(i);
             if (key != EMPTY_BUCKET_VALUE) {
-                int ordinal = (int) (pointersAndOrdinals.get(i) >>> BITS_PER_POINTER);
+                int ordinal = (int) (key >>> BITS_PER_POINTER);
                 if (ordinal > maxOrdinal) {
                     maxOrdinal = ordinal;
                 }
@@ -405,16 +431,16 @@ public class ByteArrayOrdinalMap {
      * Grow the key array.  All of the values in the current array must be re-hashed and added to the new array.
      */
     private void growKeyArray() {
-        int newSize = pointersAndOrdinals.length() * 2;
+        int newSize = pointersAndOrdinals.length() << 1;
         if (newSize < 0) {
             throw new IllegalStateException("New size computed to grow the underlying array for the map is negative. " +
                     "This is most likely due to the total number of keys added to map has exceeded the max capacity of the keys map can hold. "
                     +
                     "Current array size :" + pointersAndOrdinals.length() + " and size to grow :" + newSize);
         }
-        AtomicLongArray newKeys = emptyKeyArray(pointersAndOrdinals.length() * 2);
+        AtomicLongArray newKeys = emptyKeyArray(newSize);
 
-        long valuesToAdd[] = new long[size];
+        long[] valuesToAdd = new long[size];
 
         int counter = 0;
 
@@ -432,7 +458,7 @@ public class ByteArrayOrdinalMap {
         populateNewHashArray(newKeys, valuesToAdd);
 
         /// 70% load factor
-        sizeBeforeGrow = (int) (((float) newKeys.length()) * 0.7);
+        sizeBeforeGrow = (int) (((float) newSize) * 0.7);
         pointersAndOrdinals = newKeys;
     }
 
@@ -443,14 +469,14 @@ public class ByteArrayOrdinalMap {
     private void populateNewHashArray(AtomicLongArray newKeys, long[] valuesToAdd) {
         int modBitmask = newKeys.length() - 1;
 
-        for (int i = 0; i < valuesToAdd.length; i++) {
-            if (valuesToAdd[i] != EMPTY_BUCKET_VALUE) {
-                int hash = rehashPreviouslyAddedData(valuesToAdd[i]);
+        for (long value : valuesToAdd) {
+            if (value != EMPTY_BUCKET_VALUE) {
+                int hash = rehashPreviouslyAddedData(value);
                 int bucket = hash & modBitmask;
                 while (newKeys.get(bucket) != EMPTY_BUCKET_VALUE) {
                     bucket = (bucket + 1) & modBitmask;
                 }
-                newKeys.set(bucket, valuesToAdd[i]);
+                newKeys.set(bucket, value);
             }
         }
     }
@@ -472,8 +498,10 @@ public class ByteArrayOrdinalMap {
      */
     private AtomicLongArray emptyKeyArray(int size) {
         AtomicLongArray arr = new AtomicLongArray(size);
+        // @@@ Not a particular efficient way to initialize the contents of the array
+        // A lazy (or release store is better than a volatile store)
         for (int i = 0; i < arr.length(); i++) {
-            arr.set(i, EMPTY_BUCKET_VALUE);
+            arr.lazySet(i, EMPTY_BUCKET_VALUE);
         }
         return arr;
     }
