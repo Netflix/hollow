@@ -39,16 +39,15 @@ public class ConsumerRefreshMetrics {
         return refreshEndTimeNano;
     }
 
-    private ConsumerRefreshMetrics(long durationMillis, boolean isRefreshSuccess, boolean isInitialLoad, BlobType overallRefreshType,
-            UpdatePlanDetails updatePlanDetails, long consecutiveFailures, OptionalLong refreshSuccessAgeMillisOptional, long refreshEndTimeNano) {
-        this.durationMillis = durationMillis;
-        this.isRefreshSuccess = isRefreshSuccess;
-        this.isInitialLoad = isInitialLoad;
-        this.overallRefreshType = overallRefreshType;
-        this.updatePlanDetails = updatePlanDetails;
-        this.consecutiveFailures = consecutiveFailures;
-        this.refreshSuccessAgeMillisOptional = refreshSuccessAgeMillisOptional;
-        this.refreshEndTimeNano = refreshEndTimeNano;
+    private ConsumerRefreshMetrics(Builder builder) {
+        this.durationMillis = builder.durationMillis;
+        this.isRefreshSuccess = builder.isRefreshSuccess;
+        this.isInitialLoad = builder.isInitialLoad;
+        this.overallRefreshType = builder.overallRefreshType;
+        this.updatePlanDetails = builder.updatePlanDetails;
+        this.consecutiveFailures = builder.consecutiveFailures;
+        this.refreshSuccessAgeMillisOptional = builder.refreshSuccessAgeMillisOptional;
+        this.refreshEndTimeNano = builder.refreshEndTimeNano;
     }
 
     public static final class Builder {
@@ -77,8 +76,7 @@ public class ConsumerRefreshMetrics {
             this.isInitialLoad = isInitialLoad;
             return this;
         }
-        public Builder setOverallRefreshType(
-                BlobType overallRefreshType) {
+        public Builder setOverallRefreshType(BlobType overallRefreshType) {
             this.overallRefreshType = overallRefreshType;
             return this;
         }
@@ -101,8 +99,7 @@ public class ConsumerRefreshMetrics {
         }
 
         public ConsumerRefreshMetrics build() {
-            return new ConsumerRefreshMetrics(durationMillis, isRefreshSuccess, isInitialLoad, overallRefreshType,
-                    updatePlanDetails, consecutiveFailures, refreshSuccessAgeMillisOptional, refreshEndTimeNano);
+            return new ConsumerRefreshMetrics(this);
         }
     }
 }

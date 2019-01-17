@@ -63,7 +63,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
         updatePlanDetails.beforeVersion = beforeVersion;
         updatePlanDetails.desiredVersion = desiredVersion;
-        updatePlanDetails.numTransitions = transitionSequence.size();
         updatePlanDetails.transitionSequence = transitionSequence;
         if (isSnapshotPlan) {
             overallRefreshType = BlobType.SNAPSHOT;
