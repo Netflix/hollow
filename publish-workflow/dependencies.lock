@@ -998,7 +998,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -1301,7 +1301,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -1309,7 +1309,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -1317,13 +1317,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -2358,7 +2358,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -2720,7 +2720,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -4323,7 +4323,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -4626,7 +4626,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -4634,7 +4634,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -4642,13 +4642,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -5683,7 +5683,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -6045,7 +6045,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -7648,7 +7648,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -7951,7 +7951,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -7959,7 +7959,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -7967,13 +7967,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -9008,7 +9008,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -9370,7 +9370,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -11122,7 +11122,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -11425,7 +11425,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -11433,7 +11433,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -11441,13 +11441,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -12482,7 +12482,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -12844,7 +12844,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -14447,7 +14447,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -14750,7 +14750,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -14758,7 +14758,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -14766,13 +14766,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -15807,7 +15807,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -16169,7 +16169,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -17781,7 +17781,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -18099,7 +18099,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -18107,7 +18107,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -18115,13 +18115,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -19164,7 +19164,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -19531,7 +19531,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -21179,7 +21179,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -21497,7 +21497,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -21505,7 +21505,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -21513,13 +21513,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -22562,7 +22562,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -22929,7 +22929,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -24577,7 +24577,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -24895,7 +24895,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -24903,7 +24903,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -24911,13 +24911,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -25960,7 +25960,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -26327,7 +26327,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -27975,7 +27975,7 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "4.136.0",
+            "locked": "4.138.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -28293,7 +28293,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-common": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-legacy-schlep",
@@ -28301,7 +28301,7 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-consumer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka",
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
@@ -28309,13 +28309,13 @@
             ]
         },
         "com.netflix.nfkafka:nfkafka-legacy-schlep": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "netflix:evcache-client2"
             ]
         },
         "com.netflix.nfkafka:nfkafka-producer": {
-            "locked": "1.2.9",
+            "locked": "1.3.14",
             "transitive": [
                 "com.netflix.vms.events:vmsevents-kafka-lifecycle",
                 "netflix:evcache-client2"
@@ -29358,7 +29358,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.190.0",
+            "locked": "4.193.0",
             "transitive": [
                 "netflix:edgar_client",
                 "netflix:playback-monkey-model"
@@ -29725,7 +29725,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.149",
+            "locked": "2.150",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
