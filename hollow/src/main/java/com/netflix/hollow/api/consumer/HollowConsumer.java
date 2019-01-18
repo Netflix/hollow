@@ -837,7 +837,6 @@ public class HollowConsumer {
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
         protected HollowFilterConfig filterConfig = null;
         protected List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<>();
-        protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
@@ -845,6 +844,8 @@ public class HollowConsumer {
         protected File localBlobStoreDir = null;
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+        private Class<? extends HollowAPI> generatedAPIClass;
+        private String[] cachedTypes = new String[0];
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -884,7 +885,29 @@ public class HollowConsumer {
         public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
+            this.generatedAPIClass = generatedAPIClass;
+            return (B)this;
+        }
+
+        /**
+         * Enable caching for the specified types.
+         *
+         * When there is a type with a low cardinality, we can instantiate and cache a POJO implementation for each
+         * ordinal, which can be used by consumers in tight inner loops.  The types specified here will be cached in
+         * this way. This can only be used in conjunction with {@link #withGeneratedAPIClass(Class)}.
+         *
+         * @param cachedTypes one or more (low cardinality) types to cache as POJOs
+         * @return this builder
+         *
+         * @see <a href="https://hollow.how/advanced-topics/#caching">https://hollow.how/advanced-topics/#caching</a>
+         */
+        public B withCachedTypes(String...cachedTypes) {
+            this.cachedTypes = cachedTypes == null ? new String[0] : cachedTypes;
+            return (B)this;
+        }
+
+        public B noCachedTypes() {
+            this.cachedTypes = new String[0];
             return (B)this;
         }
 
@@ -929,6 +952,9 @@ public class HollowConsumer {
             if (blobRetriever == null && localBlobStoreDir == null)
                 throw new IllegalArgumentException("A HollowBlobRetriever or local blob store directory must be specified when building a HollowClient");
 
+            if (cachedTypes.length > 0 && generatedAPIClass == null)
+                throw new IllegalArgumentException("Must specify a generatedAPIClass when using cachedTypes");
+
             BlobRetriever blobRetriever = this.blobRetriever;
             if (localBlobStoreDir != null)
                 this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir.toPath(), blobRetriever);
@@ -945,6 +971,10 @@ public class HollowConsumer {
 
         public HollowConsumer build() {
             checkArguments();
+            final HollowAPIFactory apiFactory = generatedAPIClass == null
+                    ? HollowAPIFactory.DEFAULT_FACTORY
+                    : new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass, cachedTypes);
+
             return new HollowConsumer(blobRetriever,
                     announcementWatcher,
                     refreshListeners,
