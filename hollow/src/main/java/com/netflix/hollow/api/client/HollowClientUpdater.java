@@ -66,7 +66,9 @@ public class HollowClientUpdater {
                                HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
         this.planner = new HollowUpdatePlanner(transitionCreator, doubleSnapshotConfig);
         this.failedTransitionTracker = new FailedTransitionTracker();
-        this.staleReferenceDetector = new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector);
+        this.staleReferenceDetector = objectLongevityConfig != null && objectLongevityDetector != null
+                ? new StaleHollowReferenceDetector(objectLongevityConfig, objectLongevityDetector)
+                : null;
         // Create a copy of the listeners, removing any duplicates
         this.refreshListeners = new CopyOnWriteArrayList<>(
                 refreshListeners.stream().distinct().toArray(HollowConsumer.RefreshListener[]::new));
@@ -74,10 +76,12 @@ public class HollowClientUpdater {
         this.hashCodeFinder = hashCodeFinder;
         this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.objectLongevityConfig = objectLongevityConfig;
-        this.staleReferenceDetector.startMonitoring();
         this.metrics = metrics;
         this.metricsCollector = metricsCollector;
         this.initialLoad = new CompletableFuture<>();
+
+        if (staleReferenceDetector != null)
+            staleReferenceDetector.startMonitoring();
     }
 
     /**

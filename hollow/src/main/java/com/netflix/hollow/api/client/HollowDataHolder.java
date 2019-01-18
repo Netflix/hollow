@@ -124,7 +124,7 @@ class HollowDataHolder {
     }
 
     private void initializeAPI() {
-        if(objLongevityConfig.enableLongLivedObjectSupport()) {
+        if(objLongevityConfig != null && objLongevityConfig.enableLongLivedObjectSupport()) {
             HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
             dataAccess.setDataAccess(stateEngine);
             currentAPI = apiFactory.createAPI(dataAccess);
@@ -132,7 +132,8 @@ class HollowDataHolder {
             currentAPI = apiFactory.createAPI(stateEngine);
         }
         
-        staleReferenceDetector.newAPIHandle(currentAPI);
+        if (staleReferenceDetector != null)
+            staleReferenceDetector.newAPIHandle(currentAPI);
     }
 
     private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
@@ -145,7 +146,7 @@ class HollowDataHolder {
         try(InputStream is = blob.getInputStream()) {
             applyStateEngineTransition(is, blob, refreshListeners);
 
-            if(objLongevityConfig.enableLongLivedObjectSupport()) {
+            if(objLongevityConfig != null && objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
                 HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
                 HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
@@ -163,7 +164,7 @@ class HollowDataHolder {
                 priorHistoricalDataAccess = null;
             }
 
-            if(!staleReferenceDetector.isKnownAPIHandle(currentAPI))
+            if(staleReferenceDetector != null && !staleReferenceDetector.isKnownAPIHandle(currentAPI))
                 staleReferenceDetector.newAPIHandle(currentAPI);
             
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {

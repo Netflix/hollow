@@ -163,6 +163,25 @@ public class HollowConsumer {
             announcementWatcher.subscribeToUpdates(this);
     }
 
+    //// INCUBATING ////
+
+    protected HollowConsumer(AnnouncementWatcher announcementWatcher,
+                             HollowClientUpdater updater,
+                             Executor refreshExecutor,
+                             HollowConsumerMetrics metrics,
+                             ReadWriteLock refreshLock) {
+        /*
+         * notably different, this constructor doesn't auto-subscribe to announcement watcher
+         */
+        this.metrics = metrics;
+        this.updater = updater;
+        this.announcementWatcher = announcementWatcher;
+        this.refreshExecutor = refreshExecutor;
+        this.refreshLock = refreshLock;
+    }
+
+    //// END INCUBATING ////
+
     /**
      * Triggers a refresh to the latest version specified by the {@link HollowConsumer.AnnouncementWatcher}.
      * If already on the latest version, this operation is a no-op.
@@ -885,7 +904,6 @@ public class HollowConsumer {
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
         protected HollowFilterConfig filterConfig = null;
         protected List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<>();
-        protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
         protected HollowConsumer.ObjectLongevityConfig objectLongevityConfig = ObjectLongevityConfig.DEFAULT_CONFIG;
@@ -893,6 +911,7 @@ public class HollowConsumer {
         protected File localBlobStoreDir = null;
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
+        protected Class<? extends HollowAPI> generatedAPIClass;
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -919,20 +938,10 @@ public class HollowConsumer {
             return (B)this;
         }
 
-        /**
-         * Provide the code generated API class that extends {@link HollowAPI}.
-         *
-         * The instance returned from {@link HollowConsumer#getAPI()} will be of the provided type and can be cast
-         * to access generated methods.
-         *
-         * @param generatedAPIClass the code generated API class
-         * @return this builder
-         * @throws IllegalArgumentException if provided API class is {@code HollowAPI} instead of a subclass
-         */
         public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
             if (HollowAPI.class.equals(generatedAPIClass))
                 throw new IllegalArgumentException("must provide a code generated API class");
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
+            this.generatedAPIClass = generatedAPIClass;
             return (B)this;
         }
 
@@ -961,6 +970,7 @@ public class HollowConsumer {
             return (B)this;
         }
 
+        @Deprecated
         public B withMetricsCollector(HollowMetricsCollector<HollowConsumerMetrics> metricsCollector) {
             this.metricsCollector = metricsCollector;
             return (B)this;
@@ -992,6 +1002,10 @@ public class HollowConsumer {
 
         public HollowConsumer build() {
             checkArguments();
+            final HollowAPIFactory apiFactory = generatedAPIClass == null
+                    ? HollowAPIFactory.DEFAULT_FACTORY
+                    : new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
+
             return new HollowConsumer(blobRetriever,
                     announcementWatcher,
                     refreshListeners,
