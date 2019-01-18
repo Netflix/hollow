@@ -114,5 +114,4 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     @Override public void beginUpdate() { }
     @Override public void removedOrdinal(int ordinal) { }
     @Override public void endUpdate() { }
-
 }
