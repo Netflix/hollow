@@ -428,6 +428,21 @@ public class ByteArrayOrdinalMap {
     }
 
     /**
+     * Resize the ordinal map by increasing its capacity.
+     * <p>
+     * No action is take if the current capacity is sufficient for the given size.
+     *
+     * @param size the size to increase to, rounded up to the nearest power of two.
+     */
+    public void resize(int size) {
+        size = bucketSize(size);
+
+        if (pointersAndOrdinals.length() < size) {
+            growKeyArray(size);
+        }
+    }
+
+    /**
      * Grow the key array.  All of the values in the current array must be re-hashed and added to the new array.
      */
     private void growKeyArray() {
@@ -438,6 +453,13 @@ public class ByteArrayOrdinalMap {
                     +
                     "Current array size :" + pointersAndOrdinals.length() + " and size to grow :" + newSize);
         }
+        growKeyArray(newSize);
+    }
+
+    private void growKeyArray(int newSize) {
+        assert (newSize & (newSize - 1)) == 0; // power of 2
+        assert pointersAndOrdinals.length() < newSize;
+
         AtomicLongArray newKeys = emptyKeyArray(newSize);
 
         long[] valuesToAdd = new long[size];
@@ -455,7 +477,7 @@ public class ByteArrayOrdinalMap {
 
         Arrays.sort(valuesToAdd);
 
-        populateNewHashArray(newKeys, valuesToAdd);
+        populateNewHashArray(newKeys, valuesToAdd, counter);
 
         /// 70% load factor
         sizeBeforeGrow = (int) (((float) newSize) * 0.7);
@@ -467,9 +489,16 @@ public class ByteArrayOrdinalMap {
      * into the supplied AtomicLongArray.
      */
     private void populateNewHashArray(AtomicLongArray newKeys, long[] valuesToAdd) {
+        populateNewHashArray(newKeys, valuesToAdd, valuesToAdd.length);
+    }
+
+    private void populateNewHashArray(AtomicLongArray newKeys, long[] valuesToAdd, int length) {
+        assert length <= valuesToAdd.length;
+
         int modBitmask = newKeys.length() - 1;
 
-        for (long value : valuesToAdd) {
+        for (int i = 0; i < length; i++) {
+            long value = valuesToAdd[i];
             if (value != EMPTY_BUCKET_VALUE) {
                 int hash = rehashPreviouslyAddedData(value);
                 int bucket = hash & modBitmask;

@@ -314,8 +314,9 @@ public abstract class HollowTypeWriteState {
             restoredSchema = readState.getSchema();
         HollowRecordCopier copier = HollowRecordCopier.createCopier(restoredReadState, restoredSchema);
 
-        // Size the restore map to avoid resizing when adding ordinals
-        restoredMap = new ByteArrayOrdinalMap(populatedOrdinals.cardinality());
+        // Size the restore ordinal map to avoid resizing when adding ordinals
+        int size = populatedOrdinals.cardinality();
+        restoredMap = new ByteArrayOrdinalMap(size);
         int ordinal = populatedOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             previousCyclePopulated.set(ordinal);
@@ -323,6 +324,8 @@ public abstract class HollowTypeWriteState {
             ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
         }
 
+        // Resize the ordinal map to avoid resizing when populating
+        ordinalMap.resize(size);
         ordinalMap.reservePreviouslyPopulatedOrdinals(populatedOrdinals);
     }
 
