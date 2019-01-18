@@ -93,16 +93,16 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
     public void detach() {
         synchronized (cachedItems) {
             cachedItems.clear();
+            factory = null;
+            typeAPI = null;
+            typeReadState = null;
         }
-        factory = null;
-        typeAPI = null;
-        typeReadState = null;
     }
 
     @Override
     public void addedOrdinal(int ordinal) {
         synchronized (cachedItems) {
-            // guard against being detached (or constructed without a HollowTypeReadState
+            // guard against being detached (or constructed without a HollowTypeReadState)
             if (factory == null)
                 return;
 

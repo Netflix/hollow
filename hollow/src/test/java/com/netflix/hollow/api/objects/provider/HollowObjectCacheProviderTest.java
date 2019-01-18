@@ -20,6 +20,7 @@ package com.netflix.hollow.api.objects.provider;
 import static com.netflix.hollow.api.objects.provider.Util.memoize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import com.netflix.hollow.api.custom.HollowTypeAPI;
@@ -103,6 +104,21 @@ public class HollowObjectCacheProviderTest {
 
         assertNull(subject.get().getHollowObject(0));
         assertEquals(a, subject.get().getHollowObject(a.ordinal));
+    }
+
+    @Test
+    public void notification_afterDetaching() {
+        subject.get().detach();
+
+        // FIXME(timt): assert that this shouldn't log an error
+        notifyAdded(typeA(1));
+
+        try {
+            // asserting on the absence of side effects, in this case no gaps should have been
+            // filled with null
+            subject.get().getHollowObject(0);
+            fail("expected exception to be thrown");
+        } catch (IndexOutOfBoundsException expected) {}
     }
 
     private void prepopulate(TypeA...population) {
