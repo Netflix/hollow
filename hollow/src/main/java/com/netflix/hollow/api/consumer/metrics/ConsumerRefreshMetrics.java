@@ -1,6 +1,7 @@
 package com.netflix.hollow.api.consumer.metrics;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob.BlobType;
+import java.util.List;
 import java.util.OptionalLong;
 
 public class ConsumerRefreshMetrics {
@@ -13,6 +14,30 @@ public class ConsumerRefreshMetrics {
     private long consecutiveFailures;
     private OptionalLong refreshSuccessAgeMillisOptional; // time elapsed since the previous successful refresh
     private long refreshEndTimeNano;                // monotonic system time when refresh ended
+
+    /**
+     * A class that contains details of the consumer refresh update plan that may be useful to report as metrics or logs.
+     * These details are computed in {@code AbstractRefreshMetricsListener} during execution of the update plan.
+     */
+    public static class UpdatePlanDetails {
+        long beforeVersion;
+        long desiredVersion;
+        List<BlobType> transitionSequence;
+        int numSuccessfulTransitions;
+
+        public long getBeforeVersion() {
+            return beforeVersion;
+        }
+        public long getDesiredVersion() {
+            return desiredVersion;
+        }
+        public List<BlobType> getTransitionSequence() {
+            return transitionSequence;
+        }
+        public int getNumSuccessfulTransitions() {
+            return numSuccessfulTransitions;
+        }
+    }
 
     public long getDurationMillis() {
         return durationMillis;

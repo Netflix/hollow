@@ -24,13 +24,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
     private OptionalLong lastRefreshTimeNanoOptional;
     private long refreshStartTimeNano;
     private long consecutiveFailures;
-    private ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
     private BlobType overallRefreshType;    // Indicates whether the overall refresh (that could comprise of multiple transitions)
                                             // is classified as snapshot, delta, or reverse delta. Note that if a snapshot
                                             // transition is present then the overall refresh type is snapshot.
-
-    private UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh
-
+    private ConsumerRefreshMetrics.UpdatePlanDetails updatePlanDetails;  // Some details about the transitions comprising a refresh
+    // visible for testing
+    ConsumerRefreshMetrics.Builder refreshMetricsBuilder;
 
     public AbstractRefreshMetricsListener() {
         lastRefreshTimeNanoOptional = OptionalLong.empty();
@@ -39,12 +38,11 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public final void refreshStarted(long currentVersion, long requestedVersion) {
-
+        updatePlanDetails = new ConsumerRefreshMetrics.UpdatePlanDetails();
         refreshStartTimeNano = System.nanoTime();
-        updatePlanDetails = new UpdatePlanDetails();
-
         refreshMetricsBuilder = new ConsumerRefreshMetrics.Builder();
         refreshMetricsBuilder.setIsInitialLoad(currentVersion == VERSION_NONE);
+        refreshMetricsBuilder.setUpdatePlanDetails(updatePlanDetails);
     }
 
     /**
@@ -60,7 +58,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
      */
     @Override
     public final void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
-
         updatePlanDetails.beforeVersion = beforeVersion;
         updatePlanDetails.desiredVersion = desiredVersion;
         updatePlanDetails.transitionSequence = transitionSequence;
@@ -79,7 +76,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
-
         long refreshEndTimeNano = System.nanoTime();
 
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
@@ -98,7 +94,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
 
     @Override
     public final void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause) {
-
         long  refreshEndTimeNano = System.nanoTime();
         long durationMillis = TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - refreshStartTimeNano);
         consecutiveFailures ++;
@@ -106,7 +101,6 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         refreshMetricsBuilder.setDurationMillis(durationMillis)
                 .setIsRefreshSuccess(false)
                 .setConsecutiveFailures(consecutiveFailures)
-                .setUpdatePlanDetails(updatePlanDetails)
                 .setRefreshEndTimeNano(refreshEndTimeNano);
         if (lastRefreshTimeNanoOptional.isPresent()) {
             refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
