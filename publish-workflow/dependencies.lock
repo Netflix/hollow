@@ -130,7 +130,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -2389,29 +2388,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2485,7 +2489,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
                 "netflix:videoresolutiontypelibrary"
@@ -2601,7 +2604,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -2720,7 +2722,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -3455,7 +3457,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -5714,29 +5715,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -5810,7 +5816,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
                 "netflix:videoresolutiontypelibrary"
@@ -5926,7 +5931,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -6045,7 +6049,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -6780,7 +6784,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -9039,29 +9042,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -9135,7 +9143,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
                 "netflix:videoresolutiontypelibrary"
@@ -9251,7 +9258,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -9370,7 +9376,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -10254,7 +10260,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -12513,29 +12518,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -12609,7 +12619,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
                 "netflix:videoresolutiontypelibrary"
@@ -12725,7 +12734,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -12844,7 +12852,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -13579,7 +13587,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -15838,29 +15845,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -15934,7 +15946,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
                 "netflix:videoresolutiontypelibrary"
@@ -16050,7 +16061,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -16169,7 +16179,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -16904,7 +16914,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -19195,29 +19204,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -19291,7 +19305,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -19412,7 +19425,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -19531,7 +19543,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -20302,7 +20314,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -22593,29 +22604,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -22689,7 +22705,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -22810,7 +22825,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -22929,7 +22943,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -23700,7 +23714,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -25991,29 +26004,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -26087,7 +26105,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -26208,7 +26225,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -26327,7 +26343,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -27098,7 +27114,6 @@
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
                 "com.netflix.spectator:spectator-ext-aws",
-                "netflix:gutenberg-common",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
                 "netflix:platform-aws",
@@ -29389,29 +29404,34 @@
                 "netflix:platform-ipc"
             ]
         },
-        "netflix:gutenberg-common": {
-            "locked": "3.5.4",
+        "netflix:gutenberg-client": {
+            "locked": "4.0.1",
             "transitive": [
+                "netflix:hermes"
+            ]
+        },
+        "netflix:gutenberg-common": {
+            "locked": "4.0.1",
+            "transitive": [
+                "netflix:gutenberg-client",
                 "netflix:gutenberg-consumer-library",
                 "netflix:gutenberg-publishing-library"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "3.5.4",
+            "locked": "3.4.6",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:hermes"
+                "netflix:cinder-core"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.0.2",
+            "locked": "2.1.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -29485,7 +29505,6 @@
         "netflix:nf-archaius2-platform-bridge": {
             "locked": "1.222.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:nflibrary-junit-util",
                 "netflix:platform-chukwaClient",
                 "netflix:platform-management",
@@ -29606,7 +29625,6 @@
         "netflix:nsac-client": {
             "locked": "2.4.0",
             "transitive": [
-                "netflix:gutenberg-common",
                 "netflix:platform-aws"
             ]
         },
@@ -29725,7 +29743,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.151",
+            "locked": "2.152",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
