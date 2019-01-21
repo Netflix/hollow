@@ -91,15 +91,16 @@ public class FlatRecordWriter {
     public FlatRecord generateFlatRecord() {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             writeTo(baos);
-            ArrayByteData recordData = new ArrayByteData(baos.toByteArray());
-            return new FlatRecord(recordData, schemaIdMapper);
+            byte[] arr = baos.toByteArray();
+            ArrayByteData recordData = new ArrayByteData(arr);
+            return new FlatRecord(recordData, arr.length, schemaIdMapper);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
     }
 
     public void writeTo(OutputStream os) throws IOException {
-        if (recordLocationsByOrdinal.size() < 0)
+        if (recordLocationsByOrdinal.size() == 0)
             throw new IOException("No data to write!");
 
         int locationOfTopRecord = recordLocationsByOrdinal.get(recordLocationsByOrdinal.size() - 1);

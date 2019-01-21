@@ -41,7 +41,7 @@ public abstract class HollowTypeMapper {
 
     protected abstract int write(Object obj);
 
-	protected abstract int writeFlat(Object obj, FlatRecordWriter flatRecordWriter);
+    protected abstract int writeFlat(Object obj, FlatRecordWriter flatRecordWriter);
     
     protected abstract HollowWriteRecord newWriteRecord();
 
