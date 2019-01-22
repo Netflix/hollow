@@ -1,5 +1,5 @@
 apply plugin: 'java'
- 
+
 dependencies {
     testCompile project(":hollow-test")
     testCompile 'junit:junit:4.11'

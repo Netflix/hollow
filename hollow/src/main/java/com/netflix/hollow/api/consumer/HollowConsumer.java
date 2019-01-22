@@ -421,6 +421,7 @@ public class HollowConsumer {
 
         private final long fromVersion;
         private final long toVersion;
+        private final BlobType blobType;
 
         /**
          * Instantiate a snapshot to a specified data state version.
@@ -440,6 +441,13 @@ public class HollowConsumer {
         public Blob(long fromVersion, long toVersion) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
+
+            if (this.isSnapshot())
+                this.blobType = BlobType.SNAPSHOT;
+            else if (this.isReverseDelta())
+                this.blobType = BlobType.REVERSE_DELTA;
+            else
+                this.blobType = BlobType.DELTA;
         }
 
         /**
@@ -452,6 +460,24 @@ public class HollowConsumer {
          * @throws IOException if the input stream to the blob cannot be obtained
          */
         public abstract InputStream getInputStream() throws IOException;
+
+        /**
+         * Blobs can be of types {@code SNAPSHOT}, {@code DELTA} or {@code REVERSE_DELTA}.
+         */
+        public enum BlobType {
+            SNAPSHOT("snapshot"),
+            DELTA("delta"),
+            REVERSE_DELTA("reversedelta");
+
+            private final String type;
+            BlobType(String type) {
+                this.type = type;
+            }
+
+            public String getType() {
+                return this.type;
+            }
+        }
 
         public boolean isSnapshot() {
             return fromVersion == HollowConstants.VERSION_NONE;
@@ -471,6 +497,10 @@ public class HollowConsumer {
 
         public long getToVersion() {
             return toVersion;
+        }
+
+        public BlobType getBlobType() {
+            return blobType;
         }
     }
 
@@ -751,6 +781,18 @@ public class HollowConsumer {
          */
         void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
+        /**
+         * Called after refresh started and update plan has been initialized, but before the update plan starts executing.
+         * It is called only once per update plan (and thus only once per consumer refresh). Exposes details of the
+         * update plan.
+         * @implSpec The default implementation provided does nothing.
+         *
+         * @param beforeVersion The version when refresh started
+         * @param desiredVersion The version that the consumer refresh tries update to, even though it might not be attainable eg. HollowConstants.VERSION_LATEST
+         * @param isSnapshotPlan Indicates whether the refresh involves a snapshot transition
+         * @param transitionSequence List of transitions comprising the refresh
+         */
+        default void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {}
     }
 
     /**
@@ -781,6 +823,11 @@ public class HollowConsumer {
     public static class AbstractRefreshListener implements TransitionAwareRefreshListener {
         @Override
         public void refreshStarted(long currentVersion, long requestedVersion) {
+            // no-op
+        }
+
+        @Override
+        public void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
             // no-op
         }
 

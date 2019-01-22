@@ -20,7 +20,6 @@ package com.netflix.hollow.tools.stringifier;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.INDENT;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.NEWLINE;
 
-
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;

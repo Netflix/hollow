@@ -119,6 +119,10 @@ public class HollowClientUpdater {
                 : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), version,
                         doubleSnapshotConfig.allowDoubleSnapshot());
 
+            for (HollowConsumer.RefreshListener listener : localListeners)
+                if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
+                    ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, version, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
+
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
                     && version != HollowConstants.VERSION_LATEST)
                 throw new Exception("Could not create an update plan for version " + version);
