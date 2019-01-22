@@ -112,8 +112,12 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
                     if(entry.getKey().getType().equals(type)) {
                         int priorOrdinal = idx.getMatchingOrdinal(entry.getKey().getKey());
 
-                        if(priorOrdinal != -1)
-                            typeRecordsToRemove.set(priorOrdinal);
+                        if(priorOrdinal != -1) {
+                            if(entry.getValue() instanceof AddIfAbsent)
+                                ((AddIfAbsent)entry.getValue()).wasFound = true;
+                            else
+                                typeRecordsToRemove.set(priorOrdinal);
+                        }
                     }
                 });
             }
@@ -156,6 +160,14 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
                 
                 while(currentMutationIdx < entryList.size()) {
                     Object currentMutation = entryList.get(currentMutationIdx).getValue();
+
+                    if(currentMutation instanceof AddIfAbsent) {
+                        AddIfAbsent aia = (AddIfAbsent) currentMutation;
+                        if(aia.wasFound)
+                            currentMutation = DELETE_RECORD;
+                        else
+                            currentMutation = aia.obj;
+                    }
                     
                     if(currentMutation != DELETE_RECORD) {
                         if(currentMutation instanceof FlatRecord) {
@@ -178,5 +190,16 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         } catch(Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    static final class AddIfAbsent {
+        private final Object obj;
+        private boolean wasFound;
+        
+        public AddIfAbsent(Object obj) {
+            this.obj = obj;
+            this.wasFound = false;
+        }
+        
     }
 }
