@@ -85,31 +85,25 @@ public class HollowObjectCacheProvider<T> extends HollowObjectProvider<T> implem
 
     @Override
     public T getHollowObject(int ordinal) {
-        synchronized (cachedItems) {
-            return cachedItems.get(ordinal);
-        }
+        return cachedItems.get(ordinal);
     }
 
     public void detach() {
-        synchronized (cachedItems) {
-            cachedItems.clear();
-            factory = null;
-            typeAPI = null;
-            typeReadState = null;
-        }
+        cachedItems.clear();
+        factory = null;
+        typeAPI = null;
+        typeReadState = null;
     }
 
     @Override
     public void addedOrdinal(int ordinal) {
-        synchronized (cachedItems) {
-            // guard against being detached (or constructed without a HollowTypeReadState)
-            if (factory == null)
-                return;
+        // guard against being detached (or constructed without a HollowTypeReadState)
+        if (factory == null)
+            return;
 
-            for (int i = cachedItems.size(); i <= ordinal; ++i)
-                cachedItems.add(null);
-            cachedItems.set(ordinal, instantiateCachedObject(factory, typeReadState, typeAPI, ordinal));
-        }
+        for (int i = cachedItems.size(); i <= ordinal; ++i)
+            cachedItems.add(null);
+        cachedItems.set(ordinal, instantiateCachedObject(factory, typeReadState, typeAPI, ordinal));
     }
 
     private T instantiateCachedObject(HollowFactory<T> factory, HollowTypeDataAccess typeDataAccess, HollowTypeAPI typeAPI, int ordinal) {
