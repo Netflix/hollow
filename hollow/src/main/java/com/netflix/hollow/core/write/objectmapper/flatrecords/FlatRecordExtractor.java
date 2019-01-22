@@ -191,12 +191,7 @@ public class FlatRecordExtractor {
                 TypedOrdinal other = (TypedOrdinal) obj;
                 if (ordinal != other.ordinal)
                     return false;
-                if (type == null) {
-                    if (other.type != null)
-                        return false;
-                } else if (!type.equals(other.type))
-                    return false;
-                return true;
+                return !type.equals(other.type);
             }
         }
         
