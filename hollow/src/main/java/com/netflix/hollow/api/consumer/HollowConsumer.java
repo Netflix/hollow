@@ -36,8 +36,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -844,8 +847,8 @@ public class HollowConsumer {
         protected File localBlobStoreDir = null;
         protected Executor refreshExecutor = null;
         protected HollowMetricsCollector<HollowConsumerMetrics> metricsCollector;
-        private Class<? extends HollowAPI> generatedAPIClass;
-        private String[] cachedTypes = new String[0];
+        protected Class<? extends HollowAPI> generatedAPIClass;
+        protected String[] cachedTypes = new String[0];
 
         public B withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
             this.blobRetriever = blobRetriever;
@@ -890,23 +893,59 @@ public class HollowConsumer {
         }
 
         /**
-         * Enable caching for the specified types.
+         * Provide the code generated API class that extends {@link HollowAPI} with one or more types
+         * cached for direct field reads.
          *
-         * When there is a type with a low cardinality, we can instantiate and cache a POJO implementation for each
-         * ordinal, which can be used by consumers in tight inner loops.  The types specified here will be cached in
-         * this way. This can only be used in conjunction with {@link #withGeneratedAPIClass(Class)}.
+         * All {@HollowRecord} instances are created by one of two factories:
          *
-         * @param cachedTypes one or more (low cardinality) types to cache as POJOs
+         * <dl>
+         *     <dt>{@link com.netflix.hollow.api.objects.provider.HollowObjectFactoryProvider}</dt>
+         *     <dd>creates an instance of the corresponding {@code <Type>DelegateLookupImpl} (e.g.
+         *     {@code StringDelegateLookupImpl} or {@code MovieDelegateLookupImpl} for core
+         *     types or types in a generated client API respectively). Field accesses perform
+         *     a lookup into the underlying high-density cache</dd>
+         *
+         *     <dt>{@link com.netflix.hollow.api.objects.provider.HollowObjectCacheProvider}</dt>
+         *     <dd>instantiates and caches the corresponding {@code <Type>DelegateCachedImpl} from
+         *     the generated client API (e.g. {@code MovieDelegateCachedImpl}). For a given ordinal,
+         *     the same {@code HollowRecord} instance is returned assuming the ordinal hasn't been removed.
+         *     All of the type's fields are eagerly looked up from the high-density cache and stored as Java fields,
+         *     aking field access in tight loops or the hottest code paths more CPU efficient.</dd>
+         * </dl>
+         *
+         * Object caching should only be enabled for low cardinality, custom types in your data model.
+         *
+         * Use {@link #withGeneratedAPIClass(Class)} to build a consumer with your custom client API and
+         * using the default high-density cache for all types.
+         *
+         * @param cachedTypes one or more types to enable object caching on
          * @return this builder
          *
          * @see <a href="https://hollow.how/advanced-topics/#caching">https://hollow.how/advanced-topics/#caching</a>
          */
-        public B withCachedTypes(String...cachedTypes) {
-            this.cachedTypes = cachedTypes == null ? new String[0] : cachedTypes;
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass,
+                String cachedType, String... additionalCachedTypes) {
+            if (HollowAPI.class.equals(generatedAPIClass))
+                throw new IllegalArgumentException("must provide a code generated API class");
+            this.generatedAPIClass = Objects.requireNonNull(generatedAPIClass, "API class cannot be null");
+
+            String[] cachedTypes = new String[additionalCachedTypes.length + 1];
+            cachedTypes[0] = cachedType;
+            System.arraycopy(additionalCachedTypes, 0, cachedTypes, 1, additionalCachedTypes.length);
+
+            BitSet nulls = new BitSet(cachedTypes.length);
+            for (int i = 0; i < cachedTypes.length; ++i) {
+                if (cachedTypes[i] == null)
+                    nulls.set(i);
+            }
+            if (!nulls.isEmpty())
+                throw new NullPointerException("cached types cannot be null; argsWithNull=" + nulls.toString());
+
             return (B)this;
         }
 
-        public B noCachedTypes() {
+        public B noGeneratedAPIClass() {
+            this.generatedAPIClass = null;
             this.cachedTypes = new String[0];
             return (B)this;
         }
