@@ -1,3 +1,20 @@
+/*
+ *
+ *  Copyright 2019 Netflix, Inc.
+ *
+ *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     you may not use this file except in compliance with the License.
+ *     You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *     Unless required by applicable law or agreed to in writing, software
+ *     distributed under the License is distributed on an "AS IS" BASIS,
+ *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *     See the License for the specific language governing permissions and
+ *     limitations under the License.
+ *
+ */
 package com.netflix.hollow.core.write.objectmapper.flatrecords;
 
 import com.netflix.hollow.core.HollowDataset;
@@ -91,7 +108,8 @@ public class FlatRecordWriter {
     public FlatRecord generateFlatRecord() {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             writeTo(baos);
-            ArrayByteData recordData = new ArrayByteData(baos.toByteArray());
+            byte[] arr = baos.toByteArray();
+            ArrayByteData recordData = new ArrayByteData(arr);
             return new FlatRecord(recordData, schemaIdMapper);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
@@ -99,7 +117,7 @@ public class FlatRecordWriter {
     }
 
     public void writeTo(OutputStream os) throws IOException {
-        if (recordLocationsByOrdinal.size() < 0)
+        if (recordLocationsByOrdinal.size() == 0)
             throw new IOException("No data to write!");
 
         int locationOfTopRecord = recordLocationsByOrdinal.get(recordLocationsByOrdinal.size() - 1);
