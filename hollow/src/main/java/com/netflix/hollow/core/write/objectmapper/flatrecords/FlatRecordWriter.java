@@ -93,7 +93,7 @@ public class FlatRecordWriter {
             writeTo(baos);
             byte[] arr = baos.toByteArray();
             ArrayByteData recordData = new ArrayByteData(arr);
-            return new FlatRecord(recordData, arr.length, schemaIdMapper);
+            return new FlatRecord(recordData, schemaIdMapper);
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }

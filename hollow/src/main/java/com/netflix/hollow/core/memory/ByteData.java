@@ -49,6 +49,10 @@ public interface ByteData {
         return intBits;
     }
 
+    default long length() {
+        throw new UnsupportedOperationException();
+    }
+
     byte get(long position);
 
 }

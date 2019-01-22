@@ -36,4 +36,9 @@ public class ArrayByteData implements ByteData {
         return data[(int)position];
     }
 
+    @Override
+    public long length() {
+        return data.length;
+    }
+
 }

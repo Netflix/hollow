@@ -19,12 +19,10 @@ public class FlatRecord {
     final ByteData data;
     final int dataStartByte;
     int dataEndByte;
-    final int dataLength;
     RecordPrimaryKey recordPrimaryKey;
 
-    public FlatRecord(ByteData recordData, int dataLength, HollowSchemaIdentifierMapper schemaIdMapper) {
+    public FlatRecord(ByteData recordData, HollowSchemaIdentifierMapper schemaIdMapper) {
         this.data = recordData;
-        this.dataLength = dataLength;
         this.recordPrimaryKey = null;
         this.schemaIdMapper = schemaIdMapper;
 
@@ -61,7 +59,7 @@ public class FlatRecord {
     }
     
     public byte[] toArray() {
-        byte[] arr = new byte[dataLength];
+        byte[] arr = new byte[(int)data.length()];
         
         for(int i=0;i<arr.length;i++) {
             arr[i] = data.get(i);
