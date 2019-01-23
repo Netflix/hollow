@@ -162,6 +162,19 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         }
     }
 
+    /**
+     * Calculates the data size of a read state engine which is defined as the approximate heap footprint by iterating
+     * over the read state shards in each type state
+     * @return the heap footprint of the read state engine
+     */
+    public long calcApproxDataSize() {
+        return this.getAllTypes()
+                .stream()
+                .map(this::getTypeState)
+                .mapToLong(HollowTypeReadState::getApproximateHeapFootprintInBytes)
+                .sum();
+    }
+
     @Override
     public HollowTypeDataAccess getTypeDataAccess(String type) {
         return typeStates.get(type);

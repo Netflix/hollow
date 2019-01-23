@@ -220,7 +220,7 @@ public class HollowProducer {
      * producer's current data model).
      * <p>
      * After initialization a data model initialization event will be emitted
-     * to all registered data model initialization
+     * to all registered data model initialization listeners
      * {@link com.netflix.hollow.api.producer.listener.DataModelInitializationListener listeners}.
      *
      * @param classes the data model classes
@@ -253,7 +253,7 @@ public class HollowProducer {
      * producer's current data model).
      * <p>
      * After initialization a data model initialization event will be emitted
-     * to all registered data model initialization
+     * to all registered data model initialization listeners
      * {@link com.netflix.hollow.api.producer.listener.DataModelInitializationListener listeners}.
      *
      * @param schemas the data model classes
