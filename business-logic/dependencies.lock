@@ -1704,13 +1704,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4071,13 +4071,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6438,13 +6438,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8954,13 +8954,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11321,13 +11321,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -13699,13 +13699,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -16095,13 +16095,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -18491,13 +18491,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -20887,13 +20887,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.2.0",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
