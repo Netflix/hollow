@@ -198,38 +198,40 @@ public class FlatRecordDumper {
             
             return currentRecordPointer + 1;
         case INT:
-            if(!VarInt.readVNull(record.data, currentRecordPointer)) {
-                int value = VarInt.readVInt(record.data, currentRecordPointer);
-                currentRecordPointer += VarInt.sizeOfVInt(value);
-                if(rec != null)
-                    rec.setInt(fieldName, ZigZag.decodeInt(value));
-            }
+            if(VarInt.readVNull(record.data, currentRecordPointer))
+                return currentRecordPointer + 1;
+
+            int ivalue = VarInt.readVInt(record.data, currentRecordPointer);
+            currentRecordPointer += VarInt.sizeOfVInt(ivalue);
+            if(rec != null)
+                rec.setInt(fieldName, ZigZag.decodeInt(ivalue));
             
             return currentRecordPointer;
         case LONG:
-            if(!VarInt.readVNull(record.data, currentRecordPointer)) {
-                long value = VarInt.readVLong(record.data, currentRecordPointer);
-                currentRecordPointer += VarInt.sizeOfVLong(value);
-                if(rec != null)
-                    rec.setLong(fieldName, ZigZag.decodeLong(value));
-            }
+            if(VarInt.readVNull(record.data, currentRecordPointer))
+                return currentRecordPointer + 1;
+
+            long lvalue = VarInt.readVLong(record.data, currentRecordPointer);
+            currentRecordPointer += VarInt.sizeOfVLong(lvalue);
+            if(rec != null)
+                rec.setLong(fieldName, ZigZag.decodeLong(lvalue));
             
             return currentRecordPointer;
         case FLOAT:
             int intBits = record.data.readIntBits(currentRecordPointer);
             if(intBits != HollowObjectWriteRecord.NULL_FLOAT_BITS) {
-                float value = Float.intBitsToFloat(intBits);
+                float fvalue = Float.intBitsToFloat(intBits);
                 if(rec != null)
-                    rec.setFloat(fieldName, value);
+                    rec.setFloat(fieldName, fvalue);
             }
             
             return currentRecordPointer + 4;
         case DOUBLE:
             long longBits = record.data.readLongBits(currentRecordPointer);
             if(longBits != HollowObjectWriteRecord.NULL_DOUBLE_BITS) {
-                double value = Double.longBitsToDouble(longBits);
+                double dvalue = Double.longBitsToDouble(longBits);
                 if(rec != null)
-                    rec.setDouble(fieldName, value);
+                    rec.setDouble(fieldName, dvalue);
             }
             
             return currentRecordPointer + 8;

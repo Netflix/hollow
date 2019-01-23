@@ -171,6 +171,8 @@ public class FlatRecordWriterTests {
         TypeB a3;
         @HollowHashKey(fields="b1")
         Set<TypeB> a4;
+        @HollowInline
+        Integer nullablePrimitiveInt;
 
         public TypeA(int a1, String a2, String a3, String... b1s) {
             this.a1 = a1;
@@ -180,6 +182,7 @@ public class FlatRecordWriterTests {
             for (int i = 0; i < b1s.length; i++) {
                 this.a4.add(new TypeB(b1s[i]));
             }
+            this.nullablePrimitiveInt = null;
         }
     }
 
