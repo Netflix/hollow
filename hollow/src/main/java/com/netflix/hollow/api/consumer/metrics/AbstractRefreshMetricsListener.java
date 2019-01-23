@@ -10,6 +10,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.List;
 import java.util.OptionalLong;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class for computing Hollow Consumer refresh metrics, requires plugging in metrics reporting implementation.
@@ -20,6 +22,8 @@ import java.util.concurrent.TimeUnit;
  * to implement custom metrics reporting behavior.
  */
 public abstract class AbstractRefreshMetricsListener extends AbstractRefreshListener implements RefreshMetricsReporting {
+
+    private static final Logger log = Logger.getLogger(AbstractRefreshMetricsListener.class.getName());
 
     private OptionalLong lastRefreshTimeNanoOptional;
     private long refreshStartTimeNano;
@@ -74,6 +78,23 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         updatePlanDetails.numSuccessfulTransitions ++;
     }
 
+    /**
+     * Metrics reporting implementation is provided by the extending subclass. If exceptions are not gracefully handled
+     * in the extending subclass then an exception there can fail the consumer refresh, even though metrics reporting
+     * might not be mission critical. This method protects against that scenario by catching all exceptions, logging
+     * that there was an exception, and continuing with the consumer refresh.
+     * @param refreshMetrics Consumer refresh metrics being reported
+     */
+
+    private final void noFailRefreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
+        try {
+            refreshEndMetricsReporting(refreshMetrics);
+        } catch (Exception e) {
+            // Metric reporting is not considered critical to consumer refresh. Log exceptions and continue.
+            log.log(Level.WARNING, "Encountered an exception in reporting consumer refresh metrics, ignoring exception and continuing with consumer refresh", e);
+        }
+    }
+
     @Override
     public final void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion) {
         long refreshEndTimeNano = System.nanoTime();
@@ -87,9 +108,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
                 .setConsecutiveFailures(consecutiveFailures)
                 .setRefreshSuccessAgeMillisOptional(0l)
                 .setRefreshEndTimeNano(refreshEndTimeNano);
-        ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
 
-        refreshEndMetricsReporting(refreshMetrics);
+        noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
     }
 
     @Override
@@ -105,8 +125,8 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
         if (lastRefreshTimeNanoOptional.isPresent()) {
             refreshMetricsBuilder.setRefreshSuccessAgeMillisOptional(TimeUnit.NANOSECONDS.toMillis(refreshEndTimeNano - lastRefreshTimeNanoOptional.getAsLong()));
         }
-        ConsumerRefreshMetrics refreshMetrics = refreshMetricsBuilder.build();
-        refreshEndMetricsReporting(refreshMetrics);
+
+        noFailRefreshEndMetricsReporting(refreshMetricsBuilder.build());
     }
 
     @Override
