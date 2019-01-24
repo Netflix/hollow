@@ -20,6 +20,7 @@ package com.netflix.hollow.core.read.engine.set;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
+import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.SetMapKeyHasher;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
@@ -156,6 +157,7 @@ class HollowSetTypeReadStateShard {
     }
 
     private boolean readWasUnsafe(HollowSetTypeDataElements data) {
+        HollowUnsafeHandle.getUnsafe().loadFence();
         return data != currentDataVolatile;
     }
 

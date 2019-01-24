@@ -20,6 +20,7 @@ package com.netflix.hollow.core.read.engine.object;
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
 import com.netflix.hollow.core.memory.ByteData;
+import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.memory.encoding.ZigZag;
@@ -373,6 +374,31 @@ class HollowObjectTypeReadStateShard {
     }
 
     private boolean readWasUnsafe(HollowObjectTypeDataElements data) {
+        // Use a load (acquire) fence to constrain the compiler reordering prior plain loads so
+        // that they cannot "float down" below the volatile load of currentDataVolatile.
+        // This ensures data is checked against currentData *after* optimistic calculations
+        // have been performed on data.
+        //
+        // Note: the Java Memory Model allows for the reordering of plain loads and stores
+        // before a volatile load (those plain loads and stores can "float down" below the
+        // volatile load), but forbids the reordering of plain loads after a volatile load
+        // (those plain loads are not allowed to "float above" the volatile load).
+        // Similar reordering also applies to plain loads and stores and volatile stores.
+        // In effect the ordering of volatile loads and stores is retained and plain loads
+        // and stores can be shuffled around and grouped together, which increases
+        // optimization opportunities.
+        // This is why locks can be coarsened; plain loads and stores may enter the lock region
+        // from above (float down the acquire) or below (float above the release) but existing
+        // loads and stores may not exit (a "lock roach motel" and why there is almost universal
+        // misunderstanding of, and many misguided attempts to optimize, the infamous double
+        // checked locking idiom).
+        //
+        // Note: the fence provides stronger ordering guarantees than a corresponding non-plain
+        // load or store since the former affects all prior or subsequent loads and stores,
+        // whereas the latter is scoped to the particular load or store.
+        //
+        // For more details see http://gee.cs.oswego.edu/dl/html/j9mm.html
+        HollowUnsafeHandle.getUnsafe().loadFence();
         return data != currentDataVolatile;
     }
 

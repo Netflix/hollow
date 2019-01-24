@@ -19,6 +19,7 @@ package com.netflix.hollow.core.read.engine.list;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
 
+import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.tools.checksum.HollowChecksum;
 import java.util.BitSet;
 
@@ -89,6 +90,7 @@ class HollowListTypeReadStateShard {
     }
 
     private boolean readWasUnsafe(HollowListTypeDataElements data) {
+        HollowUnsafeHandle.getUnsafe().loadFence();
         return data != currentDataVolatile;
     }
 
