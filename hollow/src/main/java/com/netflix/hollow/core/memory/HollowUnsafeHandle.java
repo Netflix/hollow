@@ -26,17 +26,19 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class HollowUnsafeHandle {
     private static final Logger log = Logger.getLogger(HollowUnsafeHandle.class.getName());
-    private static Unsafe unsafe;
+    private static final Unsafe unsafe;
 
     static {
         Field theUnsafe;
+        Unsafe u = null;
         try {
             theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            unsafe = (Unsafe) theUnsafe.get(null);
+            u = (Unsafe) theUnsafe.get(null);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Unsafe access failed", e);
         }
+        unsafe = u;
     }
 
     public static Unsafe getUnsafe() {
