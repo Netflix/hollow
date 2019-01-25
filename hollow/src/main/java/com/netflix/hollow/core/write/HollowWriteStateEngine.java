@@ -305,8 +305,12 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
         }
         
-        if(!unrestoredStates.isEmpty())
-            throw new IllegalStateException("When state engine was restored, not all necessary states were present!  Unrestored states: " + unrestoredStates);
+        if(!unrestoredStates.isEmpty()) {
+            throw new IllegalStateException(String.format(
+                    "Current state was restored but contains unrestored state for top-level types %s. " +
+                    "Those types need to be registered with the producer (see HollowProducer.initializeDataModel)",
+                    unrestoredStates));
+        }
     }
 
     public List<HollowTypeWriteState> getOrderedTypeStates() {

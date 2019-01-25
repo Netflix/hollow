@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -117,6 +118,7 @@ public class HollowObjectMapper {
      * @see #add(Object)
      */
     public void initializeTypeState(Class<?> clazz) {
+        Objects.requireNonNull(clazz);
         getTypeMapper(clazz, null, null);
     }
 
