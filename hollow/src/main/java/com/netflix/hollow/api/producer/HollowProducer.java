@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -211,13 +212,27 @@ public class HollowProducer {
     /**
      * Initializes the data model for the given classes.
      * <p>
+     * Data model initialization is required prior to {@link #restore(long, HollowConsumer.BlobRetriever) restoring}
+     * the producer.
+     * This ensures that restoration can correctly compare the producer's current data model
+     * with the data model of the restored data state and manage any differences in those models
+     * (such as not restoring state for any types in the restoring data model not present in the
+     * producer's current data model).
+     * <p>
      * After initialization a data model initialization event will be emitted
      * to all registered data model initialization
      * {@link com.netflix.hollow.api.producer.listener.DataModelInitializationListener listeners}.
      *
      * @param classes the data model classes
+     * @throws IllegalArgumentException if {@code classes} is empty
+     * @see #restore(long, HollowConsumer.BlobRetriever)
      */
     public void initializeDataModel(Class<?>... classes) {
+        Objects.requireNonNull(classes);
+        if (classes.length == 0) {
+            throw new IllegalArgumentException("classes is empty");
+        }
+
         long start = currentTimeMillis();
         for (Class<?> c : classes) {
             objectMapper.initializeTypeState(c);
@@ -230,13 +245,27 @@ public class HollowProducer {
     /**
      * Initializes the producer data model for the given schemas.
      * <p>
+     * Data model initialization is required prior to {@link #restore(long, HollowConsumer.BlobRetriever) restoring}
+     * the producer.
+     * This ensures that restoration can correctly compare the producer's current data model
+     * with the data model of the restored data state and manage any differences in those models
+     * (such as not restoring state for any types in the restoring data model not present in the
+     * producer's current data model).
+     * <p>
      * After initialization a data model initialization event will be emitted
      * to all registered data model initialization
      * {@link com.netflix.hollow.api.producer.listener.DataModelInitializationListener listeners}.
      *
      * @param schemas the data model classes
+     * @throws IllegalArgumentException if {@code schemas} is empty
+     * @see #restore(long, HollowConsumer.BlobRetriever)
      */
     public void initializeDataModel(HollowSchema... schemas) {
+        Objects.requireNonNull(schemas);
+        if (schemas.length == 0) {
+            throw new IllegalArgumentException("classes is empty");
+        }
+
         long start = currentTimeMillis();
         HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(getWriteEngine(), Arrays.asList(schemas));
         listeners.listeners().fireProducerInit(currentTimeMillis() - start);
@@ -246,10 +275,18 @@ public class HollowProducer {
 
     /**
      * Restores the data state to a desired version.
+     * <p>
+     * Data model {@link #initializeDataModel(Class[]) initialization} is required prior to
+     * restoring the producer.  This ensures that restoration can correctly compare the producer's
+     * current data model with the data model of the restored data state and manage any differences
+     * in those models (such as not restoring state for any types in the restoring data model not
+     * present in the producer's current data model)
      *
      * @param versionDesired the desired version
      * @param blobRetriever the blob retriever
      * @return the read state of the restored state
+     * @throws IllegalStateException if the producer's data model has not been initialized
+     * @see #initializeDataModel(Class[])
      */
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever,
@@ -267,6 +304,9 @@ public class HollowProducer {
 
     private HollowProducer.ReadState restore(
             long versionDesired, HollowConsumer.BlobRetriever blobRetriever, RestoreAction restoreAction) {
+        Objects.requireNonNull(blobRetriever);
+        Objects.requireNonNull(restoreAction);
+
         if (!isInitialized) {
             throw new IllegalStateException(
                     "You must initialize the data model of a HollowProducer with producer.initializeDataModel(...) prior to restoring");
