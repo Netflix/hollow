@@ -194,6 +194,10 @@ public class CountrySpecificDataModule {
         }
 
         for (Map.Entry<Integer, MulticatalogCountryData> entry : map.entrySet()) {
+            CompleteVideoCountrySpecificData countrySpecificData = videoDataCollection.getCompleteVideoCountrySpecificData(entry.getKey());
+            if (entry.getValue().languageData != null) {
+                countrySpecificData.languageData = entry.getValue().languageData;
+            }
             mapper.add(entry.getValue());
         }
     }
