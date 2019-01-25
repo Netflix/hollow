@@ -61,7 +61,7 @@ public class FlatRecordWriterTests {
         producer.runCycle(state -> {
             FlatRecordDumper dumper = new FlatRecordDumper(state.getStateEngine());
             dumper.dump(flatten(new TypeA(1, "two", "three", "four", "five")));
-            dumper.dump(flatten(new TypeA(2, "two", "four", "six", "eight", "ten")));
+            dumper.dump(flatten(new TypeA(2, "two", "four", "six", "eight", "é with acute accent", "ten")));
             dumper.dump(flatten(new TypeC("one", "four")));
         });
 
@@ -81,9 +81,10 @@ public class FlatRecordWriterTests {
         Assert.assertEquals(2, typeA1.getInt("a1"));
         Assert.assertEquals("two", typeA1.getString("a2"));
         Assert.assertEquals("four", typeA1.getObject("a3").getString("b1"));
-        Assert.assertEquals(3, typeA1.getSet("a4").size());
+        Assert.assertEquals(4, typeA1.getSet("a4").size());
         Assert.assertTrue(typeA1.getSet("a4").findElement("six") != null);
         Assert.assertTrue(typeA1.getSet("a4").findElement("eight") != null);
+        Assert.assertTrue(typeA1.getSet("a4").findElement("é with acute accent") != null);
         Assert.assertTrue(typeA1.getSet("a4").findElement("ten") != null);
 
         GenericHollowObject typeC0 = new GenericHollowObject(consumer.getStateEngine(), "TypeC", 0);

@@ -241,9 +241,11 @@ public class FlatRecordDumper {
             
             int length = VarInt.readVInt(record.data, currentRecordPointer);
             currentRecordPointer += VarInt.sizeOfVInt(length);
-            char[] s = new char[length];
             
-            for(int i=0;i<length;i++) {
+            int cLength = VarInt.countVarIntsInRange(record.data, currentRecordPointer, length);
+            char[] s = new char[cLength];
+            
+            for(int i=0;i<cLength;i++) {
                 int charValue = VarInt.readVInt(record.data, currentRecordPointer); 
                 s[i] = (char)charValue;
                 currentRecordPointer += VarInt.sizeOfVInt(charValue);
