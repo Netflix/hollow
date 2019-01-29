@@ -18,7 +18,13 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
 
         Injector injector = InjectorBuilder.fromModules(new SunjeetsOnboardingRootModule()).createInjector();
         OnboardingItemsProducer onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
-        onboardingItemsProducer.publishData(true);
+
+        while (true) {
+            System.out.println("SNAP: Publishing,");
+            onboardingItemsProducer.publishData(true);
+            System.out.println("SNAP: Published.");
+            Thread.sleep(60*1000);
+        }
     }
 
     @Override
