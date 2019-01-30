@@ -118,6 +118,19 @@ public class StreamDataModule {
         if (streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
         }
+        
+        // Get the encoding algorithm
+        StringHollow algoHash = inputStream._getEncodingAlgorithmHash();
+        if(algoHash != null) {
+        	for(int i = 0; i < 5; i++)
+        		System.out.println("=========================");
+        	System.out.println(packages._getPackageId());
+        	System.out.println(inputStream._getDownloadableId());
+        	System.out.println(algoHash._getValue());
+        	for(int i = 0; i < 5; i++)
+        		System.out.println("=========================");
+
+        }
 
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();
