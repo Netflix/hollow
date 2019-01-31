@@ -233,8 +233,9 @@ public class HollowConsumer {
     }
 
     /**
-     * If a {@link HollowConsumer.AnnouncementWatcher} is not specified, then this method will update
-     * to the specified version.
+     * If a {@link HollowConsumer.AnnouncementWatcher} is not specified, then this method will attempt to update
+     * to the specified version, and if the specified version does not exist then to a different version as specified
+     * by functionality in the {@code BlobRetriever}.
      * <p>
      * Otherwise, an UnsupportedOperationException will be thrown.
      * <p>

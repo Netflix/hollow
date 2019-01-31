@@ -81,20 +81,24 @@ public class HollowClientUpdater {
     }
 
     /**
-     * Updates the state to the provided version
+     * Updates the client's state to the requested version, or to the version closest to but less than the requested version.
      *
-     * @param version the version to update to
-     * @return true if the update was successful
-     * @throws Throwable if the client cannot be updated
+     * @param requestedVersion the version to update the client to
+     * @return true  if the update was either successfully completed and the updated version is the same as the requested version,
+     *               or no updates were applied because the current version is the same as what the version would be after the updates were applied.
+     *         false if the update completed but the client's updated version is not the same as the requested version, likely due to
+     *               the requested version not being present in the data
+     * @throws IllegalArgumentException if no data could be retrieved for that version or any earlier versions
+     * @throws Throwable if any other exception occurred and the client could not be updated
      */
     /*
      * Note that this method is synchronized and it is the only method that modifies the
      * {@code hollowDataHolderVolatile}, so we don't need to worry about it changing out from
      * under us.
      */
-    public synchronized boolean updateTo(long version) throws Throwable {
-        if (version == getCurrentVersionId()) {
-            if (version == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
+    public synchronized boolean updateTo(long requestedVersion) throws Throwable {
+        if (requestedVersion == getCurrentVersionId()) {
+            if (requestedVersion == HollowConstants.VERSION_NONE && hollowDataHolderVolatile == null) {
                 LOG.warning("No versions to update to, initializing to empty state");
                 // attempting to refresh, but no available versions - initialize to empty state
                 hollowDataHolderVolatile = newHollowDataHolder();
@@ -111,23 +115,27 @@ public class HollowClientUpdater {
         long beforeVersion = getCurrentVersionId();
 
         for (HollowConsumer.RefreshListener listener : localListeners)
-            listener.refreshStarted(beforeVersion, version);
+            listener.refreshStarted(beforeVersion, requestedVersion);
 
         try {
             HollowUpdatePlan updatePlan = shouldCreateSnapshotPlan()
-                ? planner.planInitializingUpdate(version)
-                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), version,
+                ? planner.planInitializingUpdate(requestedVersion)
+                : planner.planUpdate(hollowDataHolderVolatile.getCurrentVersion(), requestedVersion,
                         doubleSnapshotConfig.allowDoubleSnapshot());
 
             for (HollowConsumer.RefreshListener listener : localListeners)
                 if (listener instanceof HollowConsumer.TransitionAwareRefreshListener)
-                    ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, version, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
+                    ((HollowConsumer.TransitionAwareRefreshListener)listener).transitionsPlanned(beforeVersion, requestedVersion, updatePlan.isSnapshotPlan(), updatePlan.getTransitionSequence());
 
             if (updatePlan.destinationVersion() == HollowConstants.VERSION_NONE
-                    && version != HollowConstants.VERSION_LATEST)
-                throw new Exception("Could not create an update plan for version " + version);
+                    && requestedVersion != HollowConstants.VERSION_LATEST)
+                throw new IllegalArgumentException(String.format("Could not create an update plan for version %s, because that version or any previous versions could not be retrieved.", requestedVersion));
 
-            if (updatePlan.destinationVersion(version) == getCurrentVersionId())
+            if (updatePlan.equals(HollowUpdatePlan.DO_NOTHING)
+                    && requestedVersion == HollowConstants.VERSION_LATEST)
+                throw new IllegalArgumentException("Could not create an update plan, because no existing versions could be retrieved.");
+
+            if (updatePlan.destinationVersion(requestedVersion) == getCurrentVersionId())
                 return true;
 
             if (updatePlan.isSnapshotPlan()) {
@@ -141,21 +149,21 @@ public class HollowClientUpdater {
             }
 
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
-                refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), version);
+                refreshListener.refreshSuccessful(beforeVersion, getCurrentVersionId(), requestedVersion);
 
-            metrics.updateTypeStateMetrics(getStateEngine(), version);
+            metrics.updateTypeStateMetrics(getStateEngine(), requestedVersion);
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
 
             initialLoad.complete(getCurrentVersionId()); // only set the first time
-            return getCurrentVersionId() == version;
+            return getCurrentVersionId() == requestedVersion;
         } catch(Throwable th) {
             forceDoubleSnapshotNextUpdate();
             metrics.updateRefreshFailed();
             if(metricsCollector != null)
                 metricsCollector.collect(metrics);
             for(HollowConsumer.RefreshListener refreshListener : localListeners)
-                refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), version, th);
+                refreshListener.refreshFailed(beforeVersion, getCurrentVersionId(), requestedVersion, th);
 
             // intentionally omitting a call to initialLoad.completeExceptionally(th), for producers
             // that write often a consumer has a chance to try another snapshot that might succeed
