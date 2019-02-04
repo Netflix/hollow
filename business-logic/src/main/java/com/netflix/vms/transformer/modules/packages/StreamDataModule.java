@@ -36,6 +36,7 @@ import com.netflix.vms.transformer.hollowoutput.DownloadableId;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
+import com.netflix.vms.transformer.hollowoutput.EncodingAlgorithmHash;
 import com.netflix.vms.transformer.hollowoutput.FrameRate;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.ImageSubtitleIndexByteRange;
@@ -121,16 +122,6 @@ public class StreamDataModule {
         
         // Get the encoding algorithm
         StringHollow algoHash = inputStream._getEncodingAlgorithmHash();
-        if(algoHash != null) {
-        	for(int i = 0; i < 5; i++)
-        		System.out.println("=========================");
-        	System.out.println(packages._getPackageId());
-        	System.out.println(inputStream._getDownloadableId());
-        	System.out.println(algoHash._getValue());
-        	for(int i = 0; i < 5; i++)
-        		System.out.println("=========================");
-
-        }
 
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();
@@ -145,6 +136,11 @@ public class StreamDataModule {
 
         outputStream.downloadableId = new DownloadableId(inputStream._getDownloadableId());
         outputStream.packageId = (int)packages._getPackageId();
+        
+        if(algoHash != null)
+        	outputStream.encodingAlgorithmHash = new EncodingAlgorithmHash(algoHash._getValue());
+        else
+        	outputStream.encodingAlgorithmHash = new EncodingAlgorithmHash("default");
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
         outputStream.creationTimeStampInSeconds = inputStreamIdentity._getCreatedTimeSeconds();

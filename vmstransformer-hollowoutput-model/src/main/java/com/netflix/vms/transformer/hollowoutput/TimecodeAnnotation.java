@@ -7,6 +7,7 @@ public class TimecodeAnnotation implements Cloneable {
 	public char[] type;
 	public long startMillis;
 	public long endMillis;
+	public EncodingAlgorithmHash encodingAlgorithmHash;
 	@Override
 	public int hashCode() {
 		return Objects.hash(type, startMillis, endMillis);
@@ -22,11 +23,13 @@ public class TimecodeAnnotation implements Cloneable {
 			return false;
 		TimecodeAnnotation other = (TimecodeAnnotation) obj;
 		return Objects.equals(type, other.type) && Objects.equals(startMillis, other.startMillis)
-				&& Objects.equals(endMillis, other.endMillis);
+				&& Objects.equals(endMillis, other.endMillis) && Objects.equals(encodingAlgorithmHash, other.encodingAlgorithmHash);
 	}
 	@Override
 	public String toString() {
-		return "TimecodeAnnotation [type=" + type.toString() + ", startMillis=" + startMillis + ", endMillis=" + endMillis + "]";
+		return "TimecodeAnnotation [type=" + type.toString() + 
+				", startMillis=" + startMillis + ", endMillis=" + endMillis + 
+				", encodingAlgorithmhash=" + encodingAlgorithmHash + "]";
 	}
 	
 	public TimecodeAnnotation clone() {

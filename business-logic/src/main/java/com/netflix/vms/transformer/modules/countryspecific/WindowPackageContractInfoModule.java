@@ -41,7 +41,7 @@ public class WindowPackageContractInfoModule {
         this.ctx = ctx;
         this.cupTokenFetcher = cupTokenFetcher;
         this.packageMovieDealCountryGroupIndex = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGE_MOVIE_DEAL_COUNTRY_GROUP);
-        this.packageMomentDataModule = new PackageMomentDataModule(ctx.getConfig());
+        this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
@@ -71,7 +71,7 @@ public class WindowPackageContractInfoModule {
         info.videoPackageInfo.isDefaultPackage =  packageMovieDealCountryGroupOrdinal != ORDINAL_NONE
                 && api.getPackageMovieDealCountryGroupHollow(packageMovieDealCountryGroupOrdinal)._getDefaultPackage();
 
-        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage, ctx);
+        PackageMomentData packageMomentData = packageMomentDataModule.getWindowPackageMomentData(packageData, inputPackage);
         info.videoPackageInfo.startMomentOffsetInMillis = packageMomentData.startMomentOffsetInMillis;
         info.videoPackageInfo.endMomentOffsetInMillis = packageMomentData.endMomentOffsetInMillis;
         info.videoPackageInfo.timecodes = packageMomentData.timecodes;
