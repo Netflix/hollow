@@ -193,7 +193,16 @@ public class CountrySpecificDataModule {
             }
         }
 
+        boolean addToCountrySpecificData = ctx.getConfig().isCountrySpecificLanguageDataMapEnabled();
         for (Map.Entry<Integer, MulticatalogCountryData> entry : map.entrySet()) {
+
+            // add languageDataMap to CompleteVideoCountrySpecificData based on the property.
+            if (addToCountrySpecificData && entry.getValue() != null) {
+                CompleteVideoCountrySpecificData countrySpecificData = videoDataCollection.getCompleteVideoCountrySpecificData(entry.getKey());
+                countrySpecificData.languageData = entry.getValue().languageData;
+            }
+
+            // continue adding this same data to Hollow for backwards compatibility.
             mapper.add(entry.getValue());
         }
     }

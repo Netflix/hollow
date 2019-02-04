@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.hollowoutput;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
     public List<Certification> certificationList = null;
     public SortedMapOfDateWindowToListOfInteger dateWindowWiseSeasonSequenceNumberMap = null;
     public List<VMSAvailabilityWindow> availabilityWindows = null;
+    public Map<NFLocale, MulticatalogCountryLocaleData> languageData = Collections.emptyMap();
 
     @Override
     public boolean equals(Object other) {
@@ -38,6 +40,9 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         if(o.availabilityWindows == null) {
             if(availabilityWindows != null) return false;
         } else if(!o.availabilityWindows.equals(availabilityWindows)) return false;
+        if(o.languageData == null) {
+            if(languageData != null) return false;
+        } else if(!o.languageData.equals(languageData)) return false;
         return true;
     }
 
@@ -50,6 +55,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         hashCode = hashCode * 31 + (certificationList == null ? 1237 : certificationList.hashCode());
         hashCode = hashCode * 31 + (dateWindowWiseSeasonSequenceNumberMap == null ? 1237 : dateWindowWiseSeasonSequenceNumberMap.hashCode());
         hashCode = hashCode * 31 + (availabilityWindows == null ? 1237 : availabilityWindows.hashCode());
+        hashCode = hashCode * 31 + (languageData == null ? 1237 : languageData.hashCode());
         return hashCode;
     }
 
@@ -62,6 +68,7 @@ public class CompleteVideoCountrySpecificData implements Cloneable {
         builder.append(",certificationList=").append(certificationList);
         builder.append(",dateWindowWiseSeasonSequenceNumberMap=").append(dateWindowWiseSeasonSequenceNumberMap);
         builder.append(",mediaAvailabilityWindows=").append(availabilityWindows);
+        builder.append(",langaugeData=").append(languageData);
         builder.append("}");
         return builder.toString();
     }
