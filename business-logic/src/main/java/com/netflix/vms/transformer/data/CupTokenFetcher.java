@@ -12,10 +12,6 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 
-import java.io.File;
-import java.io.PrintWriter;
-
-
 /**
  * A helper class to encapsulate extracting Cup tokens from the HollowInputAPI. Once we finish the migration from
  * Beehive cup tokens to Cinder cup tokens, this class can be removed and its functionality inlined.
