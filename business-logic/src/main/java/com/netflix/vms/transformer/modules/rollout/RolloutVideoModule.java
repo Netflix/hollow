@@ -138,6 +138,8 @@ public class RolloutVideoModule extends AbstractTransformModule {
                             phase.rawL10nAttribs.put(new Strings("POSTPLAY_OVERRIDE_MESSAGE"), new Strings(localized._getPOSTPLAY_OVERRIDE_MESSAGE()._getValue()));
                         if (localized._getPOSTPLAY_ALT() != null)
                             phase.rawL10nAttribs.put(new Strings("POSTPLAY_ALT"), new Strings(localized._getPOSTPLAY_ALT()._getValue()));
+                        if (localized._getPOSTPLAY_COMPLETION() != null)
+                            phase.rawL10nAttribs.put(new Strings("POSTPLAY_COMPLETION"), new Strings(localized._getPOSTPLAY_COMPLETION()._getValue()));
                         if (localized._getODP_OVERRIDE_MESSAGE() != null)
                             phase.rawL10nAttribs.put(new Strings("ODP_OVERRIDE_MESSAGE"), new Strings(localized._getODP_OVERRIDE_MESSAGE()._getValue()));
 
