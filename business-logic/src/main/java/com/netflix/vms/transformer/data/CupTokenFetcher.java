@@ -25,7 +25,6 @@ public class CupTokenFetcher {
     private final HollowPrimaryKeyIndex cupTokenPrimaryKeyIndex;
     private final VMSHollowInputAPI api;
     private final TransformerConfig config;
-    private PrintWriter out;
 
     public CupTokenFetcher(VMSTransformerIndexer indexer,
             VMSHollowInputAPI api, TransformerConfig config) {
@@ -36,30 +35,6 @@ public class CupTokenFetcher {
     }
     
     
-    public void createFile() {
-    	// whats the current millis
-    	Long millis = System.currentTimeMillis();
-    	String filename = "cuptokens-" + millis.toString() + ".txt";
-    	String dir = System.getProperty("java.io.tmpdir");
-    	for(int i = 0; i < 100; i++)
-    		System.out.println(dir);
-    	try {
-        	out = new PrintWriter(dir + File.separator + filename);    		
-    	} catch(Exception e) {
-    		e.printStackTrace();
-    		out = null;
-    	}
-    }
-    
-    public void closeFile() {
-    	if(out != null) {
-    		try {
-    			out.close();
-    		} catch(Exception e) {
-    			//eat it
-    		}
-    	}
-    }
     
 
     public Strings getCupToken(long videoId, ContractHollow contract) {
@@ -72,7 +47,6 @@ public class CupTokenFetcher {
         }
         long dealId = contract._getDealId();
         String token = getCupTokenStringCinder(videoId, dealId);
-        out.println(videoId + ":" + dealId + "=" + token);
         return token;
     }
     
