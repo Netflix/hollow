@@ -94,14 +94,29 @@ public class HollowUpdatePlanner {
         return deltaPlan;
     }
 
+    /**
+     * Returns an update plan that if executed will update the client to a version that is either equal to or as close to but
+     * less than the desired version as possible. This plan normally contains one snapshot transition and zero or more delta
+     * transitions but if no previous versions were found then an empty plan, {@code HollowUpdatePlan.DO_NOTHING}, is returned.
+     *
+     * @param desiredVersion The desired version to which the client wishes to update to, or update to as close to as possible but lesser than this version
+     * @return An update plan containing 1 snapshot transition and 0+ delta transitions if requested versions were found,
+     *         or an empty plan, {@code HollowUpdatePlan.DO_NOTHING}, if no previous versions were found
+     */
     private HollowUpdatePlan snapshotPlan(long desiredVersion) {
         HollowUpdatePlan plan = new HollowUpdatePlan();
-        long currentVersion = includeNearestSnapshot(plan, desiredVersion);
+        long nearestPreviousSnapshotVersion = includeNearestSnapshot(plan, desiredVersion);
 
-        if(currentVersion > desiredVersion)
+        // The includeNearestSnapshot function returns a snapshot version that is less than or equal to the desired version
+        if(nearestPreviousSnapshotVersion > desiredVersion)
             return HollowUpdatePlan.DO_NOTHING;
 
-        plan.appendPlan(deltaPlan(currentVersion, desiredVersion, Integer.MAX_VALUE));
+        // If the nearest snapshot version is {@code HollowConstants.VERSION_LATEST} then no past snapshots were found, so
+        // skip the delta planning and the update plan does nothing
+        if(nearestPreviousSnapshotVersion == HollowConstants.VERSION_LATEST)
+            return HollowUpdatePlan.DO_NOTHING;
+
+        plan.appendPlan(deltaPlan(nearestPreviousSnapshotVersion, desiredVersion, Integer.MAX_VALUE));
 
         return plan;
     }

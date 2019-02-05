@@ -37,7 +37,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.CompletableFuture;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class HollowClientUpdaterTest {
     private HollowConsumer.BlobRetriever retriever;
@@ -73,6 +75,24 @@ public class HollowClientUpdaterTest {
                 subject.shouldCreateSnapshotPlan());
         assertTrue(subject.updateTo(VERSION_NONE));
         assertTrue("Should still have no types", readStateEngine.getAllTypes().isEmpty());
+    }
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
+    @Test
+    public void testUpdateTo_updateToLatestButNoVersionsRetrieved_throwsException() throws Throwable {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Could not create an update plan, because no existing versions could be retrieved.");
+        subject.updateTo(VERSION_LATEST);
+    }
+
+    @Test
+    public void testUpdateTo_updateToArbitraryVersionButNoVersionsRetrieved_throwsException() throws Throwable {
+        long v = Long.MAX_VALUE - 1;
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage(String.format("Could not create an update plan for version %s, because that version or any previous versions could not be retrieved.", v));
+        subject.updateTo(v);
     }
 
     @Test
