@@ -61,8 +61,8 @@ public enum IndexSpec {
 
     // Merch-language-dates
     MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
-    CUP_TOKEN_BY_DEALID(HASH, "CinderCupTokenRecord", "", "movieId.value", "dealId.value"),    
-    CUP_TOKEN(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "contractId.value"),
+    CUP_TOKEN_HINDEX(HASH, "CinderCupTokenRecord", "", "movieId.value", "dealId.value"),    
+    CUP_TOKEN_PINDEX(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "dealId.value"),
     PACKAGE_MOVIE_DEAL_COUNTRY_GROUP(PRIMARY_KEY, "PackageMovieDealCountryGroup", "movieId.value", "packageId.value");
 
 
