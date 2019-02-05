@@ -239,4 +239,7 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     boolean isGrandfatherEnabled();
+
+    @DefaultValue("true")
+    boolean isCountrySpecificLanguageDataMapEnabled();
 }
