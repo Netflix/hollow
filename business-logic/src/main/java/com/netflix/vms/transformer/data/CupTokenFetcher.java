@@ -42,8 +42,7 @@ public class CupTokenFetcher {
             return CupKey.DEFAULT;
         }
         long dealId = contract._getDealId();
-        String token = getCupTokenStringCinder(videoId, dealId);
-        return token;
+        return getCupTokenStringCinder(videoId, dealId);
     }
     
 
