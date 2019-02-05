@@ -201,6 +201,8 @@ public interface TransformerConfig {
     boolean isElasticSearchNoWaitingEnabled();
 
     ///////////// TEMPORARY FEATURE-BASED //////////////////
+    @DefaultValue("false")
+    boolean useCuptokenFeedWithDealIdBasedPrimaryKey();
 
     ////////////// BUSINESS LOGIC  ////////////////////////
 
@@ -237,4 +239,7 @@ public interface TransformerConfig {
 
     @DefaultValue("false")
     boolean isGrandfatherEnabled();
+
+    @DefaultValue("true")
+    boolean isCountrySpecificLanguageDataMapEnabled();
 }

@@ -129,7 +129,7 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
-        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, api);
+        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, api, ctx.getConfig());
 
         // Grouper to group by hierarchy.
         VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
@@ -269,6 +269,7 @@ public class SimpleTransformer {
 
         long endTime = System.currentTimeMillis();
         System.out.println("Processed all videos in " + (endTime - startTime) + "ms");
+        
 
         // Check to determine whether to abort cycle due to interrupt
         ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at transform");
