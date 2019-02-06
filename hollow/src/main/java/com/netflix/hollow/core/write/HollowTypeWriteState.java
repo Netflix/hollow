@@ -241,6 +241,10 @@ public abstract class HollowTypeWriteState {
         }
     }
 
+    public void resizeOrdinalMap(int size) {
+        ordinalMap.resize(size);
+    }
+
     /**
      * Called to perform a state transition.<p>
      *
