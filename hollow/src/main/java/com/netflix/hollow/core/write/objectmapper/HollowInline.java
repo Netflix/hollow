@@ -22,7 +22,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Indicates that a field of a POJO is inlined as a value rather than
+ * a reference.
+ * <p>
+ * The field's type must a be boxed primitive type or {@code String}.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD })
+@Target( {ElementType.FIELD})
 public @interface HollowInline {
 }
