@@ -966,11 +966,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -2248,11 +2248,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -3530,11 +3530,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4961,11 +4961,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6243,11 +6243,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -7525,11 +7525,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8807,11 +8807,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -10089,11 +10089,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11371,11 +11371,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.1",
+            "locked": "4.3.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
