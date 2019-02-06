@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.schema;
 
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataInputStream;
@@ -46,6 +47,24 @@ import java.io.OutputStream;
  */
 public abstract class HollowSchema {
 
+    /**
+     * A special constant for determining if a hollow set or map schema supports a hash key
+     * for ordinal values.
+     */
+    static final String ORDINAL_HASH_KEY_FIELD_NAME = "0rdinal";
+
+    /**
+     * A special constant for determining if a hollow set or map schema supports a hash key
+     * for ordinal values.
+     */
+    static final String[] ORDINAL_HASH_KEY_FIELD_NAMES = { ORDINAL_HASH_KEY_FIELD_NAME };
+
+    /**
+     * A special constant for determining if a hollow set or map schema supports a hash key
+     * for ordinal values.
+     */
+    static final PrimaryKey ORDINAL_PRIMARY_KEY = new PrimaryKey(ORDINAL_HASH_KEY_FIELD_NAME, ORDINAL_HASH_KEY_FIELD_NAMES);
+
     private final String name;
 
     public HollowSchema(String name) {
@@ -63,15 +82,9 @@ public abstract class HollowSchema {
     public static HollowSchema withoutKeys(HollowSchema schema) {
         switch(schema.getSchemaType()) {
         case SET:
-            HollowSetSchema setSchema = (HollowSetSchema)schema;
-            if(setSchema.getHashKey() != null)
-                setSchema = new HollowSetSchema(setSchema.getName(), setSchema.getElementType());
-            return setSchema;
+            return ((HollowSetSchema)schema).withoutKeys();
         case MAP:
-            HollowMapSchema mapSchema = (HollowMapSchema)schema;
-            if(mapSchema.getHashKey() != null)
-                mapSchema = new HollowMapSchema(mapSchema.getName(), mapSchema.getKeyType(), mapSchema.getValueType());
-            return mapSchema;
+            return ((HollowMapSchema)schema).withoutKeys();
         default:
             return schema;
         }
@@ -124,13 +137,17 @@ public abstract class HollowSchema {
     private static HollowSetSchema readSetSchemaFrom(DataInputStream is, String schemaName, boolean hasHashKey) throws IOException {
         String elementType = is.readUTF();
 
-        String hashKeyFields[] = null;
+        String[] hashKeyFields = null;
 
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
-            hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
-                hashKeyFields[i] = is.readUTF();
+            if (numFields > 0) {
+                hashKeyFields = new String[numFields];
+                for (int i = 0; i < numFields; i++) {
+                    hashKeyFields[i] = is.readUTF();
+                }
+            } else {
+                hashKeyFields = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
             }
         }
 
@@ -151,9 +168,13 @@ public abstract class HollowSchema {
 
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
-            hashKeyFields = new String[numFields];
-            for(int i=0;i<numFields;i++) {
-                hashKeyFields[i] = is.readUTF();
+            if (numFields > 0) {
+                hashKeyFields = new String[numFields];
+                for (int i = 0; i < numFields; i++) {
+                    hashKeyFields[i] = is.readUTF();
+                }
+            } else {
+                hashKeyFields = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
             }
         }
 

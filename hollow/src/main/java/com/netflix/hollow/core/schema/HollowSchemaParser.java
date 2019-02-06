@@ -201,11 +201,15 @@ public class HollowSchemaParser {
             throw new IOException("Invalid Syntax: Expected '>' element type declaration: " + typeName);
 
         tok = tokenizer.nextToken();
-        String hashKeyPaths[] = parseHashKey(tokenizer);
+        String[] hashKeyPaths = parseHashKey(tokenizer);
 
         if(tokenizer.ttype != ';')
             throw new IOException("Invalid Syntax: Expected semicolon after Set schema declaration: " + typeName);
 
+
+        if (hashKeyPaths.length == 0) {
+            hashKeyPaths = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
+        }
         return new HollowSetSchema(typeName, elementType, hashKeyPaths);
     }
 
@@ -238,11 +242,14 @@ public class HollowSchemaParser {
             throw new IOException("Invalid Syntax: Expected '>' after value type declaration: " + typeName);
 
         tok = tokenizer.nextToken();
-        String hashKeyPaths[] = parseHashKey(tokenizer);
+        String[] hashKeyPaths = parseHashKey(tokenizer);
 
         if(tokenizer.ttype != ';')
             throw new IOException("Invalid Syntax: Expected semicolon after Map schema declaration: " + typeName);
 
+        if (hashKeyPaths.length == 0) {
+            hashKeyPaths = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
+        }
         return new HollowMapSchema(typeName, keyType, valueType, hashKeyPaths);
     }
 

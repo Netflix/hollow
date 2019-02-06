@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * A schema for a Map record type
@@ -44,7 +45,13 @@ public class HollowMapSchema extends HollowSchema {
         super(schemaName);
         this.keyType = keyType;
         this.valueType = valueType;
-        this.hashKey = hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0 ? null : new PrimaryKey(keyType, hashKeyFieldPaths);
+        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+            this.hashKey = null;
+        } else if (Arrays.equals(ORDINAL_HASH_KEY_FIELD_NAMES, hashKeyFieldPaths)) {
+            this.hashKey = HollowCollectionSchema.ORDINAL_PRIMARY_KEY;
+        } else {
+            this.hashKey = new PrimaryKey(keyType, hashKeyFieldPaths);
+        }
     }
 
     public String getKeyType() {
@@ -56,7 +63,7 @@ public class HollowMapSchema extends HollowSchema {
     }
 
     public PrimaryKey getHashKey() {
-        return hashKey;
+        return hashKey == ORDINAL_PRIMARY_KEY ? null : hashKey;
     }
 
     public HollowTypeReadState getKeyTypeState() {
@@ -80,6 +87,14 @@ public class HollowMapSchema extends HollowSchema {
         return SchemaType.MAP;
     }
 
+    public HollowMapSchema withoutKeys() {
+        if (hashKey == null) {
+            return this;
+        }
+
+        return new HollowMapSchema(getName(), getKeyType(), getValueType());
+    }
+
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof HollowMapSchema))
@@ -92,7 +107,7 @@ public class HollowMapSchema extends HollowSchema {
         if(!getValueType().equals(otherSchema.getValueType()))
             return false;
 
-        return isNullableObjectEquals(hashKey, otherSchema.getHashKey());
+        return isNullableObjectEquals(getHashKey(), otherSchema.getHashKey());
     }
 
     @Override
@@ -102,7 +117,7 @@ public class HollowMapSchema extends HollowSchema {
 
         if(hashKey != null) {
             builder.append(" @HashKey(");
-            if(hashKey.numFields() > 0) {
+            if(hashKey != ORDINAL_PRIMARY_KEY) {
                 builder.append(hashKey.getFieldPath(0));
                 for(int i=1;i<hashKey.numFields();i++) {
                     builder.append(", ").append(hashKey.getFieldPath(i));
@@ -119,7 +134,7 @@ public class HollowMapSchema extends HollowSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if(getHashKey() != null)
+        if(hashKey != null)
             dos.write(SchemaType.MAP.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.MAP.getTypeId());
@@ -128,12 +143,13 @@ public class HollowMapSchema extends HollowSchema {
         dos.writeUTF(getKeyType());
         dos.writeUTF(getValueType());
 
-        if(getHashKey() != null) {
+        if (hashKey == ORDINAL_PRIMARY_KEY) {
+            VarInt.writeVInt(dos, 0);
+        } else if (hashKey != null) {
             VarInt.writeVInt(dos, getHashKey().numFields());
             for(int i=0;i<getHashKey().numFields();i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));
             }
         }
     }
-
 }

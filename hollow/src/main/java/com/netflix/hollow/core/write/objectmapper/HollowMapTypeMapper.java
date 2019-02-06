@@ -53,7 +53,10 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
         
         if(hashKeyFieldPaths == null && useDefaultHashKeys && (keyMapper instanceof HollowObjectTypeMapper))
             hashKeyFieldPaths = ((HollowObjectTypeMapper)keyMapper).getDefaultElementHashKey();
-        
+
+        if (hashKeyFieldPaths != null && hashKeyFieldPaths.length == 0) {
+            hashKeyFieldPaths = ORDINAL_HASH_KEY_FIELD_NAMES;
+        }
         this.schema = new HollowMapSchema(typeName, keyMapper.getTypeName(), valueMapper.getTypeName(), hashKeyFieldPaths);
         this.hashCodeFinder = stateEngine.getHashCodeFinder();
 

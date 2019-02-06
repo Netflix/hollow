@@ -29,6 +29,11 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class HollowTypeMapper {
+    /**
+     * A special constant for determining if a hollow set or map schema supports a hash key
+     * for ordinal values.
+     */
+    static final String[] ORDINAL_HASH_KEY_FIELD_NAMES = { "0rdinal" };
 
     public static final long ASSIGNED_ORDINAL_CYCLE_MASK = 0xFFFFFFFF00000000L;
 

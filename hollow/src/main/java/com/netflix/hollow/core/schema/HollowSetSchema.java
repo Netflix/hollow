@@ -22,6 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * A schema for a Set record type.
@@ -41,7 +42,13 @@ public class HollowSetSchema extends HollowCollectionSchema {
     public HollowSetSchema(String schemaName, String elementType, String... hashKeyFieldPaths) {
         super(schemaName);
         this.elementType = elementType;
-        this.hashKey = hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0 ? null : new PrimaryKey(elementType, hashKeyFieldPaths);
+        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+            this.hashKey = null;
+        } else if (Arrays.equals(ORDINAL_HASH_KEY_FIELD_NAMES, hashKeyFieldPaths)) {
+            this.hashKey = HollowCollectionSchema.ORDINAL_PRIMARY_KEY;
+        } else {
+            this.hashKey = new PrimaryKey(elementType, hashKeyFieldPaths);
+        }
     }
 
     @Override
@@ -50,7 +57,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     }
 
     public PrimaryKey getHashKey() {
-        return hashKey;
+        return hashKey == ORDINAL_PRIMARY_KEY ? null : hashKey;
     }
 
     public void setElementTypeState(HollowTypeReadState elementTypeState) {
@@ -67,6 +74,14 @@ public class HollowSetSchema extends HollowCollectionSchema {
         return SchemaType.SET;
     }
 
+    public HollowSetSchema withoutKeys() {
+        if (hashKey == null) {
+            return this;
+        }
+
+        return new HollowSetSchema(getName(), getElementType());
+    }
+
     @Override
     public boolean equals(Object other) {
         if(!(other instanceof HollowSetSchema))
@@ -77,7 +92,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
         if(!getElementType().equals(otherSchema.getElementType()))
             return false;
 
-        return isNullableObjectEquals(hashKey, otherSchema.getHashKey());
+        return isNullableObjectEquals(getHashKey(), otherSchema.getHashKey());
     }
 
     @Override
@@ -87,7 +102,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
         if(hashKey != null) {
             builder.append(" @HashKey(");
-            if(hashKey.numFields() > 0) {
+            if(hashKey != ORDINAL_PRIMARY_KEY) {
                 builder.append(hashKey.getFieldPath(0));
                 for(int i=1;i<hashKey.numFields();i++) {
                     builder.append(", ").append(hashKey.getFieldPath(i));
@@ -104,7 +119,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if(getHashKey() != null)
+        if (hashKey != null)
             dos.write(SchemaType.SET.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.SET.getTypeId());
@@ -112,9 +127,11 @@ public class HollowSetSchema extends HollowCollectionSchema {
         dos.writeUTF(getName());
         dos.writeUTF(getElementType());
 
-        if(getHashKey() != null) {
-            VarInt.writeVInt(dos, getHashKey().numFields());
-            for(int i=0;i<getHashKey().numFields();i++) {
+        if (hashKey == ORDINAL_PRIMARY_KEY) {
+            VarInt.writeVInt(dos, 0);
+        } else if (hashKey != null) {
+            VarInt.writeVInt(dos, hashKey.numFields());
+            for (int i = 0; i < getHashKey().numFields(); i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));
             }
         }
