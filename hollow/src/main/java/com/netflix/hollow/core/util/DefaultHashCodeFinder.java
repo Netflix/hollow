@@ -21,6 +21,7 @@ import com.netflix.hollow.api.objects.HollowRecord;
 import java.util.HashSet;
 import java.util.Set;
 
+@Deprecated
 public class DefaultHashCodeFinder implements HollowObjectHashCodeFinder {
 
     public static final DefaultHashCodeFinder INSTANCE = new DefaultHashCodeFinder();

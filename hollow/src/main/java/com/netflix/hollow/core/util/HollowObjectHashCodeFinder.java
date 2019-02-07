@@ -25,7 +25,10 @@ import java.util.Set;
  * <p>
  * With this interface, in conjunction with a cooperating data ingestion mechanism, it is possible to use custom hash codes
  * in Hollow sets and maps.
+ * @deprecated Use hash key the <i>hash key</i> functionality available sets and maps
+ * @see com.netflix.hollow.core.write.objectmapper.HollowHashKey
  */
+@Deprecated
 public interface HollowObjectHashCodeFinder {
 
     String DEFINED_HASH_CODES_HEADER_NAME = "DEFINED_HASH_CODES";
