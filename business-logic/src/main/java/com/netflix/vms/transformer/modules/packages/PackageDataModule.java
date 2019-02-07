@@ -29,6 +29,8 @@ import com.netflix.vms.transformer.hollowinput.StreamBoxInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
+import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationsListHollow;
+import com.netflix.vms.transformer.hollowinput.TimecodedMomentAnnotationHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoStreamInfoHollow;
 import com.netflix.vms.transformer.hollowoutput.ChunkDurationsString;
@@ -41,11 +43,13 @@ import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
+import com.netflix.vms.transformer.hollowoutput.EncodingAlgorithmHash;
 import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.StreamData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.hollowoutput.TimecodeAnnotation;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
@@ -56,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -207,6 +212,25 @@ public class PackageDataModule {
         DrmInfoData drmInfoData = new DrmInfoData();
         drmInfoData.packageId = pkg.id;
         drmInfoData.downloadableIdToDrmInfoMap = new HashMap<>();
+        
+        // Fill in timecodes for this package
+        List<TimecodeAnnotation> timecodes = new ArrayList<>();
+        TimecodeAnnotationsListHollow inputTimecodes = packages._getTimecodeAnnotations();
+        if(inputTimecodes != null) {
+        	for(TimecodedMomentAnnotationHollow inputTimecode : inputTimecodes) {
+        		TimecodeAnnotation timecode = new TimecodeAnnotation();
+        		timecode.type = inputTimecode._getType()._getValue().toCharArray();
+        		timecode.startMillis = inputTimecode._getStartMillis();
+        		timecode.endMillis = inputTimecode._getEndMillis();
+        		StringHollow algo = inputTimecode._getEncodingAlgorithmHash();
+        		if(algo != null)
+        			timecode.encodingAlgorithmHash = new EncodingAlgorithmHash(algo._getValue());
+        		else
+        			timecode.encodingAlgorithmHash = new EncodingAlgorithmHash("default");
+        		timecodes.add(timecode);
+        	}
+        }
+        pkg.timecodes = timecodes;
 
 
         /////////// CONTRACT RESTRICTIONS /////////////////
