@@ -1723,13 +1723,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -1750,13 +1750,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -4111,13 +4111,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4138,13 +4138,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -6499,13 +6499,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6526,13 +6526,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -9036,13 +9036,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -9063,13 +9063,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -11424,13 +11424,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11451,13 +11451,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -13823,13 +13823,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -13850,13 +13850,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -16240,13 +16240,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -16267,13 +16267,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -18657,13 +18657,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -18684,13 +18684,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
@@ -21074,13 +21074,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -21101,13 +21101,13 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.1.1",
+            "locked": "4.1.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]

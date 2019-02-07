@@ -2541,7 +2541,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -2549,7 +2549,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6279,7 +6279,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -6287,7 +6287,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -10017,7 +10017,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -10025,7 +10025,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -13839,7 +13839,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -13847,7 +13847,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -19482,7 +19482,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -19490,7 +19490,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -23220,7 +23220,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -23228,7 +23228,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -26957,7 +26957,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -26965,7 +26965,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -30788,7 +30788,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -30796,7 +30796,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -34694,7 +34694,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -34702,7 +34702,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -38600,7 +38600,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -38608,7 +38608,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -42506,7 +42506,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -42514,7 +42514,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -46412,7 +46412,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -46420,7 +46420,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -50318,7 +50318,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -50326,7 +50326,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -54224,7 +54224,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -54232,7 +54232,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -58130,7 +58130,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -58138,7 +58138,7 @@
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.3.2",
+            "locked": "4.3.3",
             "transitive": [
                 "netflix:cinder-core"
             ]
