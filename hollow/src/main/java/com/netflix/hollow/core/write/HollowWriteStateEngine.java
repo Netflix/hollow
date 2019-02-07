@@ -80,6 +80,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         this(new DefaultHashCodeFinder());
     }
 
+    @Deprecated
     public HollowWriteStateEngine(HollowObjectHashCodeFinder hasher) {
         this.writeStates = new HashMap<String, HollowTypeWriteState>();
         this.hollowSchemas = new HashMap<String, HollowSchema>();
@@ -372,6 +373,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         return headerTags.get(name);
     }
 
+    @Deprecated
     public HollowObjectHashCodeFinder getHashCodeFinder() {
         return hashCodeFinder;
     }

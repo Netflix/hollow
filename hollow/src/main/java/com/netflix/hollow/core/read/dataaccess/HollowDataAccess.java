@@ -37,32 +37,33 @@ public interface HollowDataAccess extends HollowDataset {
      * @param typeName the type name
      * @return The handle to data for a specific type in this dataset.
      */
-    public HollowTypeDataAccess getTypeDataAccess(String typeName);
+    HollowTypeDataAccess getTypeDataAccess(String typeName);
 
     /**
      * @param typeName The type name
      * @param ordinal optional parameter.  When known, may provide a more optimal data access implementation for traversal of historical data access.
      * @return The handle to data for a specific type in this dataset.
      */
-    public HollowTypeDataAccess getTypeDataAccess(String typeName, int ordinal);
+    HollowTypeDataAccess getTypeDataAccess(String typeName, int ordinal);
 
     /**
      * @return The names of all types in this dataset
      */
-    public Collection<String> getAllTypes();
+    Collection<String> getAllTypes();
     
     @Override
-    public List<HollowSchema> getSchemas();
+    List<HollowSchema> getSchemas();
     
     @Override
-    public HollowSchema getSchema(String name);
+    HollowSchema getSchema(String name);
 
-    public HollowObjectHashCodeFinder getHashCodeFinder();
+    @Deprecated
+    HollowObjectHashCodeFinder getHashCodeFinder();
 
-    public MissingDataHandler getMissingDataHandler();
+    MissingDataHandler getMissingDataHandler();
 
-    public void resetSampling();
+    void resetSampling();
 
-    public boolean hasSampleResults();
+    boolean hasSampleResults();
 
 }

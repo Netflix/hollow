@@ -59,9 +59,6 @@ import java.util.Collections;
  *      <dd>Defines how to create a {@link HollowAPI} for the dataset, useful when wrapping a dataset with an api which has 
  *          been generated (via the {@link HollowAPIClassJavaGenerator})</dd>
  *          
- *      <dt>{@link HollowObjectHashCodeFinder}</dt>
- *      <dd>Defines the record hashing behavior for elements in set and map records</dd>
- *      
  *      <dt>{@link HollowClientMemoryConfig}</dt>
  *      <dd>Defines various aspects of data access guarantees and update behavior which impact the heap footprint/GC behavior
  *          of hollow.</dd>
