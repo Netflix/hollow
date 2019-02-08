@@ -9,7 +9,7 @@ public class StreamData implements Cloneable {
     public int packageId = java.lang.Integer.MIN_VALUE;
     public long fileSizeInBytes = java.lang.Long.MIN_VALUE;
     public long creationTimeStampInSeconds = java.lang.Long.MIN_VALUE;
-    public EncodingAlgorithmHash encodingAlgorithmHash = null;
+    public Strings encodingAlgorithmHash = null;
     public StreamDrmData drmData = null;
     public StreamAdditionalData additionalData = null;
     public DownloadDescriptor downloadDescriptor = null;

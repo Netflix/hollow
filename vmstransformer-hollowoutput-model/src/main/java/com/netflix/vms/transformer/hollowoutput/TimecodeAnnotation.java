@@ -7,7 +7,7 @@ public class TimecodeAnnotation implements Cloneable {
 	public char[] type;
 	public long startMillis;
 	public long endMillis;
-	public EncodingAlgorithmHash encodingAlgorithmHash;
+	public Strings encodingAlgorithmHash;
 	@Override
 	public int hashCode() {
 		return Objects.hash(type, startMillis, endMillis);

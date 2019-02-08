@@ -4,8 +4,8 @@ import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationsListHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodedMomentAnnotationHollow;
-import com.netflix.vms.transformer.hollowoutput.EncodingAlgorithmHash;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimecodeAnnotation;
 
 import java.util.HashMap;
@@ -49,9 +49,9 @@ public class PackageMomentDataModule {
         			annotation.endMillis = moment._getEndMillis();
         			StringHollow algo = moment._getEncodingAlgorithmHash();
         			if(algo != null)
-       					annotation.encodingAlgorithmHash = new EncodingAlgorithmHash(algo._getValue());
+       					annotation.encodingAlgorithmHash = new Strings(algo._getValue());
         			else
-        				annotation.encodingAlgorithmHash = new EncodingAlgorithmHash("default");
+        				annotation.encodingAlgorithmHash = new Strings("default");
         			data.timecodes.add(annotation);    				
     			}
     		}

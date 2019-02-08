@@ -43,7 +43,6 @@ import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
 import com.netflix.vms.transformer.hollowoutput.DrmKeyString;
-import com.netflix.vms.transformer.hollowoutput.EncodingAlgorithmHash;
 import com.netflix.vms.transformer.hollowoutput.FileEncodingData;
 import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
@@ -224,9 +223,9 @@ public class PackageDataModule {
         		timecode.endMillis = inputTimecode._getEndMillis();
         		StringHollow algo = inputTimecode._getEncodingAlgorithmHash();
         		if(algo != null)
-        			timecode.encodingAlgorithmHash = new EncodingAlgorithmHash(algo._getValue());
+        			timecode.encodingAlgorithmHash = new Strings(algo._getValue());
         		else
-        			timecode.encodingAlgorithmHash = new EncodingAlgorithmHash("default");
+        			timecode.encodingAlgorithmHash = new Strings("default");
         		timecodes.add(timecode);
         	}
         }
