@@ -47,7 +47,7 @@ import java.util.List;
  * <p>
  * This class has a convenience method to find values following the field path and given a start field position.
  */
-public class FieldPath {
+class FieldPath {
 
     private final String fieldPath;
     private final HollowDataAccess hollowDataAccess;
@@ -67,7 +67,7 @@ public class FieldPath {
      * @param type             parent type of the field path
      * @param fieldPath        "." separated fields
      */
-    public FieldPath(HollowDataAccess hollowDataAccess, String type, String fieldPath) {
+    FieldPath(HollowDataAccess hollowDataAccess, String type, String fieldPath) {
         this(hollowDataAccess, type, fieldPath, true);
     }
 
@@ -80,7 +80,7 @@ public class FieldPath {
      * @param fieldPath        "." separated fields
      * @param autoExpand       if the field path should be auto-expand collections and references with one field.
      */
-    public FieldPath(HollowDataAccess hollowDataAccess, String type, String fieldPath, boolean autoExpand) {
+    FieldPath(HollowDataAccess hollowDataAccess, String type, String fieldPath, boolean autoExpand) {
         this.fieldPath = fieldPath;
         this.hollowDataAccess = hollowDataAccess;
         this.type = type;
@@ -89,101 +89,45 @@ public class FieldPath {
     }
 
     private void initialize() {
-        String[] fieldParts = fieldPath.split("\\.");
+        FieldPaths.FieldPath<FieldPaths.FieldSegment> path =
+                FieldPaths.createFieldPathForPrefixIndex(hollowDataAccess, type, fieldPath, autoExpand);
+
         List<String> fields = new ArrayList<>();
         List<Integer> fieldPositions = new ArrayList<>();
         List<FieldType> fieldTypes = new ArrayList<>();
 
-        // traverse through the field path to save field position and types.
-        String refType = type;
         String lastRefType = type;
-        int i = 0;
-        while (i < fieldParts.length || refType != null) {
+        for (FieldPaths.FieldSegment segment : path.getSegments()) {
+            fields.add(segment.getName());
 
-            HollowSchema schema = hollowDataAccess.getSchema(refType);
-            if (schema == null)
-                throw new IllegalArgumentException("Schema not found for the type : " + refType);
-            SchemaType schemaType = hollowDataAccess.getSchema(refType).getSchemaType();
+            if (segment.getEnclosingSchema().getSchemaType() == SchemaType.OBJECT) {
+                assert segment instanceof FieldPaths.ObjectFieldSegment;
+                FieldPaths.ObjectFieldSegment oSegment = (FieldPaths.ObjectFieldSegment) segment;
 
-            String fieldName = null;
-            int fieldPosition = 0;
-            FieldType fieldType = FieldType.REFERENCE;
-
-            if (schemaType.equals(SchemaType.OBJECT)) {
-
-                HollowObjectSchema objectSchema = (HollowObjectSchema) schema;
-
-                // find field position, field name and field type
-                if (i >= fieldParts.length) {
-                    if (!autoExpand || objectSchema.numFields() != 1)
-                        throw new IllegalArgumentException("Incomplete field path at type :" + refType + ". Please enter the field names in type to complete the path.");
-                    fieldPosition = 0;
-                } else {
-                    fieldPosition = objectSchema.getPosition(fieldParts[i]);
-                    if (fieldPosition < 0)
-                        throw new IllegalArgumentException("Could not find a valid field position for the field :" + fieldParts[i] + " in type :" + refType);
-                    i++; // increment index for field part for next iteration.
-                }
-
-                fieldName = objectSchema.getFieldName(fieldPosition);
-                fieldType = objectSchema.getFieldType(fieldPosition);
-
-                // check field type.
-                if (fieldType.equals(FieldType.REFERENCE)) {
-                    refType = objectSchema.getReferencedType(fieldName);
-                } else if (i >= fieldParts.length) {
-                    // reached the end of field path
-                    lastRefType = refType;
-                    refType = null;
-                } else {
-                    // if not end of the field path and found a value type, then throw the exception.
-                    throw new IllegalArgumentException("Field path should contain references and should lead to a field primitive field type");
-                }
-
-            } else if (schemaType.equals(SchemaType.LIST) || schemaType.equals(SchemaType.SET)) {
-
-                if (autoExpand && (i >= fieldParts.length || (i < fieldParts.length && !fieldParts[i].equals("element")))) {
-                    fieldName = "element";
-                } else {
-                    fieldName = fieldParts[i];
-                    i++; // increment index for field part for next iteration.
-                }
-                // update ref type to element type.
-                refType = ((HollowCollectionSchema) schema).getElementType();
-
-            } else if (schemaType.equals(SchemaType.MAP)) {
-
-                if ((i >= fieldParts.length) || (!fieldParts[i].equals("value") && !fieldParts[i].equals("key")))
-                    throw new IllegalArgumentException("When using Map in field path, please specify key or value. Cannot auto-expand on Map type field");
-
-                // update field name and increment i to move to next field
-                fieldName = fieldParts[i];
-                i++;
-
-                // update ref type depending on key or value in field path for map.
-                if (fieldName.equals("value")) {
-                    refType = ((HollowMapSchema) schema).getValueType();
-                } else refType = ((HollowMapSchema) schema).getKeyType();
+                fieldPositions.add(oSegment.getIndex());
+                fieldTypes.add(oSegment.getType());
+            } else {
+                fieldPositions.add(0);
+                fieldTypes.add(FieldType.REFERENCE);
             }
 
-            // update lists
-            fields.add(fieldName);
-            fieldPositions.add(fieldPosition);
-            fieldTypes.add(fieldType);
+            String refType = segment.getTypeName();
+            if (refType != null) {
+                lastRefType = refType;
+            }
         }
 
-        this.fields = fields.toArray(new String[fields.size()]);
-        this.fieldPositions = new int[fieldPositions.size()];
-        for (i = 0; i < fieldPositions.size(); i++) this.fieldPositions[i] = fieldPositions.get(i);
-        this.fieldTypes = fieldTypes.toArray(new FieldType[fieldTypes.size()]);
+        this.fields = fields.toArray(new String[0]);
+        this.fieldPositions = fieldPositions.stream().mapToInt(i -> i).toArray();
+        this.fieldTypes = fieldTypes.toArray(new FieldType[0]);
         this.lastRefTypeInPath = lastRefType;
     }
 
-    public String getLastRefTypeInPath() {
+    String getLastRefTypeInPath() {
         return lastRefTypeInPath;
     }
 
-    public FieldType getLastFieldType() {
+    FieldType getLastFieldType() {
         return fieldTypes[this.fields.length - 1];
     }
 
@@ -193,17 +137,17 @@ public class FieldPath {
      * @param ordinal ordinal record for the given type in field path
      * @return Array of values found at the field path for the given ordinal record in the type.
      */
-    public Object[] findValues(int ordinal) {
+    Object[] findValues(int ordinal) {
         return getAllValues(ordinal, type, 0);
     }
 
     /**
      * Recursively find a value following the path. If the path contains a collection, then the first value is picked.
      *
-     * @param ordinal
+     * @param ordinal the ordinal used to find a value
      * @return A value found at the field path for the given ordinal record in the type.
      */
-    public Object findValue(int ordinal) {
+    Object findValue(int ordinal) {
         return getValue(ordinal, type, 0);
     }
 

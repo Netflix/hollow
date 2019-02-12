@@ -17,7 +17,6 @@
  */
 package com.netflix.hollow.api.consumer;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -27,6 +26,7 @@ import com.netflix.hollow.api.consumer.fs.HollowFilesystemBlobRetriever;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.metrics.HollowConsumerMetrics;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.DefaultHashCodeFinder;
@@ -35,14 +35,17 @@ import com.netflix.hollow.tools.history.HollowHistory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -52,7 +55,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * are provided to this class.
  * <p>
  * To obtain a HollowConsumer, you should use a builder pattern, for example:
- * <p>
  * <pre>
  * {@code
  *
@@ -65,50 +67,49 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <p>
  * The following components are injectable, but only an implementation of the HollowConsumer.BlobRetriever is
  * required to be injected, all other components are optional. :
- * <p>
  * <dl>
  * <dt>{@link HollowConsumer.BlobRetriever}</dt>
  * <dd>Implementations of this class define how to retrieve blob data from the blob store.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.AnnouncementWatcher}</dt>
  * <dd>Implementations of this class define the announcement mechanism, which is used to track the version of the
  * currently announced state.  It's also expected that implementations will trigger a refresh each time current
  * data version is updated.</dd>
- * <p>
+ *
  * <dt>a List of {@link HollowConsumer.RefreshListener}s</dt>
  * <dd>RefreshListener implementations will define what to do when various events happen before, during, and after updating
  * local in-memory copies of hollow data sets.</dd>
- * <p>
+ *
  * <dt>the Class representing a generated Hollow API</dt>
  * <dd>Defines how to create a {@link HollowAPI} for the dataset, useful when wrapping a dataset with an api which has
  * been generated (via the {@link HollowAPIClassJavaGenerator})</dd>
- * <p>
+ *
  * <dt>{@link HollowFilterConfig}</dt>
  * <dd>Defines what types and fields to load (or not load) into memory from hollow datasets.  Generally useful to reduce
  * heap footprint on consumers which do not require visibility of an entire dataset.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.DoubleSnapshotConfig}</dt>
  * <dd>Defines whether this consumer may attempt a double snapshot, and how many deltas will be attempted during a single refresh.
  * A double snapshot will allow your consumer to update in case of a broken delta chain, but will also result in a doubling of
  * the heap footprint while the double snapshot is occurring.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.ObjectLongevityConfig}</dt>
  * <dd>Object longevity is used to guarantee that Hollow objects which are backed by removed records will remain usable and
  * consistent until old references are discarded.  This behavior is turned off by default.  Implementations of this config
  * can be used to enable and configure this behavior.</dd>
- * <p>
+ *
  * <dt>{@link HollowConsumer.ObjectLongevityDetector}</dt>
  * <dd>Implementations of this config will be notified when usage of expired Hollow object references is attempted.</dd>
- * <p>
+ *
  * <dt>An Executor</dt>
  * <dd>The Executor which will be used to perform updates when {@link #triggerAsyncRefresh()} is called.  This will
  * default to a new fixed thread pool with a single refresh thread.</dd>
- * <p>
- * <p>
- * <p>
+ *
  * </dl>
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class HollowConsumer {
+    private static final Logger LOG = Logger.getLogger(HollowConsumer.class.getName());
 
     protected final AnnouncementWatcher announcementWatcher;
     protected final HollowClientUpdater updater;
@@ -119,7 +120,7 @@ public class HollowConsumer {
 
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
-                             List<RefreshListener> updateListeners,
+                             List<RefreshListener> refreshListeners,
                              HollowAPIFactory apiFactory,
                              HollowFilterConfig dataFilter,
                              ObjectLongevityConfig objectLongevityConfig,
@@ -127,12 +128,14 @@ public class HollowConsumer {
                              DoubleSnapshotConfig doubleSnapshotConfig,
                              HollowObjectHashCodeFinder hashCodeFinder,
                              Executor refreshExecutor) {
-        this(blobRetriever, announcementWatcher, updateListeners, apiFactory, dataFilter, objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig, hashCodeFinder, refreshExecutor, null);
+        this(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter,
+                objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig
+                , hashCodeFinder, refreshExecutor, null);
     }
 
     protected HollowConsumer(BlobRetriever blobRetriever,
                              AnnouncementWatcher announcementWatcher,
-                             List<RefreshListener> updateListeners,
+                             List<RefreshListener> refreshListeners,
                              HollowAPIFactory apiFactory,
                              HollowFilterConfig dataFilter,
                              ObjectLongevityConfig objectLongevityConfig,
@@ -144,7 +147,7 @@ public class HollowConsumer {
 
         this.metrics = new HollowConsumerMetrics();
         this.updater = new HollowClientUpdater(blobRetriever,
-                updateListeners,
+                refreshListeners,
                 apiFactory,
                 doubleSnapshotConfig,
                 hashCodeFinder,
@@ -173,8 +176,10 @@ public class HollowConsumer {
         refreshLock.writeLock().lock();
         try {
             updater.updateTo(announcementWatcher == null ? Long.MAX_VALUE : announcementWatcher.getLatestVersion());
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         } finally {
             refreshLock.writeLock().unlock();
         }
@@ -199,34 +204,44 @@ public class HollowConsumer {
      * <p>
      * Any subsequent calls for async refresh will not begin until after the specified delay
      * has completed.
+     *
+     * @param delayMillis the delay, in millseconds, before triggering the refresh
      */
     public void triggerAsyncRefreshWithDelay(int delayMillis) {
         final long targetBeginTime = System.currentTimeMillis() + delayMillis;
 
-        refreshExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    long delay = targetBeginTime - System.currentTimeMillis();
-                    if (delay > 0)
-                        Thread.sleep(delay);
-                    triggerRefresh();
-                } catch (Throwable th) {
-                    th.printStackTrace();
-                }
+        refreshExecutor.execute(() -> {
+            try {
+                long delay = targetBeginTime - System.currentTimeMillis();
+                if (delay > 0)
+                    Thread.sleep(delay);
+            } catch (InterruptedException e) {
+                // Interrupting, such as shutting down the executor pool,
+                // cancels the trigger
+                LOG.log(Level.INFO, "Async refresh interrupted before trigger, refresh cancelled", e);
+                return;
+            }
+
+            try {
+                triggerRefresh();
+            } catch (Error | RuntimeException e) {
+                // Ensure exceptions are propagated to the executor
+                LOG.log(Level.SEVERE, "Async refresh failed", e);
+                throw e;
             }
         });
     }
 
     /**
-     * If a {@link HollowConsumer.AnnouncementWatcher} is not specified, then this method will update
-     * to the specified version.
+     * If a {@link HollowConsumer.AnnouncementWatcher} is not specified, then this method will attempt to update
+     * to the specified version, and if the specified version does not exist then to a different version as specified
+     * by functionality in the {@code BlobRetriever}.
      * <p>
      * Otherwise, an UnsupportedOperationException will be thrown.
      * <p>
      * This is a blocking call.
      *
-     * @param version
+     * @param version the version to refresh to
      */
     public void triggerRefreshTo(long version) {
         if (announcementWatcher != null)
@@ -234,8 +249,10 @@ public class HollowConsumer {
 
         try {
             updater.updateTo(version);
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Error | RuntimeException e) {
+            throw e;
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
         }
     }
 
@@ -253,11 +270,26 @@ public class HollowConsumer {
         return updater.getCurrentVersionId();
     }
 
+    public CompletableFuture<Long> getInitialLoad() {
+        return updater.getInitialLoad();
+    }
+
     /**
      * @return the api which wraps the underlying dataset.
      */
     public HollowAPI getAPI() {
         return updater.getAPI();
+    }
+
+    /**
+     * Equivalent to calling {@link #getAPI()} and casting to the specified API.
+     *
+     * @param apiClass the class of the API
+     * @param <T> the type of the API
+     * @return the API which wraps the underlying dataset
+     */
+    public <T extends HollowAPI> T getAPI(Class<T> apiClass) {
+        return apiClass.cast(updater.getAPI());
     }
 
     /**
@@ -275,44 +307,69 @@ public class HollowConsumer {
     }
 
     /**
-     * Returns the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed snapshot transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedSnapshotTransitions() {
         return updater.getNumFailedSnapshotTransitions();
     }
 
     /**
-     * Returns the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
+     * @return the number of failed delta transitions stored in the {@link FailedTransitionTracker}.
      */
     public int getNumFailedDeltaTransitions() {
         return updater.getNumFailedDeltaTransitions();
     }
 
     /**
-     * Returns a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
+     * @return a {@link ReadWriteLock#readLock()}, the corresponding writeLock() of which is used to synchronize refreshes.
      * <p>
-     * This is useful if performing long-running operations which require a consistent view of the entire dataset in a single data state, to guarantee that updates do not happen while the operation runs.
+     * This is useful if performing long-running operations which require a consistent view of the entire dataset in a
+     * single data state, to guarantee that updates do not happen while the operation runs.
      */
     public Lock getRefreshLock() {
         return refreshLock.readLock();
     }
 
     /**
-     * Add a {@link RefreshListener} to this consumer.
+     * Adds a {@link RefreshListener} to this consumer.
+     * <p>
+     * If the listener was previously added to this consumer, as determined by reference equality or {@code Object}
+     * equality, then this method does nothing.
+     * <p>
+     * If a listener is added, concurrently, during the occurrence of a refresh then the listener will not receive
+     * events until the next refresh.  The listener may also be removed concurrently.
+     * <p>
+     * If the listener instance implements {@link RefreshRegistrationListener} then before the listener is added
+     * the {@link RefreshRegistrationListener#onBeforeAddition} method is be invoked.  If that method throws an
+     * exception then that exception will be thrown by this method and the listener will not be added.
+     *
+     * @param listener the refresh listener to add
      */
     public void addRefreshListener(RefreshListener listener) {
-        updater.addRefreshListener(listener);
+        updater.addRefreshListener(listener, this);
     }
 
     /**
-     * Remove a {@link RefreshListener} from this consumer.
+     * Removes a {@link RefreshListener} from this consumer.
+     * <p>
+     * If the listener was not previously added to this consumer, as determined by reference equality or {@code Object}
+     * equality, then this method does nothing.
+     * <p>
+     * If a listener is removed, concurrently, during  the occurrence of a refresh then the listener will receive all
+     * events for that refresh but not receive events for subsequent any refreshes.
+     * <p>
+     * If the listener instance implements {@link RefreshRegistrationListener} then after the listener is removed
+     * the {@link RefreshRegistrationListener#onAfterRemoval} method is be invoked.  If that method throws an
+     * exception then that exception will be thrown by this method.
+     *
+     * @param listener the refresh listener to remove
      */
     public void removeRefreshListener(RefreshListener listener) {
-        updater.removeRefreshListener(listener);
+        updater.removeRefreshListener(listener, this);
     }
 
     /**
-     * Returns the metrics for this consumer
+     * @return the metrics for this consumer
      */
     public HollowConsumerMetrics getMetrics() {
         return metrics;
@@ -327,32 +384,36 @@ public class HollowConsumer {
 
         /**
          * Returns the snapshot for the state with the greatest version identifier which is equal to or less than the desired version
+         * @param desiredVersion the desired version
+         * @return the blob of the snapshot
          */
-        public HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
+        HollowConsumer.Blob retrieveSnapshotBlob(long desiredVersion);
 
         /**
          * Returns a delta transition which can be applied to the specified version identifier
+         * @param currentVersion the current version
+         * @return the blob of the delta
          */
-        public HollowConsumer.Blob retrieveDeltaBlob(long currentVersion);
+        HollowConsumer.Blob retrieveDeltaBlob(long currentVersion);
 
         /**
          * Returns a reverse delta transition which can be applied to the specified version identifier
+         * @param currentVersion the current version
+         * @return the blob of the reverse delta
          */
-        public HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
-
+        HollowConsumer.Blob retrieveReverseDeltaBlob(long currentVersion);
     }
 
     /**
      * A Blob, which is either a snapshot or a delta, defines three things:
-     * <p>
      * <dl>
      * <dt>The "from" version</dt>
      * <dd>The unique identifier of the state to which a delta transition should be applied.  If
      * this is a snapshot, then this value is HollowConstants.VERSION_NONE.</dd>
-     * <p>
+     *
      * <dt>The "to" version</dt>
      * <dd>The unique identifier of the state at which a dataset will arrive after this blob is applied.</dd>
-     * <p>
+     *
      * <dt>The actual blob data</dt>
      * <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
      * </dl>
@@ -361,9 +422,12 @@ public class HollowConsumer {
 
         private final long fromVersion;
         private final long toVersion;
+        private final BlobType blobType;
 
         /**
          * Instantiate a snapshot to a specified data state version.
+         *
+         * @param toVersion the version
          */
         public Blob(long toVersion) {
             this(HollowConstants.VERSION_NONE, toVersion);
@@ -371,10 +435,20 @@ public class HollowConsumer {
 
         /**
          * Instantiate a delta from one data state version to another.
+         *
+         * @param fromVersion the version to start the delta from
+         * @param toVersion the version to end the delta from
          */
         public Blob(long fromVersion, long toVersion) {
             this.fromVersion = fromVersion;
             this.toVersion = toVersion;
+
+            if (this.isSnapshot())
+                this.blobType = BlobType.SNAPSHOT;
+            else if (this.isReverseDelta())
+                this.blobType = BlobType.REVERSE_DELTA;
+            else
+                this.blobType = BlobType.DELTA;
         }
 
         /**
@@ -383,10 +457,28 @@ public class HollowConsumer {
          * It is expected that the returned InputStream will not be interrupted.  For this reason, it is a good idea to
          * retrieve the entire blob (e.g. to disk) from a remote datastore prior to returning this stream.
          *
-         * @return
-         * @throws IOException
+         * @return the input stream to the blob
+         * @throws IOException if the input stream to the blob cannot be obtained
          */
         public abstract InputStream getInputStream() throws IOException;
+
+        /**
+         * Blobs can be of types {@code SNAPSHOT}, {@code DELTA} or {@code REVERSE_DELTA}.
+         */
+        public enum BlobType {
+            SNAPSHOT("snapshot"),
+            DELTA("delta"),
+            REVERSE_DELTA("reversedelta");
+
+            private final String type;
+            BlobType(String type) {
+                this.type = type;
+            }
+
+            public String getType() {
+                return this.type;
+            }
+        }
 
         public boolean isSnapshot() {
             return fromVersion == HollowConstants.VERSION_NONE;
@@ -407,6 +499,10 @@ public class HollowConsumer {
         public long getToVersion() {
             return toVersion;
         }
+
+        public BlobType getBlobType() {
+            return blobType;
+        }
     }
 
     /**
@@ -417,33 +513,33 @@ public class HollowConsumer {
      * <p>
      * If an AnnouncementWatcher is provided to a HollowConsumer, then calling HollowConsumer#triggerRefreshTo() is unsupported.
      */
-    public static interface AnnouncementWatcher {
+    public interface AnnouncementWatcher {
 
-        public static final long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
+        long NO_ANNOUNCEMENT_AVAILABLE = HollowConstants.VERSION_NONE;
 
         /**
-         * Return the latest announced version.
-         *
-         * @return
+         * @return the latest announced version.
          */
-        public long getLatestVersion();
+        long getLatestVersion();
 
         /**
          * Implementations of this method should subscribe a HollowConsumer to updates to announced versions.
          * <p>
          * When announcements are received via a push mechanism, or polling reveals a new version, a call should be placed to one
          * of the flavors of {@link HollowConsumer#triggerRefresh()} on the provided HollowConsumer.
+         *
+         * @param consumer the hollow consumer
          */
-        public abstract void subscribeToUpdates(HollowConsumer consumer);
+        void subscribeToUpdates(HollowConsumer consumer);
     }
 
-    public static interface DoubleSnapshotConfig {
+    public interface DoubleSnapshotConfig {
 
-        public boolean allowDoubleSnapshot();
+        boolean allowDoubleSnapshot();
 
-        public int maxDeltasBeforeDoubleSnapshot();
+        int maxDeltasBeforeDoubleSnapshot();
 
-        public static DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
+        DoubleSnapshotConfig DEFAULT_CONFIG = new DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
                 return 32;
@@ -460,7 +556,7 @@ public class HollowConsumer {
     public interface ObjectLongevityConfig {
 
         /**
-         * Whether or not long-lived object support is enabled.
+         * @return whether or not long-lived object support is enabled.
          * <p>
          * Because Hollow reuses pooled memory, if references to Hollow records are held too long, the underlying data may
          * be overwritten.  When long-lived object support is enabled, Hollow records referenced via a {@link HollowAPI} will,
@@ -469,9 +565,9 @@ public class HollowConsumer {
          * <p>
          * These reserved copies are backed by the {@link HollowHistory} data structure.
          */
-        public boolean enableLongLivedObjectSupport();
+        boolean enableLongLivedObjectSupport();
 
-        public boolean enableExpiredUsageStackTraces();
+        boolean enableExpiredUsageStackTraces();
 
         /**
          * Indicates whether or not sampling data will be collected on stale objects
@@ -481,40 +577,32 @@ public class HollowConsumer {
         public boolean enableSampling();
 
         /**
-         * If long-lived object support is enabled, this returns the number of milliseconds before the {@link StaleHollowReferenceDetector}
+         * @return if long-lived object support is enabled, the number of milliseconds before the {@link StaleHollowReferenceDetector}
          * will begin flagging usage of stale objects.
-         *
-         * @return
          */
-        public long gracePeriodMillis();
+        long gracePeriodMillis();
 
         /**
-         * If long-lived object support is enabled, this defines the number of milliseconds, after the grace period, during which
+         * @return if long-lived object support is enabled, the number of milliseconds, after the grace period, during which
          * data is still available in stale references, but usage will be flagged by the {@link StaleHollowReferenceDetector}.
          * <p>
          * After the grace period + usage detection period have expired, the data from stale references will become inaccessible if
          * dropDataAutomatically() is enabled.
-         *
-         * @return
          */
-        public long usageDetectionPeriodMillis();
+        long usageDetectionPeriodMillis();
 
         /**
-         * Whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
+         * @return whether or not to drop data behind stale references after the grace period + usage detection period has elapsed, assuming
          * that no usage was detected during the usage detection period.
-         *
-         * @return
          */
-        public boolean dropDataAutomatically();
+        boolean dropDataAutomatically();
 
         /**
-         * Drop data even if flagged during the usage detection period.
-         *
-         * @return
+         * @return whether data is dropped even if flagged during the usage detection period.
          */
-        public boolean forceDropData();
+        boolean forceDropData();
 
-        public static final ObjectLongevityConfig DEFAULT_CONFIG = new ObjectLongevityConfig() {
+        ObjectLongevityConfig DEFAULT_CONFIG = new ObjectLongevityConfig() {
             @Override
             public boolean enableLongLivedObjectSupport() {
                 return false;
@@ -563,8 +651,10 @@ public class HollowConsumer {
          * If a nonzero value is reported, then stale references to Hollow objects may be cached somewhere in your codebase.
          * <p>
          * This signal can be noisy, and a nonzero value indicates that some reference to stale data exists somewhere.
+         *
+         * @param count the count of stale references
          */
-        public void staleReferenceExistenceDetected(int count);
+        void staleReferenceExistenceDetected(int count);
 
         /**
          * Stale reference USAGE detection.  This will be called every ~30 seconds.
@@ -572,10 +662,12 @@ public class HollowConsumer {
          * If a nonzero value is reported, then stale references to Hollow objects are being accessed from somewhere in your codebase.
          * <p>
          * This signal is noiseless, and a nonzero value indicates that some reference to stale data is USED somewhere.
+         *
+         * @param count the count of stale references
          */
-        public void staleReferenceUsageDetected(int count);
+        void staleReferenceUsageDetected(int count);
 
-        public static ObjectLongevityDetector DEFAULT_DETECTOR = new ObjectLongevityDetector() {
+        ObjectLongevityDetector DEFAULT_DETECTOR = new ObjectLongevityDetector() {
             @Override
             public void staleReferenceUsageDetected(int count) {
             }
@@ -584,7 +676,6 @@ public class HollowConsumer {
             public void staleReferenceExistenceDetected(int count) {
             }
         };
-
     }
 
     /**
@@ -607,7 +698,7 @@ public class HollowConsumer {
          * @param currentVersion   the current state version
          * @param requestedVersion the version to which the refresh is progressing
          */
-        public void refreshStarted(long currentVersion, long requestedVersion);
+        void refreshStarted(long currentVersion, long requestedVersion);
 
         /**
          * This method is called when either data was initialized for the first time, <i>or</i> an update occurred across a
@@ -624,7 +715,7 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * This method is called whenever a live state engine's data is updated with a delta.  This method is <i>not</i>
@@ -643,14 +734,14 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * Called to indicate a blob was loaded (either a snapshot or delta).  Generally useful for logging or tracing of applied updates.
          *
          * @param transition The transition which was applied.
          */
-        public void blobLoaded(HollowConsumer.Blob transition);
+        void blobLoaded(HollowConsumer.Blob transition);
 
         /**
          * Indicates that a refresh completed successfully.
@@ -659,7 +750,7 @@ public class HollowConsumer {
          * @param afterVersion     - The version when the refresh completed
          * @param requestedVersion - The specific version which was requested
          */
-        public void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion);
+        void refreshSuccessful(long beforeVersion, long afterVersion, long requestedVersion);
 
 
         /**
@@ -670,7 +761,7 @@ public class HollowConsumer {
          * @param requestedVersion - The specific version which was requested
          * @param failureCause     - The Exception which caused the failure.
          */
-        public void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
+        void refreshFailed(long beforeVersion, long afterVersion, long requestedVersion, Throwable failureCause);
 
     }
 
@@ -687,7 +778,7 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void snapshotApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
         /**
          * This method is called <i>whenever</i> a delta is processed.  In the case of first time initialization or an update
@@ -701,13 +792,55 @@ public class HollowConsumer {
          * @param version     the current state version
          * @throws Exception thrown if an error occurs in processing
          */
-        public void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
+        void deltaApplied(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception;
 
+        /**
+         * Called after refresh started and update plan has been initialized, but before the update plan starts executing.
+         * It is called only once per update plan (and thus only once per consumer refresh). Exposes details of the
+         * update plan.
+         * @implSpec The default implementation provided does nothing.
+         *
+         * @param beforeVersion The version when refresh started
+         * @param desiredVersion The version that the consumer refresh tries update to, even though it might not be attainable eg. HollowConstants.VERSION_LATEST
+         * @param isSnapshotPlan Indicates whether the refresh involves a snapshot transition
+         * @param transitionSequence List of transitions comprising the refresh
+         */
+        default void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {}
     }
+
+    /**
+     * A listener of refresh listener addition and removal.
+     * <p>
+     * A {@link RefreshListener} implementation may  implement this interface to get notified before
+     * the listener is added (via a call to {@link #addRefreshListener(RefreshListener)} and after a listener
+     * is removed (via a call to {@link #removeRefreshListener(RefreshListener)}.
+     * <p>
+     * An implementation should not add or remove itself in response to addition or removal.  Such actions may result
+     * in a {@link StackOverflowError} or unspecified behaviour.
+     */
+    public interface RefreshRegistrationListener {
+        /**
+         * Called before the refresh listener is added.
+         * @param c the consumer the associated reference listener is being added to
+         */
+        void onBeforeAddition(HollowConsumer c);
+
+        /**
+         * Called after the refresh listener is removed.
+         * @param c the consumer the associated reference listener is being removed from
+         */
+        void onAfterRemoval(HollowConsumer c);
+    }
+
 
     public static class AbstractRefreshListener implements TransitionAwareRefreshListener {
         @Override
         public void refreshStarted(long currentVersion, long requestedVersion) {
+            // no-op
+        }
+
+        @Override
+        public void transitionsPlanned(long beforeVersion, long desiredVersion, boolean isSnapshotPlan, List<HollowConsumer.Blob.BlobType> transitionSequence) {
             // no-op
         }
 
@@ -747,22 +880,23 @@ public class HollowConsumer {
         }
     }
 
-    public static <B extends HollowConsumer.Builder<B>> HollowConsumer.Builder<B> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
-        HollowConsumer.Builder builder = new Builder();
+    public static HollowConsumer.Builder<?> withBlobRetriever(HollowConsumer.BlobRetriever blobRetriever) {
+        HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withBlobRetriever(blobRetriever);
     }
 
-    public static HollowConsumer.Builder withLocalBlobStore(File localBlobStoreDir) {
-        HollowConsumer.Builder builder = new Builder();
+    public static HollowConsumer.Builder<?> withLocalBlobStore(File localBlobStoreDir) {
+        HollowConsumer.Builder<?> builder = new Builder<>();
         return builder.withLocalBlobStore(localBlobStoreDir);
     }
 
-    public static class Builder<B extends HollowConsumer.Builder> {
+    @SuppressWarnings("unchecked")
+    public static class Builder<B extends HollowConsumer.Builder<B>> {
 
         protected HollowConsumer.BlobRetriever blobRetriever = null;
         protected HollowConsumer.AnnouncementWatcher announcementWatcher = null;
         protected HollowFilterConfig filterConfig = null;
-        protected List<HollowConsumer.RefreshListener> refreshListeners = new CopyOnWriteArrayList<HollowConsumer.RefreshListener>();
+        protected List<HollowConsumer.RefreshListener> refreshListeners = new ArrayList<>();
         protected HollowAPIFactory apiFactory = HollowAPIFactory.DEFAULT_FACTORY;
         protected HollowObjectHashCodeFinder hashCodeFinder = new DefaultHashCodeFinder();
         protected HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig = DoubleSnapshotConfig.DEFAULT_CONFIG;
@@ -793,13 +927,24 @@ public class HollowConsumer {
         }
 
         public B withRefreshListeners(HollowConsumer.RefreshListener... refreshListeners) {
-            for (HollowConsumer.RefreshListener refreshListener : refreshListeners)
-                this.refreshListeners.add(refreshListener);
+            Collections.addAll(this.refreshListeners, refreshListeners);
             return (B)this;
         }
 
-        public <T extends HollowAPI> B withGeneratedAPIClass(Class<T> generatedAPIClass) {
-            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<T>(generatedAPIClass);
+        /**
+         * Provide the code generated API class that extends {@link HollowAPI}.
+         *
+         * The instance returned from {@link HollowConsumer#getAPI()} will be of the provided type and can be cast
+         * to access generated methods.
+         *
+         * @param generatedAPIClass the code generated API class
+         * @return this builder
+         * @throws IllegalArgumentException if provided API class is {@code HollowAPI} instead of a subclass
+         */
+        public B withGeneratedAPIClass(Class<? extends HollowAPI> generatedAPIClass) {
+            if (HollowAPI.class.equals(generatedAPIClass))
+                throw new IllegalArgumentException("must provide a code generated API class");
+            this.apiFactory = new HollowAPIFactory.ForGeneratedAPI<>(generatedAPIClass);
             return (B)this;
         }
 
@@ -846,18 +991,15 @@ public class HollowConsumer {
 
             BlobRetriever blobRetriever = this.blobRetriever;
             if (localBlobStoreDir != null)
-                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir, blobRetriever);
+                this.blobRetriever = new HollowFilesystemBlobRetriever(localBlobStoreDir.toPath(), blobRetriever);
 
 
             if (refreshExecutor == null)
-                refreshExecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
-                    @Override
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r);
-                        t.setName("hollow-consumer-refresh");
-                        t.setDaemon(true);
-                        return t;
-                    }
+                refreshExecutor = Executors.newSingleThreadExecutor(r -> {
+                    Thread t = new Thread(r);
+                    t.setName("hollow-consumer-refresh");
+                    t.setDaemon(true);
+                    return t;
                 });
         }
 

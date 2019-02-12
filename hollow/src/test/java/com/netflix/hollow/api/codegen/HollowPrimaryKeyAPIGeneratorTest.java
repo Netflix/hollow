@@ -16,27 +16,24 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import org.junit.Before;
 import org.junit.Test;
 
 public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
-
-    @Override
-    @Before
-    public void setup() {
-    }
-
-    @Override
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        builder.reservePrimaryKeyIndexForTypeWithPrimaryKey(true);
-        return super.initGenerator(builder);
-    }
 
     @Test
     public void test() throws Exception {
         String apiClassName = "PrimaryKeyIndexTestAPI";
         String packageName = "codegen.primarykey";
-        runGenerator(apiClassName, packageName, Movie.class);
+        runGenerator(apiClassName, packageName, Movie.class,
+                builder -> builder.reservePrimaryKeyIndexForTypeWithPrimaryKey(true));
+    }
+
+    @Test
+    public void testWithPostfix() throws Exception {
+        String apiClassName = "PrimaryKeyIndexTestAPI";
+        String packageName = "codegen.primarykey";
+        runGenerator(apiClassName, packageName, Movie.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
     @HollowPrimaryKey(fields = { "id", "hasSubtitles", "actor", "role.id!", "role.rank" })

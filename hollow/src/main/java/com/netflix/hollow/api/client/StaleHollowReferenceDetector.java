@@ -61,6 +61,8 @@ public class StaleHollowReferenceDetector {
 
     private final StackTraceRecorder stackTraceRecorder;
 
+    private Thread monitor;
+
     public StaleHollowReferenceDetector(HollowConsumer.ObjectLongevityConfig config, HollowConsumer.ObjectLongevityDetector detector) {
         this.handles = new ArrayList<HollowWeakReferenceHandle>();
         this.config = config;
@@ -115,25 +117,42 @@ public class StaleHollowReferenceDetector {
     }
 
     public void startMonitoring() {
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                while(true) {
-                    try {
-                        Thread.sleep(HOUSEKEEPING_INTERVAL);
-                    } catch (InterruptedException e) { }
-                    housekeeping();
-
-                    detector.staleReferenceExistenceDetected(countStaleReferenceExistenceSignals());
-                    detector.staleReferenceUsageDetected(countStaleReferenceUsageSignals());
-                }
-            }
-        });
-        t.setDaemon(true);
-        t.start();
+        if (monitor == null) {
+            monitor = new Thread(new Monitor(this));
+            monitor.setDaemon(true);
+            monitor.start();
+        }
     }
 
     public StackTraceRecorder getStaleReferenceStackTraceRecorder() {
         return stackTraceRecorder;
+    }
+
+    private static class Monitor implements Runnable {
+
+        private final WeakReference<StaleHollowReferenceDetector> ref;
+
+        Monitor(StaleHollowReferenceDetector parent) {
+            this.ref = new WeakReference<>(parent);
+        }
+
+        public void run() {
+            while (ref.get() != null) {
+
+                try {
+                    Thread.sleep(HOUSEKEEPING_INTERVAL);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                StaleHollowReferenceDetector parent = ref.get();
+                if (parent != null) {
+                    parent.housekeeping();
+
+                    parent.detector.staleReferenceExistenceDetected(parent.countStaleReferenceExistenceSignals());
+                    parent.detector.staleReferenceUsageDetected(parent.countStaleReferenceUsageSignals());
+                }
+            }
+        }
     }
 
     private class HollowWeakReferenceHandle {
@@ -277,8 +296,8 @@ public class StaleHollowReferenceDetector {
             if(myAPI.getDataAccess() instanceof HollowProxyDataAccess && ((HollowProxyDataAccess)myAPI.getDataAccess()).getProxiedDataAccess() == newAPI.getDataAccess())
                 return false;
             if(myAPI.getDataAccess() instanceof HollowProxyDataAccess
-               && newAPI.getDataAccess() instanceof HollowProxyDataAccess
-               && ((HollowProxyDataAccess)myAPI.getDataAccess()).getProxiedDataAccess() == ((HollowProxyDataAccess)newAPI.getDataAccess()).getProxiedDataAccess())
+              && newAPI.getDataAccess() instanceof HollowProxyDataAccess
+              && ((HollowProxyDataAccess)myAPI.getDataAccess()).getProxiedDataAccess() == ((HollowProxyDataAccess)newAPI.getDataAccess()).getProxiedDataAccess())
                 return false;
 
             return true;

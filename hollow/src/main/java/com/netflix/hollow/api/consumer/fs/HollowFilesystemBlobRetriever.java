@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.core.HollowConstants;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -33,25 +33,15 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
     private final HollowConsumer.BlobRetriever fallbackBlobRetriever;
     private final Path blobStorePath;
 
-    // TODO: deprecate in Hollow 3.0.0
-    // @Deprecated
-    public HollowFilesystemBlobRetriever(File blobStoreDir) {
-        this(blobStoreDir.toPath());
-    }
-
     /**
      * A new HollowFilesystemBlobRetriever which is not backed by a remote store.
      *
      * @param blobStorePath The directory from which to retrieve blobs
      * @since 2.12.0
      */
+    @SuppressWarnings("unused")
     public HollowFilesystemBlobRetriever(Path blobStorePath) {
         this(blobStorePath, null);
-    }
-    
-    @Deprecated
-    public HollowFilesystemBlobRetriever(File blobStoreDir, HollowConsumer.BlobRetriever fallbackBlobRetriever) {
-        this(blobStoreDir.toPath(), fallbackBlobRetriever);
     }
 
     /**
@@ -166,26 +156,22 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         private final Path path;
 
         @Deprecated
-        public FilesystemBlob(File snapshotFile, long toVersion) {
+        FilesystemBlob(File snapshotFile, long toVersion) {
             this(snapshotFile.toPath(), toVersion);
         }
 
         /**
          * @since 2.12.0
          */
-        public FilesystemBlob(Path snapshotPath, long toVersion) {
+        FilesystemBlob(Path snapshotPath, long toVersion) {
             super(toVersion);
             this.path = snapshotPath;
-        }
-
-        public FilesystemBlob(File deltaFile, long fromVersion, long toVersion) {
-           this(deltaFile.toPath(), fromVersion, toVersion);
         }
 
         /**
          * @since 2.12.0
          */
-        public FilesystemBlob(Path deltaPath, long fromVersion, long toVersion) {
+        FilesystemBlob(Path deltaPath, long fromVersion, long toVersion) {
             super(fromVersion, toVersion);
             this.path = deltaPath;
         }
@@ -202,12 +188,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
         private final HollowConsumer.Blob remoteBlob;
         private final Path path;
 
-        @Deprecated
-        public BlobForBackupToFilesystem(HollowConsumer.Blob remoteBlob, File destinationFile) {
-            this(remoteBlob, destinationFile.toPath());
-        }
-
-        public BlobForBackupToFilesystem(HollowConsumer.Blob remoteBlob, Path destinationPath) {
+        BlobForBackupToFilesystem(HollowConsumer.Blob remoteBlob, Path destinationPath) {
             super(remoteBlob.getFromVersion(), remoteBlob.getToVersion());
             this.path = destinationPath;
             this.remoteBlob = remoteBlob;
@@ -221,7 +202,7 @@ public class HollowFilesystemBlobRetriever implements HollowConsumer.BlobRetriev
                     OutputStream os = Files.newOutputStream(path)
             ) {
                 byte buf[] = new byte[4096];
-                int n = 0;
+                int n;
                 while (-1 != (n = is.read(buf)))
                     os.write(buf, 0, n);
             }

@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.core.index;
 
+import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.FixedLengthElementArray;
@@ -41,10 +43,8 @@ import java.util.List;
 /**
  * A HollowPrimaryKeyIndex is the go-to mechanism for indexing and querying data in a Hollow blob.
  * <p>
- * A primary key index can be used to index and query a type by a {@link PrimaryKey}.  The provided {@link PrimaryKey} does 
+ * A primary key index can be used to index and query a type by a {@link PrimaryKey}.  The provided {@link PrimaryKey} does
  * not have to be the same as declared as the default in the data model.
- * <p>
- *
  */
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
@@ -58,7 +58,6 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     private final BitSet specificOrdinalsToIndex;
 
-    private PrimaryKeyIndexHashTable hashTable;
     private volatile PrimaryKeyIndexHashTable hashTableVolatile;
 
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, String type, String... fieldPaths) {
@@ -79,6 +78,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
     /**
      * This initializer can be used to create a HollowPrimaryKeyIndex which will only index a subset of the records in the specified type.
+     *
+     * @param stateEngine the read state engine
+     * @param primaryKey the primary key
+     * @param memoryRecycler the memory recycler
+     * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
         if (primaryKey==null) throw new IllegalArgumentException("primaryKey can't not be null");
@@ -152,19 +156,22 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     /**
      * Query an index with a single specified field.  The returned value with be the ordinal of the matching record.
      * <p>
-     * Use a generated API or the Generic Object API to use the returned ordinal. 
+     * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key the field key
+     * @return the matching ordinal for the key, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 1 || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = keyHashCode(key, 0);
 
-        PrimaryKeyIndexHashTable hashTable;
         int ordinal = -1;
 
         do {
-            hashTable = this.hashTable;
+            hashTable = this.hashTableVolatile;
             int bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
@@ -183,20 +190,24 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     /**
      * Query an index with two specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
-     * Use a generated API or the Generic Object API to use the returned ordinal. 
+     * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key1 the first field key
+     * @param key2 the second field key
+     * @return the matching ordinal for the two keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 2 || hashTable.bitsPerElement == 0)
             return -1;
 
         int hashCode = keyHashCode(key1, 0);
         hashCode ^= keyHashCode(key2, 1);
 
-        PrimaryKeyIndexHashTable hashTable;
         int ordinal = -1;
 
         do {
-            hashTable = this.hashTable;
+            hashTable = this.hashTableVolatile;
             int bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
@@ -215,9 +226,15 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     /**
      * Query an index with three specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
-     * Use a generated API or the Generic Object API to use the returned ordinal. 
+     * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param key1 the first field key
+     * @param key2 the second field key
+     * @param key3 the third field key
+     * @return the matching ordinal for the three keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object key1, Object key2, Object key3) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != 3 || hashTable.bitsPerElement == 0)
             return -1;
 
@@ -225,11 +242,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         hashCode ^= keyHashCode(key2, 1);
         hashCode ^= keyHashCode(key3, 2);
 
-        PrimaryKeyIndexHashTable hashTable;
         int ordinal = -1;
 
         do {
-            hashTable = this.hashTable;
+            hashTable = this.hashTableVolatile;
             int bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
@@ -248,9 +264,13 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     /**
      * Query an index with four or more specified fields.  The returned value with be the ordinal of the matching record.
      * <p>
-     * Use a generated API or the Generic Object API to use the returned ordinal. 
+     * Use a generated API or the Generic Object API to use the returned ordinal.
+     *
+     * @param keys the field keys
+     * @return the matching ordinal for the keys, otherwise -1 if the key is not present
      */
     public int getMatchingOrdinal(Object... keys) {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(fieldPathIndexes.length != keys.length || hashTable.bitsPerElement == 0)
             return -1;
 
@@ -258,11 +278,10 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         for(int i=0;i<keys.length;i++)
             hashCode ^= keyHashCode(keys[i], i);
 
-        PrimaryKeyIndexHashTable hashTable;
         int ordinal = -1;
 
         do {
-            hashTable = this.hashTable;
+            hashTable = this.hashTableVolatile;
             int bucket = hashCode & hashTable.hashMask;
             ordinal = readOrdinal(hashTable, bucket);
             while(ordinal != -1) {
@@ -306,21 +325,21 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private void setHashTable(PrimaryKeyIndexHashTable hashTable) {
-        this.hashTable = hashTable;
         this.hashTableVolatile = hashTable;
     }
 
     /**
-     * Returns whether or not this index contains duplicate records (two or more records mapping to a single primary key).
+     * @return whether or not this index contains duplicate records (two or more records mapping to a single primary key).
      */
     public boolean containsDuplicates() {
         return !getDuplicateKeys().isEmpty();
     }
 
     /**
-     * Returns any keys which are mapped to two or more records.   
+     * @return any keys which are mapped to two or more records.
      */
     public synchronized Collection<Object[]> getDuplicateKeys() {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTable.bitsPerElement == 0)
             return Collections.emptyList();
 
@@ -361,6 +380,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashTableSize = HashCodes.hashTableSize(ordinals.cardinality());
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTableSize == hashTable.hashTableSize
                 && bitsPerElement == hashTable.bitsPerElement
                 && shouldPerformDeltaUpdate()) {
@@ -371,11 +391,14 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     public void destroy() {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
         if(hashTable != null)
             hashTable.hashTable.destroy(memoryRecycler);
     }
 
     private synchronized void reindex() {
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
+        // Could be null on first reindex
         if(hashTable != null) {
             hashTable.hashTable.destroy(memoryRecycler);
         }
@@ -395,7 +418,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashMask = hashTableSize - 1;
 
         int ordinal = ordinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             int hashCode = recordHash(ordinal);
             int bucket = hashCode & hashMask;
 
@@ -413,9 +436,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private void deltaUpdate(int hashTableSize, int bitsPerElement) {
-        if(hashTable != null) {
-            hashTable.hashTable.destroy(memoryRecycler);
-        }
+        // For a delta update hashTableVolatile cannot be null
+        PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
+        hashTable.hashTable.destroy(memoryRecycler);
 
         PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
         BitSet prevOrdinals = listener.getPreviousOrdinals();
@@ -428,7 +451,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int hashMask = hashTableSize - 1;
 
         int prevOrdinal = prevOrdinals.nextSetBit(0);
-        while(prevOrdinal != -1) {
+        while(prevOrdinal != ORDINAL_NONE) {
             if(!ordinals.get(prevOrdinal)) {
                 /// remove this ordinal
                 int hashCode = recordHash(prevOrdinal);
@@ -442,7 +465,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 bucket = (bucket + 1) & hashMask;
                 int moveOrdinal = (int)hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) - 1;
 
-                while(moveOrdinal != -1) {
+                while(moveOrdinal != ORDINAL_NONE) {
                     int naturalHash = recordHash(moveOrdinal);
                     int naturalBucket = naturalHash & hashMask;
 
@@ -464,7 +487,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
 
 
         int ordinal = ordinals.nextSetBit(0);
-        while(ordinal != -1) {
+        while(ordinal != ORDINAL_NONE) {
             if(!prevOrdinals.get(ordinal)) {
                 int hashCode = recordHash(ordinal);
                 int bucket = hashCode & hashMask;
@@ -564,7 +587,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int removedRecords = 0;
 
         int prevOrdinal = previousOrdinals.nextSetBit(0);
-        while(prevOrdinal != -1) {
+        while(prevOrdinal != ORDINAL_NONE) {
             prevCardinality++;
             if(!ordinals.get(prevOrdinal))
                 removedRecords++;

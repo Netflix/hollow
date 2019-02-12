@@ -18,7 +18,6 @@
 package com.netflix.hollow.api.producer.fs;
 
 import com.netflix.hollow.api.producer.HollowProducer;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,19 +28,14 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
     
     private final Path blobStorePath;
 
-    // TODO: deprecate in Hollow 3.0.0
-    // @Deprecated
-    public HollowFilesystemPublisher(File blobStoreDir) {
-        this(blobStoreDir.toPath());
-    }
-
     /**
+     * @param blobStorePath the path to store blobs
      * @since 2.12.0
      */
     public HollowFilesystemPublisher(Path blobStorePath) {
         this.blobStorePath = blobStorePath;
         try {
-            if(!Files.exists(this.blobStorePath)){
+            if (!Files.exists(this.blobStorePath)){
                 Files.createDirectories(this.blobStorePath);
             }
         } catch (IOException e) {
@@ -65,10 +59,10 @@ public class HollowFilesystemPublisher implements HollowProducer.Publisher {
             
         try(
                 InputStream is = blob.newInputStream();
-                OutputStream os = Files.newOutputStream(destination);
+                OutputStream os = Files.newOutputStream(destination)
         ) {
             byte buf[] = new byte[4096];
-            int n = 0;
+            int n;
             while (-1 != (n = is.read(buf)))
                 os.write(buf, 0, n);
         } catch(IOException e) {

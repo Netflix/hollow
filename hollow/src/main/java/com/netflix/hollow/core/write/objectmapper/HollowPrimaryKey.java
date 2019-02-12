@@ -22,9 +22,28 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Indicates that a hollow object type (a POJO) has a primary key.
+ * <p>
+ * The primary key value of such a hollow object is the sequence of
+ * values obtained by resolving the {@link #fields field} paths (in order)
+ * given that hollow object.  There must be only one such hollow object, of
+ * a particular type, for a given primary key.  Therefore, a hollow object
+ * may be looked up given its primary key value
+ * (see
+ * {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex UniqueKeyIndex}
+ * and
+ * {@link com.netflix.hollow.core.index.HollowPrimaryKeyIndex HollowPrimaryKeyIndex}
+ * ).
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target(ElementType.TYPE)
 public @interface HollowPrimaryKey {
 
+    /**
+     * Returns the field paths of the primary key.
+     *
+     * @return the field paths of the primary key
+     */
     String[] fields();
 }

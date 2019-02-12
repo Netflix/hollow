@@ -22,10 +22,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Indicates the hollow type name of a POJO or the hollow field name of a field
+ * declared by a POJO.
+ * <p>
+ * This annotation may be used to override the hollow class name derived from the
+ * name of a {@code Class} of a POJO, or override the hollow field name derived
+ * from the name of a {@code Field} declared by a POJO.
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target( {ElementType.TYPE, ElementType.FIELD})
 public @interface HollowTypeName {
 
+    /**
+     * Returns the hollow type name or hollow field name.
+     *
+     * @return the hollow type name or hollow field name
+     */
     String name();
-
 }

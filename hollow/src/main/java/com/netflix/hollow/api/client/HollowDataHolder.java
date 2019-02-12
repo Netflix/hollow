@@ -17,10 +17,10 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.TransitionAwareRefreshListener;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -31,12 +31,11 @@ import com.netflix.hollow.tools.history.HollowHistoricalStateDataAccess;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.util.List;
 
 /**
  * A class comprising much of the internal state of a {@link HollowConsumer}.  Not intended for external consumption.
  */
-public class HollowDataHolder {
+class HollowDataHolder {
 
     private final HollowReadStateEngine stateEngine;
     private final HollowAPIFactory apiFactory;
@@ -44,7 +43,6 @@ public class HollowDataHolder {
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
     private final HollowConsumer.ObjectLongevityConfig objLongevityConfig;
-    private final List<HollowConsumer.RefreshListener> refreshListeners;
 
     private HollowFilterConfig filter;
 
@@ -54,53 +52,51 @@ public class HollowDataHolder {
 
     private long currentVersion = HollowConstants.VERSION_NONE;
 
-    public HollowDataHolder(HollowReadStateEngine stateEngine, 
+    HollowDataHolder(HollowReadStateEngine stateEngine,
                             HollowAPIFactory apiFactory, 
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector, 
-                            List<HollowConsumer.RefreshListener> refreshListeners, 
                             HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.reader = new HollowBlobReader(stateEngine);
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
-        this.refreshListeners = refreshListeners;
         this.objLongevityConfig = objLongevityConfig;
     }
 
-    public HollowReadStateEngine getStateEngine() {
+    HollowReadStateEngine getStateEngine() {
         return stateEngine;
     }
 
-    public HollowAPI getAPI() {
+    HollowAPI getAPI() {
         return currentAPI;
     }
 
-    public long getCurrentVersion() {
+    long getCurrentVersion() {
         return currentVersion;
     }
 
-    public HollowDataHolder setFilter(HollowFilterConfig filter) {
+    HollowDataHolder setFilter(HollowFilterConfig filter) {
         this.filter = filter;
         return this;
     }
 
-    public void update(HollowUpdatePlan updatePlan) throws Throwable {
+    void update(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         if(failedTransitionTracker.anyTransitionWasFailed(updatePlan))
             throw new RuntimeException("Update plan contains known failing transition!");
 
         if(updatePlan.isSnapshotPlan())
-            applySnapshotPlan(updatePlan);
+            applySnapshotPlan(updatePlan, refreshListeners);
         else
-            applyDeltaOnlyPlan(updatePlan);
+            applyDeltaOnlyPlan(updatePlan, refreshListeners);
     }
 
-    private void applySnapshotPlan(HollowUpdatePlan updatePlan) throws Throwable {
-        applySnapshotTransition(updatePlan.getSnapshotTransition());
+    private void applySnapshotPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
+        applySnapshotTransition(updatePlan.getSnapshotTransition(), refreshListeners);
             
         for(HollowConsumer.Blob blob : updatePlan.getDeltaTransitions()) {
-            applyDeltaTransition(blob, true);
+            applyDeltaTransition(blob, true, refreshListeners);
         }
 
         try {
@@ -112,9 +108,9 @@ public class HollowDataHolder {
         }
     }
 
-    private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob) throws Throwable {
+    private void applySnapshotTransition(HollowConsumer.Blob snapshotBlob, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         try(InputStream is = snapshotBlob.getInputStream()) {
-            applyStateEngineTransition(is, snapshotBlob);
+            applyStateEngineTransition(is, snapshotBlob, refreshListeners);
             initializeAPI();
             
             for(HollowConsumer.RefreshListener refreshListener : refreshListeners) {
@@ -139,15 +135,15 @@ public class HollowDataHolder {
         staleReferenceDetector.newAPIHandle(currentAPI);
     }
 
-    private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan) throws Throwable {
+    private void applyDeltaOnlyPlan(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         for(HollowConsumer.Blob blob : updatePlan) {
-            applyDeltaTransition(blob, false);
+            applyDeltaTransition(blob, false, refreshListeners);
         }
     }
 
-    private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan) throws Throwable {
+    private void applyDeltaTransition(HollowConsumer.Blob blob, boolean isSnapshotPlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
         try(InputStream is = blob.getInputStream()) {
-            applyStateEngineTransition(is, blob);
+            applyStateEngineTransition(is, blob, refreshListeners);
 
             if(objLongevityConfig.enableLongLivedObjectSupport()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
@@ -194,7 +190,7 @@ public class HollowDataHolder {
         priorHistoricalDataAccess = new WeakReference<HollowHistoricalStateDataAccess>(nextPriorState);
     }
 
-    private void applyStateEngineTransition(InputStream is, HollowConsumer.Blob transition) throws IOException {
+    private void applyStateEngineTransition(InputStream is, HollowConsumer.Blob transition, HollowConsumer.RefreshListener[] refreshListeners) throws IOException {
         if(transition.isSnapshot()) {
             if(filter == null)
                 reader.readSnapshot(is);

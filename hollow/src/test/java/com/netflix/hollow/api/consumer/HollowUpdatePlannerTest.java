@@ -20,18 +20,20 @@ package com.netflix.hollow.api.consumer;
 import com.netflix.hollow.api.client.HollowUpdatePlan;
 import com.netflix.hollow.api.client.HollowUpdatePlanner;
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
+import com.netflix.hollow.test.consumer.TestBlob;
+import com.netflix.hollow.test.consumer.TestBlobRetriever;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class HollowUpdatePlannerTest {
 
-    FakeBlobRetriever mockTransitionCreator;
+    TestBlobRetriever mockTransitionCreator;
     HollowUpdatePlanner planner;
 
     @Before
     public void setUp() {
-        mockTransitionCreator = new FakeBlobRetriever();
+        mockTransitionCreator = new TestBlobRetriever();
         planner = new HollowUpdatePlanner(mockTransitionCreator, new HollowConsumer.DoubleSnapshotConfig() {
             @Override
             public int maxDeltasBeforeDoubleSnapshot() {
@@ -268,19 +270,19 @@ public class HollowUpdatePlannerTest {
 
 
     private void addMockSnapshot(long desiredVersion, long actualVersion) {
-        Blob result = new FakeBlob(Long.MIN_VALUE, actualVersion);
+        Blob result = new TestBlob(Long.MIN_VALUE, actualVersion);
 
         mockTransitionCreator.addSnapshot(desiredVersion, result);
     }
 
     private void addMockDelta(long fromVersion, long toVersion) {
-        Blob result = new FakeBlob(fromVersion, toVersion);
+        Blob result = new TestBlob(fromVersion, toVersion);
 
         mockTransitionCreator.addDelta(fromVersion, result);
     }
 
     private void addMockReverseDelta(long fromVersion, long toVersion) {
-        Blob result = new FakeBlob(fromVersion, toVersion);
+        Blob result = new TestBlob(fromVersion, toVersion);
 
         mockTransitionCreator.addReverseDelta(fromVersion, result);
     }

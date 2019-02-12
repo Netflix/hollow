@@ -17,14 +17,12 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.producer.HollowProducer.Populator;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStorageCleaner;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemPublisher;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
@@ -41,14 +39,11 @@ public class HollowProducerBlobStorageCleanerTest {
     public void setUp() {
         publishDir = new File(SCRATCH_DIR, "publish-dir");
         publishDir.mkdir();
-        for(File file : publishDir.listFiles()) {
-            file.delete();
-        }
     }
 
     @Test
     public void cleanSnapshotsWithDefaultValue() {
-        HollowProducer.Publisher publisher = new HollowFilesystemPublisher(publishDir);
+        HollowProducer.Publisher publisher = new HollowFilesystemPublisher(publishDir.toPath());
         HollowProducer.BlobStorageCleaner blobStorageCleaner = new HollowFilesystemBlobStorageCleaner(publishDir);
         HollowProducer producer = HollowProducer.withPublisher(publisher)
                                                 .withBlobStorageCleaner(blobStorageCleaner)
@@ -56,11 +51,7 @@ public class HollowProducerBlobStorageCleanerTest {
                                                 .build();
 
         /// initialize the data -- classic producer creates the first state in the delta chain. 
-        producer.runCycle(new Populator() {
-            public void populate(WriteState state) throws Exception {
-                state.add(new TypeA(1, "one", 1));
-            }
-        });
+        producer.runCycle(state -> state.add(new TypeA(1, "one", 1)));
 
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
         incrementalProducer.addOrModify(new TypeA(2, "two", 100));
@@ -104,12 +95,7 @@ public class HollowProducerBlobStorageCleanerTest {
     }
 
     private File[] listFiles(final String blobType) {
-        return publishDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.contains(blobType);
-            }
-        });
+        return publishDir.listFiles((dir, name) -> name.contains(blobType));
     }
 
     private List<String> getFileNames(File[] files) {
@@ -122,9 +108,7 @@ public class HollowProducerBlobStorageCleanerTest {
 
     @After
     public void removeAllFiles() {
-        for(File file : publishDir.listFiles()) {
-            file.delete();
-        }
+        Arrays.stream(publishDir.listFiles()).forEach(File::delete);
     }
 
     private static final class TestVersionMinter implements HollowProducer.VersionMinter  {

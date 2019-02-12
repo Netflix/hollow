@@ -1,5 +1,4 @@
 /*
- *
  *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,9 @@
  *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *     See the License for the specific language governing permissions and
  *     limitations under the License.
- *
  */
-package com.netflix.hollow.api.producer;
+package com.netflix.hollow.api.consumer.index;
 
-/**
- * An extension of {@link HollowProducerListener} to allow adding new methods without
- * breaking backwards compatability.
- * Subclasses should extend {@link AbstractHollowProducerListener} to avoid having to
- * override every method in this interface.
- * TODO(hollow3): Collapse this into HollowProducerListener.
- */
-public interface HollowProducerListenerV2 extends HollowProducerListener {
-    enum CycleSkipReason {
-        NOT_PRIMARY_PRODUCER;
-    }
-
-    /**
-     * Called when a cycle is skipped.
-     */
-    void onCycleSkip(CycleSkipReason reason);
+public interface HollowUniqueKeyIndex<T> {
+    T findMatch(Object... keys);
 }

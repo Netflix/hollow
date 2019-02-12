@@ -64,7 +64,7 @@ public class TypeOverview {
     }
 
     public String getSchema() {
-        return schema.toString().replace("<", "&lt;").replace(">", "&gt;");
+        return schema.toString();
     }
 
     public static String heapFootprintDisplayString(long approxHeapFootprint) {

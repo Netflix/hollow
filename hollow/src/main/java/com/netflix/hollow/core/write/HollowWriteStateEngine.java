@@ -17,6 +17,7 @@
  */
 package com.netflix.hollow.core.write;
 
+import com.netflix.hollow.api.error.HollowWriteStateException;
 import com.netflix.hollow.api.error.SchemaNotFoundException;
 import com.netflix.hollow.core.HollowStateEngine;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -79,6 +80,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         this(new DefaultHashCodeFinder());
     }
 
+    @Deprecated
     public HollowWriteStateEngine(HollowObjectHashCodeFinder hasher) {
         this.writeStates = new HashMap<String, HollowTypeWriteState>();
         this.hollowSchemas = new HashMap<String, HollowSchema>();
@@ -89,6 +91,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     /**
      * Add a record to the state. 
+     * @param type the type name
+     * @param rec the record
+     * @return the ordinal of the added record
      */
     public int add(String type, HollowWriteRecord rec) {
         HollowTypeWriteState hollowTypeWriteState = writeStates.get(type);
@@ -99,6 +104,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
     /**
      * Add a type to the dataset.  Should be called during the first cycle, before writing the first state.
+     * @param writeState the write state to add
      */
     public synchronized void addTypeState(HollowTypeWriteState writeState) {
         HollowSchema schema = writeState.getSchema();
@@ -122,6 +128,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * <li>calling {@link HollowObjectMapper#initializeTypeState(Class)} with each of the top-level classes in the data model</li>
      * <li>adding the types via {@link #addTypeState(HollowTypeWriteState)}</li>
      * </ul>
+     * @param readStateEngine the read state to restore from
      */
     public void restoreFrom(HollowReadStateEngine readStateEngine) {
         if(!readStateEngine.isListenToAllPopulatedOrdinals())
@@ -166,7 +173,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         try {
             executor.awaitSuccessfulCompletion();
         } catch(Exception e){
-            throw new RuntimeException(e);
+            throw new HollowWriteStateException("Unable to restore write state from read state engine", e);
         }
     }
 
@@ -192,8 +199,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Failed to prepare for write", ex);
         }
 
         preparedForNextCycle = false;
@@ -222,8 +229,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
 
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable t) {
-            throw new RuntimeException(t);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Failed to prepare for next cycle", ex);
         }
 
         preparedForNextCycle = true;
@@ -261,8 +268,8 @@ public class HollowWriteStateEngine implements HollowStateEngine {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch(Throwable th) {
-            throw new RuntimeException(th);
+        } catch(Exception ex) {
+            throw new HollowWriteStateException("Unable to reset to the prior version of the write state", ex);
         }
         
         /// recreate a new randomized tag, to avoid any potential conflict with aborted versions
@@ -299,8 +306,12 @@ public class HollowWriteStateEngine implements HollowStateEngine {
             }
         }
         
-        if(!unrestoredStates.isEmpty())
-            throw new IllegalStateException("When state engine was restored, not all necessary states were present!  Unrestored states: " + unrestoredStates);
+        if(!unrestoredStates.isEmpty()) {
+            throw new IllegalStateException(String.format(
+                    "Current state was restored but contains unrestored state for top-level types %s. " +
+                    "Those types need to be registered with the producer (see HollowProducer.initializeDataModel)",
+                    unrestoredStates));
+        }
     }
 
     public List<HollowTypeWriteState> getOrderedTypeStates() {
@@ -308,6 +319,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
     }
 
     /**
+     * @param typeName the type name
      * @return the specified {@link HollowTypeWriteState}
      */
     public HollowTypeWriteState getTypeState(String typeName) {
@@ -361,6 +373,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
         return headerTags.get(name);
     }
 
+    @Deprecated
     public HollowObjectHashCodeFinder getHashCodeFinder() {
         return hashCodeFinder;
     }
@@ -388,7 +401,9 @@ public class HollowWriteStateEngine implements HollowStateEngine {
      * something reasonably small, for example 25MB.
      * 
      * In a future release, this value will default to  (25 * 1024 * 1024).  It is currently set to Long.MAX_VALUE to retain backwards
-     * compatibility with pre v2.1.0 consumers. 
+     * compatibility with pre v2.1.0 consumers.
+     *
+     * @param targetMaxTypeShardSize the target max type shard size, in bytes
      */
     public void setTargetMaxTypeShardSize(long targetMaxTypeShardSize) {
         this.targetMaxTypeShardSize = targetMaxTypeShardSize;

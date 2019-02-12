@@ -28,10 +28,10 @@ import com.netflix.hollow.api.producer.HollowProducer.Artifacts;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
-import com.netflix.hollow.api.producer.HollowProducer.WriteState;
 import com.netflix.hollow.api.producer.HollowProducerListener.ProducerStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.RestoreStatus;
 import com.netflix.hollow.api.producer.HollowProducerListener.Status;
+import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -77,8 +77,10 @@ public class HollowProducerTest {
 
     private HollowProducer createProducer(File tmpFolder, HollowObjectSchema... schemas) {
         HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
-            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder)).build();
-        producer.initializeDataModel(schemas);
+            .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath())).build();
+        if (schemas != null && schemas.length > 0) {
+            producer.initializeDataModel(schemas);
+        }
         producer.addListener(new FakeProducerListener());
         return producer;
     }
@@ -89,6 +91,55 @@ public class HollowProducerTest {
             System.out.println("\t deleting: " + file);
             file.delete();
         }
+    }
+
+    @Test
+    public void testPopulateNoChangesVersion() {
+        HollowProducer producer = createProducer(tmpFolder);
+        long v1 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        // Run cycle with no changes
+        long v2 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        long v3 = producer.runCycle(ws -> {
+            ws.add(2);
+        });
+
+        Assert.assertEquals(v1, v2);
+        Assert.assertTrue(v3 > v2);
+    }
+
+    @Test
+    public void testNotPrimaryProducerVersion() {
+        BasicSingleProducerEnforcer enforcer = new BasicSingleProducerEnforcer();
+        HollowProducer producer = HollowProducer.withPublisher(new FakeBlobPublisher())
+                .withSingleProducerEnforcer(enforcer)
+                .withAnnouncer(new HollowFilesystemAnnouncer(tmpFolder.toPath()))
+                .build();
+        producer.addListener(new FakeProducerListener());
+
+        long v1 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        enforcer.disable();
+        // Run cycle as not the primary producer
+        long v2 = producer.runCycle(ws -> {
+            ws.add(1);
+        });
+
+        // Run cycle as the primary producer
+        enforcer.enable();
+        long v3 = producer.runCycle(ws -> {
+            ws.add(2);
+        });
+
+        Assert.assertEquals(v1, v2);
+        Assert.assertTrue(v3 > v2);
     }
 
     @Test
@@ -106,7 +157,7 @@ public class HollowProducerTest {
     }
 
     @Test
-    public void testPublishAndRestore() throws Exception {
+    public void testPublishAndRestore() {
         HollowProducer producer = createProducer(tmpFolder, schema);
         long version = testPublishV1(producer, 2, 10);
 
@@ -211,13 +262,9 @@ public class HollowProducerTest {
         Assert.assertEquals("Should have no populated ordinals", 0,
                 producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
         doThrow(new RuntimeException("Publish failed")).when(producer).publish(
-                any(WriteState.class), any(Artifacts.class));
+                any(ListenerSupport.Listeners.class), any(Long.class), any(Artifacts.class));
         try {
-            producer.runCycle(new HollowProducer.Populator() {
-                public void populate(WriteState newState) {
-                    newState.add(new TestPojoV1(1, 1));
-                }
-            });
+            producer.runCycle(newState -> newState.add(new TestPojoV1(1, 1)));
         } catch (RuntimeException e) { // expected
         }
         Assert.assertEquals("Should still have no populated ordinals", 0,
@@ -225,11 +272,9 @@ public class HollowProducerTest {
     }
 
     private long testPublishV1(HollowProducer producer, final int size, final int valueMultiplier) {
-        producer.runCycle(new HollowProducer.Populator() {
-            public void populate(HollowProducer.WriteState newState) throws Exception {
-                for (int i = 1; i <= size; i++) {
-                    newState.add(new TestPojoV1(i, i * valueMultiplier));
-                }
+        producer.runCycle(newState -> {
+            for (int i = 1; i <= size; i++) {
+                newState.add(new TestPojoV1(i, i * valueMultiplier));
             }
         });
         Assert.assertNotNull(lastProducerStatus);
@@ -238,11 +283,9 @@ public class HollowProducerTest {
     }
 
     private long testPublishV2(HollowProducer producer, final int size, final int valueMultiplier) {
-        producer.runCycle(new HollowProducer.Populator() {
-            public void populate(HollowProducer.WriteState newState) throws Exception {
-                for (int i = 1; i <= size; i++) {
-                    newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
-                }
+        producer.runCycle(newState -> {
+            for (int i = 1; i <= size; i++) {
+                newState.add(new TestPojoV2(i, i * valueMultiplier, i * valueMultiplier));
             }
         });
         Assert.assertNotNull(lastProducerStatus);
@@ -254,7 +297,7 @@ public class HollowProducerTest {
         restoreAndAssert(producer, version, size, valueMultiplier, 1);
     }
 
-    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) throws Exception {
+    private void restoreAndAssert(HollowProducer producer, long version, int size, int valueMultiplier, int valueFieldCount) {
         ReadState readState = producer.restore(version, blobRetriever);
         Assert.assertNotNull(lastRestoreStatus);
         Assert.assertEquals(Status.SUCCESS, lastRestoreStatus.getStatus());
@@ -287,7 +330,7 @@ public class HollowProducerTest {
         public int id;
         public int v1;
 
-        public TestPojoV1(int id, int v1) {
+        TestPojoV1(int id, int v1) {
             super();
             this.id = id;
             this.v1 = v1;
@@ -297,11 +340,11 @@ public class HollowProducerTest {
     @SuppressWarnings("unused")
     @HollowTypeName(name = "TestPojo")
     private static class TestPojoV2 {
-        public int id;
-        public int v1;
-        public int v2;
+        int id;
+        int v1;
+        int v2;
 
-        public TestPojoV2(int id, int v1, int v2) {
+        TestPojoV2(int id, int v1, int v2) {
             this.id = id;
             this.v1 = v1;
             this.v2 = v2;

@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 /**
@@ -97,7 +98,7 @@ public class HollowDiff {
      *
      * @param type the type name
      * @param primaryKeyPaths the path(s) to the field(s) which comprise the type's primary key
-     * @return
+     * @return the diff type
      */
     public HollowTypeDiff addTypeDiff(String type, String... primaryKeyPaths) {
         HollowTypeDiff typeDiff = new HollowTypeDiff(this, type, primaryKeyPaths);
@@ -113,7 +114,7 @@ public class HollowDiff {
     /**
      * Retrieve a diff report for a specific type in order to inspect the calculated differences
      * @param type the type name
-     * @return
+     * @return the diff type
      */
     public HollowTypeDiff getTypeDiff(String type) {
         return typeDiffs.get(type);
@@ -151,25 +152,21 @@ public class HollowDiff {
     private void prepareForDiffCalculation() {
         SimultaneousExecutor executor = new SimultaneousExecutor(1 + typeDiffs.size(), "hollow-diff-prepare");
 
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                for(HollowTypeDiff typeDiff : typeDiffs.values()) {
-                    equalityMapping.getEqualOrdinalMap(typeDiff.getTypeName());
-                }
+        executor.execute(() -> {
+            for(HollowTypeDiff typeDiff : typeDiffs.values()) {
+                equalityMapping.getEqualOrdinalMap(typeDiff.getTypeName());
             }
         });
 
         for(final HollowTypeDiff typeDiff : typeDiffs.values()) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    typeDiff.calculateMatches();
-                }
-            });
+            executor.execute(typeDiff::calculateMatches);
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         equalityMapping.markPrepared();
     }

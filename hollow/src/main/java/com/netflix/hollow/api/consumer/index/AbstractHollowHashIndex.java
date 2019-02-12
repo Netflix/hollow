@@ -22,9 +22,11 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
  * Intended for internal use only - used by API code generator
- *,
- * @author dsu
+ * @deprecated see {@link HashIndex}
  */
+// TODO(timt): how to move to `API extends HollowAPI` without binary incompatiblity of access to the `api`
+//             field in generated subclasses, e.g. `find*Matches(...)`
+@Deprecated
 public abstract class AbstractHollowHashIndex<API> {
     protected final HollowConsumer consumer;
     protected final String queryType;
@@ -92,16 +94,17 @@ public abstract class AbstractHollowHashIndex<API> {
     }
 
     private class RefreshListener implements HollowConsumer.RefreshListener {
-        @Override public void deltaUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-            reindex(stateEngine, api);
-        }
-
-        @Override public void snapshotUpdateOccurred(HollowAPI api, HollowReadStateEngine stateEngine, long version) throws Exception {
-            reindex(stateEngine, api);
-        }
-
-        private void reindex(HollowReadStateEngine stateEngine, HollowAPI refreshAPI) {
+        @Override
+        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
+            idx.detachFromDeltaUpdates();
             idx = new HollowHashIndex(stateEngine, queryType, selectFieldPath, matchFieldPaths);
+            idx.listenForDeltaUpdates();
+
+            api = castAPI(refreshAPI);
+        }
+
+        @Override
+        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
             api = castAPI(refreshAPI);
         }
 

@@ -20,7 +20,16 @@ package com.netflix.hollow.tools.stringifier;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.INDENT;
 import static com.netflix.hollow.tools.stringifier.HollowStringifier.NEWLINE;
 
+import com.netflix.hollow.api.objects.HollowRecord;
+import com.netflix.hollow.api.objects.generic.GenericHollowObject;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.StateEngineRoundTripper;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
+import com.netflix.hollow.test.model.TestTypeA;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -114,9 +123,30 @@ public class HollowRecordJsonStringifierTest extends AbstractHollowRecordStringi
                     new TypeWithString("foo"), new TypeWithString("bar")));
     }
 
+    @Test
+    public void testStringifyIterator() throws IOException {
+        HollowRecordJsonStringifier recordJsonStringifier = new HollowRecordJsonStringifier(false, false);
+        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowObjectMapper mapper = new HollowObjectMapper(writeEngine);
+        mapper.useDefaultHashKeys();
+
+        mapper.add(new TestTypeA(1, "one"));
+        mapper.add(new TestTypeA(2, "two"));
+
+        HollowReadStateEngine readEngine = StateEngineRoundTripper.roundTripSnapshot(writeEngine);
+
+        Iterable<HollowRecord> genericHollowObjects = (Iterable) Arrays.asList(new GenericHollowObject(readEngine, "TestTypeA", 0), new GenericHollowObject(readEngine, "TestTypeA", 1));
+
+        StringWriter writer = new StringWriter();
+        recordJsonStringifier.stringify(writer, genericHollowObjects);
+        Assert.assertEquals("Multiple records should be printed correctly",
+                "[{\"id\": 1,\"name\": {\"value\": \"one\"}},{\"id\": 2,\"name\": {\"value\": \"two\"}}]", writer.toString());
+    }
+
     private static <T> String stringifyType(Class<T> clazz, boolean expanded, T... instances) throws IOException {
         HollowRecordJsonStringifier stringifier = expanded
             ? new HollowRecordJsonStringifier(true, false) : new HollowRecordJsonStringifier();
         return stringifyType(clazz, stringifier, instances);
     }
+
 }

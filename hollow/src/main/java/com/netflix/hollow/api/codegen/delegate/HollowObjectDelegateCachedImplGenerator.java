@@ -120,7 +120,7 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                 if(shortcut != null) {
                     String ordinalVariableName = fieldName + "TempOrdinal";
 
-                    builder.append("        int ").append(ordinalVariableName).append(" = typeAPI.get").append(uppercase(fieldName)).append("Ordinal(ordinal);\n");
+                    builder.append("        int ").append(ordinalVariableName).append(" = ").append(fieldName).append("Ordinal;\n");
 
                     for(int j=0;j<shortcut.getPath().length-1;j++) {
                         String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[j]);
@@ -128,7 +128,7 @@ public class HollowObjectDelegateCachedImplGenerator extends HollowObjectDelegat
                     }
 
                     String typeAPIName = HollowCodeGenerationUtils.typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
-                    builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(ordinal);\n");
+                    builder.append("        this.").append(fieldName).append(" = ").append(ordinalVariableName).append(" == -1 ? null : ").append("typeAPI.getAPI().get").append(typeAPIName).append("().get").append(uppercase(shortcut.getPath()[shortcut.getPath().length-1])).append("(").append(ordinalVariableName).append(");\n");
                 }
             }
         }

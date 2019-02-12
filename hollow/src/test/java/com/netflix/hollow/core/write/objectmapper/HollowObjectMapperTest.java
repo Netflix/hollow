@@ -19,6 +19,7 @@ package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.AbstractStateEngineTest;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowSchema;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -55,6 +57,53 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
 
         //System.out.println("---------------------------------");
         //System.out.println(new HollowRecordJsonStringifier(false, true).stringify(readStateEngine, "TypeA", 1));
+    }
+
+    @Test
+    public void testNullElements() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+
+        // Lists cannot contain null elements
+        try {
+            mapper.add(new TypeWithList("a", null, "c"));
+            Assert.fail("NullPointerException not thrown from List containing null elements");
+        } catch (NullPointerException e) {
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Lists"));
+        }
+
+        // Sets cannot contain null elements
+        try {
+            mapper.add(new TypeWithSet("a", null, "c"));
+            Assert.fail("NullPointerException not thrown from Set containing null elements");
+        } catch (NullPointerException e) {
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Sets"));
+        }
+
+        // Maps cannot contain null keys
+        try {
+            mapper.add(new TypeWithMap("a", "a", null, "b", "c", "c"));
+            Assert.fail("NullPointerException not thrown from Map containing null keys");
+        } catch (NullPointerException e) {
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Maps"));
+            Assert.assertTrue(m.contains("key"));
+        }
+
+        // Maps cannot contain null values
+        try {
+            mapper.add(new TypeWithMap("a", "a", "b", null, "c", "c"));
+            Assert.fail("NullPointerException not thrown from Map containing null values");
+        } catch (NullPointerException e) {
+            String m = e.getMessage();
+            Assert.assertNotNull(m);
+            Assert.assertTrue(m.contains("Maps"));
+            Assert.assertTrue(m.contains("value"));
+        }
     }
 
     @Test
@@ -234,6 +283,49 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         assertExpectedFailureMappingType(IndirectCircularReference.TypeE.class, "f");
     }
 
+    @Test
+    public void testAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testFinalAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithFinalAssignedOrdinal o = new TypeWithFinalAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertNotEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithAssignedOrdinal o = new TypeWithAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        Assert.assertNotEquals(1, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntAssignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        mapper.add(o);
+        Assert.assertEquals(HollowConstants.ORDINAL_NONE, o.__assigned_ordinal);
+    }
+
+    @Test
+    public void testIntPreassignedOrdinal() {
+        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
+        TypeWithIntAssignedOrdinal o = new TypeWithIntAssignedOrdinal();
+        o.__assigned_ordinal = 1;
+        mapper.add(o);
+        // int fields are ignored
+        Assert.assertEquals(1, o.__assigned_ordinal);
+    }
+
     /**
      * Convenience method for experimenting with {@link HollowObjectMapper#initializeTypeState(Class)}
      * on classes we know should fail due to circular references, confirming the exception message is correct.
@@ -312,7 +404,7 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
     }
 
     @SuppressWarnings("unused")
-    private static enum TestEnum {
+    private enum TestEnum {
         ONE(1),
         TWO(2),
         THREE(3);
@@ -397,7 +489,6 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
         }
     }
 
-
     @SuppressWarnings("unused")
     private static class TestClassImplementingInterface implements TestInterface {
         int val1;
@@ -411,4 +502,50 @@ public class HollowObjectMapperTest extends AbstractStateEngineTest {
             return 0;
         }
     }
+
+    static class TypeWithSet {
+        Set<String> c;
+
+        TypeWithSet(String... c) {
+            this.c = new HashSet<>(Arrays.asList(c));
+        }
+    }
+
+    static class TypeWithList {
+        List<String> c;
+
+        TypeWithList(String... c) {
+            this.c = new ArrayList<>(Arrays.asList(c));
+        }
+    }
+
+    static class TypeWithMap {
+        Map<String, String> m;
+
+        TypeWithMap(String... kv) {
+            m = new HashMap<>();
+            for (int i = 0; i < kv.length; i += 2) {
+                m.put(kv[i], kv[i + 1]);
+            }
+        }
+    }
+
+    static class TypeWithAssignedOrdinal {
+        long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
+    static class TypeWithFinalAssignedOrdinal {
+        // Cannot assign directly to this field otherwise javac may
+        // assume the value is a constant when accessed.
+        final long __assigned_ordinal;
+
+        TypeWithFinalAssignedOrdinal() {
+            this.__assigned_ordinal = HollowConstants.ORDINAL_NONE;
+        };
+    }
+
+    static class TypeWithIntAssignedOrdinal {
+        int __assigned_ordinal = HollowConstants.ORDINAL_NONE;
+    }
+
 }

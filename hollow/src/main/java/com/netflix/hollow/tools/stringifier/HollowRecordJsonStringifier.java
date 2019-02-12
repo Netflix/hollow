@@ -37,6 +37,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -85,6 +86,19 @@ public class HollowRecordJsonStringifier implements HollowStringifier<HollowReco
     @Override
     public void stringify(Writer writer, HollowRecord record) throws IOException {
         stringify(writer, record.getTypeDataAccess().getDataAccess(), record.getSchema().getName(), record.getOrdinal());
+    }
+
+    @Override
+    public void stringify(Writer writer, Iterable<HollowRecord> records) throws IOException {
+        writer.write("[");
+        Iterator<HollowRecord> iterator = records.iterator();
+        while (iterator.hasNext()) {
+            stringify(writer, iterator.next());
+            if (iterator.hasNext()) {
+                writer.write(",");
+            }
+        }
+        writer.write("]");
     }
 
     @Override

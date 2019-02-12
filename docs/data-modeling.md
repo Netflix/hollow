@@ -162,6 +162,12 @@ public class MaturityRating {
 
 We could have referenced these fields separately.  If we had done so, each `Movie` record, of which there are probably many, would have had to contain two separate references for these fields.  Instead, by recognizing that these fields were associated and pulling them together, space is saved because each `Movie` record now only contains one reference for this data.
 
+### Transient Fields
+
+A transient field is ignored and will not be included in an `Object` Schema.  A transient field is a field declared
+with the `transient` Java keyword or annotated with the `@HollowTransient` annotation.  The latter may be used for
+cases when the use of the `transient` Java keyword has unwanted side-effects, such as when POJOs defining the data 
+model are also consumed by tools, other than Hollow, for which the field is not transient.
 
 ## List Schemas
 

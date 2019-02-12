@@ -32,22 +32,25 @@ public interface HollowTypeDataAccess {
     /**
      * @return The {@link HollowDataAccess} for the dataset this type belongs to.
      */
-    public HollowDataAccess getDataAccess();
+    HollowDataAccess getDataAccess();
 
     /**
      * @return the {@link HollowSchema} for this type.
      */
-    public HollowSchema getSchema();
+    HollowSchema getSchema();
 
-    public void setSamplingDirector(HollowSamplingDirector director);
+    void setSamplingDirector(HollowSamplingDirector director);
     
-    public void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director);
+    void setFieldSpecificSamplingDirector(HollowFilterConfig fieldSpec, HollowSamplingDirector director);
     
-    public void ignoreUpdateThreadForSampling(Thread t);
+    void ignoreUpdateThreadForSampling(Thread t);
 
-    public HollowSampler getSampler();
+    HollowSampler getSampler();
 
-    /** Optional operation **/
-    public HollowTypeReadState getTypeState();
+    /**
+     * Optional operation
+     * @return the read state
+     */
+    HollowTypeReadState getTypeState();
 
 }

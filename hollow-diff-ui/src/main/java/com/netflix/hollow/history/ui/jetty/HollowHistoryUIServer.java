@@ -19,7 +19,10 @@ package com.netflix.hollow.history.ui.jetty;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.history.ui.HollowHistoryUI;
+import com.netflix.hollow.history.ui.VersionTimestampConverter;
 import com.netflix.hollow.tools.history.HollowHistory;
+
+import java.util.TimeZone;
 
 public class HollowHistoryUIServer {
     private static final UIServer.Factory FACTORY = new OptionalDependencyHelper().historyUIServerFactory();
@@ -27,12 +30,20 @@ public class HollowHistoryUIServer {
     private final UIServer server;
     private final HollowHistoryUI ui;
     
+    public HollowHistoryUIServer(HollowConsumer consumer, int port, TimeZone timeZone) {
+        this(new HollowHistoryUI("", consumer, timeZone), port);
+    }
+
     public HollowHistoryUIServer(HollowConsumer consumer, int port) {
         this(new HollowHistoryUI("", consumer), port);
     }
-    
+
+    public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port, TimeZone timeZone) {
+        this(new HollowHistoryUI("", consumer, numStatesToTrack, timeZone), port);
+    }
+
     public HollowHistoryUIServer(HollowConsumer consumer, int numStatesToTrack, int port) {
-        this(new HollowHistoryUI("", consumer, numStatesToTrack), port);
+        this(new HollowHistoryUI("", consumer, numStatesToTrack, VersionTimestampConverter.PACIFIC_TIMEZONE), port);
     }
 
     public HollowHistoryUIServer(HollowHistory history, int port) {

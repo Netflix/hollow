@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A {@link HollowBlobWriter} is used to serialize snapshot, delta, and reversedelta blobs based on the data state
+ * A {@link HollowBlobWriter} is used to serialize snapshot, delta, and reverse delta blobs based on the data state
  * contained in a {@link HollowWriteStateEngine}. 
  */
 public class HollowBlobWriter {
@@ -42,7 +42,9 @@ public class HollowBlobWriter {
     }
 
     /**
-     * Write the current state as a snapshot blob.  
+     * Write the current state as a snapshot blob.
+     * @param os the output stream to write the snapshot blob
+     * @throws IOException if the snapshot blob could not be written
      */
     public void writeSnapshot(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
@@ -82,6 +84,13 @@ public class HollowBlobWriter {
     /**
      * Serialize the changes necessary to transition a consumer from the previous state
      * to the current state as a delta blob.
+     *
+     * @param os the output stream to write the delta blob
+     * @throws IOException if the delta blob could not be written
+     * @throws IllegalStateException if the current state is restored from the previous state
+     * and current state contains unrestored state for one or more types.  This indicates those
+     * types have not been declared to the producer as part it's initialized data model.
+     * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();
@@ -128,7 +137,14 @@ public class HollowBlobWriter {
 
     /**
      * Serialize the changes necessary to transition a consumer from the current state to the
-     * previous state as a delta blob. 
+     * previous state as a delta blob.
+     *
+     * @param os the output stream to write the reverse delta blob
+     * @throws IOException if the reverse delta blob could not be written
+     * @throws IllegalStateException if the current state is restored from the previous state
+     * and current state contains unrestored state for one or more types.  This indicates those
+     * types have not been declared to the producer as part it's initialized data model.
+     * @see com.netflix.hollow.api.producer.HollowProducer#initializeDataModel(Class[])
      */
     public void writeReverseDelta(OutputStream os) throws IOException {
         stateEngine.prepareForWrite();

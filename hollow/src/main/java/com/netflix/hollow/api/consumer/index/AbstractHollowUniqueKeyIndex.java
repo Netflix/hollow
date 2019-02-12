@@ -25,6 +25,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
  *,
  * @author dsu
  */
+// TODO(timt): how to move to `API extends HollowAPI` without binary incompatiblity of access to the `api`
+//             field in generated subclasses, e.g. `findMatches(...)`
 public abstract class AbstractHollowUniqueKeyIndex<API, T> {
     protected final HollowConsumer consumer;
     protected HollowPrimaryKeyIndex idx;
@@ -86,7 +88,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
 
     private class RefreshListener implements HollowConsumer.RefreshListener {
         @Override
-        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) throws Exception {
+        public void snapshotUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
             idx.detachFromDeltaUpdates();
             idx = new HollowPrimaryKeyIndex(stateEngine, idx.getPrimaryKey());
             idx.listenForDeltaUpdates();
@@ -95,7 +97,7 @@ public abstract class AbstractHollowUniqueKeyIndex<API, T> {
         }
 
         @Override
-        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) throws Exception {
+        public void deltaUpdateOccurred(HollowAPI refreshAPI, HollowReadStateEngine stateEngine, long version) {
             api = castAPI(refreshAPI);
         }
 

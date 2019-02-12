@@ -83,7 +83,7 @@ HollowAPIGenerator generator =
 generator.generateFiles("/path/to/java/api/files");
 ```
 
-After this code executes, an set of Java files will be written to the location `/path/to/java/api/files`.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.
+After this code executes, a set of Java files will be written to the location `/path/to/java/api/files`.  These java files will be a generated API based on the data model defined by the schemas in our state engine, and will provide convenient methods to access that data.
 
 !!! hint "Initializing multiple types"
     If we have multiple top-level types, we should call `initializeTypeState()` multiple times, once for each class.
@@ -325,7 +325,7 @@ producer.runCycle(new Populator() {
 
 ```
 
-In the above code, we first _initialize_ the data model by providing the set of classes we will add during the cycle.  After that, we _restore_ by providing our `BlobRetriever` implementation, along with the version which should be restored.  The `HollowProducer` will will use the `BlobRetriever` to load the desired state, then use it to _restore_ itself.  In this way, a delta can be produced at startup, and consumers will not have to load a snapshot to get up-to-date.
+In the above code, we first _initialize_ the data model by providing the set of classes we will add during the cycle.  After that, we _restore_ by providing our `BlobRetriever` implementation, along with the version which should be restored.  The `HollowProducer` will use the `BlobRetriever` to load the desired state, then use it to _restore_ itself.  In this way, a delta can be produced at startup, and consumers will not have to load a snapshot to get up-to-date.
 
 !!! hint "Initializing the data model"
     Before _restoring_, we must always _initialize_ our data model.  When a data model changes between deployments, Hollow will automatically merge records of types which have changed.  In order to do this correctly, Hollow needs to know about the current data model before the restore operation begins.

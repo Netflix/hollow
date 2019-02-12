@@ -27,11 +27,11 @@
     
     #foreach($typeOverview in $typeOverviews)
         <tr>
-            <td><a href="$basePath/type?type=$typeOverview.getTypeName()">$typeOverview.getTypeName()</a></th>
+            <td><a href="$basePath/type?type=$esc.url($typeOverview.getTypeName())">$esc.html($typeOverview.getTypeName())</a></th>
             <td>$typeOverview.getNumRecords()</td>
             <td>$typeOverview.getApproxHeapFootprint()</td>
-            <td><pre>$typeOverview.getPrimaryKey()</pre></td>
-            <td><pre>$typeOverview.getSchema()</pre></td>
+            <td><pre>$esc.html($typeOverview.getPrimaryKey())</pre></td>
+            <td><pre>$esc.html($typeOverview.getSchema())</pre></td>
         </tr>
     #end
 </table>

@@ -17,7 +17,7 @@
  */
 package com.netflix.hollow.api.client;
 
-import com.netflix.hollow.api.HollowConstants;
+import com.netflix.hollow.core.HollowConstants;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -36,8 +36,8 @@ import java.io.InputStream;
  *      <dd>Implementations will define how to retrieve the actual blob data for this specific blob from a data store as an InputStream.</dd>
  * </dl>
  * 
- * @deprecated Extend the {@link com.netflix.hollow.api.consumer.HollowConsumer.Blob} for use with the {@link HollowConsumer.BlobRetriever} instead.
- * 
+ * @deprecated Extend the {@link com.netflix.hollow.api.consumer.HollowConsumer.Blob} for use with the
+ *             {@link com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever} instead.
  */
 @Deprecated
 public abstract class HollowBlob {
@@ -47,13 +47,18 @@ public abstract class HollowBlob {
 
     /**
      * Instantiate a snapshot to a specified data state version.
+     *
+     * @param toVersion the version to end from
      */
     public HollowBlob(long toVersion) {
         this(HollowConstants.VERSION_NONE, toVersion);
     }
 
     /**
-     * Instantiate a delta from one data state version to another. 
+     * Instantiate a delta from one data state version to another.
+     *
+     * @param fromVersion the version to start from
+     * @param toVersion the version to end from
      */
     public HollowBlob(long fromVersion, long toVersion) {
         this.fromVersion = fromVersion;
@@ -66,8 +71,8 @@ public abstract class HollowBlob {
      * It is expected that the returned InputStream will not be interrupted.  For this reason, it is a good idea to
      * retrieve the entire blob (e.g. to disk) from a remote datastore prior to returning this stream.
      *     
-     * @return
-     * @throws IOException
+     * @return the input stream to the blob
+     * @throws IOException if the input stream to the blob cannot be obtained
      */
     public abstract InputStream getInputStream() throws IOException;
 

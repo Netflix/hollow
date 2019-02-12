@@ -30,6 +30,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
 import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         classBodyBuilder.append("    }\n\n");
 
         if (memoizeOrdinal) {
-            classBodyBuilder.append("    private int __assigned_ordinal = -1;\n");
+            classBodyBuilder.append("    private long __assigned_ordinal = -1;\n");
         }
 
         classBodyBuilder.append("}");
@@ -148,6 +149,10 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
         for (int i = 0;i < schema.numFields();i++) {
             if (fieldNeedsTypeNameAnnotation(i)) {
                 classBodyBuilder.append("    @HollowTypeName(name=\"").append(schema.getReferencedType(i)).append("\")\n");
+            }
+            if (fieldNeedsInlineAnnotation(i)) {
+                importClasses.add(HollowInline.class);
+                classBodyBuilder.append("    @HollowInline\n");
             }
             classBodyBuilder.append("    public ");
             classBodyBuilder.append(fieldType(i));
@@ -326,6 +331,10 @@ public class HollowPOJOClassGenerator implements HollowJavaFileGenerator {
             return !referencedSchema.getName().equals(expectedCollectionClassName(referencedSchema));
         }
         return false;
+    }
+
+    private boolean fieldNeedsInlineAnnotation(int i) {
+        return schema.getFieldType(i) == FieldType.STRING;
     }
 
     private String fieldType(int i) {

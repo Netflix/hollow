@@ -1,7 +1,7 @@
 language: java
 jdk:
-- oraclejdk7
-dist: precise
+- openjdk8
+dist: trusty
 sudo: false
 install: true
 script: "./buildViaTravis.sh"

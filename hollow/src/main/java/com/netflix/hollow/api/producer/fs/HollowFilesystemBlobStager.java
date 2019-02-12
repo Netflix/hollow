@@ -21,11 +21,11 @@ import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.REVERSE_DELTA;
 import static com.netflix.hollow.api.producer.HollowProducer.Blob.Type.SNAPSHOT;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.BlobCompressor;
 import com.netflix.hollow.api.producer.HollowProducer.BlobStager;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -53,11 +53,11 @@ public class HollowFilesystemBlobStager implements BlobStager {
     /**
      * Constructor to create a new HollowFilesystemBlobStager with specified disk path and compression for Hollow blobs.
      *
-     * @param stagingPath
-     * @param compressor
-     * @throws IOException
+     * @param stagingPath the path where to stage blobs
+     * @param compressor the blob compressor
+     * @throws RuntimeException if errors occur when creating the specified path
      */
-    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) {
+    public HollowFilesystemBlobStager(Path stagingPath, BlobCompressor compressor) throws RuntimeException {
         this.stagingPath = stagingPath;
         this.compressor = compressor;
 

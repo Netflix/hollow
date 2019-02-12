@@ -24,11 +24,16 @@ import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Set;
 
 public class HollowSetTypeMapper extends HollowTypeMapper {
+
+    private static final String NULL_ELEMENT_MESSAGE =
+            "Null element contained in instance of a Set with schema \"%s\". Sets cannot contain null elements";
 
     private final HollowSetSchema schema;
     private final HollowSetTypeWriteState writeState;
@@ -67,12 +72,7 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         
         Set<?> s = (Set<?>)obj;
 
-        HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
-        for(Object o : s) {
-            int ordinal = elementMapper.write(o);
-            int hashCode = hashCodeFinder.hashCode(elementMapper.getTypeName(), ordinal, o);
-            rec.addElement(ordinal, hashCode);
-        }
+        HollowSetWriteRecord rec = copyToWriteRecord(s, null);
 
         int assignedOrdinal = writeState.add(rec);
         
@@ -81,6 +81,25 @@ public class HollowSetTypeMapper extends HollowTypeMapper {
         }
         
         return assignedOrdinal;
+    }
+    
+    @Override
+    protected int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+    	HollowSetWriteRecord rec = copyToWriteRecord((Set<?>)obj, flatRecordWriter);
+    	return flatRecordWriter.write(schema, rec);
+    }
+
+    private HollowSetWriteRecord copyToWriteRecord(Set<?> s, FlatRecordWriter flatRecordWriter) {
+        HollowSetWriteRecord rec = (HollowSetWriteRecord)writeRecord();
+        for(Object o : s) {
+            if(o == null) {
+                throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
+            }
+            int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
+            int hashCode = hashCodeFinder.hashCode(elementMapper.getTypeName(), ordinal, o);
+            rec.addElement(ordinal, hashCode);
+        }
+        return rec;
     }
 
     @Override

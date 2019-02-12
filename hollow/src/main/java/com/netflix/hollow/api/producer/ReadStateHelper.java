@@ -17,8 +17,8 @@
  */
 package com.netflix.hollow.api.producer;
 
-import com.netflix.hollow.api.HollowConstants;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 /**
@@ -61,9 +61,9 @@ final class ReadStateHelper {
         this.pending = pending;
     }
 
-    ReadStateHelper roundtrip(HollowProducer.WriteState writeState) {
+    ReadStateHelper roundtrip(long version) {
         if(pending != null) throw new IllegalStateException();
-        return new ReadStateHelper(this.current, newReadState(writeState.getVersion(), new HollowReadStateEngine()));
+        return new ReadStateHelper(this.current, newReadState(version, new HollowReadStateEngine()));
     }
 
     /**

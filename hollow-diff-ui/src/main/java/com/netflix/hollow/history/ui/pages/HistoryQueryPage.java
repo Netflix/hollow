@@ -49,7 +49,7 @@ public class HistoryQueryPage extends HistoryPage {
         List<HistoryStateQueryMatches> list = new ArrayList<HistoryStateQueryMatches>();
 
         for(HollowHistoricalState state : history.getHistoricalStates()) {
-            HistoryStateQueryMatches matches = new HistoryStateQueryMatches(state, ui, VersionTimestampConverter.getTimestamp(state.getVersion()), typeQueryKeyMatches);
+            HistoryStateQueryMatches matches = new HistoryStateQueryMatches(state, ui, VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), typeQueryKeyMatches);
             if(matches.hasMatches())
                 list.add(matches);
         }

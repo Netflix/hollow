@@ -18,9 +18,12 @@
 package com.netflix.hollow.explorer.ui.pages;
 
 import com.netflix.hollow.explorer.ui.HollowExplorerUI;
+import com.netflix.hollow.ui.EscapingTool;
 import com.netflix.hollow.ui.HollowUISession;
+import java.io.IOException;
 import java.io.Writer;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 
@@ -38,7 +41,7 @@ public abstract class HollowExplorerPage {
         this.footerTemplate = ui.getVelocityEngine().getTemplate("explorer-footer.vm");
     }
 
-    public void render(HttpServletRequest req, HollowUISession session, Writer writer) {
+    public void render(HttpServletRequest req, HttpServletResponse resp, HollowUISession session) throws IOException {
         VelocityContext ctx = new VelocityContext();
 
         if(ui.getHeaderDisplayString() != null)
@@ -49,8 +52,12 @@ public abstract class HollowExplorerPage {
         
         ctx.put("basePath", ui.getBaseURLPath());
 
+        ctx.put("esc", new EscapingTool());
+
         setUpContext(req, session, ctx);
 
+        resp.setContentType("text/html;charset=UTF-8");
+        Writer writer = resp.getWriter();
         headerTemplate.merge(ctx, writer);
         renderPage(req, ctx, writer);
         footerTemplate.merge(ctx, writer);

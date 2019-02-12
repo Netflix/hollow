@@ -85,7 +85,7 @@ class HollowWriteStateEnginePrimaryKeyHasher {
     
     private long navigateToField(HollowObjectSchema schema, int fieldIdx, SegmentedByteArray data, long offset) {
         for(int i=0;i<fieldIdx;i++) {
-            switch(schema.getFieldType(fieldIdx)) {
+            switch(schema.getFieldType(i)) {
             case INT:
             case LONG:
             case REFERENCE:
@@ -141,10 +141,10 @@ class HollowWriteStateEnginePrimaryKeyHasher {
                 return 0;
             return data.get(offset) == 1 ? 1231 : 1237;
         case DOUBLE:
-            long longBits = HollowObjectTypeWriteState.readLongBits(data, offset);
+            long longBits = data.readLongBits(offset);
             return (int)(longBits ^ (longBits >>> 32));
         case FLOAT:
-            return HollowObjectTypeWriteState.readIntBits(data, offset);
+            return data.readIntBits(offset);
         default:
             throw new IllegalArgumentException("Schema "+schema.getName()+" has unknown field type for field " + schema.getFieldName(fieldIdx) + ": " + schema.getFieldType(fieldIdx));
         }

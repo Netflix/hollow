@@ -16,37 +16,23 @@
 package com.netflix.hollow.api.codegen;
 
 import com.netflix.hollow.core.write.objectmapper.HollowPrimaryKey;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Before;
 import org.junit.Test;
 
 public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
-
-    @Override
-    @Before
-    public void setup() throws IOException {
-        // isCleanupAfterEnabled = false;
-    }
-
-    @Override
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        builder.withErgonomicShortcuts();
-        builder.withPackageGrouping();
-        builder.withHollowPrimitiveTypes(true);
-        builder.withRestrictApiToFieldType();
-        return super.initGenerator(builder);
-    }
 
     @Test
     public void test() throws Exception {
         String apiClassName = "ScalarFieldCodeGenAPI";
         String packageName = "codegen.scalar.types";
-        runGenerator(apiClassName, packageName, Movie.class);
+        runGenerator(apiClassName, packageName, Movie.class, builder ->
+                builder.withErgonomicShortcuts().withPackageGrouping()
+                        .withHollowPrimitiveTypes(true).withRestrictApiToFieldType());
     }
 
+    @SuppressWarnings("unused")
     @HollowPrimaryKey(fields = { "id" })
     private static class Movie {
         int id;
@@ -78,12 +64,14 @@ public class ScalarFieldCodeGenTest extends AbstractHollowAPIGeneratorTest {
         String stringType;  // -> REFERENCE
     }
 
+    @SuppressWarnings("unused")
     private static class Actor {
         String name;
 
         Role role;
     }
 
+    @SuppressWarnings("unused")
     private static class Role {
         Integer roleId;
 

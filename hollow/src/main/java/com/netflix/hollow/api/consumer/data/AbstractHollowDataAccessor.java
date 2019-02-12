@@ -85,7 +85,7 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     /**
-     * Return true if data change has been computed
+     * @return true if data change has been computed
      */
     public boolean isDataChangeComputed() {
         return isDataChangeComputed;
@@ -151,26 +151,27 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     /**
-     * Return the associated Type
+     * @return the associated Type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * Return the PrimaryKey that can uniquely identify a single record
+     * @return the PrimaryKey that can uniquely identify a single record
      */
     public PrimaryKey getPrimaryKey() {
         return primaryKey;
     }
 
     /**
-     * Return the Record at specified Ordinal
+     * @param ordinal the ordinal
+     * @return the Record at specified Ordinal
      */
     public abstract T getRecord(int ordinal);
 
     /**
-     * Return all the available Record
+     * @return all the available Record
      */
     public Collection<T> getAllRecords() {
         return new AllHollowRecordCollection<T>(rStateEngine.getTypeState(type)) {
@@ -182,9 +183,8 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     /**
-     * Return only the Records that are Added
-     * 
-     * @See {@link #getUpdatedRecords()}
+     * @return only the Records that are Added
+     * @see #getUpdatedRecords()
      */
     public Collection<T> getAddedRecords() {
         if (!isDataChangeComputed) computeDataChange();
@@ -192,9 +192,8 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     /**
-     * Return only the Records that are Removed
-     * 
-     * @See {@link #getUpdatedRecords()}
+     * @return only the Records that are Removed
+     * @see #getUpdatedRecords()
      */
     public Collection<T> getRemovedRecords() {
         if (!isDataChangeComputed) computeDataChange();
@@ -202,8 +201,7 @@ public abstract class AbstractHollowDataAccessor<T> {
     }
 
     /**
-     * Return the Records that are Updated with both Before and After
-     * 
+     * @return the Records that are Updated with both Before and After
      * @see UpdatedRecord
      */
     public Collection<UpdatedRecord<T>> getUpdatedRecords() {

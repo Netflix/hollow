@@ -59,9 +59,6 @@ import java.util.Collections;
  *      <dd>Defines how to create a {@link HollowAPI} for the dataset, useful when wrapping a dataset with an api which has 
  *          been generated (via the {@link HollowAPIClassJavaGenerator})</dd>
  *          
- *      <dt>{@link HollowObjectHashCodeFinder}</dt>
- *      <dd>Defines the record hashing behavior for elements in set and map records</dd>
- *      
  *      <dt>{@link HollowClientMemoryConfig}</dt>
  *      <dd>Defines various aspects of data access guarantees and update behavior which impact the heap footprint/GC behavior
  *          of hollow.</dd>
@@ -149,7 +146,7 @@ public class HollowClient {
      *
      * This is a blocking call.
      *
-     * @param version
+     * @param version the version to update to
      */
     public void triggerRefreshTo(long version) {
         announcementWatcher.setLatestVersion(version);
@@ -166,6 +163,8 @@ public class HollowClient {
     /**
      * Will apply the filter (i.e. not load the excluded types and fields) on the next snapshot update.
      * Subsequent updates will also ignore the types and fields.
+     *
+     * @param filter the filter configuration
      */
     public void setFilter(HollowFilterConfig filter) {
         updater.setFilter(filter);
@@ -179,6 +178,8 @@ public class HollowClient {
      *      <li>Will do a double snapshot if enabled, otherwise</li>
      *      <li>will traverse up to the specified number of deltas towards the desired state, then stop</li>
      * </ul>
+     *
+     * @param maxDeltas the maximum number of deltas
      */
     public void setMaxDeltas(int maxDeltas) {
         doubleSnapshotConfig.setMaxDeltasBeforeDoubleSnapshot(maxDeltas);

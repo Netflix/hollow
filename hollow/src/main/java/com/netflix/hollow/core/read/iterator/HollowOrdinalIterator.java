@@ -19,7 +19,6 @@ package com.netflix.hollow.core.read.iterator;
 
 /**
  * An iterator over ordinals.  The general pattern for use is:
- * <p>
  * <pre>
  * {@code
  * HollowOrdinalIterator iter = ...;

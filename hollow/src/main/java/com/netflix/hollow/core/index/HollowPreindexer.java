@@ -17,18 +17,18 @@
  */
 package com.netflix.hollow.core.index;
 
+import static java.util.stream.Collectors.joining;
+
 import com.netflix.hollow.core.index.traversal.HollowIndexerValueTraverser;
-import com.netflix.hollow.core.read.dataaccess.HollowCollectionTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
-import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.schema.HollowCollectionSchema;
 import com.netflix.hollow.core.schema.HollowMapSchema;
-import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HollowPreindexer {
@@ -52,7 +52,7 @@ public class HollowPreindexer {
     }
 
     public void buildFieldSpecifications() {
-        Map<String, Integer> baseFieldToIndexMap = new HashMap<String, Integer>();
+        Map<String, Integer> baseFieldToIndexMap = new HashMap<>();
 
         this.typeState = stateEngine.getTypeState(type);
 
@@ -65,70 +65,70 @@ public class HollowPreindexer {
         numMatchTraverserFields = baseFieldToIndexMap.size();
         selectFieldSpec = getHollowHashIndexField(typeState, selectField, baseFieldToIndexMap, false);
 
-        String baseFields[] = new String[baseFieldToIndexMap.size()];
+        String[] baseFields = new String[baseFieldToIndexMap.size()];
 
         for(Map.Entry<String, Integer> entry : baseFieldToIndexMap.entrySet()) {
-            baseFields[entry.getValue().intValue()] = entry.getKey();
+            baseFields[entry.getValue()] = entry.getKey();
         }
 
         traverser = new HollowIndexerValueTraverser(stateEngine, type, baseFields);
     }
-    
-    private HollowHashIndexField getHollowHashIndexField(HollowTypeReadState originalTypeState, String selectField, Map<String, Integer> baseFieldToIndexMap, boolean truncate) {
-        String fieldPaths[] = "".equals(selectField) ? new String[0] : selectField.split("\\.");
-        int fieldPathIndexes[] = new int[fieldPaths.length];
 
-        int baseFieldPathIdx = 0;
-        int fieldPathIdx = 0;
+    private HollowHashIndexField getHollowHashIndexField(HollowTypeReadState originalTypeState, String selectField,
+            Map<String, Integer> baseFieldToIndexMap, boolean truncate) {
+        FieldPaths.FieldPath<FieldPaths.FieldSegment> path = FieldPaths.createFieldPathForHashIndex(
+                stateEngine, type, selectField);
 
-        HollowTypeReadState typeState = originalTypeState;
         HollowTypeReadState baseTypeState = originalTypeState;
 
+        int baseFieldPathIdx = 0;
+
+        List<FieldPaths.FieldSegment> segments = path.getSegments();
+        int[] fieldPathIndexes = new int[segments.size()];
         FieldType fieldType = FieldType.REFERENCE;
 
-        for(int i=0;i<fieldPaths.length;i++) {
+        for (int i = 0; i < segments.size(); i++) {
+            FieldPaths.FieldSegment segment = segments.get(i);
 
-            if(typeState instanceof HollowObjectTypeDataAccess) {
-                HollowObjectSchema schema = ((HollowObjectTypeDataAccess)typeState).getSchema();
-                fieldPathIndexes[fieldPathIdx] = schema.getPosition(fieldPaths[fieldPathIdx]);
-                typeState = schema.getReferencedTypeState(fieldPathIndexes[fieldPathIdx]);
-                fieldType = schema.getFieldType(fieldPathIndexes[fieldPathIdx]);
+            HollowSchema schema = segment.enclosingSchema;
+            switch (schema.getSchemaType()) {
+                case OBJECT:
+                    FieldPaths.ObjectFieldSegment objectSegment = (FieldPaths.ObjectFieldSegment) segment;
+                    fieldType = objectSegment.getType();
+                    fieldPathIndexes[i] = objectSegment.getIndex();
 
-                if(!truncate)
-                    baseFieldPathIdx = fieldPathIdx + 1;
+                    if(!truncate)
+                        baseFieldPathIdx = i + 1;
+                    break;
+                case SET:
+                case LIST:
+                    fieldType = FieldType.REFERENCE;
 
-            } else if(typeState instanceof HollowCollectionTypeDataAccess) {
-                HollowCollectionSchema schema = ((HollowCollectionTypeDataAccess)typeState).getSchema();
-                typeState = schema.getElementTypeState();
-                baseTypeState = typeState;
-                baseFieldPathIdx = fieldPathIdx+1;
-                fieldType = FieldType.REFERENCE;
-            } else {
-                HollowMapSchema schema = ((HollowMapTypeDataAccess)typeState).getSchema();
-                boolean isKey = "key".equals(fieldPaths[fieldPathIdx]);
-                typeState = isKey ? schema.getKeyTypeState() : schema.getValueTypeState();
-                baseTypeState = typeState;
-                baseFieldPathIdx = fieldPathIdx+1;
-                fieldType = FieldType.REFERENCE;
+                    HollowCollectionSchema collectionSchema = (HollowCollectionSchema) schema;
+                    baseTypeState = collectionSchema.getElementTypeState();
+
+                    baseFieldPathIdx = i + 1;
+                    break;
+                case MAP:
+                    fieldType = FieldType.REFERENCE;
+
+                    HollowMapSchema mapSchema = (HollowMapSchema) schema;
+                    boolean isKey = "key".equals(segment.getName());
+                    baseTypeState = isKey ? mapSchema.getKeyTypeState() : mapSchema.getValueTypeState();
+
+                    baseFieldPathIdx = i + 1;
+                    break;
             }
-
-            fieldPathIdx++;
         }
 
-        StringBuilder basePathBuilder = new StringBuilder();
-        for(int i=0;i<baseFieldPathIdx;i++) {
-            if(i > 0)
-                basePathBuilder.append('.');
-            basePathBuilder.append(fieldPaths[i]);
-        }
-        String basePath = basePathBuilder.toString();
-        Integer basePathIdx = baseFieldToIndexMap.get(basePath);
-        if(basePathIdx == null) {
-            basePathIdx = Integer.valueOf(baseFieldToIndexMap.size());
-            baseFieldToIndexMap.put(basePath, basePathIdx);
-        }
+        String basePath = segments.stream().limit(baseFieldPathIdx)
+                .map(FieldPaths.FieldSegment::getName)
+                .collect(joining("."));
+        int basePathIdx = baseFieldToIndexMap.computeIfAbsent(basePath, k -> baseFieldToIndexMap.size());
 
-        return new HollowHashIndexField(basePathIdx.intValue(), Arrays.copyOfRange(fieldPathIndexes, baseFieldPathIdx, fieldPathIndexes.length), baseTypeState, fieldType);
+        return new HollowHashIndexField(basePathIdx,
+                Arrays.copyOfRange(fieldPathIndexes, baseFieldPathIdx, fieldPathIndexes.length),
+                baseTypeState, fieldType);
     }
 
     public HollowTypeReadState getTypeState() {

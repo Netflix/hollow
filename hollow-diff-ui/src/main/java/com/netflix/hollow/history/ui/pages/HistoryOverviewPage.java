@@ -77,7 +77,7 @@ public class HistoryOverviewPage extends HistoryPage {
 
             String[] overviewDisplayHeaderValues = getOverviewDisplayHeaderValues(state, ui.getOverviewDisplayHeaders());
 
-            rows.add(new HistoryOverviewRow(VersionTimestampConverter.getTimestamp(state.getVersion()), state.getVersion(), totalBreakdown, topLevelChangesByType, overviewDisplayHeaderValues));
+            rows.add(new HistoryOverviewRow(VersionTimestampConverter.getTimestamp(state.getVersion(), ui.getTimeZone()), state.getVersion(), totalBreakdown, topLevelChangesByType, overviewDisplayHeaderValues));
         }
         
         return rows;

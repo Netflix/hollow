@@ -128,6 +128,41 @@ public class HollowIncrementalProducerTest {
         assertTypeA(idx, 4, "five", 6L);
         assertTypeA(idx, 5, "five", null);
     }
+    
+    @Test
+    public void addIfAbsentWillInitializeNewRecordsButNotOverwriteExistingRecords() {
+        HollowProducer producer = createInMemoryProducer();
+
+        /// initialize the data -- classic producer creates the first state in the delta chain.
+        initializeData(producer);
+
+        /// now we'll be incrementally updating the state by mutating individual records
+        HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
+
+        incrementalProducer.addIfAbsent(new TypeA(100, "one hundred", 9999)); // new 
+        incrementalProducer.addIfAbsent(new TypeA(101, "one hundred and one", 9998)); // new
+        incrementalProducer.addIfAbsent(new TypeA(1, "one", 9997)); // exists in prior state
+        incrementalProducer.addIfAbsent(new TypeA(2, "two", 9996)); // exists in prior state
+        incrementalProducer.addOrModify(new TypeA(102, "one hundred and two", 9995)); // new
+        incrementalProducer.addIfAbsent(new TypeA(102, "one hundred and two", 9994)); // new, but already added
+        incrementalProducer.addIfAbsent(new TypeA(103, "one hundred and three", 9993)); // new
+        incrementalProducer.addOrModify(new TypeA(103, "one hundred and three", 9992)); // overwrites prior call to addIfAbsent
+        
+        long version = incrementalProducer.runCycle();
+        
+        HollowConsumer consumer = HollowConsumer.withBlobRetriever(blobStore).build();
+        consumer.triggerRefreshTo(version);
+        
+        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(consumer.getStateEngine(), "TypeA", "id1", "id2");
+        Assert.assertFalse(idx.containsDuplicates());
+        
+        assertTypeA(idx, 100, "one hundred", 9999L);
+        assertTypeA(idx, 101, "one hundred and one", 9998L);
+        assertTypeA(idx, 1, "one", 1L);
+        assertTypeA(idx, 2, "two", 2L);
+        assertTypeA(idx, 102, "one hundred and two", 9995L);
+        assertTypeA(idx, 103, "one hundred and three", 9992L);
+    }
 
     @Test
     public void publishAndLoadASnapshotDirectly() {
@@ -586,7 +621,7 @@ public class HollowIncrementalProducerTest {
         /// now we'll be incrementally updating the state by mutating individual records
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
-        Collection addOrModifyList = Arrays.asList(
+        Collection<Object> addOrModifyList = Arrays.asList(
                 new TypeA(1, "one", 100),
                 new TypeA(2, "two", 2),
                 new TypeA(3, "three", 300),
@@ -594,7 +629,7 @@ public class HollowIncrementalProducerTest {
                 new TypeA(4, "five", 6)
         );
 
-        Collection deleteList = Arrays.asList(
+        Collection<Object> deleteList = Arrays.asList(
                 new TypeA(5, "five", 5),
                 new TypeB(2, "3")
         );
@@ -656,15 +691,14 @@ public class HollowIncrementalProducerTest {
         /// now we'll be incrementally updating the state by mutating individual records
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
-        Collection addOrModifyList = Arrays.asList(
+        Collection<Object> addOrModifyList = Arrays.asList(
                 new TypeA(1, "one", 100),
                 new TypeA(2, "two", 2),
-                new TypeA(3, "three", 300),
                 new TypeA(3, "three", 3),
                 new TypeA(4, "five", 6)
         );
 
-        Collection deleteList = Arrays.asList(
+        Collection<Object> deleteList = Arrays.asList(
                 new TypeA(5, "five", 5),
                 new TypeB(2, "3")
         );
@@ -726,7 +760,7 @@ public class HollowIncrementalProducerTest {
         /// now we'll be incrementally updating the state by mutating individual records
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
-        Collection addOrModifyList = Arrays.asList(
+        Collection<Object> addOrModifyList = Arrays.asList(
                 new TypeA(1, "one", 100),
                 new TypeA(2, "two", 2),
                 new TypeA(3, "three", 300),
@@ -734,7 +768,7 @@ public class HollowIncrementalProducerTest {
                 new TypeA(4, "five", 6)
         );
 
-        Collection deleteList = Arrays.asList(
+        Collection<Object> deleteList = Arrays.asList(
                 new TypeA(5, "five", 5),
                 new TypeB(2, "3")
         );
@@ -784,7 +818,7 @@ public class HollowIncrementalProducerTest {
         /// now we'll be incrementally updating the state by mutating individual records
         HollowIncrementalProducer incrementalProducer = new HollowIncrementalProducer(producer);
 
-        Collection addOrModifyList = Arrays.asList(
+        Collection<Object> addOrModifyList = Arrays.asList(
                 new TypeA(1, "one", 100),
                 new TypeA(2, "two", 2),
                 new TypeA(3, "three", 300),
@@ -792,7 +826,7 @@ public class HollowIncrementalProducerTest {
                 new TypeA(4, "five", 6)
         );
 
-        Collection deleteList = Arrays.asList(
+        Collection<Object> deleteList = Arrays.asList(
                 new TypeA(5, "five", 5),
                 new TypeB(2, "3")
         );

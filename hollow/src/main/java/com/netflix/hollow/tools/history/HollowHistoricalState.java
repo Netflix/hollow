@@ -69,7 +69,7 @@ public class HollowHistoricalState {
 	 * If a change isn't found for the key ordinal in this state, you can try walking the chain of states up to
 	 * the present using successive calls to {@link #getNextState()}
      * 
-     * @return
+     * @return the historical state key ordinal mapping
      */
     public HollowHistoricalStateKeyOrdinalMapping getKeyOrdinalMapping() {
         return keyOrdinalMapping;

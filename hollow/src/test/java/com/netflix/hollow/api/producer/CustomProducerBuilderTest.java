@@ -18,7 +18,6 @@ public class CustomProducerBuilderTest {
     public void defaultBehavior() {
         HollowProducer producer = new AugmentedBuilder()
                 .build();
-        Assert.assertTrue(producer instanceof HollowProducer);
         Assert.assertFalse(producer instanceof AugmentedProducer);
     }
 

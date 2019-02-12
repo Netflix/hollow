@@ -29,31 +29,59 @@ public interface HollowStringifier<T extends HollowStringifier> {
 
     /**
      * Exclude specified object types (replace output with null).
+     *
+     * @param types the object type names
+     * @return this stringifier
      */
-    public T addExcludeObjectTypes(String... types);
+    T addExcludeObjectTypes(String... types);
 
     /**
      * Create a String representation of the specified {@link HollowRecord}.
+     *
+     * @param record the record
+     * @return the string representation
      */
-    public String stringify(HollowRecord record);
+    String stringify(HollowRecord record);
 
     /**
      * Writes a String representation of the specified {@link HollowRecord} to the provided Writer.
      *
+     * @param writer the writer
+     * @param record the record
      * @throws IOException thrown if there is an error writing to the Writer
      */
-    public void stringify(Writer writer, HollowRecord record) throws IOException;
+    void stringify(Writer writer, HollowRecord record) throws IOException;
+
+    /**
+     * Writes a String representation of the specified collection of {@link HollowRecord} to the provided Writer.
+     *
+     * @param writer the writer
+     * @param records the records
+     * @throws IOException thrown if there is an error writing to the Writer
+     */
+    default void stringify(Writer writer, Iterable<HollowRecord> records) throws IOException {
+        throw new UnsupportedOperationException("not implemented");
+    }
 
     /**
      * Create a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
+     *
+     * @param dataAccess the data access
+     * @param type the type name
+     * @param ordinal the oridinal
+     * @return the string representation
      */
-    public String stringify(HollowDataAccess dataAccess, String type, int ordinal);
+    String stringify(HollowDataAccess dataAccess, String type, int ordinal);
 
     /**
      * Writes a String representation of the record in the provided dataset, of the given type, with the specified ordinal.
      *
+     * @param writer the writer
+     * @param dataAccess the data access
+     * @param type the type name
+     * @param ordinal the oridinal
      * @throws IOException thrown if there is an error writing to the Writer
      */
-    public void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal)
+    void stringify(Writer writer, HollowDataAccess dataAccess, String type, int ordinal)
         throws IOException;
 }

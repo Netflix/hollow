@@ -33,6 +33,7 @@ import com.netflix.hollow.tools.stringifier.HollowRecordJsonStringifier;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.stringifier.HollowStringifier;
 import com.netflix.hollow.ui.HollowUISession;
+import com.netflix.hollow.ui.HtmlEscapingWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -158,12 +159,13 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
         Integer ordinal = (Integer) ctx.get("ordinal");
         ui.getVelocityEngine().getTemplate("browse-selected-type-top.vm").merge(ctx, writer);
         try {
+            Writer htmlEscapingWriter = new HtmlEscapingWriter(writer);
             if (!"".equals(key) && ordinal != null && ordinal.equals(-1)) {
-                writer.append("ERROR: Key " + key + " was not found!");
+                htmlEscapingWriter.append("ERROR: Key " + key + " was not found!");
             } else if (ordinal != null && !ordinal.equals(-1)) {
                 HollowStringifier stringifier = "json".equals(req.getParameter("display"))
                     ? new HollowRecordJsonStringifier() : new HollowRecordStringifier();
-                stringifier.stringify(writer, ui.getStateEngine(),
+                stringifier.stringify(htmlEscapingWriter, ui.getStateEngine(),
                     getTypeState(req).getSchema().getName(), ordinal);
             }
         } catch (IOException e) {
@@ -238,7 +240,9 @@ public class BrowseSelectedTypePage extends HollowExplorerPage {
     }
 
     private Object[] parseKey(PrimaryKey primaryKey, String keyString) {
-        String fields[] = keyString.split(":");
+        // Split by the number of fields of the primary key
+        // This ensures correct extraction of an empty value for the last field
+        String fields[] = keyString.split(":", primaryKey.numFields());
         
         Object key[] = new Object[fields.length];
         

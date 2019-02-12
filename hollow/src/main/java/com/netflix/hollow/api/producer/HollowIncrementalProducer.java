@@ -17,11 +17,15 @@
  */
 package com.netflix.hollow.api.producer;
 
+import static com.netflix.hollow.api.producer.HollowIncrementalCyclePopulator.AddIfAbsent;
+import static com.netflix.hollow.api.producer.HollowIncrementalCyclePopulator.DELETE_RECORD;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import com.netflix.hollow.api.consumer.fs.HollowFilesystemAnnouncementWatcher;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecord;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,11 +97,26 @@ public class HollowIncrementalProducer {
         RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
         mutations.put(pk, obj);
     }
+    
+    public void addIfAbsent(Object obj) {
+        RecordPrimaryKey pk = extractRecordPrimaryKey(obj);
+        mutations.putIfAbsent(pk, new AddIfAbsent(obj));
+    }
 
     public void addOrModify(Collection<Object> objList) {
         for(Object obj : objList) {
             addOrModify(obj);
         }
+    }
+    
+    public void addOrModify(FlatRecord flatRecord) {
+        RecordPrimaryKey pk = flatRecord.getRecordPrimaryKey();
+        mutations.put(pk, flatRecord);
+    }
+    
+    public void addIfAbsent(FlatRecord flatRecord) {
+        RecordPrimaryKey pk = flatRecord.getRecordPrimaryKey();
+        mutations.putIfAbsent(pk, new AddIfAbsent(flatRecord));
     }
 
     public void addOrModifyInParallel(Collection<Object> objList) {
@@ -150,7 +169,7 @@ public class HollowIncrementalProducer {
     }
 
     public void delete(RecordPrimaryKey key) {
-        mutations.put(key, HollowIncrementalCyclePopulator.DELETE_RECORD);
+        mutations.put(key, DELETE_RECORD);
     }
 
     public void discard(RecordPrimaryKey key) {
@@ -196,7 +215,7 @@ public class HollowIncrementalProducer {
     /**
      * Runs a Hollow Cycle, if successful, cleans the mutations map.
      *
-     * @return
+     * @return the version of the cycle if successful, otherwise the {@link #FAILED_VERSION}
      * @since 2.9.9
      */
     public long runCycle() {

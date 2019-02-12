@@ -19,6 +19,7 @@ package com.netflix.hollow.api.metrics;
 
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducerListener;
+import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 public class HollowProducerMetrics extends HollowMetrics {
@@ -35,41 +36,64 @@ public class HollowProducerMetrics extends HollowMetrics {
     /**
      * Updates the producer metrics:
      * cycles completed, version and type's footprint and ordinals.
-     * @param producerStatus
+     * @param producerStatus the producer status
      */
     public void updateCycleMetrics(HollowProducerListener.ProducerStatus producerStatus) {
+        Status.StatusType st = producerStatus.getStatus() == HollowProducerListener.Status.SUCCESS
+                ? Status.StatusType.SUCCESS
+                : Status.StatusType.FAIL;
+
+        updateCycleMetrics(new Status(st, producerStatus.getCause()), producerStatus.getReadState(), producerStatus.getVersion());
+    }
+
+    /**
+     * Updates the producer metrics:
+     * cycles completed, version and type's footprint and ordinals.
+     * @param status the status
+     * @param readState the read state
+     * @param version the version
+     */
+    public void updateCycleMetrics(Status status, HollowProducer.ReadState readState, long version) {
         cyclesCompleted++;
-        if(producerStatus.getStatus() == HollowProducerListener.Status.FAIL) {
+        if(status.getType() == Status.StatusType.FAIL) {
             cycleFailed++;
             return;
         }
         cyclesSucceeded++;
 
-        if(producerStatus.getReadState() != null) {
-            HollowReadStateEngine hollowReadStateEngine = producerStatus.getReadState().getStateEngine();
-            super.update(hollowReadStateEngine, producerStatus.getVersion());
+        if(readState != null) {
+            HollowReadStateEngine hollowReadStateEngine = readState.getStateEngine();
+            super.update(hollowReadStateEngine, version);
         } else {
-            super.update(producerStatus.getVersion());
+            super.update(version);
         }
     }
 
     public void updateBlobTypeMetrics(HollowProducerListener.PublishStatus publishStatus) {
-        HollowProducer.Blob.Type blobType = publishStatus.getBlob().getType();
+        Status.StatusType st = publishStatus.getStatus() == HollowProducerListener.Status.SUCCESS
+                ? Status.StatusType.SUCCESS
+                : Status.StatusType.FAIL;
+
+        updateBlobTypeMetrics(new Status(st, publishStatus.getCause()), publishStatus.getBlob());
+    }
+
+    public void updateBlobTypeMetrics(Status status, HollowProducer.Blob blob) {
+        HollowProducer.Blob.Type blobType = blob.getType();
         switch (blobType) {
             case SNAPSHOT:
-                if(publishStatus.getStatus() == HollowProducerListener.Status.SUCCESS)
+                if(status.getType() == Status.StatusType.SUCCESS)
                     snapshotsCompleted++;
                 else
                     snapshotsFailed++;
                 break;
             case DELTA:
-                if(publishStatus.getStatus() == HollowProducerListener.Status.SUCCESS)
+                if(status.getType() == Status.StatusType.SUCCESS)
                     deltasCompleted++;
                 else
                     deltasFailed++;
                 break;
             case REVERSE_DELTA:
-                if(publishStatus.getStatus() == HollowProducerListener.Status.SUCCESS)
+                if(status.getType() == Status.StatusType.SUCCESS)
                     reverseDeltasCompleted++;
                 else
                     reverseDeltasFailed++;

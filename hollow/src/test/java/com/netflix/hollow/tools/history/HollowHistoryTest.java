@@ -224,6 +224,157 @@ public class HollowHistoryTest extends AbstractStateEngineTest {
         }
     }
 
+    @Test
+    public void testAddRemoveTypeThenDelta() throws IOException {
+        addRecord(1, 2, 3);
+        addRecord(2, 3, 4);
+        roundTripSnapshot();
+
+        long version = 1;
+        HollowHistory history = new HollowHistory(readStateEngine, 1, 10);
+        setupKeyIndex(readStateEngine, history);
+
+        {
+            initWriteStateEngine();
+
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4);
+            // Add new type
+            addRecord(bSchema, B_FN_PREFIX, 1, 2);
+            addRecord(bSchema, B_FN_PREFIX, 2, 3);
+
+            roundTripSnapshot();
+            // Populate the B om the history primiary key indexes
+            setupKeyIndex(readStateEngine, history);
+            history.doubleSnapshotOccurred(readStateEngine, 2);
+
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+
+            version++;
+        }
+
+        {
+            initWriteStateEngine();
+
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4);
+            // Remove instances of B
+
+            roundTripSnapshot();
+            setupKeyIndex(readStateEngine, history);
+            history.doubleSnapshotOccurred(readStateEngine, 3);
+
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+        }
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4);
+
+            roundTripDelta();
+            history.deltaOccurred(4);
+
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+        }
+
+        {
+            initWriteStateEngine();
+
+            addRecord(1, 2, 3);
+            addRecord(2, 3, 4);
+
+            roundTripSnapshot();
+            setupKeyIndex(readStateEngine, history);
+            history.doubleSnapshotOccurred(readStateEngine, 5);
+
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveAddedRecord(history, 2L, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 1), B_FN_PREFIX, 1, 2);
+            assertRecord(retrieveRemovedRecord(history, 3, B_TYPE, 2), B_FN_PREFIX, 2, 3);
+        }
+    }
+
+    @Test
+    public void testHistoricalStates() throws IOException {
+        addRecord(1, 2, 3);
+
+        roundTripSnapshot();
+
+        HollowHistory history = new HollowHistory(readStateEngine, 1L, 2);
+        Assert.assertEquals(0, history.getNumberOfHistoricalStates());
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(4, 5, 6);
+
+            roundTripDelta();
+            history.deltaOccurred(2L);
+
+            Assert.assertEquals(1, history.getNumberOfHistoricalStates());
+        }
+
+
+        HollowHistoricalState[] historicalStates;
+        {
+            addRecord(1, 2, 3);
+
+            roundTripDelta();
+            history.deltaOccurred(3L);
+
+            Assert.assertEquals(2, history.getNumberOfHistoricalStates());
+            historicalStates = history.getHistoricalStates();
+        }
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(4, 5, 6);
+
+            roundTripDelta();
+            history.deltaOccurred(4L);
+
+            Assert.assertEquals(2, history.getNumberOfHistoricalStates());
+            Assert.assertEquals(historicalStates[0], history.getHistoricalStates()[1]);
+        }
+
+        {
+            history.removeHistoricalStates(1);
+            Assert.assertEquals(1, history.getNumberOfHistoricalStates());
+            historicalStates = history.getHistoricalStates();
+        }
+
+        {
+            addRecord(1, 2, 3);
+
+            roundTripDelta();
+            history.deltaOccurred(5L);
+
+            Assert.assertEquals(2, history.getNumberOfHistoricalStates());
+            Assert.assertEquals(historicalStates[0], history.getHistoricalStates()[1]);
+        }
+
+        {
+            history.removeHistoricalStates(history.getNumberOfHistoricalStates());
+            Assert.assertEquals(0, history.getNumberOfHistoricalStates());
+        }
+
+        {
+            addRecord(1, 2, 3);
+            addRecord(4, 5, 6);
+
+            roundTripDelta();
+            history.deltaOccurred(6L);
+
+            Assert.assertEquals(1, history.getNumberOfHistoricalStates());
+        }
+    }
+
     private void setupKeyIndex(HollowReadStateEngine stateEngine, HollowHistory history) {
         HollowHistoryKeyIndex keyIndex = history.getKeyIndex();
         for (String type : stateEngine.getAllTypes()) {

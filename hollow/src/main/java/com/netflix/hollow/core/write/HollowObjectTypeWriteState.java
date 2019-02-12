@@ -391,12 +391,12 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             readPointer += 1;
             break;
         case FLOAT:
-            long intValue = readIntBits(data, readPointer) & 0xFFFFFFFFL;
+            long intValue = data.readIntBits(readPointer) & 0xFFFFFFFFL;
             fixedLengthLongArray.setElementValue(fieldBitOffset, 32, intValue);
             readPointer += 4;
             break;
         case DOUBLE:
-            long longValue = readLongBits(data, readPointer);
+            long longValue = data.readLongBits(readPointer);
             fixedLengthLongArray.setElementValue(fieldBitOffset, 64, longValue);
             readPointer += 8;
             break;
@@ -441,26 +441,6 @@ public class HollowObjectTypeWriteState extends HollowTypeWriteState {
             buffers[index] = new ByteDataBuffer(WastefulRecycler.DEFAULT_INSTANCE);
         }
         return buffers[index];
-    }
-
-    static int readIntBits(ByteData data, long fieldPosition) {
-        int intBits = (data.get(fieldPosition++) & 0xFF) << 24;
-        intBits |= (data.get(fieldPosition++) & 0xFF) << 16;
-        intBits |= (data.get(fieldPosition++) & 0xFF) << 8;
-        intBits |= (data.get(fieldPosition) & 0xFF);
-        return intBits;
-    }
-
-    static long readLongBits(ByteData data, long fieldPosition) {
-        long longBits = (long) (data.get(fieldPosition++) & 0xFF) << 56;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 48;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 40;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 32;
-        longBits |= (long) (data.get(fieldPosition++) & 0xFF) << 24;
-        longBits |= (data.get(fieldPosition++) & 0xFF) << 16;
-        longBits |= (data.get(fieldPosition++) & 0xFF) << 8;
-        longBits |= (data.get(fieldPosition) & 0xFF);
-        return longBits;
     }
 
 }

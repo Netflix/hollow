@@ -23,9 +23,9 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -33,16 +33,14 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.AnnouncementWatcher {
 
-    private final Logger log = Logger.getLogger(HollowFilesystemAnnouncementWatcher.class.getName());
+    private static final Logger log = Logger.getLogger(HollowFilesystemAnnouncementWatcher.class.getName());
 
-    private final Path publishPath;
     private final Path announcePath;
 
     private final List<HollowConsumer> subscribedConsumers;
@@ -52,48 +50,34 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
 
     private long latestVersion;
 
-    // TODO: deprecate in Hollow 3.0.0
-    // @Deprecated
-    public HollowFilesystemAnnouncementWatcher(File publishDir) {
-        this(publishDir.toPath());
-    }
-
     /**
-     * since 2.12.0
+     * Creates a file system announcement watcher.
      *
-     * @param publishPath
+     * @param publishPath the publish path
+     * @since 2.12.0
      */
+    @SuppressWarnings("unused")
     public HollowFilesystemAnnouncementWatcher(Path publishPath) {
-        this(publishPath,
-                newScheduledThreadPool(
-                        1 /*corePoolSize*/,
-                        new ThreadFactory() {
-                            @Override
-                            public Thread newThread(Runnable r) {
-                                Thread t = new Thread(r);
-                                t.setDaemon(true);
-                                return t;
-                            }
-                        })
-        );
-
+        this(publishPath, newScheduledThreadPool(1, r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true);
+            return t;
+        }));
         ownedExecutor = true;
     }
 
-    @Deprecated
-    public HollowFilesystemAnnouncementWatcher(File publishDir, ScheduledExecutorService executor) {
-        this(publishDir.toPath(), executor);
-    }
-
     /**
-     * since 2.12.0
-     * @param publishPath
+     * Creates a file system announcement watcher.
+     *
+     * @param publishPath the publish path
+     * @param executor the executor from which watching is executed
+     * @since 2.12.0
      */
+    @SuppressWarnings("WeakerAccess")
     public HollowFilesystemAnnouncementWatcher(Path publishPath, ScheduledExecutorService executor) {
-        this.publishPath = publishPath;
         this.executor = executor;
 
-        this.announcePath = this.publishPath.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
+        this.announcePath = publishPath.resolve(HollowFilesystemAnnouncer.ANNOUNCEMENT_FILENAME);
         this.subscribedConsumers = new CopyOnWriteArrayList<>();
         this.latestVersion = readLatestVersion();
 
@@ -104,39 +88,15 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
     protected void finalize() throws Throwable {
         super.finalize();
 
+        watchFuture.cancel(true);
+
         if (ownedExecutor) {
             executor.shutdownNow();
-        }
-        else {
-            watchFuture.cancel(true);
         }
     }
 
     private ScheduledFuture setupWatch() {
-        return executor.scheduleWithFixedDelay(new Runnable() {
-            private FileTime previousFileTime = FileTime.from(0, TimeUnit.MILLISECONDS);
-
-            @Override
-            public void run() {
-                try {
-                    if (!Files.isReadable(announcePath)) return;
-
-                    FileTime lastModifiedTime = getLastModifiedTime(announcePath);
-                    if (lastModifiedTime.compareTo(previousFileTime) > 0) {
-                        previousFileTime = lastModifiedTime;
-
-                        long currentVersion = readLatestVersion();
-                        if (latestVersion != currentVersion) {
-                            latestVersion = currentVersion;
-                            for (HollowConsumer consumer : subscribedConsumers)
-                                consumer.triggerAsyncRefresh();
-                        }
-                    }
-                } catch (Throwable th) {
-                    log.log(Level.WARNING, "Exception reading the current announced version", th);
-                }
-            }
-        }, 0, 1, TimeUnit.SECONDS);
+        return executor.scheduleWithFixedDelay(new Watch(this), 0, 1, TimeUnit.SECONDS);
     }
 
     @Override
@@ -157,6 +117,42 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
             return Long.parseLong(reader.readLine());
         } catch (IOException e) {
         	throw new RuntimeException(e);
+        }
+    }
+
+    static class Watch implements Runnable {
+        private FileTime previousFileTime = FileTime.from(0, TimeUnit.MILLISECONDS);
+        private final WeakReference<HollowFilesystemAnnouncementWatcher> ref;
+
+        Watch(HollowFilesystemAnnouncementWatcher watcher) {
+            ref = new WeakReference<>(watcher);
+        }
+
+        @Override
+        public void run() {
+            try {
+                HollowFilesystemAnnouncementWatcher watcher = ref.get();
+                if (watcher != null) {
+                    if (!Files.isReadable(watcher.announcePath)) return;
+
+                    FileTime lastModifiedTime = getLastModifiedTime(watcher.announcePath);
+                    if (lastModifiedTime.compareTo(previousFileTime) > 0) {
+                        previousFileTime = lastModifiedTime;
+
+                        long currentVersion = watcher.readLatestVersion();
+                        if (watcher.latestVersion != currentVersion) {
+                            watcher.latestVersion = currentVersion;
+                            for (HollowConsumer consumer : watcher.subscribedConsumers)
+                                consumer.triggerAsyncRefresh();
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                log.log(Level.WARNING, "Exception reading the current announced version", ex);
+            } catch (Throwable th) {
+                log.log(Level.SEVERE, "Exception reading the current announced version", th);
+                throw th;
+            }
         }
     }
 }

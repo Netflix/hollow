@@ -68,10 +68,6 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         this(DefaultHashCodeFinder.INSTANCE, true, new RecyclingRecycler());
     }
 
-    public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder) {
-        this(hashCodeFinder, true, new RecyclingRecycler());
-    }
-
     public HollowReadStateEngine(boolean listenToAllPopulatedOrdinals) {
         this(DefaultHashCodeFinder.INSTANCE, listenToAllPopulatedOrdinals, new RecyclingRecycler());
     }
@@ -80,6 +76,16 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
         this(DefaultHashCodeFinder.INSTANCE, true, recycler);
     }
 
+    public HollowReadStateEngine(boolean listenToAllPopulatedOrdinals, ArraySegmentRecycler recycler) {
+        this(DefaultHashCodeFinder.INSTANCE, listenToAllPopulatedOrdinals, recycler);
+    }
+
+    @Deprecated
+    public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder) {
+        this(hashCodeFinder, true, new RecyclingRecycler());
+    }
+
+    @Deprecated
     public HollowReadStateEngine(HollowObjectHashCodeFinder hashCodeFinder, boolean listenToAllPopulatedOrdinals, ArraySegmentRecycler recycler) {
         this.typeStates = new HashMap<String, HollowTypeReadState>();
         this.listeners = new HashMap<String, List<HollowTypeStateListener>>();
@@ -109,6 +115,9 @@ public class HollowReadStateEngine implements HollowStateEngine, HollowDataAcces
 
     /**
      * Add a {@link HollowTypeStateListener} to a type.
+     *
+     * @param typeName the type name
+     * @param listener the listener to add
      */
     public void addTypeListener(String typeName, HollowTypeStateListener listener) {
         List<HollowTypeStateListener> list = listeners.get(typeName);

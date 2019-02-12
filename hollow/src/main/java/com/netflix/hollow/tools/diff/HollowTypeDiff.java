@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Obtained via a {@link HollowDiff}, this is a report of the differences in a specific type between two data states.
@@ -69,7 +70,7 @@ public class HollowTypeDiff {
 
     /**
      * Add a field path to a component of the primary key
-     * @param path
+     * @param path the field path
      */
     public void addMatchPath(String path) {
         matcher.addMatchPath(path);
@@ -79,17 +80,15 @@ public class HollowTypeDiff {
      * Shortcut the diff detail when encountering a specific type.  This can be done to improve the performance
      * of diff calculation -- at the expense of some detail.
      *
-     * @param type
+     * @param type the type name
      */
     public void addShortcutType(String type) {
         shortcutTypes.add(type);
     }
 
     /**
-     * Returns whether or not this type diff will shortcut at the specified type.
-     *
-     * @param type
-     * @return
+     * @param type the type name
+     * @return whether or not this type diff will shortcut at the specified type.
      */
     public boolean isShortcutType(String type) {
         return shortcutTypes.contains(type);
@@ -98,7 +97,7 @@ public class HollowTypeDiff {
     /**
      * Get the differences broken down by specific field paths
      *
-     * @return
+     * @return the field differences
      */
     public List<HollowFieldDiff> getFieldDiffs() {
         return calculatedFieldDiffs;
@@ -188,32 +187,28 @@ public class HollowTypeDiff {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
-                        HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
+                    DiffEqualityMapping equalityMapping = rootDiff.getEqualityMapping();
+                    HollowDiffCountingNode rootNode = new HollowDiffObjectCountingNode(rootDiff, HollowTypeDiff.this, rootId, from, to);
 
-                        DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
-                        boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);
+                    DiffEqualOrdinalMap rootNodeOrdinalMap = equalityMapping.getEqualOrdinalMap(type);
+                    boolean requiresMissingFieldTraversal = equalityMapping.requiresMissingFieldTraversal(type);
 
-                        LongList matches = matcher.getMatchedOrdinals();
-                        for(int i=threadId;i<matches.size();i+=numThreads) {
-                            int fromOrdinal = (int)(matches.get(i) >> 32);
-                            int toOrdinal = (int)matches.get(i);
+                    LongList matches = matcher.getMatchedOrdinals();
+                    for(int i=threadId;i<matches.size();i+=numThreads) {
+                        int fromOrdinal = (int)(matches.get(i) >> 32);
+                        int toOrdinal = (int)matches.get(i);
 
-                            if(rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) == -1
-                                    || rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) != rootNodeOrdinalMap.getIdentityToOrdinal(toOrdinal)) {
-                                rootNode.prepare(fromOrdinal, toOrdinal);
-                                rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                            } else if(requiresMissingFieldTraversal) {
-                                rootNode.prepare(fromOrdinal, toOrdinal);
-                                rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
-                            }
+                        if(rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) == -1
+                                || rootNodeOrdinalMap.getIdentityFromOrdinal(fromOrdinal) != rootNodeOrdinalMap.getIdentityToOrdinal(toOrdinal)) {
+                            rootNode.prepare(fromOrdinal, toOrdinal);
+                            rootNode.traverseDiffs(fromIntList(fromOrdinal), toIntList(toOrdinal));
+                        } else if(requiresMissingFieldTraversal) {
+                            rootNode.prepare(fromOrdinal, toOrdinal);
+                            rootNode.traverseMissingFields(fromIntList(fromOrdinal), toIntList(toOrdinal));
                         }
-
-                        results[threadId] = rootNode.getFieldDiffs();
-                    } catch(Exception e) {
-                        e.printStackTrace();
                     }
+
+                    results[threadId] = rootNode.getFieldDiffs();
                 }
 
                 private final IntList fromIntList = new IntList(1);
@@ -233,7 +228,11 @@ public class HollowTypeDiff {
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
 
         this.calculatedFieldDiffs = combineResults(results);
     }

@@ -20,38 +20,44 @@ package com.netflix.hollow.api.producer;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A trivial implementation of {@link HollowProducerListenerV2} which does nothing.
+ * A trivial implementation of {@link HollowProducerListener} which does nothing.
  * Implementations of HollowProducerListenerV2 should subclass this class for convenience.
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class AbstractHollowProducerListener implements HollowProducerListenerV2 {
+public class AbstractHollowProducerListener implements HollowProducerListener {
+    // DataModelInitializationListener
     @Override public void onProducerInit(long elapsed, TimeUnit unit) {}
 
+    // RestoreListener
     @Override public void onProducerRestoreStart(long restoreVersion) {}
     @Override public void onProducerRestoreComplete(RestoreStatus status, long elapsed, TimeUnit unit) {}
-    @Override public void onNewDeltaChain(long version) {}
 
+    // CycleListener
+    @Override public void onNewDeltaChain(long version) {}
     @Override public void onCycleSkip(CycleSkipReason reason) {}
     @Override public void onCycleStart(long version) {}
     @Override public void onCycleComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
-    @Override public void onNoDeltaAvailable(long version) {}
-
+    // PopulateListener
     @Override public void onPopulateStart(long version) {}
     @Override public void onPopulateComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
+    // PublishListener
+    @Override public void onNoDeltaAvailable(long version) {}
     @Override public void onPublishStart(long version) {}
-    @Override public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
     @Override public void onArtifactPublish(PublishStatus publishStatus, long elapsed, TimeUnit unit) {}
+    @Override public void onPublishComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
+    // IntegrityCheckListener
     @Override public void onIntegrityCheckStart(long version) {}
     @Override public void onIntegrityCheckComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
+    // ValidationListener
     @Override public void onValidationStart(long version) {}
     @Override public void onValidationComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
 
+    // AnnouncementListener
     @Override public void onAnnouncementStart(long version) {}
     @Override public void onAnnouncementComplete(ProducerStatus status, long elapsed, TimeUnit unit) {}
-
 }

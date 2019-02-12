@@ -32,11 +32,9 @@ import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
  * The field definitions in a hash key may be hierarchical (traverse multiple record types) via dot-notation.  For example,
  * the field definition <i>actors.element.actorId</i> may be used to traverse a child <b>LIST</b> or <b>SET</b> type record referenced by the field
  * <i>actors</i>, each elements contained therein, and finally each actors <i>actorId</i> field.
- * <p>
  */
 public class HollowHashIndex implements HollowTypeStateListener {
 
-    protected HollowHashIndexState hashState;
     private volatile HollowHashIndexState hashStateVolatile;
 
     private final HollowReadStateEngine stateEngine;
@@ -72,15 +70,16 @@ public class HollowHashIndex implements HollowTypeStateListener {
 
         builder.buildIndex();
 
-        HollowHashIndexState hollowHashIndexState = new HollowHashIndexState(builder);
-        this.hashState = hollowHashIndexState;
-        this.hashStateVolatile = hollowHashIndexState;
+        this.hashStateVolatile = new HollowHashIndexState(builder);
     }
 
 
     /**
-     * Query the index.  The returned {@link HollowHashIndexResult} will be null if no matches were found.  Otherwise, may be used
-     * to gather the matched ordinals.
+     * Query the index.
+     *
+     * @param query the query
+     * @return the hash index result to gather the matched ordinals. A {@code null} value indicated no matches were
+     * found.
      */
     public HollowHashIndexResult findMatches(Object... query) {
         int hashCode = 0;
@@ -92,8 +91,10 @@ public class HollowHashIndex implements HollowTypeStateListener {
         }
 
         HollowHashIndexResult result;
+        HollowHashIndexState hashState;
         do {
             result = null;
+            hashState = hashStateVolatile;
             long bucket = hashCode & hashState.getMatchHashMask();
             long hashBucketBit = bucket * hashState.getBitsPerMatchHashEntry();
             boolean bucketIsEmpty = hashState.getMatchHashTable().getElementValue(hashBucketBit, hashState.getBitsPerTraverserField()[0]) == 0;
@@ -103,7 +104,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
                     int selectSize = (int) hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey(), hashState.getBitsPerSelectTableSize());
                     long selectBucketPointer = hashState.getMatchHashTable().getElementValue(hashBucketBit + hashState.getBitsPerMatchHashKey() + hashState.getBitsPerSelectTableSize(), hashState.getBitsPerSelectTablePointer());
 
-                    result = new HollowHashIndexResult(this.hashState, selectBucketPointer, selectSize);
+                    result = new HollowHashIndexResult(hashState, selectBucketPointer, selectSize);
                     break;
                 }
 
@@ -117,6 +118,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     private int keyHashCode(Object key, int fieldIdx) {
+        HollowHashIndexState hashState = hashStateVolatile;
         switch(hashState.getMatchFields()[fieldIdx].getFieldType()) {
         case BOOLEAN:
             return HollowReadFieldUtils.booleanHashCode((Boolean)key);
@@ -140,6 +142,7 @@ public class HollowHashIndex implements HollowTypeStateListener {
     }
 
     private boolean matchIsEqual(FixedLengthElementArray matchHashTable, long hashBucketBit, Object[] query) {
+        HollowHashIndexState hashState = hashStateVolatile;
         for(int i = 0; i< hashState.getMatchFields().length; i++) {
             HollowHashIndexField field = hashState.getMatchFields()[i];
             int hashOrdinal = (int)matchHashTable.getElementValue(hashBucketBit + hashState.getOffsetPerTraverserField()[field.getBaseIteratorFieldIdx()], hashState.getBitsPerTraverserField()[field.getBaseIteratorFieldIdx()]) - 1;
@@ -201,6 +204,22 @@ public class HollowHashIndex implements HollowTypeStateListener {
     @Override
     public void endUpdate() {
        reindexHashIndex();
+    }
+
+    public HollowReadStateEngine getStateEngine() {
+        return stateEngine;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getSelectField() {
+        return selectField;
+    }
+
+    public String[] getMatchFields() {
+        return matchFields;
     }
 
     protected static class HollowHashIndexState {

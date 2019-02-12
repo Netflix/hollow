@@ -33,8 +33,8 @@ public class HollowSchemaSorter {
     /**
      * Dependency types come before dependent types
      *  
-     * @param dataset
-     * @return
+     * @param dataset the data set
+     * @return the dependent schema
      */
     public static List<HollowSchema> dependencyOrderedSchemaList(HollowDataset dataset) {
         return dependencyOrderedSchemaList(dataset.getSchemas());
@@ -42,8 +42,9 @@ public class HollowSchemaSorter {
         
     /**
      * Dependency types come before dependent types
-     *  
-     * @return
+     *
+     * @param schemas the schema
+     * @return the dependent schema
      */
     public static List<HollowSchema> dependencyOrderedSchemaList(Collection<HollowSchema> schemas) {
         DependencyIndex idx = new DependencyIndex();
@@ -160,6 +161,9 @@ public class HollowSchemaSorter {
     }
     
     /**
+     * @param stateEngine the state engine
+     * @param dependentType the dependent type name
+     * @param dependencyType the dependency type name
      * @return Whether or not the dependencyType is equal to, referenced by, or transitively referenced by the dependentType. 
      */
     public static boolean typeIsTransitivelyDependent(HollowStateEngine stateEngine, String dependentType, String dependencyType) {

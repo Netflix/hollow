@@ -40,6 +40,7 @@ import com.netflix.hollow.ui.HollowUIRouter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,15 +61,20 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
     private final Map<String, CustomHollowEffigyFactory> customHollowEffigyFactories;
     private final Map<String, HollowHistoryRecordNamer> customHollowRecordNamers;
     private final Map<String, PrimaryKey> matchHints;
-    
+    private final TimeZone timeZone;
+
     private String[] overviewDisplayHeaders;
-    
+
     public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer) {
-        this(baseUrlPath, consumer, 1024);
+        this(baseUrlPath, consumer, 1024, VersionTimestampConverter.PACIFIC_TIMEZONE);
     }
-    
-    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, int numStatesToTrack) {
-        this(baseUrlPath, createHistory(consumer, numStatesToTrack));
+
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, TimeZone timeZone) {
+        this(baseUrlPath, consumer, 1024, timeZone);
+    }
+
+    public HollowHistoryUI(String baseUrlPath, HollowConsumer consumer, int numStatesToTrack, TimeZone timeZone) {
+        this(baseUrlPath, createHistory(consumer, numStatesToTrack), timeZone);
     }
     
     private static HollowHistory createHistory(HollowConsumer consumer, int numStatesToTrack) {
@@ -81,8 +87,12 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
             consumer.getRefreshLock().unlock();
         }
     }
-    
+
     public HollowHistoryUI(String baseUrlPath, HollowHistory history) {
+        this(baseUrlPath, history, VersionTimestampConverter.PACIFIC_TIMEZONE);
+    }
+
+    public HollowHistoryUI(String baseUrlPath, HollowHistory history, TimeZone timeZone) {
         super(baseUrlPath);
         this.history = history;
 
@@ -100,6 +110,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         this.customHollowRecordNamers = new HashMap<String, HollowHistoryRecordNamer>();
         this.matchHints = new HashMap<String, PrimaryKey>();
         this.overviewDisplayHeaders = new String[0];
+        this.timeZone = timeZone;
     }
     
     public HollowHistory getHistory() {
@@ -203,4 +214,7 @@ public class HollowHistoryUI extends HollowUIRouter implements HollowRecordDiffU
         return viewProvider;
     }
 
+    public TimeZone getTimeZone() {
+        return timeZone;
+    }
 }

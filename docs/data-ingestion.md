@@ -84,7 +84,7 @@ If a long field named `__assigned_ordinal` is defined in a POJO class, then `Hol
 
 When the `HollowObjectMapper` sees this POJO again, it will short-circuit writing to the state engine and discovering or assigning an ordinal -- it will instead return the previously recorded ordinal.  If during processing you can reuse duplicate referenced POJOs, then you can use this effect to greatly speed up adding records to the state engine.
 
-If the `__assigned_ordinal` field is present, it should be initialized to -1.  The field may be (but does not have to be) private and/or final.
+If the `__assigned_ordinal` field is present, it should be initialized to `HollowConstants.ORDINAL_NONE`.  The field may be (but does not have to be) private and/or final.
 
 The following example `Director` class uses the `__assigned_ordinal` optimization:
 ```java
@@ -92,13 +92,12 @@ public class Director {
     long id;
     String directorName;
 
-    private final int __assigned_ordinal = -1L;
+    private transient final long __assigned_ordinal = HollowConstants.ORDINAL_NONE;
 }
-
 ```
 
 !!! warning
-    If the `__assigned_ordinal` optimization is used, POJOs should _not be modified_ after they are added to the state engine.  Any modifications after the first time a memoized POJO is added to the state engine will be ignored and any references to these POJOs will always point to the _originally_ added record.
+    If the `__assigned_ordinal` optimization is used, POJOs should _not be modified_ after they are added to the state engine.  Any modifications after the first time a memoized POJO is added to the state engine will be ignored and any references to these POJOs will always point to the _originally_ added record. Using immutable POJOs can help reduce errors.
 
 
 ## JSON to Hollow

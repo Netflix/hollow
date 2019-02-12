@@ -59,6 +59,8 @@ public class SegmentedByteArray implements ByteData {
 
     /**
      * Set the byte at the given index to the specified value
+     * @param index the index
+     * @param value the byte value
      */
     public void set(long index, byte value) {
         int segmentIndex = (int)(index >> log2OfSegmentSize);
@@ -68,6 +70,8 @@ public class SegmentedByteArray implements ByteData {
 
     /**
      * Get the value of the byte at the specified index.
+     * @param index the index
+     * @return the byte value
      */
     public byte get(long index) {
         return segments[(int)(index >>> log2OfSegmentSize)][(int)(index & bitmask)];
@@ -90,10 +94,10 @@ public class SegmentedByteArray implements ByteData {
     /**
      * For a SegmentedByteArray, this is a faster copy implementation.
      *
-     * @param src
-     * @param srcPos
-     * @param destPos
-     * @param length
+     * @param src the source data
+     * @param srcPos the position to begin copying from the source data
+     * @param destPos the position to begin writing in this array
+     * @param length the length of the data to copy
      */
     public void copy(SegmentedByteArray src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
@@ -117,6 +121,10 @@ public class SegmentedByteArray implements ByteData {
     /**
      * copies exactly data.length bytes from this SegmentedByteArray into the provided byte array
      *
+     * @param srcPos the position to begin copying from the source data
+     * @param data the source data
+     * @param destPos the position to begin writing in this array
+     * @param length the length of the data to copy
      * @return the number of bytes copied
      */
     public int copy(long srcPos, byte[] data, int destPos, int length) {
@@ -139,16 +147,32 @@ public class SegmentedByteArray implements ByteData {
 
         return dataPosition - destPos;
     }
+    
+    /**
+     * checks equality for a specified range of bytes in two arrays
+     * 
+     * @param rangeStart the start position of the comparison range in this array
+     * @param compareTo the other array to compare
+     * @param cmpStart the start position of the comparison range in the other array
+     * @param length the length of the comparison range
+     * @return
+     */
+    public boolean rangeEquals(long rangeStart, SegmentedByteArray compareTo, long cmpStart, int length) {
+    	for(int i=0;i<length;i++)
+    		if(get(rangeStart + i) != compareTo.get(cmpStart + i))
+    			return false;
+    	return true;
+    }
 
     /**
      * Copies the data from the provided source array into this array, guaranteeing that
      * if the update is seen by another thread, then all other writes prior to this call
      * are also visible to that thread.
      *
-     * @param src
-     * @param srcPos
-     * @param destPos
-     * @param length
+     * @param src the source data
+     * @param srcPos the position to begin copying from the source data
+     * @param destPos the position to begin writing in this array
+     * @param length the length of the data to copy
      */
     public void orderedCopy(SegmentedByteArray src, long srcPos, long destPos, long length) {
         int segmentLength = 1 << log2OfSegmentSize;
@@ -174,6 +198,10 @@ public class SegmentedByteArray implements ByteData {
      * guaranteeing that if the update is seen by another thread, then all other writes prior to
      * this call are also visible to that thread.
      *
+     * @param srcPos the position to begin copying from the source data
+     * @param data the source data
+     * @param destPos the position to begin writing in this array
+     * @param length the length of the data to copy
      * @return the number of bytes copied
      */
     public int orderedCopy(long srcPos, byte[] data, int destPos, int length) {
@@ -199,6 +227,10 @@ public class SegmentedByteArray implements ByteData {
 
     /**
      * Copy bytes from the supplied InputStream into this array.
+     *
+     * @param is the source data
+     * @param length the length of the data to copy
+     * @throws IOException if the copy could not be performed
      */
     public void readFrom(InputStream is, long length) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
@@ -220,6 +252,11 @@ public class SegmentedByteArray implements ByteData {
 
     /**
      * Write a portion of this data to an OutputStream.
+     *
+     * @param os the output stream to write to
+     * @param startPosition the position to begin copying from this array
+     * @param len the length of the data to copy
+     * @throws IOException if the write to the output stream could not be performed
      */
     public void writeTo(OutputStream os, long startPosition, long len) throws IOException {
         int segmentSize = 1 << log2OfSegmentSize;
@@ -249,7 +286,7 @@ public class SegmentedByteArray implements ByteData {
     /**
      * Ensures that the segment at segmentIndex exists
      *
-     * @param segmentIndex
+     * @param segmentIndex the segment index
      */
     private void ensureCapacity(int segmentIndex) {
         while(segmentIndex >= segments.length) {

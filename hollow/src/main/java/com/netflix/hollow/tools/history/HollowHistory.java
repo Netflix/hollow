@@ -37,6 +37,7 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Retains, in memory, the changes in a dataset over many states.  Indexes data for efficient retrieval from any
@@ -80,6 +81,7 @@ public class HollowHistory {
      * @param initialHollowStateEngine The HollowReadStateEngine at an initial (earliest) state.
      * @param initialVersion The initial version of the HollowReadStateEngine
      * @param maxHistoricalStatesToKeep The number of historical states to keep in memory
+     * @param isAutoDiscoverTypeIndex true if scheme types are auto-discovered from the initiate state engine
      */
     public HollowHistory(HollowReadStateEngine initialHollowStateEngine, long initialVersion, int maxHistoricalStatesToKeep, boolean isAutoDiscoverTypeIndex) {
         this.keyIndex = new HollowHistoryKeyIndex(this);
@@ -134,6 +136,13 @@ public class HollowHistory {
     }
 
     /**
+     * @return the number of historical states
+     */
+    public int getNumberOfHistoricalStates() {
+        return historicalStates.size();
+    }
+
+    /**
      * @param version A version in the past
      * @return The {@link HollowHistoricalState} for the specified version, if it exists.
      */
@@ -171,8 +180,8 @@ public class HollowHistory {
      * new {@link HollowReadStateEngine}, and create a new {@link HollowHistoricalState} to represent
      * the transition.
      *
-     * @param newHollowStateEngine
-     * @param newVersion
+     * @param newHollowStateEngine the new state engine
+     * @param newVersion the new version
      */
     public void doubleSnapshotOccurred(HollowReadStateEngine newHollowStateEngine, long newVersion) {
         if(!keyIndex.isInitialized())
@@ -226,19 +235,20 @@ public class HollowHistory {
 
         for(int i=0;i<executor.getCorePoolSize();i++) {
             final int threadNumber = i;
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    for(int i=threadNumber;i<historicalStates.size();i+=numThreads) {
-                        HollowHistoricalState historicalStateToRemap = historicalStates.get(i);
-                        remappedDataAccesses[i] = creator.copyButRemapOrdinals(historicalStateToRemap.getDataAccess(), remapper);
-                        remappedKeyOrdinalMappings[i] = historicalStateToRemap.getKeyOrdinalMapping().remap(remapper);
-                    }
+            executor.execute(() -> {
+                for(int t=threadNumber;t<historicalStates.size();t+=numThreads) {
+                    HollowHistoricalState historicalStateToRemap = historicalStates.get(t);
+                    remappedDataAccesses[t] = creator.copyButRemapOrdinals(historicalStateToRemap.getDataAccess(), remapper);
+                    remappedKeyOrdinalMappings[t] = historicalStateToRemap.getKeyOrdinalMapping().remap(remapper);
                 }
             });
         }
 
-        executor.awaitUninterruptibly();
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private HollowHistoricalStateKeyOrdinalMapping createKeyOrdinalMappingFromDelta() {
@@ -247,7 +257,13 @@ public class HollowHistory {
         for(String keyType : keyIndex.getTypeKeyIndexes().keySet()) {
             HollowHistoricalStateTypeKeyOrdinalMapping typeMapping = keyOrdinalMapping.getTypeMapping(keyType);
             HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) latestHollowReadStateEngine.getTypeState(keyType);
-            if (typeState==null) continue;
+            if (typeState==null) {
+                // The type is present in the history's primary key index but is not present
+                // in the latest read state; ensure the mapping is initialized to the default state
+                typeMapping.prepare(0, 0);
+                typeMapping.finish();
+                continue;
+            }
 
             PopulatedOrdinalListener listener = typeState.getListener(PopulatedOrdinalListener.class);
 
@@ -335,9 +351,32 @@ public class HollowHistory {
         historicalStateLookupMap.put(historicalState.getVersion(), historicalState);
 
         if(historicalStates.size() > maxHistoricalStatesToKeep) {
+            removeHistoricalStates(1);
+        }
+    }
+
+    /**
+     * Removes the last {@code n} historical states.
+     *
+     * @param n the number of historical states to remove
+     * @throws IllegalArgumentException if the {@code n} is less than {@code 0} or
+     * greater than the {@link #getNumberOfHistoricalStates() number} of historical
+     * states.
+     */
+    public void removeHistoricalStates(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove is negative: %d", n));
+        }
+        if (n > historicalStates.size()) {
+            throw new IllegalArgumentException(String.format(
+                    "Number of states to remove, %d, is greater than the number of states. %d",
+                    n, historicalStates.size()));
+        }
+
+        while (n-- > 0) {
             HollowHistoricalState removedState = historicalStates.remove(historicalStates.size() - 1);
             historicalStateLookupMap.remove(removedState.getVersion());
         }
     }
-
 }

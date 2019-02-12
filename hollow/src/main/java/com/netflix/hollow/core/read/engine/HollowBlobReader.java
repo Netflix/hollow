@@ -58,6 +58,9 @@ public class HollowBlobReader {
 
     /**
      * Initialize the state engine using a snapshot blob from the provided InputStream.
+     *
+     * @param is the input stream to read the snapshot from
+     * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is) throws IOException {
         readSnapshot(is, new HollowFilterConfig(true));
@@ -67,6 +70,10 @@ public class HollowBlobReader {
      * Initialize the state engine using a snapshot blob from the provided InputStream.
      * <p>
      * Apply the provided {@link HollowFilterConfig} to the state.
+     *
+     * @param is the input stream to read the snaptshot
+     * @param filter the filtering configuration to filter the snapshot
+     * @throws IOException if the snapshot could not be read
      */
     public void readSnapshot(InputStream is, HollowFilterConfig filter) throws IOException {
         HollowBlobHeader header = readHeader(is, false);
@@ -102,6 +109,9 @@ public class HollowBlobReader {
      * <p>
      * If a {@link HollowFilterConfig} was applied at the time the {@link HollowReadStateEngine} was initialized
      * with a snapshot, it will continue to be in effect after the state is updated.
+     *
+     * @param is the input stream to read the delta from
+     * @throws IOException if the delta could not be applied
      */
     public void applyDelta(InputStream is) throws IOException {
         HollowBlobHeader header = readHeader(is, true);

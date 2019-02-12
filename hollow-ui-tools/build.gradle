@@ -10,8 +10,8 @@ sourceSets {
 dependencies {
     compile project(':hollow')
     compile 'org.apache.velocity:velocity:1.7'
-    compile 'commons-codec:commons-codec:1.8'
-    compile 'commons-io:commons-io:2.3'
+    compile 'commons-codec:commons-codec:1.11'
+    compile 'commons-io:commons-io:2.6'
     compile 'com.google.code.gson:gson:2.8.0'
 
     compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'

@@ -23,12 +23,17 @@ import com.netflix.hollow.core.write.HollowListTypeWriteState;
 import com.netflix.hollow.core.write.HollowListWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 
 public class HollowListTypeMapper extends HollowTypeMapper {
+
+    private static final String NULL_ELEMENT_MESSAGE =
+            "Null element contained in instance of a List with schema \"%s\". Lists cannot contain null elements";
 
     private final HollowListSchema schema;
     private final HollowListTypeWriteState writeState;
@@ -64,22 +69,7 @@ public class HollowListTypeMapper extends HollowTypeMapper {
 
         List<?> l = (List<?>)obj;
 
-        HollowListWriteRecord rec = (HollowListWriteRecord)writeRecord();
-        if(ignoreListOrdering) {
-            IntList ordinalList = getIntList();
-            for(Object o : l) {
-                int ordinal = elementMapper.write(o);
-                ordinalList.add(ordinal);
-            }
-            ordinalList.sort();
-            for(int i=0;i<ordinalList.size();i++)
-                rec.addElement(ordinalList.get(i));
-        } else {
-            for(Object o : l) {
-                int ordinal = elementMapper.write(o);
-                rec.addElement(ordinal);
-            }
-        }
+        HollowListWriteRecord rec = copyToWriteRecord(l, null);
 
         int assignedOrdinal = writeState.add(rec);
 
@@ -88,6 +78,37 @@ public class HollowListTypeMapper extends HollowTypeMapper {
         }
 
         return assignedOrdinal;
+    }
+    
+    public int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+    	HollowListWriteRecord rec = copyToWriteRecord((List<?>)obj, flatRecordWriter);
+    	return flatRecordWriter.write(schema, rec);
+    }
+
+    private HollowListWriteRecord copyToWriteRecord(List<?> l, FlatRecordWriter flatRecordWriter) {
+        HollowListWriteRecord rec = (HollowListWriteRecord) writeRecord();
+        if (ignoreListOrdering) {
+            IntList ordinalList = getIntList();
+            for (Object o : l) {
+                if (o == null) {
+                    throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
+                }
+                int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
+                ordinalList.add(ordinal);
+            }
+            ordinalList.sort();
+            for (int i = 0; i < ordinalList.size(); i++)
+                rec.addElement(ordinalList.get(i));
+        } else {
+            for (Object o : l) {
+                if (o == null) {
+                    throw new NullPointerException(String.format(NULL_ELEMENT_MESSAGE, schema));
+                }
+                int ordinal = flatRecordWriter == null ? elementMapper.write(o) : elementMapper.writeFlat(o, flatRecordWriter);
+                rec.addElement(ordinal);
+            }
+        }
+        return rec;
     }
 
     @Override

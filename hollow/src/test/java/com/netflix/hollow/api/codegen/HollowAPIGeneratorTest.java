@@ -1,71 +1,54 @@
 package com.netflix.hollow.api.codegen;
 
-import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
-public class HollowAPIGeneratorTest {
+public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
 
-    private static String tmpFolder = System.getProperty("java.io.tmpdir");
-    private static String clazzFolder = String.format("%s/classes", tmpFolder);
-
-    @AfterClass
-    public static void cleanup() throws IOException {
-        Path directory = Paths.get(clazzFolder);
-        Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+    @Test
+    public void generatesFileUsingDestinationPath() throws Exception {
+        runGenerator("API", "com.netflix.hollow.example.api.generated", MyClass.class, b -> b);
     }
 
     @Test
-    public void generatesFileUsingDestinationPath()  {
-        HollowWriteStateEngine stateEngine  = new HollowWriteStateEngine();
-        HollowObjectMapper objectMapper = new HollowObjectMapper(stateEngine);
-        objectMapper.initializeTypeState(MyClass.class);
-        File clazzFiles = new File(clazzFolder);
+    public void testGenerateWithPostfix() throws Exception {
+        runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
+                builder -> builder.withClassPostfix("Generated"));
+        assertNonEmptyFileExists("codegen/api/StringGenerated.java");
+    }
 
-        HollowAPIGenerator hollowAPIGenerator = new HollowAPIGenerator.Builder()
-                .withAPIClassname("API")
-                .withPackageName("com.netflix.hollow.example.api.generated")
-                .withDataModel(stateEngine)
-                .withDestination(clazzFiles.toPath())
-                .build();
+    @Test
+    public void testGenerateWithPostfixAndPackageGrouping() throws Exception {
+        runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping());
+        assertNonEmptyFileExists("codegen/api/core/StringGenerated.java");
+    }
 
-        try {
-            hollowAPIGenerator.generateSourceFiles();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not write files to: " + clazzFolder);
-        }
+    @Test
+    public void testGenerateWithPostfixAndPrimitiveTypes() throws Exception {
+        runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping()
+                .withHollowPrimitiveTypes(true));
+        assertFileDoesNotExist("codegen/api/core/StringGenerated.java");
+        assertFileDoesNotExist("codegen/api/StringGenerated.java");
+    }
 
-        Assert.assertTrue(clazzFiles.list().length > 0);
+    @Test
+    public void testGenerateWithPostfixAndAggressiveSubstitutions() throws Exception {
+        runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
+                builder -> builder.withClassPostfix("Generated").withPackageGrouping()
+                .withHollowPrimitiveTypes(true).withAggressiveSubstitutions(true));
+        assertFileDoesNotExist("codegen/api/core/StringGenerated.java");
+        assertFileDoesNotExist("codegen/api/StringGenerated.java");
     }
 
     @SuppressWarnings("unused")
     private static class MyClass {
         int id;
+        String foo;
 
-        public MyClass(int id) {
+        public MyClass(int id, String foo) {
             this.id = id;
+            this.foo = foo;
         }
     }
 }

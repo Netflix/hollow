@@ -17,8 +17,9 @@
  */
 package com.netflix.hollow.core.memory.pool;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Deque;
 
 /**
  * A RecyclingRecycler is an {@link ArraySegmentRecycler} which actually pools arrays, in contrast
@@ -39,17 +40,9 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
         this.log2OfByteSegmentSize = log2ByteArraySize;
         this.log2OfLongSegmentSize = log2LongArraySize;
 
-        longSegmentRecycler = new Recycler<long[]>(new Creator<long[]>() {
-            public long[] create() {
-                return new long[(1 << log2LongArraySize) + 1];
-            }
-        });
-
-        byteSegmentRecycler = new Recycler<byte[]>(new Creator<byte[]>() {
-            public byte[] create() {
-                return new byte[1 << log2ByteArraySize];
-            }
-        });
+        byteSegmentRecycler = new Recycler<>(() -> new byte[1 << log2ByteArraySize]);
+        // Allocated size is increased by 1, see JavaDoc of FixedLengthElementArray for details
+        longSegmentRecycler = new Recycler<>(() -> new long[(1 << log2LongArraySize) + 1]);
     }
 
     public int getLog2OfByteSegmentSize() {
@@ -71,6 +64,7 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
     }
 
     public byte[] getByteArray() {
+        // @@@ should the array be filled?
         return byteSegmentRecycler.get();
     }
 
@@ -84,38 +78,46 @@ public class RecyclingRecycler implements ArraySegmentRecycler {
     }
 
 
-    private class Recycler<T> {
-
+    private static class Recycler<T> {
         private final Creator<T> creator;
-        private final LinkedList<T> currentSegments;
-        private final LinkedList<T> nextSegments;
+        private Deque<T> currentSegments;
+        private Deque<T> nextSegments;
 
-        public Recycler(Creator<T> creator) {
-            this.currentSegments = new LinkedList<T>();
-            this.nextSegments = new LinkedList<T>();
+        Recycler(Creator<T> creator) {
+            // Use an ArrayDeque instead of a LinkedList
+            // This will avoid memory churn allocating and collecting internal nodes
+            this.currentSegments = new ArrayDeque<>();
+            this.nextSegments = new ArrayDeque<>();
             this.creator = creator;
         }
 
-        public T get() {
-            if(!currentSegments.isEmpty()) {
+        T get() {
+            if (!currentSegments.isEmpty()) {
                 return currentSegments.removeFirst();
             }
 
             return creator.create();
         }
 
-        public void recycle(T reuse) {
+        void recycle(T reuse) {
             nextSegments.addLast(reuse);
         }
 
-        public void swap() {
+        void swap() {
+            // Swap the deque references to reduce addition and clearing cost
+            if (nextSegments.size() > currentSegments.size()) {
+                Deque<T> tmp = nextSegments;
+                nextSegments = currentSegments;
+                currentSegments = tmp;
+            }
+
             currentSegments.addAll(nextSegments);
             nextSegments.clear();
         }
     }
 
     private interface Creator<T> {
-        public T create();
+        T create();
     }
 
 }

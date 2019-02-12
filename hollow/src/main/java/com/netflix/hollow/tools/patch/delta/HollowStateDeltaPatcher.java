@@ -93,7 +93,8 @@ public class HollowStateDeltaPatcher {
     }
     
     /**
-     * The HollowWriteStateEngine containing the state, use this to write the deltas and reverse deltas.
+     * Returns the HollowWriteStateEngine containing the state, use this to write the deltas and reverse deltas.
+     * @return the HollowWriteStateEngine containing the state
      */
     public HollowWriteStateEngine getStateEngine() {
         return writeEngine;

@@ -15,7 +15,7 @@
 *#
 
 #if($filteredByQuery)
-NOTE: Results are filtered by query <span style="font-family: monospace;">$filteredByQuery</span>.  <a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
+NOTE: Results are filtered by query <span style="font-family: monospace;">$esc.html($filteredByQuery)</span>.  <a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&clearQuery=true">clear</a>
 #end
 
 <!-- navigation -->
@@ -26,7 +26,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 		<td class="nav"> 
 			#if($page != 0)
 				#set($prevPage = $page - 1)
-				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&page=$prevPage&pageSize=$pageSize">PREV</a>
+				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&page=$prevPage&pageSize=$pageSize">PREV</a>
 			#end
 			#set($lastPage = $numPages - 1)
 			#if($page != 0 && $page < $lastPage) 
@@ -34,15 +34,15 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 			#end
 			#if($page < $lastPage) 
 				#set($nextPage = $page + 1)
-				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
+				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&display=$display&page=$nextPage&pageSize=$pageSize">NEXT</a>
 			#end
 		</td>
 		#if($ordinal)
 			<td class="nav">
 				FORMAT: 
-				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
+				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=text">text</a> 
 				-
-				<a href="$basePath/type?type=$type&key=$key&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=json">json</a> 
+				<a href="$basePath/type?type=$esc.url($type)&key=$esc.url($key)&ordinal=$ordinal&page=$page&pageSize=$pageSize&display=json">json</a> 
 				 
 			</td>
 		#end
@@ -64,7 +64,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 				#foreach($key in $keys)
 					<tr>
 						<td>$key.getIdx()</td>
-						<td nowrap><a href="$basePath/type?type=$type&page=$page&pageSize=$pageSize&display=$display&ordinal=$key.getOrdinal()&key=$key.getKey()">$key.getKeyDisplay()</a></td>
+						<td nowrap><a href="$basePath/type?type=$esc.url($type)&page=$page&pageSize=$pageSize&display=$display&ordinal=$key.getOrdinal()&key=$esc.url($key.getKey())">$esc.html($key.getKeyDisplay())</a></td>
 					</tr>
 				#end
 			</table>
@@ -79,12 +79,12 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 					<th align=right nowrap>Find Key: </th>
 					<td>
 						<form id="fRec" method="get">
-							<input type="hidden" name="type" value="$type">
+							<input type="hidden" name="type" value="$esc.html($type)">
 							<input type="hidden" name="page" value="$page">
 							<input type="hidden" name="pageSize" value="$pageSize">
 							<input type="hidden" name="display" value="$display">
 							<input type="hidden" name="ordinal" value="$ordinal">
-							<input type="text" name="key" value="$key" size="120">
+							<input type="text" name="key" value="$esc.html($key)" size="120">
 							<input type="submit" value="Match">
 						</form>
 					</td>
@@ -95,7 +95,7 @@ NOTE: Results are filtered by query <span style="font-family: monospace;">$filte
 						<td id="recLink">
 							ordinal: $ordinal
 							#if($key && !$key.isEmpty())
-								<br/>key: $key
+								<br/>key: $esc.html($key)
 							#end
 						</td>
 					</tr>

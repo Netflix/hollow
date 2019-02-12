@@ -25,6 +25,7 @@ import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -46,7 +47,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
     private final HollowObjectSchema schema;
     private final HollowObjectTypeWriteState writeState;
 
-    private final AssignedOrdinalType assignedOrdinalType;
+    private final boolean hasAssignedOrdinalField;
     private final long assignedOrdinalFieldOffset;
 
     private final List<MappedField> mappedFields;
@@ -58,7 +59,9 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         this.clazz = clazz;
         this.typeName = declaredTypeName != null ? declaredTypeName : getDefaultTypeName(clazz);
         this.mappedFields = new ArrayList<MappedField>();
-        
+
+        boolean hasAssignedOrdinalField = false;
+        long assignedOrdinalFieldOffset = -1;
         if(clazz == String.class) {
             try {
                 mappedFields.add(new MappedField(clazz.getDeclaredField("value")));
@@ -74,7 +77,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         } else {
             /// gather fields from type hierarchy
             Class<?> currentClass = clazz;
-            
+
             while(currentClass != Object.class && currentClass != Enum.class) {
                 if(currentClass.isInterface()) {
                     throw new IllegalArgumentException("Unexpected interface " + currentClass.getSimpleName() + " passed as field.");
@@ -84,15 +87,23 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 Field[] declaredFields = currentClass.getDeclaredFields();
     
                 for(int i=0;i<declaredFields.length;i++) {
-                    if(!Modifier.isTransient(declaredFields[i].getModifiers()) &&
-                       !Modifier.isStatic(declaredFields[i].getModifiers()) && 
-                       !"__assigned_ordinal".equals(declaredFields[i].getName()) &&
-                       declaredFields[i].getAnnotation(HollowTransient.class) == null) {
+                    Field declaredField = declaredFields[i];
+                    int modifiers = declaredField.getModifiers();
+                    if(!Modifier.isTransient(modifiers) && !Modifier.isStatic(modifiers) &&
+                            !"__assigned_ordinal".equals(declaredField.getName()) &&
+                            !declaredField.isAnnotationPresent(HollowTransient.class)) {
 
-                        mappedFields.add(new MappedField(declaredFields[i], visited));
+                        mappedFields.add(new MappedField(declaredField, visited));
+                    } else if("__assigned_ordinal".equals(declaredField.getName()) &&
+                            currentClass == clazz) {
+                        // If there is a field of name __assigned_ordinal on clazz
+                        if(declaredField.getType() == long.class) {
+                            assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
+                            hasAssignedOrdinalField = true;;
+                        }
                     }
                 }
-    
+
                 if(currentClass.isEnum())
                     mappedFields.add(new MappedField(MappedFieldType.ENUM_NAME));
                 
@@ -113,20 +124,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         HollowObjectTypeWriteState existingWriteState = (HollowObjectTypeWriteState) parentMapper.getStateEngine().getTypeState(typeName);
         this.writeState = existingWriteState != null ? existingWriteState : new HollowObjectTypeWriteState(schema, getNumShards(clazz));
 
-        AssignedOrdinalType assignedOrdinalType = AssignedOrdinalType.NONE;
-        long assignedOrdinalFieldOffset = -1;
-        try {
-            Field declaredField = clazz.getDeclaredField("__assigned_ordinal");
-            if(declaredField.getType() == int.class || declaredField.getType() == long.class)
-                assignedOrdinalFieldOffset = unsafe.objectFieldOffset(declaredField);
-            if(declaredField.getType() == long.class)
-                assignedOrdinalType = AssignedOrdinalType.LONG;
-            else if(declaredField.getType() == int.class)
-                assignedOrdinalType = AssignedOrdinalType.INT;
-            
-        } catch (Exception ignore) { }
         this.assignedOrdinalFieldOffset = assignedOrdinalFieldOffset;
-        this.assignedOrdinalType = assignedOrdinalType;
+        this.hasAssignedOrdinalField = hasAssignedOrdinalField;
     }
 
     private static String[] getKeyFieldPaths(Class<?> clazz) {
@@ -152,44 +151,39 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
 
     @Override
     public int write(Object obj) {
-        switch(assignedOrdinalType) {
-        case LONG:
+        if (hasAssignedOrdinalField) {
             long assignedOrdinal = unsafe.getLong(obj, assignedOrdinalFieldOffset);
             if((assignedOrdinal & ASSIGNED_ORDINAL_CYCLE_MASK) == cycleSpecificAssignedOrdinalBits())
                 return (int)assignedOrdinal & Integer.MAX_VALUE;
-            break;
-        case INT:
-            int intAssignedOrdinal = unsafe.getInt(obj, assignedOrdinalFieldOffset);
-            if(intAssignedOrdinal != -1)
-                return intAssignedOrdinal;
-            break;
-        case NONE:
-            break;
         }
 
-        if(obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
-            throw new IllegalArgumentException("Attempting to write unexpected class!  Expected " + clazz + " but object was " + obj.getClass());
-
-        HollowObjectWriteRecord rec = (HollowObjectWriteRecord)writeRecord();
-
-        for(int i=0;i<mappedFields.size();i++) {
-            mappedFields.get(i).copy(obj, rec);
-        }
+        HollowObjectWriteRecord rec = copyToWriteRecord(obj, null);
 
         int assignedOrdinal = writeState.add(rec);
-        switch(assignedOrdinalType) {
-        case LONG:
+        if (hasAssignedOrdinalField) {
             unsafe.putLong(obj, assignedOrdinalFieldOffset, (long)assignedOrdinal | cycleSpecificAssignedOrdinalBits());
-            break;
-        case INT:
-            unsafe.putInt(obj, assignedOrdinalFieldOffset, assignedOrdinal);
-            break;
-        case NONE:
-            break;
         }
         return assignedOrdinal;
     }
 
+    @Override
+    public int writeFlat(Object obj, FlatRecordWriter flatRecordWriter) {
+        HollowObjectWriteRecord rec = copyToWriteRecord(obj, flatRecordWriter);
+        return flatRecordWriter.write(schema, rec);
+    }
+    
+    private HollowObjectWriteRecord copyToWriteRecord(Object obj, FlatRecordWriter flatRecordWriter) {
+        if (obj.getClass() != clazz && !clazz.isAssignableFrom(obj.getClass()))
+            throw new IllegalArgumentException("Attempting to write unexpected class!  Expected " + clazz + " but object was " + obj.getClass());
+
+        HollowObjectWriteRecord rec = (HollowObjectWriteRecord) writeRecord();
+
+        for (int i = 0; i < mappedFields.size(); i++) {
+            mappedFields.get(i).copy(obj, rec, flatRecordWriter);
+        }
+        return rec;
+    }
+    
     Object[] extractPrimaryKey(Object obj) {
         int[][] primaryKeyFieldPathIdx = this.primaryKeyFieldPathIdx;
         
@@ -290,6 +284,8 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 fieldType = MappedFieldType.FLOAT;
             } else if(type == double.class) {
                 fieldType = MappedFieldType.DOUBLE;
+            } else if (type == byte[].class && clazz == String.class) {
+                fieldType = MappedFieldType.STRING;
             } else if(type == byte[].class) {
                 fieldType = MappedFieldType.BYTES;
             } else if(type == char[].class) {
@@ -364,7 +360,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
         }
 
         @SuppressWarnings("deprecation")
-        public void copy(Object obj, HollowObjectWriteRecord rec) {
+        public void copy(Object obj, HollowObjectWriteRecord rec, FlatRecordWriter flatRecordWriter) {
             Object fieldObject;
             
             switch(fieldType) {
@@ -399,7 +395,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 case STRING:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
                     if(fieldObject != null)
-                        rec.setString(fieldName, new String((char[])fieldObject));
+                        rec.setString(fieldName, getStringFromField(obj, fieldObject));
                     break;
                 case BYTES:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
@@ -464,12 +460,16 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                     break;
                 case REFERENCE:
                     fieldObject = unsafe.getObject(obj, fieldOffset);
-                    if(fieldObject != null)
-                        rec.setReference(fieldName, subTypeMapper.write(fieldObject));
+                    if(fieldObject != null) {
+                    	if(flatRecordWriter == null)
+                    		rec.setReference(fieldName, subTypeMapper.write(fieldObject));
+                    	else
+                    		rec.setReference(fieldName, subTypeMapper.writeFlat(fieldObject, flatRecordWriter));
+                    }
                     break;
             }
         }
-        
+
         public Object retrieveFieldValue(Object obj, int[] fieldPathIdx, int idx) {
             Object fieldObject;
 
@@ -508,7 +508,7 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 return Float.valueOf(f);
             case STRING:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
-                return fieldObject == null ? null : new String((char[])fieldObject);
+                return fieldObject == null ? null : getStringFromField(obj, fieldObject);
             case BYTES:
                 fieldObject = unsafe.getObject(obj, fieldOffset);
                 return fieldObject == null ? null : (byte[])fieldObject;
@@ -539,14 +539,17 @@ public class HollowObjectTypeMapper extends HollowTypeMapper {
                 throw new IllegalArgumentException("Cannot extract POJO primary key from a " + fieldType + " mapped field type");
             }
         }
+
+        private String getStringFromField(Object obj, Object fieldObject) {
+            if (obj instanceof String) {
+                return (String) obj;
+            } else if (fieldObject instanceof char[]) {
+                return new String((char[]) fieldObject);
+            }
+            throw new IllegalArgumentException("Expected char[] or String value container for STRING.");
+        }
     }
     
-    private static enum AssignedOrdinalType {
-        INT,
-        LONG,
-        NONE
-    }
-
     private static enum MappedFieldType {
         BOOLEAN(FieldType.BOOLEAN),
         NULLABLE_PRIMITIVE_BOOLEAN(FieldType.BOOLEAN),

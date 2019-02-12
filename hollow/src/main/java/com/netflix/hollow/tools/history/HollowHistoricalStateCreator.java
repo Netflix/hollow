@@ -35,6 +35,7 @@ import com.netflix.hollow.core.schema.HollowSchemaSorter;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.util.IntMap;
 import com.netflix.hollow.core.util.IntMap.IntMapEntryIterator;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
@@ -44,14 +45,19 @@ import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
 import com.netflix.hollow.tools.combine.OrdinalRemapper;
 import com.netflix.hollow.tools.diff.exact.DiffEqualOrdinalMap;
 import com.netflix.hollow.tools.diff.exact.DiffEqualityMapping;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Used to create a historical {@link HollowDataAccess}, even in the absence of a {@link HollowHistory}.
@@ -75,6 +81,7 @@ public class HollowHistoricalStateCreator {
      * 
      * @param version The state's version
      * @param stateEngine The current {@link HollowReadStateEngine} to which a delta has been applied.
+     * @return a data access for history
      */
     public HollowHistoricalStateDataAccess createBasedOnNewDelta(long version, HollowReadStateEngine stateEngine) {
         IntMapOrdinalRemapper typeRemovedOrdinalMapping = new IntMapOrdinalRemapper();
@@ -116,7 +123,12 @@ public class HollowHistoricalStateCreator {
     }
 
     /**
-     * Create a {@link HollowDataAccess} for a {@link HollowHistory}.  Remap ordinal spaces for all prior historical versions in the {@link HollowHistory} for consistency.
+     * Create a {@link HollowDataAccess} for a {@link HollowHistory}.  Remap ordinal spaces for all prior historical
+     * versions in the {@link HollowHistory} for consistency.
+     *
+     * @param version the version
+     * @param previous the prior read state
+     * @return the data access for a history
      */
     public HollowHistoricalStateDataAccess createConsistentOrdinalHistoricalStateFromDoubleSnapshot(long version, HollowReadStateEngine previous) {
         return new HollowHistoricalStateDataAccess(totalHistory, version, previous, IdentityOrdinalRemapper.INSTANCE, Collections.<String, HollowHistoricalSchemaChange>emptyMap());
@@ -124,6 +136,12 @@ public class HollowHistoricalStateCreator {
 
     /**
      * Create a {@link HollowDataAccess} for a historical state after a double snapshot occurs, without a {@link HollowHistory}. 
+     *
+     * @param version the version
+     * @param previous the previous state
+     * @param current the current state
+     * @param ordinalRemapper the ordinal remapper
+     * @return the data access for a history
      */
     public HollowHistoricalStateDataAccess createHistoricalStateFromDoubleSnapshot(long version, HollowReadStateEngine previous, HollowReadStateEngine current, DiffEqualityMappingOrdinalRemapper ordinalRemapper) {
         HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemasWithoutKeys(previous.getSchemas()));
@@ -307,20 +325,49 @@ public class HollowHistoricalStateCreator {
     }
 
     private static HollowReadStateEngine roundTripStateEngine(HollowWriteStateEngine writeEngine) {
+        HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
         HollowReadStateEngine removedRecordCopies = new HollowReadStateEngine();
+        HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
 
-        try {
-            HollowBlobWriter writer = new HollowBlobWriter(writeEngine);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            writer.writeSnapshot(baos);
-            HollowBlobReader reader = new HollowBlobReader(removedRecordCopies);
-            reader.readSnapshot(new ByteArrayInputStream(baos.toByteArray()));
-        } catch(Exception e) {
-            e.printStackTrace();
+        // Use a pipe to write and read concurrently to avoid writing
+        // to temporary files or allocating memory
+        // @@@ for small states it's more efficient to sequentially write to
+        // and read from a byte array but it is tricky to estimate the size
+        SimultaneousExecutor executor = new SimultaneousExecutor(1);
+        Exception pipeException = null;
+        // Ensure read-side is closed after completion of read
+        try (PipedInputStream in = new PipedInputStream(1 << 15)) {
+            BufferedOutputStream out = new BufferedOutputStream(new PipedOutputStream(in));
+            executor.execute(() -> {
+                // Ensure write-side is closed after completion of write
+                try (Closeable ac = out) {
+                    writer.writeSnapshot(out);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            reader.readSnapshot(new BufferedInputStream(in));
+        } catch (Exception e) {
+            pipeException = e;
         }
+
+        // Ensure no underlying writer exception is lost due to broken pipe
+        try {
+            executor.awaitSuccessfulCompletion();
+        } catch (InterruptedException | ExecutionException e) {
+            if (pipeException == null) {
+                throw new RuntimeException(e);
+            }
+
+            pipeException.addSuppressed(e);
+        }
+        if (pipeException != null)
+            throw new RuntimeException(pipeException);
+
         return removedRecordCopies;
     }
-    
+
     private List<HollowSchema> schemasWithoutKeys(List<HollowSchema> schemas) {
         List<HollowSchema> baldSchemas = new ArrayList<HollowSchema>();
         for(HollowSchema prevSchema : schemas)

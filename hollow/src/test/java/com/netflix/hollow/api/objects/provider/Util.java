@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2018 Netflix, Inc.
+ *  Copyright 2019 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,19 +15,21 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api;
+package com.netflix.hollow.api.objects.provider;
 
-/**
- * An interface to gather various sentinel constants used across hollow.
- */
-public interface HollowConstants {
-    /**
-     * A version of VERSION_LATEST signifies "latest version".
-     */
-    long VERSION_LATEST = Long.MAX_VALUE;
+import static java.util.Objects.requireNonNull;
 
-    /**
-     * A version of VERSION_NONE signifies "no version".
-     */
-    long VERSION_NONE = Long.MIN_VALUE;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
+
+interface Util {
+    static <T> Supplier<T> memoize(Supplier<T> supplier) {
+        AtomicReference<T> value = new AtomicReference<>();
+        return () -> {
+            T val = value.get();
+            if (val == null)
+                val = value.updateAndGet(v -> v == null ? requireNonNull(supplier.get()) : v);
+            return val;
+        };
+    }
 }

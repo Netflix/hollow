@@ -63,6 +63,8 @@ public class HollowSpecificDiff {
 
     /**
      * Set the primary key paths which will be used to find matching records across the two states
+     *
+     * @param paths the key paths
      */
     public void setRecordMatchPaths(String... paths) {
         for(String path : paths)
@@ -71,6 +73,8 @@ public class HollowSpecificDiff {
 
     /**
      * Set the paths for which we will inspect differences across the two states
+     *
+     * @param paths the paths for inspection
      */
     public void setElementMatchPaths(String... paths) {
         resetResults();
@@ -81,7 +85,8 @@ public class HollowSpecificDiff {
 
     /**
      * Optionally specify paths for which we will match records within an individual type's hierarchy
-     * @param paths
+     *
+     * @param paths the paths for matching
      */
     public void setElementKeyPaths(String... paths) {
         resetResults();
@@ -161,8 +166,8 @@ public class HollowSpecificDiff {
 
         try {
             executor.awaitSuccessfulCompletion();
-        } catch (Throwable th) {
-            throw new RuntimeException(th);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 

@@ -26,11 +26,13 @@ import com.netflix.hollow.core.write.objectmapper.HollowInline;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -168,7 +170,7 @@ public class HollowPrefixIndexTest {
         MovieSetReference movieSetReference = new MovieSetReference(1, 1999, "The Matrix", new HashSet<String>(Arrays.asList("Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss")));
         objectMapper.add(movieSetReference);
         StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
-        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.value");
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieSetReference", "actors.element");
         Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
     }
@@ -182,6 +184,18 @@ public class HollowPrefixIndexTest {
         HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorReference", "actors.element");
         Set<Integer> ordinals = toSet(prefixIndex.findKeysWithPrefix("kea"));
         Assert.assertTrue(ordinals.size() == 1);
+    }
+
+    @Test
+    public void testMovieActorReference_duplicatesInList() throws Exception {
+        List<Actor> actors = Collections.singletonList(new Actor("Keanu Reeves"));
+        int numMovies = 10;
+        IntStream.range(0, numMovies).mapToObj(index ->
+                new MovieActorReference(index, 1999 + index, "The Matrix " + index, actors))
+            .forEach(objectMapper::add);
+        StateEngineRoundTripper.roundTripSnapshot(writeStateEngine, readStateEngine);
+        HollowPrefixIndex prefixIndex = new HollowPrefixIndex(readStateEngine, "MovieActorReference", "actors.element");
+        Assert.assertEquals(numMovies, toSet(prefixIndex.findKeysWithPrefix("kea")).size());
     }
 
     @Test

@@ -15,24 +15,21 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.consumer;
+package com.netflix.hollow.test.consumer;
 
 import com.netflix.hollow.api.consumer.HollowConsumer.Blob;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FakeBlobRetriever implements BlobRetriever {
-
-    private final Map<Long, Blob> snapshots;
-    private final Map<Long, Blob> deltas;
-    private final Map<Long, Blob> reverseDeltas;
-
-    public FakeBlobRetriever() {
-        this.snapshots = new HashMap<Long, Blob>();
-        this.deltas = new HashMap<Long, Blob>();
-        this.reverseDeltas = new HashMap<Long, Blob>();
-    }
+/**
+ * A simple implementation of a BlobRetriever which allows adding blobs and holds them all in
+ * memory.
+ */
+public class TestBlobRetriever implements BlobRetriever {
+    private final Map<Long, Blob> snapshots = new HashMap<>();
+    private final Map<Long, Blob> deltas = new HashMap<>();
+    private final Map<Long, Blob> reverseDeltas = new HashMap<>();
 
     @Override
     public Blob retrieveSnapshotBlob(long desiredVersion) {

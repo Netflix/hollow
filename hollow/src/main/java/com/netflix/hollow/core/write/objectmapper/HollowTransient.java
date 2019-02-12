@@ -22,6 +22,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Indicates that a field of a POJO is to be ignored.
+ * <p>
+ * This annotation should be used when the {@code transient} field
+ * modifier cannot be declared (for example if a JVM compatible
+ * language is used to represent the POJOs and there are limitations
+ * in expressing corresponding transient fields in Java byte code).
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface HollowTransient {

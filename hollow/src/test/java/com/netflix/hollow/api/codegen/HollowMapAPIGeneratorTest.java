@@ -21,15 +21,16 @@ import java.util.Set;
 import org.junit.Test;
 
 public class HollowMapAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
-    static class Weapon {
+    private static class Weapon {
     }
-    static class Minion {
+    private static class Minion {
     }
-    static class Frank {
+    private static class Frank {
     }
-    static class Kevin {
+    private static class Kevin {
     }
 
+    @SuppressWarnings("unused")
     static class Gru {
         Map<String, Minion> minions;
         Map<String, List<Frank>> franks;
@@ -37,25 +38,23 @@ public class HollowMapAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
         Set<Weapon> weapons;
     }
 
-    private boolean usePackageGrouping;
+    private static final String API_CLASS_NAME = "MapTestAPI";
+    private static final String PACKAGE_NAME = "codegen.map";
 
-    @Override
-    protected HollowAPIGenerator initGenerator(HollowAPIGenerator.Builder builder) {
-        if (usePackageGrouping) {
-            builder.withPackageGrouping();
-        }
-        return super.initGenerator(builder);
+    @Test
+    public void test_withClassPostfix() throws Exception {
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Gru.class,
+                builder -> builder.withPackageGrouping().withClassPostfix("Generated"));
     }
 
     @Test
     public void test_withPackageGrouping() throws Exception {
-        usePackageGrouping = true;
-        runGenerator("MapTestAPI", "codegen.map", Gru.class);
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Gru.class,
+                HollowAPIGenerator.Builder::withPackageGrouping);
     }
 
     @Test
     public void test_withoutPackageGrouping() throws Exception {
-        usePackageGrouping = false;
-        runGenerator("MapTestAPI", "codegen.map", Gru.class);
+        runGenerator(API_CLASS_NAME, PACKAGE_NAME, Gru.class, b -> b);
     }
 }

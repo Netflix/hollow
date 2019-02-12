@@ -36,12 +36,15 @@ public interface HollowDataset {
     List<HollowSchema> getSchemas();
 
     /**
+     * @param typeName the type name
      * @return the schema for the specified type in this dataset.
      */
     HollowSchema getSchema(String typeName);
 
     /**
-     * Like {@link #getSchema}, but throws a {@link SchemaNotFoundException} if the schema is not found.
+     * @param typeName the type name
+     * @return the schema for the specified type in this dataset.
+     * @throws SchemaNotFoundException if the schema is not found
      */
     HollowSchema getNonNullSchema(String typeName) throws SchemaNotFoundException;
 

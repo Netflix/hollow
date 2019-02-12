@@ -21,6 +21,7 @@ import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.index.AbstractHollowUniqueKeyIndex;
+import com.netflix.hollow.api.consumer.index.HollowUniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
@@ -40,6 +41,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     protected boolean isGenSimpleConstructor = false;
     protected boolean isParameterizedConstructorPublic = true;
     protected boolean isAutoListenToDataRefresh = false;
+    protected boolean isImplementsUniqueKeyIndex = true;
 
     public HollowUniqueKeyIndexGenerator(String packageName, String apiClassname, HollowObjectSchema schema,
             HollowDataset dataset, CodeGeneratorConfig config) {
@@ -60,11 +62,20 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
         appendPackageAndCommonImports(builder, apiClassname, Arrays.<HollowSchema>asList(schema));
         builder.append("import " + HollowConsumer.class.getName() + ";\n");
         builder.append("import " + AbstractHollowUniqueKeyIndex.class.getName() + ";\n");
+        builder.append("import " + HollowUniqueKeyIndex.class.getName() + ";\n");
         if (isGenSimpleConstructor)
             builder.append("import " + HollowObjectSchema.class.getName() + ";\n");
 
-        builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> {\n\n");
+        builder.append("\n/**\n");
+        genDeprecatedJavaDoc(builder);
+        builder.append(" */\n");
+        builder.append("@Deprecated\n");
+        builder.append("@SuppressWarnings(\"all\")\n");
+        builder.append("public class " + className + " extends " + AbstractHollowUniqueKeyIndex.class.getSimpleName() + "<" + apiClassname + ", " + hollowImplClassname(type) + "> ");
+        if (isImplementsUniqueKeyIndex) {
+            builder.append("implements " + HollowUniqueKeyIndex.class.getSimpleName() + "<" + hollowImplClassname(type) + "> ");
+        }
+        builder.append("{\n\n");
         {
             genConstructors(builder);
             genPublicAPIs(builder);
@@ -84,7 +95,7 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
 
     protected void genSimpleConstructor(StringBuilder builder) {
         builder.append("    public " + className + "(HollowConsumer consumer) {\n");
-        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ");");
+        builder.append("        this(consumer, "+ isAutoListenToDataRefresh + ");\n");
         builder.append("    }\n\n");
 
         builder.append("    public " + className + "(HollowConsumer consumer, boolean isListenToDataRefresh) {\n");
@@ -109,11 +120,26 @@ public class HollowUniqueKeyIndexGenerator extends HollowIndexGenerator {
     }
 
     protected void genFindMatchAPI(StringBuilder builder) {
+        if (isImplementsUniqueKeyIndex)
+            builder.append("    @Override\n");
         builder.append("    public " + hollowImplClassname(type) + " findMatch(Object... keys) {\n");
         builder.append("        int ordinal = idx.getMatchingOrdinal(keys);\n");
         builder.append("        if(ordinal == -1)\n");
         builder.append("            return null;\n");
         builder.append("        return api.get" + hollowImplClassname(type) + "(ordinal);\n");
         builder.append("    }\n\n");
+    }
+
+    protected void genDeprecatedJavaDoc(StringBuilder builder) {
+        String typeName = hollowImplClassname(type);
+        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex} which can be built as follows:\n");
+        builder.append(" * <pre>{@code\n");
+        builder.append(String.format(" *     UniqueKeyIndex<%s, K> uki = UniqueKeyIndex.from(consumer, %1$s.class)\n", typeName));
+        builder.append(" *         .usingBean(k);\n");
+        builder.append(String.format(" *     %s m = uki.findMatch(k);\n", typeName));
+        builder.append(" * }</pre>\n");
+        builder.append(" * where {@code K} is a class declaring key field paths members, annotated with\n");
+        builder.append(" * {@link com.netflix.hollow.api.consumer.index.FieldPath}, and {@code k} is an instance of\n");
+        builder.append(String.format(" * {@code K} that is the key to find the unique {@code %s} object.\n", typeName));
     }
 }
