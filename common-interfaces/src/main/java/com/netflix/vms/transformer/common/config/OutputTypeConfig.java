@@ -43,6 +43,8 @@ public enum OutputTypeConfig {
             CompleteVideo, MulticatalogCountryData, RolloutVideo, GlobalVideo, FallbackUSArtwork, LanguageRights, VideoPackageData, PackageData, L10NResources);
     public final static Set<OutputTypeConfig> VIDEO_RELATED_TYPES = Collections.unmodifiableSet(VIDEO_RELATED_TYPES_ENUMSET);
     public final static Set<OutputTypeConfig> NON_VIDEO_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.complementOf(VIDEO_RELATED_TYPES_ENUMSET));
+    // CAUTION: NON_VIDEO_RELATED_TYPES includes types that are referenced from VIDEO_RELATED_TYPES, for eg.
+    // PackageData belongs to VIDEO_RELATED_TYPES but StreamData which is a member of PackageData belongs to NON_VIDEO_RELATED_TYPES
 
     public final static Set<OutputTypeConfig> PERSON_RELATED_TYPES = Collections.unmodifiableSet(EnumSet.of(
             GlobalPerson, PersonImages));
