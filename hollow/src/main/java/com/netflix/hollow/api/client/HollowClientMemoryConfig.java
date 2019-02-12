@@ -43,14 +43,23 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
     class SpecifiedConfig implements HollowClientMemoryConfig {
 
         private final boolean enableLongLivedObjectSupport;
+        private final boolean enableSampling;
         private final boolean dropDataAutomatically;
         private final long gracePeriodMillis;
         private final long usageDetectionPeriodMillis;
 
         public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
-                                           long gracePeriodMillis, long usageDetectionPeriodMillis) {
+            long gracePeriodMillis, long usageDetectionPeriodMillis) {
+            this(enableLongLivedObjectSupport, dropDataAutomatically, false, gracePeriodMillis,
+                usageDetectionPeriodMillis);
+        }
+
+        public SpecifiedConfig(boolean enableLongLivedObjectSupport, boolean dropDataAutomatically,
+                                           boolean enableSampling, long gracePeriodMillis,
+                                           long usageDetectionPeriodMillis) {
             this.enableLongLivedObjectSupport = enableLongLivedObjectSupport;
             this.dropDataAutomatically = dropDataAutomatically;
+            this.enableSampling = enableSampling;
             this.gracePeriodMillis = gracePeriodMillis;
             this.usageDetectionPeriodMillis = usageDetectionPeriodMillis;
         }
@@ -64,6 +73,11 @@ public interface HollowClientMemoryConfig extends HollowConsumer.ObjectLongevity
         public long usageDetectionPeriodMillis() { return usageDetectionPeriodMillis; }
 
         public boolean enableExpiredUsageStackTraces() { return false; }
+
+        @Override
+        public boolean enableSampling() {
+            return enableSampling;
+        }
 
         public boolean forceDropData() { return false; }
         

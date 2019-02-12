@@ -68,7 +68,7 @@ public class HollowClientTest {
 
         client = new HollowClient.Builder()
                               .withBlobRetriever(new FakeHollowBlobRetriever())
-                              .withMemoryConfig(new HollowClientMemoryConfig.SpecifiedConfig(true, false, 10000L, 10000L))
+                              .withMemoryConfig(new HollowClientMemoryConfig.SpecifiedConfig(true, false, false, 10000L, 10000L))
                               .build();
 
         createChain();

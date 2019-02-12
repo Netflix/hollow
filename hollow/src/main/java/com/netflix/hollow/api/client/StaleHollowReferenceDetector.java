@@ -19,7 +19,9 @@ package com.netflix.hollow.api.client;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
+import com.netflix.hollow.api.sampling.HollowSamplingDirector;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.proxy.HollowProxyDataAccess;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -48,7 +50,8 @@ public class StaleHollowReferenceDetector {
     /// c) any hollow objects are referenced which we expect to be unreferenced
     /// and do the appropriate disabling / send the appropriate signals to the update listener.
     private static final long HOUSEKEEPING_INTERVAL = 30000L;
-    private static final EnabledSamplingDirector ENABLED_SAMPLING_DIRECTOR = new EnabledSamplingDirector();
+
+    private final HollowSamplingDirector samplingDirector;
 
     private final List<HollowWeakReferenceHandle> handles;
 
@@ -65,6 +68,7 @@ public class StaleHollowReferenceDetector {
         this.config = config;
         this.detector = detector;
         this.stackTraceRecorder = new StackTraceRecorder(25);
+        this.samplingDirector = config != null && config.enableSampling() ? new EnabledSamplingDirector() : DisabledSamplingDirector.INSTANCE;
     }
 
     synchronized boolean isKnownAPIHandle(HollowAPI api) {
@@ -243,7 +247,7 @@ public class StaleHollowReferenceDetector {
             HollowAPI hollowAPI = apiHandle.get();
             if(hollowAPI != null) {
                 hollowAPI.getDataAccess().resetSampling();
-                hollowAPI.setSamplingDirector(ENABLED_SAMPLING_DIRECTOR);
+                hollowAPI.setSamplingDirector(samplingDirector);
             }
         }
 
