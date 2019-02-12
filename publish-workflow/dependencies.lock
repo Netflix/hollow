@@ -2840,7 +2840,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -6225,7 +6225,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -9610,7 +9610,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -13144,7 +13144,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -16529,7 +16529,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -19963,7 +19963,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -23421,7 +23421,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -26879,7 +26879,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -30337,7 +30337,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "64.0.1",
+            "locked": "65.0.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
