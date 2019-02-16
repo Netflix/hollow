@@ -44,16 +44,16 @@ public class CycleMetrics {
             this.consecutiveFailures = consecutiveFailures;
             return this;
         }
-        public Builder setCycleDurationMillisOptional(OptionalLong cycleDurationMillisOptional) {
-            this.cycleDurationMillisOptional = cycleDurationMillisOptional;
+        public Builder setCycleDurationMillisOptional(long cycleDurationMillis) {
+            this.cycleDurationMillisOptional = OptionalLong.of(cycleDurationMillis);
             return this;
         }
-        public Builder setIsCycleSuccessOptional(Optional<Boolean> isCycleSuccessOptional) {
-            this.isCycleSuccessOptional = isCycleSuccessOptional;
+        public Builder setIsCycleSuccessOptional(boolean isCycleSuccessOptional) {
+            this.isCycleSuccessOptional = Optional.of(isCycleSuccessOptional);
             return this;
         }
-        public Builder setLastCycleSuccessTimeNanoOptional(OptionalLong lastCycleSuccessTimeNanoOptional) {
-            this.lastCycleSuccessTimeNanoOptional = lastCycleSuccessTimeNanoOptional;
+        public Builder setLastCycleSuccessTimeNanoOptional(long lastCycleSuccessTimeNano) {
+            this.lastCycleSuccessTimeNanoOptional = OptionalLong.of(lastCycleSuccessTimeNano);
             return this;
         }
 

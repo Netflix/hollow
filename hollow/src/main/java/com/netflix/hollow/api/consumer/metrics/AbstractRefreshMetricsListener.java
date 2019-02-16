@@ -85,13 +85,12 @@ public abstract class AbstractRefreshMetricsListener extends AbstractRefreshList
      * that there was an exception, and continuing with the consumer refresh.
      * @param refreshMetrics Consumer refresh metrics being reported
      */
-
     private final void noFailRefreshEndMetricsReporting(ConsumerRefreshMetrics refreshMetrics) {
         try {
             refreshEndMetricsReporting(refreshMetrics);
         } catch (Exception e) {
             // Metric reporting is not considered critical to consumer refresh. Log exceptions and continue.
-            log.log(Level.WARNING, "Encountered an exception in reporting consumer refresh metrics, ignoring exception and continuing with consumer refresh", e);
+            log.log(Level.SEVERE, "Encountered an exception in reporting consumer refresh metrics, ignoring exception and continuing with consumer refresh", e);
         }
     }
 

@@ -52,8 +52,8 @@ public class AnnouncementMetrics {
             this.isAnnouncementSuccess = isAnnouncementSuccess;
             return this;
         }
-        public Builder setLastAnnouncementSuccessTimeNanoOptional(OptionalLong lastAnnouncementSuccessTimeNanoOptional) {
-            this.lastAnnouncementSuccessTimeNanoOptional = lastAnnouncementSuccessTimeNanoOptional;
+        public Builder setLastAnnouncementSuccessTimeNanoOptional(long lastAnnouncementSuccessTimeNano) {
+            this.lastAnnouncementSuccessTimeNanoOptional = OptionalLong.of(lastAnnouncementSuccessTimeNano);
             return this;
         }
 

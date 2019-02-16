@@ -4,7 +4,6 @@ import com.netflix.hollow.api.producer.AbstractHollowProducerListener;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.time.Duration;
-import java.util.Optional;
 import java.util.OptionalLong;
 
 /**
@@ -50,12 +49,13 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
      */
     @Override
     public void onCycleSkip(CycleSkipReason reason) {
-        cycleMetricsBuilder
-                .setConsecutiveFailures(consecutiveFailures)
-                .setIsCycleSuccessOptional(Optional.empty())
-                .setCycleDurationMillisOptional(OptionalLong.empty())
-                .setLastCycleSuccessTimeNanoOptional(lastCycleSuccessTimeNanoOptional);
 
+        cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
+
+        if (lastCycleSuccessTimeNanoOptional.isPresent())
+            cycleMetricsBuilder.setLastCycleSuccessTimeNanoOptional((lastCycleSuccessTimeNanoOptional.getAsLong()));
+
+        // isCycleSuccess and cycleDurationMillis are not set for skipped cycles
         cycleMetricsReporting(cycleMetricsBuilder.build());
     }
 
@@ -82,8 +82,10 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
         announcementMetricsBuilder
                 .setDataSizeBytes(dataSizeBytes)
                 .setIsAnnouncementSuccess(isAnnouncementSuccess)
-                .setAnnouncementDurationMillis(elapsed.toMillis())
-                .setLastAnnouncementSuccessTimeNanoOptional(lastAnnouncementSuccessTimeNanoOptional);
+                .setAnnouncementDurationMillis(elapsed.toMillis());
+
+        if (lastAnnouncementSuccessTimeNanoOptional.isPresent())
+            announcementMetricsBuilder.setLastAnnouncementSuccessTimeNanoOptional(lastAnnouncementSuccessTimeNanoOptional.getAsLong());
 
         announcementMetricsReporting(announcementMetricsBuilder.build());
     }
@@ -97,23 +99,25 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
      */
     @Override
     public void onCycleComplete(com.netflix.hollow.api.producer.Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
-        Optional<Boolean> isCycleSuccess;
+        boolean isCycleSuccess;
         long cycleEndTimeNano = System.nanoTime();
 
         if (status.getType() == com.netflix.hollow.api.producer.Status.StatusType.SUCCESS) {
-            isCycleSuccess = Optional.of(true);
+            isCycleSuccess = true;
             consecutiveFailures = 0l;
             lastCycleSuccessTimeNanoOptional = OptionalLong.of(cycleEndTimeNano);
         } else {
-            isCycleSuccess = Optional.of(false);
+            isCycleSuccess = false;
             consecutiveFailures ++;
         }
 
         cycleMetricsBuilder
                 .setConsecutiveFailures(consecutiveFailures)
-                .setCycleDurationMillisOptional(OptionalLong.of(elapsed.toMillis()))
-                .setIsCycleSuccessOptional(isCycleSuccess)
-                .setLastCycleSuccessTimeNanoOptional(lastCycleSuccessTimeNanoOptional);
+                .setCycleDurationMillisOptional(elapsed.toMillis())
+                .setIsCycleSuccessOptional(isCycleSuccess);
+
+        if (lastCycleSuccessTimeNanoOptional.isPresent())
+                cycleMetricsBuilder.setLastCycleSuccessTimeNanoOptional(lastCycleSuccessTimeNanoOptional.getAsLong());
 
         cycleMetricsReporting(cycleMetricsBuilder.build());
     }
