@@ -211,13 +211,13 @@ class HollowMapTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowMapTypeDataElements currentData = currentDataVolatile;
-        int ordinal = populatedOrdinals.nextSetBit(0);
+        int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
                 int numBuckets = HashCodes.hashTableSize(size(shardOrdinal));
                 long offset = getAbsoluteBucketStart(currentData, shardOrdinal);
-    
+
                 checksum.applyInt(ordinal);
                 for(int i=0; i<numBuckets; i++) {
                     int bucketKey = getBucketKeyByAbsoluteIndex(currentData, offset + i);
@@ -227,9 +227,13 @@ class HollowMapTypeReadStateShard {
                         checksum.applyInt(getBucketValueByAbsoluteIndex(currentData, offset + i));
                     }
                 }
+                ordinal = ordinal + numShards;
+            } else {
+                // Round up ordinal
+                int r = (ordinal & -numShards) + shardNumber;
+                ordinal = (r <= ordinal) ? r + numShards : r;
             }
-
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+            ordinal = populatedOrdinals.nextSetBit(ordinal);
         }
     }
 
