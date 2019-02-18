@@ -167,7 +167,7 @@ class HollowSetTypeReadStateShard {
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
         HollowSetTypeDataElements currentData = currentDataVolatile;
-        int ordinal = populatedOrdinals.nextSetBit(0);
+        int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
@@ -182,9 +182,13 @@ class HollowSetTypeReadStateShard {
                         checksum.applyInt(bucketValue);
                     }
                 }
+                ordinal = ordinal + numShards;
+            } else {
+                // Round up ordinal
+                int r = (ordinal & -numShards) + shardNumber;
+                ordinal = (r <= ordinal) ? r + numShards : r;
             }
-
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+            ordinal = populatedOrdinals.nextSetBit(ordinal);
         }
     }
 

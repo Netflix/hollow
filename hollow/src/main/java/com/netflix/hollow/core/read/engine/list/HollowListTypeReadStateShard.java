@@ -99,7 +99,7 @@ class HollowListTypeReadStateShard {
     }
 
     protected void applyToChecksum(HollowChecksum checksum, BitSet populatedOrdinals, int shardNumber, int numShards) {
-        int ordinal = populatedOrdinals.nextSetBit(0);
+        int ordinal = populatedOrdinals.nextSetBit(shardNumber);
         while(ordinal != ORDINAL_NONE) {
             if((ordinal & (numShards - 1)) == shardNumber) {
                 int shardOrdinal = ordinal / numShards;
@@ -108,9 +108,14 @@ class HollowListTypeReadStateShard {
                 checksum.applyInt(ordinal);
                 for(int i=0;i<size;i++)
                     checksum.applyInt(getElementOrdinal(shardOrdinal, i));
-            }
 
-            ordinal = populatedOrdinals.nextSetBit(ordinal + 1);
+                ordinal = ordinal + numShards;
+            } else {
+                // Round up ordinal
+                int r = (ordinal & -numShards) + shardNumber;
+                ordinal = (r <= ordinal) ? r + numShards : r;
+            }
+            ordinal = populatedOrdinals.nextSetBit(ordinal);
         }
     }
 
