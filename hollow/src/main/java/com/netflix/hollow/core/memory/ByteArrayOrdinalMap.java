@@ -448,6 +448,8 @@ public class ByteArrayOrdinalMap {
      * Resize the ordinal map by increasing its capacity.
      * <p>
      * No action is take if the current capacity is sufficient for the given size.
+     * <p>
+     * WARNING: THIS OPERATION IS NOT THREAD-SAFE.
      *
      * @param size the size to increase to, rounded up to the nearest power of two.
      */
