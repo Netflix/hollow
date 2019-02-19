@@ -17,6 +17,7 @@
 package com.netflix.hollow.core.write.objectmapper;
 
 import com.netflix.hollow.core.schema.HollowMapSchema;
+import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.write.HollowMapTypeWriteState;
 import com.netflix.hollow.core.write.HollowMapWriteRecord;
@@ -55,7 +56,7 @@ public class HollowMapTypeMapper extends HollowTypeMapper {
             hashKeyFieldPaths = ((HollowObjectTypeMapper)keyMapper).getDefaultElementHashKey();
 
         if (hashKeyFieldPaths != null && hashKeyFieldPaths.length == 0) {
-            hashKeyFieldPaths = ORDINAL_HASH_KEY_FIELD_NAMES;
+            hashKeyFieldPaths = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
         }
         this.schema = new HollowMapSchema(typeName, keyMapper.getTypeName(), valueMapper.getTypeName(), hashKeyFieldPaths);
         this.hashCodeFinder = stateEngine.getHashCodeFinder();

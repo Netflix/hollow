@@ -238,9 +238,8 @@ public class HollowSetTypeReadState extends HollowCollectionTypeReadState implem
     @Override
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
         if (!getSchema().equals(withSchema)) {
-            // Apply checksum if one or other schema does not declare a hash key
-            if (getSchema().getHashKey() != null &&
-                    (!(withSchema instanceof HollowSetSchema) || ((HollowSetSchema) withSchema).getHashKey() != null)) {
+            // Apply checksum if withSchema does not declare a hash key
+            if (getSchema().getHashKey() != null && !getSchema().withoutKeys().equals(withSchema)) {
                 throw new IllegalArgumentException(
                         "HollowSetTypeReadState cannot calculate checksum with unequal schemas: " + getSchema()
                                 .getName());

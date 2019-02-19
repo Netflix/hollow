@@ -22,7 +22,7 @@ import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * A schema for a Set record type.
@@ -35,18 +35,36 @@ import java.util.Arrays;
 public class HollowSetSchema extends HollowCollectionSchema {
 
     private final String elementType;
+    private final boolean ordinalHashKey;
     private final PrimaryKey hashKey;
 
     private HollowTypeReadState elementTypeState;
 
+    /**
+     * Constructs a schema for a hollow set.
+     *
+     * @param schemaName the schema name
+     * @param elementType the element type name of the set
+     * @param hashKeyFieldPaths the field paths of the hash key applied to a set of this schema.
+     * If {@code null} or empty then the schema has no hash key and the hash function, applied to
+     * an element of a set to produce a hash code, is unspecified by this schema.
+     * If of the constant {@link HollowSchema#ORDINAL_HASH_KEY_FIELD_NAMES} then schema has no hash key
+     * but the hash function, applied to an element of a set to produce a hash code, is specified to be a
+     * function that returns the element's ordinal.
+     * Otherwise, the hash function is specified as described by
+     * {@link com.netflix.hollow.core.write.objectmapper.HollowHashKey}.
+     */
     public HollowSetSchema(String schemaName, String elementType, String... hashKeyFieldPaths) {
         super(schemaName);
         this.elementType = elementType;
-        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+        if (hashKeyFieldPaths == ORDINAL_HASH_KEY_FIELD_NAMES) {
+            this.ordinalHashKey = true;
             this.hashKey = null;
-        } else if (Arrays.equals(ORDINAL_HASH_KEY_FIELD_NAMES, hashKeyFieldPaths)) {
-            this.hashKey = HollowCollectionSchema.ORDINAL_PRIMARY_KEY;
+        } else if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
+            this.ordinalHashKey = false;
+            this.hashKey = null;
         } else {
+            this.ordinalHashKey = false;
             this.hashKey = new PrimaryKey(elementType, hashKeyFieldPaths);
         }
     }
@@ -57,7 +75,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     }
 
     public PrimaryKey getHashKey() {
-        return hashKey == ORDINAL_PRIMARY_KEY ? null : hashKey;
+        return hashKey;
     }
 
     public void setElementTypeState(HollowTypeReadState elementTypeState) {
@@ -75,7 +93,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     }
 
     public HollowSetSchema withoutKeys() {
-        if (hashKey == null) {
+        if (hashKey == null && !ordinalHashKey) {
             return this;
         }
 
@@ -91,8 +109,10 @@ public class HollowSetSchema extends HollowCollectionSchema {
             return false;
         if(!getElementType().equals(otherSchema.getElementType()))
             return false;
+        if(ordinalHashKey != otherSchema.ordinalHashKey)
+            return false;
 
-        return isNullableObjectEquals(getHashKey(), otherSchema.getHashKey());
+        return Objects.equals(getHashKey(), otherSchema.getHashKey());
     }
 
     @Override
@@ -100,9 +120,9 @@ public class HollowSetSchema extends HollowCollectionSchema {
         StringBuilder builder = new StringBuilder(getName());
         builder.append(" Set<").append(getElementType()).append(">");
 
-        if(hashKey != null) {
+        if(hashKey != null || ordinalHashKey) {
             builder.append(" @HashKey(");
-            if(hashKey != ORDINAL_PRIMARY_KEY) {
+            if(hashKey != null) {
                 builder.append(hashKey.getFieldPath(0));
                 for(int i=1;i<hashKey.numFields();i++) {
                     builder.append(", ").append(hashKey.getFieldPath(i));
@@ -119,7 +139,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if (hashKey != null)
+        if (hashKey != null || ordinalHashKey)
             dos.write(SchemaType.SET.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.SET.getTypeId());
@@ -127,7 +147,7 @@ public class HollowSetSchema extends HollowCollectionSchema {
         dos.writeUTF(getName());
         dos.writeUTF(getElementType());
 
-        if (hashKey == ORDINAL_PRIMARY_KEY) {
+        if (ordinalHashKey) {
             VarInt.writeVInt(dos, 0);
         } else if (hashKey != null) {
             VarInt.writeVInt(dos, hashKey.numFields());

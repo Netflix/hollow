@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.schema;
 
-import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import java.io.DataInputStream;
@@ -48,22 +47,10 @@ import java.io.OutputStream;
 public abstract class HollowSchema {
 
     /**
-     * A special constant for determining if a hollow set or map schema supports a hash key
-     * for ordinal values.
+     * A constant that may be passed as an argument to the constructor of {@link HollowSetSchema} or
+     * {@link HollowMapSchema} to indicate that ordinals should be utilized as hash codes.
      */
-    static final String ORDINAL_HASH_KEY_FIELD_NAME = "0rdinal";
-
-    /**
-     * A special constant for determining if a hollow set or map schema supports a hash key
-     * for ordinal values.
-     */
-    static final String[] ORDINAL_HASH_KEY_FIELD_NAMES = { ORDINAL_HASH_KEY_FIELD_NAME };
-
-    /**
-     * A special constant for determining if a hollow set or map schema supports a hash key
-     * for ordinal values.
-     */
-    static final PrimaryKey ORDINAL_PRIMARY_KEY = new PrimaryKey(ORDINAL_HASH_KEY_FIELD_NAME, ORDINAL_HASH_KEY_FIELD_NAMES);
+    public static final String[] ORDINAL_HASH_KEY_FIELD_NAMES = {};
 
     private final String name;
 

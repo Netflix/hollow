@@ -348,6 +348,56 @@ public class TestHashKey {
         hashCodeFinder.set(e, f);
     }
 
+    @Test
+    public void testChecksumSchema() throws Exception {
+        HollowProducer p = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .build();
+
+        long v1 = p.runCycle(ws -> {
+            ws.add(new Top("One", "Two"));
+        });
+
+        HollowReadStateEngine r = new HollowReadStateEngine();
+        HollowBlobReader br = new HollowBlobReader(r);
+        br.readSnapshot(blobStore.retrieveSnapshotBlob(v1).getInputStream());
+
+        HollowSetTypeReadState set = (HollowSetTypeReadState) r.getTypeState("SetOfBoxString");
+        HollowMapTypeReadState map = (HollowMapTypeReadState) r.getTypeState("MapOfBoxStringToBoxString");
+
+        // Pass with same schema but no key
+        set.getChecksum(new HollowSetSchema("SetOfBoxString", "BoxString"));
+        // Otherwise fail for mismatched schema
+        try {
+            set.getChecksum(new HollowSetSchema("SetOfBoxString", "BoxString", "v"));
+            Assert.fail();
+        } catch (Exception e) {}
+        try {
+            set.getChecksum(new HollowSetSchema("SetOfBoxString", "OtherBoxString"));
+            Assert.fail();
+        } catch (Exception e) {}
+        try {
+            set.getChecksum(map.getSchema());
+            Assert.fail();
+        } catch (Exception e) {}
+
+        // Pass with same schema but no key
+        map.getChecksum(new HollowMapSchema("MapOfBoxStringToBoxString", "BoxString", "BoxString"));
+        // Otherwise fail for mismatched schema
+        try {
+            map.getChecksum(new HollowMapSchema("MapOfBoxStringToBoxString", "BoxString", "BoxString", "v"));
+            Assert.fail();
+        } catch (Exception e) {}
+        try {
+            map.getChecksum(new HollowMapSchema("MapOfBoxStringToBoxString", "OtherBoxString", "OtherBoxString"));
+            Assert.fail();
+        } catch (Exception e) {}
+        try {
+            map.getChecksum(set.getSchema());
+            Assert.fail();
+        } catch (Exception e) {}
+    }
+
     /**
      * Tests that a client can override the hash key in the schema and use its own
      * HollowObjectHashCodeFinder when operating on sets or maps.
