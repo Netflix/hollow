@@ -37,6 +37,8 @@ public class CycleMetrics {
         private OptionalLong lastCycleSuccessTimeNanoOptional;
 
         public Builder() {
+            isCycleSuccessOptional = Optional.empty();
+            cycleDurationMillisOptional = OptionalLong.empty();
             lastCycleSuccessTimeNanoOptional = OptionalLong.empty();
         }
 

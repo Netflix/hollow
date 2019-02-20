@@ -49,13 +49,14 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
      */
     @Override
     public void onCycleSkip(CycleSkipReason reason) {
-
         cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
 
         if (lastCycleSuccessTimeNanoOptional.isPresent())
             cycleMetricsBuilder.setLastCycleSuccessTimeNanoOptional((lastCycleSuccessTimeNanoOptional.getAsLong()));
 
         // isCycleSuccess and cycleDurationMillis are not set for skipped cycles
+        cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
+
         cycleMetricsReporting(cycleMetricsBuilder.build());
     }
 
