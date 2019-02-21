@@ -36,7 +36,7 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
                 builder -> builder.withClassPostfix("Generated").withPackageGrouping());
     }
 
-    @HollowPrimaryKey(fields = { "id", "hasSubtitles", "actor", "role.id!", "role.rank" })
+    @HollowPrimaryKey(fields = {"id", "hasSubtitles", "actor", "role.id!", "role.rank"})
     static class Movie {
         int id;
 
@@ -44,6 +44,19 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
 
         Actor actor;
         Role role;
+
+        BoxedBoolean b1;
+        BoxedBytes b2;
+        BoxedBytes b3;
+        BoxedChar b4;
+        BoxedChars b5;
+        BoxedString b6;
+        BoxedInt b7;
+        BoxedLong b8;
+        BoxedFloat b9;
+        BoxedDouble b10;
+
+        Everything everything;
     }
 
     static class Actor {
@@ -56,5 +69,66 @@ public class HollowPrimaryKeyAPIGeneratorTest extends AbstractHollowAPIGenerator
         Long rank;
 
         String name;
+    }
+
+    @HollowPrimaryKey(fields = {"v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "ref!"})
+    static class Everything {
+        boolean v1;
+        char v2;
+        byte[] v3;
+        char v4;
+        char[] v5;
+        String v6;
+        int v7;
+        long v8;
+        float v9;
+        double v10;
+
+        BoxedInt ref;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedBoolean {
+        char v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedBytes {
+        byte[] v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedChar {
+        char v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedChars {
+        char[] v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedString {
+        String v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedInt {
+        int v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedLong {
+        long v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedFloat {
+        float v;
+    }
+
+    @HollowPrimaryKey(fields = "v")
+    static class BoxedDouble {
+        double v;
     }
 }

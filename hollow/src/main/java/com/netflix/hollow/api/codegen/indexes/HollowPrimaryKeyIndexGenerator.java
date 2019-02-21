@@ -90,15 +90,28 @@ public class HollowPrimaryKeyIndexGenerator extends HollowUniqueKeyIndexGenerato
     @Override
     protected void genDeprecatedJavaDoc(StringBuilder builder) {
         String typeName = hollowImplClassname(type);
-        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex} which can be built as follows:\n");
+
+        builder.append(" * @deprecated see {@link com.netflix.hollow.api.consumer.index.UniqueKeyIndex} which can be created as follows:\n");
         builder.append(" * <pre>{@code\n");
-        builder.append(String.format(" *     UniqueKeyIndex<%s, K> uki = UniqueKeyIndex.from(consumer, %1$s.class)\n", typeName));
-        builder.append(" *         .bindToPrimaryKey()\n");
-        builder.append(" *         .usingBean(k);\n");
-        builder.append(String.format(" *     %s m = uki.findMatch(k);\n", typeName));
+        if (pk.numFields() > 1) {
+            builder.append(String.format(" *     UniqueKeyIndex<%s, %1$s.Key> uki = %1$s.uniqueIndex(consumer);\n", typeName));
+            builder.append(String.format(" *     %s.Key k = new %1$s.Key(...);\n", typeName));
+            builder.append(String.format(" *     %s m = uki.findMatch(k);\n", typeName));
+        } else {
+            FieldType ft = pk.getFieldType(dataset, 0);
+            String keyName;
+            if (FieldType.REFERENCE.equals(ft)) {
+                HollowObjectSchema refSchema = pk.getFieldSchema(dataset, 0);
+                keyName = hollowImplClassname(refSchema.getName());
+            } else {
+                keyName = HollowCodeGenerationUtils.getJavaScalarType(ft);
+            }
+
+            builder.append(String.format(" *     UniqueKeyIndex<%1$s, %2$s> uki = %1$s.uniqueIndex(consumer);\n", typeName, keyName));
+            builder.append(String.format(" *     %s k = ...;\n", keyName));
+            builder.append(String.format(" *     %s m = uki.findMatch(k);\n", typeName));
+        }
         builder.append(" * }</pre>\n");
-        builder.append(" * where {@code K} is a class declaring primary key field paths members, annotated with\n");
-        builder.append(" * {@link com.netflix.hollow.api.consumer.index.FieldPath}, and {@code k} is an instance of\n");
-        builder.append(String.format(" * {@code K} that is the key to find the primary {@code %s} object.\n", typeName));
+        builder.append(String.format(" * @see %s#uniqueIndex\n", typeName));
     }
 }

@@ -23,6 +23,7 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.isPrimiti
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
+import static java.util.stream.Collectors.joining;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
@@ -30,12 +31,18 @@ import com.netflix.hollow.api.codegen.HollowCodeGenerationUtils;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts.Shortcut;
+import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.consumer.index.FieldPath;
+import com.netflix.hollow.api.consumer.index.UniqueKeyIndex;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.HollowDataset;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -84,10 +91,19 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         StringBuilder classBuilder = new StringBuilder();
         appendPackageAndCommonImports(classBuilder, apiClassname);
 
+        classBuilder.append("import " + HollowConsumer.class.getName() + ";\n");
+        if (schema.getPrimaryKey() != null && schema.getPrimaryKey().numFields() > 1) {
+            classBuilder.append("import " + FieldPath.class.getName() + ";\n");
+        }
+        if (schema.getPrimaryKey() != null) {
+            classBuilder.append("import " + UniqueKeyIndex.class.getName() + ";\n");
+        }
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
-        classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n\n");
-        classBuilder.append("import " + HollowRecordStringifier.class.getName() + ";\n\n");
-
+        classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n");
+        if (config.isUseVerboseToString()) {
+            classBuilder.append("import " + HollowRecordStringifier.class.getName() + ";\n");
+        }
+        classBuilder.append("\n");
 
         classBuilder.append("@SuppressWarnings(\"all\")\n");
         classBuilder.append("public class " + className + " extends HollowObject {\n\n");
@@ -102,6 +118,10 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
         if (config.isUseVerboseToString()) {
             appendToString(classBuilder);
+        }
+
+        if (schema.getPrimaryKey() != null) {
+            appendPrimaryKey(classBuilder, schema.getPrimaryKey());
         }
 
         classBuilder.append("}");
@@ -363,4 +383,98 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         classBuilder.append("    }\n\n");
     }
 
+    private void appendPrimaryKey(StringBuilder classBuilder, PrimaryKey pk) {
+        if (pk.numFields() == 1) {
+            String fieldPath = pk.getFieldPath(0);
+            FieldType fieldType = pk.getFieldType(dataset, 0);
+            String type, boxedType;
+            if (FieldType.REFERENCE.equals(fieldType)) {
+                HollowObjectSchema refSchema = pk.getFieldSchema(dataset, 0);
+                type = boxedType = hollowImplClassname(refSchema.getName());
+            } else {
+                type = HollowCodeGenerationUtils.getJavaScalarType(fieldType);
+                boxedType = HollowCodeGenerationUtils.getJavaBoxedType(fieldType);
+            }
+
+            appendPrimaryKeyDoc(classBuilder, fieldType, type);
+
+            classBuilder.append("    public static UniqueKeyIndex<" + className + ", " + boxedType + "> uniqueIndex(HollowConsumer consumer) {\n");
+            classBuilder.append("        return UniqueKeyIndex.from(consumer, " + className + ".class)\n");
+            classBuilder.append("            .bindToPrimaryKey()\n");
+            classBuilder.append("            .usingPath(\"" + fieldPath + "\", " + type + ".class);\n");
+            classBuilder.append("    }\n\n");
+        } else {
+
+            appendPrimaryKeyDoc(classBuilder, FieldType.REFERENCE, className + ".Key");
+
+            classBuilder.append("    public static UniqueKeyIndex<" + className + ", " + className + ".Key> uniqueIndex(HollowConsumer consumer) {\n");
+            classBuilder.append("        return UniqueKeyIndex.from(consumer, " + className + ".class)\n");
+            classBuilder.append("            .bindToPrimaryKey()\n");
+            classBuilder.append("            .usingBean(" + className + ".Key.class);\n");
+            classBuilder.append("    }\n\n");
+
+            classBuilder.append("    public static class Key {\n");
+            Map<String, String> parameterList = new LinkedHashMap<>();
+            for (int i = 0; i < pk.numFields(); i++) {
+                if (i > 0) {
+                    classBuilder.append("\n");
+                }
+
+                String fieldPath = pk.getFieldPath(i);
+                String name = HollowCodeGenerationUtils.normalizeFieldPathToParamName(fieldPath);
+                FieldType fieldType = pk.getFieldType(dataset, i);
+                String type;
+                if (FieldType.REFERENCE.equals(fieldType)) {
+                    HollowObjectSchema refSchema = pk.getFieldSchema(dataset, i);
+                    type = hollowImplClassname(refSchema.getName());
+                } else {
+                    type = HollowCodeGenerationUtils.getJavaScalarType(fieldType);
+                }
+                parameterList.put(name, type);
+                classBuilder.append("        @FieldPath(\"" + fieldPath + "\")\n");
+                classBuilder.append("        public final " + type + " " + name + ";\n");
+            }
+            classBuilder.append("\n");
+
+            String parameters = parameterList.entrySet().stream()
+                    .map(e -> e.getValue() + " " + e.getKey())
+                    .collect(joining(", "));
+            classBuilder.append("        public Key(" + parameters + ") {\n");
+            parameterList.forEach((n, t) -> {
+                if (t.equals("byte[]")) {
+                    classBuilder.append("            this." + n + " = " + n + " == null ? null : " + n + ".clone();\n");
+                } else {
+                    classBuilder.append("            this." + n + " = " + n + ";\n");
+                }
+            });
+            classBuilder.append("        }\n");
+
+            classBuilder.append("    }\n\n");
+        }
+    }
+
+    private void appendPrimaryKeyDoc(StringBuilder classBuilder, FieldType type, String keyTypeName) {
+        String kindSnippet;
+        switch (type) {
+            case STRING:
+            case REFERENCE:
+                kindSnippet = String.format("class {@link %s}", keyTypeName);
+                break;
+            default:
+                kindSnippet = String.format("type {@code %s}", keyTypeName);
+                break;
+        }
+        classBuilder.append("    /**\n");
+        classBuilder.append(String.format("     * Creates a unique key index for {@code %s} that has a primary key.\n", className));
+        classBuilder.append(String.format("     * The primary key is represented by the %s.\n", kindSnippet));
+        classBuilder.append("     * <p>\n");
+        classBuilder.append("     * By default the unique key index will not track updates to the {@code consumer} and thus\n");
+        classBuilder.append("     * any changes will not be reflected in matched results.  To track updates the index must be\n");
+        classBuilder.append("     * {@link HollowConsumer#addRefreshListener(HollowConsumer.RefreshListener) registered}\n");
+        classBuilder.append("     * with the {@code consumer}\n");
+        classBuilder.append("     *\n");
+        classBuilder.append("     * @param consumer the consumer\n");
+        classBuilder.append("     * @return the unique key index\n");
+        classBuilder.append("     */\n");
+    }
 }

@@ -31,6 +31,7 @@ import com.netflix.hollow.core.schema.HollowSchema;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -46,7 +47,7 @@ import java.util.stream.Stream;
  * @param <Q> the key type
  */
 public class UniqueKeyIndex<T extends HollowObject, Q>
-        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener {
+        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener, Function<Q, T> {
     final HollowConsumer consumer;
     HollowAPI api;
     final SelectFieldPathResultExtractor<T> uniqueTypeExtractor;
@@ -134,6 +135,18 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
                         MatchFieldPathArgumentExtractor
                                 .fromPathAndType(consumer.getStateEngine(), uniqueType, fieldPath, matchFieldType,
                                         FieldPaths::createFieldPathForPrimaryKey)));
+    }
+
+
+    /**
+     * Finds the unique object, an instance of the unique type, for a given key.
+     *
+     * @param key the key
+     * @return the unique object
+     */
+    @Override
+    public T apply(Q key) {
+        return findMatch(key);
     }
 
     /**

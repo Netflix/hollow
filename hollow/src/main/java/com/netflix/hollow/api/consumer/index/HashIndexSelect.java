@@ -29,6 +29,7 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -48,7 +49,7 @@ import java.util.stream.Stream;
  * @param <Q> the query type
  */
 public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
-        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener {
+        implements HollowConsumer.RefreshListener, HollowConsumer.RefreshRegistrationListener, Function<Q, Stream<S>> {
     final HollowConsumer consumer;
     HollowAPI api;
     final SelectFieldPathResultExtractor<S> selectField;
@@ -113,6 +114,17 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
                         MatchFieldPathArgumentExtractor
                                 .fromPathAndType(consumer.getStateEngine(), rootType, fieldPath, matchFieldType,
                                         FieldPaths::createFieldPathForHashIndex)));
+    }
+
+    /**
+     * Finds matches for a given query.
+     *
+     * @param query the query
+     * @return a stream of matching records (may be empty if there are no matches)
+     */
+    @Override
+    public Stream<S> apply(Q query) {
+        return findMatches(query);
     }
 
     /**
