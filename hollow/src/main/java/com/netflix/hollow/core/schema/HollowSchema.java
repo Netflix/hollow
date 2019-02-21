@@ -46,12 +46,6 @@ import java.io.OutputStream;
  */
 public abstract class HollowSchema {
 
-    /**
-     * A constant that may be passed as an argument to the constructor of {@link HollowSetSchema} or
-     * {@link HollowMapSchema} to indicate that ordinals should be utilized as hash codes.
-     */
-    public static final String[] ORDINAL_HASH_KEY_FIELD_NAMES = {};
-
     private final String name;
 
     public HollowSchema(String name) {
@@ -69,9 +63,9 @@ public abstract class HollowSchema {
     public static HollowSchema withoutKeys(HollowSchema schema) {
         switch(schema.getSchemaType()) {
         case SET:
-            return ((HollowSetSchema)schema).withoutKeys();
+            return ((HollowSetSchema)schema).withoutHashKey();
         case MAP:
-            return ((HollowMapSchema)schema).withoutKeys();
+            return ((HollowMapSchema)schema).withoutHashKey();
         default:
             return schema;
         }
@@ -128,13 +122,9 @@ public abstract class HollowSchema {
 
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
-            if (numFields > 0) {
-                hashKeyFields = new String[numFields];
-                for (int i = 0; i < numFields; i++) {
-                    hashKeyFields[i] = is.readUTF();
-                }
-            } else {
-                hashKeyFields = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
+            hashKeyFields = new String[numFields];
+            for (int i = 0; i < numFields; i++) {
+                hashKeyFields[i] = is.readUTF();
             }
         }
 
@@ -155,13 +145,9 @@ public abstract class HollowSchema {
 
         if(hasHashKey) {
             int numFields = VarInt.readVInt(is);
-            if (numFields > 0) {
-                hashKeyFields = new String[numFields];
-                for (int i = 0; i < numFields; i++) {
-                    hashKeyFields[i] = is.readUTF();
-                }
-            } else {
-                hashKeyFields = HollowSchema.ORDINAL_HASH_KEY_FIELD_NAMES;
+            hashKeyFields = new String[numFields];
+            for (int i = 0; i < numFields; i++) {
+                hashKeyFields[i] = is.readUTF();
             }
         }
 

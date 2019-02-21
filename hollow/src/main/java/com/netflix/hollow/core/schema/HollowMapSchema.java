@@ -36,7 +36,6 @@ public class HollowMapSchema extends HollowSchema {
 
     private final String keyType;
     private final String valueType;
-    private final boolean ordinalHashKey;
     private final PrimaryKey hashKey;
 
     private HollowTypeReadState keyTypeState;
@@ -51,9 +50,6 @@ public class HollowMapSchema extends HollowSchema {
      * @param hashKeyFieldPaths the field paths of the hash key applied to a map of this schema.
      * If {@code null} or empty then the schema has no hash key and the hash function, applied to
      * a key of a map to produce a hash code, is unspecified by this schema.
-     * If of the constant {@link HollowSchema#ORDINAL_HASH_KEY_FIELD_NAMES} then schema has no hash key
-     * but the hash function, applied to a key of a map to produce a hash code, is specified to be a
-     * function that returns the key's ordinal.
      * Otherwise, the hash function is specified as described by
      * {@link com.netflix.hollow.core.write.objectmapper.HollowHashKey}.
      */
@@ -61,14 +57,9 @@ public class HollowMapSchema extends HollowSchema {
         super(schemaName);
         this.keyType = keyType;
         this.valueType = valueType;
-        if (hashKeyFieldPaths == ORDINAL_HASH_KEY_FIELD_NAMES) {
-            this.ordinalHashKey = true;
-            this.hashKey = null;
-        } else if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
-            this.ordinalHashKey = false;
+        if (hashKeyFieldPaths == null || hashKeyFieldPaths.length == 0) {
             this.hashKey = null;
         } else {
-            this.ordinalHashKey = false;
             this.hashKey = new PrimaryKey(keyType, hashKeyFieldPaths);
         }
     }
@@ -106,8 +97,8 @@ public class HollowMapSchema extends HollowSchema {
         return SchemaType.MAP;
     }
 
-    public HollowMapSchema withoutKeys() {
-        if (hashKey == null && !ordinalHashKey) {
+    public HollowMapSchema withoutHashKey() {
+        if (hashKey == null) {
             return this;
         }
 
@@ -125,8 +116,6 @@ public class HollowMapSchema extends HollowSchema {
             return false;
         if(!getValueType().equals(otherSchema.getValueType()))
             return false;
-        if(ordinalHashKey != otherSchema.ordinalHashKey)
-            return false;
 
         return Objects.equals(getHashKey(), otherSchema.getHashKey());
     }
@@ -136,13 +125,11 @@ public class HollowMapSchema extends HollowSchema {
         StringBuilder builder = new StringBuilder(getName());
         builder.append(" Map<").append(getKeyType()).append(",").append(getValueType()).append(">");
 
-        if(hashKey != null || ordinalHashKey) {
+        if(hashKey != null) {
             builder.append(" @HashKey(");
-            if(hashKey != null) {
-                builder.append(hashKey.getFieldPath(0));
-                for(int i=1;i<hashKey.numFields();i++) {
-                    builder.append(", ").append(hashKey.getFieldPath(i));
-                }
+            builder.append(hashKey.getFieldPath(0));
+            for(int i=1;i<hashKey.numFields();i++) {
+                builder.append(", ").append(hashKey.getFieldPath(i));
             }
             builder.append(")");
         }
@@ -155,7 +142,7 @@ public class HollowMapSchema extends HollowSchema {
     public void writeTo(OutputStream os) throws IOException {
         DataOutputStream dos = new DataOutputStream(os);
 
-        if (hashKey != null || ordinalHashKey)
+        if (hashKey != null)
             dos.write(SchemaType.MAP.getTypeIdWithPrimaryKey());
         else
             dos.write(SchemaType.MAP.getTypeId());
@@ -164,9 +151,7 @@ public class HollowMapSchema extends HollowSchema {
         dos.writeUTF(getKeyType());
         dos.writeUTF(getValueType());
 
-        if (ordinalHashKey) {
-            VarInt.writeVInt(dos, 0);
-        } else if (hashKey != null) {
+        if (hashKey != null) {
             VarInt.writeVInt(dos, getHashKey().numFields());
             for(int i=0;i<getHashKey().numFields();i++) {
                 dos.writeUTF(getHashKey().getFieldPath(i));

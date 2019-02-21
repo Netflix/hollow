@@ -195,7 +195,7 @@ public class HollowBlobReader {
                 HollowSetSchema setSchema = (HollowSetSchema) schema;
                 // Filter out hash key if overridden by a hash code finder
                 if (hasDefinedHashCode(setSchema.getElementType())) {
-                    setSchema = setSchema.withoutKeys();
+                    setSchema = setSchema.withoutHashKey();
                 }
                 populateTypeStateSnapshot(is, new HollowSetTypeReadState(stateEngine, setSchema, numShards));
             }
@@ -206,7 +206,7 @@ public class HollowBlobReader {
                 HollowMapSchema mapSchema = (HollowMapSchema) schema;
                 // Filter out hash key if overridden by a hash code finder
                 if (hasDefinedHashCode(mapSchema.getKeyType())) {
-                    mapSchema = mapSchema.withoutKeys();
+                    mapSchema = mapSchema.withoutHashKey();
                 }
                 populateTypeStateSnapshot(is, new HollowMapTypeReadState(stateEngine, mapSchema, numShards));
             }

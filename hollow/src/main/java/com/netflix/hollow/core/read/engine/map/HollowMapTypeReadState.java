@@ -261,7 +261,7 @@ public class HollowMapTypeReadState extends HollowTypeReadState implements Hollo
     protected void applyToChecksum(HollowChecksum checksum, HollowSchema withSchema) {
         if(!getSchema().equals(withSchema)) {
             // Apply checksum if withSchema does not declare a hash key
-            if (getSchema().getHashKey() != null && !getSchema().withoutKeys().equals(withSchema)) {
+            if (getSchema().getHashKey() != null && !getSchema().withoutHashKey().equals(withSchema)) {
                 throw new IllegalArgumentException(
                         "HollowMapTypeReadState cannot calculate checksum with unequal schemas: " + getSchema()
                                 .getName());

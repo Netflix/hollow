@@ -56,65 +56,39 @@ public class TestHashKey {
     }
 
     /**
-     * Tests that a set or map declared with a hash key with empty fields, for ordinal lookup,
-     * is preserved in the schema.
+     * Tests that a set or map is declared with a hash key and new schema can be created
+     * without a hash key
      */
     @Test
-    public void testSchemaPreserve() throws Exception {
+    public void testSchemaWithAndWithoutHashKeys() throws Exception {
         HollowProducer p = HollowProducer.withPublisher(blobStore)
                 .withBlobStager(new HollowInMemoryBlobStager())
                 .build();
 
         long v1 = p.runCycle(ws -> {
-            ws.add(new TopWithOrdinals(IntStream.range(0, 100).mapToObj(Integer::toString).toArray(String[]::new)));
+            ws.add(new Top("One", "Two"));
         });
 
         HollowWriteStateEngine w = p.getWriteEngine();
         Assert.assertTrue(w.getSchema("SetOfBoxString")
-                .toString().contains("@HashKey()"));
+                .toString().contains("@HashKey"));
         Assert.assertTrue(w.getSchema("MapOfBoxStringToBoxString")
-                .toString().contains("@HashKey()"));
+                .toString().contains("@HashKey"));
 
 
-        HollowReadStateEngine r = new HollowReadStateEngine();
-        HollowBlobReader br = new HollowBlobReader(r);
-        br.readSnapshot(blobStore.retrieveSnapshotBlob(v1).getInputStream());
+        Assert.assertFalse(((HollowSetSchema)w.getSchema("SetOfBoxString")).withoutHashKey()
+                .toString().contains("@HashKey"));
+        Assert.assertFalse(((HollowMapSchema)w.getSchema("MapOfBoxStringToBoxString")).withoutHashKey()
+                .toString().contains("@HashKey"));
 
-        Assert.assertTrue(r.getSchema("SetOfBoxString")
-                .toString().contains("@HashKey()"));
-        Assert.assertTrue(r.getSchema("MapOfBoxStringToBoxString")
-                .toString().contains("@HashKey()"));
-
-
-        long v2 = p.runCycle(ws -> {
-            ws.add(new TopWithOrdinals(IntStream.range(0, 101).mapToObj(Integer::toString).toArray(String[]::new)));
-        });
-
-
-        br.applyDelta(blobStore.retrieveDeltaBlob(v1).getInputStream());
-
-        Assert.assertTrue(r.getSchema("SetOfBoxString")
-                .toString().contains("@HashKey()"));
-        Assert.assertTrue(r.getSchema("MapOfBoxStringToBoxString")
-                .toString().contains("@HashKey()"));
-
-
-        // Test without keys
-
-        Assert.assertFalse(((HollowSetSchema)r.getSchema("SetOfBoxString")).withoutKeys()
-                .toString().contains("@HashKey()"));
-        Assert.assertFalse(((HollowMapSchema)r.getSchema("MapOfBoxStringToBoxString")).withoutKeys()
-                .toString().contains("@HashKey()"));
-
-        Assert.assertFalse(HollowSchema.withoutKeys(r.getSchema("SetOfBoxString"))
-                .toString().contains("@HashKey()"));
-        Assert.assertFalse(HollowSchema.withoutKeys(r.getSchema("MapOfBoxStringToBoxString"))
-                .toString().contains("@HashKey()"));
+        Assert.assertFalse(HollowSchema.withoutKeys(w.getSchema("SetOfBoxString"))
+                .toString().contains("@HashKey"));
+        Assert.assertFalse(HollowSchema.withoutKeys(w.getSchema("MapOfBoxStringToBoxString"))
+                .toString().contains("@HashKey"));
     }
 
     /**
-     * Tests that the schema for a set or map declared with a hash key with empty fields, for ordinal lookup,
-     * can be parsed.
+     * Tests that the schema for a set or map declared with a hash key can be parsed.
      */
     @Test
     public void testSchemasParse() throws Exception {
@@ -123,7 +97,7 @@ public class TestHashKey {
                 .build();
 
         long v1 = p.runCycle(ws -> {
-            ws.add(new TopWithOrdinals(IntStream.range(0, 100).mapToObj(Integer::toString).toArray(String[]::new)));
+            ws.add(new Top("One", "Two"));
         });
 
         StringBuilder sb = new StringBuilder();
@@ -134,10 +108,9 @@ public class TestHashKey {
         Map<String, HollowSchema> schema = HollowSchemaParser.parseCollectionOfSchemas(sb.toString()).stream().collect(
                 toMap(HollowSchema::getName, s -> s));
 
-        Assert.assertTrue(schema.get("SetOfBoxString")
-                .toString().contains("@HashKey()"));
-        Assert.assertTrue(schema.get("MapOfBoxStringToBoxString")
-                .toString().contains("@HashKey()"));
+        schema.forEach((n, s) -> {
+            Assert.assertEquals(p.getWriteEngine().getSchema(n), s);
+        });
     }
 
     /**
