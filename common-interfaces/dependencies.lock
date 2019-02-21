@@ -1623,7 +1623,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -1969,7 +1969,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -3964,7 +3964,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -4310,7 +4310,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -6305,7 +6305,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -6651,7 +6651,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -8795,7 +8795,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -9141,7 +9141,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -11136,7 +11136,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -11482,7 +11482,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -13480,7 +13480,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -13826,7 +13826,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -15833,7 +15833,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -16179,7 +16179,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -18186,7 +18186,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -18532,7 +18532,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -20539,7 +20539,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.36",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
             ]
@@ -20885,7 +20885,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.645",
+            "locked": "100.0.646",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
