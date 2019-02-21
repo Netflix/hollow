@@ -620,8 +620,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -1842,14 +1842,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -2368,7 +2362,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -2513,12 +2506,6 @@
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -2559,7 +2546,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -3389,8 +3375,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -4611,14 +4597,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -5137,7 +5117,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -5282,12 +5261,6 @@
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -5328,7 +5301,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -6158,8 +6130,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -7380,14 +7352,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -7906,7 +7872,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -8051,12 +8016,6 @@
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -8097,7 +8056,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -9076,8 +9034,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -10298,14 +10256,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -10824,7 +10776,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -10969,12 +10920,6 @@
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -11015,7 +10960,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -11845,8 +11789,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -13067,14 +13011,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -13593,7 +13531,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -13738,12 +13675,6 @@
                 "com.netflix.ksclient:ksclient-core"
             ]
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -13784,7 +13715,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -14614,8 +14544,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -15839,14 +15769,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -16365,7 +16289,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -16513,12 +16436,6 @@
         "org.assertj:assertj-core": {
             "locked": "3.12.0"
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -16559,7 +16476,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -17390,8 +17306,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -18615,14 +18531,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -19141,7 +19051,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -19289,12 +19198,6 @@
         "org.assertj:assertj-core": {
             "locked": "3.12.0"
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -19335,7 +19238,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -20166,8 +20068,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -21391,14 +21293,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -21917,7 +21813,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -22065,12 +21960,6 @@
         "org.assertj:assertj-core": {
             "locked": "3.12.0"
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -22111,7 +22000,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
@@ -22942,8 +22830,8 @@
                 "netflix:nfi18n-core"
             ]
         },
-        "com.jamesmurty.utils:java-xmlbuilder": {
-            "locked": "1.1",
+        "com.jamesmurty:java-xmlbuilder": {
+            "locked": "0.4",
             "transitive": [
                 "net.java.dev.jets3t:jets3t"
             ]
@@ -24167,14 +24055,8 @@
                 "netflix:mutation-stream-common"
             ]
         },
-        "net.iharder:base64": {
-            "locked": "2.3.8",
-            "transitive": [
-                "com.jamesmurty.utils:java-xmlbuilder"
-            ]
-        },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.1",
+            "locked": "0.9.0",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
                 "netflix:platform-aws",
@@ -24693,7 +24575,6 @@
         "org.apache.httpcomponents:httpcore": {
             "locked": "4.4.10",
             "transitive": [
-                "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.httpcomponents:httpclient",
@@ -24841,12 +24722,6 @@
         "org.assertj:assertj-core": {
             "locked": "3.12.0"
         },
-        "org.bouncycastle:bcprov-jdk15on": {
-            "locked": "1.52",
-            "transitive": [
-                "net.java.dev.jets3t:jets3t"
-            ]
-        },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
             "transitive": [
@@ -24887,7 +24762,6 @@
                 "com.netflix.ksclient:ksclient-core",
                 "com.netflix.pytheas:pytheas-core",
                 "com.sun.jersey:jersey-json",
-                "net.java.dev.jets3t:jets3t",
                 "netflix:base-explorer",
                 "netflix:jarversions",
                 "netflix:mutation-stream-client",
