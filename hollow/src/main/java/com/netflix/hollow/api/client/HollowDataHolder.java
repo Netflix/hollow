@@ -124,7 +124,7 @@ class HollowDataHolder {
     }
 
     private void initializeAPI() {
-        if(objLongevityConfig != null && objLongevityConfig.enableLongLivedObjectSupport()) {
+        if(isObjectLongevityEnabled()) {
             HollowProxyDataAccess dataAccess = new HollowProxyDataAccess();
             dataAccess.setDataAccess(stateEngine);
             currentAPI = apiFactory.createAPI(dataAccess);
@@ -146,7 +146,7 @@ class HollowDataHolder {
         try(InputStream is = blob.getInputStream()) {
             applyStateEngineTransition(is, blob, refreshListeners);
 
-            if(objLongevityConfig != null && objLongevityConfig.enableLongLivedObjectSupport()) {
+            if(isObjectLongevityEnabled()) {
                 HollowDataAccess previousDataAccess = currentAPI.getDataAccess();
                 HollowHistoricalStateDataAccess priorState = new HollowHistoricalStateCreator(null).createBasedOnNewDelta(currentVersion, stateEngine);
                 HollowProxyDataAccess newDataAccess = new HollowProxyDataAccess();
@@ -211,4 +211,7 @@ class HollowDataHolder {
         currentVersion = version;
     }
 
+    private boolean isObjectLongevityEnabled() {
+        return objLongevityConfig != null && objLongevityConfig.enableLongLivedObjectSupport();
+    }
 }

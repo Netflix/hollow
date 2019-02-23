@@ -17,6 +17,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static java.util.Objects.requireNonNull;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
@@ -28,6 +30,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Detect stale Hollow references and USAGE of stale hollow references.
@@ -61,6 +64,9 @@ public class StaleHollowReferenceDetector {
     private Thread monitor;
 
     public StaleHollowReferenceDetector(HollowConsumer.ObjectLongevityConfig config, HollowConsumer.ObjectLongevityDetector detector) {
+        requireNonNull(config, "ObjectLongevityConfig required");
+        requireNonNull(detector, "ObjectLongevityDetector required");
+
         this.handles = new ArrayList<HollowWeakReferenceHandle>();
         this.config = config;
         this.detector = detector;
