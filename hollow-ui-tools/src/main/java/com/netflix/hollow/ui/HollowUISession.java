@@ -93,15 +93,17 @@ public class HollowUISession {
     }
 
     private static void cleanupSessions() {
-        Iterator<Map.Entry<Long, HollowUISession>> iter = sessions.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Long, HollowUISession> entry = iter.next();
-            if (entry.getValue().lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis())
-                iter.remove();
-        }
+        while (true) {
+            Iterator<Map.Entry<Long, HollowUISession>> iter = sessions.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<Long, HollowUISession> entry = iter.next();
+                if (entry.getValue().lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis())
+                    iter.remove();
+            }
 
-        try {
-            MINUTES.sleep(1);
-        } catch (InterruptedException e) { }
+            try {
+                MINUTES.sleep(1);
+            } catch (InterruptedException e) { }
+        }
     }
 }
