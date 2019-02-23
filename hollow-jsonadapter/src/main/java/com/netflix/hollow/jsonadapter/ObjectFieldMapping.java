@@ -21,6 +21,7 @@ import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.write.HollowObjectTypeWriteState;
 import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.jsonadapter.field.FieldProcessor;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,8 +57,8 @@ public class ObjectFieldMapping {
         this.writeRecords = writeRecords;
     }
 
-    public int build(int passthroughOrdinal) {
-        int ordinal = rootInstruction.executeInstruction(passthroughOrdinal);
+    public int build(int passthroughOrdinal, FlatRecordWriter flatRecordWriter) {
+        int ordinal = rootInstruction.executeInstruction(passthroughOrdinal, flatRecordWriter);
 
         for(Map.Entry<String, HollowObjectWriteRecord> entry : writeRecords.entrySet())
             entry.getValue().reset();
@@ -163,15 +164,17 @@ public class ObjectFieldMapping {
             childrenRecs.put(fieldName, instruction);
         }
 
-        public int executeInstruction(int passthroughOrdinal) {
+        public int executeInstruction(int passthroughOrdinal, FlatRecordWriter flatRecordWriter) {
             for(Map.Entry<String, RemappingBuilderInstruction> childEntry : childrenRecs.entrySet()) {
-                int childOrdinal = childEntry.getValue().executeInstruction(-1);
+                int childOrdinal = childEntry.getValue().executeInstruction(-1, flatRecordWriter);
                 rec.setReference(childEntry.getKey(), childOrdinal);
             }
 
             if(passthroughOrdinal != -1)
                 rec.setReference("passthrough", passthroughOrdinal);
 
+            if(flatRecordWriter != null)
+                return flatRecordWriter.write(typeState.getSchema(), rec);
             return typeState.add(rec);
         }
 

@@ -30,6 +30,7 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import com.netflix.hollow.core.write.HollowSetWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.core.write.objectmapper.flatrecords.FlatRecordWriter;
 import com.netflix.hollow.jsonadapter.field.FieldProcessor;
 import java.io.File;
 import java.io.IOException;
@@ -52,10 +53,11 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
 
     private final Map<String, ObjectFieldMapping> canonicalObjectFieldMappings;
 
-    ////TODO: Special 'passthrough' processing.
     private final Set<String> passthroughDecoratedTypes;
     private final ThreadLocal<PassthroughWriteRecords> passthroughRecords;
 
+    /// TODO: Would be nice to be able to take a HollowDataset here, if only producing FlatRecords,
+    ///       instead of requiring a HollowWriteStateEngine
     public HollowJsonAdapter(HollowWriteStateEngine stateEngine, String typeName) {
         super(typeName, "populate");
         this.stateEngine = stateEngine;
@@ -107,41 +109,48 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
     }
 
     public int processRecord(String singleRecord) throws IOException {
+        return processRecord(singleRecord, null);
+    }
+
+    public int processRecord(String singleRecord, FlatRecordWriter flatRecordWriter) throws IOException {
         JsonFactory factory = new JsonFactory();
         JsonParser parser = factory.createParser(new StringReader(singleRecord));
-        return processRecord(parser);
+        return processRecord(parser, flatRecordWriter);
     }
 
     @Override
     protected int processRecord(JsonParser parser) throws IOException {
-        initHollowWriteRecordsIfNecessary();
-        //parser.nextToken();
-        return parseSubType(parser, parser.nextToken(), typeName);
+        return processRecord(parser, null);
     }
 
+    protected int processRecord(JsonParser parser, FlatRecordWriter flatRecordWriter) throws IOException {
+        initHollowWriteRecordsIfNecessary();
+        //parser.nextToken();
+        return parseSubType(parser, flatRecordWriter, parser.nextToken(), typeName);
+    }
 
-    private int parseSubType(JsonParser parser, JsonToken currentToken, String subType) throws IOException {
+    private int parseSubType(JsonParser parser, FlatRecordWriter flatRecordWriter, JsonToken currentToken, String subType) throws IOException {
         HollowSchema subTypeSchema = hollowSchemas.get(subType);
         switch(subTypeSchema.getSchemaType()) {
             case OBJECT:
                 if(currentToken != JsonToken.START_OBJECT)
                     throw new IOException("Expecting to parse a " + subType + ", which is a " + subTypeSchema.getSchemaType() + ", expected JsonToken.START_OBJECT but instead found a " + currentToken.toString());
 
-                return addObject(parser, subType);
+                return addObject(parser, flatRecordWriter, subType);
 
             case LIST:
             case SET:
                 if(currentToken != JsonToken.START_ARRAY)
                     throw new IOException("Expecting to parse a " + subType + ", which is a " + subTypeSchema.getSchemaType() + ", expected JsonToken.START_ARRAY but instead found a " + currentToken.toString());
 
-                return addSubArray(parser, subType, getWriteRecord(subType));
+                return addSubArray(parser, flatRecordWriter, subType, getWriteRecord(subType));
 
             case MAP:
                 switch(currentToken) {
                     case START_ARRAY:
-                        return addStructuredMap(parser, subType, (HollowMapWriteRecord) getWriteRecord(subType));
+                        return addStructuredMap(parser, flatRecordWriter, subType, (HollowMapWriteRecord) getWriteRecord(subType));
                     case START_OBJECT:
-                        return addUnstructuredMap(parser, subType, (HollowMapWriteRecord) getWriteRecord(subType));
+                        return addUnstructuredMap(parser, flatRecordWriter, subType, (HollowMapWriteRecord) getWriteRecord(subType));
                     default:
                         throw new IOException("Expecting to parse a " + subType + ", which is a " + subTypeSchema.getSchemaType() + ", expected JsonToken.START_ARRAY or JsonToken.START_OBJECT but instead found a " + currentToken.toString());
                 }
@@ -150,7 +159,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
     }
 
 
-    private int addObject(JsonParser parser, String typeName) throws IOException {
+    private int addObject(JsonParser parser, FlatRecordWriter flatRecordWriter, String typeName) throws IOException {
         ObjectFieldMapping objectMapping = getObjectFieldMapping(typeName);
 
         Boolean passthroughDecoratedTypes = null;
@@ -167,7 +176,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                     ObjectMappedFieldPath mappedFieldPath = objectMapping.getMappedFieldPath(fieldName);
 
                     if(mappedFieldPath != null) {
-                        addObjectField(parser, token, mappedFieldPath);
+                        addObjectField(parser, flatRecordWriter, token, mappedFieldPath);
                     } else {
                         if(passthroughDecoratedTypes == null) {
                             passthroughDecoratedTypes = Boolean.valueOf(this.passthroughDecoratedTypes.contains(typeName));
@@ -177,7 +186,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                             }
                         }
                         if(passthroughDecoratedTypes.booleanValue()) {
-                            addPassthroughField(parser, token, fieldName, rec);
+                            addPassthroughField(parser, flatRecordWriter, token, fieldName, rec);
                         } else {
                             skipObjectField(parser, token);
                         }
@@ -191,21 +200,21 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
         }
 
         if(passthroughDecoratedTypes != null && passthroughDecoratedTypes.booleanValue()) {
-            rec.passthroughRec.setReference("singleValues", stateEngine.add("SingleValuePassthroughMap", rec.singleValuePassthroughMapRec));
-            rec.passthroughRec.setReference("multiValues", stateEngine.add("MultiValuePassthroughMap", rec.multiValuePassthroughMapRec));
+            rec.passthroughRec.setReference("singleValues", addRecord("SingleValuePassthroughMap", rec.singleValuePassthroughMapRec, flatRecordWriter));
+            rec.passthroughRec.setReference("multiValues", addRecord("MultiValuePassthroughMap", rec.multiValuePassthroughMapRec, flatRecordWriter));
 
-            int passthroughOrdinal = stateEngine.add("PassthroughData", rec.passthroughRec);
+            int passthroughOrdinal = addRecord("PassthroughData", rec.passthroughRec, flatRecordWriter);
 
-            return objectMapping.build(passthroughOrdinal);
+            return objectMapping.build(passthroughOrdinal, flatRecordWriter);
         }
 
-        return objectMapping.build(-1);
+        return objectMapping.build(-1, flatRecordWriter);
     }
 
-    private void addPassthroughField(JsonParser parser, JsonToken token, String fieldName, PassthroughWriteRecords rec) throws IOException {
+    private void addPassthroughField(JsonParser parser, FlatRecordWriter flatRecordWriter, JsonToken token, String fieldName, PassthroughWriteRecords rec) throws IOException {
         rec.passthroughMapKeyWriteRecord.reset();
         rec.passthroughMapKeyWriteRecord.setString("value", fieldName);
-        int keyOrdinal = stateEngine.add("MapKey", rec.passthroughMapKeyWriteRecord);
+        int keyOrdinal = addRecord("MapKey", rec.passthroughMapKeyWriteRecord, flatRecordWriter);
 
         switch(token) {
             case START_ARRAY:
@@ -220,7 +229,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                         case VALUE_STRING:
                             rec.passthroughMapValueWriteRecord.reset();
                             rec.passthroughMapValueWriteRecord.setString("value", parser.getValueAsString());
-                            int elementOrdinal = stateEngine.add("String", rec.passthroughMapValueWriteRecord);
+                            int elementOrdinal = addRecord("String", rec.passthroughMapValueWriteRecord, flatRecordWriter);
                             rec.multiValuePassthroughListRec.addElement(elementOrdinal);
                             break;
                         default:
@@ -230,7 +239,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                     token = parser.nextToken();
                 }
 
-                int valueListOrdinal = stateEngine.add("ListOfString", rec.multiValuePassthroughListRec);
+                int valueListOrdinal = addRecord("ListOfString", rec.multiValuePassthroughListRec, flatRecordWriter);
                 rec.multiValuePassthroughMapRec.addEntry(keyOrdinal, valueListOrdinal);
                 break;
             case VALUE_FALSE:
@@ -240,7 +249,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             case VALUE_STRING:
                 rec.passthroughMapValueWriteRecord.reset();
                 rec.passthroughMapValueWriteRecord.setString("value", parser.getValueAsString());
-                int valueOrdinal = stateEngine.add("String", rec.passthroughMapValueWriteRecord);
+                int valueOrdinal = addRecord("String", rec.passthroughMapValueWriteRecord, flatRecordWriter);
                 rec.singleValuePassthroughMapRec.addEntry(keyOrdinal, valueOrdinal);
                 break;
             case VALUE_NULL:
@@ -253,7 +262,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
         }
     }
 
-    private void addObjectField(JsonParser parser, JsonToken token, ObjectMappedFieldPath mappedFieldPath) throws IOException {
+    private void addObjectField(JsonParser parser, FlatRecordWriter flatRecordWriter, JsonToken token, ObjectMappedFieldPath mappedFieldPath) throws IOException {
         if(mappedFieldPath == null) {
             skipObjectField(parser, token);
         } else {
@@ -272,7 +281,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             switch(token) {
                 case START_ARRAY:
                 case START_OBJECT:
-                    int refOrdinal = parseSubType(parser, token, schema.getReferencedType(fieldPosition));
+                    int refOrdinal = parseSubType(parser, flatRecordWriter, token, schema.getReferencedType(fieldPosition));
                     writeRec.setReference(fieldName, refOrdinal);
                     break;
                 case VALUE_FALSE:
@@ -325,7 +334,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                                 default:
                             }
 
-                            int referencedOrdinal = stateEngine.add(schema.getReferencedType(fieldPosition), referencedRec);
+                            int referencedOrdinal = addRecord(schema.getReferencedType(fieldPosition), referencedRec, flatRecordWriter);
                             writeRec.setReference(fieldName, referencedOrdinal);
                             break;
                         default:
@@ -337,7 +346,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
         }
     }
 
-    private int addSubArray(JsonParser parser, String arrayType, HollowWriteRecord arrayRec) throws IOException {
+    private int addSubArray(JsonParser parser, FlatRecordWriter flatRecordWriter, String arrayType, HollowWriteRecord arrayRec) throws IOException {
         JsonToken token = parser.nextToken();
         arrayRec.reset();
 
@@ -350,15 +359,15 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             int elementOrdinal;
 
             if(token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                elementOrdinal = parseSubType(parser, token, schema.getElementType());
+                elementOrdinal = parseSubType(parser, flatRecordWriter, token, schema.getElementType());
             } else {
                 if(valueRec == null) {
                     valueRec = getObjectFieldMapping(schema.getElementType());
                     fieldMapping = valueRec.getSingleFieldMapping();
                 }
 
-                addObjectField(parser, token, fieldMapping);
-                elementOrdinal = valueRec.build(-1);
+                addObjectField(parser, flatRecordWriter, token, fieldMapping);
+                elementOrdinal = valueRec.build(-1, flatRecordWriter);
             }
 
             if(arrayRec instanceof HollowListWriteRecord) {
@@ -370,10 +379,10 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             token = parser.nextToken();
         }
 
-        return stateEngine.add(arrayType, arrayRec);
+        return addRecord(arrayType, arrayRec, flatRecordWriter);
     }
 
-    private int addStructuredMap(JsonParser parser, String mapTypeName, HollowMapWriteRecord mapRec) throws IOException {
+    private int addStructuredMap(JsonParser parser, FlatRecordWriter flatRecordWriter, String mapTypeName, HollowMapWriteRecord mapRec) throws IOException {
         JsonToken token = parser.nextToken();
         mapRec.reset();
 
@@ -386,9 +395,9 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
 
                     if(token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
                         if("key".equals(parser.getCurrentName()))
-                            keyOrdinal = parseSubType(parser, token, schema.getKeyType());
+                            keyOrdinal = parseSubType(parser, flatRecordWriter, token, schema.getKeyType());
                         else if("value".equals(parser.getCurrentName()))
-                            valueOrdinal = parseSubType(parser, token, schema.getValueType());
+                            valueOrdinal = parseSubType(parser, flatRecordWriter, token, schema.getValueType());
                     }
 
                     token = parser.nextToken();
@@ -400,10 +409,10 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             token = parser.nextToken();
         }
 
-        return stateEngine.add(schema.getName(), mapRec);
+        return addRecord(schema.getName(), mapRec, flatRecordWriter);
     }
 
-    private int addUnstructuredMap(JsonParser parser, String mapTypeName, HollowMapWriteRecord mapRec) throws IOException {
+    private int addUnstructuredMap(JsonParser parser, FlatRecordWriter flatRecordWriter, String mapTypeName, HollowMapWriteRecord mapRec) throws IOException {
         mapRec.reset();
 
         HollowMapSchema schema = (HollowMapSchema) hollowSchemas.get(mapTypeName);
@@ -441,19 +450,19 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
                         throw new IOException("Cannot parse type " + mapKeyWriteRecord.getSchema().getFieldType(0) + " as key in map (" + mapKeyWriteRecord.getSchema().getName() + ")");
                 }
 
-                int keyOrdinal = stateEngine.add(schema.getKeyType(), mapKeyWriteRecord);
+                int keyOrdinal = addRecord(schema.getKeyType(), mapKeyWriteRecord, flatRecordWriter);
 
                 int valueOrdinal;
 
                 if(token == JsonToken.START_OBJECT || token == JsonToken.START_ARRAY) {
-                    valueOrdinal = parseSubType(parser, token, schema.getValueType());
+                    valueOrdinal = parseSubType(parser, flatRecordWriter, token, schema.getValueType());
                 } else {
                     if(valueRec == null) {
                         valueRec = getObjectFieldMapping(schema.getValueType());
                         fieldMapping = valueRec.getSingleFieldMapping();
                     }
-                    addObjectField(parser, token, fieldMapping);
-                    valueOrdinal = valueRec.build(-1);
+                    addObjectField(parser, flatRecordWriter, token, fieldMapping);
+                    valueOrdinal = valueRec.build(-1, flatRecordWriter);
                 }
 
                 mapRec.addEntry(keyOrdinal, valueOrdinal);
@@ -461,7 +470,7 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             token = parser.nextToken();
         }
 
-        return stateEngine.add(schema.getName(), mapRec);
+        return addRecord(schema.getName(), mapRec, flatRecordWriter);
     }
 
     private void skipObject(JsonParser parser) throws IOException {
@@ -508,6 +517,14 @@ public class HollowJsonAdapter extends AbstractHollowJsonAdaptorTask {
             case VALUE_NULL:
             default:
         }
+    }
+
+    private int addRecord(String type, HollowWriteRecord rec, FlatRecordWriter flatRecordWriter) {
+        if(flatRecordWriter != null) {
+            HollowSchema schema = stateEngine.getSchema(type);
+            return flatRecordWriter.write(schema, rec);
+        }
+        return stateEngine.add(type, rec);
     }
 
     private void initHollowWriteRecordsIfNecessary() {

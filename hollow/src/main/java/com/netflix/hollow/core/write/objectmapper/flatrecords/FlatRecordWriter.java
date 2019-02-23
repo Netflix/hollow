@@ -101,6 +101,8 @@ public class FlatRecordWriter {
                 existingRecLocs.add(newRecordLocation);
             }
 
+            recordLocationsByOrdinal.add(recStart);
+
             return newRecordLocation.ordinal;
         }
     }
