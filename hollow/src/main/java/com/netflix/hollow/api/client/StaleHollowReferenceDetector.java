@@ -114,7 +114,7 @@ public class StaleHollowReferenceDetector {
 
     public void startMonitoring() {
         if (monitor == null) {
-            monitor = new Thread(new Monitor(this));
+            monitor = new Thread(new Monitor(this), "hollow | stale-ref-detector");
             monitor.setDaemon(true);
             monitor.start();
         }

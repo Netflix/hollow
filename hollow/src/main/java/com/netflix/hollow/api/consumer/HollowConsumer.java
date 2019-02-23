@@ -984,8 +984,7 @@ public class HollowConsumer {
 
             if (refreshExecutor == null)
                 refreshExecutor = Executors.newSingleThreadExecutor(r -> {
-                    Thread t = new Thread(r);
-                    t.setName("hollow-consumer-refresh");
+                    Thread t = new Thread(r, "hollow | consumer-refresh");
                     t.setDaemon(true);
                     return t;
                 });

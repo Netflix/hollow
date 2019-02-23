@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SimultaneousExecutor extends ThreadPoolExecutor {
 
-    private static final String DEFAULT_THREAD_NAME = "hollow-simultaneous-executor";
+    private static final String DEFAULT_THREAD_NAME = "hollow | simultaneous-executor";
 
     private final List<Future<?>> futures = new ArrayList<Future<?>>();
 
