@@ -46,7 +46,7 @@ public class HollowSplitter {
     public void split() {
         prepareForNextCycle();
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(getNumberOfShards());
+        SimultaneousExecutor executor = new SimultaneousExecutor(getNumberOfShards(), getClass(), "split");
 
         for(int i=0;i<getNumberOfShards();i++) {
             final int shardNumber = i;

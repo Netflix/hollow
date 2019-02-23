@@ -29,7 +29,7 @@ public class JsonArrayChunkerTest {
     public void test() throws Exception {
         String jsonArray = "[ { \"f1\\\"\" : \"value1\", \"f2\" : { \"f1.1\" : \"hel}}{{{{lo \\\"w{orld\\\"\" } } , { \"obj2\" : \"f2.1\" } ]";
         
-        JsonArrayChunker chunker = new JsonArrayChunker(new StringReader(jsonArray), new SimultaneousExecutor(), 4);
+        JsonArrayChunker chunker = new JsonArrayChunker(new StringReader(jsonArray), new SimultaneousExecutor(getClass(), "test"), 4);
         chunker.initialize();
         
         String obj1 = IOUtils.toString(chunker.nextChunk());

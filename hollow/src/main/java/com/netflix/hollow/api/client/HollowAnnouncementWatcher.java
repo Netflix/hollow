@@ -16,12 +16,14 @@
  */
 package com.netflix.hollow.api.client;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.HollowConstants;
+
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,13 +49,8 @@ public abstract class HollowAnnouncementWatcher {
      * Construct a HollowAnnouncementWatcher with a default ExecutorService.
      */
     public HollowAnnouncementWatcher() {
-        refreshExecutor = Executors.newFixedThreadPool(1, new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r);
-                t.setDaemon(true);
-                return t;
-            }
-        });
+        refreshExecutor = Executors.newFixedThreadPool(1,
+                r -> daemonThread(r, getClass(), "watch"));
     }
 
     /**

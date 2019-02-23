@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.client;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.sampling.EnabledSamplingDirector;
@@ -113,9 +115,8 @@ public class StaleHollowReferenceDetector {
 
     public void startMonitoring() {
         if (monitor == null) {
-            monitor = new Thread(new Monitor(this));
-            monitor.setDaemon(true);
-            monitor.start();
+            daemonThread(new Monitor(this), getClass(), "monitor")
+                    .start();
         }
     }
 

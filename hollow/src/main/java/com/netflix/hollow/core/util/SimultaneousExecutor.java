@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.core.util;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RunnableFuture;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -35,34 +36,130 @@ import java.util.concurrent.TimeUnit;
  */
 public class SimultaneousExecutor extends ThreadPoolExecutor {
 
-    private static final String DEFAULT_THREAD_NAME = "hollow-simultaneous-executor";
+    private static final String DEFAULT_THREAD_NAME = "simultaneous-executor";
 
     private final List<Future<?>> futures = new ArrayList<Future<?>>();
 
+    /**
+     * Creates an executor with a thread per processor.
+     * <p>
+     * Equivalent to constructing a {@code SimultaneousExecutor} with {@code 1.0d}
+     * threads per CPU.
+     */
+    public SimultaneousExecutor(Class<?> context, String description) {
+        this(1.0d, context, description);
+    }
+
+    /**
+     * Creates an executor with a thread per processor.
+     * <p>
+     * Equivalent to calling {@code SimultaneousExecutor(1.0d)}
+     *
+     * @deprecated use {@link #SimultaneousExecutor(Class, String)}
+     */
+    @Deprecated
     public SimultaneousExecutor() {
-        this(1.0d);
+        this(1.0d, SimultaneousExecutor.class, DEFAULT_THREAD_NAME);
     }
 
+    /**
+     * Creates an executor with number of threads calculated from the
+     * specified factor.
+     *
+     * @param threadsPerCpu calculated as {@code processors * threadsPerCpu} then used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context used to name created threads
+     */
+    public SimultaneousExecutor(double threadsPerCpu, Class<?> context) {
+        this(threadsPerCpu, context, DEFAULT_THREAD_NAME);
+    }
+
+    /**
+     * Creates an executor with number of threads calculated from the
+     * specified factor.
+     *
+     * @param threadsPerCpu calculated as {@code processors * threadsPerCpu} then used as {@code corePoolSize} and {@code maximumPoolSize}
+     *
+     * @deprecated use {@link #SimultaneousExecutor(double, Class)}
+     */
+    @Deprecated
     public SimultaneousExecutor(double threadsPerCpu) {
-        this(threadsPerCpu, DEFAULT_THREAD_NAME);
+        this(threadsPerCpu, SimultaneousExecutor.class, DEFAULT_THREAD_NAME);
     }
 
-    public SimultaneousExecutor(double threadsPerCpu, String threadName) {
-        this((int) ((double) Runtime.getRuntime().availableProcessors() * threadsPerCpu), threadName);
+    /**
+     * Creates an executor with number of threads calculated from the
+     * specified factor and threads named according to {@code context} and {@code description}.
+     *
+     * @param threadsPerCpu calculated as {@code processors * threadsPerCpu} then used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context combined with {@code description} to name created threads
+     * @param description brief description used to name created threads; combined with {@code context}
+     */
+    public SimultaneousExecutor(double threadsPerCpu, Class<?> context, String description) {
+        this((int) ((double) Runtime.getRuntime().availableProcessors() * threadsPerCpu), context, description);
     }
 
+    /**
+     * Creates an executor with number of threads calculated from the
+     * specified factor and threads named according to {@code description}.
+     *
+     * @param threadsPerCpu calculated as {@code processors * threadsPerCpu} then used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param description brief description used to name created threads
+     *
+     * @deprecated use {@link #SimultaneousExecutor(double, Class, String)}
+     */
+    @Deprecated
+    public SimultaneousExecutor(double threadsPerCpu, String description) {
+        this((int) ((double) Runtime.getRuntime().availableProcessors() * threadsPerCpu), SimultaneousExecutor.class, description);
+    }
+
+    /**
+     * Creates an executor with the specified number of threads and threads named
+     * according to {@code context}.
+     *
+     * @param numThreads used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context used to name created threads
+     */
+    public SimultaneousExecutor(int numThreads, Class<?> context) {
+        this(numThreads, context, DEFAULT_THREAD_NAME);
+    }
+
+    /**
+     * Creates an executor with the specified number of threads.
+     *
+     * @param numThreads used as {@code corePoolSize} and {@code maximumPoolSize}
+     *
+     * @deprecated use {@link #SimultaneousExecutor(int, Class)}
+     */
+    @Deprecated
     public SimultaneousExecutor(int numThreads) {
-        this(numThreads, DEFAULT_THREAD_NAME);
+        this(numThreads, SimultaneousExecutor.class, DEFAULT_THREAD_NAME);
     }
 
-    public SimultaneousExecutor(int numThreads, final String threadName) {
-        super(numThreads, numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r, threadName);
-                t.setDaemon(true);
-                return t;
-            }
-        });
+    /**
+     * Creates an executor with the specified number of threads and threads named
+     * according to {@code context} and {@code description}.
+     *
+     * @param numThreads used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param context combined with {@code description} to name created threads
+     * @param description brief description used to name created threads; combined with {@code context}
+     */
+    public SimultaneousExecutor(int numThreads, Class<?> context, String description) {
+        super(numThreads, numThreads, 100, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+                r -> daemonThread(r, context, description));
+    }
+
+    /**
+     * Creates an executor with the specified number of threads and threads named
+     * according to {@code description}.
+     *
+     * @param numThreads used as {@code corePoolSize} and {@code maximumPoolSize}
+     * @param description brief description used to name created threads
+     *
+     * @deprecated use {@link #SimultaneousExecutor(int, Class, String)}
+     */
+    @Deprecated
+    public SimultaneousExecutor(int numThreads, final String description) {
+        this(numThreads, SimultaneousExecutor.class, description);
     }
 
     @Override

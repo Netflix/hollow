@@ -16,13 +16,16 @@
  */
 package com.netflix.hollow.ui;
 
-import java.util.Iterator;
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.server.Response;
 
 public class HollowUISession {
@@ -84,24 +87,20 @@ public class HollowUISession {
     }
 
     static {
-        Thread sessionCleanupThread = new Thread(new Runnable() {
-            public void run() {
-                Iterator<Map.Entry<Long, HollowUISession>> iter = sessions.entrySet().iterator();
-                while(iter.hasNext()) {
-                    Map.Entry<Long, HollowUISession> entry = iter.next();
-                    if(entry.getValue().lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis())
-                        iter.remove();
-                }
-
-                try {
-                    Thread.sleep(60000L);
-                } catch (InterruptedException e) { }
-            }
-        });
-
-        sessionCleanupThread.setDaemon(true);
-        sessionCleanupThread.start();
+        daemonThread(HollowUISession::cleanupSessions, HollowUISession.class, "session-cleanup")
+                .start();
     }
 
+    private static void cleanupSessions() {
+        Iterator<Map.Entry<Long, HollowUISession>> iter = sessions.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Long, HollowUISession> entry = iter.next();
+            if (entry.getValue().lastAccessed + SESSION_ABANDONMENT_MILLIS < System.currentTimeMillis())
+                iter.remove();
+        }
 
+        try {
+            MINUTES.sleep(1);
+        } catch (InterruptedException e) { }
+    }
 }

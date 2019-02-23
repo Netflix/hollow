@@ -65,7 +65,7 @@ public class HollowChecksum {
     
     public static HollowChecksum forStateEngineWithCommonSchemas(HollowReadStateEngine stateEngine, HollowReadStateEngine commonSchemasWithState) {
         final Vector<TypeChecksum> typeChecksums = new Vector<TypeChecksum>();
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(HollowChecksum.class, "checksum-common-schemas");
 
         for(final HollowTypeReadState typeState : stateEngine.getTypeStates()) {
             HollowTypeReadState commonSchemasWithType = commonSchemasWithState.getTypeState(typeState.getSchema().getName());

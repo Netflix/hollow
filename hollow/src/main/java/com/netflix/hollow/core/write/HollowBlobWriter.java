@@ -53,7 +53,7 @@ public class HollowBlobWriter {
 
         VarInt.writeVInt(dos, stateEngine.getOrderedTypeStates().size());
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-snapshot");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
@@ -104,7 +104,7 @@ public class HollowBlobWriter {
 
         VarInt.writeVInt(dos, changedTypes.size());
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-delta");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {
@@ -158,7 +158,7 @@ public class HollowBlobWriter {
 
         VarInt.writeVInt(dos, changedTypes.size());
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-reverse-delta");
 
         for(final HollowTypeWriteState typeState : stateEngine.getOrderedTypeStates()) {
             executor.execute(new Runnable() {

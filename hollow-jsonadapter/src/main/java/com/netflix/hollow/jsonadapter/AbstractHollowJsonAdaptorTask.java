@@ -36,7 +36,7 @@ public abstract class AbstractHollowJsonAdaptorTask {
     public static boolean isDebug = false;
 
     protected final int maxWorkQueue = 2048;
-    protected final SimultaneousExecutor executor = new SimultaneousExecutor();
+    protected final SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "json-adaptor");
 
     protected final String typeName;
     protected final String actionName;

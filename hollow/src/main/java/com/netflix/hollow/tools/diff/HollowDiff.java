@@ -149,7 +149,7 @@ public class HollowDiff {
     }
 
     private void prepareForDiffCalculation() {
-        SimultaneousExecutor executor = new SimultaneousExecutor(1 + typeDiffs.size(), "hollow-diff-prepare");
+        SimultaneousExecutor executor = new SimultaneousExecutor(1 + typeDiffs.size(), getClass(), "prepare");
 
         executor.execute(() -> {
             for(HollowTypeDiff typeDiff : typeDiffs.values()) {

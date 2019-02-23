@@ -206,7 +206,7 @@ public class HollowCombiner {
      * Perform the combine operation.
      */
     public void combine() {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "combine");
         final int numThreads = executor.getCorePoolSize();
 
         createOrdinalRemappers();

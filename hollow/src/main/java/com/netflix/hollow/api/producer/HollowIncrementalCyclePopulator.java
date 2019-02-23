@@ -105,7 +105,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
             final HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(priorStateEngine, ((HollowObjectSchema) schema).getPrimaryKey()); ///TODO: Should we scan instead?  Can we create this once and do delta updates?
 
             ThreadSafeBitSet typeRecordsToRemove = new ThreadSafeBitSet(ThreadSafeBitSet.DEFAULT_LOG2_SEGMENT_SIZE_IN_BITS, populatedOrdinals);
-            SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+            SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu, getClass(), "mark-type-records-to-remove");
             for(final Map.Entry<RecordPrimaryKey, Object> entry : mutations.entrySet()) {
                 executor.execute(() -> {
                     if(entry.getKey().getType().equals(type)) {
@@ -151,7 +151,7 @@ public class HollowIncrementalCyclePopulator implements HollowProducer.Populator
         
         AtomicInteger nextMutation = new AtomicInteger(0);
         
-        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu, getClass(), "add-records");
         for(int i=0;i<executor.getCorePoolSize();i++) {
             executor.execute(() -> {
                 FlatRecordDumper flatRecordDumper = null;
