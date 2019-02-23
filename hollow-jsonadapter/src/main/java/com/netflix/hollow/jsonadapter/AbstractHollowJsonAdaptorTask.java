@@ -43,10 +43,18 @@ public abstract class AbstractHollowJsonAdaptorTask {
     protected final String actionName;
     protected final Map<String, Map<String, FieldProcessor>> fieldProcessors;
 
+    public AbstractHollowJsonAdaptorTask(String typeName) {
+        this(typeName, null);
+    }
+
     public AbstractHollowJsonAdaptorTask(String typeName, String actionName) {
         this.typeName = typeName;
         this.actionName = actionName;
         this.fieldProcessors = new HashMap<String, Map<String,FieldProcessor>>();
+    }
+
+    public String getTypeName() {
+        return typeName;
     }
 
     public void addFieldProcessor(FieldProcessor... processors) {
