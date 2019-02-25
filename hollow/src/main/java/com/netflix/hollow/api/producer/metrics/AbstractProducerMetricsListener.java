@@ -51,8 +51,7 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
     public void onCycleSkip(CycleSkipReason reason) {
         cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
 
-        if (lastCycleSuccessTimeNanoOptional.isPresent())
-            cycleMetricsBuilder.setLastCycleSuccessTimeNanoOptional((lastCycleSuccessTimeNanoOptional.getAsLong()));
+        lastCycleSuccessTimeNanoOptional.ifPresent(cycleMetricsBuilder::setLastCycleSuccessTimeNano);
 
         // isCycleSuccess and cycleDurationMillis are not set for skipped cycles
         cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
@@ -85,8 +84,7 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
                 .setIsAnnouncementSuccess(isAnnouncementSuccess)
                 .setAnnouncementDurationMillis(elapsed.toMillis());
 
-        if (lastAnnouncementSuccessTimeNanoOptional.isPresent())
-            announcementMetricsBuilder.setLastAnnouncementSuccessTimeNanoOptional(lastAnnouncementSuccessTimeNanoOptional.getAsLong());
+        lastAnnouncementSuccessTimeNanoOptional.ifPresent(announcementMetricsBuilder::setLastAnnouncementSuccessTimeNano);
 
         announcementMetricsReporting(announcementMetricsBuilder.build());
     }
@@ -114,11 +112,10 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
 
         cycleMetricsBuilder
                 .setConsecutiveFailures(consecutiveFailures)
-                .setCycleDurationMillisOptional(elapsed.toMillis())
-                .setIsCycleSuccessOptional(isCycleSuccess);
+                .setCycleDurationMillis(elapsed.toMillis())
+                .setIsCycleSuccess(isCycleSuccess);
 
-        if (lastCycleSuccessTimeNanoOptional.isPresent())
-                cycleMetricsBuilder.setLastCycleSuccessTimeNanoOptional(lastCycleSuccessTimeNanoOptional.getAsLong());
+        lastCycleSuccessTimeNanoOptional.ifPresent(cycleMetricsBuilder::setLastCycleSuccessTimeNano);
 
         cycleMetricsReporting(cycleMetricsBuilder.build());
     }

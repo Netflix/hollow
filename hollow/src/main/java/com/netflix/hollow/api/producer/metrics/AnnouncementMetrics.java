@@ -4,10 +4,10 @@ import java.util.OptionalLong;
 
 public class AnnouncementMetrics {
 
-    private long dataSizeBytes;                                     // Heap footprint of announced blob in bytes
-    private long announcementDurationMillis;                        // Announcement duration in ms, only applicable to completed cycles (skipped cycles dont announce)
-    private boolean isAnnouncementSuccess;                          // true if announcement was successful, false if announcement failed
-    private OptionalLong lastAnnouncementSuccessTimeNanoOptional;   // monotonic time of last successful announcement (no relation to wall clock), N/A until first successful announcement
+    private long dataSizeBytes;                             // Heap footprint of announced blob in bytes
+    private long announcementDurationMillis;                // Announcement duration in ms, only applicable to completed cycles (skipped cycles dont announce)
+    private boolean isAnnouncementSuccess;                  // true if announcement was successful, false if announcement failed
+    private OptionalLong lastAnnouncementSuccessTimeNano;   // monotonic time of last successful announcement (no relation to wall clock), N/A until first successful announcement
 
 
     public long getDataSizeBytes() {
@@ -19,25 +19,25 @@ public class AnnouncementMetrics {
     public boolean getIsAnnouncementSuccess() {
         return isAnnouncementSuccess;
     }
-    public OptionalLong getLastAnnouncementSuccessTimeNanoOptional() {
-        return lastAnnouncementSuccessTimeNanoOptional;
+    public OptionalLong getLastAnnouncementSuccessTimeNano() {
+        return lastAnnouncementSuccessTimeNano;
     }
 
     private AnnouncementMetrics(Builder builder) {
         this.dataSizeBytes = builder.dataSizeBytes;
         this.announcementDurationMillis = builder.announcementDurationMillis;
         this.isAnnouncementSuccess = builder.isAnnouncementSuccess;
-        this.lastAnnouncementSuccessTimeNanoOptional = builder.lastAnnouncementSuccessTimeNanoOptional;
+        this.lastAnnouncementSuccessTimeNano = builder.lastAnnouncementSuccessTimeNano;
     }
 
     public static final class Builder {
         private long dataSizeBytes;
         private long announcementDurationMillis;
         private boolean isAnnouncementSuccess;
-        private OptionalLong lastAnnouncementSuccessTimeNanoOptional;
+        private OptionalLong lastAnnouncementSuccessTimeNano;
 
         public Builder() {
-            lastAnnouncementSuccessTimeNanoOptional = OptionalLong.empty();
+            lastAnnouncementSuccessTimeNano = OptionalLong.empty();
         }
 
         public Builder setDataSizeBytes(long dataSizeBytes) {
@@ -52,8 +52,8 @@ public class AnnouncementMetrics {
             this.isAnnouncementSuccess = isAnnouncementSuccess;
             return this;
         }
-        public Builder setLastAnnouncementSuccessTimeNanoOptional(long lastAnnouncementSuccessTimeNano) {
-            this.lastAnnouncementSuccessTimeNanoOptional = OptionalLong.of(lastAnnouncementSuccessTimeNano);
+        public Builder setLastAnnouncementSuccessTimeNano(long lastAnnouncementSuccessTimeNano) {
+            this.lastAnnouncementSuccessTimeNano = OptionalLong.of(lastAnnouncementSuccessTimeNano);
             return this;
         }
 
