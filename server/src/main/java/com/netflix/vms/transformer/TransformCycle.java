@@ -410,7 +410,28 @@ public class TransformCycle {
                 // Process fastlane
                 trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
 
-                // Combine data
+                /**
+                 * Combine input states
+                 *
+                 * When combining pinned and fastlane inputs, there are some interesting behaviors (good and bad) of note.
+                 *
+                 * For video-related types as listed by {@code OutputTypeConfig.VIDEO_RELATED_TYPES}, the pinned inputs take precedence over the fastlane input.
+                 * For non-video-related types as defined by {@code OutputTypeConfig.NON_VIDEO_RELATED_TYPES}, the fastlane input takes precedence over pinned inputs.
+                 *
+                 * The good news is that this allows video-related data (for eg. PackageData) to be pinned to a certain version while allowing updates to
+                 * non-video-related data (for eg. PersonImages that are shared by multiple videos) to be propagated to the output write state.
+                 * The bad news is that this leads to confusion around whether data fixes should be propagated using pinning or the fast lane, and whether pinning
+                 * a title to a previous version will fix a data error or not. To clear this confusion one would need to be cognizant of this combining behavior and
+                 * classification of types as being video-related or non-video-related as defined in {@code OutputTypeConfig}.
+                 *
+                 * This behavior is a result the pursuit of a simple design for pinning. Non-video-related data such as CharacterImages is shared across multiple videos,
+                 * so pinning non-video-related data for one title would affect other titles, and in order to pin multiple titles at different versions a lot of referenced
+                 * data will also need to be pinned. Meanwhile, how to apply fastlane updates to pinned versions would be another issue.
+                 *
+                 * As a result, with the current pinning design, if a top-level title is added to both pinned and fastlane inputs, then the output write state will obtain
+                 * video-related data from the pinned version, and non-video-related-data from the fastlane. Thus, when using pinning or fastlane to fix data errors, one
+                 * needs to know if the erroneous attribute belongs to video-related or non-video-related data.
+                 */
                 List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
                 combiner.combine();

@@ -84,7 +84,17 @@ public class PinTitleHollowCombiner {
     }
 
 
-    // Order the read state engine such that by default fastlane is at the end - after pinned/override titles
+
+    /**
+     * Order the read state engine such that by default fastlane is at the end - after pinned/override titles.
+     * <p>
+     * The combiner de-dupes records based on the specified primary keys and the record corresponding to the first occurrence of a primary key wins i.e.,
+     * in the event that multiple records with the same primary key exist in the list of inputs, the combiner steps through the list of inputs one by one,
+     * and accepts the record corresponding to the first occurrence of the primary key while subsequent duplicate occurrences are ignored. Note that
+     * if any record <i>references</i> another record which was omitted because the primary key was deemed duplicate based on this rule, then that reference
+     * is remapped in the destination state to the matching record which was chosen to be included.
+     * </p>
+     */
     private static HollowReadStateEngine[] createPrioritizedOrderingReadStateEngines(List<HollowReadStateEngine> pinnedTitleInputs, HollowReadStateEngine fastlane) throws IOException {
         int size = pinnedTitleInputs.size() + 1;
         HollowReadStateEngine[] outputs = new HollowReadStateEngine[size];
@@ -107,8 +117,14 @@ public class PinTitleHollowCombiner {
             return combiner;
         }
 
-        // 1) allInputs should have fastlane at the end of the list so that pinned video has higher precedence over fastlane
-        // 2) Prioritize Fastlane non video related data - allows newer non-video data to have higher precedence
+        /**
+         * 1) allInputs should have fastlane at the end of the list so that pinned video has higher precedence over fastlane.
+         * 2) Prioritize Fastlane non video related data - allows newer non-video data to have higher precedence.
+         *    For non-video data, we want records in the fast lane to win over records with duplicate primary keys from pinned sources.
+         *    To that effect, the <i>prioritizeFastLaneTypes</i> method iterates over the records in the fast lane, and for each
+         *    primary key value drops the duplicate records from the pinned data sources so that when the combiner executes,
+         *    it gets all the fast lane records.
+         */
         HollowCombinerExcludePrimaryKeysCopyDirector copyDirector = new HollowCombinerExcludePrimaryKeysCopyDirector();
         prioritizeFastLaneTypes(copyDirector, OutputTypeConfig.NON_VIDEO_RELATED_TYPES, fastlane, pinnedTitleInputs, allInputs);
         HollowCombiner combiner = new HollowCombiner(copyDirector, output, allInputs);
