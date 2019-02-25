@@ -1546,6 +1546,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -2236,6 +2242,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -2466,19 +2474,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -2785,7 +2793,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -4969,6 +4977,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -5659,6 +5673,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -5889,19 +5905,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -6208,7 +6224,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -8392,6 +8408,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -9082,6 +9104,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -9312,19 +9336,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -9631,7 +9655,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -11964,6 +11988,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -12654,6 +12684,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -12884,19 +12916,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -13203,7 +13235,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -15387,6 +15419,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -16077,6 +16115,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -16307,19 +16347,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -16626,7 +16666,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -18834,6 +18874,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -19532,6 +19578,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -19762,19 +19810,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -20086,7 +20134,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -22330,6 +22378,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -23028,6 +23082,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -23258,19 +23314,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -23582,7 +23638,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -25826,6 +25882,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -26524,6 +26586,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -26754,19 +26818,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -27078,7 +27142,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -29322,6 +29386,12 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
+        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
+            "locked": "2.0.17",
+            "transitive": [
+                "netflix:hermes"
+            ]
+        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -30020,6 +30090,8 @@
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:cinder-proto-definition",
+                "netflix:hermes",
+                "netflix:playback-monkey-model",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -30250,19 +30322,19 @@
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.1.3",
+            "locked": "4.1.4",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.1.3",
+            "locked": "2.2.0",
             "requested": "latest.release"
         },
         "netflix:jarversions": {
@@ -30574,7 +30646,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.156",
+            "locked": "2.157",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
