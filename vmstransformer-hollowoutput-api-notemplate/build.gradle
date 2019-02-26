@@ -1,3 +1,5 @@
+apply plugin: 'idea'
+
 dependencies {
   compile project(':vmstransformer-hollowoutput-model')
 }
@@ -8,34 +10,34 @@ task generateApi(type:JavaExec) {
   arguments.add("--classPostfix=Hollow")
   arguments.add("--getterPrefix=_")
   arguments.add("--packageName=com.netflix.vms.generated.notemplate")
-  arguments.add("--pathToGeneratedFiles=${buildDir}/generated/java")
+  arguments.add("--pathToGeneratedFiles=${buildDir}/generated/main/java")
   main = 'com.netflix.hollow.api.codegen.HollowAPIGenerator'
-    classpath = configurations.compile + sourceSets.main.output
-    args(arguments)
+  classpath = configurations.compile
+  args(arguments)
 }
 
 sourceSets {
-  generated {
+  main {
     java {
-      srcDir "${buildDir}/generated/java"
-      outputDir = sourceSets.main.java.outputDir
+      srcDir "${buildDir}/generated/main/java"
     }
-    compileClasspath += sourceSets.main.compileClasspath
   }
 }
 
 // include generated files in source jar
 sourceJar {
-  from "${buildDir}/generated/java"
+  from "${buildDir}/generated/main/java"
 }
 
-findbugs {
-  sourceSets = [sourceSets.main, sourceSets.test]
-}
-checkstyle {
-  sourceSets = [sourceSets.main, sourceSets.test]
-}
+findbugsMain.onlyIf { false }
+checkstyleMain.onlyIf { false }
+check.dependsOn.remove(test)
 
-tasks.compileGeneratedJava.dependsOn(generateApi)
-tasks.jar.dependsOn(tasks.compileGeneratedJava)
-tasks.sourceJar.dependsOn(tasks.compileGeneratedJava)
+tasks.compileJava.dependsOn(generateApi)
+
+idea {
+  module {
+    excludeDirs -= file(buildDir)
+    buildDir.listFiles({d,f->f != 'generated'} as FilenameFilter).each {excludeDirs += it}
+  }
+}
