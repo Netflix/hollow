@@ -40,12 +40,5 @@ public class CustomHealthIndicator implements HealthIndicator {
     public void check(HealthIndicatorCallback healthCallback) {
         logger.info("SNAP: Health check invoked!");
         healthCallback.inform(Health.healthy().withDetail("message", "All good!").build());
-        try {
-            logger.info("SNAP: Start publishing endlessly");
-            SunjeetsOnboardingRoot.publishEndlessly();
-        } catch (Exception ex) {
-            logger.error("SNAP: Exception in publishing endlessly: ", ex);
-        }
-
     }
 }

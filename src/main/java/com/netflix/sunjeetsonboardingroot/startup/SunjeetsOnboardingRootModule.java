@@ -59,8 +59,7 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
         // Uncomment to load the Cassandra client
         // install(new CassandraModule());
 
-        logger.info("SNAP: binding to  Cassandra client for greetings");
-
+        logger.info("SNAP: binding to In Memory DAO for greetings");
         bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootInMemoryDao.class);
         // Swap this for the InMemoryDao bind above to use the Cassandra client instead
         // bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootCassandraDao.class);

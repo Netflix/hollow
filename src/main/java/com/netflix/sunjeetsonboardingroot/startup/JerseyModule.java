@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
  */
 public final class JerseyModule extends JerseyServletModule {
 
+    public static final String PRODUCE_ONCE_PATH = "produce-once";
+
     private static final Logger logger = LoggerFactory.getLogger(JerseyModule.class);
 
     @Override
@@ -45,6 +47,10 @@ public final class JerseyModule extends JerseyServletModule {
 
         // Set up the healthcheck endpoint to be set by the provided status servlet.
         serve("/healthcheck").with(HealthStatusServlet.class);
+
+        // Match the hollow resources, but do not consume the path
+        // This matching ensures Jersey will not swallow the URLs to static content
+        serveRegex("(/produce-.+)").with(GovernatorServletContainer.class);
     }
 
     @Advises
