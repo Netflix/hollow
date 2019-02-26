@@ -4,15 +4,12 @@ import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
 import com.netflix.archaius.ConfigProxyFactory;
-import com.netflix.sunjeetsonboardingroot.model.SunjeetsOnboardingRootCassandraDao;
 import javax.inject.Singleton;
-import javax.inject.Named;
 
 // Server dependencies
 import com.netflix.cinder.lifecycle.CinderProducerModule;
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
-import javax.inject.Named;
 
 import com.netflix.sunjeetsonboardingroot.config.SunjeetsOnboardingRootConfig;
 import com.netflix.sunjeetsonboardingroot.health.CustomHealthIndicator;

@@ -1,12 +1,14 @@
 package com.netflix.sunjeetsonboardingroot;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.sunjeetsonboardingroot.OnboardingItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public class OnboardingItemsProducer {
 
     private static final String DEFAULT_NAMESPACE = "SunjeetsOnboardingItems.v1";
