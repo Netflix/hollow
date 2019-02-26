@@ -1,1 +1,7 @@
-app-type: java-project
+app-type: debian-package
+jenkins-default-job: SUN-sunjeets-onboarding-root-publish
+jenkins-jobs:
+- SUN-sunjeets-onboarding-root-publish
+jenkins-master: engedu
+name: sunjeets-onboarding-root
+org: SUN
