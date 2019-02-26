@@ -1674,8 +1674,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -1744,13 +1742,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4114,8 +4112,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -4184,13 +4180,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6554,8 +6550,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -6624,13 +6618,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -9143,8 +9137,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -9213,13 +9205,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11583,8 +11575,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -11653,13 +11643,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -14034,8 +14024,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -14104,13 +14092,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -16503,8 +16491,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -16573,13 +16559,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -18972,8 +18958,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -19042,13 +19026,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -21441,8 +21425,6 @@
         "netflix.bom:runtime-platform-recommendations": {
             "locked": "4.7.36",
             "transitive": [
-                "netflix:cinder-core",
-                "netflix:cinder-proto-definition",
                 "netflix:videoresolutiontypelibrary"
             ]
         },
@@ -21511,13 +21493,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.0",
+            "locked": "4.4.1",
             "transitive": [
                 "netflix:cinder-core"
             ]
