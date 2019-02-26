@@ -24,3 +24,19 @@ Push a tag like `v2.0.0`      -> Publish release
 ### Project Resources
 
 - Atlas Dashboard: [http://dashboards.prod.netflix.net/show/sunjeetsonboardingroot](http://dashboards.prod.netflix.net/show/sunjeetsonboardingroot)
+- Jenkins:
+    - Jobs:
+        - ![Build Status](https://engedu.builds.test.netflix.net/buildStatus/icon?job=SUN-sunjeets-onboarding-root-build)[Build](https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-build)
+        - ![Build Status](https://engedu.builds.test.netflix.net/buildStatus/icon?job=SUN-sunjeets-onboarding-root-build-pull-request)[Build Pull Request](https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-build-pull-request)
+        - ![Build Status](https://engedu.builds.test.netflix.net/buildStatus/icon?job=SUN-sunjeets-onboarding-root-update-dependencies-lock)[Update Dependencies](https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-update-dependencies-lock)
+    - Server: engedu
+- CI Pipeline Flowchart: [http://go/defaultjavacicdpipeline](http://go/defaultjavacicdpipeline)
+- Spinnaker:
+    - Application: [Spinnaker Application](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot)
+    - Pipelines:
+        - [Deploy To Test Pipeline](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/executions?pipeline=deploy-to-test)
+        - [Release Pipeline](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/executions?pipeline=deploy-to-prod)
+    - Securitygroups:
+        - [Test Load Driver Security Group](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups)
+        - [Test Security Group](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups)
+        - [Prod Security Group](http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups)

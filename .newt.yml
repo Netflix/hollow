@@ -1,4 +1,4 @@
-app-type: debian-package
+app-type: java-project
 jenkins-default-job: SUN-sunjeets-onboarding-root-publish
 jenkins-jobs:
 - SUN-sunjeets-onboarding-root-publish

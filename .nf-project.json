@@ -1,25 +1,113 @@
 {
   "project_resources": {
-    "Atlas Dashboard": "http://dashboards.prod.netflix.net/show/sunjeetsonboardingroot"
+    "Atlas Dashboard": "http://dashboards.prod.netflix.net/show/sunjeetsonboardingroot",
+    "jenkins": {
+      "jobs": [
+        {
+          "name": "SUN-sunjeets-onboarding-root-build",
+          "friendlyName": "Build",
+          "source": "build.xml",
+          "url": "https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-build",
+          "default": true
+        },
+        {
+          "name": "SUN-sunjeets-onboarding-root-build-pull-request",
+          "friendlyName": "Build Pull Request",
+          "source": "build-pull-request.xml",
+          "url": "https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-build-pull-request"
+        },
+        {
+          "name": "SUN-sunjeets-onboarding-root-update-dependencies-lock",
+          "friendlyName": "Update Dependencies",
+          "source": "update-dependencies-lock.xml",
+          "url": "https://engedu.builds.test.netflix.net/job/SUN-sunjeets-onboarding-root-update-dependencies-lock"
+        }
+      ],
+      "server": "engedu"
+    },
+    "CI Pipeline Flowchart": "http://go/defaultjavacicdpipeline",
+    "spinnaker": {
+      "application": {
+        "name": "sunjeetsonboardingroot",
+        "friendlyName": "Spinnaker Application",
+        "source": "application.json",
+        "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot",
+        "accounts": [
+          "prod",
+          "test"
+        ],
+        "cloudProvider": "aws"
+      },
+      "pipelines": [
+        {
+          "name": "deploy-to-test",
+          "friendlyName": "Deploy To Test Pipeline",
+          "source": "master-pipeline.json",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/executions?pipeline=deploy-to-test",
+          "default": true
+        },
+        {
+          "name": "deploy-to-prod",
+          "friendlyName": "Release Pipeline",
+          "source": "release-pipeline.json",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/executions?pipeline=deploy-to-prod"
+        }
+      ],
+      "securityGroups": [
+        {
+          "name": "sunjeetsonboardingroot",
+          "friendlyName": "Test Load Driver Security Group",
+          "source": "test-load-driver-security-group.json",
+          "account": "test",
+          "region": "us-east-1",
+          "vpcId": "vpc-4de2b628",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups"
+        },
+        {
+          "name": "sunjeetsonboardingroot",
+          "friendlyName": "Test Security Group",
+          "source": "test-security-group.json",
+          "account": "test",
+          "region": "us-east-1",
+          "vpcId": "vpc-4de2b628",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups"
+        },
+        {
+          "name": "sunjeetsonboardingroot",
+          "friendlyName": "Prod Security Group",
+          "source": "prod-security-group.json",
+          "account": "prod",
+          "region": "us-east-1",
+          "vpcId": "vpc-46f5a223",
+          "url": "http://spinnaker.prod.netflix.net/#/applications/sunjeetsonboardingroot/securityGroups"
+        }
+      ]
+    }
   },
   "inputs": {
     "teamEmail": "sunjeets@netflix.com",
-    "repoOwner": "sunjeets",
+    "repoOwner": "sun",
     "repoName": "sunjeets-onboarding-root",
-    "repoOwnerType": "user",
+    "repoOwnerType": "project",
     "cloudProvider": "aws",
     "frameworkType": "governator-service",
     "ipcType": "rest",
     "generatorTasks": [
-      "generate"
+      "jenkins",
+      "spinnaker"
     ],
     "projectName": "sunjeets-onboarding-root",
     "projectClassName": "SunjeetsOnboardingRoot",
     "applicationName": "sunjeetsonboardingroot",
     "packageName": "com.netflix.sunjeetsonboardingroot",
     "testFramework": "junit",
-    "stashUser": "sunjeets"
+    "stashUser": "sunjeets",
+    "ciProjectType": "java-guice-service",
+    "jenkinsServer": "engedu",
+    "deployableArtifactName": "sunjeets-onboarding-root",
+    "prodAccount": "prod",
+    "testAccount": "test"
   },
   "generator_user": "sunjeets",
-  "ci_generator_version": "5.6.5"
+  "ci_generator_version": "3.5.1"
 }
