@@ -2421,7 +2421,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -3154,7 +3155,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -6218,7 +6219,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -6951,7 +6953,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -10015,7 +10017,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -10748,7 +10751,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -13896,7 +13899,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -14629,7 +14633,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -19598,7 +19602,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -20331,7 +20336,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -23395,7 +23400,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -24128,7 +24134,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -27191,7 +27197,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -27924,7 +27931,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -31081,7 +31088,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -31816,7 +31824,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -35046,7 +35054,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -35781,7 +35790,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -39011,7 +39020,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -39746,7 +39756,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -42976,7 +42986,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -43711,7 +43722,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -46941,7 +46952,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -47676,7 +47688,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -50906,7 +50918,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -51641,7 +51654,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -54871,7 +54884,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -55606,7 +55620,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -58836,7 +58850,8 @@
                 "netflix:cinder-proto-definition",
                 "netflix:hermes",
                 "netflix:playback-monkey-model",
-                "netflix:videoresolutiontypelibrary"
+                "netflix:videoresolutiontypelibrary",
+                "netflix:vms-utils"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -59571,7 +59586,7 @@
             "requested": "latest.release"
         },
         "netflix:vms-utils": {
-            "locked": "65.0.0",
+            "locked": "65.1.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
