@@ -51,6 +51,8 @@ public final class JerseyModule extends JerseyServletModule {
         // Match the hollow resources, but do not consume the path
         // This matching ensures Jersey will not swallow the URLs to static content
         serveRegex("(/produce-.+)").with(GovernatorServletContainer.class);
+
+
     }
 
     @Advises

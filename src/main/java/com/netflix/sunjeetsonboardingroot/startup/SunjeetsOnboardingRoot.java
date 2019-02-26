@@ -27,13 +27,16 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
 
     private OnboardingItemsProducer onboardingItemsProducer;
 
+    @Inject
+    public SunjeetsOnboardingRoot(OnboardingItemsProducer onboardingItemsProducer) {
+        this.onboardingItemsProducer = onboardingItemsProducer;
+    }
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public Response publishOnce() throws Exception {
         logger.info("SNAP: Start publishing once");
 
-        Injector injector = InjectorBuilder.fromModules(new SunjeetsOnboardingRootModule()).createInjector();
-        this.onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
         this.onboardingItemsProducer.publishData(true);
 
         logger.info("SNAP: Published.");
@@ -41,12 +44,9 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
         return Response.ok().build();
     }
 
-
-
+    /*
     public static void publishEndlessly() throws Exception {
         logger.info("SNAP: Start publishing endlessly");
-        Injector injector = InjectorBuilder.fromModules(new SunjeetsOnboardingRootModule()).createInjector();
-        OnboardingItemsProducer onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
 
         while (true) {
             Thread.sleep(10*1000);
@@ -58,11 +58,10 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
             System.out.println("SNAP: Published.");
             logger.info("SNAP: Published.");
         }
-    }
+    }*/
 
     public static void main(String[] args) throws Exception {
-        logger.info("SNAP: Stepped into main");
-        publishEndlessly();
+        logger.info("SNAP: Stepped in main");
     }
 
     @Override

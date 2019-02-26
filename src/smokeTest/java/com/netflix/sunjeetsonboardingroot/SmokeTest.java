@@ -61,5 +61,15 @@ public class SmokeTest {
             .body(containsString("Netflix sunjeets-onboarding-root"))
             ;
     }
+
+    @Test
+    public void testPublishOnceContent() throws IOException {
+        given().port(ephemeralPort).log().ifValidationFails()
+                .when()
+                .get("/produce-once")
+                .then()
+                .assertThat().statusCode(200)
+        ;
+    }
 }
 

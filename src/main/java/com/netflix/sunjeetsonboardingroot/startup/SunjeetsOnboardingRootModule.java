@@ -49,13 +49,13 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
             }
         });
         install(new JerseyModule());
-        
+
         install(new SwaggerServletModule());
         install(new JaxrsSwaggerModule());
         install(new GuiceServletSwaggerModule());
 
         install(new CinderProducerModule());
-        
+
         // Uncomment to load the Cassandra client
         // install(new CassandraModule());
 
