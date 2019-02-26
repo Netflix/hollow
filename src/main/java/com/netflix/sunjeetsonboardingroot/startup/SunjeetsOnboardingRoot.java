@@ -18,9 +18,8 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(SunjeetsOnboardingRoot.class);
 
-    public static void main(String[] args) throws Exception {
-
-        logger.info("SNAP: Stepped into main");
+    public static void publishEndlessly() throws Exception {
+        logger.info("SNAP: Start publishing endlessly");
         Injector injector = InjectorBuilder.fromModules(new SunjeetsOnboardingRootModule()).createInjector();
         OnboardingItemsProducer onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
 
@@ -34,6 +33,11 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
             System.out.println("SNAP: Published.");
             logger.info("SNAP: Published.");
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        logger.info("SNAP: Stepped into main");
+        publishEndlessly();
     }
 
     @Override

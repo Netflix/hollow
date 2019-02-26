@@ -3,6 +3,7 @@ package com.netflix.sunjeetsonboardingroot.health;
 import com.netflix.runtime.health.api.Health;
 import com.netflix.runtime.health.api.HealthIndicator;
 import com.netflix.runtime.health.api.HealthIndicatorCallback;
+import com.netflix.sunjeetsonboardingroot.startup.SunjeetsOnboardingRoot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +39,13 @@ public class CustomHealthIndicator implements HealthIndicator {
     @Override
     public void check(HealthIndicatorCallback healthCallback) {
         logger.info("SNAP: Health check invoked!");
-        
         healthCallback.inform(Health.healthy().withDetail("message", "All good!").build());
+        try {
+            logger.info("SNAP: Start publishing endlessly");
+            SunjeetsOnboardingRoot.publishEndlessly();
+        } catch (Exception ex) {
+            logger.error("SNAP: Exception in publishing endlessly: ", ex);
+        }
 
     }
 }
