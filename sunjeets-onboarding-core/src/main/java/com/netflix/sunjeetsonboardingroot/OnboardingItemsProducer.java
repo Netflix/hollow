@@ -28,11 +28,12 @@ public class OnboardingItemsProducer {
 
     public void publishData(boolean isPrimaryProducer) {
 
-        producer.enablePrimaryProducer(isPrimaryProducer);
-
-        if (isPrimaryProducer) {
+        // producer.enablePrimaryProducer(isPrimaryProducer);
+        producer.enablePrimaryProducer(true);
+        try {
 
             producer.runCycle(state -> {
+                long l = System.currentTimeMillis();
                 state.add(new OnboardingItem(1, "Software Engineer Bootcamp", true));
                 state.add(new OnboardingItem(2, "Cinder Hello World", true));
                 state.add(new OnboardingItem(3, "Coldstarts with Tim", true));
@@ -46,8 +47,10 @@ public class OnboardingItemsProducer {
                 state.add(new OnboardingItem(11, "Hollow metrics revamp", true));
                 state.add(new OnboardingItem(12, "Cinder metrics revamp", true));
                 state.add(new OnboardingItem(13, "Cinder release", true));
-                state.add(new OnboardingItem(14, "Debugging leader election", false));
+                state.add(new OnboardingItem(14, "Sunjeet Debugging leader election " + l, true));
             });
+        } finally {
+            producer.enablePrimaryProducer(false);
         }
 
     }

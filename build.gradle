@@ -12,6 +12,7 @@ buildscript {
 }
 
 allprojects {
+
     apply plugin: 'netflix.nebula'
     apply plugin: 'java'
     apply plugin: 'jacoco'

@@ -20,10 +20,10 @@ public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
         OnboardingItemsProducer onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
 
         while (true) {
+            Thread.sleep(10*1000);
             System.out.println("SNAP: Publishing,");
             onboardingItemsProducer.publishData(true);
             System.out.println("SNAP: Published.");
-            Thread.sleep(60*1000);
         }
     }
 
