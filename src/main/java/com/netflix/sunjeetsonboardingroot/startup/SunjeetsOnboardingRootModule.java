@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 // Common module dependencies
 import com.google.inject.Provides;
 import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.sunjeetsonboardingroot.model.SunjeetsOnboardingRootCassandraDao;
 import javax.inject.Singleton;
 import javax.inject.Named;
 
@@ -22,6 +23,8 @@ import com.netflix.sunjeetsonboardingroot.model.SunjeetsOnboardingRootDao;
 import com.netflix.runtime.swagger.jaxrs.JaxrsSwaggerModule;
 import com.netflix.runtime.swagger.servlets.GuiceServletSwaggerModule;
 import com.netflix.runtime.swagger.lifecycle.SwaggerServletModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the "main" module where we wire everything up. If you see this module getting overly
@@ -31,9 +34,13 @@ import com.netflix.runtime.swagger.lifecycle.SwaggerServletModule;
  */
 
 public final class SunjeetsOnboardingRootModule extends AbstractModule {
+    private static final Logger logger = LoggerFactory.getLogger(SunjeetsOnboardingRootModule.class);
 
     @Override
     protected void configure() {
+
+        logger.info("SNAP: installing modules");
+
         install(new RuntimeCoreModule());
         install(new HealthModule() {
             @Override
@@ -52,9 +59,11 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
         // Uncomment to load the Cassandra client
         // install(new CassandraModule());
 
-        bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootInMemoryDao.class);
+        logger.info("SNAP: binding to  Cassandra client for greetings");
+
+        //bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootInMemoryDao.class);
         // Swap this for the InMemoryDao bind above to use the Cassandra client instead
-        // bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootCassandraDao.class);
+        bind(SunjeetsOnboardingRootDao.class).to(SunjeetsOnboardingRootCassandraDao.class);
     }
 
     @Provides

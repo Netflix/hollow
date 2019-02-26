@@ -4,15 +4,21 @@ import com.google.inject.Inject;
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.sunjeetsonboardingroot.OnboardingItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OnboardingItemsProducer {
 
     private static final String DEFAULT_NAMESPACE = "SunjeetsOnboardingItems.v1";
     private HollowProducer producer;
 
+    private static final Logger logger = LoggerFactory.getLogger(OnboardingItemsProducer.class);
 
     @Inject
     public OnboardingItemsProducer(CinderProducerBuilder.Factory producerBuilder) {
+
+        logger.info("SNAP: Injecting OnboardingItemsProducer instance");
+
         producer = producerBuilder.get()
                 .forNamespace(DEFAULT_NAMESPACE)
                 .withRestore()

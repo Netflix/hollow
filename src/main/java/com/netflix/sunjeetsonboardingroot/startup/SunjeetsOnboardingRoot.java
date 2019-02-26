@@ -5,6 +5,8 @@ import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.guice.servlet.WebApplicationInitializer;
 
 import com.netflix.sunjeetsonboardingroot.OnboardingItemsProducer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The "main" class that boots up the service. For local testing one simply invokes the
@@ -14,16 +16,23 @@ import com.netflix.sunjeetsonboardingroot.OnboardingItemsProducer;
  */
 public class SunjeetsOnboardingRoot implements WebApplicationInitializer {
 
+    private static final Logger logger = LoggerFactory.getLogger(SunjeetsOnboardingRoot.class);
+
     public static void main(String[] args) throws Exception {
 
+        logger.info("SNAP: Stepped into main");
         Injector injector = InjectorBuilder.fromModules(new SunjeetsOnboardingRootModule()).createInjector();
         OnboardingItemsProducer onboardingItemsProducer = injector.getInstance(OnboardingItemsProducer.class);
 
         while (true) {
             Thread.sleep(10*1000);
             System.out.println("SNAP: Publishing,");
+            logger.info("SNAP: Publishing,");
+
             onboardingItemsProducer.publishData(true);
+
             System.out.println("SNAP: Published.");
+            logger.info("SNAP: Published.");
         }
     }
 
