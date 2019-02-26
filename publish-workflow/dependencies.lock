@@ -2404,7 +2404,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -5836,7 +5836,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9268,7 +9268,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -12849,7 +12849,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16281,7 +16281,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -19745,7 +19745,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23250,7 +23250,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26755,7 +26755,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30260,7 +30260,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]

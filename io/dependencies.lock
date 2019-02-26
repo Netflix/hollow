@@ -1961,7 +1961,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -2085,7 +2085,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -2100,6 +2100,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -4716,7 +4722,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -4840,7 +4846,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -4855,6 +4861,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -7471,7 +7483,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -7595,7 +7607,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -7610,6 +7622,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -10375,7 +10393,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -10499,7 +10517,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -10514,6 +10532,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -13130,7 +13154,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -13254,7 +13278,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -13269,6 +13293,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -15888,7 +15918,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -16012,7 +16042,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -16027,6 +16057,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -18650,7 +18686,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -18774,7 +18810,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -18789,6 +18825,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -21412,7 +21454,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -21536,7 +21578,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -21551,6 +21593,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
@@ -24174,7 +24222,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "46.67",
+            "locked": "47.177",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -24298,7 +24346,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.125",
+            "locked": "2.140",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -24313,6 +24361,12 @@
             "locked": "1.56.0",
             "transitive": [
                 "netflix:videoresolutiontypelibrary"
+            ]
+        },
+        "netflix:ngl": {
+            "locked": "0.13.0",
+            "transitive": [
+                "netflix:nfi18n-core"
             ]
         },
         "netflix:nimble-int-java": {
