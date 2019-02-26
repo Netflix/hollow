@@ -160,7 +160,7 @@ public class TransitiveSetTraverser {
         for(int i=0;i<schema.numFields();i++) {
             if(schema.getFieldType(i) == FieldType.REFERENCE) {
                 HollowTypeReadState childTypeState = stateEngine.getTypeState(schema.getReferencedType(i));
-                if(childTypeState.maxOrdinal() >= 0)
+                if(childTypeState != null && childTypeState.maxOrdinal() >= 0)
                     childOrdinals[i] = getOrCreateBitSet(matches, schema.getReferencedType(i), childTypeState.maxOrdinal());
             }
         }
@@ -168,7 +168,7 @@ public class TransitiveSetTraverser {
         int ordinal = matchingOrdinals.nextSetBit(0);
         while(ordinal != -1) {
             for(int i=0;i<childOrdinals.length;i++) {
-                if(schema.getFieldType(i) == FieldType.REFERENCE) {
+                if(childOrdinals[i] != null) {
                     int childOrdinal = typeState.readOrdinal(ordinal, i);
                     if(childOrdinal != -1) {
                         childOrdinals[i].set(childOrdinal);
