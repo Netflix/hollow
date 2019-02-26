@@ -35,7 +35,6 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
         logger.info("SNAP: installing modules");
 
         install(new RuntimeCoreModule());
@@ -46,11 +45,9 @@ public final class SunjeetsOnboardingRootModule extends AbstractModule {
             }
         });
         install(new JerseyModule());
-
         install(new SwaggerServletModule());
         install(new JaxrsSwaggerModule());
         install(new GuiceServletSwaggerModule());
-
         install(new CinderProducerModule());
 
         // Uncomment to load the Cassandra client
