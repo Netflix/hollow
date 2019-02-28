@@ -69,6 +69,8 @@ public class HollowSetSchema extends HollowCollectionSchema {
 
     @Override
     public boolean equals(Object other) {
+        if (this == other)
+            return true;
         if(!(other instanceof HollowSetSchema))
             return false;
         HollowSetSchema otherSchema = (HollowSetSchema)other;

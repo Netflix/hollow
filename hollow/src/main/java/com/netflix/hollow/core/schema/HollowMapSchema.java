@@ -82,6 +82,8 @@ public class HollowMapSchema extends HollowSchema {
 
     @Override
     public boolean equals(Object other) {
+        if (this == other)
+            return true;
         if(!(other instanceof HollowMapSchema))
             return false;
         HollowMapSchema otherSchema = (HollowMapSchema)other;

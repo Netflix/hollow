@@ -25,6 +25,8 @@ import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -99,10 +101,35 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
         return delegate.getTypeDataAccess();
     }
 
+    @Override
+    public HollowRecordDelegate getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // Note: hashCode is computed from the map's contents, see AbstractMap.hashCode
+
+        if (this == o) {
+            return true;
+        }
+
+        // If type state is the same then compare ordinals
+        if (o instanceof HollowMap) {
+            HollowMap<?, ?> that = (HollowMap<?, ?>) o;
+            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+                return ordinal == that.ordinal;
+            }
+        }
+
+        // Otherwise, compare the contents
+        return super.equals(o);
+    }
+
     private final class EntrySet extends AbstractSet<Map.Entry<K, V>> {
 
         @Override
-        public Iterator<java.util.Map.Entry<K, V>> iterator() {
+        public Iterator<Map.Entry<K, V>> iterator() {
             return new EntryItr();
         }
 
@@ -110,7 +137,6 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
         public int size() {
             return delegate.size(ordinal);
         }
-
     }
 
     private final class EntryItr implements Iterator<Map.Entry<K, V>> {
@@ -118,7 +144,7 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
         private final HollowMapEntryOrdinalIterator ordinalIterator;
         private Map.Entry<K, V> next;
 
-        private EntryItr() {
+        EntryItr() {
             this.ordinalIterator = delegate.iterator(ordinal);
             positionNext();
         }
@@ -129,7 +155,11 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
         }
 
         @Override
-        public java.util.Map.Entry<K, V> next() {
+        public Map.Entry<K, V> next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
             Map.Entry<K, V> current = next;
             positionNext();
             return current;
@@ -137,42 +167,65 @@ public abstract class HollowMap<K, V> extends AbstractMap<K, V> implements Hollo
 
         private void positionNext() {
             if(ordinalIterator.next()) {
-                next = new Entry(ordinalIterator.getKey(), ordinalIterator.getValue());
+                next = new OrdinalEntry<>(HollowMap.this, ordinalIterator.getKey(), ordinalIterator.getValue());
             } else {
                 next = null;
             }
         }
+    }
+
+    private final static class OrdinalEntry<K, V> implements Map.Entry<K, V> {
+        private final HollowMap<K, V> map;
+        private final int keyOrdinal;
+        private final int valueOrdinal;
+
+        OrdinalEntry(HollowMap<K, V> map, int keyOrdinal, int valueOrdinal) {
+            this.map = map;
+            this.keyOrdinal = keyOrdinal;
+            this.valueOrdinal = valueOrdinal;
+        }
 
         @Override
-        public void remove() {
+        public K getKey() {
+            return map.instantiateKey(keyOrdinal);
+        }
+
+        @Override
+        public V getValue() {
+            return map.instantiateValue(valueOrdinal);
+        }
+
+        @Override
+        public V setValue(V value) {
             throw new UnsupportedOperationException();
         }
 
-        private class Entry implements Map.Entry<K, V> {
-            private final int keyOrdinal;
-            private final int valueOrdinal;
-
-            public Entry(int keyOrdinal, int valueOrdinal) {
-                this.keyOrdinal = keyOrdinal;
-                this.valueOrdinal = valueOrdinal;
-            }
-
-            public K getKey() {
-                return instantiateKey(keyOrdinal);
-            }
-
-            public V getValue() {
-                return instantiateValue(valueOrdinal);
-            }
-
-            public V setValue(V value) {
-                throw new UnsupportedOperationException();
-            }
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(getKey()) ^ Objects.hashCode(getValue());
         }
-    }
 
-    @Override
-    public HollowRecordDelegate getDelegate() {
-        return delegate;
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof Map.Entry)) {
+                return false;
+            }
+
+            if (o instanceof OrdinalEntry) {
+                OrdinalEntry<?, ?> that = (OrdinalEntry) o;
+                if (map.delegate.getTypeDataAccess() == that.map.delegate.getTypeDataAccess()) {
+                    return keyOrdinal == that.keyOrdinal &&
+                            valueOrdinal == that.valueOrdinal;
+                }
+            }
+
+            Map.Entry<?, ?> that = (Map.Entry) o;
+            return Objects.equals(getKey(),that.getKey()) &&
+                    Objects.equals(getValue(),that.getValue());
+        }
     }
 }

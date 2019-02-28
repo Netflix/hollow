@@ -83,4 +83,24 @@ public abstract class HollowList<T> extends AbstractList<T> implements HollowRec
     public HollowRecordDelegate getDelegate() {
         return delegate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        // Note: hashCode is computed from the list's contents, see AbstractList.hashCode
+
+        if (this == o) {
+            return true;
+        }
+
+        // If type state is the same then compare ordinals
+        if (o instanceof HollowList) {
+            HollowList<?> that = (HollowList<?>) o;
+            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+                return ordinal == that.ordinal;
+            }
+        }
+
+        // Otherwise, compare the contents
+        return super.equals(o);
+    }
 }
