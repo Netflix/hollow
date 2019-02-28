@@ -24,6 +24,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A HollowSet provides an implementation of the {@link java.util.Set} interface over
@@ -84,12 +85,37 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
         return new Itr();
     }
 
+    @Override
+    public HollowRecordDelegate getDelegate() {
+        return delegate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // Note: hashCode is computed from the set's contents, see AbstractSet.hashCode
+
+        if (this == o) {
+            return true;
+        }
+
+        // If type state is the same then compare ordinals
+        if (o instanceof HollowSet) {
+            HollowSet<?> that = (HollowSet<?>) o;
+            if (delegate.getTypeDataAccess() == that.delegate.getTypeDataAccess()) {
+                return ordinal == that.ordinal;
+            }
+        }
+
+        // Otherwise, compare the contents
+        return super.equals(o);
+    }
+
     private final class Itr implements Iterator<T> {
 
         private final HollowOrdinalIterator ordinalIterator;
         private T next;
 
-        private Itr() {
+        Itr() {
             this.ordinalIterator = delegate.iterator(ordinal);
             positionNext();
         }
@@ -101,6 +127,10 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
 
         @Override
         public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
             T current = next;
             positionNext();
             return current;
@@ -114,16 +144,5 @@ public abstract class HollowSet<T> extends AbstractSet<T> implements HollowRecor
             else
                 next = null;
         }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
     }
-
-    @Override
-    public HollowRecordDelegate getDelegate() {
-        return delegate;
-    }
-
 }

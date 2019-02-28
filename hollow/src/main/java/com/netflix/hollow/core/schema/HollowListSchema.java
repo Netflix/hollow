@@ -60,6 +60,8 @@ public class HollowListSchema extends HollowCollectionSchema {
     
     @Override
     public boolean equals(Object other) {
+        if (this == other)
+            return true;
         if(!(other instanceof HollowListSchema))
             return false;
         HollowListSchema otherSchema = (HollowListSchema)other;
