@@ -295,7 +295,7 @@ public class HollowProducer {
 
     HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
         return restore(versionDesired, blobRetriever,
-                (restoreFrom, restoreTo) -> HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom));
+                (restoreFrom, restoreTo) -> HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom, false));
     }
 
     private interface RestoreAction {
