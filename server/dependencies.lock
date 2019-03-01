@@ -1612,12 +1612,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -2396,7 +2390,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -2689,7 +2682,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -5355,12 +5348,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -6139,7 +6126,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -6432,7 +6418,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -9098,12 +9084,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -9882,7 +9862,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -10175,7 +10154,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -12925,12 +12904,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -13709,7 +13682,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -14002,7 +13974,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -18573,12 +18545,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -19357,7 +19323,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -19650,7 +19615,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22316,12 +22281,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -23100,7 +23059,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -23393,7 +23351,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26059,12 +26017,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -26842,7 +26794,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -27135,7 +27086,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -29849,12 +29800,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -30674,7 +30619,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -30967,7 +30911,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -33755,12 +33699,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -34580,7 +34518,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -34873,7 +34810,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -37661,12 +37598,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -38486,7 +38417,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -38779,7 +38709,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -41567,12 +41497,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -42392,7 +42316,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -42685,7 +42608,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -45473,12 +45396,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -46298,7 +46215,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -46591,7 +46507,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -49379,12 +49295,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -50204,7 +50114,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -50497,7 +50406,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -53285,12 +53194,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -54110,7 +54013,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -54403,7 +54305,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -57191,12 +57093,6 @@
                 "com.netflix.spectator:spectator-nflx-plugin"
             ]
         },
-        "com.netflix.spring.bom:spring-boot-netflix-internalplatform-recommendations": {
-            "locked": "2.0.17",
-            "transitive": [
-                "netflix:hermes"
-            ]
-        },
         "com.netflix.suro:suro-client": {
             "locked": "0.9.0.20-platform",
             "transitive": [
@@ -58016,7 +57912,6 @@
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
-                "netflix:hermes",
                 "netflix:playback-monkey-model",
                 "netflix:vms-utils"
             ]
@@ -58309,7 +58204,7 @@
             ]
         },
         "netflix:hermes": {
-            "locked": "2.2.1",
+            "locked": "2.2.2",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
