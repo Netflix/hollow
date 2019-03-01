@@ -34,6 +34,7 @@ import com.netflix.hollow.core.write.HollowTypeWriteState;
 import com.netflix.hollow.core.write.HollowWriteRecord;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
+import com.netflix.hollow.tools.combine.IdentityOrdinalRemapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,7 +145,11 @@ public class HollowWriteStateCreator {
      * @param writeEngine the write state engine
      * @param readEngine the read state engine
      */
-    public static void populateUsingReadEngine(final HollowWriteStateEngine writeEngine, final HollowReadStateEngine readEngine) {
+    public static void populateUsingReadEngine(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine) {
+        populateUsingReadEngine(writeEngine, readEngine, true);
+    }
+
+    public static void populateUsingReadEngine(HollowWriteStateEngine writeEngine, HollowReadStateEngine readEngine, boolean preserveHashPositions) {
         SimultaneousExecutor executor = new SimultaneousExecutor();
         
         for(HollowTypeWriteState writeState : writeEngine.getOrderedTypeStates()) {
@@ -160,7 +165,7 @@ public class HollowWriteStateCreator {
                     if(writeState != null) {
                         writeState.setNumShards(readState.numShards());
                         
-                        HollowRecordCopier copier = HollowRecordCopier.createCopier(readState, writeState.getSchema());
+                        HollowRecordCopier copier = HollowRecordCopier.createCopier(readState, writeState.getSchema(), IdentityOrdinalRemapper.INSTANCE, preserveHashPositions);
                         
                         BitSet populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
