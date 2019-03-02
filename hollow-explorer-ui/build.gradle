@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 sourceSets {
     tools {
@@ -8,12 +8,12 @@ sourceSets {
 }
  
 dependencies {
-    compile project(':hollow')
-    compile project(':hollow-ui-tools')
+    api project(':hollow')
+    api project(':hollow-ui-tools')
 
     compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
-    testCompile 'junit:junit:4.11'
+    testImplementation 'junit:junit:4.11'
 
     toolsCompile configurations.compile
     toolsRuntime configurations.runtime

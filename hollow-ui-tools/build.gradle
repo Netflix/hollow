@@ -1,4 +1,4 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 sourceSets {
     tools {
@@ -8,15 +8,15 @@ sourceSets {
 }
  
 dependencies {
-    compile project(':hollow')
-    compile 'org.apache.velocity:velocity:1.7'
-    compile 'commons-codec:commons-codec:1.11'
-    compile 'commons-io:commons-io:2.6'
-    compile 'com.google.code.gson:gson:2.8.0'
+    api project(':hollow')
+    api 'org.apache.velocity:velocity:1.7'
+    api 'commons-codec:commons-codec:1.11'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'com.google.code.gson:gson:2.8.0'
 
     compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
-    testCompile 'junit:junit:4.11'
+    testImplementation 'junit:junit:4.11'
 
     toolsCompile configurations.compile
     toolsRuntime configurations.runtime
