@@ -1,5 +1,3 @@
-package hollow;
-
 /*
  *  Copyright 2016-2019 Netflix, Inc.
  *
@@ -16,6 +14,7 @@ package hollow;
  *     limitations under the License.
  *
  */
+package hollow;
 
 import com.netflix.hollow.core.memory.HollowUnsafeHandle;
 import com.netflix.hollow.core.memory.pool.ArraySegmentRecycler;
