@@ -1,9 +1,9 @@
 apply plugin: 'java-library'
+apply plugin: 'nebula.facet'
 
-sourceSets {
+facets {
     tools {
-        compileClasspath += main.output
-        runtimeClasspath += main.output
+        parentSourceSet = 'test'
     }
 }
  
@@ -14,11 +14,4 @@ dependencies {
     compileOnly 'org.eclipse.jetty:jetty-server:9.4.3.v20170317'
 
     testImplementation 'junit:junit:4.11'
-
-    toolsCompile configurations.compile
-    toolsRuntime configurations.runtime
-}
-
-configurations {
-    toolsCompile.extendsFrom compile
 }
