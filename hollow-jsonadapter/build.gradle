@@ -1,12 +1,12 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
  
 dependencies {
-    compile project(':hollow')
+    api project(':hollow')
 
-    compile 'com.fasterxml.jackson.core:jackson-core:2.4.3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.3'
-    compile 'commons-io:commons-io:2.6'
-    compile 'commons-lang:commons-lang:latest.release'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.4.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.4.3'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'commons-lang:commons-lang:latest.release'
 
-    testCompile 'junit:junit:4.11'
+    testImplementation 'junit:junit:4.11'
 }
