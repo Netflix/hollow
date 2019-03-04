@@ -136,7 +136,7 @@ public class HollowHistoryKeyIndex {
     }
 
     private void updateTypeIndexes(final HollowReadStateEngine latestStateEngine, final boolean isDelta) {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "update-type-indexes");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             executor.execute(() -> {
@@ -164,7 +164,7 @@ public class HollowHistoryKeyIndex {
         // to temporary files or allocating memory
         // @@@ for small states it's more efficient to sequentially write to
         // and read from a byte array but it is tricky to estimate the size
-        SimultaneousExecutor executor = new SimultaneousExecutor(1);
+        SimultaneousExecutor executor = new SimultaneousExecutor(1, HollowHistoryKeyIndex.class, "round-trip");
         Exception pipeException = null;
         // Ensure read-side is closed after completion of read
         try (PipedInputStream in = new PipedInputStream(1 << 15)) {
@@ -210,7 +210,7 @@ public class HollowHistoryKeyIndex {
     }
 
     private void rehashKeys() {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "rehash-keys");
 
         for(final Map.Entry<String, HollowHistoryTypeKeyIndex> entry : typeKeyIndexes.entrySet()) {
             executor.execute(() -> entry.getValue().hashRecordKeys());

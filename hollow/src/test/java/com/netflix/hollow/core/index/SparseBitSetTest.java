@@ -61,7 +61,7 @@ public class SparseBitSetTest {
         for (int j = 0; j < 10; j++) {
             int maxValue = 500000;
             sparseBitSet = new HollowSparseIntegerSet.SparseBitSet(maxValue);
-            SimultaneousExecutor executor = new SimultaneousExecutor();
+            SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "test");
             int parallelism = executor.getMaximumPoolSize();
             int taskSize = maxValue / parallelism;
             for (int i = 0; i < parallelism; i++) {

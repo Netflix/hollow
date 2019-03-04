@@ -119,12 +119,7 @@ public class HollowIncrementalProducer {
     }
 
     public void addOrModifyInParallel(Collection<Object> objList) {
-        executeInParallel(objList, new Callback() {
-            @Override
-            public void call(Object obj) {
-                addOrModify(obj);
-            }
-        });
+        executeInParallel(objList, "add-or-modify", this::addOrModify);
     }
 
     public void delete(Object obj) {
@@ -139,12 +134,7 @@ public class HollowIncrementalProducer {
     }
 
     public void deleteInParallel(Collection<Object> objList) {
-        executeInParallel(objList, new Callback() {
-            @Override
-            public void call(Object obj) {
-                delete(obj);
-            }
-        });
+        executeInParallel(objList, "delete", this::delete);
     }
 
     public void discard(Object obj) {
@@ -159,12 +149,7 @@ public class HollowIncrementalProducer {
     }
 
     public void discardInParallel(Collection<Object> objList) {
-        executeInParallel(objList, new Callback() {
-            @Override
-            public void call(Object obj) {
-                discard(obj);
-            }
-        });
+        executeInParallel(objList, "discard", this::discard);
     }
 
     public void delete(RecordPrimaryKey key) {
@@ -321,14 +306,10 @@ public class HollowIncrementalProducer {
      * @param objList
      * @param callback
      */
-    private void executeInParallel(Collection<Object> objList, final Callback callback) {
-        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu);
+    private void executeInParallel(Collection<Object> objList, String description, final Callback callback) {
+        SimultaneousExecutor executor = new SimultaneousExecutor(threadsPerCpu, getClass(), description);
         for(final Object obj : objList) {
-            executor.execute(new Runnable() {
-                public void run() {
-                    callback.call(obj);
-                }
-            });
+            executor.execute(() -> callback.call(obj));
         }
 
         try {

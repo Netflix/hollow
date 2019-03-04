@@ -54,7 +54,7 @@ public class HollowStateEngineCreator {
             typeState.createIdentityOrdinalMap();
         }
 
-        SimultaneousExecutor executor = new SimultaneousExecutor(8);
+        SimultaneousExecutor executor = new SimultaneousExecutor(8, getClass(), "copy-all");
 
         for (final NFTypeSerializer<?> serializer : stateEngine.getOrderedSerializers()) {
             executor.execute(new Runnable() {

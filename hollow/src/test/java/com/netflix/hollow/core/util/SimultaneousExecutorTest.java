@@ -19,37 +19,43 @@ package com.netflix.hollow.core.util;
 import static org.junit.Assert.fail;
 
 import java.util.concurrent.Callable;
+
+import org.junit.Before;
 import org.junit.Test;
 
+// TODO(timt): tag as MEDIUM test
 public class SimultaneousExecutorTest {
+
+    private SimultaneousExecutor subject;
+
+    @Before
+    public void before() {
+        subject = new SimultaneousExecutor(getClass(), "test");
+    }
 
     @Test
     public void failsWhenAnyRunnableThrowsException() throws Exception {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
-
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
-        executor.execute(new Job(true));
-        executor.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(true));
+        subject.execute(new Job(false));
 
         try {
-            executor.awaitSuccessfulCompletion();
+            subject.awaitSuccessfulCompletion();
             fail("Should have thrown Exception");
         } catch(Exception expected) { }
     }
 
     @Test
     public void failsWhenAnyCallableThrowsException() throws Exception {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
-
         StatusEnsuringCallable firstTask = new StatusEnsuringCallable(false);
         StatusEnsuringCallable secondTask = new StatusEnsuringCallable(false);
 
-        executor.submit(firstTask);
-        executor.submit(secondTask);
+        subject.submit(firstTask);
+        subject.submit(secondTask);
 
         try {
-            executor.awaitSuccessfulCompletion();
+            subject.awaitSuccessfulCompletion();
             fail("Should fail");
         } catch (final Exception e) {
         }
@@ -57,21 +63,19 @@ public class SimultaneousExecutorTest {
     
     @Test
     public void canBeReused() throws Exception {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
-        
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
 
-        executor.awaitSuccessfulCompletionOfCurrentTasks();
+        subject.awaitSuccessfulCompletionOfCurrentTasks();
         
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
-        executor.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
+        subject.execute(new Job(false));
 
-        executor.awaitSuccessfulCompletion();
+        subject.awaitSuccessfulCompletion();
     }
 
     private class Job implements Runnable {

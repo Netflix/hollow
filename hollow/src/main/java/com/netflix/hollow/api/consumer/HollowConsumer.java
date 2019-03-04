@@ -16,6 +16,9 @@
  */
 package com.netflix.hollow.api.consumer;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+
 import com.netflix.hollow.api.client.FailedTransitionTracker;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClientUpdater;
@@ -39,13 +42,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 /**
  * A HollowConsumer is the top-level class used by consumers of Hollow data to initialize and keep up-to-date a local in-memory
@@ -982,12 +983,7 @@ public class HollowConsumer {
 
 
             if (refreshExecutor == null)
-                refreshExecutor = Executors.newSingleThreadExecutor(r -> {
-                    Thread t = new Thread(r);
-                    t.setName("hollow-consumer-refresh");
-                    t.setDaemon(true);
-                    return t;
-                });
+                refreshExecutor = newSingleThreadExecutor(r -> daemonThread(r, getClass(), "refresh"));
         }
 
         public HollowConsumer build() {

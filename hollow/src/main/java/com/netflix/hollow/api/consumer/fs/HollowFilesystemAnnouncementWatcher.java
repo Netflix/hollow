@@ -16,11 +16,13 @@
  */
 package com.netflix.hollow.api.consumer.fs;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
 import static java.nio.file.Files.getLastModifiedTime;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemAnnouncer;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -57,11 +59,8 @@ public class HollowFilesystemAnnouncementWatcher implements HollowConsumer.Annou
      */
     @SuppressWarnings("unused")
     public HollowFilesystemAnnouncementWatcher(Path publishPath) {
-        this(publishPath, newScheduledThreadPool(1, r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            return t;
-        }));
+        this(publishPath, newScheduledThreadPool(1,
+                r -> daemonThread(r, HollowFilesystemAnnouncementWatcher.class, "watch; path=" + publishPath)));
         ownedExecutor = true;
     }
 

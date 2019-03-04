@@ -16,6 +16,8 @@
  */
 package com.netflix.hollow.api.sampling;
 
+import static com.netflix.hollow.core.util.Threads.daemonThread;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +49,8 @@ public class TimeSliceSamplingDirector extends HollowSamplingDirector {
     public void startSampling() {
         if(!isInPlay) {
             isInPlay = true;
-            Thread t = new Thread(new SampleToggler());
-            t.setDaemon(true);
-            t.start();
+            daemonThread(new SampleToggler(), getClass(), "toggler")
+                    .start();
         }
     }
 

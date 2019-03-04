@@ -119,7 +119,7 @@ public class HollowStateDeltaPatcher {
     }
     
     private void copyUnchangedDataToIntermediateState() {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "copy-unchanged");
         for(final HollowSchema schema : schemas) {
             executor.execute(new Runnable() {
                 public void run() {
@@ -227,7 +227,7 @@ public class HollowStateDeltaPatcher {
     }
 
     private Map<String, BitSet> discoverChangedOrdinalsBetweenStates() {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "discover-changed");
         Map<String, BitSet> excludeOrdinalsFromCopy = new HashMap<String, BitSet>();
         
         for(HollowSchema schema : schemas) {

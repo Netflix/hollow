@@ -229,7 +229,7 @@ public class HollowHistory {
     }
 
     private void remapHistoricalStateOrdinals(final DiffEqualityMappingOrdinalRemapper remapper, final HollowHistoricalStateDataAccess[] remappedDataAccesses, final HollowHistoricalStateKeyOrdinalMapping[] remappedKeyOrdinalMappings) {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "remap");
         final int numThreads = executor.getCorePoolSize();
 
         for(int i=0;i<executor.getCorePoolSize();i++) {
