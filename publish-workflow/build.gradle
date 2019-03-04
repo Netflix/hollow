@@ -27,4 +27,3 @@ configurations {
 jar {
   from 'src/main/java'
 }
-
