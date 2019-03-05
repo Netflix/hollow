@@ -2,18 +2,18 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ListOfCertificationHollow;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 
 public class CertificationSystemCircuitBreaker extends HollowPerCountryCompleteVideoScoringCircuitBreaker {
 
     private final int maxMaturityRating;
 
-    public CertificationSystemCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
-        this(ctx, versionId, Integer.MAX_VALUE);
+    public CertificationSystemCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
+        this(ctx, vip, versionId, Integer.MAX_VALUE);
     }
 
-    public CertificationSystemCircuitBreaker(PublishWorkflowContext ctx, long versionId, int maxMaturityRating) {
-        super(ctx, versionId);
+    public CertificationSystemCircuitBreaker(TransformerContext ctx, String vip, long versionId, int maxMaturityRating) {
+        super(ctx, vip, versionId);
         this.maxMaturityRating = maxMaturityRating;
     }
 

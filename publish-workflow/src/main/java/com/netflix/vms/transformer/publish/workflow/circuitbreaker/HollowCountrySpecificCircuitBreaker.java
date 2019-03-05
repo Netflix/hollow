@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.type.ISOCountry;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,8 +10,8 @@ public abstract class HollowCountrySpecificCircuitBreaker extends HollowCircuitB
 
     private Set<String> comparedCountries;
 
-    public HollowCountrySpecificCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
-        super(ctx, versionId);
+    public HollowCountrySpecificCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
+        super(ctx, vip, versionId);
         this.comparedCountries = new HashSet<String>();
     }
     

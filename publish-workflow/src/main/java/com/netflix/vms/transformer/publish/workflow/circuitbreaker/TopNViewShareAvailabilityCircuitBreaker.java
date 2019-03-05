@@ -2,13 +2,13 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import java.util.List;
 
 public class TopNViewShareAvailabilityCircuitBreaker extends HollowPerCountryTopNVideoScoringCircuitBreaker {
 
-	public TopNViewShareAvailabilityCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
-		super(ctx, versionId);
+	public TopNViewShareAvailabilityCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
+		super(ctx, vip, versionId);
 	}
 
 	/**

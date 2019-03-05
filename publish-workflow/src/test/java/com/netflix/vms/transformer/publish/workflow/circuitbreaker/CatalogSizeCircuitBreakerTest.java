@@ -3,8 +3,8 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.logging.TaggingLogger;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class CatalogSizeCircuitBreakerTest {
         InputStream is = new LZ4BlockInputStream(new FileInputStream(localFile));
         reader.readSnapshot(is);
 
-        PublishWorkflowContext ctx = Mockito.mock(PublishWorkflowContext.class);
+        TransformerContext ctx = Mockito.mock(TransformerContext.class);
         OctoberSkyData octoberSkyData = Mockito.mock(OctoberSkyData.class);
         TaggingLogger logger = Mockito.mock(TaggingLogger.class);
 
@@ -48,7 +48,7 @@ public class CatalogSizeCircuitBreakerTest {
         Mockito.when(octoberSkyData.getCatalogLanguages(Mockito.eq("BE"))).thenReturn(languages);
 
 
-        CatalogSizeCircuitBreaker catalogSizeCircuitBreaker = new CatalogSizeCircuitBreaker(ctx, 1L, "catalogSizeTest");
+        CatalogSizeCircuitBreaker catalogSizeCircuitBreaker = new CatalogSizeCircuitBreaker(ctx, "vip", 1L, "catalogSizeTest");
         catalogSizeCircuitBreaker.runCircuitBreaker(readEngine);
     }
 }

@@ -6,13 +6,13 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import java.util.BitSet;
 
 public abstract class HollowPerCountryCompleteVideoScoringCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
 
-    public HollowPerCountryCompleteVideoScoringCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
-        super(ctx, versionId);
+    public HollowPerCountryCompleteVideoScoringCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
+        super(ctx, vip, versionId);
     }
 
     @Override

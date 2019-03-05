@@ -6,8 +6,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.CircuitBre
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,14 +18,16 @@ public abstract class HollowCircuitBreaker {
 
     public static final CircuitBreakerResults PASSED = new CircuitBreakerResults(true, "");
 
-    protected final PublishWorkflowContext ctx;
+    protected final TransformerContext ctx;
+    protected final String vip;
     protected final long versionId;
     private final Map<String, Double> successCountsForCycle;
 
-    public HollowCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
+    public HollowCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
         this.ctx = ctx;
-        this.successCountsForCycle = new HashMap<String, Double>();
+        this.vip = vip;
         this.versionId = versionId;
+        this.successCountsForCycle = new HashMap<String, Double>();
     }
 
     public abstract String getRuleName();
@@ -99,7 +101,7 @@ public abstract class HollowCircuitBreaker {
 
     protected boolean metricExists(String metricName) {
         try {
-            getCassandraHelper().getVipKeyValuePair(ctx.getVip(), metricName);
+            getCassandraHelper().getVipKeyValuePair(vip, metricName);
             return true;
         } catch(Exception e) {
             return false;
@@ -109,16 +111,16 @@ public abstract class HollowCircuitBreaker {
     public void saveSuccessSizesForCycle(long cycleVersion) {
         for(String key: successCountsForCycle.keySet()){
             try {
-                getCassandraHelper().addVipKeyValuePair(ctx.getVip(), key, String.valueOf(successCountsForCycle.get(key)));
+                getCassandraHelper().addVipKeyValuePair(vip, key, String.valueOf(successCountsForCycle.get(key)));
             } catch (ConnectionException e) {
                 e.printStackTrace();
-                ctx.getLogger().warn(CircuitBreaker, "Hollow validation infrastructure error:  Could not write data to C*: vip={} key={}", ctx.getVip(), key);
+                ctx.getLogger().warn(CircuitBreaker, "Hollow validation infrastructure error:  Could not write data to C*: vip={} key={}", vip, key);
             }
         }
     }
 
     protected double getBaseLine(String objectName) throws NumberFormatException, ConnectionException {
-        return Double.parseDouble(getCassandraHelper().getVipKeyValuePair(ctx.getVip(), objectName));
+        return Double.parseDouble(getCassandraHelper().getVipKeyValuePair(vip, objectName));
     }
 
     private boolean failedBecauseDataNotYetPopulated(Exception e) {

@@ -13,7 +13,9 @@ public abstract class CircuitBreakerJob extends PublishWorkflowPublicationJob {
     protected final File nostreamsDeltaFile;
     protected final File nostreamsReverseDeltaFile;
 
-    public CircuitBreakerJob(PublishWorkflowContext ctx, String vip, long cycleVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
+    public CircuitBreakerJob(PublishWorkflowContext ctx, String vip, long cycleVersion,
+            File snapshotFile, File deltaFile, File reverseDeltaFile,
+            File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
         super(ctx, "circuit-breaker", cycleVersion);
         this.cycleVersion = cycleVersion;
         this.snapshotFile = snapshotFile;

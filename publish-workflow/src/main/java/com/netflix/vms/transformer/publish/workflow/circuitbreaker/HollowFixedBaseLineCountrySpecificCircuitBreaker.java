@@ -1,12 +1,12 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 
 public abstract class HollowFixedBaseLineCountrySpecificCircuitBreaker extends HollowCountrySpecificCircuitBreaker {
 
-	public HollowFixedBaseLineCountrySpecificCircuitBreaker(PublishWorkflowContext ctx, long versionId) {
-		super(ctx, versionId);
+	public HollowFixedBaseLineCountrySpecificCircuitBreaker(TransformerContext ctx, String vip, long versionId) {
+		super(ctx, vip, versionId);
 	}
 
 	@Override

@@ -3,15 +3,15 @@ package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.common.TransformerContext;
 import java.util.BitSet;
 
 public class TypeCardinalityCircuitBreaker extends HollowCircuitBreaker {
 
     private final String typeName;
 
-    public TypeCardinalityCircuitBreaker(PublishWorkflowContext ctx, long versionId, String typeName) {
-        super(ctx, versionId);
+    public TypeCardinalityCircuitBreaker(TransformerContext ctx, String vip, long versionId, String typeName) {
+        super(ctx, vip, versionId);
         this.typeName = typeName;
     }
 

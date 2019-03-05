@@ -6,6 +6,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.servo.monitor.DynamicCounter;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CatalogSizeCircuitBreaker;
@@ -34,7 +35,10 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
 
     private final boolean circuitBreakersDisabled;
 
-    public HollowBlobCircuitBreakerJob(PublishWorkflowContext ctx, long cycleVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile, HollowBlobDataProvider hollowBlobDataProvider) {
+    public HollowBlobCircuitBreakerJob(PublishWorkflowContext ctx, long cycleVersion,
+            File snapshotFile, File deltaFile, File reverseDeltaFile,
+            File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile,
+            HollowBlobDataProvider hollowBlobDataProvider) {
         super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
 
@@ -43,25 +47,27 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
     }
     
-	public static HollowCircuitBreaker[] createCircuitBreakerRules(PublishWorkflowContext ctx, long cycleVersion, long snapshotFileLength) {
-		return new HollowCircuitBreaker[] {
-                new DuplicateDetectionCircuitBreaker(ctx, cycleVersion),
-                new CertificationSystemCircuitBreaker(ctx, cycleVersion),
-                new CertificationSystemCircuitBreaker(ctx, cycleVersion, 100),
-                new CertificationSystemCircuitBreaker(ctx, cycleVersion, 75),
-                new CertificationSystemCircuitBreaker(ctx, cycleVersion, 50),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "NamedCollectionHolder"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "CompleteVideo"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "PackageData"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "StreamData"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "Artwork"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "OriginServer"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "DrmKey"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "WmDrmKey"),
-                new TypeCardinalityCircuitBreaker(ctx, cycleVersion, "GlobalPerson"),
-                new SnapshotSizeCircuitBreaker(ctx, cycleVersion, snapshotFileLength),
-                new TopNViewShareAvailabilityCircuitBreaker(ctx, cycleVersion),
-                new CatalogSizeCircuitBreaker(ctx, cycleVersion, "CatalogSize"),
+	public static HollowCircuitBreaker[] createCircuitBreakerRules(PublishWorkflowContext pctx, long cycleVersion, long snapshotFileLength) {
+        TransformerContext ctx = pctx.getTransformerContext();
+        String vip = pctx.getVip();
+        return new HollowCircuitBreaker[] {
+                new DuplicateDetectionCircuitBreaker(ctx, vip, cycleVersion),
+                new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion),
+                new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion, 100),
+                new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion, 75),
+                new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion, 50),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "NamedCollectionHolder"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "CompleteVideo"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "PackageData"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "StreamData"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "Artwork"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "OriginServer"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "DrmKey"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "WmDrmKey"),
+                new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "GlobalPerson"),
+                new SnapshotSizeCircuitBreaker(ctx, vip, cycleVersion, snapshotFileLength),
+                new TopNViewShareAvailabilityCircuitBreaker(ctx, vip, cycleVersion),
+                new CatalogSizeCircuitBreaker(ctx, vip, cycleVersion, "CatalogSize"),
         };
 	}
 

@@ -4,6 +4,7 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.CycleMonkey;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
@@ -16,6 +17,8 @@ import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
 public interface PublishWorkflowContext {
+
+    TransformerContext getTransformerContext();
 
     PublishWorkflowContext withCurrentLoggerAndConfig();
 

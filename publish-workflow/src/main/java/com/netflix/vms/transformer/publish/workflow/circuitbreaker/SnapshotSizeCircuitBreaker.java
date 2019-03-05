@@ -1,15 +1,15 @@
 package com.netflix.vms.transformer.publish.workflow.circuitbreaker;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 
 public class SnapshotSizeCircuitBreaker extends HollowCircuitBreaker {
 
     private final long snapshotSize;
 
-    public SnapshotSizeCircuitBreaker(PublishWorkflowContext ctx, long versionId, long snapshotSize) {
-        super(ctx, versionId);
+    public SnapshotSizeCircuitBreaker(TransformerContext ctx, String vip, long versionId, long snapshotSize) {
+        super(ctx, vip, versionId);
         this.snapshotSize = snapshotSize;
     }
 

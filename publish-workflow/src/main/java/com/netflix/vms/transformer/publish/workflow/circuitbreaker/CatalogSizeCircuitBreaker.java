@@ -13,8 +13,8 @@ import com.netflix.vms.generated.notemplate.MulticatalogCountryLocaleDataHollow;
 import com.netflix.vms.generated.notemplate.NFLocaleHollow;
 import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +30,8 @@ public class CatalogSizeCircuitBreaker extends HollowCircuitBreaker {
 
     private final String ruleName;
 
-    public CatalogSizeCircuitBreaker(PublishWorkflowContext ctx, long versionId, String ruleName) {
-        super(ctx, versionId);
+    public CatalogSizeCircuitBreaker(TransformerContext ctx, String vip, long versionId, String ruleName) {
+        super(ctx, vip, versionId);
         this.ruleName = ruleName;
     }
 

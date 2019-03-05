@@ -1,8 +1,11 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class HollowBlobCircuitBreakerJobTest {
 
@@ -12,7 +15,13 @@ public class HollowBlobCircuitBreakerJobTest {
 	 */
 	@Test
 	public void canRetrieveCircuitBreakerRulesWithNullParameters() {
-		HollowCircuitBreaker[] circuitBreakerRules = HollowBlobCircuitBreakerJob.createCircuitBreakerRules(null, -1L, -1L);
+		TransformerContext ctx = Mockito.mock(TransformerContext.class);
+		PublishWorkflowContext pctx = Mockito.mock(PublishWorkflowContext.class);
+
+		Mockito.when(pctx.getTransformerContext()).thenReturn(ctx);
+		Mockito.when(pctx.getVip()).thenReturn("vip");
+
+		HollowCircuitBreaker[] circuitBreakerRules = HollowBlobCircuitBreakerJob.createCircuitBreakerRules(pctx, -1L, -1L);
 		
 		Assert.assertTrue(circuitBreakerRules.length > 0);
 	}

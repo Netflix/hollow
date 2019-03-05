@@ -38,11 +38,22 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final String vip;
     private final long nowMillis;
 
-    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, String vip) {
-        this(ctx, vipAnnouncer, uploadStatus, new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, vip, new CassandraBasedPoisonedStateMarker(ctx, vip));
+    public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer,
+            Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore,
+            Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer, String vip) {
+        this(ctx, vipAnnouncer,
+                uploadStatus, fileStore,
+                new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer, vip,
+                new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
-    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer, Supplier<ServerUploadStatus> uploadStatus, PublishWorkflowStatusIndicator statusIndicator, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, String vip, PoisonedStateMarker poisonStateMarker) {
+    private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer,
+            Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore,
+            PublishWorkflowStatusIndicator statusIndicator, Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer, String vip,
+            PoisonedStateMarker poisonStateMarker) {
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
@@ -61,7 +72,16 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
 
     @Override
     public TransformerPublishWorkflowContext withCurrentLoggerAndConfig() {
-        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer, uploadStatus, statusIndicator, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, vip, poisonStateMarker);
+        return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer,
+                uploadStatus, fileStore,
+                statusIndicator, publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer, vip,
+                poisonStateMarker);
+    }
+
+    @Override
+    public TransformerContext getTransformerContext() {
+        return transformerCtx;
     }
 
     @Override
