@@ -2212,7 +2212,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -2835,7 +2835,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -5584,7 +5584,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -6207,7 +6207,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -8956,7 +8956,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -9579,7 +9579,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -12477,7 +12477,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -13100,7 +13100,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -15849,7 +15849,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -16472,7 +16472,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -19253,7 +19253,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -19893,7 +19893,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -22698,7 +22698,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -23338,7 +23338,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -26143,7 +26143,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -26783,7 +26783,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -29588,7 +29588,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.36",
+            "locked": "4.7.38",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -30228,7 +30228,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.1.0",
+            "locked": "65.2.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
