@@ -434,7 +434,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -443,19 +443,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -967,11 +967,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -1717,7 +1717,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -1726,19 +1726,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -2250,11 +2250,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -3000,7 +3000,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -3009,19 +3009,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -3533,11 +3533,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4432,7 +4432,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -4441,19 +4441,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -4965,11 +4965,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -5715,7 +5715,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -5724,19 +5724,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -6248,11 +6248,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6998,7 +6998,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -7007,19 +7007,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -7531,11 +7531,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8281,7 +8281,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -8290,19 +8290,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -8814,11 +8814,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -9564,7 +9564,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -9573,19 +9573,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -10097,11 +10097,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -10847,7 +10847,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -10856,19 +10856,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.4.0",
+            "locked": "4.5.0",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -11380,11 +11380,11 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.4.2",
+            "locked": "4.5.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
