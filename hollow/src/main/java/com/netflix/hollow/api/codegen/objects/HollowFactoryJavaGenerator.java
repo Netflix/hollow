@@ -26,7 +26,13 @@ import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
-import com.netflix.hollow.api.objects.delegate.*;
+
+import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowMapCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowSetCachedDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
