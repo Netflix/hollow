@@ -16,10 +16,6 @@
  */
 package com.netflix.hollow.api.codegen.objects;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateCachedClassname;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowFactoryClassname;
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
-
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
@@ -36,6 +32,8 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.Arrays;
+
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.*;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
@@ -77,7 +75,7 @@ public class HollowFactoryJavaGenerator extends HollowConsumerJavaFileGenerator 
 
         builder.append("    @Override\n");
         builder.append("    public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {\n");
-        builder.append("        return (T)new " + objectClassName + "(((" + typeAPIClassname(schema.getName()) + ")typeAPI).getDelegateLookupImpl(), ordinal);\n");
+        builder.append("        return (T)new " + objectClassName + "((" + delegateInterfaceName(schema) + ") typeAPI, ordinal);\n");
         builder.append("    }\n\n");
 
         builder.append("    @Override\n");

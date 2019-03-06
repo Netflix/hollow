@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.type;
 
-import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.type.delegate.LongDelegate;
 
@@ -32,10 +31,6 @@ public class HLong extends HollowObject {
 
     public Long getValueBoxed() {
         return delegate().getValueBoxed(ordinal);
-    }
-
-    public HollowAPI api() {
-        return typeApi().getAPI();
     }
 
     public LongTypeAPI typeApi() {

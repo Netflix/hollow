@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
+import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
@@ -37,7 +38,7 @@ public class GenericHollowSet extends HollowSet<HollowRecord> {
     }
     
     public GenericHollowSet(HollowSetTypeDataAccess dataAccess, int ordinal) {
-        this(new HollowSetLookupDelegate<HollowRecord>(dataAccess), ordinal);
+        this(new HollowSetTypeAPI<>(dataAccess), ordinal);
     }
 
     public GenericHollowSet(HollowSetDelegate<HollowRecord> delegate, int ordinal) {

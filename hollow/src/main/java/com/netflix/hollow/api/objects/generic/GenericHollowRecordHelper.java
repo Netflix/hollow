@@ -16,11 +16,11 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
+import com.netflix.hollow.api.custom.HollowListTypeAPI;
+import com.netflix.hollow.api.custom.HollowMapTypeAPI;
+import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
+import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 import com.netflix.hollow.api.objects.HollowRecord;
-import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
-import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
@@ -47,24 +47,24 @@ public class GenericHollowRecordHelper {
 
         if(typeState != null) {
             if(typeState instanceof HollowObjectTypeDataAccess)
-                return new GenericHollowObject(new HollowObjectGenericDelegate((HollowObjectTypeDataAccess)typeState), ordinal);
+                return new GenericHollowObject(new HollowObjectTypeAPI((HollowObjectTypeDataAccess)typeState), ordinal);
             if(typeState instanceof HollowListTypeDataAccess)
-                return new GenericHollowList(new HollowListLookupDelegate<HollowRecord>((HollowListTypeDataAccess)typeState), ordinal);
+                return new GenericHollowList(new HollowListTypeAPI<>((HollowListTypeDataAccess)typeState), ordinal);
             if(typeState instanceof HollowSetTypeDataAccess)
-                return new GenericHollowSet(new HollowSetLookupDelegate<HollowRecord>((HollowSetTypeDataAccess)typeState), ordinal);
+                return new GenericHollowSet(new HollowSetTypeAPI<>((HollowSetTypeDataAccess)typeState), ordinal);
             if(typeState instanceof HollowMapTypeDataAccess)
-                return new GenericHollowMap(new HollowMapLookupDelegate<HollowRecord, HollowRecord>((HollowMapTypeDataAccess)typeState), ordinal);
+                return new GenericHollowMap(new HollowMapTypeAPI<>((HollowMapTypeDataAccess)typeState), ordinal);
         } else {
             HollowSchema schema = dataAccess.getMissingDataHandler().handleSchema(typeName);
 
             if(schema instanceof HollowObjectSchema)
-                return new GenericHollowObject(new HollowObjectGenericDelegate(new HollowObjectMissingDataAccess(dataAccess, typeName)), ordinal);
+                return new GenericHollowObject(new HollowObjectTypeAPI(new HollowObjectMissingDataAccess(dataAccess, typeName)), ordinal);
             if(schema instanceof HollowListSchema)
-                return new GenericHollowList(new HollowListLookupDelegate<HollowRecord>(new HollowListMissingDataAccess(dataAccess, typeName)), ordinal);
+                return new GenericHollowList(new HollowListTypeAPI<>(new HollowListMissingDataAccess(dataAccess, typeName)), ordinal);
             if(schema instanceof HollowSetSchema)
-                return new GenericHollowSet(new HollowSetLookupDelegate<HollowRecord>(new HollowSetMissingDataAccess(dataAccess, typeName)), ordinal);
+                return new GenericHollowSet(new HollowSetTypeAPI<>(new HollowSetMissingDataAccess(dataAccess, typeName)), ordinal);
             if(schema instanceof HollowMapSchema)
-                return new GenericHollowMap(new HollowMapLookupDelegate<HollowRecord, HollowRecord>(new HollowMapMissingDataAccess(dataAccess, typeName)), ordinal);
+                return new GenericHollowMap(new HollowMapTypeAPI<>(new HollowMapMissingDataAccess(dataAccess, typeName)), ordinal);
         }
 
         throw new UnsupportedOperationException("I don't know how to instantiate a generic object given a " + typeState.getClass().getSimpleName());

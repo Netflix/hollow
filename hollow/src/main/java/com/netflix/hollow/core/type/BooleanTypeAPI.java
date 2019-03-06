@@ -16,7 +16,6 @@
  */
 package com.netflix.hollow.core.type;
 
-import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.type.delegate.BooleanDelegateLookupImpl;
@@ -25,8 +24,8 @@ public class BooleanTypeAPI extends HollowObjectTypeAPI {
 
     private final BooleanDelegateLookupImpl delegateLookupImpl;
 
-    public BooleanTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess, new String[] {
+    public BooleanTypeAPI(HollowObjectTypeDataAccess typeDataAccess) {
+        super(typeDataAccess, new String[] {
             "value"
         });
         this.delegateLookupImpl = new BooleanDelegateLookupImpl(this);

@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.custom;
 
+import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
 import com.netflix.hollow.api.sampling.DisabledSamplingDirector;
 import com.netflix.hollow.api.sampling.HollowObjectSampler;
 import com.netflix.hollow.api.sampling.HollowSampler;
@@ -35,15 +36,19 @@ import java.util.Arrays;
  * 
  * @see HollowTypeAPI
  */
-public abstract class HollowObjectTypeAPI extends HollowTypeAPI {
+public class HollowObjectTypeAPI extends HollowTypeAPI implements HollowObjectDelegate {
 
     protected final String fieldNames[];
     protected final int fieldIndex[];
 
     protected final HollowObjectSampler boxedFieldAccessSampler;
 
-    protected HollowObjectTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess, String fieldNames[]) {
-        super(api, typeDataAccess);
+    public HollowObjectTypeAPI(HollowObjectTypeDataAccess typeDataAccess) {
+        this(typeDataAccess, typeDataAccess.getSchema().getFieldNames());
+    }
+
+    public HollowObjectTypeAPI(HollowObjectTypeDataAccess typeDataAccess, String fieldNames[]) {
+        super(typeDataAccess);
         this.fieldNames = fieldNames;
         this.fieldIndex = new int[fieldNames.length];
 
@@ -67,6 +72,11 @@ public abstract class HollowObjectTypeAPI extends HollowTypeAPI {
     @Override
     public HollowObjectTypeDataAccess getTypeDataAccess() {
         return (HollowObjectTypeDataAccess) typeDataAccess;
+    }
+
+    @Override
+    public HollowObjectTypeAPI getTypeAPI() {
+        return null;
     }
 
     public HollowDataAccess getDataAccess() {
@@ -96,7 +106,129 @@ public abstract class HollowObjectTypeAPI extends HollowTypeAPI {
     }
 
     protected MissingDataHandler missingDataHandler() {
-        return api.getDataAccess().getMissingDataHandler();
+        return getDataAccess().getMissingDataHandler();
+    }
+
+    @Override
+    public boolean isNull(int ordinal, String fieldName) {
+        try {
+            HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+            int fieldIndex = getSchema().getPosition(fieldName);
+
+            if(fieldIndex == -1)
+                return missingDataHandler().handleIsNull(getSchema().getName(), ordinal, fieldName);
+
+            return dataAccess.isNull(ordinal, fieldIndex);
+        } catch(Exception ex) {
+            throw new RuntimeException(String.format("Unable to handle ordinal=%s, fieldName=%s", ordinal, fieldName), ex);
+        }
+    }
+
+    @Override
+    public boolean getBoolean(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        Boolean bool = (fieldIndex != -1) ?
+                dataAccess.readBoolean(ordinal, fieldIndex)
+                : missingDataHandler().handleBoolean(getSchema().getName(), ordinal, fieldName);
+
+        return bool == null ? false : bool.booleanValue();
+    }
+
+    @Override
+    public int getOrdinal(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleReferencedOrdinal(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readOrdinal(ordinal, fieldIndex);
+    }
+
+    @Override
+    public int getInt(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleInt(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readInt(ordinal, fieldIndex);
+    }
+
+    @Override
+    public long getLong(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleLong(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readLong(ordinal, fieldIndex);
+    }
+
+    @Override
+    public float getFloat(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleFloat(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readFloat(ordinal, fieldIndex);
+    }
+
+    @Override
+    public double getDouble(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleDouble(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readDouble(ordinal, fieldIndex);
+    }
+
+    @Override
+    public String getString(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1)
+            return missingDataHandler().handleString(getSchema().getName(), ordinal, fieldName);
+
+        return dataAccess.readString(ordinal, fieldIndex);
+    }
+
+    @Override
+    public boolean isStringFieldEqual(int ordinal, String fieldName, String testValue) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1) {
+            return missingDataHandler().handleStringEquals(getSchema().getName(), ordinal, fieldName, testValue);
+        }
+
+        return dataAccess.isStringFieldEqual(ordinal, fieldIndex, testValue);
+    }
+
+    @Override
+    public byte[] getBytes(int ordinal, String fieldName) {
+        HollowObjectTypeDataAccess dataAccess = getTypeDataAccess();
+        int fieldIndex = getSchema().getPosition(fieldName);
+
+        if(fieldIndex == -1) {
+            return missingDataHandler().handleBytes(getSchema().getName(), ordinal, fieldName);
+        }
+
+        return dataAccess.readBytes(ordinal, fieldIndex);
+    }
+
+    @Override
+    public HollowObjectSchema getSchema() {
+        return getTypeDataAccess().getSchema();
     }
 
 }

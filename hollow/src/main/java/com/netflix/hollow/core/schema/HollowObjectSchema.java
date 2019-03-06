@@ -25,6 +25,7 @@ import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +116,12 @@ public class HollowObjectSchema extends HollowSchema {
             return -1;
         }
         return index;
+    }
+
+    public String[] getFieldNames() {
+        String[] copyFieldNames = new String[fieldNames.length];
+        System.arraycopy(fieldNames, 0, copyFieldNames, 0, fieldNames.length);
+        return copyFieldNames;
     }
 
     public String getFieldName(int fieldPosition) {

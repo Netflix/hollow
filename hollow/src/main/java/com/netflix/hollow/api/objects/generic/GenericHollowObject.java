@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
+import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowObjectDelegate;
@@ -38,7 +39,7 @@ public class GenericHollowObject extends HollowObject {
     }
     
     public GenericHollowObject(HollowObjectTypeDataAccess dataAccess, int ordinal) {
-        this(new HollowObjectGenericDelegate(dataAccess), ordinal);
+        this(new HollowObjectTypeAPI(dataAccess), ordinal);
     }
     
     public GenericHollowObject(HollowObjectDelegate delegate, int ordinal) {

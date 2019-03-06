@@ -86,9 +86,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("Boolean");
         if(typeDataAccess != null) {
-            booleanTypeAPI = new BooleanTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            booleanTypeAPI = new BooleanTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            booleanTypeAPI = new BooleanTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "Boolean"));
+            booleanTypeAPI = new BooleanTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "Boolean"));
         }
         addTypeAPI(booleanTypeAPI);
         factory = factoryOverrides.get("Boolean");
@@ -105,9 +105,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("Double");
         if(typeDataAccess != null) {
-            doubleTypeAPI = new DoubleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            doubleTypeAPI = new DoubleTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            doubleTypeAPI = new DoubleTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "Double"));
+            doubleTypeAPI = new DoubleTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "Double"));
         }
         addTypeAPI(doubleTypeAPI);
         factory = factoryOverrides.get("Double");
@@ -124,9 +124,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("Float");
         if(typeDataAccess != null) {
-            floatTypeAPI = new FloatTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            floatTypeAPI = new FloatTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            floatTypeAPI = new FloatTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "Float"));
+            floatTypeAPI = new FloatTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "Float"));
         }
         addTypeAPI(floatTypeAPI);
         factory = factoryOverrides.get("Float");
@@ -143,9 +143,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("Integer");
         if(typeDataAccess != null) {
-            integerTypeAPI = new IntegerTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            integerTypeAPI = new IntegerTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            integerTypeAPI = new IntegerTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "Integer"));
+            integerTypeAPI = new IntegerTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "Integer"));
         }
         addTypeAPI(integerTypeAPI);
         factory = factoryOverrides.get("Integer");
@@ -162,9 +162,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("Long");
         if(typeDataAccess != null) {
-            longTypeAPI = new LongTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            longTypeAPI = new LongTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            longTypeAPI = new LongTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "Long"));
+            longTypeAPI = new LongTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "Long"));
         }
         addTypeAPI(longTypeAPI);
         factory = factoryOverrides.get("Long");
@@ -181,9 +181,9 @@ public class PrimitiveTypeTestAPI extends HollowAPI implements  HollowConsumerAP
 
         typeDataAccess = dataAccess.getTypeDataAccess("String");
         if(typeDataAccess != null) {
-            stringTypeAPI = new StringTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+            stringTypeAPI = new StringTypeAPI((HollowObjectTypeDataAccess)typeDataAccess);
         } else {
-            stringTypeAPI = new StringTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "String"));
+            stringTypeAPI = new StringTypeAPI(new HollowObjectMissingDataAccess(dataAccess, "String"));
         }
         addTypeAPI(stringTypeAPI);
         factory = factoryOverrides.get("String");
