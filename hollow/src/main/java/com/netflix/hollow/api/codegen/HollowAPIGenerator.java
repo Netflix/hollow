@@ -466,8 +466,6 @@ public class HollowAPIGenerator {
                         ergonomicShortcuts, dataset, config));
                 generateFile(directory, new HollowObjectDelegateCachedImplGenerator(packageName, objSchema,
                         ergonomicShortcuts, dataset, config));
-//                generateFile(directory, new HollowObjectDelegateLookupImplGenerator(packageName, objSchema,
-//                        ergonomicShortcuts, dataset, config));
 
                 generateFile(directory, new HollowDataAccessorGenerator(packageName, apiClassname, objSchema,
                         dataset, config));
