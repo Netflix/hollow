@@ -1,19 +1,87 @@
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+
 # Jenkins -> Spinnaker
 trigger.properties
 
-build/
-/bin/
-*/bin/
+# Netflix Newt #
+################
+.newt.*.sh
+._Dockerfile.*
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Editor Files #
+################
+*~
+*.swp
+*.swo
+
+# Gradle Files #
+################
+.gradle
+.m2
+
+# Build output directoies
+/target
+**/target
+/build
+classes
+**/build
+/bin
+**/bin
+/test-output
+**/test-output
+dist
+distMaven
+
+# IntelliJ specific files/directories
+out
+.idea
+*.ipr
+*.iws
+*.iml
+atlassian-ide-plugin.xml
+
+# Eclipse specific files/directories
 .classpath
 .project
-.gradle
 .settings
-.idea
-**/*.ipr
-**/*.iws
-**/*.iml
-business-logic/out
-common-interfaces/out
-io/out
-publish-workflow/out
-server/out
+.metadata
+
+# NetBeans specific files/directories
+.nbattrs
+
+**/deps
+.lein-failures
+
+# Clojure REPL
+.nrepl-port
+.lein-repl-history

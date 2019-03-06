@@ -15,6 +15,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoDimensionsDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class EncodingProfileModule extends AbstractTransformModule {
     private final ThreadLocal<Map<String, ProfileTypeDescriptor>> profileTypeMapRef = new ThreadLocal<>();
     private final ThreadLocal<Map<Integer, VideoDimensionsDescriptor>> videoDimensionsMapRef = new ThreadLocal<>();
     private final ThreadLocal<Map<String, Strings>> stringsMapRef = new ThreadLocal<>();
-    
+
     private final AudioChannelsDescriptorCache audioChannelsDescriptorCache = new AudioChannelsDescriptorCache();
 
     private final HollowPrimaryKeyIndex protectionTypeIndex;
@@ -40,10 +41,10 @@ public class EncodingProfileModule extends AbstractTransformModule {
     public void transform() {
         for (StreamProfilesHollow input : api.getAllStreamProfilesHollow()) {
             EncodingProfile output = new EncodingProfile();
-            output.id = (int)input._getId();
-            output.name26AndBelowStr = toCharArray(input._getName26AndBelow());
-            output.name27AndAboveStr = toCharArray(input._getName27AndAbove());
-            output.drmKeyGroup = (int)input._getDrmKeyGroup();
+            output.id = (int) input._getId();
+            output.name26AndBelowStr = input._getName26AndBelow()._getValue();
+            output.name27AndAboveStr = input._getName27AndAbove()._getValue();
+            output.drmKeyGroup = (int) input._getDrmKeyGroup();
 
             output.profileTypeDescriptor = getProfileType(input._getProfileType()._getValue());
             output.audioChannelsDescriptor = audioChannelsDescriptorCache.getAudioChannels((int) input._getAudioChannelCount());
@@ -53,12 +54,20 @@ public class EncodingProfileModule extends AbstractTransformModule {
             ProtectionTypesHollow protectionTypes = api.getProtectionTypesHollow(protectionTypeOrdinal);
             output.dRMType = protectionTypes != null ? Collections.<Strings>singleton(getStrings(protectionTypes._getName()._getValue())) : Collections.<Strings>emptySet();
 
-            output.fileExtensionStr = toCharArray(input._getFileExtension());
-            output.mimeTypeStr = toCharArray(input._getMimeType());
-            output.descriptionStr = toCharArray(input._getDescription());
+            output.fileExtensionStr = input._getFileExtension()._getValue();
+            output.mimeTypeStr = input._getMimeType()._getValue();
+            output.descriptionStr = input._getDescription()._getValue();
 
             output.isAdaptiveSwitching = input._getIsAdaptiveSwitching();
             output.videoDimensionsDescriptor = input._getIs3D() ? getVideoDimensions(3) : getVideoDimensions(2);
+
+            output.audioCodec = input._getAudioCodec()._getValue();
+            output.videoCodec = input._getVideoCodec()._getValue();
+            output.colorAttributes = input._getColorAttributes()._getValue();
+            output.bitDepth = (int) input._getBitDepth();
+            output.drmKeyType = input._getDrmKeyType()._getValue();
+            output.encryptionScheme = input._getEncryptionScheme()._getValue();
+            output.playreadyHeaderVersion = input._getPlayreadyHeaderVersion()._getValue();
 
             mapper.add(output);
         }
