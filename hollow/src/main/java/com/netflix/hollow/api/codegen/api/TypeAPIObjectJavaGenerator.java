@@ -18,6 +18,7 @@ package com.netflix.hollow.api.codegen.api;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
+import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.HollowDataset;
@@ -41,6 +42,8 @@ import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.*;
 public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
     private final HollowObjectSchema objectSchema;
+    protected final HollowErgonomicAPIShortcuts ergonomicShortcuts;
+    private final HollowObjectSchema schema;
 
     private final Set<Class<?>> importClasses = new TreeSet<Class<?>>(new Comparator<Class<?>>() {
         @Override
@@ -50,10 +53,11 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
     });
 
     public TypeAPIObjectJavaGenerator(String apiClassname, String packageName, HollowObjectSchema schema,
-            HollowDataset dataset, CodeGeneratorConfig config) {
+                                      HollowErgonomicAPIShortcuts ergonomicShortcuts, HollowDataset dataset, CodeGeneratorConfig config) {
         super(apiClassname, packageName, schema, dataset, config);
         this.objectSchema = schema;
-
+        this.ergonomicShortcuts = ergonomicShortcuts;
+        this.schema = schema;
         this.importClasses.add(HollowObjectTypeAPI.class);
         this.importClasses.add(HollowObjectTypeDataAccess.class);
     }
@@ -191,6 +195,11 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
         String fieldName = substituteInvalidChars(objectSchema.getFieldName(fieldNum));
         String referencedType = substituteInvalidChars(objectSchema.getReferencedType(fieldNum));
+
+        HollowErgonomicAPIShortcuts.Shortcut shortcut = ergonomicShortcuts.getShortcut(schema.getName() + "." + schema.getFieldName(fieldNum));
+        if(shortcut != null) {
+            addShortcutAccessMethod(builder, uppercase(fieldName), shortcut);
+        }
 
         builder.append("    @Override\n");
         builder.append("    public int get"+ uppercase(fieldName) + "Ordinal(int ordinal) {\n");
@@ -341,5 +350,101 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("    }\n\n");
 
         return builder.toString();
+    }
+
+    private void addShortcutAccessMethod(StringBuilder builder, String methodFieldName, HollowErgonomicAPIShortcuts.Shortcut shortcut) {
+        String finalFieldName = substituteInvalidChars(uppercase(shortcut.getPath()[shortcut.getPath().length-1]));
+        String finalTypeAPI = typeAPIClassname(shortcut.getPathTypes()[shortcut.getPathTypes().length-1]);
+
+        switch(shortcut.getType()) {
+            case BOOLEAN:
+                builder.append("    public boolean get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? false : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public Boolean get").append(methodFieldName).append("Boxed(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case BYTES:
+                builder.append("    public byte[] get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case DOUBLE:
+                builder.append("    public double get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? Double.NaN : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public Double get").append(methodFieldName).append("Boxed(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case FLOAT:
+                builder.append("    public float get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? Float.NaN : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public Float get").append(methodFieldName).append("Boxed(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case INT:
+                builder.append("    public int get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? Integer.MIN_VALUE : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public Integer get").append(methodFieldName).append("Boxed(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case LONG:
+                builder.append("    public long get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? Long.MIN_VALUE : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public Long get").append(methodFieldName).append("Boxed(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("Boxed(ordinal);\n");
+                builder.append("    }\n\n");
+                break;
+            case STRING:
+                builder.append("    public String get").append(methodFieldName).append("(int ordinal) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? null : getAPI().get" + finalTypeAPI + "().get").append(finalFieldName).append("(ordinal);\n");
+                builder.append("    }\n\n");
+                builder.append("    public boolean is").append(methodFieldName).append("Equal(int ordinal, String testValue) {\n");
+                builder.append("        ordinal = get").append(methodFieldName).append("Ordinal(ordinal);\n");
+                addShortcutTraversal(builder, shortcut);
+                builder.append("        return ordinal == -1 ? testValue == null : getAPI().get" + finalTypeAPI + "().is").append(finalFieldName).append("Equal(ordinal, testValue);\n");
+                builder.append("    }\n\n");
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private void addShortcutTraversal(StringBuilder builder, HollowErgonomicAPIShortcuts.Shortcut shortcut) {
+        for(int i=0;i<shortcut.getPath().length-1;i++) {
+            String typeAPIClassname = typeAPIClassname(shortcut.getPathTypes()[i]);
+            builder.append("        if(ordinal != -1) ordinal = getAPI().get" + typeAPIClassname + "().get" + uppercase(shortcut.getPath()[i]) + "Ordinal(ordinal);\n");
+        }
     }
 }

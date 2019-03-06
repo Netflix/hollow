@@ -23,7 +23,6 @@ import com.netflix.hollow.api.codegen.api.TypeAPIObjectJavaGenerator;
 import com.netflix.hollow.api.codegen.api.TypeAPISetJavaGenerator;
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateCachedImplGenerator;
 import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateInterfaceGenerator;
-import com.netflix.hollow.api.codegen.delegate.HollowObjectDelegateLookupImplGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowHashIndexGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowPrimaryKeyIndexGenerator;
 import com.netflix.hollow.api.codegen.indexes.HollowUniqueKeyIndexGenerator;
@@ -511,7 +510,7 @@ public class HollowAPIGenerator {
 
     protected HollowJavaFileGenerator getStaticAPIGenerator(HollowSchema schema) {
         if(schema instanceof HollowObjectSchema) {
-            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, dataset, config);
+            return new TypeAPIObjectJavaGenerator(apiClassname, packageName, (HollowObjectSchema) schema, ergonomicShortcuts, dataset, config);
         } else if(schema instanceof HollowListSchema) {
             return new TypeAPIListJavaGenerator(apiClassname, packageName, (HollowListSchema)schema, dataset, config);
         } else if(schema instanceof HollowSetSchema) {
