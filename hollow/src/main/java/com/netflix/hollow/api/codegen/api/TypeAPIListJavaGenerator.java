@@ -16,14 +16,12 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateLookupClassname;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowListSchema;
@@ -52,7 +50,6 @@ public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("import " + HollowListTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowListTypeDataAccess.class.getName() + ";\n");
-        builder.append("import " + HollowListLookupDelegate.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowListTypeAPI {\n\n");
@@ -68,10 +65,6 @@ public class TypeAPIListJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("        return getAPI().get").append(typeAPIClassname(schema.getElementType())).append("();\n");
         builder.append("    }\n\n");
 
-//        builder.append("    public ").append(delegateLookupClassname(schema)).append(" getDelegateLookupImpl() {\n");
-//        builder.append("        return delegateLookupImpl;\n");
-//        builder.append("    }\n\n");
-//
         builder.append("    public ").append(apiClassname).append(" getAPI() {\n");
         builder.append("        return this.api;");
         builder.append("    }\n\n");

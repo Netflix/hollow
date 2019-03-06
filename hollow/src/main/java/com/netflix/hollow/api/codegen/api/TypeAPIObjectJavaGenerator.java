@@ -102,11 +102,6 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
         }
 
-//        classBodyBuilder.append("    public ").append(delegateLookupClassname(objectSchema)).append(" getDelegateLookupImpl() {\n");
-//        classBodyBuilder.append("        return delegateLookupImpl;\n");
-//        classBodyBuilder.append("    }\n\n");
-
-//        classBodyBuilder.append("    @Override\n");
         classBodyBuilder.append("    public ").append(apiClassname).append(" getAPI() {\n");
         classBodyBuilder.append("        return this.api;\n");
         classBodyBuilder.append("    }\n\n");
