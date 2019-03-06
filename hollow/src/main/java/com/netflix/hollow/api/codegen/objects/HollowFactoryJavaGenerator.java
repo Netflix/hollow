@@ -16,6 +16,11 @@
  */
 package com.netflix.hollow.api.codegen.objects;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateCachedClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.hollowFactoryClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
+
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowConsumerJavaFileGenerator;
@@ -32,8 +37,6 @@ import com.netflix.hollow.core.schema.HollowMapSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 import java.util.Arrays;
-
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.*;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.

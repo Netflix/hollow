@@ -16,6 +16,11 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.substituteInvalidChars;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.uppercase;
+
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.codegen.HollowErgonomicAPIShortcuts;
@@ -28,8 +33,6 @@ import com.netflix.hollow.core.write.HollowObjectWriteRecord;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.*;
 
 /**
  * This class contains template logic for generating a {@link HollowAPI} implementation.  Not intended for external consumption.
