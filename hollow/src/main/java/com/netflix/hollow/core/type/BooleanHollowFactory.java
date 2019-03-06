@@ -19,13 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.type.delegate.BooleanDelegate;
 import com.netflix.hollow.core.type.delegate.BooleanDelegateCachedImpl;
 
 public class BooleanHollowFactory extends HollowFactory<HBoolean> {
 
     @Override
     public HBoolean newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HBoolean(((BooleanTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HBoolean(((BooleanDelegate)typeAPI), ordinal);
     }
 
     @Override

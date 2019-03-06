@@ -16,12 +16,14 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowMapTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowMapSchema;
@@ -50,9 +52,10 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("import " + HollowMapTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowMapTypeDataAccess.class.getName() + ";\n");
+        builder.append("import " + HollowMapDelegate.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class ").append(className).append(" extends HollowMapTypeAPI {\n\n");
+        builder.append("public class ").append(className).append(" extends HollowMapTypeAPI implements " + delegateInterfaceName(schema) + "{\n\n");
 
         builder.append("    private final ").append(apiClassname).append(" api;\n\n");
 

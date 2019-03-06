@@ -16,12 +16,14 @@
  */
 package com.netflix.hollow.api.codegen.api;
 
+import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.delegateInterfaceName;
 import static com.netflix.hollow.api.codegen.HollowCodeGenerationUtils.typeAPIClassname;
 
 import com.netflix.hollow.api.codegen.CodeGeneratorConfig;
 import com.netflix.hollow.api.codegen.HollowAPIGenerator;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowSetTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowSetSchema;
@@ -50,9 +52,10 @@ public class TypeAPISetJavaGenerator extends HollowTypeAPIGenerator {
 
         builder.append("import " + HollowSetTypeAPI.class.getName() + ";\n\n");
         builder.append("import " + HollowSetTypeDataAccess.class.getName() + ";\n");
+        builder.append("import " + HollowSetDelegate.class.getName() + ";\n");
 
         builder.append("\n@SuppressWarnings(\"all\")\n");
-        builder.append("public class ").append(className).append(" extends HollowSetTypeAPI {\n\n");
+        builder.append("public class ").append(className).append(" extends HollowSetTypeAPI implements " + delegateInterfaceName(schema) + "{\n\n");
 
         builder.append("    private final ").append(apiClassname).append(" api;\n\n");
 

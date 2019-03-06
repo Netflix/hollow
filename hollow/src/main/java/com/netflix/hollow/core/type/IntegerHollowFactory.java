@@ -19,13 +19,14 @@ package com.netflix.hollow.core.type;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.core.type.delegate.IntegerDelegate;
 import com.netflix.hollow.core.type.delegate.IntegerDelegateCachedImpl;
 
 public class IntegerHollowFactory extends HollowFactory<HInteger> {
 
     @Override
     public HInteger newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return new HInteger(((IntegerTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return new HInteger(((IntegerDelegate)typeAPI), ordinal);
     }
 
     @Override

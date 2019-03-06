@@ -16,19 +16,20 @@
  */
 package com.netflix.hollow.core.type;
 
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.custom.HollowObjectTypeAPI;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
-import com.netflix.hollow.core.type.delegate.DoubleDelegateLookupImpl;
+import com.netflix.hollow.core.type.delegate.DoubleDelegate;
 
-public class DoubleTypeAPI extends HollowObjectTypeAPI {
+public class DoubleTypeAPI extends HollowObjectTypeAPI implements DoubleDelegate {
 
-    private final DoubleDelegateLookupImpl delegateLookupImpl;
+    private final HollowAPI api;
 
-    public DoubleTypeAPI(HollowObjectTypeDataAccess typeDataAccess) {
+    public DoubleTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
         super(typeDataAccess, new String[] {
             "value"
         });
-        this.delegateLookupImpl = new DoubleDelegateLookupImpl(this);
+        this.api = api;
     }
 
     public double getValue(int ordinal) {
@@ -48,8 +49,12 @@ public class DoubleTypeAPI extends HollowObjectTypeAPI {
         return Double.isNaN(d) ? null : Double.valueOf(d);
     }
 
-    public DoubleDelegateLookupImpl getDelegateLookupImpl() {
-        return delegateLookupImpl;
+    public HollowAPI getAPI() {
+        return this.api;
     }
 
+    @Override
+    public DoubleTypeAPI getTypeAPI() {
+        return this;
+    }
 }

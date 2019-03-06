@@ -76,7 +76,7 @@ public class HollowObjectTypeAPI extends HollowTypeAPI implements HollowObjectDe
 
     @Override
     public HollowObjectTypeAPI getTypeAPI() {
-        return null;
+        return this;
     }
 
     public HollowDataAccess getDataAccess() {
