@@ -42,8 +42,8 @@ public class EncodingProfileModule extends AbstractTransformModule {
         for (StreamProfilesHollow input : api.getAllStreamProfilesHollow()) {
             EncodingProfile output = new EncodingProfile();
             output.id = (int) input._getId();
-            output.name26AndBelowStr = input._getName26AndBelow()._getValue();
-            output.name27AndAboveStr = input._getName27AndAbove()._getValue();
+            output.name26AndBelowStr = getValue(input._getName26AndBelow());
+            output.name27AndAboveStr = getValue(input._getName27AndAbove());
             output.drmKeyGroup = (int) input._getDrmKeyGroup();
 
             output.profileTypeDescriptor = getProfileType(input._getProfileType()._getValue());
@@ -52,30 +52,29 @@ public class EncodingProfileModule extends AbstractTransformModule {
             long drmType = input._getDrmType();
             int protectionTypeOrdinal = protectionTypeIndex.getMatchingOrdinal(drmType);
             ProtectionTypesHollow protectionTypes = api.getProtectionTypesHollow(protectionTypeOrdinal);
-            output.dRMType = protectionTypes != null ? Collections.<Strings>singleton(getStrings(protectionTypes._getName()._getValue())) : Collections.<Strings>emptySet();
+            output.dRMType = protectionTypes != null ? Collections.singleton(getStrings(protectionTypes._getName()._getValue())) : Collections.emptySet();
 
-            output.fileExtensionStr = input._getFileExtension()._getValue();
-            output.mimeTypeStr = input._getMimeType()._getValue();
-            output.descriptionStr = input._getDescription()._getValue();
+            output.fileExtensionStr = getValue(input._getFileExtension());
+            output.mimeTypeStr = getValue(input._getMimeType());
+            output.descriptionStr = getValue(input._getDescription());
 
             output.isAdaptiveSwitching = input._getIsAdaptiveSwitching();
             output.videoDimensionsDescriptor = input._getIs3D() ? getVideoDimensions(3) : getVideoDimensions(2);
 
-            output.audioCodec = input._getAudioCodec()._getValue();
-            output.videoCodec = input._getVideoCodec()._getValue();
-            output.colorAttributes = input._getColorAttributes()._getValue();
+            output.audioCodec = getValue(input._getAudioCodec());
+            output.videoCodec = getValue(input._getVideoCodec());
+            output.colorAttributes = getValue(input._getColorAttributes());
             output.bitDepth = (int) input._getBitDepth();
-            output.drmKeyType = input._getDrmKeyType()._getValue();
-            output.encryptionScheme = input._getEncryptionScheme()._getValue();
-            output.playreadyHeaderVersion = input._getPlayreadyHeaderVersion()._getValue();
+            output.drmKeyType = getValue(input._getDrmKeyType());
+            output.encryptionScheme = getValue(input._getEncryptionScheme());
+            output.playreadyHeaderVersion = getValue(input._getPlayreadyHeaderVersion());
 
             mapper.add(output);
         }
     }
 
-    private char[] toCharArray(StringHollow str) {
-        if (str == null || str._getValue() == null) return null;
-        return str._getValue().toCharArray();
+    private String getValue(StringHollow field) {
+        return field == null ? null : field._getValue();
     }
 
     private <K, V> Map<K, V> getMap(ThreadLocal<Map<K, V>> local) {
