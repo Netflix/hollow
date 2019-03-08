@@ -22,6 +22,7 @@ import com.netflix.hollow.core.memory.encoding.VarInt;
 import com.netflix.hollow.core.read.engine.HollowTypeReadState;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig.ObjectFilterConfig;
+import com.netflix.hollow.core.write.objectmapper.DeprecatedApi;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +43,7 @@ public class HollowObjectSchema extends HollowSchema {
     private final String fieldNames[];
     private final FieldType fieldTypes[];
     protected final String referencedTypes[];
+    private final DeprecatedApi deprecatedFields[];
     private final HollowTypeReadState referencedFieldTypeStates[];  /// populated during deserialization
     private final PrimaryKey primaryKey;
 
@@ -58,6 +60,7 @@ public class HollowObjectSchema extends HollowSchema {
         this.fieldNames = new String[numFields];
         this.fieldTypes = new FieldType[numFields];
         this.referencedTypes = new String[numFields];
+        this.deprecatedFields = new DeprecatedApi[numFields];
         this.referencedFieldTypeStates = new HollowTypeReadState[numFields];
         this.primaryKey = primaryKey;
     }
@@ -75,17 +78,25 @@ public class HollowObjectSchema extends HollowSchema {
     }
 
     public int addField(String fieldName, FieldType fieldType, String referencedType) {
-        return addField(fieldName, fieldType, referencedType, null);
+        return addField(fieldName, fieldType, referencedType, null, null);
     }
 
-    public int addField(String fieldName, FieldType fieldType, String referencedType, HollowTypeReadState referencedTypeState) {
+    public int addField(String fieldName, FieldType fieldType, DeprecatedApi deprecatedApiAnnotation) {
+        return addField(fieldName, fieldType, null, deprecatedApiAnnotation);
+    }
+
+    public int addField(String fieldName, FieldType fieldType, String referencedType, DeprecatedApi deprecatedApiAnnotation) {
+        return addField(fieldName, fieldType, referencedType, deprecatedApiAnnotation, null);
+    }
+
+    public int addField(String fieldName, FieldType fieldType, String referencedType, DeprecatedApi deprecatedApiAnnotation, HollowTypeReadState referencedTypeState) {
         if(fieldType == FieldType.REFERENCE && referencedType == null)
             throw new RuntimeException("When adding a REFERENCE field to a schema, the referenced type must be provided.  Check type: " + getName() + " field: " + fieldName);
 
         fieldNames[size] = fieldName;
         fieldTypes[size] = fieldType;
         referencedTypes[size] = referencedType;
-
+        deprecatedFields[size] = deprecatedApiAnnotation;
         nameFieldIndexLookup.put(fieldName, Integer.valueOf(size));
 
         size++;
@@ -136,6 +147,10 @@ public class HollowObjectSchema extends HollowSchema {
 
     public String getReferencedType(int fieldPosition) {
         return referencedTypes[fieldPosition];
+    }
+
+    public DeprecatedApi getDeprecatedApiAnnotation(int fieldPosition) {
+        return deprecatedFields[fieldPosition];
     }
 
     public void setReferencedTypeState(int fieldPosition, HollowTypeReadState state) {

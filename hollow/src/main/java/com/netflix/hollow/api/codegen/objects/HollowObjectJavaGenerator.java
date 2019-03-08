@@ -39,6 +39,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.objectmapper.DeprecatedApi;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -136,6 +137,9 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
     private void appendAccessors(StringBuilder classBuilder) {
         for(int i=0;i<schema.numFields();i++) {
+
+            classBuilder.append(generateFieldAccessorDeprecatedApiAnnotation(schema.getDeprecatedApiAnnotation(i)));
+
             switch(schema.getFieldType(i)) {
                 case BOOLEAN:
                     classBuilder.append(generateBooleanFieldAccessor(i));
@@ -165,6 +169,23 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
 
             classBuilder.append("\n\n");
         }
+    }
+
+    private static String generateFieldAccessorDeprecatedApiAnnotation(DeprecatedApi deprecatedApiAnnotation) {
+        StringBuilder builder = new StringBuilder();
+
+        if (deprecatedApiAnnotation != null) {
+            String annotationValue = deprecatedApiAnnotation.value();
+
+            if (!annotationValue.isEmpty()) {
+                builder.append("    /**\n")
+                        .append("     * @deprecated ").append(annotationValue).append("\n")
+                        .append("     */\n");
+            }
+
+            builder.append("    @Deprecated\n");
+        }
+        return builder.toString();
     }
 
     private String generateByteArrayFieldAccessor(int fieldNum) {
