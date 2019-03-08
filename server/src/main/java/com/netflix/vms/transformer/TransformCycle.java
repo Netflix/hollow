@@ -432,7 +432,29 @@ public class TransformCycle {
                  * video-related data from the pinned version, and non-video-related-data from the fastlane. Thus, when using pinning or fastlane to fix data errors, one
                  * needs to know if the erroneous attribute belongs to video-related or non-video-related data.
                  */
-                List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
+
+                //////////////////////
+                /*
+                 * Address issue related to removing a subset of pinned titles.
+                 *
+                 * Title pinning was designed to try to maintain the fastlane SLA since title pinning could take from a few minutes to ++ depending on how many titles and number of different versions
+                 * they belong (# of title pinning jobs, job = per pin version).
+                 * This means that fastlane cycle will not wait for title pinning job to complete (except for startup so that there is not gap during deployment).
+                 * It was done that way because new title pinning requests could be done in the background and be combined with fastlane when ready on subsequent cycles.
+                 * However, this introduces a bug where a subset of pinning titles are being removed form a pinned job because such change is considered a new title pin job.
+                 * Fastlane cycle won't wait for that new job to complete; hence, the remaining pinned titles disappears from fastlane until the background job is completed in subsequent.
+                 *
+                 * Proposal:
+                 * - Short term: Fastlane always wait for all title pinning job to complete to address the bug but it will impact fastlane SLA whenever a new title pinning requests appears at the
+                 * beginning of fastlane cycle.
+                 *
+                 * - Long term: Better handle this use case with tracking prior cycle job and correlate with new job to detect this use case. This will be a bit more involved and will take more time
+                 * to properly verify.
+                 *
+                 * NOTE: Waiting for all jobs to complete on every cycle instead of just firstCycle to address bug on moving subset of titles being pinned
+                 * List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(isFirstCycle);
+                 */
+                List<HollowReadStateEngine> overrideTitleOutputs = pinTitleMgr.getResults(true);
                 PinTitleHollowCombiner combiner = new PinTitleHollowCombiner(ctx, outputStateEngine, fastlaneOutputStateEngine, overrideTitleOutputs);
                 combiner.combine();
 
