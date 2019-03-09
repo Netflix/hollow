@@ -2212,11 +2212,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -2835,7 +2834,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -5584,11 +5583,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -6207,7 +6205,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -8956,11 +8954,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -9579,7 +9576,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -12477,11 +12474,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -13100,7 +13096,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -15849,11 +15845,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -16472,7 +16467,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -19253,11 +19248,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -19893,7 +19887,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -22698,11 +22692,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -23338,7 +23331,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -26143,11 +26136,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -26783,7 +26775,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
@@ -29588,11 +29580,10 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.38",
+            "locked": "4.7.35",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl",
-                "netflix:vms-utils"
+                "netflix:fit-impl"
             ]
         },
         "netflix.chestnut:chestnut3-api": {
@@ -30228,7 +30219,7 @@
             ]
         },
         "netflix:vms-utils": {
-            "locked": "65.2.0",
+            "locked": "65.3.0",
             "requested": "latest.release"
         },
         "netflix:whitecastle_v2": {
