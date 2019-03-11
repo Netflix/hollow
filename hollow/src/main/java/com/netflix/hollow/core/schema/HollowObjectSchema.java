@@ -118,9 +118,7 @@ public class HollowObjectSchema extends HollowSchema {
     }
 
     public String[] getFieldNames() {
-        String[] copyFieldNames = new String[fieldNames.length];
-        System.arraycopy(fieldNames, 0, copyFieldNames, 0, fieldNames.length);
-        return copyFieldNames;
+        return fieldNames.clone();
     }
 
     public String getFieldName(int fieldPosition) {
