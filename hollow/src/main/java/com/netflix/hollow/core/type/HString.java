@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.type;
 
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.type.delegate.StringDelegate;
 
@@ -31,6 +32,10 @@ public class HString extends HollowObject {
 
     public boolean isValueEqual(String testValue) {
         return delegate().isValueEqual(ordinal, testValue);
+    }
+
+    public HollowAPI api() {
+        return typeApi().getAPI();
     }
 
     public StringTypeAPI typeApi() {

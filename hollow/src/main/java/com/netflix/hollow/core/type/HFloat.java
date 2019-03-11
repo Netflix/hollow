@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.core.type;
 
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.type.delegate.FloatDelegate;
 
@@ -31,6 +32,10 @@ public class HFloat extends HollowObject {
 
     public Float getValueBoxed() {
         return delegate().getValueBoxed(ordinal);
+    }
+
+    public HollowAPI api() {
+        return typeApi().getAPI();
     }
 
     public FloatTypeAPI typeApi() {
