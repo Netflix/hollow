@@ -16,10 +16,10 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.HollowSet;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
@@ -37,7 +37,7 @@ public class GenericHollowSet extends HollowSet<HollowRecord> {
     }
     
     public GenericHollowSet(HollowSetTypeDataAccess dataAccess, int ordinal) {
-        this(new HollowSetTypeAPI<>(dataAccess), ordinal);
+        this(new HollowSetLookupDelegate<HollowRecord>(dataAccess), ordinal);
     }
 
     public GenericHollowSet(HollowSetDelegate<HollowRecord> delegate, int ordinal) {

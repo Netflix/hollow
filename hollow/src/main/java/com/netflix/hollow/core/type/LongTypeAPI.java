@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.LongDelegate;
 
 public class LongTypeAPI extends HollowObjectTypeAPI implements LongDelegate {
 
-    private final HollowAPI api;
-
     public LongTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public long getValue(int ordinal) {
@@ -49,10 +46,6 @@ public class LongTypeAPI extends HollowObjectTypeAPI implements LongDelegate {
         if(l == Long.MIN_VALUE)
             return null;
         return Long.valueOf(l);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override

@@ -72,8 +72,6 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         classBodyBuilder.append("@SuppressWarnings(\"all\")\n");
         classBodyBuilder.append("public class " + className + " extends HollowObjectTypeAPI implements " + delegateInterfaceName(objectSchema) + " {\n\n");
 
-        classBodyBuilder.append("    private final ").append(apiClassname).append(" api;\n\n");
-
         classBodyBuilder.append(generateConstructor());
         classBodyBuilder.append("\n\n");
 
@@ -109,13 +107,14 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
 
         }
 
+        classBodyBuilder.append("    @Override\n");
         classBodyBuilder.append("    public ").append(apiClassname).append(" getAPI() {\n");
-        classBodyBuilder.append("        return this.api;\n");
+        classBodyBuilder.append("        return (").append(apiClassname).append(") api;\n");
         classBodyBuilder.append("    }\n\n");
 
         classBodyBuilder.append("    @Override\n");
         classBodyBuilder.append("    public ").append(className).append(" getTypeAPI() {\n");
-        classBodyBuilder.append("        return this;\n");
+        classBodyBuilder.append("        return (").append(className).append(") this;\n");
         classBodyBuilder.append("    }\n\n");
 
         classBodyBuilder.append("}");
@@ -138,7 +137,7 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         StringBuilder builder = new StringBuilder();
 
         builder.append("    public " + className + "(" + apiClassname + " api, HollowObjectTypeDataAccess typeDataAccess) {\n");
-        builder.append("        super(typeDataAccess, new String[] {\n");
+        builder.append("        super(api, typeDataAccess, new String[] {\n");
 
         for(int i=0;i<objectSchema.numFields();i++) {
             builder.append("            \"" + objectSchema.getFieldName(i) + "\"");
@@ -148,7 +147,6 @@ public class TypeAPIObjectJavaGenerator extends HollowTypeAPIGenerator {
         }
 
         builder.append("        });\n");
-        builder.append("        this.api = api;");
         builder.append("    }");
 
         return builder.toString();

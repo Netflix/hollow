@@ -14,62 +14,42 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.custom;
+package com.netflix.hollow.api.objects.delegate;
 
+import com.netflix.hollow.api.custom.HollowMapTypeAPI;
 import com.netflix.hollow.api.objects.HollowMap;
-import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowMapEntryOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowMapSchema;
-
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * This is the Hollow Type API interface for MAP type records. 
- * 
- * @see HollowTypeAPI
+ * This is the extension of the {@link HollowRecordDelegate} interface for lookup MAP type records.
+ *
+ * @see HollowRecordDelegate
  */
-public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDelegate<K,V> {
+public class HollowMapLookupDelegate<K, V> implements HollowMapDelegate<K, V> {
 
-    public HollowMapTypeAPI(HollowAPI api, HollowMapTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess);
-    }
-    
-    public int size(int ordinal) {
-        return getTypeDataAccess().size(ordinal);
-    }
-    
-    public int get(int ordinal, int keyOrdinal) {
-        return getTypeDataAccess().get(ordinal, keyOrdinal);
+    private final HollowMapTypeDataAccess dataAccess;
+    protected final HollowMapTypeAPI typeAPI;
+
+    public HollowMapLookupDelegate(HollowMapTypeDataAccess dataAccess) {
+        this(dataAccess, null);
     }
 
-    public int get(int ordinal, int keyOrdinal, int hashCode) {
-        return getTypeDataAccess().get(ordinal, keyOrdinal, hashCode);
-    }
-    
-    public int findKey(int ordinal, Object... hashKey) {
-        return getTypeDataAccess().findKey(ordinal, hashKey);
-    }
-    
-    public int findValue(int ordinal, Object... hashKey) {
-        return getTypeDataAccess().findValue(ordinal, hashKey);
-    }
-    
-    public long findEntry(int ordinal, Object... hashKey) {
-        return getTypeDataAccess().findEntry(ordinal, hashKey);
+    public HollowMapLookupDelegate(HollowMapTypeAPI typeAPI) {
+        this(typeAPI.getTypeDataAccess(), typeAPI);
     }
 
-    public HollowMapEntryOrdinalIterator getOrdinalIterator(int ordinal) {
-        return getTypeDataAccess().ordinalIterator(ordinal);
+    private HollowMapLookupDelegate(HollowMapTypeDataAccess dataAccess, HollowMapTypeAPI typeAPI) {
+        this.dataAccess = dataAccess;
+        this.typeAPI = typeAPI;
     }
 
-    public HollowMapEntryOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
-        return getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
-    }
-    
     @Override
-    public HollowMapTypeDataAccess getTypeDataAccess() {
-        return (HollowMapTypeDataAccess) typeDataAccess;
+    public int size(int ordinal) {
+        return dataAccess.size(ordinal);
     }
 
     @Override
@@ -77,10 +57,10 @@ public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDe
         HollowMapEntryOrdinalIterator iter;
 
         if(getSchema().getHashKey() != null) {
-            iter = getTypeDataAccess().ordinalIterator(ordinal);
+            iter = dataAccess.ordinalIterator(ordinal);
         } else {
-            int hashCode = getTypeDataAccess().getDataAccess().getHashCodeFinder().hashCode(key);
-            iter = getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
+            int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(key);
+            iter = dataAccess.potentialMatchOrdinalIterator(ordinal, hashCode);
         }
 
         while(iter.next()) {
@@ -95,10 +75,10 @@ public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDe
         HollowMapEntryOrdinalIterator iter;
 
         if(getSchema().getHashKey() != null) {
-            iter = getTypeDataAccess().ordinalIterator(ordinal);
+            iter = dataAccess.ordinalIterator(ordinal);
         } else {
-            int hashCode = getTypeDataAccess().getDataAccess().getHashCodeFinder().hashCode(key);
-            iter = getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
+            int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(key);
+            iter = dataAccess.potentialMatchOrdinalIterator(ordinal, hashCode);
         }
 
         while(iter.next()) {
@@ -120,7 +100,7 @@ public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDe
 
     @Override
     public K findKey(HollowMap<K, V> map, int ordinal, Object... hashKey) {
-        int keyOrdinal = getTypeDataAccess().findKey(ordinal, hashKey);
+        int keyOrdinal = dataAccess.findKey(ordinal, hashKey);
         if(keyOrdinal != -1)
             return map.instantiateKey(keyOrdinal);
         return null;
@@ -128,15 +108,15 @@ public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDe
 
     @Override
     public V findValue(HollowMap<K, V> map, int ordinal, Object... hashKey) {
-        int valueOrdinal = getTypeDataAccess().findValue(ordinal, hashKey);
+        int valueOrdinal = dataAccess.findValue(ordinal, hashKey);
         if(valueOrdinal != -1)
             return map.instantiateValue(valueOrdinal);
         return null;
     }
 
     @Override
-    public Map.Entry<K, V> findEntry(final HollowMap<K, V> map, int ordinal, Object... hashKey) {
-        final long entryOrdinals = getTypeDataAccess().findEntry(ordinal, hashKey);
+    public Entry<K, V> findEntry(final HollowMap<K, V> map, int ordinal, Object... hashKey) {
+        final long entryOrdinals = dataAccess.findEntry(ordinal, hashKey);
         if(entryOrdinals != -1L)
             return new Map.Entry<K, V>() {
                 @Override
@@ -161,17 +141,22 @@ public class HollowMapTypeAPI<K, V> extends HollowTypeAPI implements HollowMapDe
 
     @Override
     public HollowMapEntryOrdinalIterator iterator(int ordinal) {
-        return getTypeDataAccess().ordinalIterator(ordinal);
+        return dataAccess.ordinalIterator(ordinal);
     }
 
     @Override
     public HollowMapSchema getSchema() {
-        return getTypeDataAccess().getSchema();
+        return dataAccess.getSchema();
+    }
+
+    @Override
+    public HollowMapTypeDataAccess getTypeDataAccess() {
+        return dataAccess;
     }
 
     @Override
     public HollowMapTypeAPI getTypeAPI() {
-        return this;
+        return typeAPI;
     }
 
 }

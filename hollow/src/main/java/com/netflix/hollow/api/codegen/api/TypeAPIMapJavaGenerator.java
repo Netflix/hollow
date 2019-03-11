@@ -57,11 +57,8 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("\n@SuppressWarnings(\"all\")\n");
         builder.append("public class ").append(className).append(" extends HollowMapTypeAPI implements " + delegateInterfaceName(schema) + "{\n\n");
 
-        builder.append("    private final ").append(apiClassname).append(" api;\n\n");
-
         builder.append("    public ").append(className).append("(").append(apiClassname). append(" api, HollowMapTypeDataAccess dataAccess) {\n");
-        builder.append("        super(dataAccess);\n");
-        builder.append("        this.api = api;");
+        builder.append("        super(api, dataAccess);\n");
         builder.append("    }\n\n");
 
         builder.append("    public ").append(typeAPIClassname(schema.getKeyType())).append(" getKeyAPI() {\n");
@@ -73,7 +70,12 @@ public class TypeAPIMapJavaGenerator extends HollowTypeAPIGenerator {
         builder.append("    }\n\n");
 
         builder.append("    public ").append(apiClassname).append(" getAPI() {\n");
-        builder.append("        return this.api;");
+        builder.append("        return (").append(apiClassname).append(")api;\n");
+        builder.append("    }\n\n");
+
+        builder.append("    @Override\n");
+        builder.append("    public ").append(className).append(" getTypeAPI() {\n");
+        builder.append("        return (").append(className).append(") this;\n");
         builder.append("    }\n\n");
 
         builder.append("}");

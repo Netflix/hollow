@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.StringDelegate;
 
 public class StringTypeAPI extends HollowObjectTypeAPI implements StringDelegate {
 
-    private final HollowAPI api;
-
     public StringTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public String getValue(int ordinal) {
@@ -43,10 +40,6 @@ public class StringTypeAPI extends HollowObjectTypeAPI implements StringDelegate
         if(fieldIndex[0] == -1)
             return missingDataHandler().handleStringEquals("String", ordinal, "value", testValue);
         return getTypeDataAccess().isStringFieldEqual(ordinal, fieldIndex[0], testValue);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override

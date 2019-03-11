@@ -14,50 +14,44 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.custom;
+package com.netflix.hollow.api.objects.delegate;
 
+import com.netflix.hollow.api.custom.HollowListTypeAPI;
 import com.netflix.hollow.api.objects.HollowList;
-import com.netflix.hollow.api.objects.HollowRecord;
-import com.netflix.hollow.api.objects.delegate.HollowListDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
- * This is the Hollow Type API interface for LIST type records. 
- * 
- * @see HollowTypeAPI
+ * This is the extension of the {@link HollowRecordDelegate} interface for lookup LIST type records.
+ *
+ * @see HollowRecordDelegate
  */
-public class HollowListTypeAPI<T extends HollowRecord> extends HollowTypeAPI implements HollowListDelegate<T> {
+public class HollowListLookupDelegate<T> implements HollowListDelegate<T> {
 
-    protected final HollowListTypeDataAccess listTypeDataAccess;
+    private final HollowListTypeDataAccess dataAccess;
+    protected final HollowListTypeAPI typeAPI;
 
-    public HollowListTypeAPI(HollowAPI api, HollowListTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess);
-        this.listTypeDataAccess = typeDataAccess;
+    public HollowListLookupDelegate(HollowListTypeDataAccess dataAccess) {
+        this(dataAccess, null);
     }
 
-    public int getElementOrdinal(int ordinal, int listIdx) {
-        return getTypeDataAccess().getElementOrdinal(ordinal, listIdx);
-    }
-    
-    public HollowOrdinalIterator getOrdinalIterator(int ordinal) {
-        return getTypeDataAccess().ordinalIterator(ordinal);
+    public HollowListLookupDelegate(HollowListTypeAPI typeAPI) {
+        this(typeAPI.getTypeDataAccess(), typeAPI);
     }
 
-    @Override
-    public HollowListTypeDataAccess getTypeDataAccess() {
-        return (HollowListTypeDataAccess) typeDataAccess;
+    private HollowListLookupDelegate(HollowListTypeDataAccess dataAccess, HollowListTypeAPI typeAPI) {
+        this.dataAccess = dataAccess;
+        this.typeAPI = typeAPI;
     }
 
     @Override
     public int size(int ordinal) {
-        return getTypeDataAccess().size(ordinal);
+        return dataAccess.size(ordinal);
     }
 
     @Override
     public T get(HollowList<T> list, int ordinal, int index) {
-        int elementOrdinal = getTypeDataAccess().getElementOrdinal(ordinal, index);
+        int elementOrdinal = dataAccess.getElementOrdinal(ordinal, index);
         return list.instantiateElement(elementOrdinal);
     }
 
@@ -70,7 +64,7 @@ public class HollowListTypeAPI<T extends HollowRecord> extends HollowTypeAPI imp
     public final int indexOf(HollowList<T> list, int ordinal, Object o) {
         int size = size(ordinal);
         for(int i=0;i<size;i++) {
-            int elementOrdinal = getTypeDataAccess().getElementOrdinal(ordinal, i);
+            int elementOrdinal = dataAccess.getElementOrdinal(ordinal, i);
             if(list.equalsElement(elementOrdinal, o))
                 return i;
         }
@@ -81,7 +75,7 @@ public class HollowListTypeAPI<T extends HollowRecord> extends HollowTypeAPI imp
     public final int lastIndexOf(HollowList<T> list, int ordinal, Object o) {
         int size = size(ordinal);
         for(int i=size - 1; i>=0; i--) {
-            int elementOrdinal = getTypeDataAccess().getElementOrdinal(ordinal, i);
+            int elementOrdinal = dataAccess.getElementOrdinal(ordinal, i);
             if(list.equalsElement(elementOrdinal, o))
                 return i;
         }
@@ -90,11 +84,16 @@ public class HollowListTypeAPI<T extends HollowRecord> extends HollowTypeAPI imp
 
     @Override
     public HollowListSchema getSchema() {
-        return getTypeDataAccess().getSchema();
+        return dataAccess.getSchema();
+    }
+
+    @Override
+    public HollowListTypeDataAccess getTypeDataAccess() {
+        return dataAccess;
     }
 
     @Override
     public HollowListTypeAPI getTypeAPI() {
-        return this;
+        return typeAPI;
     }
 }

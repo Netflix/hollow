@@ -14,52 +14,40 @@
  *     limitations under the License.
  *
  */
-package com.netflix.hollow.api.custom;
+package com.netflix.hollow.api.objects.delegate;
 
+import com.netflix.hollow.api.custom.HollowSetTypeAPI;
 import com.netflix.hollow.api.objects.HollowSet;
-import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.schema.HollowSetSchema;
 
 /**
- * This is the Hollow Type API interface for SET type records. 
- * 
- * @see HollowTypeAPI
+ * This is the extension of the {@link HollowRecordDelegate} interface for lookup LIST type records.
+ *
+ * @see HollowRecordDelegate
  */
-public class HollowSetTypeAPI<T> extends HollowTypeAPI implements HollowSetDelegate<T> {
+public class HollowSetLookupDelegate<T> implements HollowSetDelegate<T> {
 
-    public HollowSetTypeAPI(HollowAPI api, HollowSetTypeDataAccess typeDataAccess) {
-        super(api, typeDataAccess);
-    }
+    private final HollowSetTypeDataAccess dataAccess;
+    protected final HollowSetTypeAPI typeAPI;
 
-    public int size(int ordinal) {
-        return getTypeDataAccess().size(ordinal);
-    }
-    
-    public boolean contains(int ordinal, int value) {
-        return getTypeDataAccess().contains(ordinal, value);
+    public HollowSetLookupDelegate(HollowSetTypeDataAccess dataAccess) {
+        this(dataAccess, null);
     }
 
-    public boolean contains(int ordinal, int value, int hashCode) {
-        return getTypeDataAccess().contains(ordinal, value, hashCode);
-    }
-    
-    public int findElement(int ordinal, Object... hashKey) {
-        return getTypeDataAccess().findElement(ordinal, hashKey);
+    public HollowSetLookupDelegate(HollowSetTypeAPI typeAPI) {
+        this(typeAPI.getTypeDataAccess(), typeAPI);
     }
 
-    public HollowOrdinalIterator potentialMatchOrdinalIterator(int ordinal, int hashCode) {
-        return getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
-    }
-    
-    public HollowOrdinalIterator getOrdinalIterator(int ordinal) {
-        return getTypeDataAccess().ordinalIterator(ordinal);
+    private HollowSetLookupDelegate(HollowSetTypeDataAccess dataAccess, HollowSetTypeAPI typeAPI) {
+        this.dataAccess = dataAccess;
+        this.typeAPI = typeAPI;
     }
 
     @Override
-    public HollowSetTypeDataAccess getTypeDataAccess() {
-        return (HollowSetTypeDataAccess) typeDataAccess;
+    public int size(int ordinal) {
+        return dataAccess.size(ordinal);
     }
 
     @Override
@@ -67,10 +55,10 @@ public class HollowSetTypeAPI<T> extends HollowTypeAPI implements HollowSetDeleg
         HollowOrdinalIterator iter;
 
         if(getSchema().getHashKey() != null) {
-            iter = getTypeDataAccess().ordinalIterator(ordinal);
+            iter = dataAccess.ordinalIterator(ordinal);
         } else {
-            int hashCode = getTypeDataAccess().getDataAccess().getHashCodeFinder().hashCode(o);
-            iter = getTypeDataAccess().potentialMatchOrdinalIterator(ordinal, hashCode);
+            int hashCode = dataAccess.getDataAccess().getHashCodeFinder().hashCode(o);
+            iter = dataAccess.potentialMatchOrdinalIterator(ordinal, hashCode);
         }
 
         int potentialOrdinal = iter.next();
@@ -84,7 +72,7 @@ public class HollowSetTypeAPI<T> extends HollowTypeAPI implements HollowSetDeleg
 
     @Override
     public T findElement(HollowSet<T> set, int ordinal, Object... keys) {
-        int elementOrdinal = getTypeDataAccess().findElement(ordinal, keys);
+        int elementOrdinal = dataAccess.findElement(ordinal, keys);
         if(elementOrdinal != -1)
             return set.instantiateElement(elementOrdinal);
         return null;
@@ -92,17 +80,22 @@ public class HollowSetTypeAPI<T> extends HollowTypeAPI implements HollowSetDeleg
 
     @Override
     public HollowOrdinalIterator iterator(int ordinal) {
-        return getTypeDataAccess().ordinalIterator(ordinal);
+        return dataAccess.ordinalIterator(ordinal);
     }
 
     @Override
     public HollowSetSchema getSchema() {
-        return getTypeDataAccess().getSchema();
+        return dataAccess.getSchema();
+    }
+
+    @Override
+    public HollowSetTypeDataAccess getTypeDataAccess() {
+        return dataAccess;
     }
 
     @Override
     public HollowSetTypeAPI getTypeAPI() {
-        return this;
+        return typeAPI;
     }
 
 }

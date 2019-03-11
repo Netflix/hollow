@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.IntegerDelegate;
 
 public class IntegerTypeAPI extends HollowObjectTypeAPI implements IntegerDelegate {
 
-    private final HollowAPI api;
-
     public IntegerTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public int getValue(int ordinal) {
@@ -49,10 +46,6 @@ public class IntegerTypeAPI extends HollowObjectTypeAPI implements IntegerDelega
         if(i == Integer.MIN_VALUE)
             return null;
         return Integer.valueOf(i);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override

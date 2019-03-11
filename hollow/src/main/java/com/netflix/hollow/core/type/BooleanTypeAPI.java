@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.BooleanDelegate;
 
 public class BooleanTypeAPI extends HollowObjectTypeAPI implements BooleanDelegate {
 
-    private final HollowAPI api;
-
     public BooleanTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public boolean getValue(int ordinal) {
@@ -42,10 +39,6 @@ public class BooleanTypeAPI extends HollowObjectTypeAPI implements BooleanDelega
         if(fieldIndex[0] == -1)
             return missingDataHandler().handleBoolean("Boolean", ordinal, "value");
         return getTypeDataAccess().readBoolean(ordinal, fieldIndex[0]);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override

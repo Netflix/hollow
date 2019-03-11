@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.DoubleDelegate;
 
 public class DoubleTypeAPI extends HollowObjectTypeAPI implements DoubleDelegate {
 
-    private final HollowAPI api;
-
     public DoubleTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public double getValue(int ordinal) {
@@ -47,10 +44,6 @@ public class DoubleTypeAPI extends HollowObjectTypeAPI implements DoubleDelegate
             d = getTypeDataAccess().readDouble(ordinal, fieldIndex[0]);
         }
         return Double.isNaN(d) ? null : Double.valueOf(d);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override

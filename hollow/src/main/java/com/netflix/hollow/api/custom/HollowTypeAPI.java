@@ -32,10 +32,16 @@ import java.util.Collection;
  */
 public abstract class HollowTypeAPI implements HollowRecordDelegate {
 
+    protected final HollowAPI api;
     protected final HollowTypeDataAccess typeDataAccess;
 
-    protected HollowTypeAPI(HollowTypeDataAccess typeDataAccess) {
+    protected HollowTypeAPI(HollowAPI api, HollowTypeDataAccess typeDataAccess) {
+        this.api = api;
         this.typeDataAccess = typeDataAccess;
+    }
+
+    public HollowAPI getAPI() {
+        return api;
     }
 
     public HollowTypeDataAccess getTypeDataAccess() {

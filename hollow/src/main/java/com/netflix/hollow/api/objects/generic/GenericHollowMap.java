@@ -16,10 +16,10 @@
  */
 package com.netflix.hollow.api.objects.generic;
 
-import com.netflix.hollow.api.custom.HollowMapTypeAPI;
 import com.netflix.hollow.api.objects.HollowMap;
 import com.netflix.hollow.api.objects.HollowRecord;
 import com.netflix.hollow.api.objects.delegate.HollowMapDelegate;
+import com.netflix.hollow.api.objects.delegate.HollowMapLookupDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowDataAccess;
 import com.netflix.hollow.core.read.dataaccess.HollowMapTypeDataAccess;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
@@ -39,7 +39,7 @@ public class GenericHollowMap extends HollowMap<HollowRecord, HollowRecord>{
     }
     
     public GenericHollowMap(HollowMapTypeDataAccess dataAccess, int ordinal) {
-        this(new HollowMapTypeAPI<>(dataAccess), ordinal);
+        this(new HollowMapLookupDelegate<HollowRecord, HollowRecord>(dataAccess), ordinal);
     }
 
     public GenericHollowMap(HollowMapDelegate<HollowRecord, HollowRecord> typeState, int ordinal) {

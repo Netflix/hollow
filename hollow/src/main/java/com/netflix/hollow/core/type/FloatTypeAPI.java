@@ -23,13 +23,10 @@ import com.netflix.hollow.core.type.delegate.FloatDelegate;
 
 public class FloatTypeAPI extends HollowObjectTypeAPI implements FloatDelegate {
 
-    private final HollowAPI api;
-
     public FloatTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        super(typeDataAccess, new String[] {
+        super(api, typeDataAccess, new String[] {
             "value"
         });
-        this.api = api;
     }
 
     public float getValue(int ordinal) {
@@ -46,10 +43,6 @@ public class FloatTypeAPI extends HollowObjectTypeAPI implements FloatDelegate {
             boxedFieldAccessSampler.recordFieldAccess(fieldIndex[0]);
             f = getTypeDataAccess().readFloat(ordinal, fieldIndex[0]);
         }        return Float.isNaN(f) ? null : Float.valueOf(f);
-    }
-
-    public HollowAPI getAPI() {
-        return this.api;
     }
 
     @Override
