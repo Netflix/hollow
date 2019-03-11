@@ -23,7 +23,7 @@ import com.netflix.hollow.core.schema.HollowListSchema;
 
 /**
  * This is the extension of the {@link HollowRecordDelegate} interface for lookup LIST type records.
- *
+ * 
  * @see HollowRecordDelegate
  */
 public class HollowListLookupDelegate<T> implements HollowListDelegate<T> {

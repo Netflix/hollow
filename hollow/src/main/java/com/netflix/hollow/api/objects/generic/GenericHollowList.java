@@ -31,7 +31,7 @@ import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
  * without a custom-generated API. 
  */
 public class GenericHollowList extends HollowList<HollowRecord> {
-
+    
     public GenericHollowList(HollowDataAccess dataAccess, String type, int ordinal) {
         this((HollowListTypeDataAccess)dataAccess.getTypeDataAccess(type, ordinal), ordinal);
     }
@@ -78,5 +78,5 @@ public class GenericHollowList extends HollowList<HollowRecord> {
     public String toString() {
         return new HollowRecordStringifier().stringify(this);
     }
-
+    
 }
