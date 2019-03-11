@@ -36,7 +36,7 @@ import java.util.Arrays;
  * 
  * @see HollowTypeAPI
  */
-public class HollowObjectTypeAPI extends HollowTypeAPI implements HollowObjectDelegate {
+public abstract class HollowObjectTypeAPI extends HollowTypeAPI implements HollowObjectDelegate {
 
     protected final String fieldNames[];
     protected final int fieldIndex[];
