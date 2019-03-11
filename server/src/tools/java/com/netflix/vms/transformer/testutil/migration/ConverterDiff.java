@@ -125,7 +125,6 @@ public class ConverterDiff {
         diff.addTypeDiff("PersonAliases", "aliasId");
         diff.addTypeDiff("Persons", "personId");
         diff.addTypeDiff("ProtectionTypes", "id");
-        diff.addTypeDiff("Ratings", "ratingId");
         diff.addTypeDiff("Rollout", "movieId", "rolloutId");
         diff.addTypeDiff("ShowMemberTypes", "showMemberTypeId");
         diff.addTypeDiff("Status", "movieId", "countryCode.value");

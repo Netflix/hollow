@@ -328,7 +328,7 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int) inputAPI.getVideoArtworkSourceHollow(ordinal)._getMovieId());
                 }
             });
-            
+
             includeAll(stateEngine, "DamMerchStills");
             includeAll(stateEngine, "TopN");
             includeAll(stateEngine, "AltGenres");
@@ -356,7 +356,6 @@ public class DataSlicerImpl implements DataSlicer {
             includeAll(stateEngine, "PersonArtworkSource");
             includeAll(stateEngine, "Persons");
             includeAll(stateEngine, "ProtectionTypes");
-            includeAll(stateEngine, "Ratings");
             includeAll(stateEngine, "ShowMemberTypes");
             includeAll(stateEngine, "StorageGroups");
             includeAll(stateEngine, "StreamProfileGroups");
@@ -483,6 +482,10 @@ public class DataSlicerImpl implements DataSlicer {
         }
 
         private BitSet populatedOrdinals(HollowReadStateEngine stateEngine, String type) {
+            if (stateEngine.getTypeState(type) == null) {
+                return new BitSet();
+            }
+
             return stateEngine.getTypeState(type).getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
         }
 
