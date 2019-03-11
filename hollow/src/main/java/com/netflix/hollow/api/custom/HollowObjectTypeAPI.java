@@ -43,11 +43,7 @@ public class HollowObjectTypeAPI extends HollowTypeAPI implements HollowObjectDe
 
     protected final HollowObjectSampler boxedFieldAccessSampler;
 
-    public HollowObjectTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess) {
-        this(api, typeDataAccess, typeDataAccess.getSchema().getFieldNames());
-    }
-
-    public HollowObjectTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess, String fieldNames[]) {
+    protected HollowObjectTypeAPI(HollowAPI api, HollowObjectTypeDataAccess typeDataAccess, String fieldNames[]) {
         super(api, typeDataAccess);
         this.fieldNames = fieldNames;
         this.fieldIndex = new int[fieldNames.length];

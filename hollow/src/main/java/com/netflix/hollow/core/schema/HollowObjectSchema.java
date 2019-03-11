@@ -117,10 +117,6 @@ public class HollowObjectSchema extends HollowSchema {
         return index;
     }
 
-    public String[] getFieldNames() {
-        return fieldNames.clone();
-    }
-
     public String getFieldName(int fieldPosition) {
         return fieldNames[fieldPosition];
     }
