@@ -68,6 +68,8 @@ import javax.xml.bind.DatatypeConverter;
 public class PackageDataModule {
 
     static final int WMDRMKEY_GROUP = 1;
+	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
+    
 
     private final VMSHollowInputAPI api;
     private final HollowObjectMapper mapper;
@@ -225,7 +227,7 @@ public class PackageDataModule {
         		if(algo != null)
         			timecode.encodingAlgorithmHash = new Strings(algo._getValue());
         		else
-        			timecode.encodingAlgorithmHash = new Strings("default");
+        			timecode.encodingAlgorithmHash = new Strings(DEFAULT_ENCODING_ALGORITHM);
         		timecodes.add(timecode);
         	}
         }

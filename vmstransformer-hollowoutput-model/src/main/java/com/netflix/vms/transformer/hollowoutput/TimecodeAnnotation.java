@@ -4,10 +4,10 @@ import java.util.Objects;
 
 public class TimecodeAnnotation implements Cloneable {
 
-	public char[] type;
-	public long startMillis;
-	public long endMillis;
-	public Strings encodingAlgorithmHash;
+	public char[] type = null;
+	public long startMillis = -1;
+	public long endMillis = -1;
+	public Strings encodingAlgorithmHash = null;
 	@Override
 	public int hashCode() {
 		return Objects.hash(type, startMillis, endMillis);

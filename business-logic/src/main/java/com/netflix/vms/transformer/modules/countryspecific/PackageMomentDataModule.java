@@ -13,6 +13,7 @@ import java.util.Map;
 
 public class PackageMomentDataModule {
 
+	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
     private final Map<Integer, PackageMomentData> packageMomentDataByPackageId;
 
     public PackageMomentDataModule() {
@@ -51,7 +52,7 @@ public class PackageMomentDataModule {
         			if(algo != null)
        					annotation.encodingAlgorithmHash = new Strings(algo._getValue());
         			else
-        				annotation.encodingAlgorithmHash = new Strings("default");
+        				annotation.encodingAlgorithmHash = new Strings(DEFAULT_ENCODING_ALGORITHM);
         			data.timecodes.add(annotation);    				
     			}
     		}

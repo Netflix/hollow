@@ -66,6 +66,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class StreamDataModule {
+	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
+
     public static final VideoFormatDebugMap debugVideoFormatMap = new VideoFormatDebugMap();
     public static final DebugLogConfig debugLogConfig = new DebugLogConfig();
 
@@ -138,7 +140,7 @@ public class StreamDataModule {
         if(algoHash != null)
         	outputStream.encodingAlgorithmHash = new Strings(algoHash._getValue());
         else
-        	outputStream.encodingAlgorithmHash = new Strings("default");
+        	outputStream.encodingAlgorithmHash = new Strings(DEFAULT_ENCODING_ALGORITHM);
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
         outputStream.creationTimeStampInSeconds = inputStreamIdentity._getCreatedTimeSeconds();

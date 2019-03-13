@@ -8,13 +8,13 @@ dependencies {
     compile 'netflix:nfi18n-core'
     compile 'commons-codec:commons-codec'
     compile 'org.mockito:mockito-all:1.3'
-    compile 'netflix:vmsconverter-hollow-api:1.8.5'
+    compile 'netflix:vmsconverter-hollow-api:latest.release'
 
     testCompile 'junit:junit'
     testCompile 'com.netflix.hollow:hollow-test:latest.release'
     testCompile 'org.assertj:assertj-core'
     testCompile 'org.reflections:reflections'
-    testCompile 'netflix:vmsconverter-hollow-pojos:1.8.5'
+    testCompile 'netflix:vmsconverter-hollow-pojos:latest.release'
 }
 
 configurations.all {
