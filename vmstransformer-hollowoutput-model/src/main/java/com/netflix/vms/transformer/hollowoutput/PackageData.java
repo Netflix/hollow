@@ -21,6 +21,7 @@ public class PackageData implements Cloneable {
     public Set<EncodeSummaryDescriptor> muxAudioStreamSummary = null;
     public Set<ISOCountry> allDeployableCountries = null;
     public int runtimeInSeconds = 0;
+    public List<TimecodeAnnotation> timecodes = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -59,6 +60,9 @@ public class PackageData implements Cloneable {
         if(o.packageTags == null) {
             if(packageTags != null) return false;
         }else if(!o.packageTags.equals(packageTags)) return false;
+        if(o.timecodes == null) {
+        	if(timecodes != null) return false;
+        } else if(!o.timecodes.equals(timecodes)) return false;
         return true;
     }
 
@@ -75,6 +79,7 @@ public class PackageData implements Cloneable {
         hashCode = hashCode * 31 + (muxAudioStreamSummary == null ? 1237 : muxAudioStreamSummary.hashCode());
         hashCode = hashCode * 31 + (allDeployableCountries == null ? 1237 : allDeployableCountries.hashCode());
         hashCode = hashCode * 31 + (packageTags == null ? 1237 : packageTags.hashCode());
+        hashCode = hashCode * 31 + (timecodes == null ? 1237 : timecodes.hashCode());
         hashCode = hashCode * 31 + (isDefaultPackage ? 1231 : 1237);
         return hashCode;
     }
@@ -92,6 +97,7 @@ public class PackageData implements Cloneable {
         builder.append(",muxAudioStreamSummary=").append(muxAudioStreamSummary);
         builder.append(",isDefaultPackage=").append(isDefaultPackage);
         builder.append(",packageTags=").append(packageTags);
+        builder.append(",timecodes=").append(timecodes);
         builder.append(",allDeployableCountries=").append(allDeployableCountries);
         builder.append("}");
         return builder.toString();

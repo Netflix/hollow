@@ -9,6 +9,7 @@ public class StreamData implements Cloneable {
     public int packageId = java.lang.Integer.MIN_VALUE;
     public long fileSizeInBytes = java.lang.Long.MIN_VALUE;
     public long creationTimeStampInSeconds = java.lang.Long.MIN_VALUE;
+    public Strings encodingAlgorithmHash = null;
     public StreamDrmData drmData = null;
     public StreamAdditionalData additionalData = null;
     public DownloadDescriptor downloadDescriptor = null;
@@ -45,7 +46,10 @@ public class StreamData implements Cloneable {
         if(o.streamDataDescriptor == null) {
             if(streamDataDescriptor != null) return false;
         } else if(!o.streamDataDescriptor.equals(streamDataDescriptor)) return false;
-
+        if(o.encodingAlgorithmHash == null) {
+        	if(encodingAlgorithmHash != null) return false;
+        } else if(!o.encodingAlgorithmHash.equals(encodingAlgorithmHash)) return false;
+        	
         if(o.cRC32Hash != cRC32Hash) return false;
         if(o.sha1_1 != sha1_1) return false;
         if(o.sha1_2 != sha1_2) return false;
@@ -64,6 +68,7 @@ public class StreamData implements Cloneable {
         hashCode = hashCode * 31 + (additionalData == null ? 1237 : additionalData.hashCode());
         hashCode = hashCode * 31 + (downloadDescriptor == null ? 1237 : downloadDescriptor.hashCode());
         hashCode = hashCode * 31 + (streamDataDescriptor == null ? 1237 : streamDataDescriptor.hashCode());
+        hashCode = hashCode * 31 + (encodingAlgorithmHash == null ? 1237 : encodingAlgorithmHash.hashCode());
         hashCode = hashCode * 31 + (int) (cRC32Hash ^ (cRC32Hash >>> 32));
         hashCode = hashCode * 31 + (int) (sha1_1 ^ (sha1_1 >>> 32));
         hashCode = hashCode * 31 + (int) (sha1_2 ^ (sha1_2 >>> 32));
@@ -81,6 +86,7 @@ public class StreamData implements Cloneable {
         builder.append(",additionalData=").append(additionalData);
         builder.append(",downloadDescriptor=").append(downloadDescriptor);
         builder.append(",streamDataDescriptor=").append(streamDataDescriptor);
+        builder.append(",encodingAlgorithmHash=").append(encodingAlgorithmHash);
         builder.append(",cRC32Hash=").append(cRC32Hash);
         builder.append(",sha1_1=").append(sha1_1);
         builder.append(",sha1_2=").append(sha1_2);

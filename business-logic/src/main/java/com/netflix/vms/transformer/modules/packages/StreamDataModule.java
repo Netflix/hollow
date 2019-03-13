@@ -66,6 +66,8 @@ import java.util.Objects;
 import java.util.Set;
 
 public class StreamDataModule {
+	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
+
     public static final VideoFormatDebugMap debugVideoFormatMap = new VideoFormatDebugMap();
     public static final DebugLogConfig debugLogConfig = new DebugLogConfig();
 
@@ -118,7 +120,7 @@ public class StreamDataModule {
         if (streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
         }
-
+        
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();
         StreamDeploymentHollow inputStreamDeployment = inputStream._getDeployment();
@@ -132,6 +134,13 @@ public class StreamDataModule {
 
         outputStream.downloadableId = new DownloadableId(inputStream._getDownloadableId());
         outputStream.packageId = (int)packages._getPackageId();
+
+        // Get the encoding algorithm
+        StringHollow algoHash = inputStream._getEncodingAlgorithmHash();
+        if(algoHash != null)
+        	outputStream.encodingAlgorithmHash = new Strings(algoHash._getValue());
+        else
+        	outputStream.encodingAlgorithmHash = new Strings(DEFAULT_ENCODING_ALGORITHM);
 
         outputStream.fileSizeInBytes = inputStreamIdentity._getFileSizeInBytes();
         outputStream.creationTimeStampInSeconds = inputStreamIdentity._getCreatedTimeSeconds();

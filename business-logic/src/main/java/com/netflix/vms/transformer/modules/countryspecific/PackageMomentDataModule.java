@@ -1,11 +1,11 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
+import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodeAnnotationsListHollow;
 import com.netflix.vms.transformer.hollowinput.TimecodedMomentAnnotationHollow;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
+import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimecodeAnnotation;
 
 import java.util.HashMap;
@@ -13,15 +13,14 @@ import java.util.Map;
 
 public class PackageMomentDataModule {
 
+	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
     private final Map<Integer, PackageMomentData> packageMomentDataByPackageId;
-    private final TransformerConfig config;
 
-    public PackageMomentDataModule(TransformerConfig config) {
+    public PackageMomentDataModule() {
         this.packageMomentDataByPackageId = new HashMap<>();
-        this.config = config;
     }
 
-    public PackageMomentData getWindowPackageMomentData(PackageData packageData, PackageHollow inputPackage,  TransformerContext ctx) {
+    public PackageMomentData getWindowPackageMomentData(PackageData packageData, PackageHollow inputPackage) {
 
         PackageMomentData packageMomentData = packageMomentDataByPackageId.get(Integer.valueOf(packageData.id));
         if (packageMomentData != null)
@@ -49,6 +48,11 @@ public class PackageMomentDataModule {
         			annotation.type = moment._getType()._getValue().toCharArray();
         			annotation.startMillis = moment._getStartMillis();
         			annotation.endMillis = moment._getEndMillis();
+        			StringHollow algo = moment._getEncodingAlgorithmHash();
+        			if(algo != null)
+       					annotation.encodingAlgorithmHash = new Strings(algo._getValue());
+        			else
+        				annotation.encodingAlgorithmHash = new Strings(DEFAULT_ENCODING_ALGORITHM);
         			data.timecodes.add(annotation);    				
     			}
     		}
