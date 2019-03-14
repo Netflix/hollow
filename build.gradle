@@ -34,7 +34,11 @@ subprojects {
         resolutionStrategy {
             force 'com.google.inject.extensions:guice-servlet:latest.release'
             force 'org.apache.commons:commons-lang3:latest.release'
-            
+
+            // force to current versions until platform's recommendation is stable
+            force 'netflix:platform-aws:4.7.39'
+            force 'net.java.dev.jets3t:jets3t:0.9.0'
+
             def platform_components = [
                 'adminresources',
                 'akmsclient',
