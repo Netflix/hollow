@@ -40,13 +40,13 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.copy.HollowRecordCopier;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -63,8 +63,8 @@ import java.util.Set;
  */
 public class HollowCombiner {
 
-    private final HollowReadStateEngine inputs[];
-    private final OrdinalRemapper ordinalRemappers[];
+    private final HollowReadStateEngine[] inputs;
+    private final OrdinalRemapper[] ordinalRemappers;
 
     private final HollowWriteStateEngine output;
     private final Set<String> typeNamesWithDefinedHashCodes;
@@ -81,7 +81,15 @@ public class HollowCombiner {
      * @param inputs the set of {@link HollowReadStateEngine} to combine data from.
      */
     public HollowCombiner(HollowReadStateEngine... inputs) {
-        this(HollowWriteStateCreator.createWithSchemas(inputs[0].getSchemas()), inputs);
+        this(HollowWriteStateCreator.createWithSchemas(validateInputs(inputs)[0].getSchemas()), inputs);
+    }
+
+    static HollowReadStateEngine[] validateInputs(HollowReadStateEngine... inputs) {
+        Objects.requireNonNull(inputs);
+        if (inputs.length == 0) {
+            throw new IllegalArgumentException("No input read state engines");
+        }
+        return inputs;
     }
 
     /**
@@ -106,21 +114,24 @@ public class HollowCombiner {
      * @param inputs the set of {@link HollowReadStateEngine} to combine data from.
      */
     public HollowCombiner(HollowCombinerCopyDirector copyDirector, HollowWriteStateEngine output, HollowReadStateEngine... inputs) {
-        this.inputs = inputs;
+        Objects.requireNonNull(copyDirector);
+        Objects.requireNonNull(output);
+
+        this.inputs = validateInputs(inputs);
         this.output = output;
 
         this.typeNamesWithDefinedHashCodes = getAllTypesWithDefinedHashCodes();
         this.ordinalRemappers = new OrdinalRemapper[inputs.length];
-        this.copiersPerType = new ThreadLocal<Map<String, HollowCombinerCopier>>();
-        this.hashOrderIndependentOrdinalMaps = new HashMap<String, ByteArrayOrdinalMap>();
-        this.ignoredTypes = new HashSet<String>();
+        this.copiersPerType = new ThreadLocal<>();
+        this.hashOrderIndependentOrdinalMaps = new HashMap<>();
+        this.ignoredTypes = new HashSet<>();
         this.copyDirector = copyDirector;
 
         initializePrimaryKeys();
     }
 
     private Set<String> getAllTypesWithDefinedHashCodes() {
-        Set<String> unionOfTypesWithDefinedHashCodes = new HashSet<String>();
+        Set<String> unionOfTypesWithDefinedHashCodes = new HashSet<>();
         for(HollowReadStateEngine input : inputs) {
             unionOfTypesWithDefinedHashCodes.addAll(input.getTypesWithDefinedHashCodes());
         }
@@ -140,9 +151,18 @@ public class HollowCombiner {
      * @param newKeys the new primary keys
      */
     public void setPrimaryKeys(PrimaryKey... newKeys) {
+        Objects.requireNonNull(newKeys);
+        if (newKeys.length == 0) {
+            return;
+        }
+
+        if (inputs.length == 1) {
+            return;
+        }
+
         /// deduplicate new keys with existing keys
         //process existing ones first
-        Map<String, PrimaryKey> keysByType = new HashMap<String, PrimaryKey>();
+        Map<String, PrimaryKey> keysByType = new HashMap<>();
         for (PrimaryKey primaryKey : primaryKeys) {
             keysByType.put(primaryKey.getType(), primaryKey);
         }
@@ -152,7 +172,7 @@ public class HollowCombiner {
             keysByType.put(primaryKey.getType(), primaryKey);
         }
 
-        this.primaryKeys = sortPrimaryKeys(new ArrayList<PrimaryKey>(keysByType.values()));
+        this.primaryKeys = sortPrimaryKeys(new ArrayList<>(keysByType.values()));
     }
 
     public List<PrimaryKey> getPrimaryKeys() {
@@ -160,9 +180,14 @@ public class HollowCombiner {
     }
     
     private void initializePrimaryKeys() {
-        List<PrimaryKey> keys = new ArrayList<PrimaryKey>();
+        if (inputs.length == 1) {
+            this.primaryKeys = new ArrayList<>();
+            return;
+        }
+
+        List<PrimaryKey> keys = new ArrayList<>();
         for (HollowSchema schema : output.getSchemas()) {
-            if (schema.getSchemaType() == SchemaType.OBJECT) {
+            if (schema.getSchemaType() == SchemaType.OBJECT && !ignoredTypes.contains(schema.getName())) {
                 PrimaryKey pk = ((HollowObjectSchema) schema).getPrimaryKey();
                 if (pk != null)
                     keys.add(pk);
@@ -174,14 +199,14 @@ public class HollowCombiner {
     
     private List<PrimaryKey> sortPrimaryKeys(List<PrimaryKey> primaryKeys) {
         final List<HollowSchema> dependencyOrderedSchemas = HollowSchemaSorter.dependencyOrderedSchemaList(output.getSchemas());
-        Collections.sort(primaryKeys, new Comparator<PrimaryKey>() {
+        primaryKeys.sort(new Comparator<PrimaryKey>() {
             public int compare(PrimaryKey o1, PrimaryKey o2) {
                 return schemaDependencyIdx(o1) - schemaDependencyIdx(o2);
             }
 
             private int schemaDependencyIdx(PrimaryKey key) {
-                for(int i=0;i<dependencyOrderedSchemas.size();i++) {
-                    if(dependencyOrderedSchemas.get(i).getName().equals(key.getType()))
+                for (int i = 0; i < dependencyOrderedSchemas.size(); i++) {
+                    if (dependencyOrderedSchemas.get(i).getName().equals(key.getType()))
                         return i;
                 }
                 throw new IllegalArgumentException("Primary key defined for non-existent type: " + key.getType());
@@ -212,23 +237,23 @@ public class HollowCombiner {
         createOrdinalRemappers();
         createHashOrderIndependentOrdinalMaps();
 
-        final Set<String> processedTypes = new HashSet<String>();
-        final Set<PrimaryKey> processedPrimaryKeys = new HashSet<PrimaryKey>();
-        final Set<PrimaryKey> selectedPrimaryKeys = new HashSet<PrimaryKey>();
+        final Set<String> processedTypes = new HashSet<>();
+        final Set<PrimaryKey> processedPrimaryKeys = new HashSet<>();
+        final Set<PrimaryKey> selectedPrimaryKeys = new HashSet<>();
 
         while(processedTypes.size() < output.getOrderedTypeStates().size()){
 
             /// find the next primary keys
             for(PrimaryKey key : primaryKeys) {
-                if(!processedPrimaryKeys.contains(key)) {
+                if (!processedPrimaryKeys.contains(key) && !ignoredTypes.contains(key.getType())) {
                     if(!isAnySelectedPrimaryKeyADependencyOf(key.getType(), selectedPrimaryKeys)) {
                         selectedPrimaryKeys.add(key);
                     }
                 }
             }
 
-            final Set<String> typesToProcessThisIteration = new HashSet<String>();
-            final Map<String, HollowPrimaryKeyIndex[]> primaryKeyIndexes = new HashMap<String, HollowPrimaryKeyIndex[]>();
+            final Set<String> typesToProcessThisIteration = new HashSet<>();
+            final Map<String, HollowPrimaryKeyIndex[]> primaryKeyIndexes = new HashMap<>();
             final HollowCombinerExcludePrimaryKeysCopyDirector primaryKeyCopyDirector = new HollowCombinerExcludePrimaryKeysCopyDirector(copyDirector);
 
             for(HollowSchema schema : output.getSchemas()) {
@@ -250,7 +275,7 @@ public class HollowCombiner {
                                         int ordinal = populatedOrdinals.nextSetBit(0);
                                         while(ordinal != -1) {
                                             if(primaryKeyCopyDirector.shouldCopy(typeState, ordinal)) {
-                                                Object recordKey[] = indexes[i].getRecordKey(ordinal);
+                                                Object[] recordKey = indexes[i].getRecordKey(ordinal);
     
                                                 for(int j=i+1;j<indexes.length;j++) {
                                                     primaryKeyCopyDirector.excludeKey(indexes[j], recordKey);
@@ -276,48 +301,49 @@ public class HollowCombiner {
 
             for(int i=0;i<numThreads;i++) {
                 final int threadNumber = i;
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(int i=0;i<inputs.length;i++) {
-                            HollowCombinerCopyDirector copyDirector = selectedPrimaryKeys.isEmpty() ? HollowCombiner.this.copyDirector : primaryKeyCopyDirector;
+                executor.execute(() -> {
+                    for(int i1 =0; i1 <inputs.length; i1++) {
+                        HollowCombinerCopyDirector copyDirector = selectedPrimaryKeys.isEmpty()
+                                ? HollowCombiner.this.copyDirector
+                                : primaryKeyCopyDirector;
 
-                            HollowReadStateEngine inputEngine = inputs[i];
-                            OrdinalRemapper ordinalRemapper = selectedPrimaryKeys.isEmpty() ? ordinalRemappers[i] : new HollowCombinerPrimaryKeyOrdinalRemapper(ordinalRemappers, primaryKeyIndexes, i);
+                        HollowReadStateEngine inputEngine = inputs[i1];
+                        OrdinalRemapper ordinalRemapper = selectedPrimaryKeys.isEmpty()
+                                ? ordinalRemappers[i1]
+                                : new HollowCombinerPrimaryKeyOrdinalRemapper(ordinalRemappers, primaryKeyIndexes, i1);
 
-                            Map<String, HollowCombinerCopier> copierMap = new HashMap<String, HollowCombinerCopier>();
-                            List<HollowCombinerCopier> copierList = new ArrayList<HollowCombinerCopier>();
+                        Map<String, HollowCombinerCopier> copierMap = new HashMap<>();
+                        List<HollowCombinerCopier> copierList = new ArrayList<>();
 
-                            for(String typeName : typesToProcessThisIteration) {
-                                HollowTypeReadState readState = inputEngine.getTypeState(typeName);
-                                HollowTypeWriteState writeState = output.getTypeState(typeName);
-                                if (readState != null && writeState != null) {
-                                    HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemapper);
-                                    copierList.add(copier);
-                                    copierMap.put(typeName, copier);
-                                }
+                        for(String typeName : typesToProcessThisIteration) {
+                            HollowTypeReadState readState = inputEngine.getTypeState(typeName);
+                            HollowTypeWriteState writeState = output.getTypeState(typeName);
+                            if (readState != null && writeState != null) {
+                                HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemapper);
+                                copierList.add(copier);
+                                copierMap.put(typeName, copier);
                             }
-
-                            for(String typeName : processedTypes) {
-                                HollowTypeReadState readState = inputEngine.getTypeState(typeName);
-                                HollowTypeWriteState writeState = output.getTypeState(typeName);
-                                if (readState != null && writeState != null) {
-                                    HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemappers[i]);
-                                    copierMap.put(typeName, copier);
-                                }
-                            }
-
-                            copiersPerType.set(copierMap);
-
-                            int currentOrdinal = threadNumber;
-
-                            while(!copierList.isEmpty()) {
-                                copyOrdinalForAllStates(currentOrdinal, copierList, ordinalRemapper, copyDirector);
-
-                                currentOrdinal += numThreads;
-                            }
-
                         }
+
+                        for(String typeName : processedTypes) {
+                            HollowTypeReadState readState = inputEngine.getTypeState(typeName);
+                            HollowTypeWriteState writeState = output.getTypeState(typeName);
+                            if (readState != null && writeState != null) {
+                                HollowCombinerCopier copier = new HollowCombinerCopier(readState, writeState, ordinalRemappers[i1]);
+                                copierMap.put(typeName, copier);
+                            }
+                        }
+
+                        copiersPerType.set(copierMap);
+
+                        int currentOrdinal = threadNumber;
+
+                        while(!copierList.isEmpty()) {
+                            copyOrdinalForAllStates(currentOrdinal, copierList, ordinalRemapper, copyDirector);
+
+                            currentOrdinal += numThreads;
+                        }
+
                     }
                 });
             }
@@ -360,7 +386,8 @@ public class HollowCombiner {
         return output;
     }
 
-    private void copyOrdinalForAllStates(int currentOrdinal, List<HollowCombinerCopier> copiers, OrdinalRemapper ordinalRemapper, HollowCombinerCopyDirector copyDirector) {
+    void copyOrdinalForAllStates(int currentOrdinal, List<HollowCombinerCopier> copiers,
+            OrdinalRemapper ordinalRemapper, HollowCombinerCopyDirector copyDirector) {
         Iterator<HollowCombinerCopier> iter = copiers.iterator();
         while(iter.hasNext()) {
             HollowCombinerCopier copier = iter.next();
@@ -376,7 +403,10 @@ public class HollowCombiner {
     }
 
     int copyOrdinal(String typeName, int currentOrdinal) {
-        return copiersPerType.get().get(typeName).copy(currentOrdinal);
+        HollowCombinerCopier hollowCombinerCopier = copiersPerType.get().get(typeName);
+        return hollowCombinerCopier == null
+                ? currentOrdinal
+                : hollowCombinerCopier.copy(currentOrdinal);
     }
 
     private OrdinalRemapper[] createOrdinalRemappers() {
@@ -410,7 +440,7 @@ public class HollowCombiner {
         private final ByteArrayOrdinalMap hashOrderIndependentOrdinalMap;
         private final ByteDataBuffer scratch;
 
-        private HollowCombinerCopier(HollowTypeReadState readState, HollowTypeWriteState writeState, OrdinalRemapper ordinalRemapper) {
+        HollowCombinerCopier(HollowTypeReadState readState, HollowTypeWriteState writeState, OrdinalRemapper ordinalRemapper) {
             this.copier = HollowRecordCopier.createCopier(readState, writeState.getSchema(), ordinalRemapper, isDefinedHashCode(readState.getSchema()));
             this.populatedOrdinals = readState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
             this.writeState = writeState;
@@ -419,7 +449,7 @@ public class HollowCombiner {
             this.scratch = hashOrderIndependentOrdinalMap != null ? new ByteDataBuffer(WastefulRecycler.SMALL_ARRAY_RECYCLER) : null;
         }
 
-        private int copy(int ordinal) {
+        int copy(int ordinal) {
             if(isOrdinalPopulated(ordinal)) {
                 if(!ordinalRemapper.ordinalIsMapped(getType(), ordinal)) {
                     HollowWriteRecord rec = copier.copy(ordinal);
@@ -452,15 +482,15 @@ public class HollowCombiner {
             return -1;
         }
 
-        private boolean isOrdinalPopulated(int ordinal) {
+        boolean isOrdinalPopulated(int ordinal) {
             return populatedOrdinals.get(ordinal);
         }
 
-        private String getType() {
+        String getType() {
             return copier.getReadTypeState().getSchema().getName();
         }
 
-        private HollowTypeReadState getReadTypeState() {
+        HollowTypeReadState getReadTypeState() {
             return copier.getReadTypeState();
         }
     }
