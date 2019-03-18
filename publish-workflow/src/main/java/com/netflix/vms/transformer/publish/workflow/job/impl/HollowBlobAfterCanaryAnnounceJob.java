@@ -6,9 +6,11 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMo
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
@@ -23,29 +25,37 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
 	private static final long MAX_TIME_NEEDED_FOR_CLIENT_TO_LOAD_A_VERSION = 300000; // 5 minute
 
+	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 	private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
+	private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder videoRanker;
-	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
-	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion,
-			RegionEnum region, CanaryAnnounceJob canaryAnnounceJob, PlaybackMonkeyTester dataTester,
+	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region,
+			CanaryAnnounceJob canaryAnnounceJob,
+			PlaybackMonkeyTester dataTester,
+			HollowBlobDataProvider hollowBlobDataProvider,
 			ValuableVideoHolder videoRanker) {
-		super(ctx, ctx.getVip(), newVersion, region, canaryAnnounceJob);
+		super(ctx, vip, newVersion, region, canaryAnnounceJob);
 		this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
+		this.hollowBlobDataProvider = hollowBlobDataProvider;
 		this.videoRanker = videoRanker;
 	}
 
 	@Override
-	protected boolean executeJob() {
+	public boolean executeJob() {
+		return executeJob(hollowBlobDataProvider.getStateEngine());
+	}
+
+	public boolean executeJob(HollowReadStateEngine readStateEngine) {
 		boolean success = true;
 		if(region.equals(RegionEnum.US_EAST_1) && ctx.getConfig().isPlaybackMonkeyEnabled()){
 			final long now = System.currentTimeMillis();
 			try {
 				if(isPlaybackMonkeyInstancesReadyForTest()){
-						Set<ValuableVideo> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion());
+						Set<ValuableVideo> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion(), readStateEngine);
 						ctx.getLogger().info(PlaybackMonkey, "{}: got {} most valuable videos to test.", getJobName(), mostValuableChangedVideos.size());
 
 						testResultVideoCountryKeys = dataTester.testVideoCountryKeysWithRetry(ctx.getLogger(), mostValuableChangedVideos, ctx.getConfig().getPlaybackMonkeyMaxRetriesPerTest());

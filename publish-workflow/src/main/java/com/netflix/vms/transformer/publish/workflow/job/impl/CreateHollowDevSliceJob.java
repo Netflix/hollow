@@ -43,8 +43,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         this.sliceVip = ctx.getVip() + "_devslice";
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         try {
             HollowWriteStateEngine sliceOutputBlob = createSlice();
             

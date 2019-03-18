@@ -8,38 +8,43 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ComparisonChain;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
+import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 import com.netflix.type.ISOCountry;
 import com.netflix.type.NFCountry;
 import com.netflix.vms.generated.notemplate.CompleteVideoHollow;
 import com.netflix.vms.generated.notemplate.FloatHollow;
+import com.netflix.vms.generated.notemplate.ISOCountryHollow;
 import com.netflix.vms.generated.notemplate.IntegerHollow;
 import com.netflix.vms.generated.notemplate.MapOfIntegerToFloatHollow;
 import com.netflix.vms.generated.notemplate.MapOfIntegerToWindowPackageContractInfoHollow;
+import com.netflix.vms.generated.notemplate.PackageDataHollow;
 import com.netflix.vms.generated.notemplate.TopNVideoDataHollow;
 import com.netflix.vms.generated.notemplate.VMSAvailabilityWindowHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
+import com.netflix.vms.generated.notemplate.VideoHollow;
 import com.netflix.vms.generated.notemplate.WindowPackageContractInfoHollow;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 public class ValuableVideoHolder {
-	private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final Map<Long, Set<ValuableVideo>> mostValuableVideosToTestByCycle;
-	private final Set<VideoCountryKey> pastFailedIDsToCheck = new HashSet<>();
+	private final Set<VideoCountryKey> pastFailedIDsToCheck;
 	
-	public static class ValuableVideo extends VideoCountryKey{
+	public static class ValuableVideo extends VideoCountryKey {
 	    private final boolean isAvailableForDownload;
 	    
         public boolean isAvailableForDownload() {
@@ -74,20 +79,107 @@ public class ValuableVideoHolder {
         }
 	}
 
-    public ValuableVideoHolder(final HollowBlobDataProvider hollowBlobDataProvider) {
-        this.hollowBlobDataProvider = hollowBlobDataProvider;
-        this.mostValuableVideosToTestByCycle = new HashMap<Long, Set<ValuableVideo>>();
+    public ValuableVideoHolder() {
+        this.mostValuableVideosToTestByCycle = new HashMap<>();
+        this.pastFailedIDsToCheck = new HashSet<>();
     }
     
-	public Set<ValuableVideo> getMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
+	public Set<ValuableVideo> getMostValuableChangedVideos(PublishWorkflowContext ctx, long version,
+			HollowReadStateEngine readStateEngine) {
 		Set<ValuableVideo> valuableVideos = mostValuableVideosToTestByCycle.get(version);
 		if(valuableVideos == null){
-			valuableVideos = computeMostValuableChangedVideos(ctx, version);
+			valuableVideos = computeMostValuableChangedVideos(ctx, version, readStateEngine);
 			mostValuableVideosToTestByCycle.put(version, valuableVideos);
 		}
 		return valuableVideos;
 	}
-	
+
+	public Map<String, TopNVideoDataHollow> getTopNData(HollowReadStateEngine readStateEngine) {
+		// Read from blob
+		Map <String, TopNVideoDataHollow> result = new HashMap<>();
+
+		VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
+
+		for(TopNVideoDataHollow topn: api.getAllTopNVideoDataHollow()){
+
+			String countryId = topn._getCountryId();
+
+			result.put(countryId, topn);
+
+		}
+		return result;
+	}
+
+	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnPackages(HollowReadStateEngine readStateEngine) {
+		HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("PackageData");
+		PopulatedOrdinalListener packageListener = typeState.getListener(PopulatedOrdinalListener.class);
+		BitSet modifiedPackages = new BitSet(packageListener.getPopulatedOrdinals().length());
+		modifiedPackages.or(packageListener.getPopulatedOrdinals());
+		modifiedPackages.xor(packageListener.getPreviousOrdinals());
+
+		if (modifiedPackages.cardinality() == 0|| modifiedPackages.cardinality() == packageListener.getPopulatedOrdinals().cardinality())
+			return Collections.emptyMap();
+
+		Map<String, Set<Integer>> modifiedPackageVideoIds = new HashMap<>();
+		VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
+
+		int ordinal = modifiedPackages.nextSetBit(0);
+		while (ordinal != -1) {
+			PackageDataHollow packageData = api.getPackageDataHollow(ordinal);
+			Set<ISOCountryHollow> deployCountries = packageData._getAllDeployableCountries();
+			VideoHollow video = packageData._getVideo();
+
+			if (deployCountries == null || video == null)
+				continue;
+
+			Iterator<ISOCountryHollow> iterator = deployCountries.iterator();
+			while (iterator.hasNext()) {
+				String countryId = iterator.next()._getId();
+				Set<Integer> modIdsForCountry = modifiedPackageVideoIds.get(countryId);
+				if (modIdsForCountry == null) {
+					modIdsForCountry = new HashSet<Integer>();
+					modifiedPackageVideoIds.put(countryId, modIdsForCountry);
+				}
+				modIdsForCountry.add(video._getValue());
+			}
+			ordinal = modifiedPackages.nextSetBit(ordinal + 1);
+		}
+		return modifiedPackageVideoIds;
+	}
+
+	public Map<String, Set<Integer>> changedVideoCountryKeysBasedOnCompleteVideos(HollowReadStateEngine readStateEngine) {
+		HollowObjectTypeReadState typeState = (HollowObjectTypeReadState) readStateEngine.getTypeState("CompleteVideo");
+		PopulatedOrdinalListener completeVideoListener = typeState.getListener(PopulatedOrdinalListener.class);
+		BitSet modifiedCompleteVideos = new BitSet(completeVideoListener.getPopulatedOrdinals().length());
+		modifiedCompleteVideos.or(completeVideoListener.getPopulatedOrdinals());
+		modifiedCompleteVideos.xor(completeVideoListener.getPreviousOrdinals());
+
+		if(modifiedCompleteVideos.cardinality() == 0 || modifiedCompleteVideos.cardinality() == completeVideoListener.getPopulatedOrdinals().cardinality())
+			return Collections.emptyMap();
+
+		VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
+		Map<String, Set<Integer>> modifiedIds = new HashMap<>();
+
+		int ordinal = modifiedCompleteVideos.nextSetBit(0);
+		while(ordinal != -1) {
+			CompleteVideoHollow cv = api.getCompleteVideoHollow(ordinal);
+
+			int videoId = cv._getId()._getValue();
+			String countryId = cv._getCountry()._getId();
+
+			Set<Integer> videoIds = modifiedIds.get(countryId);
+			if(videoIds == null) {
+				videoIds = new HashSet<>();
+				modifiedIds.put(countryId, videoIds);
+			}
+			videoIds.add(videoId);
+
+			ordinal = modifiedCompleteVideos.nextSetBit(ordinal + 1);
+		}
+
+		return modifiedIds;
+	}
+
 	/**
 	 * The following logic uses for each country video that had package change this cycle, videos that had complete video change this cycle,
 	 * previous cycle failed videos to determine most valuable video to test for this cycle (for PBM).
@@ -98,7 +190,8 @@ public class ValuableVideoHolder {
 	 * @param version
 	 * @return
 	 */
-	private Set<ValuableVideo> computeMostValuableChangedVideos(PublishWorkflowContext ctx, long version) {
+	private Set<ValuableVideo> computeMostValuableChangedVideos(PublishWorkflowContext ctx, long version,
+			HollowReadStateEngine readStateEngine) {
 		long start = System.currentTimeMillis();
 		String importantCountriesCSV = ctx.getConfig().getPlaybackMonkeyTestForCountries();
 		Set<String> importantCountriesToTest = new HashSet<String>(); 
@@ -110,11 +203,11 @@ public class ValuableVideoHolder {
 
 		Set<ValuableVideo> mostValueableVideosToTest = new HashSet<ValuableVideo>(maxVideos);
 
-		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
+		final Map<String, TopNVideoDataHollow> topnByCountry = getTopNData(readStateEngine);
 
-		final Map<String, Set<Integer>> videosBasedOnPackageChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnPackages();
+		final Map<String, Set<Integer>> videosBasedOnPackageChanges = changedVideoCountryKeysBasedOnPackages(readStateEngine);
 
-		final Map<String, Set<Integer>> videosBasedOnCompVideoChanges = hollowBlobDataProvider.changedVideoCountryKeysBasedOnCompleteVideos();
+		final Map<String, Set<Integer>> videosBasedOnCompVideoChanges = changedVideoCountryKeysBasedOnCompleteVideos(readStateEngine);
 
 		final int videosPerCountry = maxVideos/ (importantCountriesToTest.size());
 		
@@ -147,9 +240,8 @@ public class ValuableVideoHolder {
 				
 				List<Integer> sortedTopNVideos = getSortedTopNVideos(videoViewHours1Day, videosWithPckgDataChange, videosWithCompVideoChange);
 
-		        HollowReadStateEngine stateEngine = hollowBlobDataProvider.getStateEngine();
-		        VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
-		        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
+		        VMSRawHollowAPI api = new VMSRawHollowAPI(readStateEngine);
+		        HollowPrimaryKeyIndex idx = new HollowPrimaryKeyIndex(readStateEngine, "CompleteVideo", "id.value", "country.id");
 				
 				int size = (videosPerCountry > sortedTopNVideos.size()) ? sortedTopNVideos.size() : videosPerCountry;
 				for (int i = 0; i < size; i++) {
@@ -176,7 +268,9 @@ public class ValuableVideoHolder {
 						 valuedVideosForCountry.size(),
 						 countryId,
 						 getValuableVideosForCountryAsString(valuedVideosForCountry));
-				ctx.getMetricRecorder().recordMetric(Metric.ViewShareCoveredByPBM, getViewShareOfVideos(valuedVideosForCountry).get(countryId), "country", countryId);
+				ctx.getMetricRecorder().recordMetric(Metric.ViewShareCoveredByPBM,
+						getViewShareOfVideos(readStateEngine, valuedVideosForCountry).get(countryId),
+						"country", countryId);
 			} else {
 				ctx.getLogger().warn(PlaybackMonkeyWarn, "For country {} topN videos are empty and so no videos were "
 						+ "added for the country even though the country is in playbackmonkeyTestForCountries property.", countryId);
@@ -296,13 +390,14 @@ public class ValuableVideoHolder {
 		return result;
 	}
 
-	public Map<String, Float> getViewShareOfVideos( Collection<? extends VideoCountryKey> videoCountryKeys) {
+	public Map<String, Float> getViewShareOfVideos(HollowReadStateEngine readStateEngine,
+			Collection<? extends VideoCountryKey> videoCountryKeys) {
 		Map<String, Float> result = new HashMap<>();
 
 		if (videoCountryKeys == null || videoCountryKeys.isEmpty())
 			return result;
 
-		final Map<String, TopNVideoDataHollow> topnByCountry = hollowBlobDataProvider.getTopNData();
+		final Map<String, TopNVideoDataHollow> topnByCountry = getTopNData(readStateEngine);
 		
 		final Map<String, Map<Integer, Float>> viewViewShare1DayByCountry = new HashMap<>(topnByCountry.size());
 		
@@ -501,7 +596,8 @@ public class ValuableVideoHolder {
     }
     
     public static final String GLOBAL_SCOPE = "GLOBAL";
-    protected Collection<String> fetchCountriesForNameSpace(final String namespace, PublishWorkflowContext ctx){
+
+    private Collection<String> fetchCountriesForNameSpace(final String namespace, PublishWorkflowContext ctx){
         if (namespace == null || namespace.trim().isEmpty()) 
             ctx.getLogger().warn(PlaybackMonkeyWarn, "PBM exclude video namespace can not be null or empty");
 

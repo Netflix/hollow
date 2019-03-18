@@ -24,12 +24,20 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     private static final int  RETRY_ATTEMPTS = 10;
     
-    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
-        super(ctx, vip, inputVersion, previousVersion, version, jobType, fileToUpload, isNostreams);
+    public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip,
+            long inputVersion, long previousVersion, long version,
+            PublishType jobType, File fileToUpload, boolean isNostreams) {
+        super(ctx, vip,
+                inputVersion, previousVersion, version,
+                jobType, fileToUpload, isNostreams);
     }
 
     @Override
-    protected boolean executeJob() {
+    public boolean executeJob() {
+        return executeJob(true);
+    }
+
+    public boolean executeJob(boolean publish) {
         FileStore fileStore = ctx.getFileStore();
         HollowProducer.Publisher publisher = isNostreams ? ctx.getNostreamsBlobPublisher() : ctx.getBlobPublisher();
         String currentVersion = String.valueOf(getCycleVersion());
@@ -49,17 +57,20 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
             int retryCount = 0;
             while(retryCount < RETRY_ATTEMPTS) {
                 try {
-                    publisher.publish(fakeProducerBlob(fileToUpload));
-                    
+                    if (publish) {
+                        publisher.publish(fakeProducerBlob(fileToUpload));
+                    }
+
                     String environmentBucketPostfix = "prod".equals(NetflixConfiguration.getEnvironment()) ? "prod" : "test";
-                    
-                    fileStore.writeMetadata("netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.US_EAST_1, getItemAttributes());
+
+                    fileStore.writeMetadata("netflix.bulkdata." + environmentBucketPostfix,
+                            getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.US_EAST_1, getItemAttributes());
                     fileStore.writeMetadata("us-west-2.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.US_WEST_2, getItemAttributes());
                     fileStore.writeMetadata("eu-west-1.netflix.bulkdata." + environmentBucketPostfix, getGutenbergS3ObjectName(), filestoreKeybase, filestoreVersionKey, System.currentTimeMillis(), RegionEnum.EU_WEST_1, getItemAttributes());
                     fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.US_EAST_1, getItemAttributes());
                     fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.US_WEST_2, getItemAttributes());
                     fileStore.setCurrentVersion(filestoreKeybase, filestoreVersionKey, RegionEnum.EU_WEST_1, getItemAttributes());
-                    
+
                     fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.US_EAST_1);
                     fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.US_WEST_2);
                     fileStore.removeObsoleteVersions(filestoreKeybase, 16384, RegionEnum.EU_WEST_1);

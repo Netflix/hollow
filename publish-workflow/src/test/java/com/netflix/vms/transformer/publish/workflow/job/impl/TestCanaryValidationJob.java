@@ -15,8 +15,7 @@ public class TestCanaryValidationJob extends CanaryValidationJob {
         super(context, vip, cycleVersion, afterCanaryAnnounceJobs);
     }
 
-	@Override
-    protected boolean executeJob() {
+	@Override public boolean executeJob() {
         return true;
     }
 }

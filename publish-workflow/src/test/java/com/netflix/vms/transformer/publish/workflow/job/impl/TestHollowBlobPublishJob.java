@@ -13,8 +13,7 @@ public class TestHollowBlobPublishJob extends HollowBlobPublishJob {
         super(context, vip, inputVersion, previousVersion, version, jobType, fileToUpload, noStreams);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return true;
     }
 }

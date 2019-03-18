@@ -11,4 +11,5 @@ public interface PublishWorkflowStager {
     
     HollowReadStateEngine getCurrentReadStateEngine();
 
+    PublishWorkflowContext getContext();
 }

@@ -14,8 +14,7 @@ public class HollowBlobDelayJob extends DelayJob {
         super(ctx, jobToDelay, delayMillis, cycleVersion);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         long endTime = System.currentTimeMillis() + delayMillis;
 
         while(System.currentTimeMillis() < endTime) {

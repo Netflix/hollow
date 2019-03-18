@@ -19,8 +19,7 @@ public class TestHollowBlobDeleteFileJob extends HollowBlobDeleteFileJob {
         this.execute = execute;
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return execute.get();
     }
 }

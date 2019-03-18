@@ -98,9 +98,9 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	}
 
 	@Override
-	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(long newVersion, RegionEnum region,
+	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip, long newVersion, RegionEnum region,
 			CanaryAnnounceJob canaryAnnounceJob) {
-		return new TestAfterCanaryAnnounceJob(context, newVersion, region, canaryAnnounceJob);
+		return new TestAfterCanaryAnnounceJob(context, vip, newVersion, region, canaryAnnounceJob);
 	}
 
 	@Override

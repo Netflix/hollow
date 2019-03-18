@@ -70,7 +70,7 @@ public abstract class PublishWorkflowPublicationJob implements PublicationJob {
         }
     }
 
-    protected abstract boolean executeJob();
+    public abstract boolean executeJob();
 
     private final void notifyBegun() {
         startTimestamp = System.currentTimeMillis();

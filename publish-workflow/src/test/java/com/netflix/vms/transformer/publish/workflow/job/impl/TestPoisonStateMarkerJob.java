@@ -13,8 +13,7 @@ public class TestPoisonStateMarkerJob extends PoisonStateMarkerJob {
         super(context, validationJob, cycleVersion);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         ctx.getStatusIndicator().markFailure(getCycleVersion());
         return true;
     }

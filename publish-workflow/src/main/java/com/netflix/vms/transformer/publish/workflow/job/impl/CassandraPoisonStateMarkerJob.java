@@ -20,8 +20,7 @@ public class CassandraPoisonStateMarkerJob extends PoisonStateMarkerJob {
         this.hollowBlobDataProvider = dataProvider;
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         try {
             ctx.getStatusIndicator().markFailure(getCycleVersion());
             hollowBlobDataProvider.revertToPriorVersion();

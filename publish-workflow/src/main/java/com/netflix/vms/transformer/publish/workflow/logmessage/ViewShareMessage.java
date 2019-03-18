@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.logmessage;
 
 import com.netflix.vms.transformer.common.MessageBuilder;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import java.util.Collection;
 import java.util.List;
 

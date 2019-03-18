@@ -3,9 +3,11 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
@@ -18,23 +20,33 @@ import java.util.Set;
 public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
     private final PlaybackMonkeyTester dataTester;
 	private Map<VideoCountryKey, Boolean> testResultVideoCountryKeys;
+	private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder videoRanker;
 
-	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, long newVersion, RegionEnum region, CircuitBreakerJob circuitBreakerJob,
-			List<PublicationJob> newPublishJobs, PlaybackMonkeyTester dataTester, ValuableVideoHolder videoRanker) {
-		super(ctx, ctx.getVip(), newVersion, region, circuitBreakerJob, newPublishJobs);
+	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region,
+			CircuitBreakerJob circuitBreakerJob,
+			List<PublicationJob> newPublishJobs,
+			PlaybackMonkeyTester dataTester,
+			HollowBlobDataProvider hollowBlobDataProvider,
+			ValuableVideoHolder videoRanker) {
+		super(ctx, vip, newVersion, region, circuitBreakerJob, newPublishJobs);
 		this.dataTester = dataTester;
-		this.videoRanker = videoRanker;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
+		this.hollowBlobDataProvider = hollowBlobDataProvider;
+		this.videoRanker = videoRanker;
 	}
 
 	@Override
-	protected boolean executeJob() {
+	public boolean executeJob() {
+		return executeJob(hollowBlobDataProvider.getStateEngine());
+	}
+
+	public boolean executeJob(HollowReadStateEngine readStateEngine) {
 		boolean success = true;
 		if(region.equals(RegionEnum.US_EAST_1) && ctx.getConfig().isPlaybackMonkeyEnabled()){
 			try {
 				long now = System.currentTimeMillis();
-				Set<ValuableVideo> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion());
+				Set<ValuableVideo> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion(), readStateEngine);
 				ctx.getLogger().info(PlaybackMonkey, "{}: got {} most valuable videos to test.", getJobName(), mostValuableChangedVideos.size());
 
 				if(mostValuableChangedVideos.size() > 0)

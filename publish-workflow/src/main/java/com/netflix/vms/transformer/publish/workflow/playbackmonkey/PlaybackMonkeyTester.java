@@ -17,7 +17,7 @@ import com.netflix.playback.monkey.model.PlaybackMonkeyTestResults.Status;
 import com.netflix.playback.monkey.model.VideoTestDetails;
 import com.netflix.servo.monitor.DynamicCounter;
 import com.netflix.vms.logging.TaggingLogger;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import java.io.IOException;
 import java.net.URI;

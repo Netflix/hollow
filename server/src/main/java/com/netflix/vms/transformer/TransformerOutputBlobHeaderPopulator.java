@@ -8,19 +8,14 @@ import java.util.Map;
 import java.util.Objects;
 
 public class TransformerOutputBlobHeaderPopulator {
-    
-    private final HollowClient inputClient;
-    private final HollowWriteStateEngine outputStateEngine;
     private final TransformerContext ctx;
     
-    public TransformerOutputBlobHeaderPopulator(HollowClient inputClient, HollowWriteStateEngine outputStateEngine, TransformerContext ctx) {
-        this.inputClient = inputClient;
-        this.outputStateEngine = outputStateEngine;
+    public TransformerOutputBlobHeaderPopulator(TransformerContext ctx) {
         this.ctx = ctx;
     }
     
 
-    public Map<String, String> addHeaders(long previousCycleNumber, long currentCycleNumber) {
+    public Map<String, String> addHeaders(HollowClient inputClient, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
         
         outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputClient.getCurrentVersionId()));
         outputStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(ctx.getNowMillis()));

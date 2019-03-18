@@ -16,8 +16,7 @@ public class TestAnnounceJob extends AnnounceJob {
         super(context, vip, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         return true;
     }

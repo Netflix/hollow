@@ -8,10 +8,12 @@ import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
@@ -30,26 +32,35 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
     private static final FastProperty.StringProperty REQUIRED_CANARIES = new FastProperty.StringProperty("com.netflix.vms.server.canary.apps", NO_CANARIES_VALUE);
     private static final long CANARY_TIMEOUT_MS = 300000; /// 5 minutes
 
+	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
     private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
     private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
+    private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder validationVideoHolder;
-	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
 
-    public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
-            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs, ValuableVideoHolder videoRanker) {
+    public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion,
+			Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
+            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs,
+			HollowBlobDataProvider hollowBlobDataProvider,
+			ValuableVideoHolder videoRanker) {
         super(ctx, ctx.getVip(), cycleVersion, afterCanaryAnnounceJobs);
         this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
+		this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
+		this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
+		this.hollowBlobDataProvider = hollowBlobDataProvider;
 		this.validationVideoHolder = videoRanker;
-        this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
-        this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
     }
 
     @Override
-    protected boolean executeJob() {
-        return getCanaryValidationResult() && getPlayBackMonkeyResult();
+	public boolean executeJob() {
+    	return executeJob(hollowBlobDataProvider.getStateEngine());
     }
 
-    private boolean getPlayBackMonkeyResult() {
+	public boolean executeJob(HollowReadStateEngine readStateEngine) {
+		return getCanaryValidationResult() && getPlayBackMonkeyResult(readStateEngine);
+	}
+
+    private boolean getPlayBackMonkeyResult(HollowReadStateEngine readStateEngine) {
         boolean pbmSuccess = true;
         if (ctx.getConfig().isPlaybackMonkeyEnabled()){
 	        try {
@@ -91,7 +102,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 	
 	            if(!failedIDs.isEmpty()){
 	                float missingViewShareThreshold = ctx.getConfig().getPlaybackmonkeyMissingViewShareThreshold();
-	                Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(failedIDs);
+	                Map<String, Float> viewShareOfFailedVideos = validationVideoHolder.getViewShareOfVideos(readStateEngine, failedIDs);
 	                for(String countryId: viewShareOfFailedVideos.keySet()){
 	                	boolean pbmSuccessForThisCountry = true;
 	                    Float missingViewShareForCountry = viewShareOfFailedVideos.get(countryId);

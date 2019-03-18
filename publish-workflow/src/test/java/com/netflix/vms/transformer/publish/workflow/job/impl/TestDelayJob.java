@@ -12,8 +12,7 @@ public class TestDelayJob extends DelayJob {
         super(context, dependency, delayMillis, cycleVersion);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return true;
     }
 }

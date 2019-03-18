@@ -71,8 +71,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
         };
 	}
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         try {
             // @TODO Need to move this to separate job - CBs and PBM depends on this updateData
             hollowBlobDataProvider.updateData(snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);

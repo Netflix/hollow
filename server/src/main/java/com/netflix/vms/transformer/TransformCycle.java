@@ -74,7 +74,7 @@ public class TransformCycle {
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final VMSTransformerWriteStateEngine fastlaneOutputStateEngine;
     private final TransformerContext ctx;
-    private TransformerOutputBlobHeaderPopulator headerPopulator;
+    private final TransformerOutputBlobHeaderPopulator headerPopulator;
     private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
@@ -97,7 +97,9 @@ public class TransformCycle {
     private Map<String, String> currentStateHeader = Collections.emptyMap();
     private Map<String, String> previousStateHeader = Collections.emptyMap();
 
-    public TransformCycle(TransformerContext ctx, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager, String converterVip, String transformerVip) {
+    public TransformCycle(TransformerContext ctx,
+            FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
+            String converterVip, String transformerVip) {
         this.ctx = ctx;
         this.versionMinter = new SequenceVersionMinter();
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
@@ -110,7 +112,7 @@ public class TransformCycle {
         this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
-        this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
+        this.headerPopulator = new TransformerOutputBlobHeaderPopulator(ctx);
         this.publishWorkflowStager = publishStager;
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
         this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
@@ -363,7 +365,6 @@ public class TransformCycle {
             // If the converter vip has changed we need to re-initialize the client
             if(hasConverterVipChanged()) {
                 inputClient = new VMSInputDataClient(filestore, resolveConverterVip(ctx, converterVip));
-                this.headerPopulator = new TransformerOutputBlobHeaderPopulator(inputClient, outputStateEngine, ctx);
                 previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
             }
             // Load Input on thread so it can process restore on first cycle if needed
@@ -492,7 +493,9 @@ public class TransformCycle {
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try {
-            currentStateHeader = new HashMap<>(headerPopulator.addHeaders(previousCycleNumber, currentCycleNumber));
+            currentStateHeader = new HashMap<>(headerPopulator.addHeaders(
+                    inputClient, outputStateEngine,
+                    previousCycleNumber, currentCycleNumber));
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 

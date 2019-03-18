@@ -19,8 +19,7 @@ public class HermesAnnounceJob extends AnnounceJob {
                 previousAnnounceJob);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         boolean success =
                 ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
         if (region == RegionEnum.EU_WEST_1) { // TODO: Announce per-region via Gutenberg.

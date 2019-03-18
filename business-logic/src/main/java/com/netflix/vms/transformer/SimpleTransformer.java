@@ -85,12 +85,12 @@ public class SimpleTransformer {
     private VideoNamedListModule videoNamedListModule;
 
     private final VMSHollowInputAPI api;
-    private final VMSTransformerWriteStateEngine writeStateEngine;
+    private final HollowWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
     private final VMSTransformerIndexer indexer;
 
-    public SimpleTransformer(VMSHollowInputAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine, TransformerContext ctx) {
+    public SimpleTransformer(VMSHollowInputAPI inputAPI, HollowWriteStateEngine outputStateEngine, TransformerContext ctx) {
         this.api = inputAPI;
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;

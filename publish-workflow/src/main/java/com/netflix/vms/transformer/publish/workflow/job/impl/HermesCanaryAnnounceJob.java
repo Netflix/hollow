@@ -11,8 +11,7 @@ public class HermesCanaryAnnounceJob extends CanaryAnnounceJob {
         super(ctx, vip, newVersion, region, beforeCanaryAnnounceHook);
     }
 
-	  @Override
-    protected boolean executeJob() {
+	  @Override public boolean executeJob() {
         return ctx.getVipAnnouncer().announce(vip, region, true, getCycleVersion());
     }
 }

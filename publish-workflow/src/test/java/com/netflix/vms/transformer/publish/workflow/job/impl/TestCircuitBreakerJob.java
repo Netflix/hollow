@@ -20,8 +20,7 @@ public class TestCircuitBreakerJob extends CircuitBreakerJob {
         this.execute = execute;
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return this.execute.get();
     }
 }

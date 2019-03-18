@@ -7,7 +7,7 @@ import com.netflix.config.NetflixConfiguration;
 import com.netflix.lifecycle.NFLifecycleUnitTester;
 import com.netflix.niws.client.RestClientManager;
 import com.netflix.vms.logging.TaggingLogger;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider.VideoCountryKey;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.impl.ValuableVideoHolder.ValuableVideo;
 import java.util.Collection;
 import java.util.HashSet;

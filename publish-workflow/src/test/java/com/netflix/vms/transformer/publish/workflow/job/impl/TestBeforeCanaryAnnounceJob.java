@@ -2,8 +2,8 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
+import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CircuitBreakerJob;
 import java.util.Collections;
@@ -20,13 +20,12 @@ public class TestBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 		super(context, vip, newVersion, region, circuitBreakerJob, newPublishJobs);
 	}
 
-	@Override
-	protected boolean executeJob() {
+	@Override public boolean executeJob() {
         return true;
 	}
 
 	@Override
-	public Map<HollowBlobDataProvider.VideoCountryKey, Boolean> getTestResults() {
+	public Map<VideoCountryKey, Boolean> getTestResults() {
 		return Collections.emptyMap();
 	}
 

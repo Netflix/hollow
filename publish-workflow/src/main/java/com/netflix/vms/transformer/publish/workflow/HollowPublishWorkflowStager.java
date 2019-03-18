@@ -50,12 +50,30 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     private final String vip;
     private final Map<RegionEnum, AnnounceJob> priorAnnouncedJobs;
 
-    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
+    public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
+            Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx, fileStore,
+                publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer, hermesBlobAnnouncer,
+                new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
-    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer, HollowBlobDataProvider circuitBreakerDataProvider, DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
-        this(ctx, new DefaultHollowPublishJobCreator(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, circuitBreakerDataProvider, new PlaybackMonkeyTester(), new ValuableVideoHolder(circuitBreakerDataProvider), dataSlicer, uploadStatus, vip), vip);
+    private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
+            Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            HollowBlobDataProvider circuitBreakerDataProvider,
+            DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+        this(ctx,
+                new DefaultHollowPublishJobCreator(ctx, fileStore,
+                        publisher, nostreamsPublisher,
+                        announcer, nostreamsAnnouncer, hermesBlobAnnouncer,
+                        circuitBreakerDataProvider,
+                        new PlaybackMonkeyTester(),
+                        new ValuableVideoHolder(),
+                        dataSlicer, uploadStatus, vip),
+                vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }
 
@@ -69,6 +87,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         this.jobCreator = jobCreator;
 
         exposePublicationHistory();
+    }
+
+    @Override
+    public PublishWorkflowContext getContext() {
+        return jobCreator.getContext();
     }
 
     @Override
@@ -130,7 +153,6 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return announceJob;
     }
 
-
     private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
         Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs = new HashMap<>(3);
         Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<>(3);
@@ -142,7 +164,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
             scheduler.submitJob(canaryAnnounceJob);
 
-            AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(newVersion, region, canaryAnnounceJob);
+            AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, region, canaryAnnounceJob);
             scheduler.submitJob(afterCanaryAnnounceJob);
 
             beforeCanaryAnnounceJobs.put(region, beforeCanaryAnnounceJob);

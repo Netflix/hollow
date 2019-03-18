@@ -10,8 +10,7 @@ public class HermesAutoPinbackJob extends AutoPinbackJob {
         super(ctx, announcement, waitMillis, cycleVersion);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         /*/// if we've previously triggered auto pinback, don't run this check
         if(VMSAutoPinBackEmergencyNotification.isPinbackTriggered()) {
             ERRCODELOGGER.logfWithExplicitCycleVersion(ErrorCode.AutoPinbackTriggered, String.valueOf(getCycleVersion()), "Auto Pinback was previously triggered.  Not testing for auto pinback");

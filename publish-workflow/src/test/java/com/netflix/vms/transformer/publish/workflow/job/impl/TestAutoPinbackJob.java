@@ -12,8 +12,7 @@ public class TestAutoPinbackJob extends AutoPinbackJob {
         super(context, announcement, waitMillis, cycleVersion);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return false;
     }
 }

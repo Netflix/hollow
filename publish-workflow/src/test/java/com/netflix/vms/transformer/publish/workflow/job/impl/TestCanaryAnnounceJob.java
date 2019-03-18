@@ -14,8 +14,7 @@ public class TestCanaryAnnounceJob extends CanaryAnnounceJob {
 		super(context, vip, newVersion, region, beforeCanaryAnnounceHook);
 	}
 
-	@Override
-    protected boolean executeJob() {
+	@Override public boolean executeJob() {
         return true;
     }
 

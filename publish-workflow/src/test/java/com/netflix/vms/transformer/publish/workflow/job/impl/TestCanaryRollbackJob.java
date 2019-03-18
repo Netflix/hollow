@@ -13,8 +13,7 @@ public class TestCanaryRollbackJob extends CanaryRollbackJob {
         super(context, vip, cycleVersion, priorVersion, priorVersion, validationJob);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         return true;
     }
 }

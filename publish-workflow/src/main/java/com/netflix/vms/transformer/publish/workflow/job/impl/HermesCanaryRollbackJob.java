@@ -11,8 +11,7 @@ public class HermesCanaryRollbackJob extends CanaryRollbackJob {
         super(ctx, vip, cycleVersion, priorVersion, ctx.getVipAnnouncer().getPreviouslyAnnouncedCanaryVersion(vip), validationJob);
     }
 
-    @Override
-    protected boolean executeJob() {
+    @Override public boolean executeJob() {
         long destVersion = rollbackVersion;
         if (rollbackVersion == Long.MIN_VALUE || rollbackVersion == Long.MAX_VALUE)
             destVersion = priorVersion;

@@ -54,6 +54,11 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
+    public PublishWorkflowContext getContext() {
+        return ctx;
+    }
+
+    @Override
     public CycleStatusFuture triggerPublish(long inputDataVersion, long previousVersion, long newVersion) {
     	ctx = ctx.withCurrentLoggerAndConfig();
 
