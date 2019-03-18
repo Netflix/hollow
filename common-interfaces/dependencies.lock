@@ -13687,7 +13687,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.12.1"
+            "locked": "3.12.2"
         },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
@@ -15989,7 +15989,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.12.1"
+            "locked": "3.12.2"
         },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
@@ -18291,7 +18291,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.12.1"
+            "locked": "3.12.2"
         },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
@@ -20593,7 +20593,7 @@
             ]
         },
         "org.assertj:assertj-core": {
-            "locked": "3.12.1"
+            "locked": "3.12.2"
         },
         "org.checkerframework:checker-compat-qual": {
             "locked": "2.0.0",
