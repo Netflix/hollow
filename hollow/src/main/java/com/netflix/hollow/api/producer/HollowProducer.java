@@ -37,6 +37,7 @@ import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -142,6 +143,7 @@ public class HollowProducer {
     private HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
     private final SingleProducerEnforcer singleProducerEnforcer;
     private long lastSuccessfulCycle = 0;
+    private final HollowObjectHashCodeFinder hashCodeFinder;
 
     private boolean isInitialized;
 
@@ -153,7 +155,8 @@ public class HollowProducer {
                 Collections.emptyList(),
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null,
-                new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer());
+                new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
+                null);
     }
 
 
@@ -165,7 +168,8 @@ public class HollowProducer {
                 b.eventListeners,
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize,
-                b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer);
+                b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
+                b.hashCodeFinder);
     }
 
     private HollowProducer(
@@ -179,7 +183,8 @@ public class HollowProducer {
             long targetMaxTypeShardSize,
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             BlobStorageCleaner blobStorageCleaner,
-            SingleProducerEnforcer singleProducerEnforcer) {
+            SingleProducerEnforcer singleProducerEnforcer,
+            HollowObjectHashCodeFinder hashCodeFinder) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -187,11 +192,17 @@ public class HollowProducer {
         this.singleProducerEnforcer = singleProducerEnforcer;
         this.snapshotPublishExecutor = snapshotPublishExecutor == null ? Runnable::run : snapshotPublishExecutor;
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
+        this.hashCodeFinder = hashCodeFinder;
 
-        HollowWriteStateEngine writeEngine = new HollowWriteStateEngine();
+        HollowWriteStateEngine writeEngine = hashCodeFinder == null
+                ? new HollowWriteStateEngine()
+                : new HollowWriteStateEngine(hashCodeFinder);
         writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
 
         this.objectMapper = new HollowObjectMapper(writeEngine);
+        if (hashCodeFinder != null) {
+            objectMapper.doNotUseDefaultHashKeys();
+        }
         this.readStates = ReadStateHelper.newDeltaChain();
         this.blobStorageCleaner = blobStorageCleaner;
 
@@ -323,9 +334,17 @@ public class HollowProducer {
                     readStates = ReadStateHelper.restored(readState);
 
                     // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
-                    HollowObjectMapper newObjectMapper = createNewHollowObjectMapperFromExisting(objectMapper);
+                    Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
+                    HollowWriteStateEngine writeEngine = hashCodeFinder == null
+                            ? new HollowWriteStateEngine()
+                            : new HollowWriteStateEngine(hashCodeFinder);
+                    HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
+                    HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
+                    if (hashCodeFinder != null) {
+                        newObjectMapper.doNotUseDefaultHashKeys();
+                    }
 
-                    restoreAction.restore(readStates.current().getStateEngine(), newObjectMapper.getStateEngine());
+                    restoreAction.restore(readStates.current().getStateEngine(), writeEngine);
 
                     status.versions(versionDesired, readState.getVersion())
                             .success();
@@ -343,12 +362,6 @@ public class HollowProducer {
             localListeners.fireProducerRestoreComplete(status);
         }
         return readState;
-    }
-
-    private static HollowObjectMapper createNewHollowObjectMapperFromExisting(HollowObjectMapper objectMapper) {
-        Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
-        HollowWriteStateEngine writeEngine = HollowWriteStateCreator.createWithSchemas(schemas);
-        return new HollowObjectMapper(writeEngine);
     }
 
     public HollowWriteStateEngine getWriteEngine() {
@@ -1144,6 +1157,7 @@ public class HollowProducer {
         HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
+        HollowObjectHashCodeFinder hashCodeFinder = null;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -1279,6 +1293,12 @@ public class HollowProducer {
 
         public B noSingleProducerEnforcer() {
             this.singleProducerEnforcer = null;
+            return (B) this;
+        }
+
+        @Deprecated
+        public B withHashCodeFinder(HollowObjectHashCodeFinder hashCodeFinder) {
+            this.hashCodeFinder = hashCodeFinder;
             return (B) this;
         }
 
