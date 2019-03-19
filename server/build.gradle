@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.gretty:gretty:2.1.0'
+        classpath 'org.gretty:gretty:2.3.1'
     }
 }
 

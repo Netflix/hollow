@@ -40,6 +40,7 @@ import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.fastlane.HollowFastlanePublishWorkflowStager;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HermesBlobAnnouncer;
+import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider;
 import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
@@ -71,6 +72,9 @@ public class TransformerCycleKickoff {
 
         String outputNamespace = "vms-" + transformerConfig.getTransformerVip();
         String nostreamsOutputNamespace = "vms-" + VipNameUtil.getNoStreamsVip(transformerConfig);
+        // ultimately canary namespace for announcement = "hollow." + "vms.canary.hollow.blob." + vip + ".announcement"
+        String canaryNamespace = HermesTopicProvider.getDataCanaryTopic(transformerConfig.getTransformerVip());
+        String devSliceNamespace = "vms-" + HermesTopicProvider.getDevSliceTopic(transformerConfig.getTransformerVip());
 
         Publisher publisher = new NFHollowPublisher(gutenbergFilePublisher, outputNamespace,
                 GutenbergIdentifiers.DEFAULT_REGIONS);
@@ -81,9 +85,26 @@ public class TransformerCycleKickoff {
         Announcer nostreamsAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
                 new NFHollowBlobRetriever(gutenbergFileConsumer, nostreamsOutputNamespace), nostreamsOutputNamespace);
 
+        /**
+         * Trick : Canary announcement is done on a different topic. However, for the NFHollowAnnouncer to verify the publish we use outputNamespace.
+         *
+         * In the publish workflow, we first upload the blobs for the outputNamespace. The blobs are published (uploaded) to the output namespace
+         * but they are not announced to the consumers listening to the output namespace until the integrity checks, validation and canary pass.
+         *
+         * Once the blobs are uploaded, we then announce the new version on the canary topic.
+         * When announcing on the canary topic, NFHollowAnnouncer verifies if the blobs are published/uploaded.
+         * Hence using outerNamespace in the NFHollowBlobRetriever when constructing the announcer for canary topic.
+         *
+         * Note : The client needs to do a similar operation for getting updates for running canary on the outputNamespace.
+         * That is, use announcement watcher for the canary topic, and create blob retriever for the outputNamespace.
+         */
+        Announcer canaryAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher, new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), canaryNamespace);
+        Publisher devSlicePublisher = new NFHollowPublisher(gutenbergFilePublisher, devSliceNamespace, GutenbergIdentifiers.DEFAULT_REGIONS);
+        Announcer devSliceAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher, new NFHollowBlobRetriever(gutenbergFileConsumer, devSliceNamespace), devSliceNamespace);
+
         TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
-        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer);
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
@@ -198,12 +219,12 @@ public class TransformerCycleKickoff {
                 history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer, Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
         if (isFastlane)
             return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
     private static boolean shouldTryCompaction(boolean isFastlane, TransformerConfig cfg) {

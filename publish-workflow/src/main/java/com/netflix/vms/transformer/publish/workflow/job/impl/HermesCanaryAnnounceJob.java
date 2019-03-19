@@ -12,6 +12,7 @@ public class HermesCanaryAnnounceJob extends CanaryAnnounceJob {
     }
 
 	  @Override public boolean executeJob() {
+        ctx.getCanaryAnnouncer().announce(getCycleVersion());
         return ctx.getVipAnnouncer().announce(vip, region, true, getCycleVersion());
     }
 }

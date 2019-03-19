@@ -42,6 +42,12 @@ public interface PublishWorkflowContext {
 
     HollowProducer.Announcer getNostreamsStateAnnouncer();
 
+    HollowProducer.Announcer getCanaryAnnouncer();
+
+    HollowProducer.Publisher getDevSlicePublisher();
+
+    HollowProducer.Announcer getDevSliceAnnouncer();
+
     VipAnnouncer getVipAnnouncer();
 
     long getNowMillis();

@@ -52,23 +52,26 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
     public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
             DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx, fileStore,
                 publisher, nostreamsPublisher,
-                announcer, nostreamsAnnouncer, hermesBlobAnnouncer,
+                announcer, nostreamsAnnouncer, canaryAnnouncer,
+                devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer,
                 new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
     private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider circuitBreakerDataProvider,
             DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx,
                 new DefaultHollowPublishJobCreator(ctx, fileStore,
                         publisher, nostreamsPublisher,
-                        announcer, nostreamsAnnouncer, hermesBlobAnnouncer,
+                        announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer,
                         circuitBreakerDataProvider,
                         new PlaybackMonkeyTester(),
                         new ValuableVideoHolder(),
@@ -161,6 +164,10 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobs);
             scheduler.submitJob(beforeCanaryAnnounceJob);
 
+            // Gutenberg announcement for canary (via HollowProducer.Announcer) is done in all regions.
+            // The blobs are uploaded in all 3 regions, so announcing in all 3 regions is not a problem EXCEPT for the before/after canary jobs (they are still per region in this loop).
+            // PBM is only deployed to US-east region, we we are good with this.
+            // todo split gutenberg announcement region wise, if plan to ever have canary run in different regions incrementally.
             CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
             scheduler.submitJob(canaryAnnounceJob);
 

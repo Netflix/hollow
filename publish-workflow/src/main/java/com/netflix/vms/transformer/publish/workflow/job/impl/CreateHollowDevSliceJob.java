@@ -6,6 +6,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevS
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
@@ -17,11 +18,16 @@ import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
+
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,13 +40,17 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     private final DataSlicer dataSlicer;
     private final String sliceVip;
     private final long inputVersion;
+    private final HollowProducer.Publisher publisher;
+    private final HollowProducer.Announcer announcer;
     
     public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, long inputVersion, long currentCycleId) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.dataSlicer = dataSlicer;
         this.inputVersion = inputVersion;
-        this.sliceVip = ctx.getVip() + "_devslice";
+        this.sliceVip = HermesTopicProvider.getDevSliceTopic(ctx.getVip());
+        this.publisher = ctx.getDevSlicePublisher();
+        this.announcer = ctx.getDevSliceAnnouncer();
     }
 
     @Override public boolean executeJob() {
@@ -52,6 +62,10 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
             publishSlice(sliceSnapshotFile, RegionEnum.US_EAST_1);
             publishSlice(sliceSnapshotFile, RegionEnum.US_WEST_2);
             publishSlice(sliceSnapshotFile, RegionEnum.EU_WEST_1);
+
+            // using HollowProducer.Publisher and Announcer, backed up by cinder publisher/announcer impls.
+            publish(sliceSnapshotFile);
+            announcer.announce(getCycleVersion());
 
             sliceSnapshotFile.delete();
 
@@ -84,6 +98,37 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         HollowBlobKeybaseBuilder keybaseBuilder = new HollowBlobKeybaseBuilder(sliceVip);
         ctx.getFileStore().publish(sliceSnapshotFile, keybaseBuilder.getSnapshotKeybase(), String.valueOf(getCycleVersion()), region, getItemAttributes());
         ctx.getVipAnnouncer().announce(sliceVip, region, false, getCycleVersion());
+    }
+
+    // uploads the sliced snapshot file using HollowProducer.Publisher.
+    private void publish(File sliceSnapshotFile) {
+        // using Long.MIN_VALUE as fromVersion, since dev slice only supports SNAPSHOT mode
+        publisher.publish(new HollowProducer.Blob(Long.MIN_VALUE, getCycleVersion(), HollowProducer.Blob.Type.SNAPSHOT) {
+            @Override
+            protected void write(HollowBlobWriter writer) throws IOException {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                return new BufferedInputStream(new FileInputStream(sliceSnapshotFile));
+            }
+
+            @Override
+            public void cleanup() {
+                // nothing to do, assuming clean up is done later
+            }
+
+            @Override
+            public File getFile() {
+                return sliceSnapshotFile;
+            }
+
+            @Override
+            public Path getPath() {
+                return sliceSnapshotFile.toPath();
+            }
+        });
     }
     
     private List<ItemAttribute> getItemAttributes() {

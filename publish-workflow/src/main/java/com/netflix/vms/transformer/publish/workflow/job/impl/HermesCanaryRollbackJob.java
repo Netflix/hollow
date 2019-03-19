@@ -21,6 +21,9 @@ public class HermesCanaryRollbackJob extends CanaryRollbackJob {
                 allSucceeded = false;
             }
         }
+        // This is for all regions, which is expected.
+        // When rolling back current version for the canary, we check for reverseDelta for the outNamespace.
+        ctx.getCanaryAnnouncer().announce(destVersion);
         return allSucceeded;
     }
 }

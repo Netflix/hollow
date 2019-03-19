@@ -36,7 +36,7 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	public TestDefaultHollowPublishJobCreator(PublishWorkflowContext context,
             TransformerContext transformerContext, String vip) {
 		super(transformerContext, null, null, null, null, null, null, null, null, null,
-                null, null, vip);
+                null, null, null, null, null, vip);
 		this.context = context;
 	}
 

@@ -32,6 +32,9 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     private final Publisher nostreamsPublisher;
     private final Announcer announcer;
     private final Announcer nostreamsAnnouncer;
+    private final Announcer canaryAnnouncer;
+    private final Publisher devSlicePublisher;
+    private final Announcer devSliceAnnouncer;
     private final PublishWorkflowStatusIndicator statusIndicator;
 
     /* fields */
@@ -41,19 +44,23 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     public TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer,
             Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, String vip) {
+            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer, String vip) {
+
         this(ctx, vipAnnouncer,
                 uploadStatus, fileStore,
                 new PublishWorkflowStatusIndicator(ctx.getMetricRecorder()), publisher, nostreamsPublisher,
-                announcer, nostreamsAnnouncer, vip,
+                announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, vip,
                 new CassandraBasedPoisonedStateMarker(ctx, vip));
     }
 
     private TransformerPublishWorkflowContext(TransformerContext ctx, VipAnnouncer vipAnnouncer,
             Supplier<ServerUploadStatus> uploadStatus, FileStore fileStore,
             PublishWorkflowStatusIndicator statusIndicator, Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, String vip,
+            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer, String vip,
             PoisonedStateMarker poisonStateMarker) {
+
         this.transformerCtx = ctx;
         this.vip = vip;
         this.config = ctx.getConfig();
@@ -65,6 +72,9 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         this.nostreamsPublisher = nostreamsPublisher;
         this.announcer = announcer;
         this.nostreamsAnnouncer = nostreamsAnnouncer;
+        this.canaryAnnouncer = canaryAnnouncer;
+        this.devSlicePublisher = devSlicePublisher;
+        this.devSliceAnnouncer = devSliceAnnouncer;
         this.statusIndicator = statusIndicator;
         this.logger = ctx.getLogger();
         this.nowMillis = ctx.getNowMillis();
@@ -75,7 +85,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer,
                 uploadStatus, fileStore,
                 statusIndicator, publisher, nostreamsPublisher,
-                announcer, nostreamsAnnouncer, vip,
+                announcer, canaryAnnouncer, nostreamsAnnouncer, devSlicePublisher, devSliceAnnouncer, vip,
                 poisonStateMarker);
     }
 
@@ -137,6 +147,21 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
     @Override
     public VipAnnouncer getVipAnnouncer() {
         return vipAnnouncer;
+    }
+
+    @Override
+    public Announcer getCanaryAnnouncer() {
+        return canaryAnnouncer;
+    }
+
+    @Override
+    public Publisher getDevSlicePublisher() {
+        return devSlicePublisher;
+    }
+
+    @Override
+    public Announcer getDevSliceAnnouncer() {
+        return devSliceAnnouncer;
     }
 
     @Override
