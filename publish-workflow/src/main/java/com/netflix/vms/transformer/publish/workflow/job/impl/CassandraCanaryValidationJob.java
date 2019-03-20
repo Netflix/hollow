@@ -20,6 +20,7 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
 import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +93,10 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 	                    ctx.getLogger().warn(PlaybackMonkey, new PbmsMessage(true,
 	                            "IDs failed both before and after tests (added for visibility and these do not break cycles)", failedInBothBeforeAfter));
 	            } else {
+	            	int befSize = (befTestResults == null)? 0 : befTestResults.size();
+					int aftSize = (aftTestResults == null)? 0 : aftTestResults.size();
+					ctx.getLogger().error(PlaybackMonkey, new PbmsMessage(false,
+							"Could not validate pbm. Either before or after or both results are empty or null. Sizes: beforeResults: "+befSize+"; afterResults: "+aftSize, failedIDs));
 	                pbmSuccess = false;
 	            }
 	
@@ -119,10 +124,11 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
 	            pbmSuccess = false;
 	        }
         }
-        boolean finalResultAferPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
+        boolean finalResultAfterPBMOverride = PlaybackMonkeyUtil.getFinalResultAferPBMOverride(pbmSuccess, ctx.getConfig());
         // Send success or failure result from here. As this is the final PBM step.
-        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAferPBMOverride, vip);
-		return finalResultAferPBMOverride;
+        PlaybackMonkeyUtil.sendPBMFailureMetric(ctx, finalResultAfterPBMOverride, vip);
+        ctx.getLogger().info(PlaybackMonkey, "{}: success: {}. finalResultAfterPBMOverride: {}; PBM Enabled: {}", getJobName(), pbmSuccess, finalResultAfterPBMOverride, ctx.getConfig().isPlaybackMonkeyEnabled());
+		return finalResultAfterPBMOverride;
     }
 
 
