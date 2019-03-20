@@ -55,6 +55,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -190,7 +191,7 @@ public class HollowProducer {
         this.versionMinter = versionMinter;
         this.blobStager = blobStager;
         this.singleProducerEnforcer = singleProducerEnforcer;
-        this.snapshotPublishExecutor = snapshotPublishExecutor == null ? Runnable::run : snapshotPublishExecutor;
+        this.snapshotPublishExecutor = snapshotPublishExecutor;
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
         this.hashCodeFinder = hashCodeFinder;
 
@@ -583,27 +584,32 @@ public class HollowProducer {
     void publish(ListenerSupport.Listeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
-            stageBlob(toVersion, artifacts, Blob.Type.SNAPSHOT);
+            artifacts.snapshot = stageBlob(listeners,
+                    blobStager.openSnapshot(toVersion));
 
             if (readStates.hasCurrent()) {
-                stageBlob(toVersion, artifacts, Blob.Type.DELTA);
-                stageBlob(toVersion, artifacts, Blob.Type.REVERSE_DELTA);
-                publishBlob(listeners, artifacts, Blob.Type.DELTA);
-                publishBlob(listeners, artifacts, Blob.Type.REVERSE_DELTA);
+                artifacts.delta = stageBlob(listeners,
+                        blobStager.openDelta(readStates.current().getVersion(), toVersion));
+                artifacts.reverseDelta = stageBlob(listeners,
+                        blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
+
+                publishBlob(listeners, artifacts.delta);
+                publishBlob(listeners, artifacts.reverseDelta);
 
                 if (--numStatesUntilNextSnapshot < 0) {
-                    // @@@ No checking if publish failed, this is asynchronously performed
-                    // but there is no waiting to verify the snapshot is complete
-                    snapshotPublishExecutor.execute(() -> {
-                        publishBlob(listeners, artifacts, Blob.Type.SNAPSHOT);
+                    if (snapshotPublishExecutor == null) {
+                        publishBlob(listeners, artifacts.snapshot);
                         artifacts.markSnapshotPublishComplete();
-                    });
+                    } else {
+                        // Submit the publish blob task to the executor
+                        publishSnapshotBlobAsync(listeners, artifacts);
+                    }
                     numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
                 } else {
                     artifacts.markSnapshotPublishComplete();
                 }
             } else {
-                publishBlob(listeners, artifacts, Blob.Type.SNAPSHOT);
+                publishBlob(listeners, artifacts.snapshot);
                 artifacts.markSnapshotPublishComplete();
                 numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
             }
@@ -617,58 +623,81 @@ public class HollowProducer {
         }
     }
 
-    private void stageBlob(long toVersion, Artifacts artifacts, Blob.Type blobType) throws IOException {
+    private Blob stageBlob(ListenerSupport.Listeners listeners, Blob blob) throws IOException {
+        Status.PublishBuilder builder = new Status.PublishBuilder();
         HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
-        switch (blobType) {
-            case SNAPSHOT:
-                artifacts.snapshot = blobStager.openSnapshot(toVersion);
-                artifacts.snapshot.write(writer);
-                break;
-            case DELTA:
-                artifacts.delta = blobStager.openDelta(readStates.current().getVersion(), toVersion);
-                artifacts.delta.write(writer);
-                break;
-            case REVERSE_DELTA:
-                artifacts.reverseDelta = blobStager.openReverseDelta(toVersion,
-                        readStates.current().getVersion());
-                artifacts.reverseDelta.write(writer);
-                break;
-            default:
-                throw new IllegalStateException("unknown type, type=" + blobType);
+        try {
+            builder.blob(blob);
+            blob.write(writer);
+            builder.success();
+            return blob;
+        } catch (Throwable t) {
+            builder.fail(t);
+            throw t;
+        } finally {
+            listeners.fireBlobStage(builder);
         }
     }
 
-    private void publishBlob(ListenerSupport.Listeners listeners, Artifacts artifacts, Blob.Type blobType) {
+    private void publishBlob(ListenerSupport.Listeners listeners, Blob blob) {
         Status.PublishBuilder builder = new Status.PublishBuilder();
         try {
-            switch (blobType) {
-                case SNAPSHOT:
-                    builder.blob(artifacts.snapshot);
-                    publisher.publish(artifacts.snapshot);
-                    break;
-                case DELTA:
-                    builder.blob(artifacts.delta);
-                    publisher.publish(artifacts.delta);
-                    break;
-                case REVERSE_DELTA:
-                    builder.blob(artifacts.reverseDelta);
-                    publisher.publish(artifacts.reverseDelta);
-                    break;
-                default:
-                    throw new IllegalStateException("unknown type, type=" + blobType);
-            }
-
+            builder.blob(blob);
+            publishBlob(blob);
             builder.success();
-        } catch (Throwable th) {
-            builder.fail(th);
-            throw th;
+        } catch (Throwable t) {
+            builder.fail(t);
+            throw t;
         } finally {
             listeners.fireBlobPublish(builder);
-            metrics.updateBlobTypeMetrics(builder.build(), builder.blob);
+            metrics.updateBlobTypeMetrics(builder.build(), blob);
             if (metricsCollector != null) {
                 metricsCollector.collect(metrics);
             }
-            blobStorageCleaner.clean(blobType);
+        }
+    }
+
+    private void publishSnapshotBlobAsync(ListenerSupport.Listeners listeners, Artifacts artifacts) {
+        Blob blob = artifacts.snapshot;
+        CompletableFuture<HollowProducer.Blob> cf = new CompletableFuture<>();
+        try {
+            snapshotPublishExecutor.execute(() -> {
+                Status.StageBuilder builder = new Status.StageBuilder();
+                try {
+                    publishBlob(blob);
+                    builder.success();
+                    // Any dependent task that needs access to the blob contents should
+                    // not execute asynchronously otherwise the blob will be cleaned up
+                    cf.complete(blob);
+                } catch (Throwable t) {
+                    builder.fail(t);
+                    cf.completeExceptionally(t);
+                    throw t;
+                } finally {
+                    metrics.updateBlobTypeMetrics(builder.build(), blob);
+                    if (metricsCollector != null) {
+                        metricsCollector.collect(metrics);
+                    }
+                }
+                artifacts.markSnapshotPublishComplete();
+            });
+        } catch (Throwable t) {
+            cf.completeExceptionally(t);
+            metrics.updateBlobTypeMetrics(new Status.StageBuilder().fail(t).build(), blob);
+            if (metricsCollector != null) {
+                metricsCollector.collect(metrics);
+            }
+            throw t;
+        } finally {
+            listeners.fireBlobPublishAsync(cf);
+        }
+    }
+
+    private void publishBlob(Blob b) {
+        try {
+            publisher.publish(b);
+        } finally {
+            blobStorageCleaner.clean(b.getType());
         }
     }
 

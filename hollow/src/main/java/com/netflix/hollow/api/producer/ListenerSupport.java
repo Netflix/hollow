@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Consumer;
@@ -216,6 +217,20 @@ final class ListenerSupport {
                     l -> l.onPublishStart(version));
 
             return new Status.StageBuilder().version(version);
+        }
+
+        void fireBlobStage(Status.PublishBuilder b) {
+            Status s = b.build();
+            HollowProducer.Blob blob = b.blob;
+            Duration elapsed = b.elapsed();
+
+            fire(PublishListener.class,
+                    l -> l.onBlobStage(s, blob, elapsed));
+        }
+
+        void fireBlobPublishAsync(CompletableFuture<HollowProducer.Blob> f) {
+            fire(PublishListener.class,
+                    l -> l.onBlobPublishAsync(f));
         }
 
         void fireBlobPublish(Status.PublishBuilder b) {

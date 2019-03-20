@@ -20,13 +20,16 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducerListener;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HollowProducerMetrics extends HollowMetrics {
     private int cyclesCompleted = 0;
     private int cyclesSucceeded = 0;
     private int cycleFailed = 0;
-    private int snapshotsCompleted = 0;
-    private int snapshotsFailed = 0;
+    // Snapshots can be published asynchronously resulting concurrent
+    // access to the snapshot metrics
+    private AtomicInteger snapshotsCompleted = new AtomicInteger();
+    private AtomicInteger snapshotsFailed = new AtomicInteger();
     private int deltasCompleted = 0;
     private int deltasFailed = 0;
     private int reverseDeltasCompleted = 0;
@@ -81,9 +84,9 @@ public class HollowProducerMetrics extends HollowMetrics {
         switch (blobType) {
             case SNAPSHOT:
                 if(status.getType() == Status.StatusType.SUCCESS)
-                    snapshotsCompleted++;
+                    snapshotsCompleted.incrementAndGet();
                 else
-                    snapshotsFailed++;
+                    snapshotsFailed.incrementAndGet();
                 break;
             case DELTA:
                 if(status.getType() == Status.StatusType.SUCCESS)
@@ -113,11 +116,11 @@ public class HollowProducerMetrics extends HollowMetrics {
     }
 
     public int getSnapshotsCompleted() {
-        return snapshotsCompleted;
+        return snapshotsCompleted.get();
     }
 
     public int getSnapshotsFailed() {
-        return snapshotsFailed;
+        return snapshotsFailed.get();
     }
 
     public int getDeltasCompleted() {
