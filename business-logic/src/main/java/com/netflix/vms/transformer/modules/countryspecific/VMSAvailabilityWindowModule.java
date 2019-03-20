@@ -12,7 +12,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
-import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.FeedMovieCountryLanguagesHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.LongHollow;
@@ -25,6 +24,7 @@ import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
+import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
 import com.netflix.vms.transformer.hollowoutput.CompleteVideoCountrySpecificData;
 import com.netflix.vms.transformer.hollowoutput.CupKey;
 import com.netflix.vms.transformer.hollowoutput.DateWindow;
@@ -143,11 +143,11 @@ public class VMSAvailabilityWindowModule {
         return outputWindow;
     }
 
-    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, ContractHollow contractData, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
+    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, VmsAttributeFeedEntryHollow contractAttributes, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
 
         // 1. merge cup token values
         List<Strings> cupTokens = new ArrayList<>();
-        Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractData);
+        Strings contractCupToken = cupTokenFetcher.getCupToken(videoId, contractAttributes);
         if (existingInfo.videoContractInfo.contractId > contractId) {
             cupTokens.addAll(existingInfo.videoContractInfo.cupTokens.ordinals);
             if (!cupTokens.contains(contractCupToken)) cupTokens.add(contractCupToken);
@@ -224,7 +224,8 @@ public class VMSAvailabilityWindowModule {
 
                 // get contract ID, contract data, and contract for download availability, contract packages -> A contract could have multiple packages & contract assets
                 long dealId = windowContractHollow._getDealId();
-                ContractHollow contractData = VideoContractUtil.getContract(api, indexer, ctx, videoId, country, dealId);
+                
+                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, country, dealId);
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
                 List<RightsContractPackageHollow> contractPackages = windowContractHollow._getPackages() != null ? windowContractHollow._getPackages().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
                 List<RightsContractAssetHollow> contractAssets = windowContractHollow._getAssets() != null ? windowContractHollow._getAssets().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
@@ -242,10 +243,11 @@ public class VMSAvailabilityWindowModule {
                     // CASE 2: Packages not available -> Build the info using assets, contractID and videoID and use "0" for package Id
 
                     //Do not lose sight of the fact that the rollingEpisode flag could be set even if the packages are not present
-                    if (contractData != null && contractData._getDayAfterBroadcast()) rollup.foundRollingEpisodes();
+                    if (contractAttributes != null && contractAttributes._getDayAfterBroadcast() != null && contractAttributes._getDayAfterBroadcast()._getValue()) 
+                    	rollup.foundRollingEpisodes();
 
                     // build info without package data, Use the assets and contract data though
-                    WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractData, videoId);
+                    WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractAttributes, videoId);
                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                     if (packageIdForWindow == 0) thisWindowBundledAssetsGroupId = Math.max((int) dealId, thisWindowBundledAssetsGroupId);
@@ -311,7 +313,7 @@ public class VMSAvailabilityWindowModule {
                                     // if existing windowPackageContractInfo is present and window data is NOT TO BE filtered,
                                     // then clone and update window package contract info.
                                     WindowPackageContractInfo updatedClone = cloneWindowPackageContractInfo(videoId, windowPackageContractInfo,
-                                            dealId, contractData, contractAssets, isAvailableForDownload, packageId.val);
+                                            dealId, contractAttributes, contractAssets, isAvailableForDownload, packageId.val);
 
                                     // update the package window package contract info
                                     outputWindow.windowInfosByPackageId.put(packageId, updatedClone);
@@ -356,7 +358,7 @@ public class VMSAvailabilityWindowModule {
                                         includedWindowPackageData = true;
 
                                         // package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(videoId, packageData, windowContractHollow, contractData, country, isAvailableForDownload, packageDataCollection);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(videoId, packageData, windowContractHollow, contractAttributes, country, isAvailableForDownload, packageDataCollection);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = contractPackages == null ? true : packageData.isDefaultPackage;
                                         if (!considerForPackageSelection) {
@@ -381,7 +383,7 @@ public class VMSAvailabilityWindowModule {
 
                                     } else {
                                         // package data not available -- use the contract only
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractData, videoId);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractAttributes, videoId);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                         // if fist package, then update contract id for the current window

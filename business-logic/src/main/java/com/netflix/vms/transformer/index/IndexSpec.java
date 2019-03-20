@@ -59,12 +59,13 @@ public enum IndexSpec {
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
     
 
+    
     // Merch-language-dates
     MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
     CUP_TOKEN_HINDEX(HASH, "CinderCupTokenRecord", "", "movieId.value", "dealId.value"),    
     CUP_TOKEN_PINDEX(PRIMARY_KEY, "CinderCupTokenRecord", "movieId.value", "dealId.value"),
-    PACKAGE_MOVIE_DEAL_COUNTRY_GROUP(PRIMARY_KEY, "PackageMovieDealCountryGroup", "movieId.value", "packageId.value");
-
+    PACKAGE_MOVIE_DEAL_COUNTRY_GROUP(PRIMARY_KEY, "PackageMovieDealCountryGroup", "movieId.value", "packageId.value"),
+	VMS_ATTRIBUTE_FEED_ENTRY(PRIMARY_KEY, "VmsAttributeFeedEntry", "movieId.value", "dealId.value", "countryCode.value");
 
     private final IndexType indexType;
     private final String parameters[];

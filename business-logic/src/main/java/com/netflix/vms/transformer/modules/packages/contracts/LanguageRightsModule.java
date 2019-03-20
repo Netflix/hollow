@@ -5,17 +5,15 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
-import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundlesListHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
+import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleEntryHollow;
 import com.netflix.vms.transformer.hollowinput.RightsHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
+import com.netflix.vms.transformer.hollowinput.SetOfDisallowedAssetBundleEntryHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
 import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -28,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LanguageRightsModule extends AbstractTransformModule {
@@ -66,9 +65,9 @@ public class LanguageRightsModule extends AbstractTransformModule {
                 Pair<Integer, Integer> rightsKey = new Pair<>(intDealId, movieId);
 
                 long dealId = windowContract._getDealId();
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, movieId, countryCode, dealId);
-                DisallowedAssetBundlesListHollow disallowedBundleList_ = contract == null ? null : contract._getDisallowedAssetBundles();
-                if (disallowedBundleList_ == null || disallowedBundleList_.isEmpty()) {
+                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, movieId, countryCode, dealId);
+                SetOfDisallowedAssetBundleEntryHollow disallowedBundleSet_ = contractAttributes == null ? null : contractAttributes._getDisallowedAssetBundles();
+                if (disallowedBundleSet_ == null || disallowedBundleSet_.isEmpty()) {
                     continue;
                 }
 
@@ -85,19 +84,19 @@ public class LanguageRightsModule extends AbstractTransformModule {
                 Map<com.netflix.vms.transformer.hollowoutput.Integer, LanguageRestrictions> lrMap = new HashMap<>();
                 langRights.languageRestrictionsMap.put(cycleConstants.getISOCountry(countryCode), lrMap);
 
-                for (DisallowedAssetBundleHollow bundle_ : disallowedBundleList_) {
+                for (DisallowedAssetBundleEntryHollow bundle_ : disallowedBundleSet_) {
                     LanguageRestrictions lr = new LanguageRestrictions();
                     StringHollow audioLangHollow = bundle_._getAudioLanguageCode();
                     String audioLang = audioLangHollow == null ? null : audioLangHollow._getValue();
                     lr.audioLanguage = audioLang == null ? null : new Strings(audioLang);
                     lr.audioLanguageId = LanguageIdMapping.getLanguageId(audioLang);
-                    lr.requiresForcedSubtitles = bundle_._getForceSubtitleBoxed().booleanValue();
+                    if(bundle_._getForceSubtitle() != null)
+                    	lr.requiresForcedSubtitles = bundle_._getForceSubtitle()._getValue();
                     lr.disallowedTimedText = new HashSet<>();
                     lr.disallowedTimedTextBcp47codes = new HashSet<>();
 
-                    DisallowedSubtitleLangCodesListHollow disallowedlangs_ = bundle_._getDisallowedSubtitleLangCodes();
-                    for (DisallowedSubtitleLangCodeHollow lang_ : disallowedlangs_) {
-                        StringHollow bcp_ = lang_._getValue();
+                    Set<StringHollow> disallowedlangs_ = bundle_._getDisallowedSubtitleLangCodes();
+                    for (StringHollow bcp_ : disallowedlangs_) {
                         if (bcp_ != null) {
                             String bcp = bcp_._getValue();
                             lr.disallowedTimedTextBcp47codes.add(new Strings(bcp));

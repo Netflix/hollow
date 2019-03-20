@@ -5,8 +5,8 @@ import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
-import com.netflix.vms.transformer.hollowinput.ContractHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
 import com.netflix.vms.transformer.hollowoutput.CupKey;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.index.IndexSpec;
@@ -33,15 +33,15 @@ public class CupTokenFetcher {
     
     
 
-    public Strings getCupToken(long videoId, ContractHollow contract) {
-        return new Strings(getCupTokenString(videoId, contract));
+    public Strings getCupToken(long videoId, VmsAttributeFeedEntryHollow contractAttributes) {
+        return new Strings(getCupTokenString(videoId, contractAttributes));
     }
 
-    public String getCupTokenString(long videoId, ContractHollow contract) {
-        if (contract == null) {
+    public String getCupTokenString(long videoId, VmsAttributeFeedEntryHollow contractAttributes) {
+        if (contractAttributes == null) {
             return CupKey.DEFAULT;
         }
-        long dealId = contract._getDealId();
+        long dealId = contractAttributes._getDealId()._getValue();
         return getCupTokenStringCinder(videoId, dealId);
     }
     

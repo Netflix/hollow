@@ -13,10 +13,7 @@ import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
-import com.netflix.vms.transformer.hollowinput.ContractHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodeHollow;
-import com.netflix.vms.transformer.hollowinput.DisallowedSubtitleLangCodesListHollow;
+import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleEntryHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
@@ -30,6 +27,7 @@ import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StreamNonImageInfoHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
 import com.netflix.vms.transformer.hollowoutput.AvailabilityWindow;
 import com.netflix.vms.transformer.hollowoutput.ContractRestriction;
 import com.netflix.vms.transformer.hollowoutput.CupKey;
@@ -231,28 +229,30 @@ public class ContractRestrictionModule {
 
         // get contract data from Contract feed published by beehive. This contract data has information on title, country, prepromotion and cup tokens and others.
         long dealId = windowContractHollow._getDealId();
-        ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, dealId);
+        VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, countryCode, dealId);
 
         
-        if (contract != null) {
+        if (contractAttributes != null) {
             // Contract feed also has data on disAllowedBundles
-            List<DisallowedAssetBundleHollow> disallowedAssetBundles = contract._getDisallowedAssetBundles();
+            Set<DisallowedAssetBundleEntryHollow> disallowedAssetBundles = contractAttributes._getDisallowedAssetBundles();
+
 
             // for each disAllowedBundles, build a language restriction
-            for (DisallowedAssetBundleHollow disallowedAssetBundle : disallowedAssetBundles) {
+            for (DisallowedAssetBundleEntryHollow disallowedAssetBundle : disallowedAssetBundles) {
                 LanguageRestrictions langRestriction = new LanguageRestrictions();
                 String audioLangStr = disallowedAssetBundle._getAudioLanguageCode()._getValue();
                 Strings audioLanguage = getBcp47Code(audioLangStr);
                 langRestriction.audioLanguage = audioLanguage;
                 langRestriction.audioLanguageId = LanguageIdMapping.getLanguageId(audioLangStr);
-                langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle();
+                if(disallowedAssetBundle._getForceSubtitle() != null)
+                	langRestriction.requiresForcedSubtitles = disallowedAssetBundle._getForceSubtitle()._getValue();
 
                 Set<Strings> disallowedTimedTextCodes = new HashSet<Strings>();
                 Set<com.netflix.vms.transformer.hollowoutput.Integer> disallowedTimedTextIds = new HashSet<>();
-                List<DisallowedSubtitleLangCodeHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+                Set<StringHollow> disallowedSubtitles = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
 
-                for (DisallowedSubtitleLangCodeHollow sub : disallowedSubtitles) {
-                    String subLang = sub._getValue()._getValue();
+                for (StringHollow sub : disallowedSubtitles) {
+                	String subLang = sub._getValue();
                     disallowedTimedTextCodes.add(getBcp47Code(subLang));
                     disallowedTimedTextIds.add(new com.netflix.vms.transformer.hollowoutput.Integer(LanguageIdMapping.getLanguageId(subLang)));
                 }
@@ -265,13 +265,13 @@ public class ContractRestrictionModule {
                 restriction.languageBcp47RestrictionsMap.put(audioLanguage, langRestriction);
             }
 
-            String cupToken = cupTokenFetcher.getCupTokenString(videoId, contract);
+            String cupToken = cupTokenFetcher.getCupTokenString(videoId, contractAttributes);
             restriction.cupKeys.add(getCupKey(cupToken));
         }
 
         restriction.isAvailableForDownload = windowContractHollow._getDownload();
 
-        finalizeContractRestriction(assetTypeIdx, restriction, contract);
+        finalizeContractRestriction(assetTypeIdx, restriction, contractAttributes);
 
         return restriction;
     }
@@ -311,8 +311,8 @@ public class ContractRestrictionModule {
         }
 
         long dealId = selectedRightsContract._getDealId();
-        ContractHollow selectedContract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, dealId);
-        finalizeContractRestriction(assetTypeIdx, restriction, selectedContract);
+        VmsAttributeFeedEntryHollow selectedContractAttribute = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, countryCode, dealId);
+        finalizeContractRestriction(assetTypeIdx, restriction, selectedContractAttribute);
 
         return restriction;
     }
@@ -332,9 +332,9 @@ public class ContractRestrictionModule {
             markAssetTypeIndexForExcludedDownloadablesCalculation(assetTypeIdx, thisRightsContract._getAssets(), viewing);
 
             long dealId = thisRightsContract._getDealId();
-            ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, dealId);
-            if (contract != null) {
-                for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
+            VmsAttributeFeedEntryHollow contractAttribute = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, countryCode, dealId);
+            if (contractAttribute != null) {
+                for (DisallowedAssetBundleEntryHollow disallowedAssetBundle : contractAttribute._getDisallowedAssetBundles()) {
                     String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
 
                     if (!disallowedAssetBundle._getDisallowedSubtitleLangCodes().isEmpty()) {
@@ -345,7 +345,7 @@ public class ContractRestrictionModule {
                 }
             }
 
-            String cupKey = cupTokenFetcher.getCupTokenString(videoId, contract);
+            String cupKey = cupTokenFetcher.getCupTokenString(videoId, contractAttribute);
             orderedContractIdCupKeyMap.put((int) dealId, cupKey);
 
             // if any rights contract is downloadable, then the package is downloadable.
@@ -384,19 +384,19 @@ public class ContractRestrictionModule {
                 // which were *not* disallowed, are allowed.
                 Set<String> bundleRestrictedAudioLanguagesFromThisContract = new HashSet<String>();
                 long dealId = rightsContract._getDealId();
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, dealId);
-                if (contract != null) {
-                    for (DisallowedAssetBundleHollow disallowedAssetBundle : contract._getDisallowedAssetBundles()) {
+                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, countryCode, dealId);
+                if (contractAttributes != null) {
+                    for (DisallowedAssetBundleEntryHollow disallowedAssetBundle : contractAttributes._getDisallowedAssetBundles()) {
                         String audioLang = disallowedAssetBundle._getAudioLanguageCode()._getValue();
                         MergeableTextLanguageBundleRestriction textRestriction = getMergeableTextRestrictionsByAudioLang(mergedTextLanguageRestrictions, audioLang);
 
-                        DisallowedSubtitleLangCodesListHollow disallowedSubtitleLangCodes = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
+                        Set<StringHollow> disallowedSubtitleLangCodes = disallowedAssetBundle._getDisallowedSubtitleLangCodes();
                         if (!disallowedSubtitleLangCodes.isEmpty()) {
                             // For this audio language, we need to modify the text languages allowed for this contract by removing each
                             // disallowed text language from the set.
                             Set<String> thisAudioLanguageAllowedTextLanguages = new HashSet<String>(overallContractAllowedTextLanguages);
-                            for (DisallowedSubtitleLangCodeHollow lang : disallowedSubtitleLangCodes) {
-                                String textLang = lang._getValue()._getValue();
+                            for (StringHollow lang : disallowedSubtitleLangCodes) {
+                                String textLang = lang._getValue();
                                 thisAudioLanguageAllowedTextLanguages.remove(textLang);
                                 textRestriction.addDisallowedTextLanguage(textLang);
                             }
@@ -426,10 +426,10 @@ public class ContractRestrictionModule {
                 Set<String> forcedSubtitleLanguagesForThisContract = new HashSet<String>();
 
                 long dealId = rightsContract._getDealId();
-                ContractHollow contract = VideoContractUtil.getContract(api, indexer, ctx, videoId, countryCode, dealId);
-                if (contract != null) {
-                    for (DisallowedAssetBundleHollow assetBundle : contract._getDisallowedAssetBundles()) {
-                        if (assetBundle._getForceSubtitle())
+                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, countryCode, dealId);
+                if (contractAttributes != null) {
+                    for (DisallowedAssetBundleEntryHollow assetBundle : contractAttributes._getDisallowedAssetBundles()) {
+                        if (assetBundle._getForceSubtitle() != null && assetBundle._getForceSubtitle()._getValue())
                             forcedSubtitleLanguagesForThisContract.add(assetBundle._getAudioLanguageCode()._getValue());
                     }
                 }
@@ -528,9 +528,11 @@ public class ContractRestrictionModule {
      * @param restriction
      * @param selectedContract
      */
-    private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, ContractHollow selectedContract) {
-        if (selectedContract != null && selectedContract._getPrePromotionDays() != Long.MIN_VALUE)
-            restriction.prePromotionDays = (int) selectedContract._getPrePromotionDays();
+    private void finalizeContractRestriction(DownloadableAssetTypeIndex assetTypeIdx, ContractRestriction restriction, VmsAttributeFeedEntryHollow selectedContractAttribute) {
+        if (selectedContractAttribute != null &&  
+        		selectedContractAttribute._getPrePromotionDays() != null && 
+        		selectedContractAttribute._getPrePromotionDays()._getValue() != Long.MIN_VALUE)
+            restriction.prePromotionDays = (int) selectedContractAttribute._getPrePromotionDays()._getValue();
 
         restriction.excludedDownloadables = assetTypeIdx.getAllUnmarked();
         restriction.availableAssets = assetTypeIdx.getAllMarkedForStreamingAssets();
