@@ -19,6 +19,8 @@ package com.netflix.hollow.api.producer.listener;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * A listener of publish events associated with the producer publish stage.
@@ -47,12 +49,21 @@ public interface PublishListener extends HollowProducerEventListener {
      */
     void onPublishStart(long version);
 
-    // Called during publish start-complete cycle for each blob
-    // Can be merged in to PublishListener?
+    /**
+     * Called once a blob has been staged successfully or failed to stage.
+     * This method is called for every {@link HollowProducer.Blob.Type} that
+     * was staged.
+     *
+     * @param status status of staging. {@link Status#getType()} returns {@code SUCCESS} or {@code FAIL}.
+     * @param blob the blob
+     * @param elapsed time taken to stage the blob
+     */
+    default void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
+    }
 
     /**
      * Called once a blob has been published successfully or failed to published.
-     * This method is called for every {@link com.netflix.hollow.api.producer.HollowProducer.Blob.Type} that
+     * This method is called for every {@link HollowProducer.Blob.Type} that
      * was published.
      *
      * @param status status of publishing. {@link Status#getType()} returns {@code SUCCESS} or {@code FAIL}.
@@ -60,6 +71,21 @@ public interface PublishListener extends HollowProducerEventListener {
      * @param elapsed time taken to publish the blob
      */
     void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed);
+
+    /**
+     * Called if a blob is to be published asynchronously.
+     * This method is called for a {@link HollowProducer.Blob.Type#SNAPSHOT snapshot} blob when the
+     * producer is {@link HollowProducer.Builder#withSnapshotPublishExecutor(Executor) built} with a snapshot
+     * publish executor (that enables asynchronous publication).
+     *
+     * @param blob the future holding the blob that will be completed successfully when the blob has been published
+     * or with error if publishing failed.  When the blob future completes the contents of the blob are only
+     * guaranteed to be available if further stages are executed using the default execution mode of this future
+     * (i.e. use of asynchronous execution could result in a subsequent stage completing after the blob contents have
+     * been cleaned up).
+     */
+    default void onBlobPublishAsync(CompletableFuture<HollowProducer.Blob> blob) {
+    }
 
     /**
      * Called after the publish stage finishes normally or abnormally. A {@code SUCCESS} status indicates that
