@@ -156,29 +156,28 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return announceJob;
     }
 
+    /**
+     * We run canary only in us-east.
+     * BeforeCanaryAnnounceJob only needs to run once
+     * CanaryAnnounceJob makes announcement for canary data in all regions (both old and new style)
+     * AfterCanaryAnnounceJob only needs to run once
+     *
+     * CanaryValidationJob depends on BeforeCanaryAnnounceJob and AfterCanaryAnnounceJob
+     * PoisonStateMarkerJob needs to run once (will be removed soon)
+     * CanaryRollbackJob rollbacks the announcement in all regions (both old and new style)
+     */
     private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
-        Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs = new HashMap<>(3);
-        Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs = new HashMap<>(3);
 
-        for (RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, region, circuitBreakerJob, publishJobs);
-            scheduler.submitJob(beforeCanaryAnnounceJob);
+        BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, circuitBreakerJob, publishJobs);
+        scheduler.submitJob(beforeCanaryAnnounceJob);
 
-            // Gutenberg announcement for canary (via HollowProducer.Announcer) is done in all regions.
-            // The blobs are uploaded in all 3 regions, so announcing in all 3 regions is not a problem EXCEPT for the before/after canary jobs (they are still per region in this loop).
-            // PBM is only deployed to US-east region, we we are good with this.
-            // todo split gutenberg announcement region wise, if plan to ever have canary run in different regions incrementally.
-            CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, region, beforeCanaryAnnounceJob);
-            scheduler.submitJob(canaryAnnounceJob);
+        CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, beforeCanaryAnnounceJob);
+        scheduler.submitJob(canaryAnnounceJob);
 
-            AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, region, canaryAnnounceJob);
-            scheduler.submitJob(afterCanaryAnnounceJob);
+        AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, canaryAnnounceJob);
+        scheduler.submitJob(afterCanaryAnnounceJob);
 
-            beforeCanaryAnnounceJobs.put(region, beforeCanaryAnnounceJob);
-            afterCanaryAnnounceJobs.put(region, afterCanaryAnnounceJob);
-        }
-
-        CanaryValidationJob validationJob = jobCreator.createCanaryValidationJob(vip, newVersion, beforeCanaryAnnounceJobs, afterCanaryAnnounceJobs);
+        CanaryValidationJob validationJob = jobCreator.createCanaryValidationJob(vip, newVersion, beforeCanaryAnnounceJob, afterCanaryAnnounceJob);
         PoisonStateMarkerJob canaryPoisonStateMarkerJob = jobCreator.createPoisonStateMarkerJob(validationJob, newVersion);
         CanaryRollbackJob canaryRollbackJob = jobCreator.createCanaryRollbackJob(vip, newVersion, previousVersion, validationJob);
 

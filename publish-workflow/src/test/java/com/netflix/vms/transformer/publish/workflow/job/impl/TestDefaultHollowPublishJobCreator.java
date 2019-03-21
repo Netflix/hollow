@@ -19,7 +19,6 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.Pub
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -86,27 +85,27 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	}
 
 	@Override
-	public BeforeCanaryAnnounceJob createBeforeCanaryAnnounceJob(String vip, long newVersion, RegionEnum region,
+	public BeforeCanaryAnnounceJob createBeforeCanaryAnnounceJob(String vip, long newVersion,
             CircuitBreakerJob circuitBreakerJob, List<PublicationJob> newPublishJobs) {
-		return new TestBeforeCanaryAnnounceJob(context, vip, newVersion, region, circuitBreakerJob, newPublishJobs);
+		return new TestBeforeCanaryAnnounceJob(context, vip, newVersion, circuitBreakerJob, newPublishJobs);
 	}
 
 	@Override
 	public CanaryAnnounceJob createCanaryAnnounceJob(String vip,
-            long newVersion, RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
-        return new TestCanaryAnnounceJob(context, vip, newVersion, region, beforeCanaryAnnounceHook);
+            long newVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+        return new TestCanaryAnnounceJob(context, vip, newVersion, beforeCanaryAnnounceHook);
 	}
 
 	@Override
-	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip, long newVersion, RegionEnum region,
+	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip, long newVersion,
 			CanaryAnnounceJob canaryAnnounceJob) {
-		return new TestAfterCanaryAnnounceJob(context, vip, newVersion, region, canaryAnnounceJob);
+		return new TestAfterCanaryAnnounceJob(context, vip, newVersion, canaryAnnounceJob);
 	}
 
 	@Override
 	public CanaryValidationJob createCanaryValidationJob(String vip,
-			long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
-			Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
+			long cycleVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceJobs,
+			AfterCanaryAnnounceJob afterCanaryAnnounceJobs) {
 		return new TestCanaryValidationJob(context, vip, cycleVersion, afterCanaryAnnounceJobs);
 	}
 

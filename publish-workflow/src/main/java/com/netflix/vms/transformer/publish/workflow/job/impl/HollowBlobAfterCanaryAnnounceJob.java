@@ -5,7 +5,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMo
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -31,12 +30,12 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 	private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder videoRanker;
 
-	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region,
+	public HollowBlobAfterCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion,
 			CanaryAnnounceJob canaryAnnounceJob,
 			PlaybackMonkeyTester dataTester,
 			HollowBlobDataProvider hollowBlobDataProvider,
 			ValuableVideoHolder videoRanker) {
-		super(ctx, vip, newVersion, region, canaryAnnounceJob);
+		super(ctx, vip, newVersion, canaryAnnounceJob);
 		this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
@@ -51,7 +50,7 @@ public class HollowBlobAfterCanaryAnnounceJob extends AfterCanaryAnnounceJob {
 
 	public boolean executeJob(HollowReadStateEngine readStateEngine) {
 		boolean success = true;
-		if(region.equals(RegionEnum.US_EAST_1) && ctx.getConfig().isPlaybackMonkeyEnabled()){
+		if(ctx.getConfig().isPlaybackMonkeyEnabled()){
 			final long now = System.currentTimeMillis();
 			try {
 				if(isPlaybackMonkeyInstancesReadyForTest()){

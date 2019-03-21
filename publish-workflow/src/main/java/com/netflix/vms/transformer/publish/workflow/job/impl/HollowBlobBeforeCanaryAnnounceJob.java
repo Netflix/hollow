@@ -2,7 +2,6 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
 
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -23,13 +22,13 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 	private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder videoRanker;
 
-	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region,
+	public HollowBlobBeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion,
 			CircuitBreakerJob circuitBreakerJob,
 			List<PublicationJob> newPublishJobs,
 			PlaybackMonkeyTester dataTester,
 			HollowBlobDataProvider hollowBlobDataProvider,
 			ValuableVideoHolder videoRanker) {
-		super(ctx, vip, newVersion, region, circuitBreakerJob, newPublishJobs);
+		super(ctx, vip, newVersion, circuitBreakerJob, newPublishJobs);
 		this.dataTester = dataTester;
 		this.testResultVideoCountryKeys = Collections.emptyMap();
 		this.hollowBlobDataProvider = hollowBlobDataProvider;
@@ -43,7 +42,7 @@ public class HollowBlobBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 
 	public boolean executeJob(HollowReadStateEngine readStateEngine) {
 		boolean success = true;
-		if(region.equals(RegionEnum.US_EAST_1) && ctx.getConfig().isPlaybackMonkeyEnabled()){
+		if(ctx.getConfig().isPlaybackMonkeyEnabled()){
 			try {
 				long now = System.currentTimeMillis();
 				Set<ValuableVideo> mostValuableChangedVideos = videoRanker.getMostValuableChangedVideos(ctx, getCycleVersion(), readStateEngine);

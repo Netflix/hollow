@@ -27,7 +27,6 @@ import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
@@ -116,8 +115,8 @@ public class DefaultHollowPublishJobCreator {
         return new HermesCanaryRollbackJob(ctx, vip, cycleVersion, priorVersion, validationJob);
     }
 
-    public CanaryValidationJob createCanaryValidationJob(String vip, long cycleVersion, Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
-            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs) {
+    public CanaryValidationJob createCanaryValidationJob(String vip, long cycleVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceJobs,
+            AfterCanaryAnnounceJob afterCanaryAnnounceJobs) {
         return new CassandraCanaryValidationJob(ctx, cycleVersion,
                 beforeCanaryAnnounceJobs,
                 afterCanaryAnnounceJobs,
@@ -126,10 +125,10 @@ public class DefaultHollowPublishJobCreator {
     }
 
 	public BeforeCanaryAnnounceJob createBeforeCanaryAnnounceJob(String vip,
-			long newVersion, RegionEnum region,
+			long newVersion,
 			CircuitBreakerJob circuitBreakerJob,
 			List<PublicationJob> newPublishJobs) {
-		return new HollowBlobBeforeCanaryAnnounceJob(ctx, vip, newVersion, region,
+		return new HollowBlobBeforeCanaryAnnounceJob(ctx, vip, newVersion,
                 circuitBreakerJob,
 				newPublishJobs,
                 playbackMonkeyTester,
@@ -137,14 +136,13 @@ public class DefaultHollowPublishJobCreator {
                 videoRanker);
 	}
 
-	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion, 
-	        RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
-		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, region, beforeCanaryAnnounceHook);
+	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, beforeCanaryAnnounceHook);
 	}
 
-	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip, long newVersion, RegionEnum region,
+	public AfterCanaryAnnounceJob createAfterCanaryAnnounceJob(String vip, long newVersion,
             CanaryAnnounceJob canaryAnnounceJob) {
-		return new HollowBlobAfterCanaryAnnounceJob(ctx, vip, newVersion, region,
+		return new HollowBlobAfterCanaryAnnounceJob(ctx, vip, newVersion,
                 canaryAnnounceJob,
                 playbackMonkeyTester,
                 hollowBlobDataProvider,

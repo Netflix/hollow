@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.BeforeCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
@@ -10,8 +9,8 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
  */
 public class TestCanaryAnnounceJob extends CanaryAnnounceJob {
     public TestCanaryAnnounceJob(PublishWorkflowContext context, String vip, long newVersion,
-        RegionEnum region, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
-		super(context, vip, newVersion, region, beforeCanaryAnnounceHook);
+        BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+		super(context, vip, newVersion, beforeCanaryAnnounceHook);
 	}
 
 	@Override public boolean executeJob() {

@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
-import com.netflix.config.NetflixConfiguration;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
@@ -15,9 +14,9 @@ import java.util.Map;
  */
 public class TestBeforeCanaryAnnounceJob extends BeforeCanaryAnnounceJob {
 	public TestBeforeCanaryAnnounceJob(PublishWorkflowContext context, String vip, long newVersion,
-        NetflixConfiguration.RegionEnum region, CircuitBreakerJob circuitBreakerJob,
+        CircuitBreakerJob circuitBreakerJob,
         List<PublicationJob> newPublishJobs) {
-		super(context, vip, newVersion, region, circuitBreakerJob, newPublishJobs);
+		super(context, vip, newVersion, circuitBreakerJob, newPublishJobs);
 	}
 
 	@Override public boolean executeJob() {

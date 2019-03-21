@@ -7,7 +7,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMo
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.astyanax.connectionpool.exceptions.NotFoundException;
 import com.netflix.config.FastProperty;
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
@@ -34,20 +33,20 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
     private static final long CANARY_TIMEOUT_MS = 300000; /// 5 minutes
 
 	private final TransformerCassandraColumnFamilyHelper cassandraHelper;
-    private final Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs;
-    private final Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs;
+    private final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob;
+    private final AfterCanaryAnnounceJob afterCanaryAnnounceJob;
     private final HollowBlobDataProvider hollowBlobDataProvider;
 	private final ValuableVideoHolder validationVideoHolder;
 
     public CassandraCanaryValidationJob(PublishWorkflowContext ctx, long cycleVersion,
-			Map<RegionEnum, BeforeCanaryAnnounceJob> beforeCanaryAnnounceJobs,
-            Map<RegionEnum, AfterCanaryAnnounceJob> afterCanaryAnnounceJobs,
+			BeforeCanaryAnnounceJob beforeCanaryAnnounceJob,
+            AfterCanaryAnnounceJob afterCanaryAnnounceJob,
 			HollowBlobDataProvider hollowBlobDataProvider,
 			ValuableVideoHolder videoRanker) {
-        super(ctx, ctx.getVip(), cycleVersion, afterCanaryAnnounceJobs);
+        super(ctx, ctx.getVip(), cycleVersion, afterCanaryAnnounceJob);
         this.cassandraHelper = ctx.getCassandraHelper().getColumnFamilyHelper(CANARY_VALIDATION);
-		this.beforeCanaryAnnounceJobs = beforeCanaryAnnounceJobs;
-		this.afterCanaryAnnounceJobs = afterCanaryAnnounceJobs;
+		this.beforeCanaryAnnounceJob = beforeCanaryAnnounceJob;
+		this.afterCanaryAnnounceJob = afterCanaryAnnounceJob;
 		this.hollowBlobDataProvider = hollowBlobDataProvider;
 		this.validationVideoHolder = videoRanker;
     }
@@ -65,9 +64,7 @@ public class CassandraCanaryValidationJob extends CanaryValidationJob {
         boolean pbmSuccess = true;
         if (ctx.getConfig().isPlaybackMonkeyEnabled()){
 	        try {
-	            RegionEnum region = RegionEnum.US_EAST_1;
-	            final BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = beforeCanaryAnnounceJobs.get(region);
-	            final AfterCanaryAnnounceJob afterCanaryAnnounceJob = afterCanaryAnnounceJobs.get(region);
+
 	            final Map<VideoCountryKey, Boolean> befTestResults = beforeCanaryAnnounceJob.getTestResults();
 	            final Map<VideoCountryKey, Boolean> aftTestResults = afterCanaryAnnounceJob.getTestResults();
 	

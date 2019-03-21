@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
-import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.VideoCountryKey;
@@ -13,18 +12,16 @@ import java.util.Map;
 public abstract class BeforeCanaryAnnounceJob extends PublishWorkflowPublicationJob {
 
     protected final String vip;
-    protected final RegionEnum region;
     private final List<HollowBlobPublishJob> snapshotPublishJobs;
     private final List<HollowBlobPublishJob> deltaPublishJobs;
     private final List<HollowBlobPublishJob> reverseDeltaPublishJobs;
     private final CircuitBreakerJob circuitBreakerJob;
 
-	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion, RegionEnum region,
+	public BeforeCanaryAnnounceJob(PublishWorkflowContext ctx, String vip, long newVersion,
             CircuitBreakerJob circuitBreakerJob,
             List<PublicationJob> newPublishJobs) {
-		super(ctx, "Before-canary-annouce-"+region, newVersion);
+		super(ctx, "Before-canary-announce", newVersion);
         this.vip = vip;
-        this.region = region;
         this.circuitBreakerJob = circuitBreakerJob;
         this.snapshotPublishJobs = findJob(newPublishJobs, PublishType.SNAPSHOT);
         this.deltaPublishJobs = findJob(newPublishJobs, PublishType.DELTA);
