@@ -1480,7 +1480,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -2807,7 +2807,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -5078,7 +5078,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -6334,7 +6334,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -8667,7 +8667,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -9994,7 +9994,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -12474,7 +12474,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -13801,7 +13801,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -18251,7 +18251,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -19578,7 +19578,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -21974,7 +21974,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -23301,7 +23301,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -25697,7 +25697,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -27023,7 +27023,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -29467,7 +29467,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -30835,7 +30835,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -33226,7 +33226,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -34521,7 +34521,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -36976,7 +36976,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -38344,7 +38344,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -40862,7 +40862,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -42230,7 +42230,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -44748,7 +44748,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -46116,7 +46116,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -48507,7 +48507,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -49802,7 +49802,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -52257,7 +52257,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -53625,7 +53625,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
@@ -56143,7 +56143,7 @@
             ]
         },
         "com.netflix.runtime:runtime-lifecycle": {
-            "locked": "4.7.44"
+            "locked": "4.7.45"
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
             "locked": "4.2.0",
@@ -57511,7 +57511,7 @@
             ]
         },
         "netflix:nf-filter": {
-            "locked": "4.7.44",
+            "locked": "4.7.45",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle",
                 "netflix:base-server"
