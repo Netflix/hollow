@@ -20,7 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Beta API subject to change.
+ * @deprecated see {@link com.netflix.hollow.api.producer.listener.IncrementalPopulateListener}
+ * @see com.netflix.hollow.api.producer.listener.IncrementalPopulateListener
  */
+@Deprecated
 public class AbstractIncrementalCycleListener implements IncrementalCycleListener {
     @Override
     public void onCycleComplete(IncrementalCycleStatus status, long elapsed, TimeUnit unit) { }

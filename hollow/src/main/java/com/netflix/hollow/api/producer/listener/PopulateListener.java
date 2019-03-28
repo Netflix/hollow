@@ -37,7 +37,7 @@ public interface PopulateListener extends HollowProducerEventListener {
     void onPopulateStart(long version);
 
     /**
-     * Called once populating task stage has finished successfully or failed.
+     * Called once the populating task stage has finished successfully or failed.
      * Use {@link Status#getType()} to get status of the task.
      *
      * @param status A value of {@code SUCCESS} indicates that all data was successfully populated.

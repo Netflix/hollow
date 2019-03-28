@@ -17,8 +17,6 @@
 package com.netflix.hollow.api.producer;
 
 import static com.netflix.hollow.api.consumer.HollowConsumer.AnnouncementWatcher.NO_ANNOUNCEMENT_AVAILABLE;
-import static java.lang.System.currentTimeMillis;
-import static java.util.stream.Collectors.toList;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.metrics.HollowMetricsCollector;
@@ -26,24 +24,15 @@ import com.netflix.hollow.api.metrics.HollowProducerMetrics;
 import com.netflix.hollow.api.producer.enforcer.BasicSingleProducerEnforcer;
 import com.netflix.hollow.api.producer.enforcer.SingleProducerEnforcer;
 import com.netflix.hollow.api.producer.fs.HollowFilesystemBlobStager;
-import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.HollowProducerEventListener;
-import com.netflix.hollow.api.producer.validation.ValidationResult;
-import com.netflix.hollow.api.producer.validation.ValidationStatus;
-import com.netflix.hollow.api.producer.validation.ValidationStatusException;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
-import com.netflix.hollow.core.HollowConstants;
-import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
-import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowSchema;
 import com.netflix.hollow.core.util.HollowObjectHashCodeFinder;
-import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.hollow.core.write.objectmapper.RecordPrimaryKey;
-import com.netflix.hollow.tools.checksum.HollowChecksum;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import java.io.File;
 import java.io.IOException;
@@ -51,16 +40,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A HollowProducer is the top-level class used by producers of Hollow data to populate, publish, and announce data states.
@@ -126,100 +107,36 @@ import java.util.logging.Logger;
  *
  * @author Tim Taylor {@literal<tim@toolbear.io>}
  */
-public class HollowProducer {
+public class HollowProducer extends AbstractHollowProducer {
 
-    private static final long DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE = 16L * 1024L * 1024L;
-
-    private final Logger log = Logger.getLogger(HollowProducer.class.getName());
-    private final BlobStager blobStager;
-    private final Publisher publisher;
-    private final Announcer announcer;
-    private final BlobStorageCleaner blobStorageCleaner;
-    private HollowObjectMapper objectMapper;
-    private final VersionMinter versionMinter;
-    private final ListenerSupport listeners;
-    private ReadStateHelper readStates;
-    private final Executor snapshotPublishExecutor;
-    private final int numStatesBetweenSnapshots;
-    private int numStatesUntilNextSnapshot;
-    private HollowProducerMetrics metrics;
-    private HollowMetricsCollector<HollowProducerMetrics> metricsCollector;
-    private final SingleProducerEnforcer singleProducerEnforcer;
-    private long lastSuccessfulCycle = 0;
-    private final HollowObjectHashCodeFinder hashCodeFinder;
-
-    private boolean isInitialized;
+    /*
+     * HollowProducer and HollowProducer.Incremental extend from a package protected AbstractHollowProducer
+     * for sharing common functionality.
+     * To preserve binary compatibility HollowProducer overrides many methods on AbstractHollowProducer
+     * and directly defers to them (in effect explicit bridge methods).
+     */
 
     @Deprecated
     public HollowProducer(
             Publisher publisher,
             Announcer announcer) {
-        this(new HollowFilesystemBlobStager(), publisher, announcer,
-                Collections.emptyList(),
-                new VersionMinterWithCounter(), null, 0,
-                DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null,
-                new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null);
+        super(publisher, announcer);
     }
-
 
     // The only constructor should be that which accepts a builder
     // This ensures that if the builder modified to include new state that
     // extended builders will not require modification to pass on that new state
     protected HollowProducer(Builder<?> b) {
-        this(b.stager, b.publisher, b.announcer,
-                b.eventListeners,
-                b.versionMinter, b.snapshotPublishExecutor,
-                b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize,
-                b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder);
+        super(b);
     }
 
-    private HollowProducer(
-            BlobStager blobStager,
-            Publisher publisher,
-            Announcer announcer,
-            List<? extends HollowProducerEventListener> eventListeners,
-            VersionMinter versionMinter,
-            Executor snapshotPublishExecutor,
-            int numStatesBetweenSnapshots,
-            long targetMaxTypeShardSize,
-            HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
-            BlobStorageCleaner blobStorageCleaner,
-            SingleProducerEnforcer singleProducerEnforcer,
-            HollowObjectHashCodeFinder hashCodeFinder) {
-        this.publisher = publisher;
-        this.announcer = announcer;
-        this.versionMinter = versionMinter;
-        this.blobStager = blobStager;
-        this.singleProducerEnforcer = singleProducerEnforcer;
-        this.snapshotPublishExecutor = snapshotPublishExecutor;
-        this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
-        this.hashCodeFinder = hashCodeFinder;
-
-        HollowWriteStateEngine writeEngine = hashCodeFinder == null
-                ? new HollowWriteStateEngine()
-                : new HollowWriteStateEngine(hashCodeFinder);
-        writeEngine.setTargetMaxTypeShardSize(targetMaxTypeShardSize);
-
-        this.objectMapper = new HollowObjectMapper(writeEngine);
-        if (hashCodeFinder != null) {
-            objectMapper.doNotUseDefaultHashKeys();
-        }
-        this.readStates = ReadStateHelper.newDeltaChain();
-        this.blobStorageCleaner = blobStorageCleaner;
-
-        this.listeners = new ListenerSupport(eventListeners.stream().distinct().collect(toList()));
-
-        this.metrics = new HollowProducerMetrics();
-        this.metricsCollector = metricsCollector;
-    }
 
     /**
      * @return the metrics for this producer
      */
+    @Override
     public HollowProducerMetrics getMetrics() {
-        return this.metrics;
+        return super.getMetrics();
     }
 
     /**
@@ -240,19 +157,9 @@ public class HollowProducer {
      * @throws IllegalArgumentException if {@code classes} is empty
      * @see #restore(long, HollowConsumer.BlobRetriever)
      */
+    @Override
     public void initializeDataModel(Class<?>... classes) {
-        Objects.requireNonNull(classes);
-        if (classes.length == 0) {
-            throw new IllegalArgumentException("classes is empty");
-        }
-
-        long start = currentTimeMillis();
-        for (Class<?> c : classes) {
-            objectMapper.initializeTypeState(c);
-        }
-        listeners.listeners().fireProducerInit(currentTimeMillis() - start);
-
-        isInitialized = true;
+        super.initializeDataModel(classes);
     }
 
     /**
@@ -273,17 +180,9 @@ public class HollowProducer {
      * @throws IllegalArgumentException if {@code schemas} is empty
      * @see #restore(long, HollowConsumer.BlobRetriever)
      */
+    @Override
     public void initializeDataModel(HollowSchema... schemas) {
-        Objects.requireNonNull(schemas);
-        if (schemas.length == 0) {
-            throw new IllegalArgumentException("classes is empty");
-        }
-
-        long start = currentTimeMillis();
-        HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(getWriteEngine(), Arrays.asList(schemas));
-        listeners.listeners().fireProducerInit(currentTimeMillis() - start);
-
-        isInitialized = true;
+        super.initializeDataModel(schemas);
     }
 
     /**
@@ -301,78 +200,19 @@ public class HollowProducer {
      * @throws IllegalStateException if the producer's data model has not been initialized
      * @see #initializeDataModel(Class[])
      */
+    @Override
     public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(versionDesired, blobRetriever,
-                (restoreFrom, restoreTo) -> restoreTo.restoreFrom(restoreFrom));
+        return super.restore(versionDesired, blobRetriever);
     }
 
-    HollowProducer.ReadState hardRestore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
-        return restore(versionDesired, blobRetriever,
-                (restoreFrom, restoreTo) -> HollowWriteStateCreator.populateUsingReadEngine(restoreTo, restoreFrom, false));
-    }
-
-    private interface RestoreAction {
-        void restore(HollowReadStateEngine restoreFrom, HollowWriteStateEngine restoreTo);
-    }
-
-    private HollowProducer.ReadState restore(
-            long versionDesired, HollowConsumer.BlobRetriever blobRetriever, RestoreAction restoreAction) {
-        Objects.requireNonNull(blobRetriever);
-        Objects.requireNonNull(restoreAction);
-
-        if (!isInitialized) {
-            throw new IllegalStateException(
-                    "You must initialize the data model of a HollowProducer with producer.initializeDataModel(...) prior to restoring");
-        }
-
-        ReadState readState = null;
-        ListenerSupport.Listeners localListeners = listeners.listeners();
-        Status.RestoreStageBuilder status = localListeners.fireProducerRestoreStart(versionDesired);
-        try {
-            if (versionDesired != HollowConstants.VERSION_NONE) {
-                HollowConsumer client = HollowConsumer.withBlobRetriever(blobRetriever).build();
-                client.triggerRefreshTo(versionDesired);
-                if (client.getCurrentVersionId() == versionDesired) {
-                    readState = ReadStateHelper.newReadState(client.getCurrentVersionId(), client.getStateEngine());
-                    readStates = ReadStateHelper.restored(readState);
-
-                    // Need to restore data to new ObjectMapper since can't restore to non empty Write State Engine
-                    Collection<HollowSchema> schemas = objectMapper.getStateEngine().getSchemas();
-                    HollowWriteStateEngine writeEngine = hashCodeFinder == null
-                            ? new HollowWriteStateEngine()
-                            : new HollowWriteStateEngine(hashCodeFinder);
-                    HollowWriteStateCreator.populateStateEngineWithTypeWriteStates(writeEngine, schemas);
-                    HollowObjectMapper newObjectMapper = new HollowObjectMapper(writeEngine);
-                    if (hashCodeFinder != null) {
-                        newObjectMapper.doNotUseDefaultHashKeys();
-                    }
-
-                    restoreAction.restore(readStates.current().getStateEngine(), writeEngine);
-
-                    status.versions(versionDesired, readState.getVersion())
-                            .success();
-                    objectMapper = newObjectMapper; // Restore completed successfully so swap
-                } else {
-                    status.versions(versionDesired, client.getCurrentVersionId());
-                    throw new IllegalStateException(
-                            "Unable to reach requested version to restore from: " + versionDesired);
-                }
-            }
-        } catch (Throwable th) {
-            status.fail(th);
-            throw th;
-        } finally {
-            localListeners.fireProducerRestoreComplete(status);
-        }
-        return readState;
-    }
-
+    @Override
     public HollowWriteStateEngine getWriteEngine() {
-        return objectMapper.getStateEngine();
+        return super.getWriteEngine();
     }
 
+    @Override
     public HollowObjectMapper getObjectMapper() {
-        return objectMapper;
+        return super.getObjectMapper();
     }
 
     /**
@@ -382,14 +222,9 @@ public class HollowProducer {
      * @param doEnable true if enable primary producer, if false
      * @return true if the intended action was successful
      */
+    @Override
     public boolean enablePrimaryProducer(boolean doEnable) {
-
-        if (doEnable) {
-            singleProducerEnforcer.enable();
-        } else {
-            singleProducerEnforcer.disable();
-        }
-        return (singleProducerEnforcer.isPrimary() == doEnable);
+        return super.enablePrimaryProducer(doEnable);
     }
 
     /**
@@ -402,22 +237,8 @@ public class HollowProducer {
      * @throws RuntimeException if the cycle failed
      */
     // @@@ Should this be marked as synchronized?
-    public long runCycle(Populator task) {
+    public long runCycle(HollowProducer.Populator task) {
         return runCycle(null, task);
-    }
-
-    /**
-     * Runs a cycle to incrementally populate, publish, and announce a new single data state.
-     *
-     * @param task the incremental populating task to add changes (additions, modifications, or deletions)
-     * @return the version identifier of the announced state, otherwise the
-     * last successful announced version if 1) there were no data changes compared to that version;
-     * or 2) the producer is not the primary producer
-     * @throws RuntimeException if the cycle failed
-     */
-    // @@@ Should this be marked as synchronized?
-    public long runIncrementalCycle(IncrementalPopulator task) {
-        return runCycle(task, null);
     }
 
     /**
@@ -440,97 +261,6 @@ public class HollowProducer {
         return NO_ANNOUNCEMENT_AVAILABLE;
     }
 
-    long runCycle(IncrementalPopulator incrementalPopulator, Populator populator) {
-        ListenerSupport.Listeners localListeners = listeners.listeners();
-
-        if (!singleProducerEnforcer.isPrimary()) {
-            // TODO: minimum time spacing between cycles
-            log.log(Level.INFO, "cycle not executed -- not primary");
-            localListeners.fireCycleSkipped(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
-            return lastSuccessfulCycle;
-        }
-
-        long toVersion = versionMinter.mint();
-
-        if (!readStates.hasCurrent()) {
-            localListeners.fireNewDeltaChain(toVersion);
-        }
-
-        Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
-        try {
-            return runCycle(localListeners, incrementalPopulator, populator, cycleStatus, toVersion);
-        } finally {
-            localListeners.fireCycleComplete(cycleStatus);
-            metrics.updateCycleMetrics(cycleStatus.build(), cycleStatus.readState, cycleStatus.version);
-            if (metricsCollector != null) {
-                metricsCollector.collect(metrics);
-            }
-        }
-    }
-
-    long runCycle(ListenerSupport.Listeners listeners,
-            IncrementalPopulator incrementalPopulator, Populator populator,
-            Status.StageWithStateBuilder cycleStatus, long toVersion) {
-        // 1. Begin a new cycle
-        Artifacts artifacts = new Artifacts();
-        HollowWriteStateEngine writeEngine = getWriteEngine();
-        try {
-            // 1a. Prepare the write state
-            writeEngine.prepareForNextCycle();
-
-            // 2. Populate the state
-            populate(listeners, incrementalPopulator, populator, toVersion);
-
-            // 3. Produce a new state if there's work to do
-            if (writeEngine.hasChangedSinceLastCycle()) {
-                // 3a. Publish, run checks & validation, then announce new state consumers
-                publish(listeners, toVersion, artifacts);
-
-                ReadStateHelper candidate = readStates.roundtrip(toVersion);
-                cycleStatus.readState(candidate.pending());
-                candidate = checkIntegrity(listeners, candidate, artifacts);
-
-                try {
-                    validate(listeners, candidate.pending());
-
-                    announce(listeners, candidate.pending());
-
-                    readStates = candidate.commit();
-                    cycleStatus.readState(readStates.current()).success();
-                } catch (Throwable th) {
-                    if (artifacts.hasReverseDelta()) {
-                        applyDelta(artifacts.reverseDelta, candidate.pending().getStateEngine());
-                        readStates = candidate.rollback();
-                    }
-                    throw th;
-                }
-                lastSuccessfulCycle = toVersion;
-            } else {
-                // 3b. Nothing to do; reset the effects of Step 2
-                // Return the lastSucessfulCycle to the caller thereby
-                // the callee can track that version against consumers
-                // without having to listen to events.
-                // Consistently report the version that would be used if
-                // data had been published for the events.  This
-                // is for consistency in tracking
-                writeEngine.resetToLastPrepareForNextCycle();
-                cycleStatus.success();
-                listeners.fireNoDelta(toVersion);
-            }
-        } catch (Throwable th) {
-            writeEngine.resetToLastPrepareForNextCycle();
-            cycleStatus.fail(th);
-
-            if (th instanceof RuntimeException) {
-                throw (RuntimeException) th;
-            }
-            throw new RuntimeException(th);
-        } finally {
-            artifacts.cleanup();
-        }
-        return lastSuccessfulCycle;
-    }
-
     /**
      * Adds a listener to this producer.
      * <p>
@@ -542,8 +272,9 @@ public class HollowProducer {
      *
      * @param listener the listener to add
      */
+    @Override
     public void addListener(HollowProducerListener listener) {
-        listeners.addListener(listener);
+        super.addListener(listener);
     }
 
     /**
@@ -557,8 +288,9 @@ public class HollowProducer {
      *
      * @param listener the listener to add
      */
+    @Override
     public void addListener(HollowProducerEventListener listener) {
-        listeners.addListener(listener);
+        super.addListener(listener);
     }
 
     /**
@@ -572,8 +304,9 @@ public class HollowProducer {
      *
      * @param listener the listener to remove
      */
+    @Override
     public void removeListener(HollowProducerListener listener) {
-        listeners.removeListener(listener);
+        super.removeListener(listener);
     }
 
     /**
@@ -587,243 +320,9 @@ public class HollowProducer {
      *
      * @param listener the listener to remove
      */
+    @Override
     public void removeListener(HollowProducerEventListener listener) {
-        listeners.removeListener(listener);
-    }
-
-    void populate(ListenerSupport.Listeners listeners,
-            IncrementalPopulator incrementalPopulator, Populator populator,
-            long toVersion) throws Exception {
-        assert incrementalPopulator != null ^ populator != null;
-
-        Status.StageBuilder populateStatus = listeners.firePopulateStart(toVersion);
-        try {
-            if (incrementalPopulator != null) {
-                // Incremental population is a sub-stage of the population stage
-                // This ensures good integration with existing population listeners if this sub-stage fails
-                // then the population stage will fail
-                populator = incrementalPopulate(listeners, incrementalPopulator, toVersion);
-            }
-
-            try (CloseableWriteState writeState = new CloseableWriteState(toVersion, objectMapper,
-                    readStates.current())) {
-                populator.populate(writeState);
-                populateStatus.success();
-            }
-        } catch (Throwable th) {
-            populateStatus.fail(th);
-            throw th;
-        } finally {
-            listeners.firePopulateComplete(populateStatus);
-        }
-    }
-
-    Populator incrementalPopulate(ListenerSupport.Listeners listeners,
-            IncrementalPopulator incrementalPopulator,
-            long toVersion) throws Exception {
-        ConcurrentHashMap<RecordPrimaryKey, Object> events = new ConcurrentHashMap<>();
-        Status.IncrementalPopulateBuilder incrementalPopulateStatus = listeners.fireIncrementalPopulateStart(toVersion);
-        try (CloseableIncrementalWriteState iws = new CloseableIncrementalWriteState(events, getObjectMapper())) {
-            incrementalPopulator.populate(iws);
-            incrementalPopulateStatus.success();
-
-            long removed = events.values().stream()
-                    .filter(o -> o == HollowIncrementalCyclePopulator.DELETE_RECORD).count();
-            long addedOrModified = events.size() - removed;
-            incrementalPopulateStatus.changes(removed, addedOrModified);
-        } catch (Throwable th) {
-            incrementalPopulateStatus.fail(th);
-            throw th;
-        } finally {
-            listeners.fireIncrementalPopulateComplete(incrementalPopulateStatus);
-        }
-
-        return new HollowIncrementalCyclePopulator(events, 1.0);
-    }
-
-    /*
-     * Publish the write state, storing the artifacts in the provided object. Visible for testing.
-     */
-    void publish(ListenerSupport.Listeners listeners, long toVersion, Artifacts artifacts) throws IOException {
-        Status.StageBuilder psb = listeners.firePublishStart(toVersion);
-        try {
-            artifacts.snapshot = stageBlob(listeners,
-                    blobStager.openSnapshot(toVersion));
-
-            if (readStates.hasCurrent()) {
-                artifacts.delta = stageBlob(listeners,
-                        blobStager.openDelta(readStates.current().getVersion(), toVersion));
-                artifacts.reverseDelta = stageBlob(listeners,
-                        blobStager.openReverseDelta(toVersion, readStates.current().getVersion()));
-
-                publishBlob(listeners, artifacts.delta);
-                publishBlob(listeners, artifacts.reverseDelta);
-
-                if (--numStatesUntilNextSnapshot < 0) {
-                    if (snapshotPublishExecutor == null) {
-                        publishBlob(listeners, artifacts.snapshot);
-                        artifacts.markSnapshotPublishComplete();
-                    } else {
-                        // Submit the publish blob task to the executor
-                        publishSnapshotBlobAsync(listeners, artifacts);
-                    }
-                    numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
-                } else {
-                    artifacts.markSnapshotPublishComplete();
-                }
-            } else {
-                publishBlob(listeners, artifacts.snapshot);
-                artifacts.markSnapshotPublishComplete();
-                numStatesUntilNextSnapshot = numStatesBetweenSnapshots;
-            }
-
-            psb.success();
-        } catch (Throwable throwable) {
-            psb.fail(throwable);
-            throw throwable;
-        } finally {
-            listeners.firePublishComplete(psb);
-        }
-    }
-
-    private Blob stageBlob(ListenerSupport.Listeners listeners, Blob blob) throws IOException {
-        Status.PublishBuilder builder = new Status.PublishBuilder();
-        HollowBlobWriter writer = new HollowBlobWriter(getWriteEngine());
-        try {
-            builder.blob(blob);
-            blob.write(writer);
-            builder.success();
-            return blob;
-        } catch (Throwable t) {
-            builder.fail(t);
-            throw t;
-        } finally {
-            listeners.fireBlobStage(builder);
-        }
-    }
-
-    private void publishBlob(ListenerSupport.Listeners listeners, Blob blob) {
-        Status.PublishBuilder builder = new Status.PublishBuilder();
-        try {
-            builder.blob(blob);
-            publishBlob(blob);
-            builder.success();
-        } catch (Throwable t) {
-            builder.fail(t);
-            throw t;
-        } finally {
-            listeners.fireBlobPublish(builder);
-            metrics.updateBlobTypeMetrics(builder.build(), blob);
-            if (metricsCollector != null) {
-                metricsCollector.collect(metrics);
-            }
-        }
-    }
-
-    private void publishSnapshotBlobAsync(ListenerSupport.Listeners listeners, Artifacts artifacts) {
-        Blob blob = artifacts.snapshot;
-        CompletableFuture<HollowProducer.Blob> cf = new CompletableFuture<>();
-        try {
-            snapshotPublishExecutor.execute(() -> {
-                Status.StageBuilder builder = new Status.StageBuilder();
-                try {
-                    publishBlob(blob);
-                    builder.success();
-                    // Any dependent task that needs access to the blob contents should
-                    // not execute asynchronously otherwise the blob will be cleaned up
-                    cf.complete(blob);
-                } catch (Throwable t) {
-                    builder.fail(t);
-                    cf.completeExceptionally(t);
-                    throw t;
-                } finally {
-                    metrics.updateBlobTypeMetrics(builder.build(), blob);
-                    if (metricsCollector != null) {
-                        metricsCollector.collect(metrics);
-                    }
-                }
-                artifacts.markSnapshotPublishComplete();
-            });
-        } catch (Throwable t) {
-            cf.completeExceptionally(t);
-            metrics.updateBlobTypeMetrics(new Status.StageBuilder().fail(t).build(), blob);
-            if (metricsCollector != null) {
-                metricsCollector.collect(metrics);
-            }
-            throw t;
-        } finally {
-            listeners.fireBlobPublishAsync(cf);
-        }
-    }
-
-    private void publishBlob(Blob b) {
-        try {
-            publisher.publish(b);
-        } finally {
-            blobStorageCleaner.clean(b.getType());
-        }
-    }
-
-    /**
-     * Given these read states
-     * <p>
-     * * S(cur) at the currently announced version
-     * * S(pnd) at the pending version
-     * <p>
-     * Ensure that:
-     * <p>
-     * S(cur).apply(forwardDelta).checksum == S(pnd).checksum
-     * S(pnd).apply(reverseDelta).checksum == S(cur).checksum
-     *
-     * @return updated read states
-     */
-    private ReadStateHelper checkIntegrity(ListenerSupport.Listeners listeners, ReadStateHelper readStates, Artifacts artifacts) throws Exception {
-        Status.StageWithStateBuilder status = listeners.fireIntegrityCheckStart(readStates.pending());
-        try {
-            ReadStateHelper result = readStates;
-            HollowReadStateEngine pending = readStates.pending().getStateEngine();
-            readSnapshot(artifacts.snapshot, pending);
-
-            if (readStates.hasCurrent()) {
-                HollowReadStateEngine current = readStates.current().getStateEngine();
-
-                log.info("CHECKSUMS");
-                HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                log.info("  CUR        " + currentChecksum);
-
-                HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                log.info("         PND " + pendingChecksum);
-
-                if (artifacts.hasDelta()) {
-                    if (!artifacts.hasReverseDelta()) {
-                        throw new IllegalStateException("Both a delta and reverse delta are required");
-                    }
-
-                    // FIXME: timt: future cycles will fail unless both deltas validate
-                    applyDelta(artifacts.delta, current);
-                    HollowChecksum forwardChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                    //out.format("  CUR => PND %s\n", forwardChecksum);
-                    if (!forwardChecksum.equals(pendingChecksum)) {
-                        throw new ChecksumValidationException(Blob.Type.DELTA);
-                    }
-
-                    applyDelta(artifacts.reverseDelta, pending);
-                    HollowChecksum reverseChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                    //out.format("  CUR <= PND %s\n", reverseChecksum);
-                    if (!reverseChecksum.equals(currentChecksum)) {
-                        throw new ChecksumValidationException(Blob.Type.REVERSE_DELTA);
-                    }
-                    result = readStates.swap();
-                }
-            }
-            status.success();
-            return result;
-        } catch (Throwable th) {
-            status.fail(th);
-            throw th;
-        } finally {
-            listeners.fireIntegrityCheckComplete(status);
-        }
+        super.removeListener(listener);
     }
 
     public static final class ChecksumValidationException extends IllegalStateException {
@@ -831,65 +330,6 @@ public class HollowProducer {
 
         ChecksumValidationException(Blob.Type type) {
             super(type.name() + " checksum invalid");
-        }
-    }
-
-    private void readSnapshot(Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        try (InputStream is = blob.newInputStream()) {
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).readSnapshot(is);
-        }
-    }
-
-    private void applyDelta(Blob blob, HollowReadStateEngine stateEngine) throws IOException {
-        try (InputStream is = blob.newInputStream()) {
-            new HollowBlobReader(stateEngine, new HollowBlobHeaderReader()).applyDelta(is);
-        }
-    }
-
-    private void validate(ListenerSupport.Listeners listeners, HollowProducer.ReadState readState) {
-        Status.StageWithStateBuilder psb = listeners.fireValidationStart(readState);
-
-        ValidationStatus status = null;
-        try {
-            // Stream over the concatenation of the old and new validators
-            List<ValidationResult> results =
-                    listeners.getListeners(ValidatorListener.class)
-                            .map(v -> {
-                                try {
-                                    return v.onValidate(readState);
-                                } catch (RuntimeException e) {
-                                    return ValidationResult.from(v).error(e);
-                                }
-                            })
-                            .collect(toList());
-
-            status = new ValidationStatus(results);
-
-            if (!status.passed()) {
-                ValidationStatusException e = new ValidationStatusException(
-                        status, "One or more validations failed. Please check individual failures.");
-                psb.fail(e);
-                throw e;
-            }
-            psb.success();
-        } finally {
-            listeners.fireValidationComplete(psb, status);
-        }
-    }
-
-
-    private void announce(ListenerSupport.Listeners listeners, HollowProducer.ReadState readState) {
-        if (announcer != null) {
-            Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);
-            try {
-                announcer.announce(readState.getVersion());
-                status.success();
-            } catch (Throwable th) {
-                status.fail(th);
-                throw th;
-            } finally {
-                listeners.fireAnnouncementComplete(status);
-            }
         }
     }
 
@@ -966,9 +406,9 @@ public class HollowProducer {
          * <p>Calling this method after the producer's populate stage has completed is an error.
          *
          * @param o the POJO to add
+         * @return the ordinal associated with the added POJO
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
-         * @return the ordinal associated with the added POJO
          */
         int add(Object o) throws IllegalStateException;
 
@@ -980,9 +420,9 @@ public class HollowProducer {
          * saving the returned reference in a local variable that is closed over by an asynchronous task as that
          * circumvents this guard. It is safest to call {@code writeState.getObjectMapper()} within the closure.
          *
+         * @return the object mapper
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
-         * @return the object mapper
          */
         HollowObjectMapper getObjectMapper() throws IllegalStateException;
 
@@ -994,9 +434,9 @@ public class HollowProducer {
          * saving the returned reference in a local variable that is closed over by an asynchronous task as that
          * circumvents this guard. It is safest to call {@code writeState.getStateEngine()} within the closure.
          *
+         * @return the write state engine
          * @throws IllegalStateException if called after the populate stage has completed (see
          * {@link Populator} for details on the contract)
-         * @return the write state engine
          */
         HollowWriteStateEngine getStateEngine() throws IllegalStateException;
 
@@ -1026,114 +466,19 @@ public class HollowProducer {
     }
 
     /**
-     * Represents a task that incrementally populates a new data state within a {@link HollowProducer} cycle (
-     * more specifically within the population stage)
-     *
-     * <p>This is a functional interface whose functional method is
-     * {@link #populate(IncrementalWriteState)}.
-     */
-    @FunctionalInterface
-    public interface IncrementalPopulator {
-
-        /**
-         * Incrementally populates the provided {@link IncrementalWriteState} with new additions, modifications or
-         * removals of objects. Often written as a lambda passed in to
-         * {@link HollowProducer#runIncrementalCycle(IncrementalPopulator)}:
-         *
-         * <pre>{@code
-         * producer.runIncrementalCycle(incrementalState -> {
-         *     Collection<C> changesA = queryA();
-         *     for (Change c : changesA) {
-         *         if (c.isAddOrModify() {
-         *             incrementalState.addOrModify(c.getObject());
-         *         } else {
-         *             incrementalState.delete(c.getObject());
-         *         }
-         *     }
-         *
-         *     changesB = queryB();
-         *     // ...
-         * });
-         * }</pre>
-         *
-         * <p>Notes:
-         *
-         * <ul>
-         * <li>The data from the previous cycle is carried over with changes (additions, modifications or removals).
-         * <li>caught exceptions that are unrecoverable must be rethrown</li>
-         * <li>the provided {@code IncrementalWriteState} will be inoperable when this method returns; method
-         * calls against it will throw {@code IllegalStateException}</li>
-         * <li>the {@code IncrementalWriteState} is thread safe</li>
-         * </ul>
-         *
-         * <p>
-         * Incrementally populating asynchronously has these additional requirements:
-         * <ul>
-         * <li>MUST NOT return from this method until all workers have completed – either normally
-         * or exceptionally – or have been cancelled</li>
-         * <li>MUST throw an exception if any worker completed exceptionally. MAY cancel remaining tasks
-         * <em>or</em> wait for the remainder to complete.</li>
-         * </ul>
-         *
-         * @param state the state to add, modify or delete objects
-         * @throws Exception if population fails.  If failure occurs the data from the previous cycle is not changed.
-         */
-        void populate(HollowProducer.IncrementalWriteState state) throws Exception;
-    }
-
-    /**
-     * Representation of write state that can be incrementally changed.
-     */
-    public interface IncrementalWriteState {
-
-        /**
-         * Adds a new object or modifies an existing object.  The object must define a primary key.
-         * <p>
-         * Calling this method after the producer's incremental populate stage has completed is an error.
-         *
-         * @param o the object
-         * @throws IllegalArgumentException if the object does not have primary key defined
-         */
-        void addOrModify(Object o);
-
-        /**
-         * Deletes an object.  The object must define a primary key.
-         * <p>
-         * This action is ignored if the object does not exist.
-         * <p>
-         * Calling this method after the producer's incremental populate stage has completed is an error.
-         *
-         * @param o the object
-         * @throws IllegalArgumentException if the object does not have primary key defined
-         */
-        void delete(Object o);
-
-        /**
-         * Deletes an object given its primary key value.
-         * <p>
-         * If the object does not exist (has already been deleted, say) then this action as no effect on the
-         * write state.
-         * <p>
-         * Calling this method after the producer's incremental populate stage has completed is an error.
-         *
-         * @param key the primary key value
-         * @throws IllegalArgumentException if the field path of the primary key is not resolvable
-         */
-        void delete(RecordPrimaryKey key);
-    }
-
-    /**
      * Representation of read state computed from the population of new write state.
      */
     public interface ReadState {
         /**
          * Returns the version of the read state
+         *
          * @return the version
          */
         long getVersion();
 
         /**
          * Returns the read state engine
+         *
          * @return the read state engine
          */
         HollowReadStateEngine getStateEngine();
@@ -1283,51 +628,6 @@ public class HollowProducer {
 
     public interface Announcer {
         void announce(long stateVersion);
-    }
-
-    static final class Artifacts {
-        Blob snapshot = null;
-        Blob delta = null;
-        Blob reverseDelta = null;
-
-        boolean cleanupCalled;
-        boolean snapshotPublishComplete;
-
-        synchronized void cleanup() {
-            cleanupCalled = true;
-
-            cleanupSnapshot();
-
-            if (delta != null) {
-                delta.cleanup();
-                delta = null;
-            }
-            if (reverseDelta != null) {
-                reverseDelta.cleanup();
-                reverseDelta = null;
-            }
-        }
-
-        synchronized void markSnapshotPublishComplete() {
-            snapshotPublishComplete = true;
-
-            cleanupSnapshot();
-        }
-
-        private void cleanupSnapshot() {
-            if (cleanupCalled && snapshotPublishComplete && snapshot != null) {
-                snapshot.cleanup();
-                snapshot = null;
-            }
-        }
-
-        boolean hasDelta() {
-            return delta != null;
-        }
-
-        boolean hasReverseDelta() {
-            return reverseDelta != null;
-        }
     }
 
     public static HollowProducer.Builder<?> withPublisher(HollowProducer.Publisher publisher) {
@@ -1513,9 +813,25 @@ public class HollowProducer {
             }
         }
 
+        /**
+         * Builds a producer where the complete data is populated.
+         *
+         * @return a producer.
+         */
         public HollowProducer build() {
             checkArguments();
             return new HollowProducer(this);
+        }
+
+        /**
+         * Builds an incremental producer where changes (additions, modifications, removals) are
+         * populated.
+         *
+         * @return an incremental producer
+         */
+        public HollowProducer.Incremental buildIncremental() {
+            checkArguments();
+            return new HollowProducer.Incremental(this);
         }
     }
 
@@ -1555,21 +871,159 @@ public class HollowProducer {
     }
 
     /**
-     * This Dummy blob storage cleaner does nothing
+     * A producer of Hollow data that populates with given data changes (addition, modification or removal), termed
+     * incremental production.
+     * <p>
+     * A {@link HollowProducer} populates with all the given data after which changes are determined.  Generally in
+     * other respects {@code HollowProducer} and {@code HollowProducer.Incremental} have the same behaviour when
+     * publishing and announcing data states.
      */
-    private static class DummyBlobStorageCleaner extends HollowProducer.BlobStorageCleaner {
-
-        @Override
-        public void cleanSnapshots() {
+    public static class Incremental extends AbstractHollowProducer {
+        protected Incremental(Builder<?> b) {
+            super(b);
         }
 
+        /**
+         * Restores the data state to a desired version.
+         * <p>
+         * Data model {@link #initializeDataModel(Class[]) initialization} is required prior to
+         * restoring the producer.  This ensures that restoration can correctly compare the producer's
+         * current data model with the data model of the restored data state and manage any differences
+         * in those models (such as not restoring state for any types in the restoring data model not
+         * present in the producer's current data model)
+         *
+         * @param versionDesired the desired version
+         * @param blobRetriever the blob retriever
+         * @return the read state of the restored state
+         * @throws IllegalStateException if the producer's data model has not been initialized
+         * @see #initializeDataModel(Class[])
+         */
         @Override
-        public void cleanDeltas() {
+        public HollowProducer.ReadState restore(long versionDesired, HollowConsumer.BlobRetriever blobRetriever) {
+            return super.hardRestore(versionDesired, blobRetriever);
         }
 
-        @Override
-        public void cleanReverseDeltas() {
+        /**
+         * Runs a cycle to incrementally populate, publish, and announce a new single data state.
+         *
+         * @param task the incremental populating task to add changes (additions, modifications, or deletions)
+         * @return the version identifier of the announced state, otherwise the
+         * last successful announced version if 1) there were no data changes compared to that version;
+         * or 2) the producer is not the primary producer
+         * @throws RuntimeException if the cycle failed
+         */
+        // @@@ Should this be marked as synchronized?
+        public long runIncrementalCycle(Incremental.IncrementalPopulator task) {
+            return runCycle(task, null);
         }
+
+        /**
+         * Represents a task that incrementally populates a new data state within a {@link HollowProducer} cycle (
+         * more specifically within the population stage)
+         *
+         * <p>This is a functional interface whose functional method is
+         * {@link #populate(IncrementalWriteState)}.
+         */
+        @FunctionalInterface
+        public interface IncrementalPopulator {
+
+            /**
+             * Incrementally populates the provided {@link IncrementalWriteState} with new additions, modifications or
+             * removals of objects. Often written as a lambda passed in to
+             * {@link Incremental#runIncrementalCycle(IncrementalPopulator)}:
+             *
+             * <pre>{@code
+             * producer.runIncrementalCycle(incrementalState -> {
+             *     Collection<C> changesA = queryA();
+             *     for (Change c : changesA) {
+             *         if (c.isAddOrModify() {
+             *             incrementalState.addOrModify(c.getObject());
+             *         } else {
+             *             incrementalState.delete(c.getObject());
+             *         }
+             *     }
+             *
+             *     changesB = queryB();
+             *     // ...
+             * });
+             * }</pre>
+             *
+             * <p>Notes:
+             *
+             * <ul>
+             * <li>The data from the previous cycle is carried over with changes (additions, modifications or removals).
+             * <li>caught exceptions that are unrecoverable must be rethrown</li>
+             * <li>the provided {@code IncrementalWriteState} will be inoperable when this method returns; method
+             * calls against it will throw {@code IllegalStateException}</li>
+             * <li>the {@code IncrementalWriteState} is thread safe</li>
+             * </ul>
+             *
+             * <p>
+             * Incrementally populating asynchronously has these additional requirements:
+             * <ul>
+             * <li>MUST NOT return from this method until all workers have completed – either normally
+             * or exceptionally – or have been cancelled</li>
+             * <li>MUST throw an exception if any worker completed exceptionally. MAY cancel remaining tasks
+             * <em>or</em> wait for the remainder to complete.</li>
+             * </ul>
+             *
+             * @param state the state to add, modify or delete objects
+             * @throws Exception if population fails.  If failure occurs the data from the previous cycle is not changed.
+             */
+            void populate(IncrementalWriteState state) throws Exception;
+        }
+
+        /**
+         * Representation of write state that can be incrementally changed.
+         */
+        public interface IncrementalWriteState {
+
+            /**
+             * Adds a new object or modifies an existing object.  The object must define a primary key.
+             * <p>
+             * Calling this method after the producer's incremental populate stage has completed is an error.
+             *
+             * @param o the object
+             * @throws IllegalArgumentException if the object does not have primary key defined
+             */
+            void addOrModify(Object o);
+
+            /**
+             * Adds a new object.  If the object already exists no action is taken and the object is left unmodified.
+             * The object must define a primary key.
+             * <p>
+             * Calling this method after the producer's incremental populate stage has completed is an error.
+             *
+             * @param o the object
+             * @throws IllegalArgumentException if the object does not have primary key defined
+             */
+            void addIfAbsent(Object o);
+
+            /**
+             * Deletes an object.  The object must define a primary key.
+             * <p>
+             * This action is ignored if the object does not exist.
+             * <p>
+             * Calling this method after the producer's incremental populate stage has completed is an error.
+             *
+             * @param o the object
+             * @throws IllegalArgumentException if the object does not have primary key defined
+             */
+            void delete(Object o);
+
+            /**
+             * Deletes an object given its primary key value.
+             * <p>
+             * If the object does not exist (has already been deleted, say) then this action as no effect on the
+             * write state.
+             * <p>
+             * Calling this method after the producer's incremental populate stage has completed is an error.
+             *
+             * @param key the primary key value
+             * @throws IllegalArgumentException if the field path of the primary key is not resolvable
+             */
+            void delete(RecordPrimaryKey key);
+        }
+
     }
-
 }

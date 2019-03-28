@@ -23,7 +23,6 @@ import static org.mockito.Mockito.spy;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
-import com.netflix.hollow.api.producer.HollowProducer.Artifacts;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.api.producer.HollowProducer.Blob.Type;
 import com.netflix.hollow.api.producer.HollowProducer.ReadState;
@@ -261,7 +260,7 @@ public class HollowProducerTest {
         Assert.assertEquals("Should have no populated ordinals", 0,
                 producer.getWriteEngine().getTypeState("TestPojo").getPopulatedBitSet().cardinality());
         doThrow(new RuntimeException("Publish failed")).when(producer).publish(
-                any(ListenerSupport.Listeners.class), any(Long.class), any(Artifacts.class));
+                any(ListenerSupport.Listeners.class), any(Long.class), any(AbstractHollowProducer.Artifacts.class));
         try {
             producer.runCycle(newState -> newState.add(new TestPojoV1(1, 1)));
         } catch (RuntimeException e) { // expected
