@@ -414,8 +414,8 @@ public class HollowProducer {
         if (!readStates.hasCurrent()) {
             localListeners.fireNewDeltaChain(toVersion);
         }
-        Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
 
+        Status.StageWithStateBuilder cycleStatus = localListeners.fireCycleStart(toVersion);
         try {
             return runCycle(localListeners, task, cycleStatus, toVersion);
         } finally {

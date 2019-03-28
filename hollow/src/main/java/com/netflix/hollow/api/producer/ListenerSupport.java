@@ -29,6 +29,7 @@ import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
 import com.netflix.hollow.api.producer.listener.PopulateListener;
 import com.netflix.hollow.api.producer.listener.PublishListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
+import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
@@ -132,7 +133,12 @@ final class ListenerSupport {
             s.forEach(l -> {
                 try {
                     r.accept(l);
+                } catch (VetoableListener.ListenerVetoException e) {
+                    throw e;
                 } catch (RuntimeException e) {
+                    if (l instanceof VetoableListener) {
+                        throw e;
+                    }
                     LOG.log(Level.WARNING, "Error executing listener", e);
                 }
             });

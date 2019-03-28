@@ -10,6 +10,7 @@ import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
 import com.netflix.hollow.api.producer.listener.PopulateListener;
 import com.netflix.hollow.api.producer.listener.PublishListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
+import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.api.producer.validation.ValidationStatus;
 import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import java.io.InputStream;
@@ -45,6 +46,76 @@ public class HollowProducerListenerTest {
             Throwable t = new Throwable();
             StackTraceElement caller = t.getStackTrace()[1];
             callCount.compute(caller.getMethodName(), (k, v) -> v == null ? 1 : v + 1);
+        }
+    }
+
+    @Test
+    public void testListenerVetoException() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withAnnouncer((HollowProducer.Announcer) stateVersion -> { })
+                .build();
+
+        class Listener implements CycleListener {
+            @Override public void onCycleSkip(CycleSkipReason reason) {
+            }
+
+            @Override public void onNewDeltaChain(long version) {
+            }
+
+            @Override public void onCycleStart(long version) {
+                throw new VetoableListener.ListenerVetoException("VETOED");
+            }
+
+            @Override public void onCycleComplete(
+                    Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+            }
+        }
+        Listener l = new Listener();
+        producer.addListener(l);
+
+        producer.initializeDataModel(Top.class);
+
+        try {
+            producer.runCycle(ws -> ws.add(new Top(1)));
+            Assert.fail();
+        } catch (VetoableListener.ListenerVetoException e) {
+            Assert.assertEquals("VETOED", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testVetoableListener() {
+        HollowProducer producer = HollowProducer.withPublisher(blobStore)
+                .withBlobStager(new HollowInMemoryBlobStager())
+                .withAnnouncer((HollowProducer.Announcer) stateVersion -> { })
+                .build();
+
+        class Listener implements CycleListener, VetoableListener {
+            @Override public void onCycleSkip(CycleSkipReason reason) {
+            }
+
+            @Override public void onNewDeltaChain(long version) {
+            }
+
+            @Override public void onCycleStart(long version) {
+                throw new RuntimeException("VETOED");
+            }
+
+            @Override public void onCycleComplete(
+                    Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+            }
+        }
+        Listener l = new Listener();
+        producer.addListener(l);
+
+        producer.initializeDataModel(Top.class);
+
+        try {
+            producer.runCycle(ws -> ws.add(new Top(1)));
+            Assert.fail();
+        } catch (RuntimeException e) {
+            Assert.assertEquals("VETOED", e.getMessage());
         }
     }
 
