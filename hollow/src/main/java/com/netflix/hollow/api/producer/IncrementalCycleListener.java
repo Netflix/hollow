@@ -28,7 +28,10 @@ import java.util.concurrent.TimeUnit;
  *
  * A class should implement {@code IncrementalCycleListener}, if it wants to be notified on start/completion of various stages of the {@link HollowIncrementalProducer}.
  *
+ * @deprecated see {@link com.netflix.hollow.api.producer.listener.IncrementalPopulateListener}
+ * @see com.netflix.hollow.api.producer.listener.IncrementalPopulateListener
  */
+@Deprecated
 public interface IncrementalCycleListener extends EventListener {
 
     /**

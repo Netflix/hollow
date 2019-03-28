@@ -34,22 +34,21 @@ public class FlatRecord {
     final HollowSchemaIdentifierMapper schemaIdMapper;
     final ByteData data;
     final int dataStartByte;
-    int dataEndByte;
-    RecordPrimaryKey recordPrimaryKey;
+    final int dataEndByte;
+    final RecordPrimaryKey recordPrimaryKey;
 
     public FlatRecord(ByteData recordData, HollowSchemaIdentifierMapper schemaIdMapper) {
         this.data = recordData;
-        this.recordPrimaryKey = null;
         this.schemaIdMapper = schemaIdMapper;
 
         int currentRecordPointer = 0;
         int locationOfTopRecord = VarInt.readVInt(recordData, currentRecordPointer);
         currentRecordPointer += VarInt.sizeOfVInt(locationOfTopRecord);
 
-        dataEndByte = VarInt.readVInt(recordData, currentRecordPointer);
-        currentRecordPointer += VarInt.sizeOfVInt(dataEndByte);
-        dataStartByte = currentRecordPointer;
-        dataEndByte += dataStartByte + locationOfTopRecord;
+        int end = VarInt.readVInt(recordData, currentRecordPointer);
+        currentRecordPointer += VarInt.sizeOfVInt(end);
+        this.dataStartByte = currentRecordPointer;
+        this.dataEndByte  = end + dataStartByte + locationOfTopRecord;
 
         int topRecordSchemaId = VarInt.readVInt(recordData, dataStartByte + locationOfTopRecord);
         HollowSchema topRecordSchema = schemaIdMapper.getSchema(topRecordSchemaId);
@@ -59,7 +58,7 @@ public class FlatRecord {
 
             if (primaryKey != null) {
                 Object[] recordPrimaryKey = new Object[primaryKey.numFields()];
-                FieldType primaryKeyFieldTypes[] = schemaIdMapper.getPrimaryKeyFieldTypes(topRecordSchemaId);
+                FieldType[] primaryKeyFieldTypes = schemaIdMapper.getPrimaryKeyFieldTypes(topRecordSchemaId);
                 int primaryKeyRecordPointer = dataEndByte;
 
                 for (int i = 0; i < recordPrimaryKey.length; i++) {
@@ -70,7 +69,11 @@ public class FlatRecord {
                 }
                 
                 this.recordPrimaryKey = new RecordPrimaryKey(topRecordSchema.getName(), recordPrimaryKey);
+            } else {
+                this.recordPrimaryKey = null;
             }
+        } else {
+            this.recordPrimaryKey = null;
         }
     }
     
@@ -102,7 +105,7 @@ public class FlatRecord {
         case STRING:
             int length = VarInt.readVInt(data, location);
             location += VarInt.sizeOfVInt(length);
-            char s[] = new char[length]; 
+            char[] s = new char[length];
             
             for(int i=0;i<length;i++) {
                 s[i] = (char)VarInt.readVInt(data, location);
@@ -113,7 +116,7 @@ public class FlatRecord {
         case BYTES:
             length = VarInt.readVInt(data, location);
             location += VarInt.sizeOfVInt(length);
-            byte b[] = new byte[length];
+            byte[] b = new byte[length];
             
             for(int i=0;i<b.length;i++) {
                 b[i] = data.get(location++);

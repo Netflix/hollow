@@ -35,7 +35,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Warning: This is a BETA API and is subject to breaking changes.
+ * @deprecated see {@link HollowProducer.Incremental}
+ * @see HollowProducer.Incremental
  */
+@Deprecated
 public class HollowIncrementalProducer {
 
     private static final long FAILED_VERSION = Long.MIN_VALUE;
