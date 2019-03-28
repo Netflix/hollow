@@ -54,7 +54,7 @@ public class HollowObjectSchema extends HollowSchema {
     public HollowObjectSchema(String schemaName, int numFields, PrimaryKey primaryKey) {
         super(schemaName);
 
-        this.nameFieldIndexLookup = new HashMap<String, Integer>(numFields);
+        this.nameFieldIndexLookup = new HashMap<>(numFields);
         this.fieldNames = new String[numFields];
         this.fieldTypes = new FieldType[numFields];
         this.referencedTypes = new String[numFields];
@@ -71,26 +71,34 @@ public class HollowObjectSchema extends HollowSchema {
     }
 
     public int addField(String fieldName, FieldType fieldType) {
-        return addField(fieldName, fieldType, null, null);
+        return addField(fieldName, fieldType, null);
     }
 
     public int addField(String fieldName, FieldType fieldType, String referencedType) {
-        return addField(fieldName, fieldType, referencedType, null);
-    }
-
-    public int addField(String fieldName, FieldType fieldType, String referencedType, HollowTypeReadState referencedTypeState) {
-        if(fieldType == FieldType.REFERENCE && referencedType == null)
-            throw new RuntimeException("When adding a REFERENCE field to a schema, the referenced type must be provided.  Check type: " + getName() + " field: " + fieldName);
-
+        if (fieldType == FieldType.REFERENCE && referencedType == null) {
+            throw new RuntimeException(
+                    "When adding a REFERENCE field to a schema, the referenced type must be provided.  Check type: "
+                            + getName() + " field: " + fieldName);
+        }
         fieldNames[size] = fieldName;
         fieldTypes[size] = fieldType;
         referencedTypes[size] = referencedType;
-
-        nameFieldIndexLookup.put(fieldName, Integer.valueOf(size));
+        nameFieldIndexLookup.put(fieldName, size);
 
         size++;
 
         return size - 1;
+    }
+
+    /**
+     * @deprecated This method ignores the provided {@code HollowTypeReadState} - you should use
+     * {@link #addField(String, FieldType, String)} and then call
+     * {@link #setReferencedTypeState(int, HollowTypeReadState)} with the returned integer. This
+     * method will be removed in a future release.
+     */
+    @Deprecated
+    public int addField(String fieldName, FieldType fieldType, String referencedType, HollowTypeReadState referencedTypeState) {
+        return addField(fieldName, fieldType, referencedType);
     }
 
     /**
@@ -103,9 +111,10 @@ public class HollowObjectSchema extends HollowSchema {
      */
     public int getPosition(String fieldName) {
         Integer index = nameFieldIndexLookup.get(fieldName);
-        if(index == null)
+        if (index == null) {
             return -1;
-        return index.intValue();
+        }
+        return index;
     }
 
     public String getFieldName(int fieldPosition) {
@@ -326,7 +335,7 @@ public class HollowObjectSchema extends HollowSchema {
      * All allowable field types.
      *
      */
-    public static enum FieldType {
+    public enum FieldType {
         /**
          * A reference to another field.  References are typed, and are fixed-length fields are encoded as the ordinal of the referenced record.
          */
@@ -374,7 +383,7 @@ public class HollowObjectSchema extends HollowSchema {
         private final int fixedLength;
         private final boolean varIntEncodesLength;
 
-        private FieldType(int fixedLength, boolean varIntEncodesLength) {
+        FieldType(int fixedLength, boolean varIntEncodesLength) {
             this.fixedLength = fixedLength;
             this.varIntEncodesLength = varIntEncodesLength;
         }
@@ -387,6 +396,4 @@ public class HollowObjectSchema extends HollowSchema {
             return varIntEncodesLength;
         }
     }
-
-
 }
