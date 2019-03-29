@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.api.client.HollowAPIFactory;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.client.HollowClientMemoryConfig;
@@ -12,20 +11,11 @@ import com.netflix.hollow.core.util.DefaultHashCodeFinder;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import java.util.Collections;
 
+@Deprecated
 public class VMSInputDataClient extends HollowClient {
-    
+
     public static final String TEST_PROXY_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-test";
     public static final String PROD_PROXY_URL = "http://discovery.cloud.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-prod";
-
-    public VMSInputDataClient(FileStore fileStore, String converterVip) {
-        super(new VMSDataTransitionCreator(fileStore, converterVip),
-              new VMSInputDataUpdateDirector(fileStore, converterVip),
-              HollowUpdateListener.DEFAULT_LISTENER,
-              new VMSInputDataAPIFactory(),
-              new DefaultHashCodeFinder(),
-              HollowClientMemoryConfig.DEFAULT_CONFIG);
-        setMaxDeltas(40);
-    }
 
     public VMSInputDataClient(String baseProxyURL, String localDataDir, String converterVip) {
         super(new VMSDataProxyTransitionCreator(baseProxyURL, localDataDir, converterVip),
@@ -57,6 +47,5 @@ public class VMSInputDataClient extends HollowClient {
             api.setSamplingDirector(DisabledSamplingDirector.INSTANCE);
             return api;
         }
-
     }
 }

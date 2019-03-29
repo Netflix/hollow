@@ -11,6 +11,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.cinder.consumer.NFHollowBlobRetriever;
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.cinder.producer.NFHollowAnnouncer;
@@ -19,6 +20,7 @@ import com.netflix.gutenberg.GutenbergIdentifiers;
 import com.netflix.gutenberg.api.publisher.GutenbergFilePublisher;
 import com.netflix.gutenberg.api.publisher.GutenbergValuePublisher;
 import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -31,6 +33,7 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
+import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
@@ -53,11 +56,14 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
 
+    private final String CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER = "vmsconverter-";
+
     @Inject
     public TransformerCycleKickoff(
             TransformerCycleInterrupter cycleInterrupter,
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
+            Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
             FileStore fileStore,
             Supplier<CinderProducerBuilder> cinderBuilder,
             GutenbergFilePublisher gutenbergFilePublisher,
@@ -108,12 +114,14 @@ public class TransformerCycleKickoff {
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer);
 
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder, CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + transformerConfig.getConverterVip());
+
         TransformCycle cycle = new TransformCycle(
                 ctx,
+                inputConsumer,
                 fileStore,
                 hermesBlobAnnouncer,
                 publishStager,
-                transformerConfig.getConverterVip(),
                 transformerConfig.getTransformerVip(),
                 cinderBuilder);
 

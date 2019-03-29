@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
@@ -15,15 +15,15 @@ public class TransformerOutputBlobHeaderPopulator {
     }
     
 
-    public Map<String, String> addHeaders(HollowClient inputClient, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
-        
-        outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputClient.getCurrentVersionId()));
+    public Map<String, String> addHeaders(HollowConsumer inputConsumer, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
+
+        outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputConsumer.getCurrentVersionId()));
         outputStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
         outputStateEngine.addHeaderTag("awsAmiId", ctx.getConfig().getAwsAmiId());
         outputStateEngine.addHeaderTags(BlobMetaDataUtil.getPublisherProps(ctx.getConfig().getTransformerVip(), System.currentTimeMillis(), String.valueOf(currentCycleNumber), previousCycleNumber == Long.MIN_VALUE ? "" : String.valueOf(previousCycleNumber)));
         
         /// input versions
-        Map<String, String> inputHeaderTags = inputClient.getStateEngine().getHeaderTags();
+        Map<String, String> inputHeaderTags = inputConsumer.getStateEngine().getHeaderTags();
         for(Map.Entry<String, String> entry : inputHeaderTags.entrySet()) {
             if(entry.getKey().endsWith("_coldstart")) {
                 String mutationGroup = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));

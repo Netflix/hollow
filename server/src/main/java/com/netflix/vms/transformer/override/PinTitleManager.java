@@ -262,11 +262,7 @@ public class PinTitleManager {
     @VisibleForTesting
     PinTitleProcessor createInputBasedProcessor() {
         String vip = inputDataVip != null ? inputDataVip : ctx.getConfig().getConverterVip();
-        if (fileStore != null) {
-            return new InputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
-        } else {
-            return new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
-        }
+        return new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
     }
 
     // Create Output Based Processor

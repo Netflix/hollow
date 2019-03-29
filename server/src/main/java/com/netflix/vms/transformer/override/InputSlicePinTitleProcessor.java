@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.aws.file.FileStore;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
@@ -23,13 +22,6 @@ import java.util.Arrays;
 public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
     private final VMSInputDataClient inputDataClient;
-
-    public InputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
-        super(vip, localBlobStore, ctx);
-
-        this.pinTitleFileStore = fileStore;
-        this.inputDataClient = new VMSInputDataClient(fileStore, vip);
-    }
 
     public InputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
         super(vip, localBlobStore, ctx);

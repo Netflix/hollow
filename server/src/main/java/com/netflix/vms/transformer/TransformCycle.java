@@ -19,10 +19,9 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformR
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
-import com.google.gson.Gson;
 import com.netflix.aws.file.FileStore;
 import com.netflix.cinder.producer.CinderProducerBuilder;
-import com.netflix.hollow.api.client.HollowClient;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
@@ -52,7 +51,6 @@ import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
 import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.override.PinTitleHelper;
@@ -83,7 +81,6 @@ import java.util.function.Supplier;
 
 public class TransformCycle {
     private final String transformerVip;
-    private HollowClient inputClient;
     private final VMSTransformerWriteStateEngine outputStateEngine;
     private final VMSTransformerWriteStateEngine fastlaneOutputStateEngine;
     private final TransformerContext ctx;
@@ -93,10 +90,10 @@ public class TransformCycle {
     private final FollowVipPinExtractor followVipPinExtractor;
     private final FileStore filestore;
     private final HermesBlobAnnouncer hermesBlobAnnouncer;
-    private final String converterVip;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
+    private HollowConsumer inputConsumer;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -105,28 +102,23 @@ public class TransformCycle {
     private boolean isFirstCycle = true;
     private boolean isRestoreNeeded = true;
 
-    private String previouslyResolvedConverterVip;
-
     private Map<String, String> currentStateHeader = Collections.emptyMap();
     private Map<String, String> previousStateHeader = Collections.emptyMap();
 
     private final HollowProducer producer;
     private final AtomicLong cinderVersion;
 
-    public TransformCycle(TransformerContext ctx,
+    public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
-            String converterVip, String transformerVip,
+            String transformerVip,
             Supplier<CinderProducerBuilder> cinderBuilder) {
         this.ctx = ctx;
         this.versionMinter = new SequenceVersionMinter();
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
 
         this.transformerVip = transformerVip;
-        this.converterVip = converterVip;
-        this.previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
         this.filestore = fileStore;
         this.hermesBlobAnnouncer = hermesBlobAnnouncer;
-        this.inputClient = new VMSInputDataClient(fileStore, previouslyResolvedConverterVip);
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(ctx);
@@ -138,6 +130,8 @@ public class TransformCycle {
 
         this.isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
+
+        this.inputConsumer = inputConsumer;
 
         Monitors.registerObject(timeSinceLastPublishGauge);
 
@@ -193,7 +187,7 @@ public class TransformCycle {
                     .withVersionMinter(cinderVersion::get)
                     .withRestore());
             publishStager.initProducer(
-                    inputClient::getCurrentVersionId,
+                    inputConsumer::getCurrentVersionId,
                     producer,
                     cinderVip);
 
@@ -205,7 +199,7 @@ public class TransformCycle {
                     .withVersionMinter(cinderVersion::get)
                     .withRestore());
             publishStager.initNoStreamsProducer(
-                    inputClient::getCurrentVersionId,
+                    inputConsumer::getCurrentVersionId,
                     noStreamsProducer,
                     nostreamsCinderVip);
 
@@ -603,8 +597,8 @@ public class TransformCycle {
         }
     }
 
-    private static ExecuteFutureResult executeLoadInput(SimultaneousExecutor executor, TransformerContext ctx, HollowClient inputClient, final Long pinnedInputVersion) {
-        ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
+    private static ExecuteFutureResult executeLoadInput(SimultaneousExecutor executor, TransformerContext ctx, HollowConsumer inputConsumer, final Long pinnedInputVersion) {
+                ExecuteFutureResult inputProcessingResult = new ExecuteFutureResult(ctx, "updateTheInput");
         executor.execute(() -> {
             try {
                 inputProcessingResult.started();
@@ -613,13 +607,13 @@ public class TransformCycle {
                 ctx.getCycleMonkey().doMonkeyBusiness(inputProcessingResult.getName());
 
                 if (pinnedInputVersion == null)
-                    inputClient.triggerRefresh();
+                    inputConsumer.triggerRefresh();
                 else {
-                    inputClient.triggerRefreshTo(pinnedInputVersion);
-                    if (inputClient.getCurrentVersionId() != pinnedInputVersion) throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
+                    inputConsumer.triggerRefreshTo(pinnedInputVersion);
+                    if (inputConsumer.getCurrentVersionId() != pinnedInputVersion) throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
                 }
 
-                ctx.getLogger().info(BlobState, "Loaded input to version={}, header={}", inputClient.getCurrentVersionId(), inputClient.getStateEngine().getHeaderTags());
+                ctx.getLogger().info(BlobState, "Loaded input to version={}, header={}", inputConsumer.getCurrentVersionId(), inputConsumer.getStateEngine().getHeaderTags());
                 inputProcessingResult.completed();
             } catch (Exception ex) {
                 ctx.getLogger().error(BlobState, "Failed to Load Input", ex);
@@ -641,13 +635,8 @@ public class TransformCycle {
             if(pinnedInputVersion == null && followVipPin != null)
                 pinnedInputVersion = followVipPin.getInputVersionId();
 
-            // If the converter vip has changed we need to re-initialize the client
-            if(hasConverterVipChanged()) {
-                inputClient = new VMSInputDataClient(filestore, resolveConverterVip(ctx, converterVip));
-                previouslyResolvedConverterVip = resolveConverterVip(ctx, converterVip);
-            }
             // Load Input on thread so it can process restore on first cycle if needed
-            ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputClient, pinnedInputVersion);
+            ExecuteFutureResult inputProcessingResult = executeLoadInput(executor, ctx, inputConsumer, pinnedInputVersion);
 
             // Determine whether to process restore here; only restore once
             if (isRestoreNeeded && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
@@ -666,10 +655,10 @@ public class TransformCycle {
                 nowMillis = System.currentTimeMillis();
             ctx.setNowMillis(nowMillis);
 
-            ctx.getLogger().info(InputDataConverterVersionId, inputClient.getCurrentVersionId());
+            ctx.getLogger().info(InputDataConverterVersionId, inputConsumer.getCurrentVersionId());
             ctx.getLogger().info(ProcessNowMillis, "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
 
-            VMSInputDataVersionLogger.logInputVersions(inputClient.getStateEngine().getHeaderTags(), ctx.getLogger());
+            VMSInputDataVersionLogger.logInputVersions(inputConsumer.getStateEngine().getHeaderTags(), ctx.getLogger());
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState, "Failed to process Input", ex);
             throw new RuntimeException("Failed to process input", ex);
@@ -686,9 +675,9 @@ public class TransformCycle {
             long previousVersion = newState.getPriorState() == null ? -1 : newState.getPriorState().getVersion();
 
             output.getHeaderTags().clear();
-            headerPopulator.addHeaders(inputClient, output, previousVersion, newState.getVersion());
+            headerPopulator.addHeaders(inputConsumer, output, previousVersion, newState.getVersion());
 
-            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), output, ctx);
+            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputConsumer.getAPI(), output, ctx);
             try {
                 transformer.transform();
             } catch (Error | RuntimeException e) {
@@ -710,7 +699,7 @@ public class TransformCycle {
                 pinTitleMgr.submitJobsToProcessASync(pinnedTitleSpecs);
 
                 // Process fastlane
-                trasformInputData(inputClient.getAPI(), fastlaneOutputStateEngine, ctx);
+                trasformInputData(inputConsumer.getAPI(), fastlaneOutputStateEngine, ctx);
 
                 /**
                  * Combine input states
@@ -766,7 +755,7 @@ public class TransformCycle {
                 ctx.getLogger().info(CyclePinnedTitles, "Processed blobId={}, pinnedTitles={}, hasDataChanged={}, fastlaneChanged={}, isFirstCycle={}, duration={}",
                         overrideBlobID, pinnedTitles, outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(), isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
-                trasformInputData(inputClient.getAPI(), outputStateEngine, ctx);
+                trasformInputData(inputConsumer.getAPI(), outputStateEngine, ctx);
 
                 // Spot to trigger Cycle Monkey if enabled
                 cycleMonkey.doMonkeyBusiness("transformTheData");
@@ -795,7 +784,7 @@ public class TransformCycle {
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try {
             currentStateHeader = new HashMap<>(headerPopulator.addHeaders(
-                    inputClient, outputStateEngine,
+                    inputConsumer, outputStateEngine,
                     previousCycleNumber, currentCycleNumber));
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
@@ -909,7 +898,7 @@ public class TransformCycle {
 
         ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
-            CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputClient.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
+            CycleStatusFuture future = publishWorkflowStager.triggerPublish(inputConsumer.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
 
@@ -940,24 +929,6 @@ public class TransformCycle {
 
     private void incrementSuccessCounter() {
         ctx.getMetricRecorder().incrementCounter(Metric.CycleSuccessCounter, 1);
-    }
-
-    private boolean hasConverterVipChanged() {
-        return !this.previouslyResolvedConverterVip.equals(resolveConverterVip(this.ctx, this.converterVip));
-    }
-
-    @SuppressWarnings("unchecked")
-    private String resolveConverterVip(TransformerContext ctx, String converterVip) {
-
-        // get the map of converterVip vs keybase
-        String json = this.ctx.getConfig().getConverterVipToKeybaseMap();
-
-        Map<String, String> map = new HashMap<String, String>();
-        Gson gson = new Gson();
-        map = gson.fromJson(json, map.getClass());
-
-        // See if we have an entry for converterVip
-        return map.containsKey(converterVip) ? map.get(converterVip) : converterVip;
     }
 
     public static class ExecuteFutureResult {
