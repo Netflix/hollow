@@ -21,12 +21,22 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
 
 import com.google.gson.Gson;
 import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.hollow.api.client.HollowClient;
 import com.netflix.hollow.api.custom.HollowAPI;
+import com.netflix.hollow.api.producer.HollowProducer;
+import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.CycleListener;
+import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
+import com.netflix.hollow.api.producer.listener.PopulateListener;
+import com.netflix.hollow.api.producer.listener.PublishListener;
+import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
@@ -59,6 +69,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,6 +78,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 public class TransformCycle {
     private final String transformerVip;
@@ -97,9 +110,13 @@ public class TransformCycle {
     private Map<String, String> currentStateHeader = Collections.emptyMap();
     private Map<String, String> previousStateHeader = Collections.emptyMap();
 
+    private final HollowProducer producer;
+    private final AtomicLong cinderVersion;
+
     public TransformCycle(TransformerContext ctx,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
-            String converterVip, String transformerVip) {
+            String converterVip, String transformerVip,
+            Supplier<CinderProducerBuilder> cinderBuilder) {
         this.ctx = ctx;
         this.versionMinter = new SequenceVersionMinter();
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
@@ -123,6 +140,217 @@ public class TransformCycle {
         this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
 
         Monitors.registerObject(timeSinceLastPublishGauge);
+
+        /*
+         * Use HollowProducer for "feather" and "feather_nostreams" if enabled and not configured
+         * for the fast lane.
+         * TODO:
+         * - Announcements are not staggered, see HermesAnnounceListener
+         *   Possible use CompletableFuture.supplyAsync(supplier, delayedExecutor(timeout, timeUnit))
+         *   rather than an explicit queue + thread pool.
+         *
+         * - Enhance publish listener to emit a blob stage event
+         *   The snapshot blob size that can be input to the SnapshotSizeCircuitBreaker
+         *
+         * - Snapshot blobs are not published asynchronously
+         *   Enhance publish listener to emit a publish event with CompletableFuture
+         *
+         * - Enhance announcement listener to emit a pre-announce event from which
+         *   the nostreams pipeline can be executed
+         *   In addition if the nostreams pipeline fails then the it should cause the main
+         *   pipeline to fail i.e. listener veto
+         *
+         * - Canary/Playback monkey not yet tested
+         *
+         * - The VMS dashboard mostly works but is not reporting published blobs and announcements
+         *
+         * - Likely not possible to interrupt a cycle
+         *   See usages of the method TransformerCycleInterrupter.triggerInterruptIfNeeded
+         *
+         * - No integration with the cycle monkey (see also listener veto support)
+         *   See usages of the method CycleMonkey.doMonkeyBusiness
+         *
+         * - There may be rare cases where the main producer cycle results in changes but the nostreams
+         *   producer does not.  In that case the nostreams cycle will not publish and announce
+         *   anything.  Presumably if such cases have previously occurred then delta and reverse delta
+         *   blobs would be published containing no changes.
+         *
+         * - Remove the use of VMSTransformerHashCodeFinder when initializing the producers
+         *   This may require a new VIP as there are issues processing the nostreams data,
+         *   specifically a map with a hash key whose key type is not present.  This likely
+         *   makes it difficult to transition an existing VIP to use HollowProducer while
+         *   preserving the delta chain
+         */
+        if (ctx.getConfig().isCinderEnabled() && !isFastlane) {
+            this.cinderVersion = new AtomicLong();
+            cinderVersion.set(currentCycleNumber);
+
+            String cinderVip = ctx.getConfig().getTransformerVip();
+            String cinderOutputNamespace = "vms-" + cinderVip;
+            this.producer = VMSTransformerWriteStateEngine.initAndBuildProducer(
+                    cinderBuilder.get()
+                    .forNamespace(cinderOutputNamespace)
+                    .withVersionMinter(cinderVersion::get)
+                    .withRestore());
+            publishStager.initProducer(
+                    inputClient::getCurrentVersionId,
+                    producer,
+                    cinderVip);
+
+            String nostreamsCinderVip = cinderVip + "_nostreams";
+            String cinderNostreamsOutputNamespace = "vms-" + nostreamsCinderVip;
+            HollowProducer noStreamsProducer = VMSTransformerWriteStateEngine.initAndBuildNoStreamsProducer(
+                    cinderBuilder.get()
+                    .forNamespace(cinderNostreamsOutputNamespace)
+                    .withVersionMinter(cinderVersion::get)
+                    .withRestore());
+            publishStager.initNoStreamsProducer(
+                    inputClient::getCurrentVersionId,
+                    noStreamsProducer,
+                    nostreamsCinderVip);
+
+            class NoStreamsPipeline implements IntegrityCheckListener {
+                @Override
+                public void onIntegrityCheckStart(long version) {
+                }
+
+                @Override
+                public void onIntegrityCheckComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+                    noStreamsProducer.runCycle(ws -> {
+                        HollowReadStateEngine input = readState.getStateEngine();
+                        HollowWriteStateEngine output = ws.getStateEngine();
+                        HollowCombiner combiner = new HollowCombiner(output, input);
+
+                        combiner.addIgnoredTypes(
+                                "ChunkDurationsString",
+                                "CodecPrivateDataString",
+                                "DeploymentIntent",
+                                "DownloadLocationSet",
+                                "DrmInfo",
+                                "DrmInfoData",
+                                "DrmKey",
+                                "DrmKeyString",
+                                "DrmHeader",
+                                "FileEncodingData",
+                                "ImageSubtitleIndexByteRange",
+                                "MapOfIntegerToDrmHeader",
+                                "MapOfDownloadableIdToDrmInfo",
+                                "QoEInfo",
+                                "SetOfStreamData",
+                                "StreamAdditionalData",
+                                "StreamData",
+                                "StreamDataDescriptor",
+                                "StreamDownloadLocationFilename",
+                                "StreamDrmData",
+                                "StreamMostlyConstantData",
+                                "WmDrmKey"
+
+                                // This type is not excluded and is present in nostreams blobs
+                                // but its keys and values are excluded and are not present.
+                                // This will cause a failure when writing out the map write state if
+                                // DrmKeyString has a primary key that becomes the hash key
+//                                ,
+//                                "MapOfDrmKeyStringToDrmKeyString"
+                        );
+
+                        combiner.combine();
+                    });
+                }
+            }
+            producer.addListener(new NoStreamsPipeline());
+
+            class LoggingListener implements CycleListener, PublishListener, RestoreListener, PopulateListener,
+                    IntegrityCheckListener {
+                // Restore listener
+
+                @Override public void onProducerRestoreStart(long restoreVersion) {
+                    // @@@ Cycle start
+                }
+
+                @Override public void onProducerRestoreComplete(
+                        Status status, long versionDesired, long versionReached, Duration elapsed) {
+                    previousCycleNumber = versionReached;
+                }
+
+
+                // Cycle listener
+
+                @Override public void onCycleSkip(CycleSkipReason reason) {
+                }
+
+                @Override public void onNewDeltaChain(long version) {
+                }
+
+                @Override public void onCycleStart(long version) {
+                }
+
+                @Override public void onCycleComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+                    if (workflowStarted) {
+                        workflowStarted = false;
+                        ctx.stopTimerAndLogDuration(P4_WaitForPublishWorkflowDuration);
+                    }
+                }
+
+                @Override public void onNoDeltaAvailable(long version) {
+                }
+
+
+                // Populate listener
+
+                @Override public void onPopulateStart(long version) {
+                    ctx.getMetricRecorder().startTimer(P2_ProcessDataDuration);
+                }
+
+                @Override public void onPopulateComplete(Status status, long version, Duration elapsed) {
+                    if (status.getType() == Status.StatusType.FAIL) {
+                        ctx.getLogger().error(Arrays.asList(BlobState, TransformCycleFailed), "transform failed",
+                                status.getCause());
+                    }
+                    ctx.stopTimerAndLogDuration(P2_ProcessDataDuration);
+                }
+
+
+                // Publish listener
+
+                // @@@ Timing of P3_WriteOutputDataDuration writing and publish blobs
+
+                @Override public void onPublishStart(long version) {
+                    ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
+                    currentStateHeader = new HashMap<>(producer.getWriteEngine().getHeaderTags());
+                }
+
+                @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
+                }
+
+                @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
+                    if (status.getType() == Status.StatusType.FAIL) {
+                        ctx.getLogger().error(Arrays.asList(BlobState, WritingBlobsFailed), "Writing blobs failed",
+                                status.getCause());
+                    }
+                    ctx.stopTimerAndLogDuration(P3_WriteOutputDataDuration);
+                }
+
+
+                // Integrity check listener
+
+                boolean workflowStarted;
+
+                @Override public void onIntegrityCheckStart(long version) {
+                    workflowStarted = true;
+                    ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
+                }
+
+                @Override public void onIntegrityCheckComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+                }
+            }
+            producer.addListener(new LoggingListener());
+        } else {
+            this.cinderVersion = null;
+            this.producer = null;
+        }
     }
 
     private static boolean isNoStreamsBlobEnabled(boolean isFastlane) {
@@ -149,27 +377,52 @@ public class TransformCycle {
     }
 
     public void cycle() throws Throwable {
-        try {
-            beginCycle();
-            updateTheInput();
-            transformTheData();
-            if(isUnchangedFastlaneState()) {
-                rollbackFastlaneStateEngine();
-                incrementSuccessCounter();
-            } else {
-                writeTheBlobFiles();
-                submitToPublishWorkflow();
-                endCycleSuccessfully();
-            }
-        } catch (Throwable th) {
-            outputStateEngine.addHeaderTags(previousStateHeader);
-            ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine), "Transformer failed cycle -- rolling back write state engine to previousState=({})", BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine), th);
+        if (producer == null) {
+            try {
+                beginCycle();
+                updateTheInput();
 
-            outputStateEngine.resetToLastPrepareForNextCycle();
-            fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
-            throw th;
-        } finally {
-            isFirstCycle = false;
+                transformTheData();
+                if (isUnchangedFastlaneState()) {
+                    rollbackFastlaneStateEngine();
+                    incrementSuccessCounter();
+                } else {
+                    writeTheBlobFiles();
+                    submitToPublishWorkflow();
+                    endCycleSuccessfully();
+                }
+            } catch (Throwable th) {
+                outputStateEngine.addHeaderTags(previousStateHeader);
+                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine),
+                        "Transformer failed cycle -- rolling back write state engine to previousState=({})",
+                        BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine), th);
+
+                outputStateEngine.resetToLastPrepareForNextCycle();
+                fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
+                throw th;
+            } finally {
+                isFirstCycle = false;
+            }
+        } else {
+            try {
+                beginCycleCinder();
+
+                // Only restores the input
+                // @@@ Does not report the time take to restore the output
+                setRestoreNeeded(false);
+                updateTheInput();
+
+                cinderCycle();
+
+                endCycleSuccessfullyCinder();
+            } catch (Throwable th) {
+                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine),
+                        "Transformer failed cycle -- rolling back write state engine to previousState=({})",
+                        BlobMetaDataUtil.fetchCoreHeaders(producer.getWriteEngine()), th);
+                throw th;
+            } finally {
+                isFirstCycle = false;
+            }
         }
     }
 
@@ -248,6 +501,32 @@ public class TransformCycle {
         outputStateEngine.prepareForNextCycle();
         fastlaneOutputStateEngine.prepareForNextCycle();
         pinTitleMgr.prepareForNextCycle();
+    }
+
+    private void beginCycleCinder() {
+        // First cycle already initialized in Constructor
+        if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
+        cinderVersion.set(currentCycleNumber);
+
+        // Track cycle begin
+        previousStateHeader = new HashMap<>(producer.getWriteEngine().getHeaderTags());
+        ctx.getLogger().info(BlobState, "Using Cinder/HollowProducer");
+        ctx.getLogger().info(BlobState, "beginCycle : cycle={}, isFastlane={}, isNoStreamsBlobEnabled={}, previousStateHeader({})", currentCycleNumber, isFastlane, isNoStreamsBlobEnabled, BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader));
+        ctx.getLogger().info(TransformCycleBegin, "Beginning cycle={} jarVersion={}", currentCycleNumber, BlobMetaDataUtil.getJarVersion());
+
+        // Check whether to Pause Cycle (before any logic)
+        checkPauseCycle();
+
+        // Init Context to begin cycle processing (e.g. Freeze Config)
+        ctx.beginCycle();
+        ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(), "Stopped at beginCycle");
+
+        // track ids
+        trackIds(CycleFastlaneIds, "Fastlane Ids={}", ctx.getFastlaneIds());
+        trackIds(CyclePinnedTitles, "Config Spec={}", ctx.getPinTitleSpecs());
+
+        // Spot to trigger Cycle Monkey if enabled
+        cycleMonkey.doMonkeyBusiness("beginCycle");
     }
 
     private static ExecuteFutureResult executeRestore(String name, TransformerContext ctx,
@@ -399,6 +678,28 @@ public class TransformCycle {
         }
     }
 
+
+    private void cinderCycle() {
+        producer.runCycle(newState -> {
+            HollowWriteStateEngine output = newState.getStateEngine();
+            output.getHeaderTags().clear();
+            long previousVersion = newState.getPriorState() == null ? -1 : newState.getPriorState().getVersion();
+
+            output.getHeaderTags().clear();
+            headerPopulator.addHeaders(inputClient, output, previousVersion, newState.getVersion());
+
+            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputClient.getAPI(), output, ctx);
+            try {
+                transformer.transform();
+            } catch (Error | RuntimeException e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        });
+    }
+
+
     private boolean transformTheData() throws Throwable {
         long startTime = System.currentTimeMillis();
         ctx.getMetricRecorder().startTimer(P2_ProcessDataDuration);
@@ -546,11 +847,29 @@ public class TransformCycle {
     }
 
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
-        HollowFilterConfig filterConfig = getStreamsFilter("StreamData", "StreamDownloadLocationFilename", "SetOfStreamData", "FileEncodingData",
-                "MapOfDownloadableIdToDrmInfo", "DrmHeader", "DrmKeyString", "ChunkDurationsString", "StreamDataDescriptor",
-                "StreamAdditionalData", "DownloadLocationSet", "MapOfIntegerToDrmHeader", "DrmKey", "StreamDrmData",
-                "WmDrmKey", "DrmInfo", "StreamMostlyConstantData", "ImageSubtitleIndexByteRange", "DrmInfoData", "QoEInfo",
-                "DeploymentIntent", "CodecPrivateDataString");
+        HollowFilterConfig filterConfig = getStreamsFilter(
+                "StreamData",
+                "StreamDownloadLocationFilename",
+                "SetOfStreamData",
+                "FileEncodingData",
+                "MapOfDownloadableIdToDrmInfo",
+                "DrmHeader",
+                "DrmKeyString",
+                "ChunkDurationsString",
+                "StreamDataDescriptor",
+                "StreamAdditionalData",
+                "DownloadLocationSet",
+                "MapOfIntegerToDrmHeader",
+                "DrmKey",
+                "StreamDrmData",
+                "WmDrmKey",
+                "DrmInfo",
+                "StreamMostlyConstantData",
+                "ImageSubtitleIndexByteRange",
+                "DrmInfoData",
+                "QoEInfo",
+                "DeploymentIntent",
+                "CodecPrivateDataString");
 
         FilteredHollowBlobWriter writer = new FilteredHollowBlobWriter(filterConfig);
 
@@ -609,6 +928,14 @@ public class TransformCycle {
         // On success, make sure outputStateEngine has current state header
         outputStateEngine.addHeaderTags(currentStateHeader);
         ctx.getLogger().info(BlobState, "endCycleSuccessfully write state : before({}), after({}),)", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine));
+    }
+
+    private void endCycleSuccessfullyCinder() {
+        incrementSuccessCounter();
+        timeSinceLastPublishGauge.notifyPublishSuccess();
+        previousCycleNumber = currentCycleNumber;
+
+        ctx.getLogger().info(BlobState, "endCycleSuccessfully write state : before({}), after({}),)", BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader), BlobMetaDataUtil.fetchCoreHeaders(producer.getWriteEngine()));
     }
 
     private void incrementSuccessCounter() {

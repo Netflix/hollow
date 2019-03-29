@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer;
 
+import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.hollowoutput.ArtWorkImageFormatEntry;
@@ -77,5 +78,83 @@ public class VMSTransformerWriteStateEngine extends HollowWriteStateEngine {
     private void initializeTypeStates(HollowObjectMapper mapper, Class<?>... clazzes) {
         for(Class<?> clazz : clazzes)
             mapper.initializeTypeState(clazz);
+    }
+
+    public static HollowProducer initAndBuildProducer(HollowProducer.Builder b) {
+        HollowProducer p = b.withHashCodeFinder(new VMSTransformerHashCodeFinder())
+                .build();
+        initProducer(p);
+        return p;
+    }
+
+    private static void initProducer(HollowProducer p) {
+        p.initializeDataModel(
+                CompleteVideo.class,
+                VideoPackageData.class,
+                NamedCollectionHolder.class,
+                EncodingProfile.class,
+                OriginServer.class,
+                LanguageRights.class,
+                DeploymentIntent.class,
+                GlobalPerson.class,
+                GlobalVideo.class,
+                PersonImages.class,
+                ArtWorkImageFormatEntry.class,
+                ArtWorkImageTypeEntry.class,
+                ArtWorkImageRecipe.class,
+                DrmKey.class,
+                WmDrmKey.class,
+                DrmInfoData.class,
+                DrmSystem.class,
+                L10NResources.class,
+                EncodingProfileGroup.class,
+                CharacterImages.class,
+                FileEncodingData.class,
+                RolloutVideo.class,
+                RolloutCharacter.class,
+                FallbackUSArtwork.class,
+                TopNVideoData.class,
+                MulticatalogCountryData.class
+        );
+    }
+
+    public static HollowProducer initAndBuildNoStreamsProducer(HollowProducer.Builder b) {
+        HollowProducer p = b.withHashCodeFinder(new VMSTransformerHashCodeFinder())
+                .build();
+        initProducerNoStreams(p);
+        return p;
+    }
+
+    private static void initProducerNoStreams(HollowProducer p) {
+        p.initializeDataModel(
+                ArtWorkImageFormatEntry.class,
+                ArtWorkImageRecipe.class,
+                ArtWorkImageTypeEntry.class,
+                CharacterImages.class,
+                CompleteVideo.class,
+                DrmSystem.class,
+                EncodingProfile.class,
+                EncodingProfileGroup.class,
+                FallbackUSArtwork.class,
+                GlobalPerson.class,
+                GlobalVideo.class,
+                L10NResources.class,
+                LanguageRights.class,
+                MulticatalogCountryData.class,
+                NamedCollectionHolder.class,
+                OriginServer.class,
+                PersonImages.class,
+                RolloutVideo.class,
+                RolloutCharacter.class,
+                TopNVideoData.class,
+                VideoPackageData.class,
+
+                // Types ignored
+                DeploymentIntent.class,
+                DrmInfoData.class,
+                DrmKey.class,
+                FileEncodingData.class,
+                WmDrmKey.class
+        );
     }
 }

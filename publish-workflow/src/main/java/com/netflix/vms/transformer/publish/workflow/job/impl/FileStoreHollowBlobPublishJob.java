@@ -34,10 +34,10 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
 
     @Override
     public boolean executeJob() {
-        return executeJob(true);
+        return executeJob(true, 0);
     }
 
-    public boolean executeJob(boolean publish) {
+    public boolean executeJob(boolean publish, long duration) {
         FileStore fileStore = ctx.getFileStore();
         HollowProducer.Publisher publisher = isNostreams ? ctx.getNostreamsBlobPublisher() : ctx.getBlobPublisher();
         String currentVersion = String.valueOf(getCycleVersion());
@@ -87,7 +87,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
             throw new RuntimeException(e);
         }
 
-        logResult(filestoreKeybase, status, success, startTime);
+        logResult(filestoreKeybase, status, success, duration + (System.currentTimeMillis() - startTime));
 
         return success;
     }
@@ -110,8 +110,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         throw new IllegalStateException();
     }
 
-    private void logResult(String keybase, FileRegionUploadStatus status, boolean success, long startTime) {
-        long duration = System.currentTimeMillis() - startTime;
+    private void logResult(String keybase, FileRegionUploadStatus status, boolean success, long duration) {
         if(success) {
             status.setStatus(UploadStatus.SUCCESS);
             ctx.getLogger().info(PublishedBlob, new PublishBlobMessage(keybase, status.getRegion(), getCycleVersion(), getCycleVersion(), fileToUpload.length(), duration));

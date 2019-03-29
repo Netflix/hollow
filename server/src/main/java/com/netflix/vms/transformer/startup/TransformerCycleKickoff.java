@@ -12,6 +12,7 @@ import com.google.inject.Singleton;
 import com.netflix.archaius.api.Config;
 import com.netflix.aws.file.FileStore;
 import com.netflix.cinder.consumer.NFHollowBlobRetriever;
+import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.cinder.producer.NFHollowAnnouncer;
 import com.netflix.cinder.producer.NFHollowPublisher;
 import com.netflix.gutenberg.GutenbergIdentifiers;
@@ -58,6 +59,7 @@ public class TransformerCycleKickoff {
             ElasticSearchClient esClient,
             TransformerCassandraHelper cassandraHelper,
             FileStore fileStore,
+            Supplier<CinderProducerBuilder> cinderBuilder,
             GutenbergFilePublisher gutenbergFilePublisher,
             GutenbergFileConsumer gutenbergFileConsumer,
             GutenbergValuePublisher gutenbergValuePublisher,
@@ -112,7 +114,8 @@ public class TransformerCycleKickoff {
                 hermesBlobAnnouncer,
                 publishStager,
                 transformerConfig.getConverterVip(),
-                transformerConfig.getTransformerVip());
+                transformerConfig.getTransformerVip(),
+                cinderBuilder);
 
         if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
             TransformCycle.restore(new SimultaneousExecutor(2, "vms-restore"), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);

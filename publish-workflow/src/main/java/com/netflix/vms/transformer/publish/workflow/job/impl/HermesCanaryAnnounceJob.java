@@ -12,9 +12,10 @@ public class HermesCanaryAnnounceJob extends CanaryAnnounceJob {
         super(ctx, vip, newVersion, beforeCanaryAnnounceHook);
     }
 
-	  @Override public boolean executeJob() {
-          // This does a global announcement (we only run canary in us-east, plus even if it ran in all 3 regions.
-          // It's okay to do global announcements, it would just mean all canary instances get the version to canary at the same time)
+    @Override
+    public boolean executeJob() {
+        // This does a global announcement (we only run canary in us-east, plus even if it ran in all 3 regions.
+        // It's okay to do global announcements, it would just mean all canary instances get the version to canary at the same time)
         ctx.getCanaryAnnouncer().announce(getCycleVersion());
         boolean success = true;
         // announce canary version in all 3 regions as separate announcements (does not matter since we only run canary in us-east-1)

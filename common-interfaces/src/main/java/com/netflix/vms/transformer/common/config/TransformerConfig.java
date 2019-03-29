@@ -242,4 +242,14 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     boolean isCountrySpecificLanguageDataMapEnabled();
+
+
+    // Temporary features switching in cinder support
+
+    /**
+     * @return true if the VIP and nostreams VIP are produced, published and
+     * announced using Cinder and HollowProducer pipelines.
+     */
+    @DefaultValue("false")
+    boolean isCinderEnabled();
 }

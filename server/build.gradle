@@ -74,6 +74,7 @@ dependencies {
     compile 'netflix:vms-hollow-generated-notemplate:latest.release'
 
     compile 'netflix:cinder-core:latest.release'
+    compile 'netflix:cinder-lifecycle:latest.release'
 
     // httpclient
     compile 'org.apache.httpcomponents:httpclient'

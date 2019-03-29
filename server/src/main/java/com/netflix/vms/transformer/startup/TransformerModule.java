@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import com.netflix.archaius.ConfigProxyFactory;
+import com.netflix.cinder.lifecycle.CinderProducerModule;
 import com.netflix.cup.CupModule;
 import com.netflix.runtime.health.guice.HealthModule;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
@@ -44,6 +45,8 @@ public final class TransformerModule extends AbstractModule {
         });
         install(new JerseyModule());
         install(new CupModule());
+
+        install(new CinderProducerModule());
 
         bind(OctoberSkyData.class).to(OctoberSkyDataImpl.class);
         bind(CupLibrary.class).to(CupLibraryImpl.class);

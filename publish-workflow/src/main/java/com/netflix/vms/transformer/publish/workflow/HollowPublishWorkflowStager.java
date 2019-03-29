@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
@@ -268,4 +270,20 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         ctx.getPublicationHistoryConsumer().accept(scheduler.getHistory());
     }
 
+    @Override
+    public void initProducer(LongSupplier inputVersion, HollowProducer p, String vip) {
+        // Add circuit breaker validator before canary validator
+        ValidatorForCircuitBreakers vcbs = new ValidatorForCircuitBreakers(ctx, vip);
+        p.addListener(vcbs);
+
+        p.addListener(new ValidatorForCanaryPBM(vcbs, this, jobCreator, vip));
+
+        p.addListener(new HermesPublishListener(inputVersion, jobCreator, vip));
+        p.addListener(new HermesAnnounceListener(inputVersion, jobCreator, vip));
+    }
+
+    @Override
+    public void initNoStreamsProducer(LongSupplier inputVersion, HollowProducer p, String vip) {
+        p.addListener(new HermesPublishListener(inputVersion, jobCreator, vip));
+    }
 }
