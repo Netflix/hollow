@@ -634,6 +634,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -2556,8 +2557,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -4335,6 +4341,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -6116,8 +6123,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -7887,6 +7899,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -9809,8 +9822,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -11727,6 +11745,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -13649,8 +13668,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -17537,6 +17561,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -19459,8 +19484,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -21293,6 +21323,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -23215,8 +23246,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -25049,6 +25085,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -26970,8 +27007,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -28794,6 +28836,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -30815,8 +30858,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -32656,6 +32704,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -34534,8 +34583,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -36369,6 +36423,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -38390,8 +38445,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -40288,6 +40348,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -42309,8 +42370,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -44207,6 +44273,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -46228,8 +46295,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -48069,6 +48141,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -49947,8 +50020,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -51782,6 +51860,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -53803,8 +53882,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
@@ -55701,6 +55785,7 @@
                 "netflix.ipc.metrics:ipc-metrics-lifecycle",
                 "netflix.ipc.metrics:ipc-metrics-servlet",
                 "netflix:chronos-client",
+                "netflix:cinder-lifecycle",
                 "netflix:eureka2-grpc-client-guice",
                 "netflix:mutation-stream-common",
                 "netflix:nf-eventbus-guice",
@@ -57722,8 +57807,13 @@
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
+                "com.netflix.vms.transformer:vmstransformer-publish-workflow",
+                "netflix:cinder-lifecycle"
             ]
+        },
+        "netflix:cinder-lifecycle": {
+            "locked": "4.5.1",
+            "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
             "locked": "4.5.1",
