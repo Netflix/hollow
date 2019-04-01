@@ -214,40 +214,7 @@ public class TransformCycle {
                     noStreamsProducer.runCycle(ws -> {
                         HollowReadStateEngine input = readState.getStateEngine();
                         HollowWriteStateEngine output = ws.getStateEngine();
-                        HollowCombiner combiner = new HollowCombiner(output, input);
-
-                        combiner.addIgnoredTypes(
-                                "ChunkDurationsString",
-                                "CodecPrivateDataString",
-                                "DeploymentIntent",
-                                "DownloadLocationSet",
-                                "DrmInfo",
-                                "DrmInfoData",
-                                "DrmKey",
-                                "DrmKeyString",
-                                "DrmHeader",
-                                "FileEncodingData",
-                                "ImageSubtitleIndexByteRange",
-                                "MapOfIntegerToDrmHeader",
-                                "MapOfDownloadableIdToDrmInfo",
-                                "QoEInfo",
-                                "SetOfStreamData",
-                                "StreamAdditionalData",
-                                "StreamData",
-                                "StreamDataDescriptor",
-                                "StreamDownloadLocationFilename",
-                                "StreamDrmData",
-                                "StreamMostlyConstantData",
-                                "WmDrmKey"
-
-                                // This type is not excluded and is present in nostreams blobs
-                                // but its keys and values are excluded and are not present.
-                                // This will cause a failure when writing out the map write state if
-                                // DrmKeyString has a primary key that becomes the hash key
-//                                ,
-//                                "MapOfDrmKeyStringToDrmKeyString"
-                        );
-
+                        HollowCombiner combiner = VMSTransformerWriteStateEngine.getNoStreamsCombiner(input, output);
                         combiner.combine();
                     });
                 }
@@ -836,30 +803,7 @@ public class TransformCycle {
     }
 
     private void createNostreamsFilteredFile(String unfilteredFilename, String filteredFilename, boolean isSnapshot) throws IOException {
-        HollowFilterConfig filterConfig = getStreamsFilter(
-                "StreamData",
-                "StreamDownloadLocationFilename",
-                "SetOfStreamData",
-                "FileEncodingData",
-                "MapOfDownloadableIdToDrmInfo",
-                "DrmHeader",
-                "DrmKeyString",
-                "ChunkDurationsString",
-                "StreamDataDescriptor",
-                "StreamAdditionalData",
-                "DownloadLocationSet",
-                "MapOfIntegerToDrmHeader",
-                "DrmKey",
-                "StreamDrmData",
-                "WmDrmKey",
-                "DrmInfo",
-                "StreamMostlyConstantData",
-                "ImageSubtitleIndexByteRange",
-                "DrmInfoData",
-                "QoEInfo",
-                "DeploymentIntent",
-                "CodecPrivateDataString");
-
+        HollowFilterConfig filterConfig = VMSTransformerWriteStateEngine.getNoStreamsFilterConfig();
         FilteredHollowBlobWriter writer = new FilteredHollowBlobWriter(filterConfig);
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
