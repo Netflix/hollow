@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementFailure;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementSuccess;
 
+import com.netflix.cinder.producer.NFHollowAnnouncer;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -43,6 +44,13 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
     @Override public boolean executeJob() {
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
+
+        if (region.equals(RegionEnum.US_EAST_1)) {
+            // NFHollowAnnouncer announces to all region, so doing it only once. todo just like HermesAnnounceJob, add a way to announce per region.
+            // following the comment in HermesAnnounceJob#executeJob
+            ((NFHollowAnnouncer) ctx.getStateAnnouncer()).setCurrentVersionToDesiredVersion(priorVersion);
+            ctx.getStateAnnouncer().announce(getCycleVersion());
+        }
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;
