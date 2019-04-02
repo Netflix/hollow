@@ -24,6 +24,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.util.function.BiObjectIntFunction;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -44,10 +45,6 @@ final class SelectFieldPathResultExtractor<T> {
             BiObjectIntFunction<HollowAPI, T> extractor) {
         this.fieldPath = fieldPath;
         this.extractor = extractor;
-    }
-
-    interface BiObjectIntFunction<T, R> {
-        R apply(T t, int i);
     }
 
     T extract(HollowAPI api, int ordinal) {

@@ -16,17 +16,21 @@
 package com.netflix.hollow.api.consumer.data;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.objects.delegate.HollowObjectGenericDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowObject;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.engine.object.HollowObjectTypeReadState;
 
-/*
+/**
  * Provide generic way to access data per type to retrieve All, Added, Updated and Removed Records
- * 
+ * <p>
  * It manages data as GenericHollowObject
+ *
+ * @deprecated use {@code ObjectDataAccessor<GenericHollowObject>}
  */
+@Deprecated
 public class GenericHollowRecordDataAccessor extends AbstractHollowDataAccessor<GenericHollowObject> {
 
     public GenericHollowRecordDataAccessor(HollowConsumer consumer, String type) {

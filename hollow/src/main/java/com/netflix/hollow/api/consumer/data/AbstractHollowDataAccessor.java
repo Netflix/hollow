@@ -16,6 +16,7 @@
 package com.netflix.hollow.api.consumer.data;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
+import com.netflix.hollow.api.objects.HollowObject;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.HollowPrimaryKeyValueDeriver;
 import com.netflix.hollow.core.index.key.PrimaryKey;
@@ -123,7 +124,7 @@ public abstract class AbstractHollowDataAccessor<T> {
                 if (removedOrdinal != -1) { // record was re-added after being removed = update
                     updatedRecordOrdinals.set(removedOrdinal);
                     T removedRecord = getRecord(removedOrdinal);
-                    updatedRecords.add(new UpdatedRecord<T>(removedRecord, addedRecord));
+                    updatedRecords.add(new UpdatedRecord<>(removedRecord, addedRecord));
                 } else {
                     addedRecords.add(addedRecord);
                 }
@@ -263,11 +264,11 @@ public abstract class AbstractHollowDataAccessor<T> {
         @Override
         public String toString() {
             StringBuilder builder = new StringBuilder();
-            builder.append("UpdatedRecord [before=");
+            builder.append("\n┍━ Before ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
             builder.append(before);
-            builder.append(", after=");
+            builder.append("\n ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄ \n");
             builder.append(after);
-            builder.append("]");
+            builder.append("\n┕━ After ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
             return builder.toString();
         }
     }

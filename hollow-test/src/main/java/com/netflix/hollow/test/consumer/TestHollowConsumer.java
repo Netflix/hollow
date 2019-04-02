@@ -86,6 +86,18 @@ public class TestHollowConsumer extends HollowConsumer {
         return this;
     }
 
+    public TestHollowConsumer addDelta(long fromVersion, long toVersion, HollowWriteStateEngine stateEngine) throws IOException {
+        if (blobRetriever instanceof TestBlobRetriever) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            new HollowBlobWriter(stateEngine).writeDelta(outputStream);
+            ((TestBlobRetriever) blobRetriever).addDelta(fromVersion, new TestBlob(fromVersion, toVersion,
+                    new ByteArrayInputStream(outputStream.toByteArray())));
+        } else {
+            throw new IllegalStateException("Cannot add delta if not using TestBlobRetriever");
+        }
+        return this;
+    }
+
     public static class Builder extends HollowConsumer.Builder<Builder> {
         @Override
         public TestHollowConsumer build() {

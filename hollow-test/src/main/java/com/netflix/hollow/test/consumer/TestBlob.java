@@ -38,6 +38,11 @@ public class TestBlob extends Blob {
         this.inputStream = null;
     }
 
+    public TestBlob(long fromVersion, long toVersion, InputStream inputStream) {
+        super(fromVersion, toVersion);
+        this.inputStream = inputStream;
+    }
+
     public InputStream getInputStream() throws IOException {
         return inputStream;
     }

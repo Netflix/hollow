@@ -65,7 +65,11 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
         builder.append("import " + HollowReadStateEngine.class.getName() + ";\n");
 
         builder.append("\n");
+        builder.append("/**\n");
+        builder.append(" * @deprecated use {@code ObjectDataAccessor<" + type + ">}\n");
+        builder.append(" */\n");
         builder.append("@SuppressWarnings(\"all\")\n");
+        builder.append("@Deprecated\n");
         builder.append("public class " + className + " extends " + AbstractHollowDataAccessor.class.getSimpleName() + "<" + type  +"> {\n\n");
 
         builder.append("    public static final String TYPE = \"" + type + "\";\n");
@@ -80,29 +84,46 @@ public class HollowDataAccessorGenerator extends HollowConsumerJavaFileGenerator
     }
 
     protected void genConstructors(StringBuilder builder) {
+        builder.append("    /**\n");
+        builder.append("     * @depreated use {@code ObjectDataAccessor.from(consumer, " + type + ".class).bindToPrimaryKey()}\n");
+        builder.append("     */\n");
+        builder.append("    @Deprecated\n");
         builder.append("    public " + className + "(HollowConsumer consumer) {\n");
         builder.append("        super(consumer, TYPE);\n");
         builder.append("        this.api = (" + apiclassName + ")consumer.getAPI();\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api) {\n");
-        builder.append("        super(rStateEngine, TYPE);\n");
+        builder.append("    /**\n");
+        builder.append("     * @depreated use {@code ObjectDataAccessor.from(api, stateEngine, " + type + ".class).bindToPrimaryKey()}\n");
+        builder.append("     */\n");
+        builder.append("    @Deprecated\n");
+        builder.append("    public " + className + "(HollowReadStateEngine stateEngine, " + apiclassName + " api) {\n");
+        builder.append("        super(stateEngine, TYPE);\n");
         builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api, String ... fieldPaths) {\n");
-        builder.append("        super(rStateEngine, TYPE, fieldPaths);\n");
+        builder.append("    /**\n");
+        builder.append("     * @depreated use {@code ObjectDataAccessor.from(api, stateEngine, " + type + ".class).usingPath(\""+ type + "\", fieldPaths)}\n");
+        builder.append("     */\n");
+        builder.append("    @Deprecated\n");
+        builder.append("    public " + className + "(HollowReadStateEngine stateEngine, " + apiclassName + " api, String ... fieldPaths) {\n");
+        builder.append("        super(stateEngine, TYPE, fieldPaths);\n");
         builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
 
-        builder.append("    public " + className + "(HollowReadStateEngine rStateEngine, " + apiclassName + " api, PrimaryKey primaryKey) {\n");
-        builder.append("        super(rStateEngine, TYPE, primaryKey);\n");
+        builder.append("    /**\n");
+        builder.append("     * @depreated use {@code ObjectDataAccessor.from(api, stateEngine, " + type + ".class).usingKey(key)}\n");
+        builder.append("     */\n");
+        builder.append("    @Deprecated\n");
+        builder.append("    public " + className + "(HollowReadStateEngine stateEngine, " + apiclassName + " api, PrimaryKey key) {\n");
+        builder.append("        super(stateEngine, TYPE, key);\n");
         builder.append("        this.api = api;\n");
         builder.append("    }\n\n");
     }
 
     protected void genPublicAPIs(StringBuilder builder) {
-        builder.append("    @Override public " + type + " getRecord(int ordinal){\n");
+        builder.append("    @Override\n");
+        builder.append("    public " + type + " getRecord(int ordinal){\n");
         builder.append("        return api.get" + type + "(ordinal);\n");
         builder.append("    }\n\n");
     }

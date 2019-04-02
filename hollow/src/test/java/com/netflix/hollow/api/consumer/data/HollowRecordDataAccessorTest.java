@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class HollowDataAccessorTest extends AbstractStateEngineTest {
+public class HollowRecordDataAccessorTest extends AbstractStateEngineTest {
     private static final String TEST_TYPE = "TestObject";
     HollowObjectSchema schema;
 

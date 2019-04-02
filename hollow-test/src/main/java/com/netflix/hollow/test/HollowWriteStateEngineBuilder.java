@@ -16,6 +16,7 @@
  */
 package com.netflix.hollow.test;
 
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import java.util.Arrays;
@@ -51,6 +52,25 @@ public class HollowWriteStateEngineBuilder {
         for (Class<?> type : types) {
             objectMapper.initializeTypeState(type);
         }
+    }
+
+    /**
+     * Create a HollowWriteStateEngineBuilder, initializing it with a type state containing the
+     * provided types. Adding objects will add their types, if not already present.
+     */
+    public HollowWriteStateEngineBuilder(Class<?>... types) {
+        this(Arrays.asList(types));
+    }
+
+    /**
+     * Restore type states from the provided read state engine
+     */
+    public HollowWriteStateEngineBuilder restoreFrom(HollowReadStateEngine readStateEngine) {
+        if (built) {
+            throw new IllegalArgumentException("Cannot restore after building Hollow state engine");
+        }
+        writeEngine.restoreFrom(readStateEngine);
+        return this;
     }
 
     /**
