@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -270,6 +271,20 @@ public class HollowConsumer {
         return updater.getCurrentVersionId();
     }
 
+    /**
+     * Returns a {@code CompletableFuture} that completes after the initial data load succeeds.
+     * <p>
+     * Callers can use methods like {@link CompletableFuture#join()} or {@link CompletableFuture#get(long, TimeUnit)}
+     * to block until the initial load is complete.
+     * <p>
+     * A failure during the initial load <em>will not</em> cause the future to complete exceptionally; this allows
+     * for a subsequent data version to eventually succeed.
+     * <p>
+     * In a consumer without published or announced versions – or one that always fails the initial load – the future
+     * will remain incomplete indefinitely.
+     *
+     * @return a future which, when completed, has a value set to the data version that was initially loaded
+     */
     public CompletableFuture<Long> getInitialLoad() {
         return updater.getInitialLoad();
     }
