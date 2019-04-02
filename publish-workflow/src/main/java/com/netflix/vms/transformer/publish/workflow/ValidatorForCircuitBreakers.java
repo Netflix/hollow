@@ -18,11 +18,17 @@ import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CatalogSizeCi
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.CertificationSystemCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.DuplicateDetectionCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
+import com.netflix.vms.transformer.publish.workflow.circuitbreaker.SnapshotSizeCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TopNViewShareAvailabilityCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.TypeCardinalityCircuitBreaker;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +79,26 @@ public class ValidatorForCircuitBreakers implements
     @Override public void onPublishStart(long version) {
     }
 
+    long snapshotSize;
+
+    @Override
+    public void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
+        Path path;
+        if (status.getType() == Status.StatusType.SUCCESS) {
+            if (blob != null &&
+                    blob.getType() == HollowProducer.Blob.Type.SNAPSHOT &&
+                    (path = blob.getPath()) != null) {
+                try {
+                    snapshotSize = Files.size(path);
+                } catch (IOException e) {
+                    ctx.getLogger().error(CircuitBreaker, "Error obtaining snapshot blob size", e);
+                }
+            } else {
+                ctx.getLogger().warn(CircuitBreaker, "Snapshot blob size cannot be obtained: {}", blob);
+            }
+        }
+    }
+
     @Override public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
         // There is an issue obtaining the snapshot size since it is published asynchronously
         // Note this is a problem in general with the listeners, it breaks the assumption of single threaded
@@ -97,7 +123,7 @@ public class ValidatorForCircuitBreakers implements
             return;
         }
 
-        circuitBreakerRules = createCircuitBreakerRules(ctx, vip, version, 0);
+        circuitBreakerRules = createCircuitBreakerRules(ctx, vip, version, snapshotSize);
     }
 
     @Override
@@ -180,9 +206,9 @@ public class ValidatorForCircuitBreakers implements
         }
     }
 
-    public static HollowCircuitBreaker[] createCircuitBreakerRules(
+    static HollowCircuitBreaker[] createCircuitBreakerRules(
             TransformerContext ctx, String vip, long cycleVersion, long snapshotFileLength) {
-        return new HollowCircuitBreaker[] {
+        List<HollowCircuitBreaker> cbs = new ArrayList<>(Arrays.asList(
                 new DuplicateDetectionCircuitBreaker(ctx, vip, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion, 100),
@@ -197,11 +223,14 @@ public class ValidatorForCircuitBreakers implements
                 new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "DrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "WmDrmKey"),
                 new TypeCardinalityCircuitBreaker(ctx, vip, cycleVersion, "GlobalPerson"),
-                // @@@ require snapshot size
-                // new SnapshotSizeCircuitBreaker(ctx, vip, cycleVersion, snapshotFileLength),
                 new TopNViewShareAvailabilityCircuitBreaker(ctx, vip, cycleVersion),
-                new CatalogSizeCircuitBreaker(ctx, vip, cycleVersion, "CatalogSize"),
-        };
+                new CatalogSizeCircuitBreaker(ctx, vip, cycleVersion, "CatalogSize")
+        ));
+        if (snapshotFileLength > 0) {
+            cbs.add(new SnapshotSizeCircuitBreaker(ctx, vip, cycleVersion, snapshotFileLength));
+        }
+
+        return cbs.toArray(new HollowCircuitBreaker[0]);
     }
 
     private void logResult(boolean isAllDataValid, long cycleVersion) {

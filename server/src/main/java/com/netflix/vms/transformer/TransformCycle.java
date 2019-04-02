@@ -18,6 +18,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformC
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformRestore;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WritingBlobsFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.WroteBlob;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.cinder.producer.CinderProducerBuilder;
@@ -25,11 +26,13 @@ import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.AnnouncementListener;
 import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.IntegrityCheckListener;
 import com.netflix.hollow.api.producer.listener.PopulateListener;
 import com.netflix.hollow.api.producer.listener.PublishListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
+import com.netflix.hollow.api.producer.listener.VetoableListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.filter.HollowFilterConfig;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -76,6 +79,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -107,6 +113,7 @@ public class TransformCycle {
 
     private final HollowProducer producer;
     private final AtomicLong cinderVersion;
+    private final ExecutorService produceExecutor;
 
     public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
@@ -143,17 +150,6 @@ public class TransformCycle {
          *   Possible use CompletableFuture.supplyAsync(supplier, delayedExecutor(timeout, timeUnit))
          *   rather than an explicit queue + thread pool.
          *
-         * - Enhance publish listener to emit a blob stage event
-         *   The snapshot blob size that can be input to the SnapshotSizeCircuitBreaker
-         *
-         * - Snapshot blobs are not published asynchronously
-         *   Enhance publish listener to emit a publish event with CompletableFuture
-         *
-         * - Enhance announcement listener to emit a pre-announce event from which
-         *   the nostreams pipeline can be executed
-         *   In addition if the nostreams pipeline fails then the it should cause the main
-         *   pipeline to fail i.e. listener veto
-         *
          * - Canary/Playback monkey not yet tested
          *
          * - The VMS dashboard mostly works but is not reporting published blobs and announcements
@@ -163,6 +159,11 @@ public class TransformCycle {
          *
          * - No integration with the cycle monkey (see also listener veto support)
          *   See usages of the method CycleMonkey.doMonkeyBusiness
+         *
+         * - If the time between an announce and a new cycle is very small there is a chance
+         *   the new cycle will obtain the prior announce version from Gutenberg and therefore
+         *   restore backwards (as if pinned).  There are some consistency issues with
+         *   Gutenberg, where it takes a few seconds to reach consistency.
          *
          * - There may be rare cases where the main producer cycle results in changes but the nostreams
          *   producer does not.  In that case the nostreams cycle will not publish and announce
@@ -179,13 +180,20 @@ public class TransformCycle {
             this.cinderVersion = new AtomicLong();
             cinderVersion.set(currentCycleNumber);
 
+            this.produceExecutor = Executors.newCachedThreadPool(r -> {
+                Thread t = new Thread(r, "vmstransformer-producer");
+                // Not necessary if constructing thread is a daemon thread
+                t.setDaemon(true);
+                return t;
+            });
             String cinderVip = ctx.getConfig().getTransformerVip();
             String cinderOutputNamespace = "vms-" + cinderVip;
             this.producer = VMSTransformerWriteStateEngine.initAndBuildProducer(
                     cinderBuilder.get()
-                    .forNamespace(cinderOutputNamespace)
-                    .withVersionMinter(cinderVersion::get)
-                    .withRestore());
+                            .withSnapshotPublishExecutor(produceExecutor)
+                            .forNamespace(cinderOutputNamespace)
+                            .withVersionMinter(cinderVersion::get)
+                            .withRestore());
             publishStager.initProducer(
                     inputConsumer::getCurrentVersionId,
                     producer,
@@ -195,28 +203,51 @@ public class TransformCycle {
             String cinderNostreamsOutputNamespace = "vms-" + nostreamsCinderVip;
             HollowProducer noStreamsProducer = VMSTransformerWriteStateEngine.initAndBuildNoStreamsProducer(
                     cinderBuilder.get()
-                    .forNamespace(cinderNostreamsOutputNamespace)
-                    .withVersionMinter(cinderVersion::get)
-                    .withRestore());
+                            .withSnapshotPublishExecutor(produceExecutor)
+                            .forNamespace(cinderNostreamsOutputNamespace)
+                            .withVersionMinter(cinderVersion::get)
+                            .withRestore());
             publishStager.initNoStreamsProducer(
                     inputConsumer::getCurrentVersionId,
                     noStreamsProducer,
                     nostreamsCinderVip);
 
-            class NoStreamsPipeline implements IntegrityCheckListener {
+            class NoStreamsPipeline implements IntegrityCheckListener, AnnouncementListener {
                 @Override
                 public void onIntegrityCheckStart(long version) {
                 }
 
+                CompletableFuture<Void> noStreams;
+
                 @Override
                 public void onIntegrityCheckComplete(
                         Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
-                    noStreamsProducer.runCycle(ws -> {
-                        HollowReadStateEngine input = readState.getStateEngine();
-                        HollowWriteStateEngine output = ws.getStateEngine();
-                        HollowCombiner combiner = VMSTransformerWriteStateEngine.getNoStreamsCombiner(input, output);
-                        combiner.combine();
-                    });
+                    noStreams = CompletableFuture.runAsync(() -> {
+                        noStreamsProducer.runCycle(ws -> {
+                            HollowReadStateEngine input = readState.getStateEngine();
+                            HollowWriteStateEngine output = ws.getStateEngine();
+                            HollowCombiner combiner = VMSTransformerWriteStateEngine.getNoStreamsCombiner(input, output);
+                            combiner.combine();
+                        });
+                    }, produceExecutor);
+                }
+
+                @Override
+                public void onAnnouncementStart(long version) {
+                    if (noStreams == null) {
+                        return;
+                    }
+
+                    try {
+                        noStreams.join();
+                    } catch (Exception e) {
+                        throw new VetoableListener.ListenerVetoException(e);
+                    }
+                }
+
+                @Override
+                public void onAnnouncementComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
                 }
             }
             producer.addListener(new NoStreamsPipeline());
@@ -311,6 +342,7 @@ public class TransformCycle {
         } else {
             this.cinderVersion = null;
             this.producer = null;
+            this.produceExecutor = null;
         }
     }
 
@@ -376,6 +408,17 @@ public class TransformCycle {
                 cinderCycle();
 
                 endCycleSuccessfullyCinder();
+
+                // @@@ Sleep to ensure Gutenberg's announcement is available to query when restoring
+                //     If the time between the end of one cycle and a new cycle is too quick a restore
+                //     may still observe the previously announced version and restore to that version
+                //     resulting in a possible break of the delta chain (luckily playback monkey checks
+                //     will cause the cycle to fail).
+                //     It can take a little time until Gutenberg's announcement is eventually consistent.
+                //     This *needs* to be fixed in Cinder's NFHollowAnnouncer.
+                try {
+                    SECONDS.sleep(15);
+                } catch (InterruptedException e) {}
             } catch (Throwable th) {
                 ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine),
                         "Transformer failed cycle -- rolling back write state engine to previousState=({})",
