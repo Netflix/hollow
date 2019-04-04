@@ -28,10 +28,12 @@ gretty {
 // tomcat server.
 ospackage {
     packageName = 'vmstransformer'
+    preInstall file('scripts/ulog-preinstall.sh')
     requires('nflx-ezconfig')
     requires('nflx-base-www')
-    requires('nflx-ulog-tomcat')
-    postInstall('mkdir /etc/nflx-ulog/; echo "export ulog.stream=\"vms\"" > /etc/nflx-ulog/ulog.conf')
+    requires('rsyslog', '8.32', GREATER | EQUAL)
+    requires('rsyslog-mmnormalize', '8.32', GREATER | EQUAL)
+    requires('nflx-ulog-agent')
     // A future base AMI release will make this the default
     postInstall('system-jdk --set zulu-8-amd64')
 }

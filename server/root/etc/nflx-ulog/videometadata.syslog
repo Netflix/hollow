@@ -1,0 +1,4 @@
+            property(name="$!lvl" outname="lvl" format="jsonf") constant(value=", ")
+            property(name="$!thread" outname="thread" format="jsonf") constant(value=", ")
+            property(name="$!cls" outname="cls" format="jsonf") constant(value=", ")
+            property(name="$!method" outname="method" format="jsonf") constant(value=", ")
