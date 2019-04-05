@@ -83,18 +83,17 @@ public class ValidatorForCircuitBreakers implements
 
     @Override
     public void onBlobStage(Status status, HollowProducer.Blob blob, Duration elapsed) {
-        Path path;
-        if (status.getType() == Status.StatusType.SUCCESS) {
-            if (blob != null &&
-                    blob.getType() == HollowProducer.Blob.Type.SNAPSHOT &&
-                    (path = blob.getPath()) != null) {
+        if (status.getType() == Status.StatusType.SUCCESS &&
+                blob.getType() == HollowProducer.Blob.Type.SNAPSHOT) {
+            Path path = blob.getPath();
+            if (path != null) {
                 try {
                     snapshotSize = Files.size(path);
                 } catch (IOException e) {
                     ctx.getLogger().error(CircuitBreaker, "Error obtaining snapshot blob size", e);
                 }
             } else {
-                ctx.getLogger().warn(CircuitBreaker, "Snapshot blob size cannot be obtained: {}", blob);
+                ctx.getLogger().warn(CircuitBreaker, "Snapshot blob size cannot be obtained: path is null");
             }
         }
     }

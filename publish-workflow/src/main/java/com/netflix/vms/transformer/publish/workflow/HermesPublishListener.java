@@ -8,6 +8,7 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.LongSupplier;
 
 public class HermesPublishListener implements
@@ -16,7 +17,6 @@ public class HermesPublishListener implements
     private final LongSupplier inputVersion;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
-    private final PublishWorkflowContext ctx;
 
     public HermesPublishListener(
             LongSupplier inputVersion,
@@ -25,7 +25,6 @@ public class HermesPublishListener implements
         this.inputVersion = inputVersion;
         this.jobCreator = jobCreator;
         this.vip = vip;
-        this.ctx = jobCreator.getContext();
     }
 
     private long previousVersion;
@@ -56,7 +55,33 @@ public class HermesPublishListener implements
     }
 
     @Override
+    public void onBlobPublishAsync(
+            CompletableFuture<HollowProducer.Blob> blob) {
+        long start = System.nanoTime();
+
+        long iv = inputVersion.getAsLong();
+        long pv = previousVersion;
+        long cv = currentVersion;
+        blob.thenAccept(b -> {
+            long d = System.nanoTime() - start;
+            blobPublish(b, Duration.ofNanos(d), iv, pv, cv);
+        });
+    }
+
+    @Override
     public void onBlobPublish(Status status, HollowProducer.Blob blob, Duration elapsed) {
+        if (status.getType() != Status.StatusType.SUCCESS) {
+            return;
+        }
+
+        blobPublish(blob, elapsed, inputVersion.getAsLong(), previousVersion, currentVersion);
+    }
+
+    @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
+    }
+
+    private void blobPublish(HollowProducer.Blob blob, Duration elapsed,
+            long inputVersion, long previousVersion, long currentVersion) {
         HollowBlobPublishJob.PublishType pt;
         switch (blob.getType()) {
             case SNAPSHOT:
@@ -71,14 +96,10 @@ public class HermesPublishListener implements
                 break;
         }
 
-        // @@@ Require a onBlobStaged event, since the snapshot may be published asynchronously (it is not by
-        //     default for a producer)
         FileStoreHollowBlobPublishJob publishJob = (FileStoreHollowBlobPublishJob) jobCreator.createPublishJob(
                 vip, pt, false,
-                inputVersion.getAsLong(), previousVersion, currentVersion, blob.getPath().toFile());
+                inputVersion, previousVersion, currentVersion, blob.getPath().toFile());
         publishJob.executeJob(false, elapsed.toMillis());
     }
 
-    @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
-    }
 }
