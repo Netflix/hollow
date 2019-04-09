@@ -49,13 +49,13 @@ public class ClientPinningUtil {
 
     public static void unpinClients(String vipName, RegionEnum region) throws IOException {
     	String key = propertyNameSuffix + "." + vipName;
-    	PersistedPropertiesUtil.deleteFastProperty(key,
-                null,                                         // no appId
-                NetflixConfiguration.getEnvironmentEnum(),
-                region,
-                null,                                         // no serverId
-                null,                                         // no stack
-                null);                                        // no countries    		
+    	EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
+		PersistedPropertiesUtil.deleteFastProperty(key, null, env, region, null, null, null);
+
+		// after deleting this FP, announcement watcher will get a null value
+		// null values are ignored, resulting in unpin action
+		String newFP = "hollow.pin.vms-" + vipName;
+		PersistedPropertiesUtil.deleteFastProperty(newFP, null, env, region, null, null, null);
     }
 
     /**
@@ -69,16 +69,26 @@ public class ClientPinningUtil {
 
     	String key = propertyNameSuffix + "." + vipName;
         EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-        boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
-        if(exists) {
-            // Update property
-            PersistedPropertiesUtil.updateFastProperty(key, blobVersion, null, env, region, null, null, null);
-        } else {
-            // create property
-            PersistedPropertiesUtil.createFastProperty(key, blobVersion, null, env, region, null, null, null);
-        }        	
+        pinUsingFastProperty(key, blobVersion, region);
 
+        // This FP is used in announcement watcher to look for pinned versions.
+		// VMS-client is transitioning to use HollowConsumer.
+		// Choosing to use FP style pinning, since Gutenberg API's do not support including region in the scope for pin topics.
+        String newFP = "hollow.pin.vms-" + vipName;
+        pinUsingFastProperty(newFP, blobVersion, region);
     }
+
+    private static void pinUsingFastProperty(String key, String value, RegionEnum region) throws IOException {
+		EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
+		boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
+    	if(exists) {
+			// Update property
+			PersistedPropertiesUtil.updateFastProperty(key, value, null, env, region, null, null, null);
+		} else {
+			// create property
+			PersistedPropertiesUtil.createFastProperty(key, value, null, env, region, null, null, null);
+		}
+	}
 
 
     public static String getPinnedVersion(String vipName, RegionEnum region) throws IOException {
