@@ -13,6 +13,7 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'netflix:nflibrary-junit-util'
+
 }
 
 configurations {

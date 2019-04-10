@@ -69,6 +69,11 @@ public class SimpleOctoberSkyData implements OctoberSkyData {
     }
 
     @Override
+    public Set<String> getLanguageVariants(String country, String language) {
+        return Collections.emptySet();
+    }
+
+    @Override
     public void refresh() { }
 
 }

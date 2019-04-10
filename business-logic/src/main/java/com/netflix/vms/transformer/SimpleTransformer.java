@@ -123,7 +123,11 @@ public class SimpleTransformer {
         }
         ctx.getLogger().info(MultiLocaleCountries, "Countries that will support multi-language catalogs are {} out of all supported countries {}", multiLanguageCatalogCountries, octoberSkyData.getSupportedCountries());
         for (String country : multiLanguageCatalogCountries) {
-            ctx.getLogger().info(MultiLocaleCountries, "Country {}: multi-language catalogs supported for locale={}", country, octoberSkyData.getCatalogLanguages(country));
+            Set<String> supportedLanguageCatalogs = octoberSkyData.getCatalogLanguages(country);
+            ctx.getLogger().info(MultiLocaleCountries, "Country : {} supported language catalogs : {}", country, supportedLanguageCatalogs);
+            for (String language : supportedLanguageCatalogs) {
+                ctx.getLogger().info(MultiLocaleCountries, "Catalog {}:{} languageVariants:{}", country, language, octoberSkyData.getLanguageVariants(country, language));
+            }
         }
 
         long startTime = System.currentTimeMillis();

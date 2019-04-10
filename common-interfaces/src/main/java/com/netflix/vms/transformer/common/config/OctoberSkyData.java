@@ -4,12 +4,18 @@ import java.util.Set;
 
 public interface OctoberSkyData {
 
-	public Set<String> getSupportedCountries();
+	Set<String> getSupportedCountries();
 	
-    public Set<String> getCatalogLanguages(String country);
+    Set<String> getCatalogLanguages(String country);
 
     Set<String> getMultiLanguageCatalogCountries();
+
+    /**
+     * Look-up a set of language-variants/locales that are present in the given country and language catalog.
+     * Example: catalog "HK:zh" supports following variants/locales "zh-Hant", "yue" and "zh"
+     */
+    Set<String> getLanguageVariants(String country, String language);
     
-    public void refresh();
+    void refresh();
 
 }
