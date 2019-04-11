@@ -966,13 +966,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -998,19 +998,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -1050,7 +1050,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -1069,31 +1069,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -1118,7 +1118,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -2116,13 +2116,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -2148,19 +2148,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -2200,7 +2200,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -2219,31 +2219,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -2268,7 +2268,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -3370,13 +3370,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -3402,19 +3402,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -3454,7 +3454,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -3473,31 +3473,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -3522,7 +3522,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -4797,13 +4797,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -4829,19 +4829,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -4881,7 +4881,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -4900,31 +4900,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -4949,7 +4949,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -6081,13 +6081,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -6113,19 +6113,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -6165,7 +6165,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -6184,31 +6184,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -6233,7 +6233,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -7365,13 +7365,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -7397,19 +7397,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -7449,7 +7449,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -7468,31 +7468,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -7517,7 +7517,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -8515,13 +8515,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8547,19 +8547,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -8599,7 +8599,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -8618,31 +8618,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -8667,7 +8667,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -9769,13 +9769,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -9801,19 +9801,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -9853,7 +9853,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -9872,31 +9872,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -9921,7 +9921,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
@@ -11053,13 +11053,13 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model"
             ]
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.5.5",
+            "locked": "4.7.0",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11085,19 +11085,19 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.1",
+            "locked": "4.2.2",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:netflix-config": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -11137,7 +11137,7 @@
             ]
         },
         "netflix:platform-core": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit-impl",
                 "netflix:nfzookeeper",
@@ -11156,31 +11156,31 @@
             ]
         },
         "netflix:platform-ipc": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:gutenberg-common"
             ]
         },
         "netflix:platform-logimpl": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-utils"
             ]
         },
         "netflix:platform-pool": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-sla": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-ipc"
             ]
         },
         "netflix:platform-utils": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:platform-dependency-command",
                 "netflix:platform-ipc"
@@ -11205,7 +11205,7 @@
             ]
         },
         "netflix:server-context": {
-            "locked": "4.7.49",
+            "locked": "4.7.50",
             "transitive": [
                 "netflix:fit",
                 "netflix:fit-impl",
