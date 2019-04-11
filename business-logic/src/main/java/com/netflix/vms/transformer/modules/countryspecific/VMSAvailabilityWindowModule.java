@@ -619,6 +619,8 @@ public class VMSAvailabilityWindowModule {
     }
 
     private Long getEarliestWindowStartDateForTheLanguage(long videoId, String country, String language) {
+
+        boolean shouldCheckLanguageVariants = ctx.getConfig().isLanguageVariantsForMerchIntentEnabled();
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
         if (ordinal != -1) {
 
@@ -628,8 +630,16 @@ public class VMSAvailabilityWindowModule {
             LongHollow longHollow = mapOfStringToLongHollow.get(language);
             if (longHollow != null) {
                 return longHollow._getValue();
-            } else { return null; }
+            }
 
+            if (shouldCheckLanguageVariants) {
+                Set<String> languageVariants = ctx.getOctoberSkyData().getLanguageVariants(country, language);
+                for (String variant : languageVariants) {
+                    longHollow = mapOfStringToLongHollow.get(variant);
+                    if (longHollow != null) return longHollow._getValue();
+                }
+            }
+            return null;
         }
         return null;
     }

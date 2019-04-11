@@ -222,7 +222,7 @@ public interface TransformerConfig {
     
 
 
-    ////////////// Multi-langauge catalog configs ////////////////////////
+    ////////////// Multi-language catalog configs ////////////////////////
 
     @DefaultValue("BE,CH,LU,TH,IL,GR,RO,CY,MD")
     String getMultilanguageCatalogCountries();
@@ -238,6 +238,9 @@ public interface TransformerConfig {
 
     @DefaultValue("true")
     boolean isCountrySpecificLanguageDataMapEnabled();
+
+    @DefaultValue("false")
+    boolean isLanguageVariantsForMerchIntentEnabled();
 
 
     // Temporary features switching in cinder support
