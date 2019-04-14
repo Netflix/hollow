@@ -1146,7 +1146,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -2279,7 +2279,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -3540,7 +3540,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -4962,7 +4962,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -6241,7 +6241,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -7520,7 +7520,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -8653,7 +8653,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -9914,7 +9914,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"
@@ -11193,7 +11193,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "netflix.chestnut:chestnut3-logger"

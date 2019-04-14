@@ -1984,7 +1984,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -4100,7 +4100,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -6352,7 +6352,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -8807,7 +8807,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -11119,7 +11119,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -13434,7 +13434,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -15562,7 +15562,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -17826,7 +17826,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
@@ -20150,7 +20150,7 @@
             ]
         },
         "org.apache.commons:commons-lang3": {
-            "locked": "3.8.1",
+            "locked": "3.9",
             "transitive": [
                 "com.netflix.archaius:archaius2-core",
                 "org.apache.cassandra:cassandra-thrift"
