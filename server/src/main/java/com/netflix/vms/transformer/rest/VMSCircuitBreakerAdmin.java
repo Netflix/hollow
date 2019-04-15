@@ -17,9 +17,8 @@ import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.publish.workflow.circuitbreaker.HollowCircuitBreaker;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobCircuitBreakerJob;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -161,15 +160,10 @@ public class VMSCircuitBreakerAdmin {
 	}
 
     private List<HollowCircuitBreaker> getCircuitBreakerJobs() {
-        List<HollowCircuitBreaker> circuitBreakers = new ArrayList<HollowCircuitBreaker>(
-                Arrays.asList(
-                        HollowBlobCircuitBreakerJob.createCircuitBreakerRules(null, -1L, -1L)
-                ));
-
-        Collections.sort(circuitBreakers, (cb1, cb2) -> {
-            return cb1.getRuleName().compareTo(cb2.getRuleName());
-        });
-
+        List<HollowCircuitBreaker> circuitBreakers = Arrays.asList(
+                HollowBlobCircuitBreakerJob.createCircuitBreakerRules(null,
+                        transformerConfig.getTransformerVip(), -1L, -1L));
+        circuitBreakers.sort(Comparator.comparing(HollowCircuitBreaker::getRuleName));
         return circuitBreakers;
     }
 }

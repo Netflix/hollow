@@ -41,15 +41,13 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
             HollowBlobDataProvider hollowBlobDataProvider) {
         super(ctx, ctx.getVip(), cycleVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         this.hollowBlobDataProvider = hollowBlobDataProvider;
-
-        this.circuitBreakerRules = createCircuitBreakerRules(ctx, cycleVersion, snapshotFile.length());
-        
+        this.circuitBreakerRules = createCircuitBreakerRules(ctx.getTransformerContext(), ctx.getVip(),
+                cycleVersion, snapshotFile.length());
         this.circuitBreakersDisabled = !ctx.getConfig().isCircuitBreakersEnabled();
     }
     
-	public static HollowCircuitBreaker[] createCircuitBreakerRules(PublishWorkflowContext pctx, long cycleVersion, long snapshotFileLength) {
-        TransformerContext ctx = pctx.getTransformerContext();
-        String vip = pctx.getVip();
+	public static HollowCircuitBreaker[] createCircuitBreakerRules(TransformerContext ctx, String vip,
+            long cycleVersion, long snapshotFileLength) {
         return new HollowCircuitBreaker[] {
                 new DuplicateDetectionCircuitBreaker(ctx, vip, cycleVersion),
                 new CertificationSystemCircuitBreaker(ctx, vip, cycleVersion),
