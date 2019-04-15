@@ -1172,7 +1172,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -2378,7 +2379,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -3269,7 +3270,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -4468,6 +4470,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.karyon:karyon-spi": {
+            "locked": "1.0.28",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "com.netflix.karyon:karyon2-admin": {
             "locked": "2.9.2",
             "transitive": [
@@ -5575,7 +5583,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -6448,6 +6456,24 @@
             "locked": "1.9.3",
             "transitive": [
                 "com.sun.jersey.contribs:jersey-multipart"
+            ]
+        },
+        "org.mortbay.jetty:jetty": {
+            "locked": "6.1.26",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
+        "org.mortbay.jetty:jetty-util": {
+            "locked": "6.1.26",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
+            ]
+        },
+        "org.mortbay.jetty:servlet-api": {
+            "locked": "2.5-20081211",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
             ]
         },
         "org.ow2.asm:asm": {
@@ -7701,7 +7727,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -8907,7 +8934,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -9798,7 +9825,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -11232,7 +11260,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -12438,7 +12467,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -13329,7 +13358,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -14620,7 +14650,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -15826,7 +15857,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -16717,7 +16748,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -18032,7 +18064,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -19246,7 +19279,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -20172,7 +20205,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -21401,6 +21435,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.karyon:karyon-spi": {
+            "locked": "1.0.28",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "com.netflix.karyon:karyon2-admin": {
             "locked": "2.9.2",
             "transitive": [
@@ -22516,7 +22556,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -23424,6 +23464,24 @@
             "locked": "1.9.5",
             "transitive": [
                 "com.netflix.governator:governator-test"
+            ]
+        },
+        "org.mortbay.jetty:jetty": {
+            "locked": "6.1.26",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
+        "org.mortbay.jetty:jetty-util": {
+            "locked": "6.1.26",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
+            ]
+        },
+        "org.mortbay.jetty:servlet-api": {
+            "locked": "2.5-20081211",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
             ]
         },
         "org.objenesis:objenesis": {
@@ -24707,7 +24765,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -25921,7 +25980,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -26847,7 +26906,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -28168,7 +28228,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -29382,7 +29443,7 @@
             ]
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-io"
             ]
@@ -30308,7 +30369,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {

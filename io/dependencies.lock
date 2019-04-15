@@ -977,7 +977,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -1579,6 +1580,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -1867,10 +1869,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -1950,7 +1953,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -2076,7 +2079,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -2636,7 +2639,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -3617,6 +3621,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.karyon:karyon-spi": {
+            "locked": "1.0.28",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "com.netflix.karyon:karyon2-admin": {
             "locked": "2.9.2",
             "transitive": [
@@ -4129,6 +4139,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -4400,10 +4411,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -4483,7 +4495,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -4609,7 +4621,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -5138,6 +5150,24 @@
             "locked": "1.9.3",
             "transitive": [
                 "com.sun.jersey.contribs:jersey-multipart"
+            ]
+        },
+        "org.mortbay.jetty:jetty": {
+            "locked": "6.1.26",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
+        "org.mortbay.jetty:jetty-util": {
+            "locked": "6.1.26",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
+            ]
+        },
+        "org.mortbay.jetty:servlet-api": {
+            "locked": "2.5-20081211",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
             ]
         },
         "org.ow2.asm:asm": {
@@ -6177,7 +6207,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -6779,6 +6810,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -7067,10 +7099,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -7150,7 +7183,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -7276,7 +7309,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -7836,7 +7869,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -9052,7 +9086,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -9654,6 +9689,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -9942,10 +9978,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -10025,7 +10062,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -10151,7 +10188,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -10711,7 +10748,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -11784,7 +11822,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -12386,6 +12425,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -12674,10 +12714,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -12757,7 +12798,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -12883,7 +12924,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -13443,7 +13484,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -14516,7 +14558,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -15118,6 +15161,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -15409,10 +15453,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -15492,7 +15537,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -15618,7 +15663,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -16182,7 +16227,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -17163,6 +17209,12 @@
                 "netflix:platform-ipc"
             ]
         },
+        "com.netflix.karyon:karyon-spi": {
+            "locked": "1.0.28",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
         "com.netflix.karyon:karyon2-admin": {
             "locked": "2.9.2",
             "transitive": [
@@ -17675,6 +17727,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -17949,10 +18002,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -18032,7 +18086,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -18158,7 +18212,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -18691,6 +18745,24 @@
             "locked": "1.9.3",
             "transitive": [
                 "com.sun.jersey.contribs:jersey-multipart"
+            ]
+        },
+        "org.mortbay.jetty:jetty": {
+            "locked": "6.1.26",
+            "transitive": [
+                "netflix:country-launch"
+            ]
+        },
+        "org.mortbay.jetty:jetty-util": {
+            "locked": "6.1.26",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
+            ]
+        },
+        "org.mortbay.jetty:servlet-api": {
+            "locked": "2.5-20081211",
+            "transitive": [
+                "org.mortbay.jetty:jetty"
             ]
         },
         "org.ow2.asm:asm": {
@@ -19730,7 +19802,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -20332,6 +20405,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -20623,10 +20697,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -20706,7 +20781,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -20832,7 +20907,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -21396,7 +21471,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
@@ -22469,7 +22545,8 @@
         "com.netflix.karyon:karyon-spi": {
             "locked": "1.0.28",
             "transitive": [
-                "com.netflix.karyon:karyon-eureka"
+                "com.netflix.karyon:karyon-eureka",
+                "netflix:country-launch"
             ]
         },
         "com.netflix.karyon:karyon2-admin": {
@@ -23071,6 +23148,7 @@
                 "netflix:edgar_client",
                 "netflix:edgar_span_model",
                 "netflix:mutation-stream-common",
+                "netflix:nfi18n-core",
                 "netflix:nfsso",
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
@@ -23362,10 +23440,11 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.35",
+            "locked": "4.7.39",
             "transitive": [
                 "netflix:fit",
-                "netflix:fit-impl"
+                "netflix:fit-impl",
+                "netflix:nfi18n-core"
             ]
         },
         "netflix.grpc:netflix-grpc-common": {
@@ -23445,7 +23524,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "47.177",
+            "locked": "48.51",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -23571,7 +23650,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.140",
+            "locked": "2.142",
             "transitive": [
                 "netflix:country-launch"
             ]
@@ -24135,7 +24214,8 @@
         "org.mortbay.jetty:jetty": {
             "locked": "6.1.26",
             "transitive": [
-                "com.netflix.karyon:karyon2-admin"
+                "com.netflix.karyon:karyon2-admin",
+                "netflix:country-launch"
             ]
         },
         "org.mortbay.jetty:jetty-util": {
