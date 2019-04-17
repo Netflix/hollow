@@ -579,7 +579,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     }
 
     private boolean shouldPerformDeltaUpdate() {
-        BitSet previousOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
+        BitSet previousOrdinals = typeState.getListener(PopulatedOrdinalListener.class).getPreviousOrdinals();
         BitSet ordinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
 
         int prevCardinality = 0;
