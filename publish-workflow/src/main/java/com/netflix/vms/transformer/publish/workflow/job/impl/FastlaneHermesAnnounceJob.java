@@ -44,13 +44,7 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
     @Override public boolean executeJob() {
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
-
-        if (region.equals(RegionEnum.US_EAST_1)) {
-            // NFHollowAnnouncer announces to all region, so doing it only once. todo just like HermesAnnounceJob, add a way to announce per region.
-            // following the comment in HermesAnnounceJob#executeJob
-            ((NFHollowAnnouncer) ctx.getStateAnnouncer()).setCurrentVersionToDesiredVersion(priorVersion);
-            ctx.getStateAnnouncer().announce(getCycleVersion());
-        }
+        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;

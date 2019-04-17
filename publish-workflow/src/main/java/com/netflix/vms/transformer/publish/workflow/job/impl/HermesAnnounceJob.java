@@ -20,22 +20,9 @@ public class HermesAnnounceJob extends AnnounceJob {
     }
 
     @Override public boolean executeJob() {
-        boolean success =
-                ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
-        if (region == RegionEnum.EU_WEST_1) { // TODO: Announce per-region via Gutenberg.
-            /* Before announcing this cycle version, we need to set the current version  on the
-             * announcer (the last announced version the announcer knows about) since we aren't
-             * using NFHollowProducer. Note that if we didn't restore (i.e. we're breaking the delta
-             * chain and we didn't publish a delta file) the priorVersion is VERSION_NONE on the
-             * first cycle. This is expected, since it results in the Cinder publish verification
-             * step passing. */
-            ((NFHollowAnnouncer) ctx.getStateAnnouncer())
-                    .setCurrentVersionToDesiredVersion(priorVersion);
-            ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer())
-                    .setCurrentVersionToDesiredVersion(priorVersion);
-            ctx.getStateAnnouncer().announce(getCycleVersion());
-            ctx.getNostreamsStateAnnouncer().announce(getCycleVersion());
-        }
+        boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
+        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
+        ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;
