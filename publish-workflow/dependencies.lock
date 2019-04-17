@@ -129,6 +129,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -157,6 +158,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -746,6 +748,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -781,6 +784,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -1403,11 +1407,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -1865,6 +1907,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -2178,10 +2221,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -2301,7 +2344,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -2510,6 +2553,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -2653,7 +2698,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -2765,6 +2809,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -3199,6 +3244,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary"
             ]
         },
@@ -3370,6 +3416,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -3519,6 +3566,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -3547,6 +3595,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -4074,6 +4123,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -4107,6 +4157,7 @@
                 "com.netflix.archaius:archaius2-persisted2",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -4677,11 +4728,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -5087,6 +5176,7 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius2-commons-configuration",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -5384,9 +5474,9 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -5505,7 +5595,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -5714,6 +5804,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -5857,7 +5949,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -5969,6 +6060,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -6393,6 +6485,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary"
             ]
         },
@@ -6537,6 +6630,7 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.ksclient:ksclient-core",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -6684,6 +6778,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -6712,6 +6807,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -7301,6 +7397,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -7336,6 +7433,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -7958,11 +8056,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -8420,6 +8556,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -8733,10 +8870,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -8856,7 +8993,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -9065,6 +9202,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -9208,7 +9347,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -9320,6 +9458,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -9754,6 +9893,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary"
             ]
         },
@@ -9925,6 +10065,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -10217,6 +10358,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -10245,6 +10387,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -10834,6 +10977,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -10869,6 +11013,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -11491,11 +11636,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -11953,6 +12136,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -12266,10 +12450,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -12389,7 +12573,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -12598,6 +12782,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -12741,7 +12927,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -12853,6 +13038,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -13287,6 +13473,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary"
             ]
         },
@@ -13458,6 +13645,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -13607,6 +13795,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -13635,6 +13824,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -14224,6 +14414,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -14259,6 +14450,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -14881,11 +15073,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -15343,6 +15573,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -15656,10 +15887,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -15779,7 +16010,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -15988,6 +16219,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -16131,7 +16364,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -16243,6 +16475,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -16677,6 +16910,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary"
             ]
         },
@@ -16848,6 +17082,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -16997,6 +17232,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -17025,6 +17261,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -17615,6 +17852,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -17651,6 +17889,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -18295,11 +18534,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -18757,6 +19034,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -19077,10 +19355,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -19201,7 +19479,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -19410,6 +19688,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -19558,7 +19838,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -19670,6 +19949,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -20119,6 +20399,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary",
                 "netflix:nflibrary-junit-util"
             ]
@@ -20311,6 +20592,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -20460,6 +20742,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -20488,6 +20771,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -21016,6 +21300,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -21050,6 +21335,7 @@
                 "com.netflix.archaius:archaius2-test",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -21642,11 +21928,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -22052,6 +22376,7 @@
             "locked": "1.8",
             "transitive": [
                 "com.netflix.archaius:archaius2-commons-configuration",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -22356,9 +22681,9 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -22478,7 +22803,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -22687,6 +23012,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -22835,7 +23162,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -22947,6 +23273,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -23386,6 +23713,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary",
                 "netflix:nflibrary-junit-util"
             ]
@@ -23551,6 +23879,7 @@
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-protobuf",
                 "com.netflix.ksclient:ksclient-core",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -23698,6 +24027,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -23726,6 +24056,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -24316,6 +24647,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -24352,6 +24684,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -24996,11 +25329,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -25458,6 +25829,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -25778,10 +26150,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -25902,7 +26274,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -26111,6 +26483,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -26259,7 +26633,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -26371,6 +26744,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -26820,6 +27194,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary",
                 "netflix:nflibrary-junit-util"
             ]
@@ -27012,6 +27387,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
@@ -27161,6 +27537,7 @@
                 "com.amazonaws:aws-java-sdk-ses",
                 "com.amazonaws:aws-java-sdk-sqs",
                 "com.amazonaws:aws-java-sdk-sts",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-ext-aws",
                 "netflix:nsac-client",
                 "netflix:nsac-common",
@@ -27189,6 +27566,7 @@
         "com.amazonaws:aws-java-sdk-s3": {
             "locked": "1.11.501",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:gutenberg-common",
                 "netflix:whitecastle_v2"
             ]
@@ -27779,6 +28157,7 @@
                 "com.netflix.ksclient:platform-chukwaClient-legacy",
                 "com.netflix.nfkafka:nfkafka-consumer",
                 "com.netflix.nfkafka:nfkafka-producer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
                 "com.netflix.suro:suro-kafka-producer",
@@ -27815,6 +28194,7 @@
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.ksclient:ksclient-lifecycle",
                 "com.netflix.runtime:health-integrations",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.spectator:spectator-nflx-plugin",
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -28459,11 +28839,49 @@
                 "netflix:base-server"
             ]
         },
+        "com.netflix.s3:nfs3-api": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
+        "com.netflix.s3:nfs3-api-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-config"
+            ]
+        },
+        "com.netflix.s3:nfs3-aws-sdk": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-core"
+            ]
+        },
+        "com.netflix.s3:nfs3-common": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
+                "com.netflix.s3:nfs3-jets3t"
+            ]
+        },
+        "com.netflix.s3:nfs3-config": {
+            "locked": "1.1.4",
+            "transitive": [
+                "com.netflix.s3:nfs3-common"
+            ]
+        },
         "com.netflix.s3:nfs3-core": {
-            "locked": "1.0.1",
+            "locked": "1.1.4",
             "transitive": [
                 "netflix:platform-aws",
                 "netflix:platform-management"
+            ]
+        },
+        "com.netflix.s3:nfs3-jets3t": {
+            "locked": "1.1.4",
+            "transitive": [
+                "netflix:awsutils"
             ]
         },
         "com.netflix.securekafka:ks-secure-kafka-files": {
@@ -28921,6 +29339,7 @@
                 "com.netflix.pytheas:pytheas-api",
                 "com.netflix.pytheas:pytheas-core",
                 "com.netflix.ribbon:ribbon-archaius",
+                "com.netflix.s3:nfs3-common",
                 "netflix:base-server",
                 "netflix:nfi18n-core",
                 "netflix:nflibrary",
@@ -29241,10 +29660,10 @@
             ]
         },
         "net.java.dev.jets3t:jets3t": {
-            "locked": "0.9.5-nf.4",
+            "locked": "0.9.5-nf.5",
             "transitive": [
                 "com.google.code.simplejpa:simplejpa",
-                "com.netflix.s3:nfs3-core"
+                "com.netflix.s3:nfs3-jets3t"
             ]
         },
         "net.jcip:jcip-annotations": {
@@ -29365,7 +29784,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.80.0",
+            "locked": "1.85.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -29574,6 +29993,8 @@
             "locked": "4.7.50",
             "transitive": [
                 "com.netflix.jaxrs:netflix-jaxrs-extensions-exceptionmapper",
+                "com.netflix.s3:nfs3-api",
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:base-explorer",
                 "netflix:fit-impl",
@@ -29722,7 +30143,6 @@
         "netflix:nsac-client": {
             "locked": "2.7.0",
             "transitive": [
-                "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws"
             ]
         },
@@ -29834,6 +30254,7 @@
         "netflix:platform-utils": {
             "locked": "4.7.50",
             "transitive": [
+                "com.netflix.s3:nfs3-common",
                 "com.netflix.s3:nfs3-core",
                 "netflix:platform-aws",
                 "netflix:platform-dependency-command",
@@ -30283,6 +30704,7 @@
         "org.codehaus.woodstox:wstx-asl": {
             "locked": "3.2.9",
             "transitive": [
+                "com.netflix.s3:nfs3-aws-sdk",
                 "netflix:nflibrary",
                 "netflix:nflibrary-junit-util"
             ]
@@ -30475,6 +30897,7 @@
                 "com.netflix.ribbon:ribbon-eureka",
                 "com.netflix.ribbon:ribbon-httpclient",
                 "com.netflix.ribbon:ribbon-loadbalancer",
+                "com.netflix.s3:nfs3-config",
                 "com.netflix.servo:servo-apache",
                 "com.netflix.servo:servo-aws",
                 "com.netflix.servo:servo-core",
