@@ -31,6 +31,8 @@ public class HermesPublishListener implements
 
     private long currentVersion;
 
+    private PublishWorkflowContext ctx;
+
 
     // RestoreListener
 
@@ -50,7 +52,10 @@ public class HermesPublishListener implements
     @Override public void onNoDeltaAvailable(long version) {
     }
 
-    @Override public void onPublishStart(long version) {
+    @Override
+    public void onPublishStart(long version) {
+        // See HermesAnnounceListener.onCycleStart for call to jobCreator.beginStagingNewCycle()
+        ctx = jobCreator.getContext();
         currentVersion = version;
     }
 
@@ -62,9 +67,10 @@ public class HermesPublishListener implements
         long iv = inputVersion.getAsLong();
         long pv = previousVersion;
         long cv = currentVersion;
+        PublishWorkflowContext context = this.ctx;
         blob.thenAccept(b -> {
             long d = System.nanoTime() - start;
-            blobPublish(b, Duration.ofNanos(d), iv, pv, cv);
+            blobPublish(context, vip, b, Duration.ofNanos(d), iv, pv, cv);
         });
     }
 
@@ -74,13 +80,15 @@ public class HermesPublishListener implements
             return;
         }
 
-        blobPublish(blob, elapsed, inputVersion.getAsLong(), previousVersion, currentVersion);
+        blobPublish(ctx, vip, blob, elapsed, inputVersion.getAsLong(), previousVersion, currentVersion);
     }
 
     @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
     }
 
-    private void blobPublish(HollowProducer.Blob blob, Duration elapsed,
+    private static void blobPublish(PublishWorkflowContext ctx,
+            String vip,
+            HollowProducer.Blob blob, Duration elapsed,
             long inputVersion, long previousVersion, long currentVersion) {
         HollowBlobPublishJob.PublishType pt;
         switch (blob.getType()) {
@@ -96,9 +104,10 @@ public class HermesPublishListener implements
                 break;
         }
 
-        FileStoreHollowBlobPublishJob publishJob = (FileStoreHollowBlobPublishJob) jobCreator.createPublishJob(
-                vip, pt, false,
-                inputVersion, previousVersion, currentVersion, blob.getPath().toFile());
+        FileStoreHollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, vip,
+                inputVersion, previousVersion, currentVersion,
+                pt, blob.getPath().toFile(), false);
+
         publishJob.executeJob(false, elapsed.toMillis());
     }
 

@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang.StringUtils;
 
 public class ValidatorForCircuitBreakers implements
@@ -154,40 +154,62 @@ public class ValidatorForCircuitBreakers implements
 
         SimultaneousExecutor executor = new SimultaneousExecutor();
 
-        Map<HollowCircuitBreaker, Future<HollowCircuitBreaker.CircuitBreakerResults>> resultFutures = new HashMap<>();
+        Map<HollowCircuitBreaker, CompletableFuture<HollowCircuitBreaker.CircuitBreakerResults>> resultFutures =
+                new HashMap<>();
 
         for (HollowCircuitBreaker rule : circuitBreakerRules) {
-            Future<HollowCircuitBreaker.CircuitBreakerResults> job = executor.submit(
-                    () -> rule.run(readState.getStateEngine()));
+            CompletableFuture<HollowCircuitBreaker.CircuitBreakerResults> job = CompletableFuture.supplyAsync(
+                    () -> rule.run(readState.getStateEngine()), executor);
             resultFutures.put(rule, job);
         }
 
         try {
-            executor.awaitSuccessfulCompletion();
+            // Wait for all jobs to complete, ignoring any exceptional completions
+            CompletableFuture<Void> allFuture = CompletableFuture.allOf(
+                    resultFutures.values().toArray(new CompletableFuture[0]))
+                    .handle((r, t) -> null);
+            allFuture.get();
 
             boolean isAllDataValid = true;
 
+            Throwable validationError = null;
             ValidationResult.ValidationResultBuilder vresult = ValidationResult.from(this);
-            for (Map.Entry<HollowCircuitBreaker, Future<HollowCircuitBreaker.CircuitBreakerResults>> e : resultFutures
-                    .entrySet()) {
-                HollowCircuitBreaker.CircuitBreakerResults results = e.getValue().get();
+            for (Map.Entry<HollowCircuitBreaker, CompletableFuture<HollowCircuitBreaker.CircuitBreakerResults>> e :
+                    resultFutures.entrySet()) {
 
-                for (HollowCircuitBreaker.CircuitBreakerResult result : results) {
-                    if (!StringUtils.isEmpty(result.getMessage())) {
-                        if (result.isPassed()) {
-                            ctx.getLogger().info(CircuitBreaker, result.getMessage());
-                        } else {
-                            ctx.getLogger().error(CircuitBreaker, result.getMessage());
+                HollowCircuitBreaker.CircuitBreakerResults results = null;
+                try {
+                    results = e.getValue().get();
+                } catch (Exception x) {
+                    if (validationError == null) {
+                        validationError = x;
+                    } else {
+                        validationError.addSuppressed(x);
+                    }
+                }
+
+                if (results != null) {
+                    for (HollowCircuitBreaker.CircuitBreakerResult result : results) {
+                        if (!StringUtils.isEmpty(result.getMessage())) {
+                            if (result.isPassed()) {
+                                ctx.getLogger().info(CircuitBreaker, result.getMessage());
+                            } else {
+                                ctx.getLogger().error(CircuitBreaker, result.getMessage());
+                            }
+
+                            vresult.detail(e.getKey().getRuleName(), result.isPassed());
+                            vresult.detail(e.getKey().getRuleName() + ".message", result.getMessage());
                         }
 
-                        vresult.detail(e.getKey().getRuleName(), result.isPassed());
+                        isAllDataValid = isAllDataValid && result.isPassed();
                     }
-
-                    isAllDataValid = isAllDataValid && result.isPassed();
                 }
             }
 
-            if (isAllDataValid) {
+            if (validationError != null) {
+                failed = true;
+                return vresult.error(validationError);
+            } else if (isAllDataValid) {
                 for (HollowCircuitBreaker rule : circuitBreakerRules) {
                     rule.saveSuccessSizesForCycle(readState.getVersion());
                 }

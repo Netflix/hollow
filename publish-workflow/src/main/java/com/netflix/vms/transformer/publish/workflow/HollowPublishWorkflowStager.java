@@ -279,7 +279,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         p.addListener(new ValidatorForCanaryPBM(vcbs, this, jobCreator, vip));
 
         p.addListener(new HermesPublishListener(inputVersion, jobCreator, vip));
-        p.addListener(new HermesAnnounceListener(inputVersion, jobCreator, vip));
+        p.addListener(new HermesAnnounceListener(jobCreator, vip));
     }
 
     @Override

@@ -6,35 +6,33 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Announceme
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
+import com.netflix.hollow.api.producer.listener.AnnouncementListener;
 import com.netflix.hollow.api.producer.listener.CycleListener;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
+import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
+import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
+import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import java.time.Duration;
-import java.util.function.LongSupplier;
 
 public class HermesAnnounceListener implements
         RestoreListener,
+        AnnouncementListener,
         CycleListener {
-    private final LongSupplier inputVersion;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
-    private final PublishWorkflowContext ctx;
 
     public HermesAnnounceListener(
-            LongSupplier inputVersion,
             DefaultHollowPublishJobCreator jobCreator,
             String vip) {
-        this.inputVersion = inputVersion;
         this.jobCreator = jobCreator;
         this.vip = vip;
-        this.ctx = jobCreator.getContext();
     }
 
     private long previousVersion;
 
-    private long currentVersion;
-
+    private PublishWorkflowContext ctx;
 
     // RestoreListener
 
@@ -49,19 +47,15 @@ public class HermesAnnounceListener implements
     }
 
 
-    // CycleListener
+    // AnnouncementListener
 
-    @Override public void onCycleSkip(CycleSkipReason reason) {
-    }
-
-    @Override public void onNewDeltaChain(long version) {
-    }
-
-    @Override public void onCycleStart(long version) {
+    @Override
+    public void onAnnouncementStart(long version) {
     }
 
     @Override
-    public void onCycleComplete(Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+    public void onAnnouncementComplete(
+            Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
         if (status.getType() != Status.StatusType.SUCCESS) {
             return;
         }
@@ -69,12 +63,11 @@ public class HermesAnnounceListener implements
         // @@@ Stagger announcements for the two non-main regions
         // Add to queue
         for (NetflixConfiguration.RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            boolean success = jobCreator.getContext().getVipAnnouncer()
+            boolean success = ctx.getVipAnnouncer()
                     .announce(vip, region, false, version, previousVersion);
 
             logResult(success, version, region);
         }
-        ctx.getStatusIndicator().markSuccess(version);
     }
 
     private void logResult(boolean success, long version, NetflixConfiguration.RegionEnum region) {
@@ -86,6 +79,48 @@ public class HermesAnnounceListener implements
         } else {
             ctx.getLogger().error(AnnouncementFailure, "Hollow data announce failure: for version "
                     + version + " for vip " + vip + " region " + region);
+        }
+    }
+
+
+    // CycleListener
+
+
+    @Override public void onCycleSkip(CycleSkipReason reason) {
+    }
+
+    @Override public void onNewDeltaChain(long version) {
+    }
+
+    @Override public void onCycleStart(long version) {
+        // Create a context which obtains the current logger from TransformerContext
+        // which is bound to to the current cycle
+        ctx = jobCreator.beginStagingNewCycle();
+    }
+
+    @Override
+    public void onCycleComplete(Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+        // @@@ Move into TransformerCycle.cycle?
+        if (status.getType() != Status.StatusType.SUCCESS) {
+            // Create Fake job to avoid NPE when constructing CassandraPoisonStateMarkerJob
+            // (whose job name is derived from its dependent job name)
+            PublicationJob fj = new PublishWorkflowPublicationJob(jobCreator.getContext(), "validation", version) {
+                @Override public boolean executeJob() {
+                    return false;
+                }
+
+                @Override protected boolean isFailedBasedOnDependencies() {
+                    return false;
+                }
+
+                @Override public boolean isEligible() {
+                    return false;
+                }
+            };
+            PoisonStateMarkerJob canaryPoisonStateMarkerJob = jobCreator.createPoisonStateMarkerJob(fj, version);
+            canaryPoisonStateMarkerJob.executeJob();
+        } else {
+            ctx.getStatusIndicator().markSuccess(version);
         }
     }
 }

@@ -4,15 +4,10 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.api.producer.validation.ValidationResult;
-import com.netflix.hollow.api.producer.validation.ValidationStatus;
-import com.netflix.hollow.api.producer.validation.ValidationStatusListener;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
-import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryRollbackJob;
-import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
-import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.CassandraCanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobAfterCanaryAnnounceJob;
@@ -22,7 +17,6 @@ import java.util.Collections;
 
 public class ValidatorForCanaryPBM implements
         RestoreListener,
-        ValidationStatusListener,
         ValidatorListener {
     private final ValidatorForCircuitBreakers vcbs;
     private final PublishWorkflowStager publishStager;
@@ -54,39 +48,6 @@ public class ValidatorForCanaryPBM implements
     public void onProducerRestoreComplete(
             Status status, long versionDesired, long versionReached, Duration elapsed) {
         previousVersion = versionReached;
-    }
-
-
-    // ValidationStatusListener
-
-    @Override
-    public void onValidationStatusStart(long version) {
-    }
-
-    @Override
-    public void onValidationStatusComplete(
-            ValidationStatus status, long version, Duration elapsed) {
-        if (status.passed()) {
-            return;
-        }
-
-        // Create Fake job to avoid NPE when constructing CassandraPoisonStateMarkerJob
-        // (whose job name is derived from its dependent job name)
-        PublicationJob fj = new PublishWorkflowPublicationJob(jobCreator.getContext(), "validation", version) {
-            @Override public boolean executeJob() {
-                return false;
-            }
-
-            @Override protected boolean isFailedBasedOnDependencies() {
-                return false;
-            }
-
-            @Override public boolean isEligible() {
-                return false;
-            }
-        };
-        PoisonStateMarkerJob canaryPoisonStateMarkerJob = jobCreator.createPoisonStateMarkerJob(fj, version);
-        canaryPoisonStateMarkerJob.executeJob();
     }
 
 
