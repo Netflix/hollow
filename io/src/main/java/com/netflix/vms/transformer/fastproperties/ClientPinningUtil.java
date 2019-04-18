@@ -51,11 +51,17 @@ public class ClientPinningUtil {
     	String key = propertyNameSuffix + "." + vipName;
     	EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
 		PersistedPropertiesUtil.deleteFastProperty(key, null, env, region, null, null, null);
+		String keyNoStreams = propertyNameSuffix + "." + vipName + "_nostreams";
+		PersistedPropertiesUtil.deleteFastProperty(keyNoStreams, null, env, region, null, null, null);
 
 		// after deleting this FP, announcement watcher will get a null value
 		// null values are ignored, resulting in unpin action
 		String newFP = "hollow.pin.vms-" + vipName;
 		PersistedPropertiesUtil.deleteFastProperty(newFP, null, env, region, null, null, null);
+
+		String noStreamsFP = "hollow.pin.vms-" + vipName + "_nostreams";
+		PersistedPropertiesUtil.deleteFastProperty(noStreamsFP, null, env, region, null, null, null);
+
     }
 
     /**
@@ -68,14 +74,19 @@ public class ClientPinningUtil {
     public static void pinClients(String vipName, String blobVersion, RegionEnum region) throws IOException {
 
     	String key = propertyNameSuffix + "." + vipName;
-        EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
         pinUsingFastProperty(key, blobVersion, region);
+
+        String keyNoStreams = propertyNameSuffix + "." + vipName + "_nostreams";
+        pinUsingFastProperty(keyNoStreams, blobVersion, region);
 
         // This FP is used in announcement watcher to look for pinned versions.
 		// VMS-client is transitioning to use HollowConsumer.
 		// Choosing to use FP style pinning, since Gutenberg API's do not support including region in the scope for pin topics.
         String newFP = "hollow.pin.vms-" + vipName;
         pinUsingFastProperty(newFP, blobVersion, region);
+
+		String noStreamsFP = "hollow.pin.vms-" + vipName + "_nostreams";
+		pinUsingFastProperty(noStreamsFP, blobVersion, region);
     }
 
     private static void pinUsingFastProperty(String key, String value, RegionEnum region) throws IOException {
