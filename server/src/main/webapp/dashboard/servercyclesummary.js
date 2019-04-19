@@ -109,9 +109,10 @@ function ServerCycleSummaryTab(dashboard) {
             // this can be expensive if too many publish failures, usually 0
             this.blobErrorMapModel = new DataOperator(this.blobStatusArrayModel).groupBy("version").inpDataModel;
 
-            var greenColor = "#E0FFE0";
-            var yellowColor = "#FFFFBD";
             var redColor = "#FF9999";
+            var greenColor = "#E0FFE0";
+            var blueColor = "#E0E0FF";
+            var yellowColor = "#FFFFBD";
             var orangeColor = "#FFA500";
             var whiteColor = "#FFFFFF";
 
@@ -152,8 +153,8 @@ function ServerCycleSummaryTab(dashboard) {
 
              // fast-lane does not publish every cycle, and announces without delay
             if(dashboard.vipAddress.indexOf("_override") == -1) {
-            // returns filtered array
-            var announceResult = this.hollowPublishRegionModel.filter("eventInfo.currentCycle", currCycle);
+                // returns filtered array
+                var announceResult = this.hollowPublishRegionModel.filter("eventInfo.currentCycle", currCycle);
                 if(announceResult.length > 0) {
                     for(i=0;i<regions.length;i++) {
                         for(var ires = 0; ires < announceResult.length; ires++) {
@@ -176,12 +177,18 @@ function ServerCycleSummaryTab(dashboard) {
             if (cycleFail) {
                 html += "<td><img src='images/x.png'></td>";
             } else if (cycleSuccess) {
-            	if(showNonAvailability) {
-            		html += "<td><img src='images/waiting.png'></td>";
-            		rowStyle = "<tr style='background-color:" + orangeColor + "; color:black'>";
-            	}else {
-	                html += "<td><img src='images/ok.png'></td>";
-	                rowStyle = "<tr style='background-color:" + whiteColor + "; color:black'>";
+                if (showNonAvailability && hollowDisplayString.length > 0) {
+                    // Announcing to all regions not yet complete
+                    html += "<td><img src='images/waiting.png'></td>";
+                    rowStyle = "<tr style='background-color:" + orangeColor + "; color:black'>";
+                } else if (showNonAvailability && hollowDisplayString.length == 0) {
+                    // No announcements after cycle success indicates no changes
+                    html += "<td><img src='images/ok.png'></td>";
+	                rowStyle = "<tr style='background-color:" + blueColor + "; color:black'>";
+                } else {
+                    // Announced in all regions
+                    html += "<td><img src='images/ok.png'></td>";
+                    rowStyle = "<tr style='background-color:" + whiteColor + "; color:black'>";
             	}
             } else if (!cycleFail && !cycleSuccess) {
                 if(row == 0) {
