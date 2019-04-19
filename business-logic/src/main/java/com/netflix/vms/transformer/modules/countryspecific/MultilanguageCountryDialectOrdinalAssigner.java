@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
-import org.jboss.netty.util.internal.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MultilanguageCountryDialectOrdinalAssigner {
     
