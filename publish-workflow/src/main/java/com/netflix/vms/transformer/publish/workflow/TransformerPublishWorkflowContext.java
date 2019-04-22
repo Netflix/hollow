@@ -85,7 +85,7 @@ public class TransformerPublishWorkflowContext implements PublishWorkflowContext
         return new TransformerPublishWorkflowContext(transformerCtx, vipAnnouncer,
                 uploadStatus, fileStore,
                 statusIndicator, publisher, nostreamsPublisher,
-                announcer, canaryAnnouncer, nostreamsAnnouncer, devSlicePublisher, devSliceAnnouncer, vip,
+                announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, vip,
                 poisonStateMarker);
     }
 

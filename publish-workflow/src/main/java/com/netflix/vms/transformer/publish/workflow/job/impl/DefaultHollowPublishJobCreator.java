@@ -66,8 +66,8 @@ public class DefaultHollowPublishJobCreator {
                 fileStore,
                 publisher,
                 nostreamsPublisher,
-                nostreamsAnnouncer,
                 announcer,
+                nostreamsAnnouncer,
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 vip);
