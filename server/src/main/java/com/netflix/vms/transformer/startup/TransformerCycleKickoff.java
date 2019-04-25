@@ -56,7 +56,7 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
 
-    private final String CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER = "vmsconverter-";
+    private static final String CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER = "vmsconverter-";
 
     @Inject
     public TransformerCycleKickoff(
@@ -89,32 +89,47 @@ public class TransformerCycleKickoff {
         Publisher nostreamsPublisher = new NFHollowPublisher(gutenbergFilePublisher, nostreamsOutputNamespace,
                 GutenbergIdentifiers.DEFAULT_REGIONS);
         Announcer announcer = new NFHollowAnnouncer(gutenbergValuePublisher,
-                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), outputNamespace);
+                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace),
+                outputNamespace);
         Announcer nostreamsAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
-                new NFHollowBlobRetriever(gutenbergFileConsumer, nostreamsOutputNamespace), nostreamsOutputNamespace);
+                new NFHollowBlobRetriever(gutenbergFileConsumer, nostreamsOutputNamespace),
+                nostreamsOutputNamespace);
 
-        /**
-         * Trick : Canary announcement is done on a different topic. However, for the NFHollowAnnouncer to verify the publish we use outputNamespace.
+        /*
+         * Trick : Canary announcement is done on a different topic. However, for the NFHollowAnnouncer to verify the
+         * publish we use outputNamespace.
          *
-         * In the publish workflow, we first upload the blobs for the outputNamespace. The blobs are published (uploaded) to the output namespace
-         * but they are not announced to the consumers listening to the output namespace until the integrity checks, validation and canary pass.
+         * In the publish workflow, we first upload the blobs for the outputNamespace. The blobs are published
+         * (uploaded) to the output namespace but they are not announced to the consumers listening to the output
+         * namespace until the integrity checks, validation and canary pass.
          *
          * Once the blobs are uploaded, we then announce the new version on the canary topic.
          * When announcing on the canary topic, NFHollowAnnouncer verifies if the blobs are published/uploaded.
          * Hence using outerNamespace in the NFHollowBlobRetriever when constructing the announcer for canary topic.
          *
-         * Note : The client needs to do a similar operation for getting updates for running canary on the outputNamespace.
-         * That is, use announcement watcher for the canary topic, and create blob retriever for the outputNamespace.
+         * Note : The client needs to do a similar operation for getting updates for running canary on the
+         * outputNamespace.  That is, use announcement watcher for the canary topic, and create blob retriever for the
+         * outputNamespace.
          */
-        Announcer canaryAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher, new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), canaryNamespace);
-        Publisher devSlicePublisher = new NFHollowPublisher(gutenbergFilePublisher, devSliceNamespace, GutenbergIdentifiers.DEFAULT_REGIONS);
-        Announcer devSliceAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher, new NFHollowBlobRetriever(gutenbergFileConsumer, devSliceNamespace), devSliceNamespace);
+        Announcer canaryAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
+                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), canaryNamespace);
+        Publisher devSlicePublisher = new NFHollowPublisher(gutenbergFilePublisher, devSliceNamespace,
+                GutenbergIdentifiers.DEFAULT_REGIONS);
+        Announcer devSliceAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
+                new NFHollowBlobRetriever(gutenbergFileConsumer, devSliceNamespace), devSliceNamespace);
 
-        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary, cassandraHelper, healthIndicator);
+        TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary,
+                cassandraHelper, healthIndicator);
         boolean isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
-        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer);
+        PublishWorkflowStager publishStager = publishStager(ctx, isFastlane, fileStore,
+                publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer,
+                canaryAnnouncer,
+                devSlicePublisher, devSliceAnnouncer,
+                hermesBlobAnnouncer);
 
-        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder, CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + transformerConfig.getConverterVip());
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder,
+                CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + transformerConfig.getConverterVip());
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
@@ -126,7 +141,11 @@ public class TransformerCycleKickoff {
                 cinderBuilder);
 
         if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-            TransformCycle.restore(new SimultaneousExecutor(2, "vms-restore"), ctx, cycle, fileStore, hermesBlobAnnouncer, isFastlane, false);
+            SimultaneousExecutor executor = new SimultaneousExecutor(2,
+                    TransformerCycleKickoff.class,
+                    "vms-restore");
+            TransformCycle.restoreOutputs(executor, ctx, cycle, fileStore,
+                    hermesBlobAnnouncer, isFastlane, false);
         }
 
         Thread t = new Thread(new Runnable() {
@@ -170,13 +189,16 @@ public class TransformerCycleKickoff {
                 long minCycleTime = (long)transformerConfig.getMinCycleCadenceMinutes() * 60 * 1000;
                 long timeSinceLastCycle = System.currentTimeMillis() - cycleStartTime;
                 long msUntilNextCycle = minCycleTime - timeSinceLastCycle;
-                ctx.getLogger().info(WaitForNextCycle, "Waiting {}ms until beginning next cycle", Math.max(msUntilNextCycle, 0));
+                ctx.getLogger().info(WaitForNextCycle,
+                        "Waiting {}ms until beginning next cycle",
+                        Math.max(msUntilNextCycle, 0));
 
                 long sleepStart = System.currentTimeMillis();
                 ctx.getMetricRecorder().startTimer(P5_WaitForNextCycleDuration);
                 while(msUntilNextCycle > 0) {
                     if (ctx.getCycleInterrupter().isCycleInterrupted()) {
-                        ctx.getLogger().info(CycleInterrupted, "Interrupted while waiting for next Cycle ");
+                        ctx.getLogger().info(CycleInterrupted,
+                                "Interrupted while waiting for next Cycle");
                         break;
                     }
 
@@ -190,7 +212,9 @@ public class TransformerCycleKickoff {
                 }
                 long sleepDuration = System.currentTimeMillis() - sleepStart;
                 ctx.stopTimerAndLogDuration(P5_WaitForNextCycleDuration);
-                ctx.getLogger().info(WaitForNextCycle, "Waited {}", OutputUtil.formatDuration(sleepDuration, true));
+                ctx.getLogger().info(WaitForNextCycle,
+                        "Waited {}",
+                        OutputUtil.formatDuration(sleepDuration, true));
             }
 
             private void setUpFastlaneContext() {
@@ -201,12 +225,14 @@ public class TransformerCycleKickoff {
             private void markCycleFailed(Throwable th) {
                 consecutiveCycleFailures++;
                 healthIndicator.cycleFailed(th);
-                ctx.getLogger().error(TransformCycleFailed, "TransformerCycleKickoff failed cycle", th);
+                ctx.getLogger().error(TransformCycleFailed,
+                        "TransformerCycleKickoff failed cycle", th);
             }
 
             private void markCycleSucessful() {
                 consecutiveCycleFailures = 0;
-                ctx.getLogger().info(TransformCycleSuccess, "Cycle succeeded");
+                ctx.getLogger().info(TransformCycleSuccess,
+                        "Cycle succeeded");
                 healthIndicator.cycleSucessful();
             }
 
@@ -217,7 +243,9 @@ public class TransformerCycleKickoff {
         t.start();
     }
 
-    private TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient, TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary, TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
+    private TransformerContext ctx(TransformerCycleInterrupter cycleInterrupter, ElasticSearchClient esClient,
+            TransformerConfig transformerConfig, Config config, OctoberSkyData octoberSkyData, CupLibrary cupLibrary,
+            TransformerCassandraHelper cassandraHelper, TransformerServerHealthIndicator healthIndicator) {
         return new TransformerServerContext(
                 cycleInterrupter,
                 new TransformerServerLogger(transformerConfig, esClient),
@@ -230,12 +258,24 @@ public class TransformerCycleKickoff {
                 history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore, Publisher publisher, Publisher nostreamsPublisher, Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer, Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer) {
+    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore,
+            Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer,
+            Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer,
+            HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
         if (isFastlane)
-            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer,
+                    uploadStatus, ctx.getConfig().getTransformerVip());
 
-        return new HollowPublishWorkflowStager(ctx, fileStore, publisher, nostreamsPublisher, announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer, new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+        return new HollowPublishWorkflowStager(ctx, fileStore,
+                publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer,
+                canaryAnnouncer,
+                devSlicePublisher, devSliceAnnouncer,
+                hermesBlobAnnouncer,
+                new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 
     private static boolean shouldTryCompaction(boolean isFastlane, TransformerConfig cfg) {
