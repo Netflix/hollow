@@ -84,6 +84,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 public class TransformCycle {
@@ -113,7 +114,6 @@ public class TransformCycle {
     private Map<String, String> previousStateHeader = Collections.emptyMap();
 
     private final HollowProducer producer;
-    private final AtomicLong cinderVersion;
     private final ExecutorService produceExecutor;
 
     public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer,
@@ -178,8 +178,9 @@ public class TransformCycle {
          *   preserving the delta chain
          */
         if (ctx.getConfig().isCinderEnabled() && !isFastlane) {
-            this.cinderVersion = new AtomicLong();
-            cinderVersion.set(currentCycleNumber);
+            LongSupplier cinderPreviousVersion = () -> previousCycleNumber;
+            LongSupplier cinderVersion = () -> currentCycleNumber;
+            AtomicLong noStreamsVersion = new AtomicLong(Long.MIN_VALUE);
 
             this.produceExecutor = Executors.newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "vmstransformer-producer");
@@ -189,42 +190,51 @@ public class TransformCycle {
             });
             String cinderVip = ctx.getConfig().getTransformerVip();
             String cinderOutputNamespace = "vms-" + cinderVip;
-            this.producer = VMSTransformerWriteStateEngine.initAndBuildProducer(
-                    cinderBuilder.get()
-                            .withSnapshotPublishExecutor(produceExecutor)
-                            .forNamespace(cinderOutputNamespace)
-                            .withVersionMinter(cinderVersion::get)
-                            .withRestore());
+            CinderProducerBuilder producerBuilder = cinderBuilder.get()
+                    .withSnapshotPublishExecutor(produceExecutor)
+                    .forNamespace(cinderOutputNamespace)
+                    .withVersionMinter(cinderVersion::getAsLong)
+                    .withRestore();
             publishStager.initProducer(
                     inputConsumer::getCurrentVersionId,
-                    producer,
-                    cinderVip);
+                    producerBuilder,
+                    cinderVip,
+                    cinderPreviousVersion, noStreamsVersion::get);
+            this.producer = VMSTransformerWriteStateEngine.initAndBuildProducer(producerBuilder);
 
             String nostreamsCinderVip = cinderVip + "_nostreams";
             String cinderNostreamsOutputNamespace = "vms-" + nostreamsCinderVip;
-            HollowProducer noStreamsProducer = VMSTransformerWriteStateEngine.initAndBuildNoStreamsProducer(
-                    cinderBuilder.get()
-                            .withSnapshotPublishExecutor(produceExecutor)
-                            .forNamespace(cinderNostreamsOutputNamespace)
-                            .withVersionMinter(cinderVersion::get)
-                            .withRestore());
+
+            CinderProducerBuilder noStreamsProducerBuilder = cinderBuilder.get()
+                    .withSnapshotPublishExecutor(produceExecutor)
+                    .forNamespace(cinderNostreamsOutputNamespace)
+                    .withVersionMinter(cinderVersion::getAsLong)
+                    .withRestore();
             publishStager.initNoStreamsProducer(
                     inputConsumer::getCurrentVersionId,
-                    noStreamsProducer,
-                    nostreamsCinderVip);
+                    noStreamsProducerBuilder,
+                    nostreamsCinderVip,
+                    cinderPreviousVersion);
+            HollowProducer noStreamsProducer = VMSTransformerWriteStateEngine.initAndBuildNoStreamsProducer(
+                    noStreamsProducerBuilder);
 
-            class NoStreamsPipeline implements IntegrityCheckListener, AnnouncementListener {
+            class NoStreamsPipeline implements CycleListener, IntegrityCheckListener, AnnouncementListener {
+
+                CompletableFuture<Long> noStreams;
+
+                // IntegrityCheckListener
+
                 @Override
                 public void onIntegrityCheckStart(long version) {
                 }
 
-                CompletableFuture<Void> noStreams;
-
                 @Override
                 public void onIntegrityCheckComplete(
                         Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
-                    noStreams = CompletableFuture.runAsync(() -> {
-                        noStreamsProducer.runCycle(ws -> {
+                    // Execute nostreams pipeline in parallel to the main pipeline
+                    // and join on announcement or cycle completion
+                    noStreams = CompletableFuture.supplyAsync(() -> {
+                        return noStreamsProducer.runCycle(ws -> {
                             HollowReadStateEngine input = readState.getStateEngine();
                             HollowWriteStateEngine output = ws.getStateEngine();
                             HollowCombiner combiner = VMSTransformerWriteStateEngine.getNoStreamsCombiner(input, output);
@@ -233,16 +243,18 @@ public class TransformCycle {
                     }, produceExecutor);
                 }
 
+
+                // AnnouncementListener
+
                 @Override
                 public void onAnnouncementStart(long version) {
-                    if (noStreams == null) {
-                        return;
-                    }
-
                     try {
-                        noStreams.join();
+                        // Wait for nostreams to complete, any exception will veto the main pipeline
+                        noStreamsVersion.set(noStreams.join());
                     } catch (Exception e) {
                         throw new VetoableListener.ListenerVetoException(e);
+                    } finally {
+                        noStreams = null;
                     }
                 }
 
@@ -250,11 +262,40 @@ public class TransformCycle {
                 public void onAnnouncementComplete(
                         Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
                 }
+
+
+                // CycleListener
+
+                @Override public void onCycleSkip(CycleSkipReason reason) {
+                }
+
+                @Override public void onNewDeltaChain(long version) {
+                }
+
+                @Override public void onCycleStart(long version) {
+                }
+
+                @Override public void onCycleComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+                    if (status.getType() == Status.StatusType.FAIL && noStreams != null) {
+                        // Wait for nostreams to complete if main pipeline failed after integrity check
+                        try {
+                            noStreams.join();
+                        } catch (Exception e) {
+                            Throwable cause = status.getCause();
+                            if (cause != null) {
+                                status.getCause().addSuppressed(e);
+                            }
+                        } finally {
+                            noStreams = null;
+                        }
+                    }
+                }
             }
             producer.addListener(new NoStreamsPipeline());
 
             class LoggingListener implements CycleListener, PublishListener, RestoreListener, PopulateListener,
-                    IntegrityCheckListener {
+                    IntegrityCheckListener, AnnouncementListener {
                 // Restore listener
 
                 @Override public void onProducerRestoreStart(long restoreVersion) {
@@ -338,10 +379,30 @@ public class TransformCycle {
                 @Override public void onIntegrityCheckComplete(
                         Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
                 }
+
+
+                // Announcement listener
+
+                @Override public void onAnnouncementStart(long version) {
+                }
+
+                @Override public void onAnnouncementComplete(
+                        Status status, HollowProducer.ReadState readState, long version, Duration elapsed) {
+                    if (status.getType() == Status.StatusType.FAIL) {
+                        return;
+                    }
+
+                    previousCycleNumber = version;
+                    timeSinceLastPublishGauge.notifyPublishSuccess();
+
+                    ctx.getLogger().info(BlobState,
+                            "endCycleSuccessfully write state : before({}), after({}),)",
+                            BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader),
+                            BlobMetaDataUtil.fetchCoreHeaders(producer.getWriteEngine()));
+                }
             }
             producer.addListener(new LoggingListener());
         } else {
-            this.cinderVersion = null;
             this.producer = null;
             this.produceExecutor = null;
         }
@@ -525,7 +586,6 @@ public class TransformCycle {
     private void beginCycleCinder() {
         // First cycle already initialized in Constructor
         if (!isFirstCycle) currentCycleNumber = initCycleNumber(ctx, versionMinter);
-        cinderVersion.set(currentCycleNumber);
 
         // Track cycle begin
         previousStateHeader = new HashMap<>(producer.getWriteEngine().getHeaderTags());
@@ -1015,13 +1075,6 @@ public class TransformCycle {
 
     private void endCycleSuccessfullyCinder() {
         incrementSuccessCounter();
-        timeSinceLastPublishGauge.notifyPublishSuccess();
-        previousCycleNumber = currentCycleNumber;
-
-        ctx.getLogger().info(BlobState,
-                "endCycleSuccessfully write state : before({}), after({}),)",
-                BlobMetaDataUtil.fetchCoreHeaders(previousStateHeader),
-                BlobMetaDataUtil.fetchCoreHeaders(producer.getWriteEngine()));
     }
 
     private void incrementSuccessCounter() {

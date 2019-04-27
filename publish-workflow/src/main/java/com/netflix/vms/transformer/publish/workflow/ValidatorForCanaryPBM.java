@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.PlaybackMonkey;
+
 import com.netflix.hollow.api.producer.HollowProducer;
-import com.netflix.hollow.api.producer.Status;
-import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.hollow.api.producer.validation.ValidationResult;
 import com.netflix.hollow.api.producer.validation.ValidatorListener;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -12,42 +12,28 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.CassandraCanaryVali
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobAfterCanaryAnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.HollowBlobBeforeCanaryAnnounceJob;
-import java.time.Duration;
 import java.util.Collections;
+import java.util.function.LongSupplier;
 
 public class ValidatorForCanaryPBM implements
-        RestoreListener,
         ValidatorListener {
     private final ValidatorForCircuitBreakers vcbs;
     private final PublishWorkflowStager publishStager;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
+    private final LongSupplier previousVersion;
 
     public ValidatorForCanaryPBM(
             ValidatorForCircuitBreakers vcbs,
             PublishWorkflowStager publishStager,
             DefaultHollowPublishJobCreator jobCreator,
-            String vip) {
+            String vip,
+            LongSupplier previousVersion) {
         this.vcbs = vcbs;
         this.publishStager = publishStager;
         this.jobCreator = jobCreator;
         this.vip = vip;
-    }
-
-
-    // RestoreListener
-
-    private long previousVersion;
-
-    @Override
-    public void onProducerRestoreStart(long restoreVersion) {
-        previousVersion = Long.MIN_VALUE;
-    }
-
-    @Override
-    public void onProducerRestoreComplete(
-            Status status, long versionDesired, long versionReached, Duration elapsed) {
-        previousVersion = versionReached;
+        this.previousVersion = previousVersion;
     }
 
 
@@ -71,10 +57,13 @@ public class ValidatorForCanaryPBM implements
         try {
             r = validate(readState, vip, version);
             return r;
+        } catch (Exception e) {
+            jobCreator.getContext().getLogger().error(PlaybackMonkey, "Validation error", e);
+            throw e;
         } finally {
             if (r == null || !r.isPassed()) {
                 CanaryRollbackJob canaryRollbackJob = jobCreator.createCanaryRollbackJob(
-                        vip, version, previousVersion,
+                        vip, version, previousVersion.getAsLong(),
                         null);
                 canaryRollbackJob.executeJob();
             }

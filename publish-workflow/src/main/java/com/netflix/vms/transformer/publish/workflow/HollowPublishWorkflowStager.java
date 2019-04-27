@@ -1,12 +1,18 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementFailure;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.AnnouncementSuccess;
+
 import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.producer.CinderProducerBuilder;
+import com.netflix.cinder.producer.NFHollowAnnouncer;
+import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
-import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
@@ -54,26 +60,35 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
     public HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
-            Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            Announcer announcer, Announcer nostreamsAnnouncer,
+            Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer,
+            HermesBlobAnnouncer hermesBlobAnnouncer,
             DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx, fileStore,
                 publisher, nostreamsPublisher,
-                announcer, nostreamsAnnouncer, canaryAnnouncer,
-                devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer,
+                announcer, nostreamsAnnouncer,
+                canaryAnnouncer,
+                devSlicePublisher, devSliceAnnouncer,
+                hermesBlobAnnouncer,
                 new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
     }
 
     private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
-            Announcer announcer, Announcer nostreamsAnnouncer, Announcer canaryAnnouncer,
-            Publisher devSlicePublisher, Announcer devSliceAnnouncer, HermesBlobAnnouncer hermesBlobAnnouncer,
+            Announcer announcer, Announcer nostreamsAnnouncer,
+            Announcer canaryAnnouncer,
+            Publisher devSlicePublisher, Announcer devSliceAnnouncer,
+            HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider circuitBreakerDataProvider,
             DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx,
                 new DefaultHollowPublishJobCreator(ctx, fileStore,
                         publisher, nostreamsPublisher,
-                        announcer, nostreamsAnnouncer, canaryAnnouncer, devSlicePublisher, devSliceAnnouncer, hermesBlobAnnouncer,
+                        announcer, nostreamsAnnouncer,
+                        canaryAnnouncer,
+                        devSlicePublisher, devSliceAnnouncer,
+                        hermesBlobAnnouncer,
                         circuitBreakerDataProvider,
                         new PlaybackMonkeyTester(),
                         new ValuableVideoHolder(),
@@ -125,7 +140,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         // / add canary announcement and validation jobs
         final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, publishJobs);
 
-        final AnnounceJob primaryRegionAnnounceJob = createAnnounceJobForRegion(regionProvider.getPrimaryRegion(), previousVersion, newVersion, canaryValidationJob, null);
+        final AnnounceJob primaryRegionAnnounceJob = createAnnounceJobForRegion(regionProvider.getPrimaryRegion(),
+                previousVersion, newVersion, canaryValidationJob, null);
 
         // / add secondary regions
         for (final RegionEnum region : regionProvider.getNonPrimaryRegions()) {
@@ -140,11 +156,14 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }
 
-    private AnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion, CanaryValidationJob validationJob, AnnounceJob primaryRegionAnnounceJob) {
-        DelayJob delayJob = jobCreator.createDelayJob(primaryRegionAnnounceJob, regionProvider.getPublishDelayInSeconds(region) * 1000, newVersion);
+    private AnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion,
+            CanaryValidationJob validationJob, AnnounceJob primaryRegionAnnounceJob) {
+        DelayJob delayJob = jobCreator.createDelayJob(primaryRegionAnnounceJob,
+                regionProvider.getPublishDelayInSeconds(region) * 1000, newVersion);
         scheduler.submitJob(delayJob);
 
-        AnnounceJob announceJob = jobCreator.createAnnounceJob(vip, previousVerion, newVersion, region, validationJob, delayJob, priorAnnouncedJobs.get(region));
+        AnnounceJob announceJob = jobCreator.createAnnounceJob(vip, previousVerion, newVersion, region,
+                validationJob, delayJob, priorAnnouncedJobs.get(region));
         scheduler.submitJob(announceJob);
 
         priorAnnouncedJobs.put(region, announceJob);
@@ -168,20 +187,26 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
      * PoisonStateMarkerJob needs to run once (will be removed soon)
      * CanaryRollbackJob rollbacks the announcement in all regions (both old and new style)
      */
-    private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion, CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
+    private CanaryValidationJob addCanaryJobs(long previousVersion, long newVersion,
+            CircuitBreakerJob circuitBreakerJob, List<PublicationJob> publishJobs) {
 
-        BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion, circuitBreakerJob, publishJobs);
+        BeforeCanaryAnnounceJob beforeCanaryAnnounceJob = jobCreator.createBeforeCanaryAnnounceJob(vip, newVersion,
+                circuitBreakerJob, publishJobs);
         scheduler.submitJob(beforeCanaryAnnounceJob);
 
-        CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion, beforeCanaryAnnounceJob);
+        CanaryAnnounceJob canaryAnnounceJob = jobCreator.createCanaryAnnounceJob(vip, newVersion,
+                beforeCanaryAnnounceJob);
         scheduler.submitJob(canaryAnnounceJob);
 
-        AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion, canaryAnnounceJob);
+        AfterCanaryAnnounceJob afterCanaryAnnounceJob = jobCreator.createAfterCanaryAnnounceJob(vip, newVersion,
+                canaryAnnounceJob);
         scheduler.submitJob(afterCanaryAnnounceJob);
 
-        CanaryValidationJob validationJob = jobCreator.createCanaryValidationJob(vip, newVersion, beforeCanaryAnnounceJob, afterCanaryAnnounceJob);
+        CanaryValidationJob validationJob = jobCreator.createCanaryValidationJob(vip, newVersion,
+                beforeCanaryAnnounceJob, afterCanaryAnnounceJob);
         PoisonStateMarkerJob canaryPoisonStateMarkerJob = jobCreator.createPoisonStateMarkerJob(validationJob, newVersion);
-        CanaryRollbackJob canaryRollbackJob = jobCreator.createCanaryRollbackJob(vip, newVersion, previousVersion, validationJob);
+        CanaryRollbackJob canaryRollbackJob = jobCreator.createCanaryRollbackJob(vip, newVersion, previousVersion,
+                validationJob);
 
         scheduler.submitJob(validationJob);
         scheduler.submitJob(canaryPoisonStateMarkerJob);
@@ -199,7 +224,9 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         File nostreamsDeltaFile = new File(fileNamer.getNostreamsDeltaFileName(previousVersion, newVersion));
         File nostreamsReverseDeltaFile = new File(fileNamer.getNostreamsReverseDeltaFileName(newVersion, previousVersion));
 
-        CircuitBreakerJob validationJob = jobCreator.createCircuitBreakerJob(vip, newVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
+        CircuitBreakerJob validationJob = jobCreator.createCircuitBreakerJob(vip, newVersion,
+                snapshotFile, deltaFile, reverseDeltaFile,
+                nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile);
         scheduler.submitJob(validationJob);
 
         PoisonStateMarkerJob poisonMarkerJob = jobCreator.createPoisonStateMarkerJob(validationJob, newVersion);
@@ -231,29 +258,35 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if (snapshotFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, false, inputDataVersion, previousVersion, newVersion, snapshotFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, false,
+                    inputDataVersion, previousVersion, newVersion, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
-            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.SNAPSHOT, true, inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.SNAPSHOT, true,
+                    inputDataVersion, previousVersion, newVersion, nostreamsSnapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (deltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, false, inputDataVersion, previousVersion, newVersion, deltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, false,
+                    inputDataVersion, previousVersion, newVersion, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
-            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.DELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.DELTA, true,
+                    inputDataVersion, previousVersion, newVersion, nostreamsDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (reverseDeltaFile.exists()) {
-            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, false, inputDataVersion, previousVersion, newVersion, reverseDeltaFile);
+            HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, false,
+                    inputDataVersion, previousVersion, newVersion, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
-            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.REVERSEDELTA, true, inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
+            publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.REVERSEDELTA, true,
+                    inputDataVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
@@ -271,19 +304,69 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public void initProducer(LongSupplier inputVersion, HollowProducer p, String vip) {
+    public void initProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
+            String vip,
+            LongSupplier previousVersion, LongSupplier noStreamsVersion) {
         // Add circuit breaker validator before canary validator
         ValidatorForCircuitBreakers vcbs = new ValidatorForCircuitBreakers(ctx, vip);
-        p.addListener(vcbs);
+        pb.withListener(vcbs);
 
-        p.addListener(new ValidatorForCanaryPBM(vcbs, this, jobCreator, vip));
+        pb.withListener(new ValidatorForCanaryPBM(vcbs, this, jobCreator,
+                vip, previousVersion));
 
-        p.addListener(new HermesPublishListener(inputVersion, jobCreator, vip));
-        p.addListener(new HermesAnnounceListener(jobCreator, vip));
+        pb.withListener(new HermesPublishListener(inputVersion, jobCreator,
+                vip, previousVersion));
+        pb.withListener(new PublishCycleListener(jobCreator, vip));
+
+        // Use special announcer that supports region staggering
+        pb.withAnnouncer(new DelayedAnnouncer(jobCreator, vip, previousVersion) {
+            @Override
+            void announce(
+                    PublishWorkflowContext ctx, String vip, long previousVersion, long currentVersion,
+                    RegionEnum region) {
+                boolean success = ctx.getVipAnnouncer()
+                        .announce(vip, region, false, currentVersion, previousVersion);
+
+                // Announce via Gutenberg using explicit announcers
+                // This can be replaced when region staggering is supported in Gutenberg
+                // However, the nostreams producer announcement still needs to be bound
+                // to the main producer announcement
+                ((NFHollowAnnouncer) ctx.getStateAnnouncer())
+                        .announce(previousVersion, currentVersion, region);
+
+                if (noStreamsVersion.getAsLong() == currentVersion) {
+                    // No streams may not have published anything because there are no changes
+                    ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer())
+                            .announce(Long.MIN_VALUE, currentVersion, region);
+                }
+                logResult(success, ctx, vip, currentVersion, region);
+            }
+
+            private void logResult(
+                    boolean success, PublishWorkflowContext ctx,
+                    String vip, long currentVersion,
+                    NetflixConfiguration.RegionEnum region) {
+                if (success) {
+                    ctx.getLogger().info(AnnouncementSuccess, "Hollow data announce success: for version "
+                            + currentVersion + " for vip " + vip + " region " + region);
+                    ctx.getMetricRecorder().incrementCounter(TransformerMetricRecorder.Metric.AnnounceSuccess, 1,
+                            "destination.region", region.toString());
+                } else {
+                    ctx.getLogger().error(AnnouncementFailure, "Hollow data announce failure: for version "
+                            + currentVersion + " for vip " + vip + " region " + region);
+                }
+            }
+        });
     }
 
     @Override
-    public void initNoStreamsProducer(LongSupplier inputVersion, HollowProducer p, String vip) {
-        p.addListener(new HermesPublishListener(inputVersion, jobCreator, vip));
+    public void initNoStreamsProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
+            String vip, LongSupplier previousVersion) {
+        pb.withListener(new HermesPublishListener(inputVersion, jobCreator, vip, previousVersion));
+
+        // Announcement occurs on the main producer
+        // If there are no changes on the main producer but are on the nostreams producer
+        // the no announcement will occur for either producer
+        pb.withAnnouncer(v -> {});
     }
 }

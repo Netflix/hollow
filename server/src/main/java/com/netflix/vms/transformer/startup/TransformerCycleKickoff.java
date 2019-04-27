@@ -95,7 +95,7 @@ public class TransformerCycleKickoff {
                 new NFHollowBlobRetriever(gutenbergFileConsumer, nostreamsOutputNamespace),
                 nostreamsOutputNamespace);
 
-        /*
+        /**
          * Trick : Canary announcement is done on a different topic. However, for the NFHollowAnnouncer to verify the
          * publish we use outputNamespace.
          *
@@ -112,11 +112,13 @@ public class TransformerCycleKickoff {
          * outputNamespace.
          */
         Announcer canaryAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
-                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace), canaryNamespace);
+                new NFHollowBlobRetriever(gutenbergFileConsumer, outputNamespace),
+                canaryNamespace);
         Publisher devSlicePublisher = new NFHollowPublisher(gutenbergFilePublisher, devSliceNamespace,
                 GutenbergIdentifiers.DEFAULT_REGIONS);
         Announcer devSliceAnnouncer = new NFHollowAnnouncer(gutenbergValuePublisher,
-                new NFHollowBlobRetriever(gutenbergFileConsumer, devSliceNamespace), devSliceNamespace);
+                new NFHollowBlobRetriever(gutenbergFileConsumer, devSliceNamespace),
+                devSliceNamespace);
 
         TransformerContext ctx = ctx(cycleInterrupter, esClient, transformerConfig, config, octoberSkyData, cupLibrary,
                 cassandraHelper, healthIndicator);
@@ -258,7 +260,8 @@ public class TransformerCycleKickoff {
                 history -> VMSPublishWorkflowHistoryAdmin.history = history);
     }
 
-    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane, FileStore fileStore,
+    private static PublishWorkflowStager publishStager(TransformerContext ctx, boolean isFastlane,
+            FileStore fileStore,
             Publisher publisher, Publisher nostreamsPublisher,
             Announcer announcer, Announcer nostreamsAnnouncer,
             Announcer canaryAnnouncer,
@@ -266,8 +269,8 @@ public class TransformerCycleKickoff {
             HermesBlobAnnouncer hermesBlobAnnouncer) {
         Supplier<ServerUploadStatus> uploadStatus = VMSServerUploadStatus::get;
         if (isFastlane)
-            return new HollowFastlanePublishWorkflowStager(ctx, fileStore, publisher, announcer, hermesBlobAnnouncer,
-                    uploadStatus, ctx.getConfig().getTransformerVip());
+            return new HollowFastlanePublishWorkflowStager(ctx, fileStore,
+                    publisher, announcer, hermesBlobAnnouncer, uploadStatus, ctx.getConfig().getTransformerVip());
 
         return new HollowPublishWorkflowStager(ctx, fileStore,
                 publisher, nostreamsPublisher,

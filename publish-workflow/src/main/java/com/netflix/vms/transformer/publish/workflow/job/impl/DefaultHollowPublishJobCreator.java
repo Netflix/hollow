@@ -43,10 +43,8 @@ public class DefaultHollowPublishJobCreator {
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
-            Publisher publisher,
-            Publisher nostreamsPublisher,
-            Announcer announcer,
-            Announcer nostreamsAnnouncer,
+            Publisher publisher, Publisher nostreamsPublisher,
+            Announcer announcer, Announcer nostreamsAnnouncer,
             Announcer canaryAnnouncer,
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
@@ -64,10 +62,8 @@ public class DefaultHollowPublishJobCreator {
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
                 fileStore,
-                publisher,
-                nostreamsPublisher,
-                announcer,
-                nostreamsAnnouncer,
+                publisher, nostreamsPublisher,
+                announcer, nostreamsAnnouncer,
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 vip);
@@ -82,8 +78,10 @@ public class DefaultHollowPublishJobCreator {
         return ctx;
     }
 
-    public AnnounceJob createAnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region, CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-        return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
+    public AnnounceJob createAnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region,
+            CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
+        return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob,
+                previousAnnounceJob);
     }
 
     public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean isNostreams,
@@ -103,20 +101,26 @@ public class DefaultHollowPublishJobCreator {
         return new HollowBlobDelayJob(ctx, dependency, delayMillis, cycleVersion);
     }
 
-    public CircuitBreakerJob createCircuitBreakerJob(String vip, long newVersion, File snapshotFile, File deltaFile, File reverseDeltaFile, File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
-        return new HollowBlobCircuitBreakerJob(ctx, newVersion, snapshotFile, deltaFile, reverseDeltaFile, nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile, hollowBlobDataProvider);
+    public CircuitBreakerJob createCircuitBreakerJob(String vip, long newVersion,
+            File snapshotFile, File deltaFile, File reverseDeltaFile,
+            File nostreamsSnapshotFile, File nostreamsDeltaFile, File nostreamsReverseDeltaFile) {
+        return new HollowBlobCircuitBreakerJob(ctx, newVersion,
+                snapshotFile, deltaFile, reverseDeltaFile,
+                nostreamsSnapshotFile, nostreamsDeltaFile, nostreamsReverseDeltaFile,
+                hollowBlobDataProvider);
     }
 
     public PoisonStateMarkerJob createPoisonStateMarkerJob(PublicationJob validationJob, long newVersion) {
         return new CassandraPoisonStateMarkerJob(ctx, validationJob, hollowBlobDataProvider, newVersion);
     }
 
-    public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion,CanaryValidationJob validationJob) {
+    public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion,
+            CanaryValidationJob validationJob) {
         return new HermesCanaryRollbackJob(ctx, vip, cycleVersion, priorVersion, validationJob);
     }
 
-    public CanaryValidationJob createCanaryValidationJob(String vip, long cycleVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceJobs,
-            AfterCanaryAnnounceJob afterCanaryAnnounceJobs) {
+    public CanaryValidationJob createCanaryValidationJob(String vip, long cycleVersion,
+            BeforeCanaryAnnounceJob beforeCanaryAnnounceJobs, AfterCanaryAnnounceJob afterCanaryAnnounceJobs) {
         return new CassandraCanaryValidationJob(ctx, cycleVersion,
                 beforeCanaryAnnounceJobs,
                 afterCanaryAnnounceJobs,
@@ -136,7 +140,8 @@ public class DefaultHollowPublishJobCreator {
                 videoRanker);
 	}
 
-	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion,
+            BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
 		return new HermesCanaryAnnounceJob(ctx, vip, newVersion, beforeCanaryAnnounceHook);
 	}
 
@@ -153,7 +158,9 @@ public class DefaultHollowPublishJobCreator {
         return new HermesAutoPinbackJob(ctx, announcement, waitMillis, cycleVersion);
     }
 
-    public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, long inputVersion, long cycleVersion) {
-        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer, inputVersion, cycleVersion);
+    public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency,
+            long inputVersion, long cycleVersion) {
+        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer,
+                inputVersion, cycleVersion);
     }
 }

@@ -34,8 +34,14 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 
 	public TestDefaultHollowPublishJobCreator(PublishWorkflowContext context,
             TransformerContext transformerContext, String vip) {
-		super(transformerContext, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, vip);
+		super(transformerContext, null,
+				null, null,
+				null, null,
+				null,
+				null, null,
+				null, null,
+				null, null, null,
+				null, vip);
 		this.context = context;
 	}
 
@@ -54,11 +60,13 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	@Override
 	public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean noStreams,
             long inputVersion, long previousVersion, long version, File fileToUpload) {
-		return new TestHollowBlobPublishJob(context, vip, inputVersion, previousVersion, version, jobType, fileToUpload, noStreams);
+		return new TestHollowBlobPublishJob(context, vip, inputVersion, previousVersion, version, jobType, fileToUpload,
+				noStreams);
 	}
 
     @Override
-    public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version, String... filesToDelete) {
+    public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> copyJobs, long version,
+			String... filesToDelete) {
         return new TestHollowBlobDeleteFileJob(context, deleteJobExecute, copyJobs, version, filesToDelete);
     }
 
@@ -80,7 +88,8 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	}
 
 	@Override
-	public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion, CanaryValidationJob validationJob) {
+	public CanaryRollbackJob createCanaryRollbackJob(String vip, long cycleVersion, long priorVersion,
+			CanaryValidationJob validationJob) {
 		return new TestCanaryRollbackJob(context, vip, cycleVersion, priorVersion, validationJob);
 	}
 
@@ -91,8 +100,8 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 	}
 
 	@Override
-	public CanaryAnnounceJob createCanaryAnnounceJob(String vip,
-            long newVersion, BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
+	public CanaryAnnounceJob createCanaryAnnounceJob(String vip, long newVersion,
+			BeforeCanaryAnnounceJob beforeCanaryAnnounceHook) {
         return new TestCanaryAnnounceJob(context, vip, newVersion, beforeCanaryAnnounceHook);
 	}
 

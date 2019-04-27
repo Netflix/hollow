@@ -3,7 +3,6 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.api.producer.listener.PublishListener;
-import com.netflix.hollow.api.producer.listener.RestoreListener;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
@@ -12,39 +11,25 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.LongSupplier;
 
 public class HermesPublishListener implements
-        RestoreListener,
         PublishListener {
     private final LongSupplier inputVersion;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
+    private final LongSupplier previousVersion;
 
     public HermesPublishListener(
             LongSupplier inputVersion,
             DefaultHollowPublishJobCreator jobCreator,
-            String vip) {
+            String vip, LongSupplier previousVersion) {
         this.inputVersion = inputVersion;
         this.jobCreator = jobCreator;
         this.vip = vip;
+        this.previousVersion = previousVersion;
     }
-
-    private long previousVersion;
 
     private long currentVersion;
 
     private PublishWorkflowContext ctx;
-
-
-    // RestoreListener
-
-    @Override
-    public void onProducerRestoreStart(long restoreVersion) {
-        previousVersion = Long.MIN_VALUE;
-    }
-
-    @Override
-    public void onProducerRestoreComplete(Status status, long versionDesired, long versionReached, Duration elapsed) {
-        previousVersion = versionReached;
-    }
 
 
     // PublishListener
@@ -54,7 +39,7 @@ public class HermesPublishListener implements
 
     @Override
     public void onPublishStart(long version) {
-        // See HermesAnnounceListener.onCycleStart for call to jobCreator.beginStagingNewCycle()
+        // See PublishCycleListener.onCycleStart for call to jobCreator.beginStagingNewCycle()
         ctx = jobCreator.getContext();
         currentVersion = version;
     }
@@ -65,7 +50,7 @@ public class HermesPublishListener implements
         long start = System.nanoTime();
 
         long iv = inputVersion.getAsLong();
-        long pv = previousVersion;
+        long pv = previousVersion.getAsLong();
         long cv = currentVersion;
         PublishWorkflowContext context = this.ctx;
         blob.thenAccept(b -> {
@@ -80,13 +65,14 @@ public class HermesPublishListener implements
             return;
         }
 
-        blobPublish(ctx, vip, blob, elapsed, inputVersion.getAsLong(), previousVersion, currentVersion);
+        blobPublish(ctx, vip, blob, elapsed, inputVersion.getAsLong(), previousVersion.getAsLong(), currentVersion);
     }
 
     @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
     }
 
-    private static void blobPublish(PublishWorkflowContext ctx,
+    private static void blobPublish(
+            PublishWorkflowContext ctx,
             String vip,
             HollowProducer.Blob blob, Duration elapsed,
             long inputVersion, long previousVersion, long currentVersion) {
@@ -110,5 +96,4 @@ public class HermesPublishListener implements
 
         publishJob.executeJob(false, elapsed.toMillis());
     }
-
 }
