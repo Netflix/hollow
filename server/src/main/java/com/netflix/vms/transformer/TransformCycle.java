@@ -22,6 +22,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.netflix.aws.file.FileStore;
 import com.netflix.cinder.producer.CinderProducerBuilder;
+import com.netflix.gutenberg.GutenbergException;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.producer.HollowProducer;
@@ -745,6 +746,22 @@ public class TransformCycle {
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState,
                     "Failed to Load Input", ex);
+
+            // If the consumer transitioning failed in Gutenberg via Cinder's NFHollowBlobRetriever to obtain a blob
+            // then clear the transitions so it is free to try again (since it anyway will).
+            // Otherwise, in the worst case a newly started transformer could wait ~2 hours (the period at which the
+            // converter produces snapshots).
+            // @@@ Fragile relying on GutenbergException, should surface cinder specific exception in
+            // NFHollowBlobRetriever
+            if (ex instanceof GutenbergException &&
+                    (inputConsumer.getNumFailedSnapshotTransitions() > 0 ||
+                            inputConsumer.getNumFailedDeltaTransitions() > 0)) {
+                inputConsumer.clearFailedTransitions();
+
+                ctx.getLogger().info(BlobState,
+                        "Resetting input with failed transitions: snapshots={}, deltas={}",
+                        inputConsumer.getNumFailedSnapshotTransitions(), inputConsumer.getNumFailedDeltaTransitions());
+            }
             throw ex;
         }
     }
