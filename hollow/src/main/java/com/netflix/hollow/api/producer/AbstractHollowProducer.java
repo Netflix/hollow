@@ -671,12 +671,12 @@ abstract class AbstractHollowProducer {
             if (readStates.hasCurrent()) {
                 HollowReadStateEngine current = readStates.current().getStateEngine();
 
-                log.info("CHECKSUMS");
+                log.finest("CHECKSUMS");
                 HollowChecksum currentChecksum = HollowChecksum.forStateEngineWithCommonSchemas(current, pending);
-                log.info("  CUR        " + currentChecksum);
+                log.finest("  CUR        " + currentChecksum);
 
                 HollowChecksum pendingChecksum = HollowChecksum.forStateEngineWithCommonSchemas(pending, current);
-                log.info("         PND " + pendingChecksum);
+                log.finest("         PND " + pendingChecksum);
 
                 if (artifacts.hasDelta()) {
                     if (!artifacts.hasReverseDelta()) {

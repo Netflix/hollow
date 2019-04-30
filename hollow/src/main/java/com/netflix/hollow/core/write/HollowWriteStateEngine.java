@@ -159,7 +159,7 @@ public class HollowWriteStateEngine implements HollowStateEngine {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        log.info("RESTORE: " + typeName);
+                        log.finest("RESTORE: " + typeName);
                         writeState.restoreFrom(readState);
                     }
                 });

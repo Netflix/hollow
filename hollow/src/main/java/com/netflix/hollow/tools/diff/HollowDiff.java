@@ -137,7 +137,7 @@ public class HollowDiff {
 
         long endTime = System.currentTimeMillis();
 
-        log.info("PREPARED IN " + (endTime - startTime) + "ms");
+        log.finest("PREPARED IN " + (endTime - startTime) + "ms");
 
         for(HollowTypeDiff typeDiff : typeDiffs.values()) {
             typeDiff.calculateDiffs();

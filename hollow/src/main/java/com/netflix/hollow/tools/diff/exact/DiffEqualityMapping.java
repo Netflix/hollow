@@ -88,9 +88,9 @@ public class DiffEqualityMapping {
         if(fromTypeState == null || toTypeState == null)
             return DiffEqualOrdinalMap.EMPTY_MAP;
 
-        log.info("starting to build equality map for " + type);
+        log.finest("starting to build equality map for " + type);
         DiffEqualOrdinalMap map = buildMap(fromTypeState, toTypeState);
-        log.info("finished building equality map for " + type);
+        log.finest("finished building equality map for " + type);
         return map;
     }
 
