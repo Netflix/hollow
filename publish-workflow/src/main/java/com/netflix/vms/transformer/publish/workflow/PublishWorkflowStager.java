@@ -17,7 +17,8 @@ public interface PublishWorkflowStager {
 
     default void initProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
             String vip,
-            LongSupplier previousVersion, LongSupplier noStreamsVersion) {
+            LongSupplier previousVersion,
+            LongSupplier noStreamsPreviousVersion, LongSupplier noStreamsVersion) {
     }
 
     default void initNoStreamsProducer(LongSupplier inputVersion, CinderProducerBuilder pb,

@@ -306,7 +306,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     @Override
     public void initProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
             String vip,
-            LongSupplier previousVersion, LongSupplier noStreamsVersion) {
+            LongSupplier previousVersion,
+            LongSupplier noStreamsPreviousVersion, LongSupplier noStreamsVersion) {
         // Add circuit breaker validator before canary validator
         ValidatorForCircuitBreakers vcbs = new ValidatorForCircuitBreakers(ctx, vip);
         pb.withListener(vcbs);
@@ -337,7 +338,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                 if (noStreamsVersion.getAsLong() == currentVersion) {
                     // No streams may not have published anything because there are no changes
                     ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer())
-                            .announce(Long.MIN_VALUE, currentVersion, region);
+                            .announce(noStreamsPreviousVersion.getAsLong(), currentVersion, region);
                 }
                 logResult(success, ctx, vip, currentVersion, region);
             }

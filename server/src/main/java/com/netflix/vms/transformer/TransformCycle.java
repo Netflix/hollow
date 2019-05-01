@@ -179,8 +179,9 @@ public class TransformCycle {
          *   preserving the delta chain
          */
         if (ctx.getConfig().isCinderEnabled() && !isFastlane) {
-            LongSupplier cinderPreviousVersion = () -> previousCycleNumber;
-            LongSupplier cinderVersion = () -> currentCycleNumber;
+            LongSupplier mainPreviousVersion = () -> previousCycleNumber;
+            LongSupplier mainVersion = () -> currentCycleNumber;
+            AtomicLong noStreamsPreviousVersion = new AtomicLong(Long.MIN_VALUE);
             AtomicLong noStreamsVersion = new AtomicLong(Long.MIN_VALUE);
 
             this.produceExecutor = Executors.newCachedThreadPool(r -> {
@@ -194,13 +195,13 @@ public class TransformCycle {
             CinderProducerBuilder producerBuilder = cinderBuilder.get()
                     .withSnapshotPublishExecutor(produceExecutor)
                     .forNamespace(cinderOutputNamespace)
-                    .withVersionMinter(cinderVersion::getAsLong)
+                    .withVersionMinter(mainVersion::getAsLong)
                     .withRestore();
             publishStager.initProducer(
                     inputConsumer::getCurrentVersionId,
                     producerBuilder,
                     cinderVip,
-                    cinderPreviousVersion, noStreamsVersion::get);
+                    mainPreviousVersion, noStreamsPreviousVersion::get, noStreamsVersion::get);
             this.producer = VMSTransformerWriteStateEngine.initAndBuildProducer(producerBuilder);
 
             String nostreamsCinderVip = cinderVip + "_nostreams";
@@ -209,13 +210,13 @@ public class TransformCycle {
             CinderProducerBuilder noStreamsProducerBuilder = cinderBuilder.get()
                     .withSnapshotPublishExecutor(produceExecutor)
                     .forNamespace(cinderNostreamsOutputNamespace)
-                    .withVersionMinter(cinderVersion::getAsLong)
+                    .withVersionMinter(mainVersion::getAsLong)
                     .withRestore();
             publishStager.initNoStreamsProducer(
                     inputConsumer::getCurrentVersionId,
                     noStreamsProducerBuilder,
                     nostreamsCinderVip,
-                    cinderPreviousVersion);
+                    mainPreviousVersion);
             HollowProducer noStreamsProducer = VMSTransformerWriteStateEngine.initAndBuildNoStreamsProducer(
                     noStreamsProducerBuilder);
 
@@ -236,6 +237,11 @@ public class TransformCycle {
                     // and join on announcement or cycle completion
                     noStreams = CompletableFuture.supplyAsync(() -> {
                         return noStreamsProducer.runCycle(ws -> {
+                            long previousVersion = ws.getPriorState() == null
+                                    ? Long.MIN_VALUE
+                                    : ws.getPriorState().getVersion();
+                            noStreamsPreviousVersion.set(previousVersion);
+
                             HollowReadStateEngine input = readState.getStateEngine();
                             HollowWriteStateEngine output = ws.getStateEngine();
                             HollowCombiner combiner = VMSTransformerWriteStateEngine.getNoStreamsCombiner(input, output);
