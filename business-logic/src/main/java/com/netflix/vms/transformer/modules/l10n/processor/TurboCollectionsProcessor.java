@@ -52,6 +52,7 @@ public class TurboCollectionsProcessor extends AbstractL10NMiscProcessor<TurboCo
         map.put("srg.dn", input._getSrg_dn());
         map.put("mc.d", input._getMc_d());
         map.put("mc.dn", input._getMc_dn());
+        map.put("tg.dn", input._getTg_dn());
         map.put("seorbt", input._getSeorbt());
         map.put("seogh", input._getSeogh());
         map.put("seodt", input._getSeodt());
