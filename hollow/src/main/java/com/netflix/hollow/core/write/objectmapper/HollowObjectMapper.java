@@ -132,7 +132,7 @@ public class HollowObjectMapper {
         // Compute the type name
         String typeName = declaredName != null
                 ? declaredName
-                : typeNameMappers.computeIfAbsent(type, HollowObjectTypeMapper::getDefaultTypeName);
+                : findTypeName(type);
         HollowTypeMapper typeMapper = typeMappers.get(typeName);
 
         if (typeMapper == null) {
@@ -171,6 +171,15 @@ public class HollowObjectMapper {
         }
 
         return typeMapper;
+    }
+
+    private String findTypeName(Type type) {
+        String typeName = typeNameMappers.get(type);
+        if(typeName == null) {
+            typeName = HollowObjectTypeMapper.getDefaultTypeName(type);
+            typeNameMappers.putIfAbsent(type, typeName);
+        }
+        return typeName;
     }
 
     int nextUnassignedTypeId() {
