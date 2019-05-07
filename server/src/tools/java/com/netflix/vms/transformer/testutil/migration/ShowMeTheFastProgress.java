@@ -128,7 +128,7 @@ public class ShowMeTheFastProgress {
         outputStateEngine.addHeaderTag(PUBLISH_CYCLE_DATATS_HEADER, String.valueOf(publishCycleDataTS));
 
         // Run Transformer
-        SimpleTransformer transformer = new SimpleTransformer(inputAPI, outputStateEngine, ctx);
+        SimpleTransformer transformer = new SimpleTransformer(inputAPI, null, outputStateEngine, ctx);
         transformer.setPublishCycleDataTS(publishCycleDataTS);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
@@ -159,7 +159,7 @@ public class ShowMeTheFastProgress {
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
         // Run Transformer
-        SimpleTransformer transformer = new SimpleTransformer(inputAPI, outputStateEngine, ctx);
+        SimpleTransformer transformer = new SimpleTransformer(inputAPI, null, outputStateEngine, ctx);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         System.out.println(actualOutputReadStateEngine.getHeaderTags());

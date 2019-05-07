@@ -251,4 +251,8 @@ public interface TransformerConfig {
      */
     @DefaultValue("false")
     boolean isCinderEnabled();
+    
+    String getGatekeeper2Namespace();
+    
+    String getGatekeeper2Countries();
 }

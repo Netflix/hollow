@@ -132,10 +132,18 @@ public class TransformerCycleKickoff {
 
         HollowConsumer inputConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder,
                 CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + transformerConfig.getConverterVip());
+        
+        String gk2Namespace = transformerConfig.getGatekeeper2Namespace();
+        HollowConsumer gk2StatusConsumer = null;
+        if(gk2Namespace != null) {
+            gk2StatusConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder, 
+                    transformerConfig.getGatekeeper2Namespace());
+        }
 
         TransformCycle cycle = new TransformCycle(
                 ctx,
                 inputConsumer,
+                gk2StatusConsumer,
                 fileStore,
                 hermesBlobAnnouncer,
                 publishStager,

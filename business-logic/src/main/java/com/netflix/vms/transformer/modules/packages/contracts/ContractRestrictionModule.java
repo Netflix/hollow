@@ -4,14 +4,12 @@ import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilit
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.DOWNLOAD;
 import static com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing.STREAM;
 
-import com.netflix.hollow.core.index.HollowHashIndex;
-import com.netflix.hollow.core.index.HollowHashIndexResult;
-import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.AudioStreamInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleEntryHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
@@ -35,9 +33,9 @@ import com.netflix.vms.transformer.hollowoutput.ISOCountry;
 import com.netflix.vms.transformer.hollowoutput.LanguageRestrictions;
 import com.netflix.vms.transformer.hollowoutput.OfflineViewingRestrictions;
 import com.netflix.vms.transformer.hollowoutput.Strings;
-import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.contracts.DownloadableAssetTypeIndex.Viewing;
+import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
@@ -54,8 +52,8 @@ import java.util.stream.Collectors;
 /// Documentation of this logic available at: https://docs.google.com/document/d/15eGhbVPcEK_ARZA8OrtXpPAzrTalVqmZnKuzK_hrZAA/edit
 public class ContractRestrictionModule {
 
-    private final HollowHashIndex videoStatusIdx;
-
+    private final GatekeeperStatusRetriever statusRetriever;
+    
     private final VMSHollowInputAPI api;
     private final TransformerContext ctx;
     private final VMSTransformerIndexer indexer;
@@ -68,13 +66,13 @@ public class ContractRestrictionModule {
     private final CupTokenFetcher cupTokenFetcher;
 
     public ContractRestrictionModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer,
-            CupTokenFetcher cupTokenFetcher) {
+            GatekeeperStatusRetriever statusRetriever, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;
         this.cycleConstants = cycleConstants;
         this.cupTokenFetcher = cupTokenFetcher;
-        this.videoStatusIdx = indexer.getHashIndex(IndexSpec.ALL_VIDEO_STATUS);
+        this.statusRetriever = statusRetriever;
         this.cupKeysMap = new HashMap<>();
         this.bcp47Codes = new HashMap<>();
         this.assetTypeDeterminer = new StreamContractAssetTypeDeterminer(api, indexer);
@@ -103,73 +101,65 @@ public class ContractRestrictionModule {
 
 
         // iterate over the VideoStatus of every country
-        HollowHashIndexResult statusResult = videoStatusIdx.findMatches(packageHollow._getMovieId());
-        if (statusResult != null) {
+        
+        for (StatusHollow status : statusRetriever.getAllStatus(packageHollow._getMovieId())) {
 
-            HollowOrdinalIterator iter = statusResult.iterator();
-            int statusOrdinal = iter.next();
-            while (statusOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-
-                StatusHollow status = api.getStatusHollow(statusOrdinal);
-                FlagsHollow rightsFlags = status._getFlags();
-                if (rightsFlags == null || !rightsFlags._getGoLive()) {
-                    statusOrdinal = iter.next();
-                    continue;
-                }
-
-                int videoId = (int) packageHollow._getMovieId();
-                String countryCode = status._getCountryCode()._getValue();
-                Set<ContractRestriction> contractRestrictions = new HashSet<>();
-
-                ListOfRightsWindowHollow windows = status._getRights()._getWindows();
-                for (RightsWindowHollow window : windows) {
-
-                    // create map of contractId to isAvailableForDownload
-                    Map<Integer, Boolean> dealIds = new HashMap<>();
-                    if (window._getContractIdsExt() != null) {
-                        for (RightsWindowContractHollow contract : window._getContractIdsExt()) {
-                        	dealIds.put(Integer.valueOf((int) contract._getDealId()), Boolean.valueOf(contract._getDownload()));                        		
-                        }
-                    }
-
-                    assetTypeIdx.resetMarks();
-
-                    List<RightsWindowContractHollow> applicableRightsContracts = new ArrayList<>();
-                    if (window._getContractIdsExt() != null && !window._getContractIdsExt().isEmpty()) {
-                        // make sure that package id in contract matches with the packageId under consideration
-                        applicableRightsContracts = filterToApplicableContracts(packageHollow, window._getContractIdsExt(), dealIds);
-                    }
-
-                    if (applicableRightsContracts.size() > 0) {
-                        ContractRestriction restriction;
-
-                        if (applicableRightsContracts.size() == 1)
-                            restriction = buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, applicableRightsContracts.get(0), videoId, countryCode);
-                        else
-                            restriction = buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, applicableRightsContracts, videoId, countryCode);
-                        if (restriction.cupKeys.isEmpty()) {
-                            restriction.cupKeys.add(getCupKey(CupKey.DEFAULT));
-                        }
-
-                        restriction.availabilityWindow = new AvailabilityWindow();
-                        restriction.availabilityWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
-                        restriction.availabilityWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
-                        if (window._getOnHold()) {
-                            restriction.availabilityWindow.startDate.val += ONE_THOUSAND_YEARS;
-                            restriction.availabilityWindow.endDate.val += ONE_THOUSAND_YEARS;
-                            restriction.availabilityWindow.onHold = true;
-                        }
-
-                        contractRestrictions.add(restriction);
-                    }
-                }
-
-                if (!contractRestrictions.isEmpty())
-                    restrictions.put(cycleConstants.getISOCountry(status._getCountryCode()._getValue()), contractRestrictions);
-
-                statusOrdinal = iter.next();
+            FlagsHollow rightsFlags = status._getFlags();
+            if (rightsFlags == null || !rightsFlags._getGoLive()) {
+                continue;
             }
+
+            int videoId = (int) packageHollow._getMovieId();
+            String countryCode = status._getCountryCode()._getValue();
+            Set<ContractRestriction> contractRestrictions = new HashSet<>();
+
+            ListOfRightsWindowHollow windows = status._getRights()._getWindows();
+            for (RightsWindowHollow window : windows) {
+
+                // create map of contractId to isAvailableForDownload
+                Map<Integer, Boolean> dealIds = new HashMap<>();
+                if (window._getContractIdsExt() != null) {
+                    for (RightsWindowContractHollow contract : window._getContractIdsExt()) {
+                    	dealIds.put(Integer.valueOf((int) contract._getDealId()), Boolean.valueOf(contract._getDownload()));                        		
+                    }
+                }
+
+                assetTypeIdx.resetMarks();
+
+                List<RightsWindowContractHollow> applicableRightsContracts = new ArrayList<>();
+                if (window._getContractIdsExt() != null && !window._getContractIdsExt().isEmpty()) {
+                    // make sure that package id in contract matches with the packageId under consideration
+                    applicableRightsContracts = filterToApplicableContracts(packageHollow, window._getContractIdsExt(), dealIds);
+                }
+
+                if (applicableRightsContracts.size() > 0) {
+                    ContractRestriction restriction;
+
+                    if (applicableRightsContracts.size() == 1)
+                        restriction = buildRestrictionBasedOnSingleApplicableContract(assetTypeIdx, applicableRightsContracts.get(0), videoId, countryCode);
+                    else
+                        restriction = buildRestrictionBasedOnMultipleApplicableContracts(assetTypeIdx, applicableRightsContracts, videoId, countryCode);
+                    if (restriction.cupKeys.isEmpty()) {
+                        restriction.cupKeys.add(getCupKey(CupKey.DEFAULT));
+                    }
+
+                    restriction.availabilityWindow = new AvailabilityWindow();
+                    restriction.availabilityWindow.startDate = OutputUtil.getRoundedDate(window._getStartDate());
+                    restriction.availabilityWindow.endDate = OutputUtil.getRoundedDate(window._getEndDate());
+                    if (window._getOnHold()) {
+                        restriction.availabilityWindow.startDate.val += ONE_THOUSAND_YEARS;
+                        restriction.availabilityWindow.endDate.val += ONE_THOUSAND_YEARS;
+                        restriction.availabilityWindow.onHold = true;
+                    }
+
+                    contractRestrictions.add(restriction);
+                }
+            }
+
+            if (!contractRestrictions.isEmpty())
+                restrictions.put(cycleConstants.getISOCountry(status._getCountryCode()._getValue()), contractRestrictions);
         }
+
 
         return restrictions;
     }
@@ -364,12 +354,8 @@ public class ContractRestrictionModule {
                 Set<String> overallContractAllowedTextLanguages = new HashSet<String>();
                 for (RightsContractAssetHollow assetInput : rightsContract._getAssets()) {
                     try {
-                        ContractAsset asset = cycleConstants.rightsContractAssetCache.getResult(assetInput.getOrdinal());
-                        if (asset == null) {
-                            asset = new ContractAsset(assetInput);
-                            cycleConstants.rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
-                        }
-
+                        ContractAsset asset = cachedAsset(assetInput);
+                        
                         if (asset.getType() == ContractAssetType.SUBTITLES) {
                             overallContractAllowedTextLanguages.add(asset.getLanguage());
                         }
@@ -511,14 +497,24 @@ public class ContractRestrictionModule {
 
     private void markAssetTypeIndexForExcludedDownloadablesCalculation(DownloadableAssetTypeIndex assetTypeIdx, ListOfRightsContractAssetHollow contractAssets, Viewing viewing) {
         for (RightsContractAssetHollow assetInput : contractAssets) {
-            ContractAsset asset = cycleConstants.rightsContractAssetCache.getResult(assetInput.getOrdinal());
-            if (asset == null) {
-                asset = new ContractAsset(assetInput);
-                cycleConstants.rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
-            }
-
+            ContractAsset asset = cachedAsset(assetInput);
             assetTypeIdx.mark(asset, viewing);
         }
+    }
+    
+    private ContractAsset cachedAsset(RightsContractAssetHollow assetInput) {
+        InputOrdinalResultCache<ContractAsset> cache;
+        if(assetInput.getTypeDataAccess().getDataAccess() == api.getDataAccess())
+            cache = cycleConstants.rightsContractAssetCache;
+        else
+            cache = cycleConstants.gk2RightsContractAssetCache;
+        
+        ContractAsset asset = cache.getResult(assetInput.getOrdinal());
+        if(asset == null) {
+            asset = new ContractAsset(assetInput);
+            asset = cache.setResult(assetInput.getOrdinal(), asset);
+        }
+        return asset;
     }
 
     /**

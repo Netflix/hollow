@@ -4,6 +4,7 @@ import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
+import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
@@ -15,12 +16,18 @@ import java.util.List;
 
 public class MultilanguageCountryWindowFilter {
 
+    private final VMSHollowInputAPI api;
+    
     private final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    private final InputOrdinalResultCache<ContractAsset> gk2RightsContractAssetCache;
+    
     private final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner;
 
 
-    public MultilanguageCountryWindowFilter(CycleConstants cycleConstants) {
+    public MultilanguageCountryWindowFilter(VMSHollowInputAPI api, CycleConstants cycleConstants) {
+        this.api = api;
         this.rightsContractAssetCache = cycleConstants.rightsContractAssetCache;
+        this.gk2RightsContractAssetCache = cycleConstants.gk2RightsContractAssetCache;
         this.dialectOrdinalAssigner = cycleConstants.dialectOrdinalAssigner;
     }
 
@@ -37,11 +44,7 @@ public class MultilanguageCountryWindowFilter {
         long availability = 0;
 
         for (RightsContractAssetHollow assetInput : contractAssets) {
-            ContractAsset asset = rightsContractAssetCache.getResult(assetInput.getOrdinal());
-            if (asset == null) {
-                asset = new ContractAsset(assetInput);
-                rightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
-            }
+            ContractAsset asset = cachedAsset(assetInput);
 
             if (language.equals(asset.getLanguage())) {
                 // effectively always 0, above check ensures lengths are same so method languageDialectOffset will return 0.
@@ -54,6 +57,21 @@ public class MultilanguageCountryWindowFilter {
         return availability;
     }
 
+    private ContractAsset cachedAsset(RightsContractAssetHollow assetInput) {
+        InputOrdinalResultCache<ContractAsset> cache;
+        if(assetInput.getTypeDataAccess().getDataAccess() == api.getDataAccess())
+            cache = rightsContractAssetCache;
+        else
+            cache = gk2RightsContractAssetCache;
+        
+        ContractAsset asset = cache.getResult(assetInput.getOrdinal());
+        if(asset == null) {
+            asset = new ContractAsset(assetInput);
+            asset = cache.setResult(assetInput.getOrdinal(), asset);
+        }
+        return asset;
+    }
+    
     /**
      * Determines if the language is available for the given package.
      * 001 - AUDIO assets only

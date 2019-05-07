@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * Generates Title Override based on Input Slice
  *
- * @author dsu
+ * TODO: Remove this functionality.
  */
 public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
@@ -54,8 +54,9 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             HollowReadStateEngine inputStateEngineSlice = readStateEngine(slicedFile);
 
             VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
+            
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-            new SimpleTransformer(api, outputStateEngine, ctx).transform();
+            new SimpleTransformer(api, null, outputStateEngine, ctx).transform();
 
             String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
             writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);

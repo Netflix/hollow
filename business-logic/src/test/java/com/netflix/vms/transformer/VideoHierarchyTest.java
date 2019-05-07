@@ -19,6 +19,7 @@ import com.netflix.vms.transformer.converterpojos.Supplementals;
 import com.netflix.vms.transformer.converterpojos.VideoGeneral;
 import com.netflix.vms.transformer.converterpojos.VideoType;
 import com.netflix.vms.transformer.converterpojos.VideoTypeDescriptor;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.helper.HollowReadStateEngineBuilder;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -128,7 +129,8 @@ public class VideoHierarchyTest {
     private VideoHierarchy getVideoHierarchy(HollowReadStateEngine readStateEngine) {
         VMSHollowInputAPI api = new VMSHollowInputAPI(readStateEngine);
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(readStateEngine, mockContext);
-        VideoHierarchyInitializer initializer = new VideoHierarchyInitializer(api, indexer, mockContext);
+        GatekeeperStatusRetriever statusRetriever = new GatekeeperStatusRetriever(api, indexer);
+        VideoHierarchyInitializer initializer = new VideoHierarchyInitializer(api, indexer, statusRetriever, mockContext);
         int ordinal = indexer.getHashIndex(IndexSpec.SHOW_SEASON_EPISODE).findMatches(
                 Long.valueOf(SHOW)).iterator().next();
         ShowSeasonEpisodeHollow showSeasonEpisode = api.getShowSeasonEpisodeHollow(ordinal);

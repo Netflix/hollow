@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
@@ -60,7 +61,7 @@ public class CountrySpecificDataModule {
     private final CycleConstants constants;
     private final VMSTransformerIndexer indexer;
 
-    private final HollowPrimaryKeyIndex videoStatusIdx;
+    private final GatekeeperStatusRetriever statusRetriever;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
@@ -71,14 +72,14 @@ public class CountrySpecificDataModule {
     private VideoDataCollection videoDataCollection;
 
     public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper,
-            CycleConstants constants, VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
-            CupTokenFetcher cupTokenFetcher) {
+            CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever,
+            CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
         this.constants = constants;
         this.indexer = indexer;
-        this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
+        this.statusRetriever = statusRetriever;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
@@ -95,7 +96,7 @@ public class CountrySpecificDataModule {
         this.mapper = null;
         this.constants = null;
         this.indexer = null;
-        this.videoStatusIdx = null;
+        this.statusRetriever = null;
         this.videoGeneralIdx = null;
         this.rolloutVideoTypeIndex = null;
         this.videoTypeCountryIndex = null;
@@ -221,10 +222,8 @@ public class CountrySpecificDataModule {
     }
 
     private void convertLocale(Integer videoId, boolean isStandalone, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
-        int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
-        if (statusOrdinal != -1) {
-            StatusHollow status = api.getStatusHollow(statusOrdinal);
-
+        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        if (status != null) {
             /// in order to calculate the hasNewContent flag, we need to know the latest in-window episode launch date for this hierarchy
             if (rollup.doEpisode()) {
                 Long launchDate = getLaunchDateForLanguage(status, language);
@@ -288,10 +287,8 @@ public class CountrySpecificDataModule {
         Long firstDisplayDate = null;
         List<VMSAvailabilityWindow> availabilityWindowList = null;
 
-        int statusOrdinal = videoStatusIdx.getMatchingOrdinal(videoId.longValue(), countryCode);
-        if (statusOrdinal != -1) {
-            StatusHollow status = api.getStatusHollow(statusOrdinal);
-
+        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        if (status != null) {
             availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, data, status, rollup);
             firstDisplayDate = populateFirstDisplayDateData(data, status, availabilityWindowList);
         }
@@ -378,7 +375,7 @@ public class CountrySpecificDataModule {
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
-        Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer);
+        Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer, statusRetriever);
         VideoTypeDescriptorHollow videoType = getVideoTypeDescriptor(videoId, countryCode);
         boolean isOriginal = videoType == null ? false : videoType._getOriginal();
         boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoType, videoId, countryCode);
@@ -520,9 +517,8 @@ public class CountrySpecificDataModule {
     }
 
     private boolean isTopNodeGoLive(int topNodeId, String countryCode) {
-        int statusOrdinal = videoStatusIdx.getMatchingOrdinal(Long.valueOf(topNodeId), countryCode);
-        if (statusOrdinal != -1) {
-            StatusHollow status = api.getStatusHollow(statusOrdinal);
+        StatusHollow status = statusRetriever.getStatus(Long.valueOf(topNodeId), countryCode);
+        if (status != null) {
             FlagsHollow flags = status._getFlags();
             if (flags != null)
                 return flags._getGoLive();

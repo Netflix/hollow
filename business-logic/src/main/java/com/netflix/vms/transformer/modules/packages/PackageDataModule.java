@@ -14,6 +14,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
@@ -93,7 +94,8 @@ public class PackageDataModule {
 
     public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx,
             HollowObjectMapper objectMapper, CycleConstants cycleConstants,
-            VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
+            VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever, 
+            CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = objectMapper;
@@ -107,7 +109,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<>();
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, cupTokenFetcher);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, statusRetriever, cupTokenFetcher);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
         this.hdrProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "HDR");

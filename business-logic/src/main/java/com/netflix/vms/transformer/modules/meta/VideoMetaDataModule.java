@@ -6,7 +6,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.PERSONS_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_ID;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
@@ -19,6 +18,7 @@ import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.DateHollow;
 import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
@@ -78,7 +78,7 @@ public class VideoMetaDataModule {
     private final HollowHashIndex personVideoIdx;
     private final HollowHashIndex personVideoRoleIdx;
     private final HollowHashIndex showCountryLabelIdx;
-    private final HollowPrimaryKeyIndex videoStatusIdx;
+    private final GatekeeperStatusRetriever statusRetriever;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
     private final int newContentFlagDuration;
@@ -88,7 +88,7 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<>();
 
-    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
         this.api = api;
         this.ctx = ctx;
         this.constants = constants;
@@ -98,7 +98,7 @@ public class VideoMetaDataModule {
         this.personVideoRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
         this.showCountryLabelIdx = indexer.getHashIndex(IndexSpec.SHOW_COUNTRY_LABEL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
-        this.videoStatusIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);
+        this.statusRetriever = statusRetriever;
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(L10N_STORIES_SYNOPSES);
 
@@ -231,10 +231,8 @@ public class VideoMetaDataModule {
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = new VideoMetaDataCountrySpecificDataKey();
 
-        int statusOrdinal = videoStatusIdx.getMatchingOrdinal((long) videoId, countryCode);
-        StatusHollow status = null;
-        if (statusOrdinal != -1) {
-            status = api.getStatusHollow(statusOrdinal);
+        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        if (status != null) {
             countrySpecificKey.isSearchOnly = status._getFlags()._getSearchOnly();
         }
 
@@ -381,7 +379,7 @@ public class VideoMetaDataModule {
             typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
         }
 
-        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer);
+        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer, statusRetriever);
 
         StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
         if (copyright != null) {

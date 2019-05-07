@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer.util;
 
-import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
-import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
@@ -21,21 +20,17 @@ import java.util.Set;
 
 public class VideoSetTypeUtil {
 
-    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
-        return computeSetTypes(videoId, countryCode, null, null, api, ctx, constants, indexer);
+    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
+        return computeSetTypes(videoId, countryCode, null, null, api, ctx, constants, indexer, statusRetriever);
     }
 
-    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, StatusHollow rights, VideoTypeDescriptorHollow typeDescriptor, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+    public static Set<VideoSetType> computeSetTypes(long videoId, String countryCode, StatusHollow rights, VideoTypeDescriptorHollow typeDescriptor, VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
         boolean isInWindow = false;
         boolean isInFuture = false;
         boolean isExtended = false;
 
         if (rights == null) {
-            HollowPrimaryKeyIndex videoRightsIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);
-            int rightsOrdinal = videoRightsIdx.getMatchingOrdinal(videoId, countryCode);
-            if (rightsOrdinal != -1) {
-                rights = api.getStatusHollow(rightsOrdinal);
-            }
+            rights = statusRetriever.getStatus(videoId, countryCode);
         }
         if (rights != null) {
             ListOfRightsWindowHollow windows = rights._getRights()._getWindows();

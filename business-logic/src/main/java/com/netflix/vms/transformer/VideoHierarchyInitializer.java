@@ -7,6 +7,7 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
@@ -42,18 +43,18 @@ public class VideoHierarchyInitializer {
     private final HollowPrimaryKeyIndex videoGeneralIndex;
     private final HollowHashIndex showSeasonEpisodeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
-    private final HollowPrimaryKeyIndex videoStatusIndex;
+    private final GatekeeperStatusRetriever statusRetriever;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
 
-    public VideoHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, TransformerContext ctx) {
+    public VideoHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever, TransformerContext ctx) {
         this.api = api;
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
         this.videoGeneralIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.showSeasonEpisodeIndex = indexer.getHashIndex(IndexSpec.SHOW_SEASON_EPISODE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
-        this.videoStatusIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
+        this.statusRetriever = statusRetriever;
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
     }
@@ -203,11 +204,10 @@ public class VideoHierarchyInitializer {
     }
 
     boolean isGoLiveOrHasFirstDisplayDate(long videoId, String countryCode) {
-        int statusOrdinal = videoStatusIndex.getMatchingOrdinal(videoId, countryCode);
-        if (statusOrdinal == -1)
+        StatusHollow videoStatus = statusRetriever.getStatus(videoId, countryCode);
+        if(videoStatus == null)
             return false;
 
-        StatusHollow videoStatus = api.getStatusHollow(statusOrdinal);
         if (videoStatus._getFlags()._getGoLive())
             return true;
 

@@ -90,7 +90,7 @@ public class VMSAvailabilityWindowModule {
         this.cupTokenFetcher = cupTokenFetcher;
 
         this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher, ctx);
-        this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(cycleConstants);
+        this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(api, cycleConstants);
         this.cycleDataAggregator = cycleDataAggregator;
 
         EMPTY_CUP_TOKENS = new LinkedHashSetOfStrings();

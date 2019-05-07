@@ -102,7 +102,8 @@ public class TransformCycle {
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
-    private HollowConsumer inputConsumer;
+    private final HollowConsumer inputConsumer;
+    private final HollowConsumer gk2StatusConsumer;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
@@ -117,7 +118,7 @@ public class TransformCycle {
     private final HollowProducer producer;
     private final ExecutorService produceExecutor;
 
-    public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer,
+    public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer, HollowConsumer gk2StatusConsumer,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
             String transformerVip,
             Supplier<CinderProducerBuilder> cinderBuilder) {
@@ -141,6 +142,7 @@ public class TransformCycle {
         this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
 
         this.inputConsumer = inputConsumer;
+        this.gk2StatusConsumer = gk2StatusConsumer;
 
         Monitors.registerObject(timeSinceLastPublishGauge);
 
@@ -728,11 +730,11 @@ public class TransformCycle {
     }
 
     private static CompletableFuture<Void> loadInputAsync(Executor executor,
-            TransformerContext ctx, HollowConsumer inputConsumer, final Long pinnedInputVersion) {
-        return CompletableFuture.runAsync(() -> loadInput(ctx, inputConsumer, pinnedInputVersion), executor);
+            TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer) {
+        return CompletableFuture.runAsync(() -> loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer), executor);
     }
 
-    private static void loadInput(TransformerContext ctx, HollowConsumer inputConsumer, final Long pinnedInputVersion) {
+    private static void loadInput(TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer) {
         try {
             // Spot to trigger Cycle Monkey if enabled
             ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
@@ -745,6 +747,9 @@ public class TransformCycle {
                     throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
                 }
             }
+            
+            if(gk2StatusConsumer != null)
+                gk2StatusConsumer.triggerRefresh();
 
             ctx.getLogger().info(BlobState,
                     "Loaded input to version={}, header={}",
@@ -790,7 +795,7 @@ public class TransformCycle {
                         "vms-restore-and-input-processing");
 
                 // Load input concurrently with restoring the outputs
-                CompletableFuture<Void> inputProcessingResult = loadInputAsync(executor, ctx, inputConsumer, pinnedInputVersion);
+                CompletableFuture<Void> inputProcessingResult = loadInputAsync(executor, ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer);
                 // Restore outputs concurrently
                 restoreOutputs(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
 
@@ -798,7 +803,7 @@ public class TransformCycle {
                 inputProcessingResult.get();
             } else {
                 // Load input sequentially
-                loadInput(ctx, inputConsumer, pinnedInputVersion);
+                loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer);
             }
 
             //// set the now millis
@@ -834,7 +839,7 @@ public class TransformCycle {
             output.getHeaderTags().clear();
             headerPopulator.addHeaders(inputConsumer, output, previousVersion, newState.getVersion());
 
-            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputConsumer.getAPI(), output, ctx);
+            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputConsumer.getAPI(), gk2StatusConsumer, output, ctx);
             try {
                 transformer.transform();
             } catch (Error | RuntimeException e) {
@@ -856,7 +861,7 @@ public class TransformCycle {
                 pinTitleMgr.submitJobsToProcessASync(pinnedTitleSpecs);
 
                 // Process fastlane
-                trasformInputData(inputConsumer.getAPI(), fastlaneOutputStateEngine, ctx);
+                trasformInputData(inputConsumer.getAPI(), gk2StatusConsumer, fastlaneOutputStateEngine, ctx);
 
                 /*
                  * Combine input states
@@ -935,7 +940,7 @@ public class TransformCycle {
                         outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(),
                         isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
-                trasformInputData(inputConsumer.getAPI(), outputStateEngine, ctx);
+                trasformInputData(inputConsumer.getAPI(), gk2StatusConsumer, outputStateEngine, ctx);
 
                 // Spot to trigger Cycle Monkey if enabled
                 cycleMonkey.doMonkeyBusiness("transformTheData");
@@ -950,9 +955,9 @@ public class TransformCycle {
         return true;
     }
 
-    private static void trasformInputData(HollowAPI inputAPI, VMSTransformerWriteStateEngine outputStateEngine,
+    private static void trasformInputData(HollowAPI inputAPI, HollowConsumer gk2StatusConsumer, VMSTransformerWriteStateEngine outputStateEngine,
             TransformerContext ctx) throws Throwable {
-        SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, outputStateEngine, ctx);
+        SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, gk2StatusConsumer, outputStateEngine, ctx);
         transformer.transform();
 
         String BLOB_ID = VipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";

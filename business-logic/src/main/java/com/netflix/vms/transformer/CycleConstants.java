@@ -59,15 +59,17 @@ public class CycleConstants {
     public final InputOrdinalResultCache<Boolean> isNewEpisodeOverlayTypes;
 
     public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
+    public final InputOrdinalResultCache<ContractAsset> gk2RightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
 
     private final ConcurrentHashMap<String, ISOCountry> isoCountryMap = new ConcurrentHashMap<String, ISOCountry>();
 
 
-    public CycleConstants(HollowReadStateEngine inputStateEngine) {
+    public CycleConstants(HollowReadStateEngine inputStateEngine, HollowReadStateEngine gatekeeper2StateEngine) {
         this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("IPLArtworkDerivative").maxOrdinal());
         this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
         this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
+        this.gk2RightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(gatekeeper2StateEngine.getTypeState("RightsContractAsset").maxOrdinal());
         this.artworkDerivativeOverlayTypes = new InputOrdinalResultCache<String>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
         this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }
@@ -76,6 +78,7 @@ public class CycleConstants {
         this.artworkDerivativeCache = null;
         this.artworkDerivativesCache = null;
         this.rightsContractAssetCache = null;
+        this.gk2RightsContractAssetCache = null;
         this.artworkDerivativeOverlayTypes = null;
         this.isNewEpisodeOverlayTypes = null;
     }

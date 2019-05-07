@@ -136,7 +136,7 @@ public class TitleLevelPinningPOC {
             mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
             VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-            SimpleTransformer transformer = new SimpleTransformer(api, fastlaneOutput, ctx);
+            SimpleTransformer transformer = new SimpleTransformer(api, null, fastlaneOutput, ctx);
             transformer.transform();
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
             writeStateEngine(fastlaneOutput, new File(FASTLANE_FILE));

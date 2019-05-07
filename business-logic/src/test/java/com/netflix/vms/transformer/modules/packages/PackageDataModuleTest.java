@@ -13,6 +13,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.converterpojos.DealCountryGroup;
 import com.netflix.vms.transformer.converterpojos.Package;
 import com.netflix.vms.transformer.converterpojos.PackageMovieDealCountryGroup;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.helper.HollowReadStateEngineBuilder;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -75,7 +76,8 @@ public class PackageDataModuleTest {
         HollowReadStateEngine readStateEngine = (HollowReadStateEngine)  api.getDataAccess();
         TransformerContext mockContext = mock(TransformerContext.class);
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(readStateEngine, mockContext);
+        GatekeeperStatusRetriever statusRetriever = new GatekeeperStatusRetriever(api, indexer);
         return new PackageDataModule(api, mockContext, mock(HollowObjectMapper.class),
-                new CycleConstants(readStateEngine),  indexer, null);
+                new CycleConstants(readStateEngine, readStateEngine),  indexer, statusRetriever, null);
     }
 }

@@ -62,7 +62,7 @@ public class TransformerScenario {
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         ctx.setNowMillis(processTimestamp);
-        new SimpleTransformer(api, outputStateEngine, ctx).transform();
+        new SimpleTransformer(api, null, outputStateEngine, ctx).transform();
 
         return outputStateEngine;
     }

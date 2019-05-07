@@ -18,6 +18,7 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
+import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
@@ -68,7 +69,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex videoArtworkBySourceFileIdIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
-    private final HollowPrimaryKeyIndex videoStatusIdx;
+    private final GatekeeperStatusRetriever statusRetriever;
     private HollowHashIndex rolloutIndex;
 
     private HollowHashIndex overrideScheduleIndex;
@@ -78,13 +79,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
     private final int MIN_ROLLUP_SIZE = 4; // 3
 
-    public VideoImagesDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
+    public VideoImagesDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
         super("Video", api, ctx, mapper, cycleConstants, indexer);
 
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID);
         this.videoArtworkBySourceFileIdIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_SOURCE_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
-        this.videoStatusIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_STATUS);
+        this.statusRetriever = statusRetriever;
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
         overrideScheduleIndex = indexer.getHashIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
@@ -383,11 +384,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     }
 
     public boolean isAvailableForED(int videoId, String countryCode) {
-        int statusOrdinal = videoStatusIdx.getMatchingOrdinal((long) videoId, countryCode);
-        StatusHollow status = null;
-        if (statusOrdinal != -1) {
-            status = api.getStatusHollow(statusOrdinal);
-        }
+        StatusHollow status = statusRetriever.getStatus((long) videoId, countryCode);
 
         boolean isGoLive = false;
         boolean isInWindow = false;

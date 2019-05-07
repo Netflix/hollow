@@ -70,7 +70,7 @@ public class PinTitleTest {
             mgr.submitJobsToProcessASync(pinTitleSpecs);
 
             final VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-            SimpleTransformer transformer = new SimpleTransformer(api, fastlaneOutput, ctx);
+            SimpleTransformer transformer = new SimpleTransformer(api, null, fastlaneOutput, ctx);
             transformer.transform();
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
 
@@ -154,7 +154,7 @@ public class PinTitleTest {
         File blobFile = env.localBlobStore().resolve(filename).toFile();
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        SimpleTransformer transformer = new SimpleTransformer(api, outputStateEngine, ctx);
+        SimpleTransformer transformer = new SimpleTransformer(api, null, outputStateEngine, ctx);
         transformer.transform();
         PinTitleHelper.addBlobID(outputStateEngine, name);
 
