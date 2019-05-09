@@ -46,8 +46,6 @@ public enum IndexSpec {
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "countryInfos.element", "videoId", "countryInfos.element.countryCode.value"),
     PACKAGES_BY_VIDEO(HASH, "Package", "", "movieId"),
     ALL_VIDEO_STATUS(HASH, "Status", "", "movieId"),
-    VIDEO_CONTRACTS(HASH, "Contracts", "", "movieId", "countryCode.value"),
-    VIDEO_CONTRACT_BY_DEALID(HASH, "Contracts", "contracts.element", "movieId", "countryCode.value", "contracts.element.dealId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
     SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
     MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID(HASH, "MovieCharacterPerson", "", "characters.element.personId"),

@@ -14,6 +14,7 @@
 <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value="doFilter"/>
 <stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.buildship.core.classpathprovider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.netflix.vms.transformer.testutil.slice.FilterToSmallDataSubset"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="vmstransformer-server"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea -Xmx15G -Xms15G"/>

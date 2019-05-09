@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -2341,7 +2340,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -2622,7 +2621,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -2804,7 +2803,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -5496,7 +5495,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -5777,7 +5776,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -5959,7 +5958,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -8784,7 +8783,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -9065,7 +9064,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -9247,7 +9246,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -9858,8 +9857,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -9930,8 +9928,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.2"
         }
     },
     "jacocoAnt": {
@@ -9942,8 +9939,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.2"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.2",
@@ -12251,7 +12247,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -12532,7 +12528,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -12714,7 +12710,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -15575,7 +15571,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -15856,7 +15852,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -16038,7 +16034,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -18902,7 +18898,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -19183,7 +19179,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -19365,7 +19361,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -22064,7 +22060,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -22345,7 +22341,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -22527,7 +22523,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25359,7 +25355,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -25640,7 +25636,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -25822,7 +25818,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -28690,7 +28686,7 @@
             ]
         },
         "netflix:atlas-client": {
-            "locked": "2.23.0",
+            "locked": "2.23.1",
             "transitive": [
                 "netflix.grpc:netflix-grpc-runtime-guice",
                 "netflix.grpc:netflix-grpc-salp",
@@ -28971,7 +28967,7 @@
             ]
         },
         "netflix:nimble-int-java": {
-            "locked": "0.6.49",
+            "locked": "0.6.51",
             "transitive": [
                 "netflix:atlas-client",
                 "netflix:nf-eureka-client"
@@ -29153,7 +29149,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.730",
+            "locked": "100.0.733",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
