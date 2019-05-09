@@ -101,7 +101,7 @@ public class PlaybackMonkeyTester {
         final boolean testCompleted[] = new boolean[keys.size()];
         final boolean testSuccess[] = new boolean[keys.size()];
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "workflow-playbackmonkey-testkeys");
         final int numThreads = executor.getCorePoolSize();
 
         logger.info(PlaybackMonkey, "keys.size(): {} ; testIds.length: {}", keys.size(), testIds.length);
@@ -129,7 +129,7 @@ public class PlaybackMonkeyTester {
 
         logger.info(PlaybackMonkey, "Initiated {} number of video country tests.", keys.size());
 
-        executor = new SimultaneousExecutor();
+        executor = new SimultaneousExecutor(getClass(), "testVideoCountryKeys");
         
         // TODO: make timeout a fast property
         long timeToQuit = System.currentTimeMillis() + 1 * 60 * 1000; 

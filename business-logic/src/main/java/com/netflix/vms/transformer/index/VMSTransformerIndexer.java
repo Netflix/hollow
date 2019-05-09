@@ -20,7 +20,7 @@ public class VMSTransformerIndexer {
 
     public VMSTransformerIndexer(HollowReadStateEngine stateEngine, TransformerContext ctx) {
     	this.ctx = ctx;
-        ExecutorService executor = new SimultaneousExecutor();
+        ExecutorService executor = new SimultaneousExecutor(getClass(), "index");
 
         try {
             Map<IndexSpec, Object> indexMap = new HashMap<IndexSpec, Object>();

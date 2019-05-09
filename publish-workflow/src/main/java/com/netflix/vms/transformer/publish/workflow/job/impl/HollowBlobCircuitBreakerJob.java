@@ -99,7 +99,7 @@ public class HollowBlobCircuitBreakerJob extends CircuitBreakerJob {
 
         final HollowReadStateEngine stateEngine = hollowBlobDataProvider.getStateEngine();
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "workflow-circuit-breakers");
 
         List<Future<CircuitBreakerResults>> resultFutures = new ArrayList<Future<CircuitBreakerResults>>();
 

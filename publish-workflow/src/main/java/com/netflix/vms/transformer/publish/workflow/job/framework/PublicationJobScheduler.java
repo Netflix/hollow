@@ -12,7 +12,7 @@ public class PublicationJobScheduler {
 
     public PublicationJobScheduler() {
         publicationJobQueue = new PublishWorkflowPublicationJobQueue();
-        threadPool = new SimultaneousExecutor();
+        threadPool = new SimultaneousExecutor(getClass(), "publish");
 
         startListening();
     }

@@ -152,7 +152,7 @@ public class ValidatorForCircuitBreakers implements
             return ValidationResult.from(this).passed("DISABLED");
         }
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "validate-circuit-breakers");
 
         Map<HollowCircuitBreaker, CompletableFuture<HollowCircuitBreaker.CircuitBreakerResults>> resultFutures =
                 new HashMap<>();
@@ -162,13 +162,14 @@ public class ValidatorForCircuitBreakers implements
                     () -> rule.run(readState.getStateEngine()), executor);
             resultFutures.put(rule, job);
         }
-
         try {
             // Wait for all jobs to complete, ignoring any exceptional completions
             CompletableFuture<Void> allFuture = CompletableFuture.allOf(
                     resultFutures.values().toArray(new CompletableFuture[0]))
                     .handle((r, t) -> null);
             allFuture.get();
+            // Cleanup executor
+            executor.shutdown();
 
             boolean isAllDataValid = true;
 

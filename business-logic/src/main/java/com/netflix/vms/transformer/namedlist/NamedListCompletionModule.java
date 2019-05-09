@@ -33,7 +33,7 @@ public class NamedListCompletionModule implements TransformModule {
 
     public void transform() throws Exception {
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "transform");
 
         VideoOrdinalTracker videoOrdinalTracker = videoNamedLists.getVideoOrdinalTracker();
         

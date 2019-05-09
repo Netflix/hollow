@@ -185,7 +185,7 @@ public class SimpleTransformer {
         CycleDataAggregatorHelper.configureLogsTagsForVMSWindowModule(cycleDataAggregator);
 
 
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "transform");
         for (int i = 0; i < executor.getCorePoolSize(); i++) {
             executor.execute(() -> {
 

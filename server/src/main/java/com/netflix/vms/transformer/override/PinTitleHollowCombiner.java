@@ -249,7 +249,7 @@ public class PinTitleHollowCombiner {
     // ----- Logic to combine NamedList
 
     protected void combineNamedLists() throws Exception {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "combine-named-lists");
 
         for (HollowReadStateEngine input : inputs) {
             VMSRawHollowAPI api = new VMSRawHollowAPI(input);
@@ -318,7 +318,7 @@ public class PinTitleHollowCombiner {
     }
 
     private void writeNamedListsToOutput(HollowWriteStateEngine output) throws Exception {
-        SimultaneousExecutor executor = new SimultaneousExecutor();
+        SimultaneousExecutor executor = new SimultaneousExecutor(getClass(), "write-named-lists");
 
         for(final Entry<ISOCountry, ConcurrentHashMap<String, Set<Integer>>> entry : combinedVideoLists.entrySet()) {
             final ISOCountry country = entry.getKey();

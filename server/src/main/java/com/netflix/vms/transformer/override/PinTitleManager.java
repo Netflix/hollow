@@ -31,7 +31,7 @@ public class PinTitleManager {
     private final TransformerContext ctx;
     private final FileStore fileStore;
 
-    private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor();
+    private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor(getClass(), "pin-title-jobs");
     private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
     private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
