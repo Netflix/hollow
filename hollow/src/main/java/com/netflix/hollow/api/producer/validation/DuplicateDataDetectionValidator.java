@@ -49,10 +49,15 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
     private static final String DUPLICATE_KEYS_FOUND_ERRRO_MSG_FORMAT =
             "Duplicate keys found for type %s. Primarykey in schema is %s. "
                     + "Duplicate IDs are: %s";
-    private static final String NO_PRIMARY_KEY_ERRRO_MSG_FORMAT =
+    private static final String NO_PRIMARY_KEY_ERROR_MSG_FORMAT =
             "DuplicateDataDetectionValidator defined but unable to find primary key "
                     + "for data type %s. Please check schema definition.";
-    private static final String NOT_AN_OBJECT_ERROR_MSGR_FORMAT =
+
+    private static final String NO_SCHEMA_FOUND_MSG_FORMAT =
+            "DuplicateDataDetectionValidator defined for data type %s but schema not found."
+            + "Please check that the HollowProducer is initialized with the data type's schema "
+            + "(see initializeDataModel)";
+    private static final String NOT_AN_OBJECT_ERROR_MSG_FORMAT =
             "DuplicateDataDetectionValidator is defined but schema type of %s "
                     + "is not Object. This validation cannot be done.";
 
@@ -125,14 +130,17 @@ public class DuplicateDataDetectionValidator implements ValidatorListener {
         PrimaryKey primaryKey;
         if (fieldPathNames == null) {
             HollowSchema schema = readState.getStateEngine().getSchema(dataTypeName);
+            if (schema == null) {
+                return vrb.failed(String.format(NO_SCHEMA_FOUND_MSG_FORMAT, dataTypeName));
+            }
             if (schema.getSchemaType() != SchemaType.OBJECT) {
-                return vrb.failed(String.format(NOT_AN_OBJECT_ERROR_MSGR_FORMAT, dataTypeName));
+                return vrb.failed(String.format(NOT_AN_OBJECT_ERROR_MSG_FORMAT, dataTypeName));
             }
 
             HollowObjectSchema oSchema = (HollowObjectSchema) schema;
             primaryKey = oSchema.getPrimaryKey();
             if (primaryKey == null) {
-                return vrb.failed(String.format(NO_PRIMARY_KEY_ERRRO_MSG_FORMAT, dataTypeName));
+                return vrb.failed(String.format(NO_PRIMARY_KEY_ERROR_MSG_FORMAT, dataTypeName));
             }
         } else {
             primaryKey = new PrimaryKey(dataTypeName, fieldPathNames);
