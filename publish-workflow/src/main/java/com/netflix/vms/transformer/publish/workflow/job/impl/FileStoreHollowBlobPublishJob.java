@@ -54,8 +54,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         long startTime = System.currentTimeMillis();
 
         try {
-            int retryCount = 0;
-            while(retryCount < RETRY_ATTEMPTS) {
+            while(status.getRetryCount() < RETRY_ATTEMPTS) {
                 try {
                     if (publish) {
                         publisher.publish(fakeProducerBlob(fileToUpload));
