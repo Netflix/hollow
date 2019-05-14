@@ -2165,7 +2165,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -2384,7 +2384,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -2596,7 +2596,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -2616,7 +2616,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -5320,7 +5320,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -5539,7 +5539,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -5751,7 +5751,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -5771,7 +5771,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -8608,7 +8608,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -8827,7 +8827,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -9039,7 +9039,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -9059,7 +9059,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -12075,7 +12075,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -12294,7 +12294,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -12506,7 +12506,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -12526,7 +12526,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -15399,7 +15399,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -15618,7 +15618,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -15830,7 +15830,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -15850,7 +15850,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -18726,7 +18726,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -18945,7 +18945,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -19157,7 +19157,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -19177,7 +19177,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -21888,7 +21888,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -22107,7 +22107,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -22319,7 +22319,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -22339,7 +22339,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -25183,7 +25183,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -25402,7 +25402,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -25614,7 +25614,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -25634,7 +25634,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
@@ -28514,7 +28514,7 @@
             ]
         },
         "netflix.bom:runtime-platform-recommendations": {
-            "locked": "4.7.50",
+            "locked": "4.7.52",
             "transitive": [
                 "com.netflix.simone:okja-client-guice",
                 "com.netflix.simone:okja-proto-definition",
@@ -28733,7 +28733,7 @@
             "requested": "latest.release"
         },
         "netflix:country-launch": {
-            "locked": "48.51",
+            "locked": "49.30",
             "requested": "latest.release"
         },
         "netflix:edgar_client": {
@@ -28945,7 +28945,7 @@
             ]
         },
         "netflix:nfi18n-core": {
-            "locked": "2.142",
+            "locked": "2.144",
             "transitive": [
                 "netflix:country-launch",
                 "netflix:nf-filter"
@@ -28965,7 +28965,7 @@
             ]
         },
         "netflix:ngl": {
-            "locked": "0.13.0",
+            "locked": "0.16.0",
             "transitive": [
                 "netflix:nfi18n-core"
             ]
