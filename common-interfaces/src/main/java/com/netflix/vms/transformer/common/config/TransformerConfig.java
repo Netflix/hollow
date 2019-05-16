@@ -49,6 +49,8 @@ public interface TransformerConfig {
 
     Long getPinInputVersion();
 
+    Long getPinGk2InputVersion();
+
     Long getNowMillis();
 
     String getFollowVip();

@@ -2,9 +2,8 @@ package com.netflix.vms.transformer.rest.blobinfo;
 
 import com.netflix.aws.db.Item;
 import com.netflix.aws.db.ItemAttribute;
-import com.netflix.videometadata.VMSToStringBuilder;
-import com.netflix.videometadata.util.UnmodifiableCollections;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,6 +11,8 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.StandardToStringStyle;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.time.FastDateFormat;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -93,7 +94,7 @@ public class BlobImageEntry {
     }
 
     public Map<BlobType, Item> getItemMap() {
-        return UnmodifiableCollections.unmodifiableMap(itemMap);
+        return Collections.unmodifiableMap(itemMap);
     }
 
     @Override
@@ -190,8 +191,28 @@ public class BlobImageEntry {
         toStringBuilder.append(sb);
         return toStringBuilder.toString();
     }
-   
-    
+
+    public static class VMSToStringBuilder extends ToStringBuilder {
+
+        public VMSToStringBuilder(final Object object) {
+            super(object, VMSToStringStyle.INSTANCE);
+        }
+    }
+
+    public static class VMSToStringStyle extends StandardToStringStyle {
+
+        private static final long serialVersionUID = 17195679727926667L;
+        public static final VMSToStringStyle INSTANCE = new VMSToStringStyle();
+
+        private VMSToStringStyle() {
+            super();
+            this.setUseShortClassName(true);
+            this.setUseIdentityHashCode(false);
+            this.setFieldSeparator(", ");
+            this.setContentStart(" [");
+        }
+    }
+
     public static enum BlobType {
         SNAPSHOT,
         DELTA,

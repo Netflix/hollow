@@ -51,6 +51,17 @@ public class FileStoreUtil {
         }
     }
 
+    public static long getGk2InputDataVersion(FileAccessItem fileItem) {
+        String inputVersionStr = getAttribute(fileItem, "gk2InputVersion");
+        if (inputVersionStr == null) return Long.MIN_VALUE;
+
+        try {
+            return Long.parseLong(inputVersionStr);
+        } catch(Throwable th) {
+            LOGGER.error("Exception: ", th);
+            return Long.MIN_VALUE;
+        }
+    }
 
     public static long getPublishCycleDataTS(FileAccessItem fileItem) {
         String publishCycleDataTS = getAttribute(fileItem, "publishCycleDataTS");

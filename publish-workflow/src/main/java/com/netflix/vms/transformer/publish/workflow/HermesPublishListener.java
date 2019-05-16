@@ -13,15 +13,18 @@ import java.util.function.LongSupplier;
 public class HermesPublishListener implements
         PublishListener {
     private final LongSupplier inputVersion;
+    private final LongSupplier gk2InputVersion;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
     private final LongSupplier previousVersion;
 
     public HermesPublishListener(
             LongSupplier inputVersion,
+            LongSupplier gk2InputVersion,
             DefaultHollowPublishJobCreator jobCreator,
             String vip, LongSupplier previousVersion) {
         this.inputVersion = inputVersion;
+        this.gk2InputVersion = gk2InputVersion;
         this.jobCreator = jobCreator;
         this.vip = vip;
         this.previousVersion = previousVersion;
@@ -50,12 +53,13 @@ public class HermesPublishListener implements
         long start = System.nanoTime();
 
         long iv = inputVersion.getAsLong();
+        long gk2iv = gk2InputVersion.getAsLong();
         long pv = previousVersion.getAsLong();
         long cv = currentVersion;
         PublishWorkflowContext context = this.ctx;
         blob.thenAccept(b -> {
             long d = System.nanoTime() - start;
-            blobPublish(context, vip, b, Duration.ofNanos(d), iv, pv, cv);
+            blobPublish(context, vip, b, Duration.ofNanos(d), iv, gk2iv, pv, cv);
         });
     }
 
@@ -65,7 +69,9 @@ public class HermesPublishListener implements
             return;
         }
 
-        blobPublish(ctx, vip, blob, elapsed, inputVersion.getAsLong(), previousVersion.getAsLong(), currentVersion);
+        blobPublish(ctx, vip, blob, elapsed,
+                inputVersion.getAsLong(), gk2InputVersion.getAsLong(),
+                previousVersion.getAsLong(), currentVersion);
     }
 
     @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
@@ -75,7 +81,8 @@ public class HermesPublishListener implements
             PublishWorkflowContext ctx,
             String vip,
             HollowProducer.Blob blob, Duration elapsed,
-            long inputVersion, long previousVersion, long currentVersion) {
+            long inputVersion, long gk2Version,
+            long previousVersion, long currentVersion) {
         HollowBlobPublishJob.PublishType pt;
         switch (blob.getType()) {
             case SNAPSHOT:
@@ -91,7 +98,7 @@ public class HermesPublishListener implements
         }
 
         FileStoreHollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, vip,
-                inputVersion, previousVersion, currentVersion,
+                inputVersion, gk2Version, previousVersion, currentVersion,
                 pt, blob.getPath().toFile(), false);
 
         publishJob.executeJob(false, elapsed.toMillis());

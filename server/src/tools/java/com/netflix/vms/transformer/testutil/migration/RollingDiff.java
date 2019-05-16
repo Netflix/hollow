@@ -6,7 +6,6 @@ import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.core.HollowBlobHeader;
 import com.netflix.hollow.core.read.engine.HollowBlobHeaderReader;
-import com.netflix.videometadata.util.HttpHelper;
 import com.netflix.vms.transformer.fastproperties.PersistedPropertiesUtil;
 import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;

@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -457,8 +456,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -567,10 +565,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -2611,7 +2607,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -3034,7 +3029,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -3043,25 +3038,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -3564,12 +3559,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -3676,7 +3665,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -3877,7 +3865,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -3910,7 +3897,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -4037,8 +4023,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -4124,12 +4109,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -4636,8 +4615,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -4730,10 +4708,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -6579,7 +6555,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -7001,7 +6976,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -7010,25 +6985,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -7531,12 +7506,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -7637,7 +7606,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -7838,7 +7806,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -7868,7 +7835,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -7991,8 +7957,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -8070,12 +8035,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -8586,8 +8545,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -8696,10 +8654,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -10740,7 +10696,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -11163,7 +11118,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -11172,25 +11127,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -11693,12 +11648,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -11805,7 +11754,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -12006,7 +11954,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -12039,7 +11986,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -12166,8 +12112,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -12253,12 +12198,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -12434,8 +12373,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -12884,8 +12822,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -12994,10 +12931,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -15038,7 +14973,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -15461,7 +15395,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -15470,25 +15404,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -15991,12 +15925,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -16103,7 +16031,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -16304,7 +16231,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -16337,7 +16263,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -16464,8 +16389,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -16551,12 +16475,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -18623,8 +18541,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.2"
         }
     },
     "jacocoAnt": {
@@ -18635,8 +18552,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.2"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.2",
@@ -19152,8 +19068,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -19262,10 +19177,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -21306,7 +21219,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -21729,7 +21641,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -21738,25 +21650,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -22259,12 +22171,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -22371,7 +22277,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -22572,7 +22477,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -22605,7 +22509,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -22732,8 +22635,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -22819,12 +22721,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -23366,8 +23262,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -23476,10 +23371,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -25520,7 +25413,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -25943,7 +25835,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -25952,25 +25844,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -26473,12 +26365,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -26585,7 +26471,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -26786,7 +26671,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -26819,7 +26703,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -26946,8 +26829,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -27033,12 +26915,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -27580,8 +27456,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -27690,10 +27565,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -29733,7 +29606,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients"
             ]
         },
@@ -30156,7 +30028,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -30165,25 +30037,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -30686,12 +30558,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -30798,7 +30664,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -30999,7 +30864,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -31032,7 +30896,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -31128,8 +30991,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -31215,12 +31077,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -31783,8 +31639,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -31893,10 +31748,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -34029,7 +33882,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -34459,7 +34311,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -34468,25 +34320,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -34990,12 +34842,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -35109,7 +34955,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -35321,7 +35166,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -35354,7 +35198,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -35490,8 +35333,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -35588,12 +35430,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -36123,8 +35959,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -36217,10 +36052,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -38156,7 +37989,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -38585,7 +38417,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -38594,25 +38426,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -39116,12 +38948,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -39229,7 +39055,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -39441,7 +39266,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -39471,7 +39295,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -39603,8 +39426,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -39693,12 +39515,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -40234,8 +40050,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -40344,10 +40159,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -42480,7 +42293,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -42910,7 +42722,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -42919,25 +42731,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -43441,12 +43253,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -43560,7 +43366,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -43772,7 +43577,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -43805,7 +43609,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -43941,8 +43744,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -44039,12 +43841,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -44611,8 +44407,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -44721,10 +44516,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -46857,7 +46650,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -47287,7 +47079,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -47296,25 +47088,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -47818,12 +47610,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -47937,7 +47723,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -48149,7 +47934,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -48182,7 +47966,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -48318,8 +48101,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -48416,12 +48198,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -48988,8 +48764,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -49098,10 +48873,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -51234,7 +51007,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -51664,7 +51436,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -51673,25 +51445,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -52195,12 +51967,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -52314,7 +52080,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -52526,7 +52291,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -52559,7 +52323,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -52695,8 +52458,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -52793,12 +52555,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -53328,8 +53084,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -53422,10 +53177,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -55361,7 +55114,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -55790,7 +55542,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -55799,25 +55551,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -56321,12 +56073,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -56434,7 +56180,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -56646,7 +56391,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -56676,7 +56420,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -56808,8 +56551,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -56898,12 +56640,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -57439,8 +57175,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -57549,10 +57284,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -59685,7 +59418,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -60115,7 +59847,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -60124,25 +59856,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -60646,12 +60378,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -60765,7 +60491,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -60977,7 +60702,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -61010,7 +60734,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -61146,8 +60869,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -61244,12 +60966,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {
@@ -61816,8 +61532,7 @@
                 "netflix:edgar_span_model",
                 "netflix:evcache-client2",
                 "netflix:simone-client",
-                "netflix:videoresolutiontypelibrary",
-                "org.reflections:reflections"
+                "netflix:videoresolutiontypelibrary"
             ]
         },
         "com.google.code.findbugs:jsr305": {
@@ -61926,10 +61641,8 @@
                 "netflix:playback-monkey-model",
                 "netflix:simone-client",
                 "netflix:simone-common",
-                "netflix:vms-utils",
                 "org.apache.curator:curator-client",
-                "org.elasticsearch:elasticsearch",
-                "org.reflections:reflections"
+                "org.elasticsearch:elasticsearch"
             ]
         },
         "com.google.inject.extensions:guice-assistedinject": {
@@ -64062,7 +63775,6 @@
                 "com.netflix.astyanax:astyanax-cql",
                 "com.netflix.vms.events:vmsevents-kafka",
                 "netflix:cinder-core",
-                "netflix:vms-utils",
                 "org.apache.kafka:kafka-clients",
                 "org.cassandraunit:cassandra-unit-shaded"
             ]
@@ -64492,7 +64204,7 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:cinder-core",
                 "netflix:gutenberg-consumer-library",
@@ -64501,25 +64213,25 @@
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "4.2.6",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-consumer-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:gutenberg-publishing-library": {
-            "locked": "4.2.5",
+            "locked": "4.2.7",
             "transitive": [
                 "netflix:hermes"
             ]
         },
         "netflix:hermes": {
-            "locked": "2.6.0",
+            "locked": "2.6.1",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-publish-workflow"
             ]
@@ -65023,12 +64735,6 @@
             "project": true,
             "requested": "latest.release"
         },
-        "netflix:vms-utils": {
-            "locked": "68.1.0",
-            "transitive": [
-                "com.netflix.vms.transformer:vmstransformer-publish-workflow"
-            ]
-        },
         "netflix:vmsconverter-hollow-api": {
             "locked": "1.12.0",
             "transitive": [
@@ -65142,7 +64848,6 @@
                 "netflix:nfsso",
                 "netflix:nsac-client",
                 "netflix:platform-ipc",
-                "netflix:vms-utils",
                 "org.apache.httpcomponents:httpasyncclient",
                 "org.apache.thrift:libthrift"
             ]
@@ -65354,7 +65059,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-mapper-asl",
                 "org.codehaus.jackson:jackson-xc"
@@ -65387,7 +65091,6 @@
                 "netflix:platform-aws",
                 "netflix:platform-ipc",
                 "netflix:platform-management",
-                "netflix:vms-utils",
                 "netflix:whitecastle_v2",
                 "org.codehaus.jackson:jackson-jaxrs",
                 "org.codehaus.jackson:jackson-xc"
@@ -65523,8 +65226,7 @@
         "org.javassist:javassist": {
             "locked": "3.20.0-GA",
             "transitive": [
-                "netflix:platform-dependency-command",
-                "org.reflections:reflections"
+                "netflix:platform-dependency-command"
             ]
         },
         "org.json:json": {
@@ -65621,12 +65323,6 @@
             "locked": "2.14.1",
             "transitive": [
                 "netflix:base-explorer"
-            ]
-        },
-        "org.reflections:reflections": {
-            "locked": "0.9.10",
-            "transitive": [
-                "netflix:vms-utils"
             ]
         },
         "org.slf4j:slf4j-api": {

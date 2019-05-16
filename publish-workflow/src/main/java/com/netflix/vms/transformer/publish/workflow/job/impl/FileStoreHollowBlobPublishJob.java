@@ -8,7 +8,6 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
-import com.netflix.videometadata.s3.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
@@ -25,10 +24,10 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
     private static final int  RETRY_ATTEMPTS = 10;
     
     public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip,
-            long inputVersion, long previousVersion, long version,
+            long inputVersion, long gk2InputVersion, long previousVersion, long version,
             PublishType jobType, File fileToUpload, boolean isNostreams) {
         super(ctx, vip,
-                inputVersion, previousVersion, version,
+                inputVersion, gk2InputVersion, previousVersion, version,
                 jobType, fileToUpload, isNostreams);
     }
 
@@ -139,6 +138,7 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         
         BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
         BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(inputVersion));
+        BlobMetaDataUtil.addAttribute(att, "gk2InputVersion", String.valueOf(gk2InputVersion));
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
         return att;

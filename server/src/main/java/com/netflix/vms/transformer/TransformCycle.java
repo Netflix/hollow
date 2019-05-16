@@ -186,6 +186,10 @@ public class TransformCycle {
             AtomicLong noStreamsPreviousVersion = new AtomicLong(Long.MIN_VALUE);
             AtomicLong noStreamsVersion = new AtomicLong(Long.MIN_VALUE);
 
+            LongSupplier g2kInputVersion = gk2StatusConsumer == null
+                    ? () -> Long.MIN_VALUE
+                    : gk2StatusConsumer::getCurrentVersionId;
+
             this.produceExecutor = Executors.newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "vmstransformer-producer");
                 // Not necessary if constructing thread is a daemon thread
@@ -201,6 +205,7 @@ public class TransformCycle {
                     .withRestore();
             publishStager.initProducer(
                     inputConsumer::getCurrentVersionId,
+                    g2kInputVersion,
                     producerBuilder,
                     cinderVip,
                     mainPreviousVersion, noStreamsPreviousVersion::get, noStreamsVersion::get);
@@ -216,6 +221,7 @@ public class TransformCycle {
                     .withRestore();
             publishStager.initNoStreamsProducer(
                     inputConsumer::getCurrentVersionId,
+                    g2kInputVersion,
                     noStreamsProducerBuilder,
                     nostreamsCinderVip,
                     mainPreviousVersion);
@@ -730,11 +736,11 @@ public class TransformCycle {
     }
 
     private static CompletableFuture<Void> loadInputAsync(Executor executor,
-            TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer) {
-        return CompletableFuture.runAsync(() -> loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer), executor);
+            TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer, Long pinnedGk2InputVersion) {
+        return CompletableFuture.runAsync(() -> loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion), executor);
     }
 
-    private static void loadInput(TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer) {
+    private static void loadInput(TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer, Long pinnedGk2InputVersion) {
         try {
             // Spot to trigger Cycle Monkey if enabled
             ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
@@ -747,9 +753,17 @@ public class TransformCycle {
                     throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
                 }
             }
-            
-            if(gk2StatusConsumer != null)
-                gk2StatusConsumer.triggerRefresh();
+
+            if(gk2StatusConsumer != null) {
+                if (pinnedGk2InputVersion == null) {
+                    gk2StatusConsumer.triggerRefresh();
+                } else {
+                    gk2StatusConsumer.triggerRefreshTo(pinnedGk2InputVersion);
+                    if (gk2StatusConsumer.getCurrentVersionId() != pinnedGk2InputVersion) {
+                        throw new IllegalStateException("Failed to pin GK2 input to :" + pinnedGk2InputVersion);
+                    }
+                }
+            }
 
             ctx.getLogger().info(BlobState,
                     "Loaded input to version={}, header={}",
@@ -788,6 +802,14 @@ public class TransformCycle {
                 pinnedInputVersion = followVipPin.getInputVersionId();
             }
 
+            Long pinnedGk2InputVersion = ctx.getConfig().getPinGk2InputVersion();
+            if(pinnedGk2InputVersion == null && followVipPin != null) {
+                pinnedGk2InputVersion = followVipPin.getGk2InputVersion();
+                if (pinnedGk2InputVersion == Long.MIN_VALUE) {
+                    pinnedGk2InputVersion = null;
+                }
+            }
+
             // Determine whether to process restore here; only restore once
             if (isRestoreNeeded && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
                 SimultaneousExecutor executor = new SimultaneousExecutor(3,
@@ -795,7 +817,7 @@ public class TransformCycle {
                         "vms-restore-and-input-processing");
 
                 // Load input concurrently with restoring the outputs
-                CompletableFuture<Void> inputProcessingResult = loadInputAsync(executor, ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer);
+                CompletableFuture<Void> inputProcessingResult = loadInputAsync(executor, ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion);
                 // Restore outputs concurrently
                 restoreOutputs(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
 
@@ -803,7 +825,7 @@ public class TransformCycle {
                 inputProcessingResult.get();
             } else {
                 // Load input sequentially
-                loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer);
+                loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion);
             }
 
             //// set the now millis
@@ -1076,8 +1098,12 @@ public class TransformCycle {
 
         ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
+            long gk2Version = (gk2StatusConsumer == null)
+                    ? Long.MIN_VALUE
+                    : gk2StatusConsumer.getCurrentVersionId();
+
             CycleStatusFuture future = publishWorkflowStager.triggerPublish(
-                    inputConsumer.getCurrentVersionId(), previousCycleNumber, currentCycleNumber);
+                    inputConsumer.getCurrentVersionId(), gk2Version, previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
 

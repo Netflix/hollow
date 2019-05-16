@@ -7,7 +7,7 @@ import java.util.function.LongSupplier;
 
 public interface PublishWorkflowStager {
     
-    CycleStatusFuture triggerPublish(long inputDataVersion, long previousCycleId, long currentCycleId);
+    CycleStatusFuture triggerPublish(long inputDataVersion, long gk2InputVersion, long previousCycleId, long currentCycleId);
     
     void notifyRestoredStateEngine(HollowReadStateEngine stateEngine, HollowReadStateEngine nostreamsRestoredState);
     
@@ -15,13 +15,15 @@ public interface PublishWorkflowStager {
 
     PublishWorkflowContext getContext();
 
-    default void initProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
+    default void initProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+            CinderProducerBuilder pb,
             String vip,
             LongSupplier previousVersion,
             LongSupplier noStreamsPreviousVersion, LongSupplier noStreamsVersion) {
     }
 
-    default void initNoStreamsProducer(LongSupplier inputVersion, CinderProducerBuilder pb,
+    default void initNoStreamsProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+            CinderProducerBuilder pb,
             String vip,
             LongSupplier previousVersion) {
     }

@@ -7,7 +7,6 @@ dependencies {
     compile 'netflix:playback-monkey-model:latest.release'
     compile 'netflix:awsutils:latest.release'
     compile 'netflix:hermes:latest.release'
-    compile 'netflix:vms-utils:latest.release'
     compile 'netflix:cinder-core:latest.release'
 
     testCompile 'junit:junit'

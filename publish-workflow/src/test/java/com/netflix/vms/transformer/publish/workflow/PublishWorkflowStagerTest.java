@@ -29,6 +29,7 @@ public class PublishWorkflowStagerTest {
     private static final String VIP = "magicvip";
     private static final long CURRENT_VERSION = 2L;
     private static final long INPUT_DATA_VERSION = 1L;
+    private static final long GK2_INPUT_DATA_VERSION = 1L;
     private static final long LATEST_VERSION = 3L;
 
     private HollowPublishWorkflowStager stager;
@@ -104,7 +105,7 @@ public class PublishWorkflowStagerTest {
             return true;
         });
 
-        stager.triggerPublish(INPUT_DATA_VERSION, CURRENT_VERSION, LATEST_VERSION).awaitStatus();
+        stager.triggerPublish(INPUT_DATA_VERSION, GK2_INPUT_DATA_VERSION, CURRENT_VERSION, LATEST_VERSION).awaitStatus();
         // grab exception from worker thread, throw here
         Throwable thrown = f.get();
         if (thrown != null) {

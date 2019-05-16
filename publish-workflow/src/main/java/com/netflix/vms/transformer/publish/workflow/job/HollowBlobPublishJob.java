@@ -8,15 +8,17 @@ public abstract class HollowBlobPublishJob extends PublishWorkflowPublicationJob
 
     protected final String vip;
     protected final long inputVersion;
+    protected final long gk2InputVersion;
     protected final long previousVersion;
     protected final boolean isNostreams;
     protected final File fileToUpload;
     protected final PublishType jobType;
 
-    public HollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
+    public HollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long gk2InputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
         super(ctx, "publish-"+ jobType.toString(), version);
         this.vip = vip;
         this.inputVersion = inputVersion;
+        this.gk2InputVersion = gk2InputVersion;
         this.previousVersion = previousVersion;
         this.jobType = jobType;
         this.fileToUpload = fileToUpload;

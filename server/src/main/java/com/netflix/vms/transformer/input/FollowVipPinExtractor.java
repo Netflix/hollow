@@ -37,11 +37,12 @@ public class FollowVipPinExtractor {
                 }
                 
                 long inputVersion = FileStoreUtil.getInputDataVersion(latestItem);
+                long gk2InputVersion = FileStoreUtil.getGk2InputDataVersion(latestItem);
                 long publishCycleDataTS = FileStoreUtil.getPublishCycleDataTS(latestItem);
                 
                 if(inputVersion != Long.MIN_VALUE && publishCycleDataTS != Long.MIN_VALUE) {
                     ctx.getLogger().info(FollowVip, "Following VIP " + followVip + " version " + dataVersion + "(converter: " + converterVip + " inputVersion: " + inputVersion + " dataTS: " + publishCycleDataTS + ")");
-                    return new FollowVipPin(followVip, inputVersion, publishCycleDataTS);
+                    return new FollowVipPin(followVip, inputVersion, gk2InputVersion, publishCycleDataTS);
                 } else {
                     ctx.getLogger().warn(FollowVip, "Could not determine pin values from " + followVip);
                 }

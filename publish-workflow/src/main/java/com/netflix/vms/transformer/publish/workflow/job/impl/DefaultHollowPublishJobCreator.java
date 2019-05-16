@@ -85,10 +85,10 @@ public class DefaultHollowPublishJobCreator {
     }
 
     public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean isNostreams,
-            long inputVersion, long previousVersion, long version,
+            long inputVersion, long gk2InputVersion, long previousVersion, long version,
             File fileToUpload) {
         return new FileStoreHollowBlobPublishJob(ctx, vip,
-                inputVersion, previousVersion, version,
+                inputVersion, gk2InputVersion, previousVersion, version,
                 jobType, fileToUpload, isNostreams);
     }
 

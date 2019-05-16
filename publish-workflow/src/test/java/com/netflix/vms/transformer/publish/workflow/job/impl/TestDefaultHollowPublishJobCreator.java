@@ -59,8 +59,8 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 
 	@Override
 	public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean noStreams,
-            long inputVersion, long previousVersion, long version, File fileToUpload) {
-		return new TestHollowBlobPublishJob(context, vip, inputVersion, previousVersion, version, jobType, fileToUpload,
+            long inputVersion, long gk2InputVersion, long previousVersion, long version, File fileToUpload) {
+		return new TestHollowBlobPublishJob(context, vip, inputVersion, gk2InputVersion, previousVersion, version, jobType, fileToUpload,
 				noStreams);
 	}
 
