@@ -2758,7 +2758,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -6490,7 +6490,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -10424,7 +10424,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -14546,7 +14546,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -18525,7 +18525,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -22536,7 +22536,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -26341,7 +26341,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -30348,7 +30348,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
@@ -34400,7 +34400,7 @@
             ]
         },
         "netflix:awsutils": {
-            "locked": "1.87.0",
+            "locked": "1.88.0",
             "requested": "latest.release"
         },
         "netflix:base-explorer": {
