@@ -53,7 +53,6 @@ public class AbstractProducerMetricsListenerTest {
             }
         }
         AbstractProducerMetricsListener concreteProducerMetricsListener = new TestProducerMetricsListener();
-        concreteProducerMetricsListener.onCycleStart(TEST_VERSION);
         concreteProducerMetricsListener.onCycleSkip(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
     }
 
@@ -71,7 +70,6 @@ public class AbstractProducerMetricsListenerTest {
         }
         AbstractProducerMetricsListener concreteProducerMetricsListener = new TestProducerMetricsListener();
         concreteProducerMetricsListener.lastCycleSuccessTimeNanoOptional = OptionalLong.of(TEST_LAST_CYCLE_NANOS);
-        concreteProducerMetricsListener.onCycleStart(TEST_VERSION);
         concreteProducerMetricsListener.onCycleSkip(CycleListener.CycleSkipReason.NOT_PRIMARY_PRODUCER);
     }
 
