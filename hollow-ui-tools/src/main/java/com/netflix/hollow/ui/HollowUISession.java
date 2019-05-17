@@ -62,7 +62,7 @@ public class HollowUISession {
 
         if(req.getCookies() != null) {
             for(Cookie cookie : req.getCookies()) {
-                if("hollowDiffSessionId".equals(cookie.getName())) {
+                if("hollowUISessionId".equals(cookie.getName())) {
                     sessionId = Long.valueOf(cookie.getValue());
                 }
             }
@@ -70,7 +70,7 @@ public class HollowUISession {
 
         if(sessionId == null) {
             sessionId = new Random().nextLong() & Long.MAX_VALUE;
-            Cookie cookie = new Cookie("hollowDiffSessionId", sessionId.toString());
+            Cookie cookie = new Cookie("hollowUISessionId", sessionId.toString());
             cookie.setComment(Response.HTTP_ONLY_COMMENT);
             resp.addCookie(cookie);
         }
@@ -82,6 +82,7 @@ public class HollowUISession {
             if(existingSession != null)
                 session = existingSession;
         }
+        session.updateLastAccessed();
 
         return session;
     }
