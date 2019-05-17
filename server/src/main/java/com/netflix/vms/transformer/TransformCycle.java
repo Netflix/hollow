@@ -7,7 +7,6 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
@@ -836,12 +835,13 @@ public class TransformCycle {
                 nowMillis = System.currentTimeMillis();
             ctx.setNowMillis(nowMillis);
 
-            ctx.getLogger().info(InputDataConverterVersionId, inputConsumer.getCurrentVersionId());
+            VMSInputDataVersionLogger.logInputVersions(inputConsumer, gk2StatusConsumer, ctx);
+
             ctx.getLogger().info(ProcessNowMillis,
                     "Using transform timestamp of {} ({})",
                     nowMillis, new Date(nowMillis));
 
-            VMSInputDataVersionLogger.logInputVersions(inputConsumer.getStateEngine().getHeaderTags(), ctx.getLogger());
+            VMSInputDataVersionLogger.logConverterInputVersions(inputConsumer.getStateEngine().getHeaderTags(), ctx.getLogger());
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState,
                     "Failed to process Input", ex);
