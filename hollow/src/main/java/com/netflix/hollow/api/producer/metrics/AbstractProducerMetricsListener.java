@@ -31,7 +31,6 @@ import java.util.OptionalLong;
 public abstract class AbstractProducerMetricsListener extends AbstractHollowProducerListener implements
         ProducerMetricsReporting {
 
-    private CycleMetrics.Builder cycleMetricsBuilder;
     private AnnouncementMetrics.Builder announcementMetricsBuilder;
 
     // visible for testing
@@ -44,11 +43,6 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
         consecutiveFailures = 0l;
         lastCycleSuccessTimeNanoOptional = OptionalLong.empty();
         lastAnnouncementSuccessTimeNanoOptional = OptionalLong.empty();
-    }
-
-    @Override
-    public void onCycleStart(long version) {
-        cycleMetricsBuilder = new CycleMetrics.Builder();
     }
 
     @Override
@@ -65,12 +59,11 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
      */
     @Override
     public void onCycleSkip(CycleSkipReason reason) {
-        cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
+        CycleMetrics.Builder cycleMetricsBuilder = new CycleMetrics.Builder();
 
+        cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
         lastCycleSuccessTimeNanoOptional.ifPresent(cycleMetricsBuilder::setLastCycleSuccessTimeNano);
-
         // isCycleSuccess and cycleDurationMillis are not set for skipped cycles
-        cycleMetricsBuilder.setConsecutiveFailures(consecutiveFailures);
 
         cycleMetricsReporting(cycleMetricsBuilder.build());
     }
@@ -99,7 +92,6 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
                 .setDataSizeBytes(dataSizeBytes)
                 .setIsAnnouncementSuccess(isAnnouncementSuccess)
                 .setAnnouncementDurationMillis(elapsed.toMillis());
-
         lastAnnouncementSuccessTimeNanoOptional.ifPresent(announcementMetricsBuilder::setLastAnnouncementSuccessTimeNano);
 
         announcementMetricsReporting(announcementMetricsBuilder.build());
@@ -126,11 +118,10 @@ public abstract class AbstractProducerMetricsListener extends AbstractHollowProd
             consecutiveFailures ++;
         }
 
-        cycleMetricsBuilder
+        CycleMetrics.Builder cycleMetricsBuilder = new CycleMetrics.Builder()
                 .setConsecutiveFailures(consecutiveFailures)
                 .setCycleDurationMillis(elapsed.toMillis())
                 .setIsCycleSuccess(isCycleSuccess);
-
         lastCycleSuccessTimeNanoOptional.ifPresent(cycleMetricsBuilder::setLastCycleSuccessTimeNano);
 
         cycleMetricsReporting(cycleMetricsBuilder.build());
