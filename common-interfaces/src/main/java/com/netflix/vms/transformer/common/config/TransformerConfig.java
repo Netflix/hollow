@@ -244,6 +244,9 @@ public interface TransformerConfig {
     @DefaultValue("false")
     boolean isLanguageVariantsForMerchIntentEnabled();
 
+    @DefaultValue("false")
+    boolean isLanguageVariantsForAssetCheckEnabled();
+
 
     // Temporary features switching in cinder support
 

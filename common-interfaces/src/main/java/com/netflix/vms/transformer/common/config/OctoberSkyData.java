@@ -15,6 +15,11 @@ public interface OctoberSkyData {
      * Example: catalog "HK:zh" supports following variants/locales "zh-Hant", "yue" and "zh"
      */
     Set<String> getLanguageVariants(String country, String language);
+
+    /**
+     * Look up additional supported language-variants
+     */
+    Set<String> getOtherLanguageVariants(String country, String language);
     
     void refresh();
 

@@ -9,6 +9,7 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.CycleDataAggregator;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
@@ -39,6 +40,7 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -186,6 +188,14 @@ public class VMSAvailabilityWindowModule {
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
 
+        String originalLanguageBCPCodeForVideo = "";
+        int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
+        if (videoGeneralOrdinal != -1) {
+            VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
+            if (general._getOriginalLanguageBcpCode() != null)
+                originalLanguageBCPCodeForVideo = general._getOriginalLanguageBcpCode()._getValue();
+        }
+
         long minWindowStartDate = Long.MAX_VALUE;
 
         boolean currentOrFirstFutureWindowFoundLocalAudio = false;
@@ -228,10 +238,10 @@ public class VMSAvailabilityWindowModule {
                 VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, country, dealId);
                 boolean isAvailableForDownload = windowContractHollow._getDownload();
                 List<RightsContractPackageHollow> contractPackages = windowContractHollow._getPackages() != null ? windowContractHollow._getPackages().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
-                List<RightsContractAssetHollow> contractAssets = windowContractHollow._getAssets() != null ? windowContractHollow._getAssets().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
+                List<RightsContractAssetHollow> contractAssetRights = windowContractHollow._getAssets() != null ? windowContractHollow._getAssets().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
 
                 // CASE 1: NO packages and Assets in the contract -> Build info using only the videoID and contractID
-                if (windowContractHollow._getPackageIdBoxed() == null && contractAssets.isEmpty() && contractPackages.isEmpty()) {
+                if (windowContractHollow._getPackageIdBoxed() == null && contractAssetRights.isEmpty() && contractPackages.isEmpty()) {
 
                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) dealId, videoId));
                     if (maxPackageId == 0) {
@@ -266,8 +276,22 @@ public class VMSAvailabilityWindowModule {
                                 packageData = packageDataCollection.getPackageData();
 
                             if (language != null) {
-                                long contractAssetAvailability = language == null ? -1 : multilanguageCountryWindowFilter.contractAvailabilityForLanguage(language, contractAssets);
-                                long packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
+                                long packageAvailability = 0L;
+                                if (country != null && ctx.getConfig().isLanguageVariantsForAssetCheckEnabled()) {
+
+                                    OctoberSkyData osData = ctx.getOctoberSkyData();
+                                    Set<String> variants = osData.getLanguageVariants(country, language);
+
+                                    if (osData.getOtherLanguageVariants(country, language).contains(originalLanguageBCPCodeForVideo))
+                                        variants.add(originalLanguageBCPCodeForVideo);
+                                    for (String locale : variants) {
+                                        long contractAssetAvailability = multilanguageCountryWindowFilter.contractAvailabilityForLocale(locale, contractAssetRights);
+                                        packageAvailability |= multilanguageCountryWindowFilter.packageIsAvailableForLocale(locale, packageData, contractAssetAvailability);
+                                    }
+                                } else {
+                                    long contractAssetAvailability = multilanguageCountryWindowFilter.contractAvailabilityForLanguage(language, contractAssetRights);
+                                    packageAvailability = multilanguageCountryWindowFilter.packageIsAvailableForLanguage(language, packageData, contractAssetAvailability);
+                                }
 
                                 // package filtering
                                 if (packageAvailability == 0) {
@@ -313,7 +337,7 @@ public class VMSAvailabilityWindowModule {
                                     // if existing windowPackageContractInfo is present and window data is NOT TO BE filtered,
                                     // then clone and update window package contract info.
                                     WindowPackageContractInfo updatedClone = cloneWindowPackageContractInfo(videoId, windowPackageContractInfo,
-                                            dealId, contractAttributes, contractAssets, isAvailableForDownload, packageId.val);
+                                            dealId, contractAttributes, contractAssetRights, isAvailableForDownload, packageId.val);
 
                                     // update the package window package contract info
                                     outputWindow.windowInfosByPackageId.put(packageId, updatedClone);
@@ -426,7 +450,7 @@ public class VMSAvailabilityWindowModule {
                 if (isOpenWindow && !includedWindowPackageData) skipWindow = true;
 
                 // if window is future, and no package data was included and also no intention to get assets then skip the window.
-                if (isFutureWindow && !includedWindowPackageData && getEarliestWindowStartDateForTheLanguage(videoId, country, language) == null) skipWindow = true;
+                if (isFutureWindow && !includedWindowPackageData && getEarliestWindowStartDateForTheLanguage(videoId, country, language, originalLanguageBCPCodeForVideo) == null) skipWindow = true;
             }
 
             if (!skipWindow) {
@@ -618,7 +642,9 @@ public class VMSAvailabilityWindowModule {
         return false;
     }
 
-    private Long getEarliestWindowStartDateForTheLanguage(long videoId, String country, String language) {
+    private Long getEarliestWindowStartDateForTheLanguage(long videoId, String country, String language, String originalLanguageBCPCodeForVideo) {
+
+        // todo use originalLanguageBCPCodeForVideo
 
         boolean shouldCheckLanguageVariants = ctx.getConfig().isLanguageVariantsForMerchIntentEnabled();
         int ordinal = merchLanguageDateIdx.getMatchingOrdinal(videoId, country);
@@ -634,6 +660,9 @@ public class VMSAvailabilityWindowModule {
 
             if (shouldCheckLanguageVariants) {
                 Set<String> languageVariants = ctx.getOctoberSkyData().getLanguageVariants(country, language);
+                if(ctx.getOctoberSkyData().getOtherLanguageVariants(country, language).contains(originalLanguageBCPCodeForVideo)) {
+                    languageVariants.add(originalLanguageBCPCodeForVideo);
+                }
                 for (String variant : languageVariants) {
                     longHollow = mapOfStringToLongHollow.get(variant);
                     if (longHollow != null) return longHollow._getValue();

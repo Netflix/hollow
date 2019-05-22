@@ -71,8 +71,16 @@ public class OctoberSkyDataImpl implements OctoberSkyData {
     @Override
     public Set<String> getLanguageVariants(String country, String language) {
         LanguageCatalogMetadata catalogMetadata = countryLanguageCatalogLanguageVariantsMap.get(country + COUNTRY_LANGUAGE_SEP + language);
-        if (catalogMetadata != null)
+        if (catalogMetadata != null && catalogMetadata.getCatalogLanguages() != null)
             return catalogMetadata.getCatalogLanguages().stream().collect(Collectors.toSet());
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<String> getOtherLanguageVariants(String country, String language) {
+        LanguageCatalogMetadata otherLanguages = countryLanguageCatalogLanguageVariantsMap.get(country + COUNTRY_LANGUAGE_SEP + language);
+        if (otherLanguages != null && otherLanguages.getOtherLanguagesIfOriginalLanguage() != null)
+            return otherLanguages.getOtherLanguagesIfOriginalLanguage().stream().collect(Collectors.toSet());
         return Collections.emptySet();
     }
 
