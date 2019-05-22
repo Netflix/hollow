@@ -4,6 +4,7 @@ import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.data.TransformedVideoData;
@@ -39,6 +40,7 @@ public class VideoMiscDataModule {
     private final HollowPrimaryKeyIndex videoAwardIdx;
     private final HollowPrimaryKeyIndex csmReviewIdx;
     private final HollowPrimaryKeyIndex awardIdx;
+    private static FastProperty.BooleanProperty DISABLE_VIDEO_AWARDS = new FastProperty.BooleanProperty("transformer.videoMisc.disable.awardAttributes", true);
 
     public VideoMiscDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
         this.api = api;
@@ -82,7 +84,7 @@ public class VideoMiscDataModule {
 
     private VideoMiscData createMiscData(int videoId) {
         VideoMiscData miscData = new VideoMiscData();
-        miscData.videoAwards = getAwards(videoId);
+        miscData.videoAwards = getVideoAwards(videoId);
         miscData.cSMReview = getCSMReview(videoId);
         return miscData;
     }
@@ -138,7 +140,15 @@ public class VideoMiscDataModule {
     private Strings getStrings(StringHollow stringHollow) {
         return (stringHollow != null && stringHollow._getValue() != null) ? new Strings(stringHollow._getValue().toCharArray()) : null;
     }
-    
+
+    private List<VideoAward> getVideoAwards(int videoId){
+        // If disabled, return empty
+        if(DISABLE_VIDEO_AWARDS.getValue()){
+            return new ArrayList<>();
+        }
+        return getAwards(videoId);
+    }
+
     private List<VideoAward> getAwards(int videoId) {
         List<VideoAward> videoAwards = new ArrayList<>();
         int videoAwardsOrdinal = videoAwardIdx.getMatchingOrdinal((long)videoId);
