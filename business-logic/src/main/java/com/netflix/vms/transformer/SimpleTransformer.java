@@ -231,7 +231,7 @@ public class SimpleTransformer {
                                 processCurrentData(transformedVideoData, objectMapper);
                         }
                     } catch (Throwable th) {
-                        ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) stacktrace={}" + getTopNodeIdentifierString(processGroup), Arrays.toString(th.getStackTrace()), th);
+                        ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup) + " stacktrace= " + Arrays.toString(th.getStackTrace()), th);
                         failedIndividualTransforms.incrementAndGet();
                     }
 

@@ -226,9 +226,10 @@ public class VMSAvailabilityWindowModule {
             VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
             boolean isOpenWindow = window._getStartDate() <= ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis();
             boolean isFutureWindow = window._getStartDate() > ctx.getNowMillis();
+            boolean hasMerchIntentForLanguage = language != null ?
+                    getEarliestWindowStartDateForTheLanguage(videoId, country, language, originalLanguageBCPCodeForVideo) != null : false;
             List<RightsWindowContractHollow> windowContracts = window._getContractIdsExt() != null ?  window._getContractIdsExt().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
             boolean shouldFilterWindowPackageContractData = shouldFilterWindowPackageContractData(window._getStartDate(), window._getEndDate());
-
 
             for (RightsWindowContractHollow windowContractHollow : windowContracts) {
 
@@ -275,6 +276,7 @@ public class VMSAvailabilityWindowModule {
                             if (packageDataCollection != null)
                                 packageData = packageDataCollection.getPackageData();
 
+                            // merch filtering logic begins here
                             if (language != null) {
                                 long packageAvailability = 0L;
                                 if (country != null && ctx.getConfig().isLanguageVariantsForAssetCheckEnabled()) {
@@ -298,7 +300,11 @@ public class VMSAvailabilityWindowModule {
 
                                     // check for grandfathering of existing titles in country catalog to continue to be available in new language catalog in that country.
                                     boolean skipPackage = true;
-                                    if (grandfatherEnabled && grandfatherLanguages.contains(language)) skipPackage = false;
+                                    if (grandfatherEnabled && grandfatherLanguages.contains(language)) {
+                                        skipPackage = false;
+                                    } else if(isFutureWindow && hasMerchIntentForLanguage) {
+                                        skipPackage = false;
+                                    }
                                     if (skipPackage) {
                                         reportMissingAssets(videoId, country, language, packageId.val, dealId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                         continue;
@@ -450,7 +456,9 @@ public class VMSAvailabilityWindowModule {
                 if (isOpenWindow && !includedWindowPackageData) skipWindow = true;
 
                 // if window is future, and no package data was included and also no intention to get assets then skip the window.
-                if (isFutureWindow && !includedWindowPackageData && getEarliestWindowStartDateForTheLanguage(videoId, country, language, originalLanguageBCPCodeForVideo) == null) skipWindow = true;
+                if (isFutureWindow && !includedWindowPackageData && !hasMerchIntentForLanguage) {
+                    skipWindow = true;
+                }
             }
 
             if (!skipWindow) {
