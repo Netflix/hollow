@@ -78,6 +78,7 @@ abstract class AbstractHollowProducer {
     final SingleProducerEnforcer singleProducerEnforcer;
     long lastSuccessfulCycle = 0;
     final HollowObjectHashCodeFinder hashCodeFinder;
+    final boolean doIntegrityCheck;
 
     boolean isInitialized;
 
@@ -90,7 +91,7 @@ abstract class AbstractHollowProducer {
                 new VersionMinterWithCounter(), null, 0,
                 DEFAULT_TARGET_MAX_TYPE_SHARD_SIZE, null,
                 new DummyBlobStorageCleaner(), new BasicSingleProducerEnforcer(),
-                null);
+                null, true);
     }
 
     // The only constructor should be that which accepts a builder
@@ -102,7 +103,7 @@ abstract class AbstractHollowProducer {
                 b.versionMinter, b.snapshotPublishExecutor,
                 b.numStatesBetweenSnapshots, b.targetMaxTypeShardSize,
                 b.metricsCollector, b.blobStorageCleaner, b.singleProducerEnforcer,
-                b.hashCodeFinder);
+                b.hashCodeFinder, b.doIntegrityCheck);
     }
 
     private AbstractHollowProducer(
@@ -117,7 +118,8 @@ abstract class AbstractHollowProducer {
             HollowMetricsCollector<HollowProducerMetrics> metricsCollector,
             HollowProducer.BlobStorageCleaner blobStorageCleaner,
             SingleProducerEnforcer singleProducerEnforcer,
-            HollowObjectHashCodeFinder hashCodeFinder) {
+            HollowObjectHashCodeFinder hashCodeFinder,
+            boolean doIntegrityCheck) {
         this.publisher = publisher;
         this.announcer = announcer;
         this.versionMinter = versionMinter;
@@ -126,6 +128,7 @@ abstract class AbstractHollowProducer {
         this.snapshotPublishExecutor = snapshotPublishExecutor;
         this.numStatesBetweenSnapshots = numStatesBetweenSnapshots;
         this.hashCodeFinder = hashCodeFinder;
+        this.doIntegrityCheck = doIntegrityCheck;
 
         HollowWriteStateEngine writeEngine = hashCodeFinder == null
                 ? new HollowWriteStateEngine()
@@ -368,7 +371,9 @@ abstract class AbstractHollowProducer {
 
                 ReadStateHelper candidate = readStates.roundtrip(toVersion);
                 cycleStatus.readState(candidate.pending());
-                candidate = checkIntegrity(listeners, candidate, artifacts);
+                candidate = doIntegrityCheck ? 
+                        checkIntegrity(listeners, candidate, artifacts) : 
+                            noIntegrityCheck(candidate, artifacts);
 
                 try {
                     validate(listeners, candidate.pending());
@@ -529,8 +534,8 @@ abstract class AbstractHollowProducer {
     void publish(ListenerSupport.Listeners listeners, long toVersion, Artifacts artifacts) throws IOException {
         Status.StageBuilder psb = listeners.firePublishStart(toVersion);
         try {
-            artifacts.snapshot = stageBlob(listeners,
-                    blobStager.openSnapshot(toVersion));
+            if(!readStates.hasCurrent() || doIntegrityCheck || numStatesUntilNextSnapshot <= 0)
+                artifacts.snapshot = stageBlob(listeners, blobStager.openSnapshot(toVersion));
 
             if (readStates.hasCurrent()) {
                 artifacts.delta = stageBlob(listeners,
@@ -708,6 +713,29 @@ abstract class AbstractHollowProducer {
         } finally {
             listeners.fireIntegrityCheckComplete(status);
         }
+    }
+    
+    private ReadStateHelper noIntegrityCheck(ReadStateHelper readStates, Artifacts artifacts) throws IOException {
+        ReadStateHelper result = readStates;
+
+        if(!readStates.hasCurrent()) {
+            HollowReadStateEngine pending = readStates.pending().getStateEngine();
+            readSnapshot(artifacts.snapshot, pending);
+        } else {
+            HollowReadStateEngine current = readStates.current().getStateEngine();
+
+            if (artifacts.hasDelta()) {
+                if (!artifacts.hasReverseDelta()) {
+                    throw new IllegalStateException("Both a delta and reverse delta are required");
+                }
+
+                applyDelta(artifacts.delta, current);
+                
+                result = readStates.swap();
+            }
+        }
+
+        return result;
     }
 
     private void readSnapshot(HollowProducer.Blob blob, HollowReadStateEngine stateEngine) throws IOException {
