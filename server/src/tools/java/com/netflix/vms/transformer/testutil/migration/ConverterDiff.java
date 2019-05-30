@@ -111,7 +111,6 @@ public class ConverterDiff {
         diff.addTypeDiff("ConsolidatedCertificationSystems", "certificationSystemId");
         diff.addTypeDiff("ConsolidatedVideoRatings", "videoId");
         diff.addTypeDiff("Contracts", "movieId", "countryCode.value");
-        diff.addTypeDiff("CSMReview", "videoId");
         diff.addTypeDiff("DrmSystemIdentifiers", "id");
         diff.addTypeDiff("Episodes", "movieId", "episodeId");
         diff.addTypeDiff("Festivals", "festivalId");
@@ -155,7 +154,6 @@ public class ConverterDiff {
          *  AssetMetaDatas
          *  AudioStreamInfo
          *  Awards
-         *  CSMReview
          *  CacheDeploymentIntent
          *  Categories
          *  CategoryGroups

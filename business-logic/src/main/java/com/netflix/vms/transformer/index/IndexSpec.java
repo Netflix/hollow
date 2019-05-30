@@ -16,7 +16,6 @@ public enum IndexSpec {
     STREAM_PROFILE_GROUP(PRIMARY_KEY, "StreamProfileGroups", "groupName.value"),
     VIDEO_AWARD(PRIMARY_KEY, "VideoAward", "videoId"),
     VMS_AWARD(PRIMARY_KEY, "VMSAward", "awardId"),
-    CSM_REVIEW(PRIMARY_KEY, "CSMReview", "videoId"),
     ARTWORK_IMAGE_FORMAT(PRIMARY_KEY, "ArtWorkImageType", "imageType.value"),
     ARTWORK_RECIPE(PRIMARY_KEY, "ArtworkRecipe", "recipeName.value"),
     ARTWORK_TERRITORY_COUNTRIES(PRIMARY_KEY, "TerritoryCountries", "territoryCode.value"),

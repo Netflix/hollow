@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.modules.meta;
 
-import static com.netflix.vms.transformer.index.IndexSpec.CSM_REVIEW;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
 
@@ -8,14 +7,12 @@ import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.data.TransformedVideoData;
-import com.netflix.vms.transformer.hollowinput.CSMReviewHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoAwardHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardListHollow;
 import com.netflix.vms.transformer.hollowinput.VideoAwardMappingHollow;
-import com.netflix.vms.transformer.hollowoutput.ICSMReview;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VPerson;
 import com.netflix.vms.transformer.hollowoutput.Video;
@@ -24,7 +21,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoAwardFestival;
 import com.netflix.vms.transformer.hollowoutput.VideoAwardType;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
-import com.netflix.vms.transformer.util.OutputUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +34,6 @@ public class VideoMiscDataModule {
     private final VMSHollowInputAPI api;
     Map<Integer, VideoMiscData> videoMiscMap = new HashMap<>();
     private final HollowPrimaryKeyIndex videoAwardIdx;
-    private final HollowPrimaryKeyIndex csmReviewIdx;
     private final HollowPrimaryKeyIndex awardIdx;
     private static FastProperty.BooleanProperty DISABLE_VIDEO_AWARDS = new FastProperty.BooleanProperty("transformer.videoMisc.disable.awardAttributes", true);
 
@@ -46,7 +41,6 @@ public class VideoMiscDataModule {
         this.api = api;
         this.videoAwardIdx = indexer.getPrimaryKeyIndex(VIDEO_AWARD);
         this.awardIdx = indexer.getPrimaryKeyIndex(VMS_AWARD);
-        this.csmReviewIdx = indexer.getPrimaryKeyIndex(CSM_REVIEW);
     }
 
     public Map<Integer, VideoMiscData> buildVideoMiscDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
@@ -85,56 +79,7 @@ public class VideoMiscDataModule {
     private VideoMiscData createMiscData(int videoId) {
         VideoMiscData miscData = new VideoMiscData();
         miscData.videoAwards = getVideoAwards(videoId);
-        miscData.cSMReview = getCSMReview(videoId);
         return miscData;
-    }
-
-    private ICSMReview getCSMReview(int videoId) {
-        int csmReviewOrdinal = csmReviewIdx.getMatchingOrdinal((long)videoId);
-        if(csmReviewOrdinal != -1) {
-            CSMReviewHollow csmReviewHollow = api.getCSMReviewHollow(csmReviewOrdinal);
-            ICSMReview csmReview = new ICSMReview();
-            csmReview.ageExplanation = getStrings(csmReviewHollow._getAgeExplanation());
-            csmReview.ageRecommendation = (int)csmReviewHollow._getAgeRecommendation();
-            csmReview.castMemberNames = getStrings(csmReviewHollow._getCastMemberNames());
-            csmReview.consumerism = getStrings(csmReviewHollow._getConsumerism());
-            csmReview.consumerismAlert = (int)csmReviewHollow._getConsumerismAlert();
-            csmReview.dat = getStrings(csmReviewHollow._getDat());
-            csmReview.datAlert = (int)csmReviewHollow._getDatAlert();
-            csmReview.directorNames = getStrings(csmReviewHollow._getDirectorNames());
-            csmReview.genre = getStrings(csmReviewHollow._getGenre());
-            csmReview.greenBeginsAge = (int)csmReviewHollow._getGreenBeginsAge();
-            csmReview.isItAnyGood = getStrings(csmReviewHollow._getIsItAnyGood());
-            csmReview.languageAlert = (int)csmReviewHollow._getLanguageAlert();
-            csmReview.languageNote = getStrings(csmReviewHollow._getLanguageNote());
-            csmReview.link = getStrings(csmReviewHollow._getLink());
-            csmReview.mediaType = getStrings(csmReviewHollow._getMediaType());
-            csmReview.messageAlert = (int)csmReviewHollow._getMessageAlert();
-            csmReview.movieID = (int)csmReviewHollow._getVideoId();
-            csmReview.mPAAExplanation = getStrings(csmReviewHollow._getMpaaExplanation());
-            csmReview.mPAARating = getStrings(csmReviewHollow._getMpaaRating());
-            csmReview.oneLiner = getStrings(csmReviewHollow._getOneLiner());
-            csmReview.otherChoices = getStrings(csmReviewHollow._getOtherChoices());
-            csmReview.parentsNeedToKnow = getStrings(csmReviewHollow._getParentsNeedToKnow());
-            csmReview.plasticReleaseDate = OutputUtil.getRoundedDate(csmReviewHollow._getPlasticReleaseDate());
-            csmReview.redEndsAge = (int)csmReviewHollow._getRedEndsAge();
-            csmReview.releaseDate = OutputUtil.getRoundedDate(csmReviewHollow._getReleaseDate());
-            csmReview.reviewerName = getStrings(csmReviewHollow._getReviewerName());
-            csmReview.runtimeInMins = (int)csmReviewHollow._getRuntimeInMins();
-            csmReview.sexualContent = getStrings(csmReviewHollow._getSexualContent());
-            csmReview.sexualContentAlert = (int)csmReviewHollow._getSexualContentAlert();
-            csmReview.socialBehavior = getStrings(csmReviewHollow._getSocialBehavior());
-            csmReview.socialBehaviorAlert = (int)csmReviewHollow._getSocialBehaviorAlert();
-            csmReview.stars = (int)csmReviewHollow._getStars();
-            csmReview.studio = getStrings(csmReviewHollow._getStudio());
-            csmReview.title = getStrings(csmReviewHollow._getTitle());
-            csmReview.violenceAlert = (int)csmReviewHollow._getViolenceAlert();
-            csmReview.violenceNote = getStrings(csmReviewHollow._getViolenceNote());
-            csmReview.whatsTheStory = getStrings(csmReviewHollow._getWhatsTheStory());
-            return csmReview;
-        }
-
-        return null;
     }
 
     private Strings getStrings(StringHollow stringHollow) {

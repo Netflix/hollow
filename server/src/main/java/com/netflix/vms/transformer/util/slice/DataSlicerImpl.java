@@ -226,12 +226,6 @@ public class DataSlicerImpl implements DataSlicer {
                     return Integer.valueOf((int) inputAPI.getStatusHollow(ordinal)._getMovieId());
                 }
             });
-            findIncludedOrdinals(stateEngine, "CSMReview", videoIdsToInclude, new VideoIdDeriver() {
-                @Override
-                public Integer deriveId(int ordinal) {
-                    return Integer.valueOf((int)inputAPI.getCSMReviewHollow(ordinal)._getVideoId());
-                }
-            });
             findIncludedOrdinals(stateEngine, "PackageMovieDealCountryGroup", videoIdsToInclude, new VideoIdDeriver() {
                 @Override
                 public Integer deriveId(int ordinal) {
