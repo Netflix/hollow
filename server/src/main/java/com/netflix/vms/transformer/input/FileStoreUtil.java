@@ -2,6 +2,8 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileAccessItem;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,27 +41,16 @@ public class FileStoreUtil {
         return getAttribute(fileItem, "converterVip");
     }
 
-    public static long getInputDataVersion(FileAccessItem fileItem) {
-        String inputVersionStr = getAttribute(fileItem, "inputVersion");
-        if (inputVersionStr == null) return Long.MIN_VALUE;
+    public static Long getInputVersion(FileAccessItem fileItem, UpstreamDatasetHolder.Dataset dataset) {
+
+        String inputVersionStr = getAttribute(fileItem, UpstreamDatasetConfig.getInputVersionAttribute(dataset));
+        if (inputVersionStr == null || inputVersionStr.isEmpty()) return null;
 
         try {
             return Long.parseLong(inputVersionStr);
         } catch(Throwable th) {
-            LOGGER.error("Exception: ", th);
-            return Long.MIN_VALUE;
-        }
-    }
-
-    public static long getGk2InputDataVersion(FileAccessItem fileItem) {
-        String inputVersionStr = getAttribute(fileItem, "gk2InputVersion");
-        if (inputVersionStr == null) return Long.MIN_VALUE;
-
-        try {
-            return Long.parseLong(inputVersionStr);
-        } catch(Throwable th) {
-            LOGGER.error("Exception: ", th);
-            return Long.MIN_VALUE;
+            LOGGER.error("Failed to parse version for input {} from FileStore: ", dataset, th);
+            return null;
         }
     }
 

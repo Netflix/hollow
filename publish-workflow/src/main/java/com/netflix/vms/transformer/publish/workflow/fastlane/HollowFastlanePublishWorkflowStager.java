@@ -6,6 +6,7 @@ import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
@@ -61,11 +62,11 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
-    public CycleStatusFuture triggerPublish(long inputDataVersion, long gk2InputVersion, long previousVersion, long newVersion) {
+    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion) {
     	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
-        List<PublicationJob> allPublishJobs = addPublishJobs(inputDataVersion, gk2InputVersion, previousVersion, newVersion);
+        List<PublicationJob> allPublishJobs = addPublishJobs(cycleInputs, previousVersion, newVersion);
 
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
             createAnnounceJobForRegion(region, previousVersion, newVersion, allPublishJobs);
@@ -76,24 +77,24 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
         return CycleStatusFuture.UNCHECKED_STATUS;
     }
 
-    private List<PublicationJob> addPublishJobs(long inputDataVersion, long gk2InputVersion, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(CycleInputs cycleInputs, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
 
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if(snapshotFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, gk2InputVersion, previousVersion, newVersion, PublishType.SNAPSHOT, snapshotFile, false);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), cycleInputs, previousVersion, newVersion, PublishType.SNAPSHOT, snapshotFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(deltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, gk2InputVersion, previousVersion, newVersion, PublishType.DELTA, deltaFile, false);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), cycleInputs, previousVersion, newVersion, PublishType.DELTA, deltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if(reverseDeltaFile.exists()){
-            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), inputDataVersion, gk2InputVersion, previousVersion, newVersion, PublishType.REVERSEDELTA, reverseDeltaFile, false);
+            HollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, ctx.getVip(), cycleInputs, previousVersion, newVersion, PublishType.REVERSEDELTA, reverseDeltaFile, false);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }

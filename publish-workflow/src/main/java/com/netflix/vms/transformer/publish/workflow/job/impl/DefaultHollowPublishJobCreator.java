@@ -5,6 +5,7 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
@@ -84,12 +85,12 @@ public class DefaultHollowPublishJobCreator {
                 previousAnnounceJob);
     }
 
+
     public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean isNostreams,
-            long inputVersion, long gk2InputVersion, long previousVersion, long version,
+            CycleInputs cycleInputs, long previousVersion, long version,
             File fileToUpload) {
-        return new FileStoreHollowBlobPublishJob(ctx, vip,
-                inputVersion, gk2InputVersion, previousVersion, version,
-                jobType, fileToUpload, isNostreams);
+        return new FileStoreHollowBlobPublishJob(ctx, vip, cycleInputs,
+                previousVersion, version, jobType, fileToUpload, isNostreams);
     }
 
     public HollowBlobDeleteFileJob createDeleteFileJob(List<PublicationJob> circuitBreakerAndPublishJobs,
@@ -159,8 +160,8 @@ public class DefaultHollowPublishJobCreator {
     }
 
     public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency,
-            long inputVersion, long cycleVersion) {
+            CycleInputs cycleInputs, long cycleVersion) {
         return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer,
-                inputVersion, cycleVersion);
+                cycleInputs, cycleVersion);
     }
 }

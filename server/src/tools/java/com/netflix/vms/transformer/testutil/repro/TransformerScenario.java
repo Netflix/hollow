@@ -1,4 +1,6 @@
 package com.netflix.vms.transformer.testutil.repro;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
 import com.netflix.hollow.core.memory.encoding.HashCodes;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -7,8 +9,10 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
@@ -18,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -58,11 +64,16 @@ public class TransformerScenario {
             inputStateEngineSlice = createStateEngineSlice(scenarioInputFile);
         }
 
-        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         ctx.setNowMillis(processTimestamp);
-        new SimpleTransformer(api, null, outputStateEngine, ctx).transform();
+
+        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+        inputs.put(CONVERTER, new InputState(inputStateEngineSlice, inputDataVersion));   // TODO: Add all Cinder inputs
+        CycleInputs cycleInputs = new CycleInputs(inputs, outputDataVersion);
+
+
+        new SimpleTransformer(cycleInputs, outputStateEngine, ctx).transform();
 
         return outputStateEngine;
     }

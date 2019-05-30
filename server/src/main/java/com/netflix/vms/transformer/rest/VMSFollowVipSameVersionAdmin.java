@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.rest;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.netflix.aws.file.FileAccessItem;
@@ -125,10 +127,12 @@ public class VMSFollowVipSameVersionAdmin {
 
         for(FileAccessItem item : allVersionItems) {
             Long outputVersion = FileStoreUtil.getToVersion(item);
-            Long inputVersion = FileStoreUtil.getInputDataVersion(item);
+            Long converterInputVersion = FileStoreUtil.getInputVersion(item, CONVERTER);
+            if (converterInputVersion == null)
+                converterInputVersion = Long.MIN_VALUE;
             Long cycleDataTimestamp = FileStoreUtil.getPublishCycleDataTS(item);
 
-            String key = inputVersion + "_" + cycleDataTimestamp;
+            String key = converterInputVersion + "_" + cycleDataTimestamp;
             Set<Long> outputVersionSet = map.get(key);
             if (outputVersionSet == null) {
                 outputVersionSet = new HashSet<>();

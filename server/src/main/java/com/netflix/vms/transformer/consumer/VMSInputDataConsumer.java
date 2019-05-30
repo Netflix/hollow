@@ -2,7 +2,7 @@ package com.netflix.vms.transformer.consumer;
 
 import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.hollow.api.custom.HollowAPI;
 import java.util.function.Supplier;
 
 public class VMSInputDataConsumer {
@@ -11,11 +11,11 @@ public class VMSInputDataConsumer {
      * Create a HollowConsumer for consuming input data. This is used to update data from converter at the
      * start of {@code TransformCycle}
      */
-    public static HollowConsumer getNewConsumer(Supplier<CinderConsumerBuilder> builder, String namespace) {
+    public static HollowConsumer getNewConsumer(Supplier<CinderConsumerBuilder> builder, String namespace, Class<? extends HollowAPI> apiClass) {
 
         return builder.get()
                 .forNamespace(namespace)
-                .withGeneratedAPIClass(VMSHollowInputAPI.class)
+                .withGeneratedAPIClass(apiClass)
                 .noAnnouncementWatcher()
                 .build();
     }

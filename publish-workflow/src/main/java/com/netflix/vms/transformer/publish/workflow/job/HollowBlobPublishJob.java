@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import java.io.File;
@@ -7,18 +8,17 @@ import java.io.File;
 public abstract class HollowBlobPublishJob extends PublishWorkflowPublicationJob {
 
     protected final String vip;
-    protected final long inputVersion;
-    protected final long gk2InputVersion;
+    protected CycleInputs cycleInputs;
     protected final long previousVersion;
     protected final boolean isNostreams;
     protected final File fileToUpload;
     protected final PublishType jobType;
 
-    public HollowBlobPublishJob(PublishWorkflowContext ctx, String vip, long inputVersion, long gk2InputVersion, long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
+    public HollowBlobPublishJob(PublishWorkflowContext ctx, String vip, CycleInputs cycleInputs,
+            long previousVersion, long version, PublishType jobType, File fileToUpload, boolean isNostreams) {
         super(ctx, "publish-"+ jobType.toString(), version);
         this.vip = vip;
-        this.inputVersion = inputVersion;
-        this.gk2InputVersion = gk2InputVersion;
+        this.cycleInputs = cycleInputs;
         this.previousVersion = previousVersion;
         this.jobType = jobType;
         this.fileToUpload = fileToUpload;

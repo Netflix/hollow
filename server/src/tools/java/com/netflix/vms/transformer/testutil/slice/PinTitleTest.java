@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.testutil.slice;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
@@ -13,6 +14,9 @@ import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
@@ -33,8 +37,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -61,16 +67,21 @@ public class PinTitleTest {
         ctx.setFastlaneIds(toSet(fastlaneIds));
         ctx.setPinTitleSpecs(pinTitleSpecs);
 
+        final long converterVersion = 20180205231110642L;
         // Fetch Input State Engine
-        HollowReadStateEngine inputStateEngine = fetchInputStateEngine(CONVERTER_VIP, 20180205231110642L, FASTLANE_ID, PINTITLE_ID);
-        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
+        HollowReadStateEngine inputStateEngine = fetchInputStateEngine(CONVERTER_VIP, converterVersion, FASTLANE_ID, PINTITLE_ID);
 
         {
             PinTitleManager mgr = new PinTitleManager(env.proxyURL, CONVERTER_VIP, TRANSFORMER_VIP, LOCAL_BLOB_STORE, ctx);
             mgr.submitJobsToProcessASync(pinTitleSpecs);
 
             final VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-            SimpleTransformer transformer = new SimpleTransformer(api, null, fastlaneOutput, ctx);
+
+            Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+            inputs.put(CONVERTER, new InputState(inputStateEngine, converterVersion));   // TODO: Add all Cinder inputs
+            CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
+            SimpleTransformer transformer = new SimpleTransformer(cycleInputs, fastlaneOutput, ctx);
             transformer.transform();
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
 
@@ -154,7 +165,12 @@ public class PinTitleTest {
         File blobFile = env.localBlobStore().resolve(filename).toFile();
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-        SimpleTransformer transformer = new SimpleTransformer(api, null, outputStateEngine, ctx);
+        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+        inputs.put(CONVERTER, new InputState((HollowReadStateEngine) api.getDataAccess(), version));   // TODO: Add all Cinder inputs
+        CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
+
+        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
         transformer.transform();
         PinTitleHelper.addBlobID(outputStateEngine, name);
 

@@ -1,5 +1,6 @@
 package com.netflix.vms.transformer.testutil.slice;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 
 import com.netflix.hollow.core.memory.pool.WastefulRecycler;
@@ -13,8 +14,10 @@ import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
@@ -31,8 +34,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -122,7 +127,6 @@ public class TitleLevelPinningPOC {
         final String INPUT_FN = isLoadSlide ? SLICED_INPUT_FILE : SNAPSHOT_FILE;
         final VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         HollowReadStateEngine inputStateEngine = loadStateEngine(INPUT_FN);
-        VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngine);
 
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         ctx.setFastlaneIds(toSet(fastlaneIds));
@@ -135,8 +139,12 @@ public class TitleLevelPinningPOC {
             PinTitleManager mgr = new PinTitleManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx);
             mgr.submitJobsToProcessASync(overrideTitleSpecs);
 
+            Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+            inputs.put(CONVERTER, new InputState(inputStateEngine, 1l));   // TODO: Add all Cinder inputs
+            CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
             VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
-            SimpleTransformer transformer = new SimpleTransformer(api, null, fastlaneOutput, ctx);
+            SimpleTransformer transformer = new SimpleTransformer(cycleInputs, fastlaneOutput, ctx);
             transformer.transform();
             PinTitleHelper.addBlobID(fastlaneOutput, "FASTLANE");
             writeStateEngine(fastlaneOutput, new File(FASTLANE_FILE));

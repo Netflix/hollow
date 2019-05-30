@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.PublishedBlob;
 
 import com.netflix.aws.file.FileStore;
@@ -8,6 +10,10 @@ import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PublishBlobMessage;
@@ -16,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
@@ -24,10 +31,10 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
     private static final int  RETRY_ATTEMPTS = 10;
     
     public FileStoreHollowBlobPublishJob(PublishWorkflowContext ctx, String vip,
-            long inputVersion, long gk2InputVersion, long previousVersion, long version,
+            CycleInputs cycleInputs,
+            long previousVersion, long version,
             PublishType jobType, File fileToUpload, boolean isNostreams) {
-        super(ctx, vip,
-                inputVersion, gk2InputVersion, previousVersion, version,
+        super(ctx, vip, cycleInputs, previousVersion, version,
                 jobType, fileToUpload, isNostreams);
     }
 
@@ -137,8 +144,20 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
         }
         
         BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
-        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(inputVersion));
-        BlobMetaDataUtil.addAttribute(att, "gk2InputVersion", String.valueOf(gk2InputVersion));
+
+        // for backwards compatibility, version attributes with the 'old' names continue to be written
+        // these can be dropped by the end of Q3 2019
+        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(
+                cycleInputs.getInputs().get(CONVERTER).getVersion()));
+        BlobMetaDataUtil.addAttribute(att, "gk2InputVersion", String.valueOf(
+                cycleInputs.getInputs().get(GATEKEEPER2) == null ? Long.MIN_VALUE
+                        : cycleInputs.getInputs().get(GATEKEEPER2).getVersion()));
+
+        // Add input version attributes for all inputs
+        for (Map.Entry<UpstreamDatasetHolder.Dataset, InputState> entry : cycleInputs.getInputs().entrySet())
+            BlobMetaDataUtil.addAttribute(att, UpstreamDatasetConfig.getInputVersionAttribute(entry.getKey()),
+                    String.valueOf(entry.getValue().getVersion()));
+
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
         return att;

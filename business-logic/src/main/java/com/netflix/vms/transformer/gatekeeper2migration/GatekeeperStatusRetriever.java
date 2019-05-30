@@ -3,11 +3,11 @@ package com.netflix.vms.transformer.gatekeeper2migration;
 import static com.netflix.vms.transformer.index.IndexSpec.ALL_VIDEO_STATUS;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_STATUS;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.index.key.PrimaryKey;
+import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -27,14 +27,15 @@ public class GatekeeperStatusRetriever {
     private final HollowPrimaryKeyIndex converterStatusIdx;
     private final HollowHashIndex converterAllStatusIdx;
     
-    public GatekeeperStatusRetriever(HollowConsumer gk2StatusConsumer,
-                                     Set<String> gk2RolloutCountries,
-                                     VMSHollowInputAPI converterInputAPI,
-                                     VMSTransformerIndexer indexer) {
-        
-        this.gk2StatusAPI = (VMSHollowInputAPI) gk2StatusConsumer.getAPI();
+    public GatekeeperStatusRetriever(
+            VMSHollowInputAPI gk2StatusAPI,
+            VMSHollowInputAPI converterInputAPI,
+            Set<String> gk2RolloutCountries,
+            VMSTransformerIndexer indexer) {
+
+        this.gk2StatusAPI = gk2StatusAPI;
         this.gk2RolloutCountries = gk2RolloutCountries;
-        this.gk2StatusIdx = new HollowPrimaryKeyIndex(gk2StatusConsumer.getStateEngine(), new PrimaryKey("Status", "movieId", "countryCode"));
+        this.gk2StatusIdx = new HollowPrimaryKeyIndex((HollowReadStateEngine) gk2StatusAPI.getDataAccess(), new PrimaryKey("Status", "movieId", "countryCode"));
         
         this.converterInputAPI = converterInputAPI;
         this.converterStatusIdx = indexer.getPrimaryKeyIndex(VIDEO_STATUS);

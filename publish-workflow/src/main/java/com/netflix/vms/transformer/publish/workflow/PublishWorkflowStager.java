@@ -2,12 +2,14 @@ package com.netflix.vms.transformer.publish.workflow;
 
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 public interface PublishWorkflowStager {
     
-    CycleStatusFuture triggerPublish(long inputDataVersion, long gk2InputVersion, long previousCycleId, long currentCycleId);
+    CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousCycleId, long currentCycleId);
     
     void notifyRestoredStateEngine(HollowReadStateEngine stateEngine, HollowReadStateEngine nostreamsRestoredState);
     
@@ -15,14 +17,16 @@ public interface PublishWorkflowStager {
 
     PublishWorkflowContext getContext();
 
-    default void initProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+    default void initProducer(
+            Supplier<CycleInputs> cycleInputs,
             CinderProducerBuilder pb,
             String vip,
             LongSupplier previousVersion,
             LongSupplier noStreamsPreviousVersion, LongSupplier noStreamsVersion) {
     }
 
-    default void initNoStreamsProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+    default void initNoStreamsProducer(
+            Supplier<CycleInputs> cycleInputs,
             CinderProducerBuilder pb,
             String vip,
             LongSupplier previousVersion) {

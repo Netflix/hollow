@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
@@ -8,7 +10,6 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSp
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
@@ -17,6 +18,11 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.common.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.common.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
@@ -85,8 +91,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SimpleTransformer {
 
     private VideoNamedListModule videoNamedListModule;
-
-    private final VMSHollowInputAPI api;
+    private final VMSHollowInputAPI converterAPI;
     private final HollowWriteStateEngine writeStateEngine;
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
@@ -94,32 +99,42 @@ public class SimpleTransformer {
     
     private final GatekeeperStatusRetriever statusRetriever;
 
-    public SimpleTransformer(VMSHollowInputAPI converterInputAPI, 
-                             HollowConsumer gk2StatusConsumer, 
+    public SimpleTransformer(CycleInputs cycleInputs,
                              HollowWriteStateEngine outputStateEngine, 
                              TransformerContext ctx) {
-        this.api = converterInputAPI;
+
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;
-        HollowReadStateEngine inputStateEngine = (HollowReadStateEngine) converterInputAPI.getDataAccess();
-        this.cycleConstants = new CycleConstants(inputStateEngine, gk2StatusConsumer == null ? inputStateEngine : gk2StatusConsumer.getStateEngine());
+
+        UpstreamDatasetHolder upstream = UpstreamDatasetHolder.getNewDatasetHolder(cycleInputs.getInputs());
+
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.converterAPI = converterDataset.getAPI();
+        HollowReadStateEngine converterInputStateEngine = converterDataset.getInputState().getStateEngine();
+
+        Gatekeeper2Dataset gk2Dataset = upstream.getDataset(GATEKEEPER2);
+        VMSHollowInputAPI gk2StatusAPI = gk2Dataset.getAPI();
+        HollowReadStateEngine gk2InputStateEngine = gk2Dataset.getInputState().getStateEngine();
+
+        this.cycleConstants = new CycleConstants(converterInputStateEngine, gk2StatusAPI == null ? converterInputStateEngine : gk2InputStateEngine);
         long startTime = System.currentTimeMillis();
-        this.indexer = new VMSTransformerIndexer(inputStateEngine, ctx);
+        this.indexer = new VMSTransformerIndexer(converterInputStateEngine, ctx);
         long endTime = System.currentTimeMillis();
         
         System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
         
-        this.statusRetriever = createGatekeeperStatusRetriever(converterInputAPI, gk2StatusConsumer, outputStateEngine, ctx);
+        this.statusRetriever = createGatekeeperStatusRetriever(gk2Dataset, outputStateEngine, ctx);
     }
 
     /// TODO: Remove after full GK2 migration.
-    private GatekeeperStatusRetriever createGatekeeperStatusRetriever(VMSHollowInputAPI converterInputAPI, 
-                                                                      HollowConsumer gk2StatusConsumer, 
-                                                                      HollowWriteStateEngine outputStateEngine, 
-                                                                      TransformerContext ctx) {
+    private GatekeeperStatusRetriever createGatekeeperStatusRetriever(
+            Gatekeeper2Dataset gk2Dataset,
+            HollowWriteStateEngine outputStateEngine,
+            TransformerContext ctx) {
         GatekeeperStatusRetriever statusRetriever;
-        if(gk2StatusConsumer == null) {
-            statusRetriever = new GatekeeperStatusRetriever(converterInputAPI, indexer);
+        VMSHollowInputAPI gk2StatusAPI = gk2Dataset.getAPI();
+        if(gk2StatusAPI == null) {
+            statusRetriever = new GatekeeperStatusRetriever(converterAPI, indexer);
         } else {
             String gk2CountriesStr = ctx.getConfig().getGatekeeper2Countries();
             Set<String> gk2Countries = Collections.emptySet();
@@ -128,10 +143,10 @@ public class SimpleTransformer {
             }
             
             outputStateEngine.addHeaderTag("gatekeeper2_countries", gk2CountriesStr == null ? "" : gk2CountriesStr);
-            outputStateEngine.addHeaderTag("gatekeeper2_status_namespace", ctx.getConfig().getGatekeeper2Namespace());
-            outputStateEngine.addHeaderTag("gatekeeper2_status_version", String.valueOf(gk2StatusConsumer.getCurrentVersionId()));
-            
-            statusRetriever = new GatekeeperStatusRetriever(gk2StatusConsumer, gk2Countries, converterInputAPI, indexer);
+            outputStateEngine.addHeaderTag("gatekeeper2_status_namespace", UpstreamDatasetConfig.getNamespaces().get(GATEKEEPER2));
+            outputStateEngine.addHeaderTag("gatekeeper2_status_version", String.valueOf(gk2Dataset.getInputState().getVersion()));
+
+            statusRetriever = new GatekeeperStatusRetriever(gk2StatusAPI, converterAPI, gk2Countries, indexer);
         }
         
         return statusRetriever;
@@ -145,7 +160,7 @@ public class SimpleTransformer {
         StreamDataModule.clearVideoFormatDiffs();
 
         // hierarchy initializer, HollowObjectMapper and namedListModule
-        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(api, indexer, statusRetriever, ctx);
+        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(converterAPI, indexer, statusRetriever, ctx);
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
         objectMapper.doNotUseDefaultHashKeys();
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
@@ -168,10 +183,10 @@ public class SimpleTransformer {
         long startTime = System.currentTimeMillis();
 
         // this module can be removed in the future when we have fully migrated to cup tokens from cinder
-        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, api, ctx.getConfig());
+        CupTokenFetcher cupTokenFetcher = new CupTokenFetcher(indexer, converterAPI, ctx.getConfig());
 
         // Grouper to group by hierarchy.
-        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(api, ctx);
+        VideoHierarchyGrouper showGrouper = new VideoHierarchyGrouper(converterAPI, ctx);
         final List<Set<VideoHierarchyGroup>> processGroups = showGrouper.getProcessGroups();
         ctx.getLogger().info(TransformInfo, "topNodes={}", processGroups.size());
 
@@ -190,16 +205,16 @@ public class SimpleTransformer {
             executor.execute(() -> {
 
                 // create new modules for each executor thread
-                PackageDataModule packageDataModule = new PackageDataModule(api, ctx, objectMapper, cycleConstants,
+                PackageDataModule packageDataModule = new PackageDataModule(converterAPI, ctx, objectMapper, cycleConstants,
                         indexer, statusRetriever, cupTokenFetcher);
-                VideoCollectionsModule collectionsModule = new VideoCollectionsModule(api, ctx, cycleConstants, indexer);
-                VideoMetaDataModule metadataModule = new VideoMetaDataModule(api, ctx, cycleConstants, indexer, statusRetriever);
-                VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(api, indexer, statusRetriever);
-                VideoMiscDataModule miscDataModule = new VideoMiscDataModule(api, indexer);
-                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(api, ctx, objectMapper, cycleConstants, indexer, statusRetriever);
-                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(api, ctx,
+                VideoCollectionsModule collectionsModule = new VideoCollectionsModule(converterAPI, ctx, cycleConstants, indexer);
+                VideoMetaDataModule metadataModule = new VideoMetaDataModule(converterAPI, ctx, cycleConstants, indexer, statusRetriever);
+                VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(converterAPI, indexer, statusRetriever);
+                VideoMiscDataModule miscDataModule = new VideoMiscDataModule(converterAPI, indexer);
+                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(converterAPI, ctx, objectMapper, cycleConstants, indexer, statusRetriever);
+                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(converterAPI, ctx,
                         objectMapper, cycleConstants, indexer, statusRetriever, cycleDataAggregator, cupTokenFetcher);
-                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(api, ctx, cycleConstants, objectMapper, indexer);
+                L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();
                 while (idx < processGroups.size()) {
@@ -227,8 +242,10 @@ public class SimpleTransformer {
                             countrySpecificModule.buildCountrySpecificDataByCountry(showHierarchiesByCountry, transformedVideoData);
 
                             // process the transformed video data
-                            if (transformedVideoData.getVideoDataCollectionMap() != null && !transformedVideoData.getVideoDataCollectionMap().isEmpty())
+                            if (transformedVideoData.getVideoDataCollectionMap() != null && !transformedVideoData
+                                    .getVideoDataCollectionMap().isEmpty()) {
                                 processCurrentData(transformedVideoData, objectMapper);
+                            }
                         }
                     } catch (Throwable th) {
                         ctx.getLogger().error(IndividualTransformFailed, "Transformation failed for hierarchy with top node(s) " + getTopNodeIdentifierString(processGroup) + " stacktrace= " + Arrays.toString(th.getStackTrace()), th);
@@ -253,21 +270,21 @@ public class SimpleTransformer {
         // @formatter:off
         // Register Transform Modules
         List<TransformModule> moduleList = Arrays.asList(
-                new DrmSystemModule(api, ctx, cycleConstants, objectMapper),
-                new OriginServerModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new EncodingProfileModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new CacheDeploymentIntentModule(api, ctx, cycleConstants, objectMapper),
-                new ArtworkTypeModule(api, ctx, cycleConstants, objectMapper),
-                new ArtworkImageRecipeModule(api, ctx, cycleConstants, objectMapper),
-                new EncodingProfileGroupModule(api, ctx, cycleConstants, objectMapper),
+                new DrmSystemModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new OriginServerModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new EncodingProfileModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new CacheDeploymentIntentModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new ArtworkTypeModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new ArtworkImageRecipeModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new EncodingProfileGroupModule(converterAPI, ctx, cycleConstants, objectMapper),
 
-                new L10NMiscResourcesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new LanguageRightsModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new TopNVideoDataModule(api, ctx, cycleConstants, objectMapper),
-                new RolloutVideoModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new PersonImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new CharacterImagesModule(api, ctx, cycleConstants, objectMapper, indexer),
-                new GlobalPersonModule(api, ctx, cycleConstants, objectMapper, indexer)
+                new L10NMiscResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new LanguageRightsModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new TopNVideoDataModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new RolloutVideoModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new PersonImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new CharacterImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new GlobalPersonModule(converterAPI, ctx, cycleConstants, objectMapper, indexer)
         );
 
         // @formatter:on
@@ -447,7 +464,7 @@ public class SimpleTransformer {
         long movieId = completeVideo.id.value;
         int matchingOrdinal = primaryKeyIndex.getMatchingOrdinal(movieId);
         if (matchingOrdinal != -1) {
-            MovieCharacterPersonHollow movieCharacterPersonHollow = api.getMovieCharacterPersonHollow(matchingOrdinal);
+            MovieCharacterPersonHollow movieCharacterPersonHollow = converterAPI.getMovieCharacterPersonHollow(matchingOrdinal);
             CharacterListHollow characterList = movieCharacterPersonHollow._getCharacters();
             Iterator<PersonCharacterHollow> iterator = characterList.iterator();
             while (iterator.hasNext()) {

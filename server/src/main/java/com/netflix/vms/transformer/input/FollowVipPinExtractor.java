@@ -5,7 +5,12 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.FollowVip;
 import com.netflix.aws.file.FileAccessItem;
 import com.netflix.aws.file.FileStore;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FollowVipPinExtractor {
 
@@ -32,17 +37,34 @@ public class FollowVipPinExtractor {
             if(latestItem != null) {
                 String converterVip = FileStoreUtil.getConverterVip(latestItem);
                 if(!ctx.getConfig().getConverterVip().equals(converterVip)) {
-                    ctx.getLogger().warn(FollowVip, "Could not follow VIP " + followVip + ": not using same converter VIP (I'm using " + ctx.getConfig().getConverterVip() + " and it's using " + converterVip + ")");
+                    ctx.getLogger().warn(FollowVip, "Could not follow VIP " + followVip
+                            + ": not using same converter VIP (I'm using " + ctx.getConfig().getConverterVip()
+                            + " and it's using " + converterVip + ")");
                     return null;
                 }
                 
-                long inputVersion = FileStoreUtil.getInputDataVersion(latestItem);
-                long gk2InputVersion = FileStoreUtil.getGk2InputDataVersion(latestItem);
+                Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
+                UpstreamDatasetConfig.getNamespaces().keySet().forEach(dataset -> {
+                    Long inputVersion = FileStoreUtil.getInputVersion(latestItem, dataset);
+                    if (inputVersion != null)
+                        inputVersions.put(dataset, inputVersion);
+                    else
+                        ctx.getLogger().error(FollowVip, "Could not find input version for dataset={} in followVip={}."
+                                + " Continuing with remaining inputs.", dataset, followVip);
+                });
+
+                String logInputVersions = inputVersions.entrySet().stream()
+                        .map(Map.Entry::toString)
+                        .collect(Collectors.joining(" "));
+
                 long publishCycleDataTS = FileStoreUtil.getPublishCycleDataTS(latestItem);
-                
-                if(inputVersion != Long.MIN_VALUE && publishCycleDataTS != Long.MIN_VALUE) {
-                    ctx.getLogger().info(FollowVip, "Following VIP " + followVip + " version " + dataVersion + "(converter: " + converterVip + " inputVersion: " + inputVersion + " dataTS: " + publishCycleDataTS + ")");
-                    return new FollowVipPin(followVip, inputVersion, gk2InputVersion, publishCycleDataTS);
+
+
+                if(!inputVersions.isEmpty() && publishCycleDataTS != Long.MIN_VALUE) {
+                    ctx.getLogger().info(FollowVip, "Following VIP " + followVip + " version " + dataVersion
+                            + " dataTS: " + publishCycleDataTS
+                            + " inputs= (" + logInputVersions + ")");
+                    return new FollowVipPin(followVip, inputVersions, publishCycleDataTS);
                 } else {
                     ctx.getLogger().warn(FollowVip, "Could not determine pin values from " + followVip);
                 }

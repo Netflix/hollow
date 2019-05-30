@@ -1,21 +1,29 @@
 package com.netflix.vms.transformer.publish.workflow;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.publish.workflow.VipAnnouncer;
 import com.netflix.vms.transformer.publish.status.PublishWorkflowStatusIndicator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.TestDefaultHollowPublishJobCreator;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,6 +32,8 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class PublishWorkflowStagerTest {
     private static final String VIP = "magicvip";
@@ -35,9 +45,15 @@ public class PublishWorkflowStagerTest {
     private HollowPublishWorkflowStager stager;
     private List<File> tempFilesCreated;
     private TestDefaultHollowPublishJobCreator jobCreator;
+    private CycleInputs testCycleInputs;
+
+    @Mock private HollowConsumer mockConsumerMuon;
+    @Mock private HollowConsumer mockConsumerGk2;
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
+
         TransformerCassandraHelper cassandraHelper = mock(TransformerCassandraHelper.class);
         VipAnnouncer vipAnnouncer = mock(VipAnnouncer.class);
         TransformerConfig config = mock(TransformerConfig.class);
@@ -59,6 +75,13 @@ public class PublishWorkflowStagerTest {
         TransformerContext transformerContext = mock(TransformerContext.class);
         when(transformerContext.getPublicationHistoryConsumer()).thenReturn(c -> {});
         when(transformerContext.getCassandraHelper()).thenReturn(cassandraHelper);
+
+        Map<UpstreamDatasetHolder.Dataset, InputState> testInputs = new HashMap<>();
+        testInputs.put(CONVERTER, new InputState(mockConsumerMuon));
+        testInputs.put(GATEKEEPER2, new InputState(mockConsumerGk2));
+        testCycleInputs = new CycleInputs(testInputs, 1l);
+        when(mockConsumerMuon.getCurrentVersionId()).thenReturn(INPUT_DATA_VERSION);
+        when(mockConsumerGk2.getCurrentVersionId()).thenReturn(GK2_INPUT_DATA_VERSION);
 
         jobCreator = new TestDefaultHollowPublishJobCreator(publishContext, transformerContext, VIP);
         tempFilesCreated = createTempFiles();
@@ -105,7 +128,7 @@ public class PublishWorkflowStagerTest {
             return true;
         });
 
-        stager.triggerPublish(INPUT_DATA_VERSION, GK2_INPUT_DATA_VERSION, CURRENT_VERSION, LATEST_VERSION).awaitStatus();
+        stager.triggerPublish(testCycleInputs, CURRENT_VERSION, LATEST_VERSION).awaitStatus();
         // grab exception from worker thread, throw here
         Throwable thrown = f.get();
         if (thrown != null) {

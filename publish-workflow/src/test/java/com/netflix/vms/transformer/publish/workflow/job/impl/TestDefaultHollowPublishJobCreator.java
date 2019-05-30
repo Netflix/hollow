@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import com.netflix.config.NetflixConfiguration.RegionEnum;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -59,9 +60,8 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 
 	@Override
 	public HollowBlobPublishJob createPublishJob(String vip, PublishType jobType, boolean noStreams,
-            long inputVersion, long gk2InputVersion, long previousVersion, long version, File fileToUpload) {
-		return new TestHollowBlobPublishJob(context, vip, inputVersion, gk2InputVersion, previousVersion, version, jobType, fileToUpload,
-				noStreams);
+			CycleInputs cycleInputs, long previousVersion, long version, File fileToUpload) {
+		return new TestHollowBlobPublishJob(context, vip, cycleInputs, previousVersion, version, jobType, fileToUpload, noStreams);
 	}
 
     @Override

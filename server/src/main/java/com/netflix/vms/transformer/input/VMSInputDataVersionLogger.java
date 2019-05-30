@@ -6,6 +6,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataV
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,16 +20,12 @@ public class VMSInputDataVersionLogger {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
-    public static void logInputVersions(
-            HollowConsumer inputConsumer, HollowConsumer gk2StatusConsumer,
-            TransformerContext ctx) {
-
+    public static void logInputVersions(Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers, TransformerContext ctx) {
         Map<String, Long> inputs = new HashMap<>();
-        inputs.put(CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + ctx.getConfig().getConverterVip(),
-                inputConsumer.getCurrentVersionId());
-        if (gk2StatusConsumer != null) {
-            inputs.put(ctx.getConfig().getGatekeeper2Namespace(), gk2StatusConsumer.getCurrentVersionId());
+        for (UpstreamDatasetHolder.Dataset dataset : inputConsumers.keySet()) {
+            inputs.put(UpstreamDatasetConfig.getNamespaces().get(dataset), inputConsumers.get(dataset).getCurrentVersionId());
         }
+        // This log msg is rendered in the "Inputs to transformer" widget on dashboard
         String intputsLogLine = inputs.entrySet().stream()
                 .map(Map.Entry::toString)
                 .collect(Collectors.joining(" "));

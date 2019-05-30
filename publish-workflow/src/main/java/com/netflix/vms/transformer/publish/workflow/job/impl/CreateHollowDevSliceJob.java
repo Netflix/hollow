@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.DEV_SLICE_TOPNODE_IDS;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
@@ -11,13 +12,13 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CreateDevSliceJob;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,15 +39,16 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     private final HollowBlobDataProvider dataProvider;
     private final DataSlicer dataSlicer;
     private final String sliceVip;
-    private final long inputVersion;
+    CycleInputs cycleInputs;
     private final HollowProducer.Publisher publisher;
     private final HollowProducer.Announcer announcer;
     
-    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider, DataSlicer dataSlicer, long inputVersion, long currentCycleId) {
+    public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider,
+            DataSlicer dataSlicer, CycleInputs cycleInputs, long currentCycleId) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
         this.dataSlicer = dataSlicer;
-        this.inputVersion = inputVersion;
+        this.cycleInputs = cycleInputs;
         this.sliceVip = HermesTopicProvider.getDevSliceTopic(ctx.getVip());
         this.publisher = ctx.getDevSlicePublisher();
         this.announcer = ctx.getDevSliceAnnouncer();
@@ -141,7 +143,7 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         BlobMetaDataUtil.addAttribute(att, "toVersion", String.valueOf(getCycleVersion()));
         
         BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
-        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(inputVersion));
+        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(cycleInputs.getInputs().get(CONVERTER).getVersion()));
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
         return att;

@@ -23,7 +23,6 @@ import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
-import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.TransformCycle;
 import com.netflix.vms.transformer.atlas.AtlasTransformerMetricRecorder;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -33,6 +32,8 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
@@ -49,6 +50,8 @@ import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
@@ -56,7 +59,7 @@ import netflix.admin.videometadata.uploadstat.VMSServerUploadStatus;
 @Singleton
 public class TransformerCycleKickoff {
 
-    private static final String CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER = "vmsconverter-";
+    private Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
 
     @Inject
     public TransformerCycleKickoff(
@@ -130,33 +133,44 @@ public class TransformerCycleKickoff {
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer);
 
-        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder,
-                CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER + transformerConfig.getConverterVip());
-        
-        String gk2Namespace = transformerConfig.getGatekeeper2Namespace();
-        HollowConsumer gk2StatusConsumer = null;
-        if(gk2Namespace != null) {
-            gk2StatusConsumer = VMSInputDataConsumer.getNewConsumer(cinderConsumerBuilder, 
-                    transformerConfig.getGatekeeper2Namespace());
+        //
+        // [n Cinder inputs]
+        //  • indicates TODO
+        //  √ indicates done
+        //
+        // - Onboard n inputs in transformer cycle
+        //      √ Load/refresh data from n consumers concurrently.
+        //      √ Apply output blob header tags consistently.
+        //      √ Switch from custom FP-based input-pinning to Gutenberg pinning.
+        //      • Consumer-specific APIs (instead of VMSHollowInputAPI for all consumers)
+        //      • Store output metadata (currently in Cassandra) and blob headers (currently in output blob) in Gutenberg
+        //
+        // - Follow VIP
+        //      √ Get FollowVIP transform cycle working for n inputs.
+        //      • Get "/vms/followvipsameversion" working for n inputs.
+        //      • [desirable] replace FileStore metadata with Gutenberg metadata.
+        //
+        // - Input slicing
+        //      • Get input slicing working for n inputs.
+        //      • [desirable] replace HollowClient with HollowConsumer thereby also removing FileStore usage.
+        //
+        // - Dev slice
+        //      • Get dev slice working for n inputs.
+
+        Map<UpstreamDatasetHolder.Dataset, String> namespaces = UpstreamDatasetConfig.getNamespaces();
+        for (UpstreamDatasetHolder.Dataset dataSet: namespaces.keySet()) {
+            inputConsumers.put(dataSet, VMSInputDataConsumer.getNewConsumer(
+                    cinderConsumerBuilder, namespaces.get(dataSet), UpstreamDatasetConfig.INPUT_APIS.get(dataSet)));
         }
 
         TransformCycle cycle = new TransformCycle(
-                ctx,
-                inputConsumer,
-                gk2StatusConsumer,
-                fileStore,
-                hermesBlobAnnouncer,
-                publishStager,
-                transformerConfig.getTransformerVip(),
-                cinderBuilder);
-
-        if (!ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-            SimultaneousExecutor executor = new SimultaneousExecutor(2,
-                    TransformerCycleKickoff.class,
-                    "vms-restore");
-            TransformCycle.restoreOutputs(executor, ctx, cycle, fileStore,
-                    hermesBlobAnnouncer, isFastlane, false);
-        }
+            ctx,
+            inputConsumers,
+            fileStore,
+            hermesBlobAnnouncer,
+            publishStager,
+            transformerConfig.getTransformerVip(),
+            cinderBuilder);
 
         Thread t = new Thread(new Runnable() {
             private long cycleStartTime = 0;
@@ -171,11 +185,6 @@ public class TransformerCycleKickoff {
 
                         cycle.cycle();
                         markCycleSucessful();
-
-                        if (shouldTryCompaction(isFastlane, ctx.getConfig())) {
-                            cycle.tryCompaction();
-                            markCycleSucessful();
-                        }
 
                         waitForMinCycleTimeToPass();
                     } catch(Throwable th) {
@@ -287,9 +296,5 @@ public class TransformerCycleKickoff {
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer,
                 new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
-    }
-
-    private static boolean shouldTryCompaction(boolean isFastlane, TransformerConfig cfg) {
-        return !isFastlane && cfg.isCompactionEnabled();
     }
 }

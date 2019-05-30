@@ -4,12 +4,12 @@ import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Durat
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P2_ProcessDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P3_WriteOutputDataDuration;
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric.P4_WaitForPublishWorkflowDuration;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.BlobState;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleFastlaneIds;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.ProcessNowMillis;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.RollbackStateEngine;
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.StateEngineCompaction;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleBegin;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCycleFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformCyclePaused;
@@ -23,7 +23,6 @@ import com.netflix.aws.file.FileStore;
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.gutenberg.GutenbergException;
 import com.netflix.hollow.api.consumer.HollowConsumer;
-import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.api.producer.listener.AnnouncementListener;
@@ -39,19 +38,19 @@ import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.combine.HollowCombiner;
-import com.netflix.hollow.tools.compact.HollowCompactor;
 import com.netflix.hollow.tools.filter.FilteredHollowBlobWriter;
 import com.netflix.servo.monitor.Monitors;
 import com.netflix.vms.logging.TaggingLogger.LogTag;
 import com.netflix.vms.transformer.common.CycleMonkey;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.TransformerMetricRecorder.DurationMetric;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric;
 import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
@@ -80,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -101,11 +101,11 @@ public class TransformCycle {
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
     private final CycleMonkey cycleMonkey;
-    private final HollowConsumer inputConsumer;
-    private final HollowConsumer gk2StatusConsumer;
+    private final Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers;
 
     private long previousCycleNumber = Long.MIN_VALUE;
     private long currentCycleNumber = Long.MIN_VALUE;
+    private CycleInputs cycleInputsCinder;
     private final boolean isFastlane;
     private final boolean isNoStreamsBlobEnabled;
     private boolean isFirstCycle = true;
@@ -117,7 +117,7 @@ public class TransformCycle {
     private final HollowProducer producer;
     private final ExecutorService produceExecutor;
 
-    public TransformCycle(TransformerContext ctx, HollowConsumer inputConsumer, HollowConsumer gk2StatusConsumer,
+    public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
             String transformerVip,
             Supplier<CinderProducerBuilder> cinderBuilder) {
@@ -140,8 +140,7 @@ public class TransformCycle {
         this.isFastlane = VipNameUtil.isOverrideVip(ctx.getConfig());
         this.isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
 
-        this.inputConsumer = inputConsumer;
-        this.gk2StatusConsumer = gk2StatusConsumer;
+        this.inputConsumers = inputConsumers;
 
         Monitors.registerObject(timeSinceLastPublishGauge);
 
@@ -182,12 +181,9 @@ public class TransformCycle {
         if (ctx.getConfig().isCinderEnabled() && !isFastlane) {
             LongSupplier mainPreviousVersion = () -> previousCycleNumber;
             LongSupplier mainVersion = () -> currentCycleNumber;
+            Supplier<CycleInputs> mainCycleInputs = () -> cycleInputsCinder;
             AtomicLong noStreamsPreviousVersion = new AtomicLong(Long.MIN_VALUE);
             AtomicLong noStreamsVersion = new AtomicLong(Long.MIN_VALUE);
-
-            LongSupplier g2kInputVersion = gk2StatusConsumer == null
-                    ? () -> Long.MIN_VALUE
-                    : gk2StatusConsumer::getCurrentVersionId;
 
             this.produceExecutor = Executors.newCachedThreadPool(r -> {
                 Thread t = new Thread(r, "vmstransformer-producer");
@@ -203,8 +199,7 @@ public class TransformCycle {
                     .withVersionMinter(mainVersion::getAsLong)
                     .withRestore();
             publishStager.initProducer(
-                    inputConsumer::getCurrentVersionId,
-                    g2kInputVersion,
+                    mainCycleInputs,
                     producerBuilder,
                     cinderVip,
                     mainPreviousVersion, noStreamsPreviousVersion::get, noStreamsVersion::get);
@@ -219,8 +214,7 @@ public class TransformCycle {
                     .withVersionMinter(mainVersion::getAsLong)
                     .withRestore();
             publishStager.initNoStreamsProducer(
-                    inputConsumer::getCurrentVersionId,
-                    g2kInputVersion,
+                    mainCycleInputs,
                     noStreamsProducerBuilder,
                     nostreamsCinderVip,
                     mainPreviousVersion);
@@ -450,15 +444,14 @@ public class TransformCycle {
         if (producer == null) {
             try {
                 beginCycle();
-                loadInputAndRestoreOutputs();
-
-                transformTheData();
+                CycleInputs cycleInputs = loadInputAndRestoreOutputs();
+                transformTheData(cycleInputs);
                 if (isUnchangedFastlaneState()) {
                     rollbackFastlaneStateEngine();
                     incrementSuccessCounter();
                 } else {
-                    writeTheBlobFiles();
-                    submitToPublishWorkflow();
+                    writeTheBlobFiles(cycleInputs);
+                    submitToPublishWorkflow(cycleInputs);
                     endCycleSuccessfully();
                 }
             } catch (Throwable th) {
@@ -480,7 +473,7 @@ public class TransformCycle {
                 // Only restores the input
                 // @@@ Does not report the time take to restore the output
                 setRestoreNeeded(false);
-                loadInputAndRestoreOutputs();
+                this.cycleInputsCinder = loadInputAndRestoreOutputs();
 
                 cinderCycle();
 
@@ -503,34 +496,6 @@ public class TransformCycle {
                 throw th;
             } finally {
                 isFirstCycle = false;
-            }
-        }
-    }
-
-    public void tryCompaction() throws Throwable {
-        long compactionBytesThreshold = ctx.getConfig().getCompactionHoleByteThreshold();
-        int compactionPercentThreshold = ctx.getConfig().getCompactionHolePercentThreshold();
-        HollowCompactor compactor = new HollowCompactor(outputStateEngine, publishWorkflowStager.getCurrentReadStateEngine(),
-                compactionBytesThreshold, compactionPercentThreshold);
-
-        if(compactor.needsCompaction()) {
-            try {
-                beginCycle();
-                ctx.getLogger().info(Arrays.asList(BlobState, StateEngineCompaction),
-                        "Compacting State Engine");
-                compactor.compact();
-                writeTheBlobFiles();
-                submitToPublishWorkflow();
-                endCycleSuccessfully();
-            } catch(Throwable th) {
-                outputStateEngine.addHeaderTags(previousStateHeader);
-                ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine),
-                        "Transformer failed cycle -- rolling back write state engine to previousState=({})",
-                        BlobMetaDataUtil.fetchCoreHeaders(outputStateEngine), th);
-
-                outputStateEngine.resetToLastPrepareForNextCycle();
-                fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
-                throw th;
             }
         }
     }
@@ -685,14 +650,9 @@ public class TransformCycle {
         }
     }
 
-    public static void restoreOutputs(SimultaneousExecutor executor,
+    public static void triggerAsyncRestoreOutputs(SimultaneousExecutor executor,
             TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer,
-            boolean isFastlane, boolean isRunWithinUpdateInput) {
-        // No need to track duration if RunWithinUpdateInput since it will be part of that duration
-        if (!isRunWithinUpdateInput) {
-            ctx.getMetricRecorder().startTimer(DurationMetric.P0_RestoreDataDuration);
-        }
-
+            boolean isFastlane) {
         try {
             TransformerConfig cfg = ctx.getConfig();
             if (cfg.isRestoreFromPreviousStateEngine()) {
@@ -727,49 +687,46 @@ public class TransformCycle {
             ctx.getLogger().error(Arrays.asList(TransformRestore, BlobState),
                     "Failed to restore data", ex);
             throw new IllegalStateException("Failed to restore data", ex);
-        } finally {
-            if (!isRunWithinUpdateInput) {
-                ctx.stopTimerAndLogDuration(DurationMetric.P0_RestoreDataDuration);
-            }
         }
     }
 
-    private static CompletableFuture<Void> loadInputAsync(Executor executor,
-            TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer, Long pinnedGk2InputVersion) {
-        return CompletableFuture.runAsync(() -> loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion), executor);
+    // Triggers asynchronous tasks on {@code exector} to load inputs from {code inputConsumers} corresponding to each dataset
+    // and upon completion these tasks update the passed {@code updatedInputs} map with latest {@code InputState} for the datasets.
+    // Does not block on completion of triggered tasks.
+    private static void triggerAsyncLoadInputs(Executor executor,
+            TransformerContext ctx, Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers,
+            FollowVipPin followVipPin, Map<UpstreamDatasetHolder.Dataset, InputState> updatedInputs) {
+        // Spot to trigger Cycle Monkey if enabled
+        ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
+
+        inputConsumers.forEach((dataset, consumer) -> {
+            executor.execute(() -> {
+                loadInput(ctx, dataset, consumer, followVipPin);
+                updatedInputs.put(dataset, new InputState(consumer));
+            });
+        });
     }
 
-    private static void loadInput(TransformerContext ctx, HollowConsumer inputConsumer, Long pinnedInputVersion, HollowConsumer gk2StatusConsumer, Long pinnedGk2InputVersion) {
+    private static void loadInput(TransformerContext ctx, UpstreamDatasetHolder.Dataset dataset, HollowConsumer consumer, FollowVipPin followVipPin) {
         try {
-            // Spot to trigger Cycle Monkey if enabled
-            ctx.getCycleMonkey().doMonkeyBusiness("loadInput");
+            Long followVipInputVersion = null;
+            if (followVipPin != null)   // followVip configured
+                followVipInputVersion = followVipPin.getInputVersions().get(dataset);
 
-            if (pinnedInputVersion == null) {
-                inputConsumer.triggerRefresh();
+            if (followVipInputVersion == null) {
+                consumer.triggerRefresh();
             } else {
-                inputConsumer.triggerRefreshTo(pinnedInputVersion);
-                if (inputConsumer.getCurrentVersionId() != pinnedInputVersion) {
-                    throw new IllegalStateException("Failed to pin input to :" + pinnedInputVersion);
+                consumer.triggerRefreshTo(followVipInputVersion);
+                if (!followVipInputVersion.equals(consumer.getCurrentVersionId())) {
+                    throw new IllegalStateException(
+                            "Failed to pin input " + dataset + " to version :" + followVipInputVersion);
                 }
             }
-
-            if(gk2StatusConsumer != null) {
-                if (pinnedGk2InputVersion == null) {
-                    gk2StatusConsumer.triggerRefresh();
-                } else {
-                    gk2StatusConsumer.triggerRefreshTo(pinnedGk2InputVersion);
-                    if (gk2StatusConsumer.getCurrentVersionId() != pinnedGk2InputVersion) {
-                        throw new IllegalStateException("Failed to pin GK2 input to :" + pinnedGk2InputVersion);
-                    }
-                }
-            }
-
-            ctx.getLogger().info(BlobState,
-                    "Loaded input to version={}, header={}",
-                    inputConsumer.getCurrentVersionId(), inputConsumer.getStateEngine().getHeaderTags());
+            ctx.getLogger().info(BlobState, "Loaded input={} to version={}, header={}",
+                    dataset, consumer.getCurrentVersionId(), consumer.getStateEngine().getHeaderTags());
         } catch (Exception ex) {
             ctx.getLogger().error(BlobState,
-                    "Failed to Load Input", ex);
+                    "Failed to Load Input {}", dataset, ex);
 
             // If the consumer transitioning failed in Gutenberg via Cinder's NFHollowBlobRetriever to obtain a blob
             // then clear the transitions so it is free to try again (since it anyway will).
@@ -778,54 +735,35 @@ public class TransformCycle {
             // @@@ Fragile relying on GutenbergException, should surface cinder specific exception in
             // NFHollowBlobRetriever
             if (ex instanceof GutenbergException &&
-                    (inputConsumer.getNumFailedSnapshotTransitions() > 0 ||
-                            inputConsumer.getNumFailedDeltaTransitions() > 0)) {
-                inputConsumer.clearFailedTransitions();
+                    (consumer.getNumFailedSnapshotTransitions() > 0 ||
+                            consumer.getNumFailedDeltaTransitions() > 0)) {
+                consumer.clearFailedTransitions();
 
                 ctx.getLogger().info(BlobState,
-                        "Resetting input with failed transitions: snapshots={}, deltas={}",
-                        inputConsumer.getNumFailedSnapshotTransitions(), inputConsumer.getNumFailedDeltaTransitions());
+                        "Resetting input={} with failed transitions: snapshots={}, deltas={}",
+                        dataset, consumer.getNumFailedSnapshotTransitions(), consumer.getNumFailedDeltaTransitions());
             }
             throw ex;
         }
     }
 
-    private void loadInputAndRestoreOutputs() {
+    private CycleInputs loadInputAndRestoreOutputs() {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
+        Map<UpstreamDatasetHolder.Dataset, InputState> updatedInputs = new ConcurrentHashMap<>();
         try {
             FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+            SimultaneousExecutor executor = new SimultaneousExecutor(12,
+                    TransformCycle.class, "vms-restore-and-input-processing");
 
-            /// load the input data
-            Long pinnedInputVersion = ctx.getConfig().getPinInputVersion();
-            if(pinnedInputVersion == null && followVipPin != null) {
-                pinnedInputVersion = followVipPin.getInputVersionId();
-            }
-
-            Long pinnedGk2InputVersion = ctx.getConfig().getPinGk2InputVersion();
-            if(pinnedGk2InputVersion == null && followVipPin != null) {
-                pinnedGk2InputVersion = followVipPin.getGk2InputVersion();
-                if (pinnedGk2InputVersion == Long.MIN_VALUE) {
-                    pinnedGk2InputVersion = null;
-                }
-            }
+            triggerAsyncLoadInputs(executor, ctx, inputConsumers, followVipPin, updatedInputs);
 
             // Determine whether to process restore here; only restore once
-            if (isRestoreNeeded && ctx.getConfig().isProcessRestoreAndInputInParallel()) {
-                SimultaneousExecutor executor = new SimultaneousExecutor(3,
-                        TransformCycle.class,
-                        "vms-restore-and-input-processing");
-
-                // Load input concurrently with restoring the outputs
-                CompletableFuture<Void> inputProcessingResult = loadInputAsync(executor, ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion);
+            if (isRestoreNeeded) {
                 // Restore outputs concurrently
-                restoreOutputs(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane, true);
-
-                executor.awaitUninterruptibly();
-                inputProcessingResult.get();
-            } else {
-                // Load input sequentially
-                loadInput(ctx, inputConsumer, pinnedInputVersion, gk2StatusConsumer, pinnedGk2InputVersion);
+                triggerAsyncRestoreOutputs(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane);
             }
+
+            executor.awaitSuccessfulCompletion();
 
             //// set the now millis
             Long nowMillis = ctx.getConfig().getNowMillis();
@@ -835,20 +773,21 @@ public class TransformCycle {
                 nowMillis = System.currentTimeMillis();
             ctx.setNowMillis(nowMillis);
 
-            VMSInputDataVersionLogger.logInputVersions(inputConsumer, gk2StatusConsumer, ctx);
+            VMSInputDataVersionLogger.logInputVersions(inputConsumers, ctx);
 
             ctx.getLogger().info(ProcessNowMillis,
                     "Using transform timestamp of {} ({})",
                     nowMillis, new Date(nowMillis));
 
-            VMSInputDataVersionLogger.logConverterInputVersions(inputConsumer.getStateEngine().getHeaderTags(), ctx.getLogger());
+            VMSInputDataVersionLogger.logConverterInputVersions(
+                    inputConsumers.get(CONVERTER).getStateEngine().getHeaderTags(), ctx.getLogger());
         } catch (Exception ex) {
-            ctx.getLogger().error(BlobState,
-                    "Failed to process Input", ex);
-            throw new RuntimeException("Failed to process input", ex);
+            ctx.getLogger().error(BlobState, "Failed to process Input or restore Output", ex);
+            throw new RuntimeException("Failed to process input or restore output", ex);
         } finally {
             ctx.stopTimerAndLogDuration(P1_ReadInputDataDuration);
         }
+        return new CycleInputs(updatedInputs, currentCycleNumber);
     }
 
 
@@ -859,9 +798,9 @@ public class TransformCycle {
             long previousVersion = newState.getPriorState() == null ? -1 : newState.getPriorState().getVersion();
 
             output.getHeaderTags().clear();
-            headerPopulator.addHeaders(inputConsumer, output, previousVersion, newState.getVersion());
+            headerPopulator.addHeaders(cycleInputsCinder, output, previousVersion, newState.getVersion());
 
-            SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputConsumer.getAPI(), gk2StatusConsumer, output, ctx);
+            SimpleTransformer transformer = new SimpleTransformer(cycleInputsCinder, output, ctx);
             try {
                 transformer.transform();
             } catch (Error | RuntimeException e) {
@@ -873,7 +812,7 @@ public class TransformCycle {
     }
 
 
-    private boolean transformTheData() throws Throwable {
+    private boolean transformTheData(CycleInputs cycleInputs) throws Throwable {
         long startTime = System.currentTimeMillis();
         ctx.getMetricRecorder().startTimer(P2_ProcessDataDuration);
         try {
@@ -883,7 +822,7 @@ public class TransformCycle {
                 pinTitleMgr.submitJobsToProcessASync(pinnedTitleSpecs);
 
                 // Process fastlane
-                trasformInputData(inputConsumer.getAPI(), gk2StatusConsumer, fastlaneOutputStateEngine, ctx);
+                trasformInputData(cycleInputs, fastlaneOutputStateEngine, ctx);
 
                 /*
                  * Combine input states
@@ -962,7 +901,7 @@ public class TransformCycle {
                         outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(),
                         isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
-                trasformInputData(inputConsumer.getAPI(), gk2StatusConsumer, outputStateEngine, ctx);
+                trasformInputData(cycleInputs, outputStateEngine, ctx);
 
                 // Spot to trigger Cycle Monkey if enabled
                 cycleMonkey.doMonkeyBusiness("transformTheData");
@@ -977,23 +916,24 @@ public class TransformCycle {
         return true;
     }
 
-    private static void trasformInputData(HollowAPI inputAPI, HollowConsumer gk2StatusConsumer, VMSTransformerWriteStateEngine outputStateEngine,
+    private static void trasformInputData(CycleInputs cycleInputs, VMSTransformerWriteStateEngine outputStateEngine,
             TransformerContext ctx) throws Throwable {
-        SimpleTransformer transformer = new SimpleTransformer((VMSHollowInputAPI) inputAPI, gk2StatusConsumer, outputStateEngine, ctx);
+
+        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
         transformer.transform();
 
         String BLOB_ID = VipNameUtil.isOverrideVip(ctx.getConfig()) ? "FASTLANE" : "BASEBLOB";
         PinTitleHelper.addBlobID(outputStateEngine, BLOB_ID);
     }
 
-    private void writeTheBlobFiles() throws Exception {
+    private void writeTheBlobFiles(CycleInputs cycleInputs) throws Exception {
         ctx.getMetricRecorder().startTimer(P3_WriteOutputDataDuration);
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try {
             currentStateHeader = new HashMap<>(headerPopulator.addHeaders(
-                    inputConsumer, outputStateEngine,
-                    previousCycleNumber, currentCycleNumber));
+                    cycleInputs, outputStateEngine,
+                    previousCycleNumber, cycleInputs.getCycleNumber()));
             HollowBlobFileNamer fileNamer = new HollowBlobFileNamer(transformerVip);
             HollowBlobWriter writer = new HollowBlobWriter(outputStateEngine);
 
@@ -1091,19 +1031,14 @@ public class TransformCycle {
         return true;
     }
 
-    public void submitToPublishWorkflow() {
+    public void submitToPublishWorkflow(CycleInputs cycleInputs) {
         // Check to determine whether to abort cycle due to interrupt
         ctx.getCycleInterrupter().triggerInterruptIfNeeded(ctx.getCurrentCycleId(), ctx.getLogger(),
                 "Stopped at submitToPublishWorkflow");
 
         ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
-            long gk2Version = (gk2StatusConsumer == null)
-                    ? Long.MIN_VALUE
-                    : gk2StatusConsumer.getCurrentVersionId();
-
-            CycleStatusFuture future = publishWorkflowStager.triggerPublish(
-                    inputConsumer.getCurrentVersionId(), gk2Version, previousCycleNumber, currentCycleNumber);
+            CycleStatusFuture future = publishWorkflowStager.triggerPublish(cycleInputs, previousCycleNumber, currentCycleNumber);
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
 

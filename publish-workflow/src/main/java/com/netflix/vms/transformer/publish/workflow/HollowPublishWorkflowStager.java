@@ -13,6 +13,7 @@ import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
@@ -128,14 +129,14 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public CycleStatusFuture triggerPublish(long inputDataVersion, long gk2InputVersion, long previousVersion, long newVersion) {
+    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion) {
         PublishWorkflowContext ctx = jobCreator.beginStagingNewCycle();
 
         // Add validation job
         final CircuitBreakerJob circuitBreakerJob = addCircuitBreakerJob(previousVersion, newVersion);
 
         // Add publish jobs
-        final List<PublicationJob> publishJobs = addPublishJobs(inputDataVersion, gk2InputVersion, previousVersion, newVersion);
+        final List<PublicationJob> publishJobs = addPublishJobs(cycleInputs, previousVersion, newVersion);
 
         // / add canary announcement and validation jobs
         final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, publishJobs);
@@ -151,7 +152,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         addDeleteJob(previousVersion, newVersion, circuitBreakerJob, publishJobs);
 
         if(ctx.getConfig().isCreateDevSlicedBlob())
-            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, inputDataVersion, newVersion));
+            scheduler.submitJob(jobCreator.createDevSliceJob(ctx, primaryRegionAnnounceJob, cycleInputs, newVersion));
 
         return new WorkflowCycleStatusFuture(ctx.getStatusIndicator(), newVersion);
     }
@@ -248,7 +249,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                 fileNamer.getNostreamsSnapshotFileName(nextVersion)));
     }
 
-    private List<PublicationJob> addPublishJobs(long inputDataVersion, long gk2InputVersion, long previousVersion, long newVersion) {
+    private List<PublicationJob> addPublishJobs(CycleInputs cycleInputs, long previousVersion, long newVersion) {
         File snapshotFile = new File(fileNamer.getSnapshotFileName(newVersion));
         File reverseDeltaFile = new File(fileNamer.getReverseDeltaFileName(newVersion, previousVersion));
         File deltaFile = new File(fileNamer.getDeltaFileName(previousVersion, newVersion));
@@ -259,34 +260,34 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         List<PublicationJob> submittedJobs = new ArrayList<>();
         if (snapshotFile.exists()) {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.SNAPSHOT, false,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, snapshotFile);
+                    cycleInputs, previousVersion, newVersion, snapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
             publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.SNAPSHOT, true,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, nostreamsSnapshotFile);
+                    cycleInputs, previousVersion, newVersion, nostreamsSnapshotFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (deltaFile.exists()) {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.DELTA, false,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, deltaFile);
+                    cycleInputs, previousVersion, newVersion, deltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
             publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.DELTA, true,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, nostreamsDeltaFile);
+                    cycleInputs, previousVersion, newVersion, nostreamsDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
         if (reverseDeltaFile.exists()) {
             HollowBlobPublishJob publishJob = jobCreator.createPublishJob(vip, PublishType.REVERSEDELTA, false,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, reverseDeltaFile);
+                    cycleInputs, previousVersion, newVersion, reverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
 
             publishJob = jobCreator.createPublishJob(VipNameUtil.getNoStreamsVip(vip), PublishType.REVERSEDELTA, true,
-                    inputDataVersion, gk2InputVersion, previousVersion, newVersion, nostreamsReverseDeltaFile);
+                    cycleInputs, previousVersion, newVersion, nostreamsReverseDeltaFile);
             scheduler.submitJob(publishJob);
             submittedJobs.add(publishJob);
         }
@@ -304,7 +305,8 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public void initProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+    public void initProducer(
+            Supplier<CycleInputs> cycleInputs,
             CinderProducerBuilder pb,
             String vip,
             LongSupplier previousVersion,
@@ -316,8 +318,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         pb.withListener(new ValidatorForCanaryPBM(vcbs, this, jobCreator,
                 vip, previousVersion));
 
-        pb.withListener(new HermesPublishListener(inputVersion, gk2InputVersion, jobCreator,
-                vip, previousVersion));
+        pb.withListener(new HermesPublishListener(cycleInputs, jobCreator, vip, previousVersion));
         pb.withListener(new PublishCycleListener(jobCreator, vip));
 
         // Use special announcer that supports region staggering
@@ -362,10 +363,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public void initNoStreamsProducer(LongSupplier inputVersion, LongSupplier gk2InputVersion,
+    public void initNoStreamsProducer(
+            Supplier<CycleInputs> cycleInputs,
             CinderProducerBuilder pb,
             String vip, LongSupplier previousVersion) {
-        pb.withListener(new HermesPublishListener(inputVersion, gk2InputVersion, jobCreator, vip, previousVersion));
+        pb.withListener(new HermesPublishListener(cycleInputs, jobCreator, vip, previousVersion));
 
         // Announcement occurs on the main producer
         // If there are no changes on the main producer but are on the nostreams producer

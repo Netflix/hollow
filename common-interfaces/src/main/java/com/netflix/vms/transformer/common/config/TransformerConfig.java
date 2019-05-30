@@ -30,9 +30,6 @@ public interface TransformerConfig {
     @PropertyName(name = "vms.transformerCycleMonkeyPhaseChaosEnabled.${0}")
     public boolean isTransformerCycleMonkeyPhaseChaosEnabled(String phaseName);
 
-    @DefaultValue("true")
-    boolean isProcessRestoreAndInputInParallel();
-
     @DefaultValue("defaultConverterVip")
     String getConverterVip();
 
@@ -46,10 +43,6 @@ public interface TransformerConfig {
     String getAwsInstanceId();
 
     String getAwsAmiId();
-
-    Long getPinInputVersion();
-
-    Long getPinGk2InputVersion();
 
     Long getNowMillis();
 
@@ -86,15 +79,6 @@ public interface TransformerConfig {
     boolean isFailIfRestoreNotAvailable();
 
     Long getRestoreFromSpecificVersion();
-
-    @DefaultValue("false")
-    boolean isCompactionEnabled();
-
-    @DefaultValue("2000000")
-    long getCompactionHoleByteThreshold();
-
-    @DefaultValue("10")
-    int getCompactionHolePercentThreshold();
 
     @DefaultValue("false")
     boolean isMerchstillEpisodeLiveCheckEnabled();
@@ -256,8 +240,6 @@ public interface TransformerConfig {
      */
     @DefaultValue("false")
     boolean isCinderEnabled();
-    
-    String getGatekeeper2Namespace();
     
     String getGatekeeper2Countries();
 }

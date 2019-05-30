@@ -3,28 +3,27 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.api.producer.listener.PublishListener;
+import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.LongSupplier;
+import java.util.function.Supplier;
 
 public class HermesPublishListener implements
         PublishListener {
-    private final LongSupplier inputVersion;
-    private final LongSupplier gk2InputVersion;
+    private final Supplier<CycleInputs> cycleInputs;
     private final DefaultHollowPublishJobCreator jobCreator;
     private final String vip;
     private final LongSupplier previousVersion;
 
     public HermesPublishListener(
-            LongSupplier inputVersion,
-            LongSupplier gk2InputVersion,
+            Supplier<CycleInputs> cycleInputs,
             DefaultHollowPublishJobCreator jobCreator,
             String vip, LongSupplier previousVersion) {
-        this.inputVersion = inputVersion;
-        this.gk2InputVersion = gk2InputVersion;
+        this.cycleInputs = cycleInputs;
         this.jobCreator = jobCreator;
         this.vip = vip;
         this.previousVersion = previousVersion;
@@ -36,7 +35,6 @@ public class HermesPublishListener implements
 
 
     // PublishListener
-
     @Override public void onNoDeltaAvailable(long version) {
     }
 
@@ -52,14 +50,12 @@ public class HermesPublishListener implements
             CompletableFuture<HollowProducer.Blob> blob) {
         long start = System.nanoTime();
 
-        long iv = inputVersion.getAsLong();
-        long gk2iv = gk2InputVersion.getAsLong();
         long pv = previousVersion.getAsLong();
         long cv = currentVersion;
         PublishWorkflowContext context = this.ctx;
         blob.thenAccept(b -> {
             long d = System.nanoTime() - start;
-            blobPublish(context, vip, b, Duration.ofNanos(d), iv, gk2iv, pv, cv);
+            blobPublish(context, vip, b, Duration.ofNanos(d), pv, cv);
         });
     }
 
@@ -69,19 +65,16 @@ public class HermesPublishListener implements
             return;
         }
 
-        blobPublish(ctx, vip, blob, elapsed,
-                inputVersion.getAsLong(), gk2InputVersion.getAsLong(),
-                previousVersion.getAsLong(), currentVersion);
+        blobPublish(ctx, vip, blob, elapsed, previousVersion.getAsLong(), currentVersion);
     }
 
     @Override public void onPublishComplete(Status status, long version, Duration elapsed) {
     }
 
-    private static void blobPublish(
+    private void blobPublish(
             PublishWorkflowContext ctx,
             String vip,
             HollowProducer.Blob blob, Duration elapsed,
-            long inputVersion, long gk2Version,
             long previousVersion, long currentVersion) {
         HollowBlobPublishJob.PublishType pt;
         switch (blob.getType()) {
@@ -98,8 +91,7 @@ public class HermesPublishListener implements
         }
 
         FileStoreHollowBlobPublishJob publishJob = new FileStoreHollowBlobPublishJob(ctx, vip,
-                inputVersion, gk2Version, previousVersion, currentVersion,
-                pt, blob.getPath().toFile(), false);
+                cycleInputs.get(), previousVersion, currentVersion, pt, blob.getPath().toFile(), false);
 
         publishJob.executeJob(false, elapsed.toMillis());
     }

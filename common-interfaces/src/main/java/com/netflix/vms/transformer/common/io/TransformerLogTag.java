@@ -29,7 +29,6 @@ public enum TransformerLogTag implements LogTag {
     RollbackStateEngine,
     CyclePinnedTitles,
     CycleInterrupted,
-    StateEngineCompaction,
     HideCycleFromDashboard,
     DroppedTopNodeOnFloor,
     ArtworkFallbackMissing,

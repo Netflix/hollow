@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
 import com.netflix.aws.file.FileStore;
 import com.netflix.governator.InjectorBuilder;
 import com.netflix.governator.LifecycleInjector;
@@ -12,6 +14,9 @@ import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
@@ -30,8 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -118,7 +125,11 @@ public class ShowMeTheFastProgress {
         long converterBlobVersion = Long.parseLong(expectedOutputStateEngine.getHeaderTag("sourceDataVersion"));
 
         // Load Transformer input based on converterBlobVersion
-        VMSHollowInputAPI inputAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterBlobVersion, topNodes);
+        VMSHollowInputAPI muonAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterBlobVersion, topNodes);
+        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+        inputs.put(CONVERTER, new InputState((HollowReadStateEngine) muonAPI.getDataAccess(), converterBlobVersion));   // TODO: Add all Cinder inputs
+        CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
@@ -128,7 +139,7 @@ public class ShowMeTheFastProgress {
         outputStateEngine.addHeaderTag(PUBLISH_CYCLE_DATATS_HEADER, String.valueOf(publishCycleDataTS));
 
         // Run Transformer
-        SimpleTransformer transformer = new SimpleTransformer(inputAPI, null, outputStateEngine, ctx);
+        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
         transformer.setPublishCycleDataTS(publishCycleDataTS);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
@@ -151,7 +162,7 @@ public class ShowMeTheFastProgress {
         //ctx.overrideSupportedCountries("US");
 
         // Load Transformer input based on converterBlobVersion
-        VMSHollowInputAPI inputAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterVersion, topNodes);
+        VMSHollowInputAPI muonAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterVersion, topNodes);
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
@@ -159,7 +170,11 @@ public class ShowMeTheFastProgress {
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
         // Run Transformer
-        SimpleTransformer transformer = new SimpleTransformer(inputAPI, null, outputStateEngine, ctx);
+        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+        inputs.put(CONVERTER, new InputState((HollowReadStateEngine) muonAPI.getDataAccess(), converterVersion));   // TODO: Add all Cinder inputs
+        CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
+        SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
         transformer.transform();
         HollowReadStateEngine actualOutputReadStateEngine = roundTripOutputStateEngine(outputStateEngine);
         System.out.println(actualOutputReadStateEngine.getHeaderTags());

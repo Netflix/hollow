@@ -1,8 +1,13 @@
 package com.netflix.vms.transformer;
 
-import com.netflix.hollow.api.consumer.HollowConsumer;
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import java.util.Map;
 import java.util.Objects;
@@ -15,15 +20,22 @@ public class TransformerOutputBlobHeaderPopulator {
     }
     
 
-    public Map<String, String> addHeaders(HollowConsumer inputConsumer, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
+    public Map<String, String> addHeaders(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
 
-        outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(inputConsumer.getCurrentVersionId()));
+        // input version header tags for all inputs
+        for (Map.Entry<UpstreamDatasetHolder.Dataset, InputState> entry : cycleInputs.getInputs().entrySet())
+            outputStateEngine.addHeaderTag(UpstreamDatasetConfig.getInputVersionAttribute(entry.getKey()),
+                    String.valueOf(entry.getValue().getVersion()));
+        InputState converterInput = cycleInputs.getInputs().get(CONVERTER);
+        outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(converterInput.getVersion()));    // for backwards compatibility, indicates converter input version
+
+        // custom input header tags
         outputStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
         outputStateEngine.addHeaderTag("awsAmiId", ctx.getConfig().getAwsAmiId());
         outputStateEngine.addHeaderTags(BlobMetaDataUtil.getPublisherProps(ctx.getConfig().getTransformerVip(), System.currentTimeMillis(), String.valueOf(currentCycleNumber), previousCycleNumber == Long.MIN_VALUE ? "" : String.valueOf(previousCycleNumber)));
         
-        /// input versions
-        Map<String, String> inputHeaderTags = inputConsumer.getStateEngine().getHeaderTags();
+        // header tags for converter inputs' versions
+        Map<String, String> inputHeaderTags = converterInput.getStateEngine().getHeaderTags();
         for(Map.Entry<String, String> entry : inputHeaderTags.entrySet()) {
             if(entry.getKey().endsWith("_coldstart")) {
                 String mutationGroup = entry.getKey().substring(0, entry.getKey().indexOf("_coldstart"));

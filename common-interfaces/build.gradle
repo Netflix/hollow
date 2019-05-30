@@ -4,6 +4,7 @@ dependencies {
     compile 'com.netflix.astyanax:astyanax-cassandra'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile "netflix:videoresolutiontypelibrary:latest.release"
+    compile 'netflix:vmsconverter-hollow-api:latest.release'
     compile 'netflix:netflix-config'
 
     testCompile 'junit:junit'

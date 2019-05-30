@@ -1,18 +1,24 @@
 package com.netflix.vms.transformer.override;
 
+import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
+import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generates Title Override based on Input Slice
@@ -53,10 +59,13 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
             File slicedFile = performInputSlice(inputDataVersion, topNodes);
             HollowReadStateEngine inputStateEngineSlice = readStateEngine(slicedFile);
 
-            VMSHollowInputAPI api = new VMSHollowInputAPI(inputStateEngineSlice);
-            
             VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-            new SimpleTransformer(api, null, outputStateEngine, ctx).transform();
+
+            Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
+            inputs.put(CONVERTER, new InputState(inputStateEngineSlice, inputDataVersion));   // TODO: Add all Cinder inputs
+            CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
+
+            new SimpleTransformer(cycleInputs, outputStateEngine, ctx).transform();
 
             String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
             writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);
