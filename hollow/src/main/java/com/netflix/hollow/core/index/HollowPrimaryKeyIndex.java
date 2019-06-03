@@ -38,6 +38,8 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A HollowPrimaryKeyIndex is the go-to mechanism for indexing and querying data in a Hollow blob.
@@ -46,6 +48,7 @@ import java.util.List;
  * not have to be the same as declared as the default in the data model.
  */
 public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
+    private static final Logger LOG = Logger.getLogger(HollowPrimaryKeyIndex.class.getName());
 
     private final HollowObjectTypeReadState typeState;
     private final int[][] fieldPathIndexes;
@@ -383,9 +386,30 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         if(hashTableSize == hashTable.hashTableSize
                 && bitsPerElement == hashTable.bitsPerElement
                 && shouldPerformDeltaUpdate()) {
-            deltaUpdate(hashTableSize, bitsPerElement);
+            try {
+                deltaUpdate(hashTableSize, bitsPerElement);
+            } catch (OrdinalNotFoundException e) {
+                /*
+                It has been observed that delta updates can result in CPU spinning attempting to find
+                a previous ordinal to remove.  It's not clear what the cause of the issue is but it does
+                not appear to be data related (since the failure is not consistent when multiple instances
+                update to the same version) nor concurrency related (since an update occurs in a synchronized
+                block).  A rare possibility is it might be a C2 compiler issue.  Changing the code shape may
+                well fix that.  Attempts to reproduce this locally has so far failed.
+                Given the importance of indexing a full reindex is performed on such a failure.  This, however,
+                will make it more difficult to detect such issues.
+                 */
+                LOG.log(Level.SEVERE, "Delta update of index failed.  Performing a full reindex", e);
+                reindex();
+            }
         } else {
             reindex();
+        }
+    }
+
+    private static class OrdinalNotFoundException extends IllegalStateException {
+        OrdinalNotFoundException(String s) {
+            super(s);
         }
     }
 
@@ -452,12 +476,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int prevOrdinal = prevOrdinals.nextSetBit(0);
         while(prevOrdinal != ORDINAL_NONE) {
             if(!ordinals.get(prevOrdinal)) {
-                /// remove this ordinal
+                /// find and remove this ordinal
                 int hashCode = recordHash(prevOrdinal);
-                int bucket = hashCode & hashMask;
-
-                while(hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement) != prevOrdinal + 1)
-                    bucket = (bucket + 1) & hashMask;
+                int bucket = findOrdinalBucket(bitsPerElement, hashedArray, hashCode, hashMask, prevOrdinal);
 
                 hashedArray.clearElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
                 int emptyBucket = bucket;
@@ -504,6 +525,27 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         setHashTable(new PrimaryKeyIndexHashTable(hashedArray, hashTableSize, hashMask, bitsPerElement));
 
         memoryRecycler.swap();
+    }
+
+    private int findOrdinalBucket(int bitsPerElement, FixedLengthElementArray hashedArray, int hashCode, int hashMask, int prevOrdinal) {
+        int startBucket = hashCode & hashMask;
+        int bucket = startBucket;
+        long value;
+        do {
+            value = hashedArray.getElementValue((long)bucket * (long)bitsPerElement, bitsPerElement);
+            if (prevOrdinal + 1 == value) {
+                return bucket;
+            }
+            bucket = (bucket + 1) & hashMask;
+        } while (value != 0 && bucket != startBucket);
+
+        if (value == 0) {
+            throw new OrdinalNotFoundException(String.format("Ordinal not found (found empty entry): "
+                    + "ordinal=%d startBucket=%d", prevOrdinal, startBucket));
+        } else {
+            throw new OrdinalNotFoundException(String.format("Ordinal not found (wrapped around table): "
+                    + "ordinal=%d startBucket=%d", prevOrdinal, startBucket));
+        }
     }
 
     private boolean bucketInRange(int fromBucket, int toBucket, int testBucket) {
