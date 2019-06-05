@@ -651,6 +651,7 @@ public class HollowProducer extends AbstractHollowProducer {
         BlobStorageCleaner blobStorageCleaner = new DummyBlobStorageCleaner();
         SingleProducerEnforcer singleProducerEnforcer = new BasicSingleProducerEnforcer();
         HollowObjectHashCodeFinder hashCodeFinder = null;
+        boolean doIntegrityCheck = true;
 
         public B withBlobStager(HollowProducer.BlobStager stager) {
             this.stager = stager;
@@ -792,6 +793,11 @@ public class HollowProducer extends AbstractHollowProducer {
         @Deprecated
         public B withHashCodeFinder(HollowObjectHashCodeFinder hashCodeFinder) {
             this.hashCodeFinder = hashCodeFinder;
+            return (B) this;
+        }
+        
+        public B noIntegrityCheck() {
+            this.doIntegrityCheck = false;
             return (B) this;
         }
 
