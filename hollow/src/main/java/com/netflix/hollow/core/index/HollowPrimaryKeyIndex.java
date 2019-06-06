@@ -38,6 +38,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A HollowPrimaryKeyIndex is the go-to mechanism for indexing and querying data in a Hollow blob.
@@ -84,7 +85,7 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
      * @param specificOrdinalsToIndex the bit set
      */
     public HollowPrimaryKeyIndex(HollowReadStateEngine stateEngine, PrimaryKey primaryKey, ArraySegmentRecycler memoryRecycler, BitSet specificOrdinalsToIndex) {
-        if (primaryKey==null) throw new IllegalArgumentException("primaryKey can't not be null");
+        Objects.requireNonNull(primaryKey, "primaryKey required");
 
         this.primaryKey = primaryKey;
         this.typeState = (HollowObjectTypeReadState) stateEngine.getTypeState(primaryKey.getType());
