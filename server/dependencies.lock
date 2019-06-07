@@ -1159,7 +1159,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -1170,19 +1170,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -2903,7 +2903,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -2912,11 +2912,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -3559,7 +3559,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -5279,7 +5279,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -5290,19 +5290,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -6860,7 +6860,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -6869,11 +6869,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -7516,7 +7516,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -9268,7 +9268,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -9279,19 +9279,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -11012,7 +11012,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -11021,11 +11021,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11668,7 +11668,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -13556,7 +13556,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -13567,19 +13567,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -15300,7 +15300,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -15309,11 +15309,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -15956,7 +15956,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -19814,7 +19814,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -19825,19 +19825,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -21558,7 +21558,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -21567,11 +21567,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -22214,7 +22214,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -24018,7 +24018,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -24029,19 +24029,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -25762,7 +25762,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -25771,11 +25771,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -26418,7 +26418,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -28222,7 +28222,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -28233,19 +28233,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -29965,7 +29965,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -29974,11 +29974,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -30621,7 +30621,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -32466,7 +32466,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -32478,25 +32478,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -34258,7 +34258,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -34267,11 +34267,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -34914,7 +34914,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -36747,7 +36747,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -36759,25 +36759,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -38374,7 +38374,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -38383,11 +38383,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -39030,7 +39030,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -40897,7 +40897,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -40909,25 +40909,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -42689,7 +42689,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -42698,11 +42698,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -43345,7 +43345,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -45264,7 +45264,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -45276,25 +45276,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -47056,7 +47056,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -47065,11 +47065,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -47712,7 +47712,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -49631,7 +49631,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -49643,25 +49643,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -51423,7 +51423,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -51432,11 +51432,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -52079,7 +52079,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -53912,7 +53912,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -53924,25 +53924,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -55539,7 +55539,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -55548,11 +55548,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -56195,7 +56195,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -58062,7 +58062,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -58074,25 +58074,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -59854,7 +59854,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -59863,11 +59863,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -60510,7 +60510,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -62429,7 +62429,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -62441,25 +62441,25 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-jsonadapter": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "2.+"
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -64221,7 +64221,7 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-hollowoutput-model",
@@ -64230,11 +64230,11 @@
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.7.6",
+            "locked": "4.7.7",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -64877,7 +64877,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.757",
+            "locked": "100.0.758",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
