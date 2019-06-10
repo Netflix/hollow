@@ -39,6 +39,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -89,6 +90,7 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
     public String generate() {
         StringBuilder classBuilder = new StringBuilder();
         appendPackageAndCommonImports(classBuilder, apiClassname);
+        boolean requiresHollowTypeName = !className.equals(schema.getName());
 
         classBuilder.append("import " + HollowConsumer.class.getName() + ";\n");
         if (schema.getPrimaryKey() != null && schema.getPrimaryKey().numFields() > 1) {
@@ -99,12 +101,18 @@ public class HollowObjectJavaGenerator extends HollowConsumerJavaFileGenerator {
         }
         classBuilder.append("import " + HollowObject.class.getName() + ";\n");
         classBuilder.append("import " + HollowObjectSchema.class.getName() + ";\n");
+        if (requiresHollowTypeName) {
+            classBuilder.append("import " + HollowTypeName.class.getName() + ";\n");
+        }
         if (config.isUseVerboseToString()) {
             classBuilder.append("import " + HollowRecordStringifier.class.getName() + ";\n");
         }
         classBuilder.append("\n");
 
         classBuilder.append("@SuppressWarnings(\"all\")\n");
+        if (requiresHollowTypeName) {
+            classBuilder.append("@" + HollowTypeName.class.getSimpleName() + "(name=\"" + schema.getName() + "\")\n");
+        }
         classBuilder.append("public class " + className + " extends HollowObject {\n\n");
 
         appendConstructor(classBuilder);

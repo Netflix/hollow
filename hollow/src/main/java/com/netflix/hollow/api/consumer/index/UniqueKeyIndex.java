@@ -27,6 +27,8 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
+import com.netflix.hollow.core.write.objectmapper.HollowTypeMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +53,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
     HollowAPI api;
     final SelectFieldPathResultExtractor<T> uniqueTypeExtractor;
     final List<MatchFieldPathArgumentExtractor<Q>> matchFields;
-    final String uniqueTypeName;
+    final String uniqueSchemaName;
     final String[] matchFieldPaths;
     HollowPrimaryKeyIndex hpki;
 
@@ -62,13 +64,13 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
             List<MatchFieldPathArgumentExtractor<Q>> matchFields) {
         this.consumer = consumer;
         this.api = consumer.getAPI();
-        this.uniqueTypeName = uniqueType.getSimpleName();
+        this.uniqueSchemaName = HollowObjectTypeMapper.getDefaultTypeName(uniqueType);
 
         this.uniqueTypeExtractor = SelectFieldPathResultExtractor
                 .from(consumer.getAPI().getClass(), consumer.getStateEngine(), uniqueType, "", uniqueType);
 
         if (primaryTypeKey != null) {
-            matchFields = validatePrimaryKeyFieldPaths(consumer, uniqueTypeName, primaryTypeKey, matchFields);
+            matchFields = validatePrimaryKeyFieldPaths(consumer, uniqueSchemaName, primaryTypeKey, matchFields);
         }
 
         this.matchFields = matchFields;
@@ -76,7 +78,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
                 .map(mf -> mf.fieldPath.toString())
                 .toArray(String[]::new);
 
-        this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueTypeName, matchFieldPaths);
+        this.hpki = new HollowPrimaryKeyIndex(consumer.getStateEngine(), uniqueSchemaName, matchFieldPaths);
     }
 
     static <Q> List<MatchFieldPathArgumentExtractor<Q>> validatePrimaryKeyFieldPaths(
@@ -243,7 +245,7 @@ public class UniqueKeyIndex<T extends HollowObject, Q>
          * @throws IllegalArgumentException if there is no primary key associated with the unique type
          */
         public Builder<T> bindToPrimaryKey() {
-            String primaryTypeName = uniqueType.getSimpleName();
+            String primaryTypeName = HollowTypeMapper.getDefaultTypeName(uniqueType);
             HollowSchema schema = consumer.getStateEngine().getNonNullSchema(primaryTypeName);
 
             assert schema.getSchemaType() == HollowSchema.SchemaType.OBJECT;

@@ -14,6 +14,7 @@ public class HollowAPIGeneratorTest extends AbstractHollowAPIGeneratorTest {
         runGenerator("MyClassTestAPI", "codegen.api", MyClass.class,
                 builder -> builder.withClassPostfix("Generated"));
         assertNonEmptyFileExists("codegen/api/StringGenerated.java");
+        assertClassHasHollowTypeName("codegen.api.MyClassGenerated", "MyClass");
     }
 
     @Test

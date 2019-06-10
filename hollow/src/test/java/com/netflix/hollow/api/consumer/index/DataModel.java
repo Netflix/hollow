@@ -164,12 +164,31 @@ public class DataModel {
             }
         }
 
+        public static class TypeWithTypeB {
+            final String foo;
+            final TypeB typeB;
+
+            public TypeWithTypeB(String foo, TypeB typeB) {
+                this.foo = foo;
+                this.typeB = typeB;
+            }
+        }
+
         public static class SubTypeOfTypeWithPrimaryKey {
             final String s;
             final int i;
 
             public SubTypeOfTypeWithPrimaryKey(String s, int i) {
                 this.s = s;
+                this.i = i;
+            }
+        }
+
+        @HollowPrimaryKey(fields = {"i"})
+        public static class TypeWithPrimaryKey2 {
+            final int i;
+
+            public TypeWithPrimaryKey2(int i) {
                 this.i = i;
             }
         }
@@ -280,8 +299,8 @@ public class DataModel {
                 return new TypeA(null, ordinal);
             }
 
-            public TypeB getTypeB(int ordinal) {
-                return new TypeB(null, ordinal);
+            public TypeBSuffixed getTypeBSuffixed(int ordinal) {
+                return new TypeBSuffixed(null, ordinal);
             }
 
             public TypeWithPrimaryKey getTypeWithPrimaryKey(int ordinal) {
@@ -290,6 +309,10 @@ public class DataModel {
 
             public SubTypeOfTypeWithPrimaryKey getSubTypeOfTypeWithPrimaryKey(int ordinal) {
                 return new SubTypeOfTypeWithPrimaryKey(null, ordinal);
+            }
+
+            public TypeWithPrimaryKeySuffixed getTypeWithPrimaryKeySuffixed(int ordinal) {
+                return new TypeWithPrimaryKeySuffixed(null, ordinal);
             }
 
             public ListOfBoxes getListOfBoxes(int ordinal) {
@@ -365,8 +388,9 @@ public class DataModel {
             }
         }
 
-        public static class TypeB extends HollowObject {
-            public TypeB(HollowObjectDelegate delegate, int ordinal) {
+        @HollowTypeName(name = "TypeB")
+        public static class TypeBSuffixed extends HollowObject {
+            public TypeBSuffixed(HollowObjectDelegate delegate, int ordinal) {
                 super(delegate, ordinal);
             }
         }
@@ -377,8 +401,21 @@ public class DataModel {
             }
         }
 
+        public static class TypeWithTypeB extends HollowObject {
+            public TypeWithTypeB(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+        }
+
         public static class SubTypeOfTypeWithPrimaryKey extends HollowObject {
             public SubTypeOfTypeWithPrimaryKey(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+        }
+
+        @HollowTypeName(name = "TypeWithPrimaryKey2")
+        public static class TypeWithPrimaryKeySuffixed extends HollowObject {
+            public TypeWithPrimaryKeySuffixed(HollowObjectDelegate delegate, int ordinal) {
                 super(delegate, ordinal);
             }
         }

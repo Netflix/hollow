@@ -24,6 +24,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AnnotatedElement;
@@ -169,7 +170,7 @@ final class MatchFieldPathArgumentExtractor<Q> {
             HollowDataset dataset, Class<?> rootType, String fieldPath,
             Class<T> extractorType, Function<Q, T> extractorFunction,
             FieldPathResolver fpResolver) {
-        String rootTypeName = rootType.getSimpleName();
+        String rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
         FieldPaths.FieldPath<? extends FieldPaths.FieldSegment> fp = fpResolver.resolve(dataset, rootTypeName,
                 fieldPath);
 

@@ -24,6 +24,7 @@ import com.netflix.hollow.core.HollowDataset;
 import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowSchema;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -71,7 +72,7 @@ final class SelectFieldPathResultExtractor<T> {
     static <T> SelectFieldPathResultExtractor<T> from(
             Class<? extends HollowAPI> apiType, HollowDataset dataset, Class<?> rootType, String fieldPath,
             Class<T> selectType) {
-        String rootTypeName = rootType.getSimpleName();
+        String rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
         FieldPaths.FieldPath<FieldPaths.FieldSegment> fp =
                 FieldPaths.createFieldPathForHashIndex(dataset, rootTypeName, fieldPath);
 
@@ -101,7 +102,7 @@ final class SelectFieldPathResultExtractor<T> {
                     throw incompatibleSelectType(selectType, fieldPath, typeName);
                 }
                 // @@@ Check that object schema has single value field of String type such as HString
-            } else if (!selectType.getSimpleName().equals(typeName)) {
+            } else if (!HollowObjectTypeMapper.getDefaultTypeName(selectType).equals(typeName)) {
                 if (schemaType != HollowSchema.SchemaType.OBJECT && !GenericHollowObject.class.isAssignableFrom(
                         selectType)) {
                     throw incompatibleSelectType(selectType, fieldPath, typeName);
