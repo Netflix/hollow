@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -27,7 +28,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class HashIndexTest {
     // Map of primitive class to box class
-    static final Map<Class<?>, Class<?>> primitiveClasses;
+    private static final Map<Class<?>, Class<?>> primitiveClasses;
     static {
         primitiveClasses = new HashMap<>();
         primitiveClasses.put(boolean.class, Boolean.class);
@@ -42,7 +43,7 @@ public class HashIndexTest {
 
     static HollowConsumer consumer;
 
-    static DataModel.Consumer.Api api;
+    private static DataModel.Consumer.Api api;
 
     @BeforeClass
     public static void setup() {
@@ -59,6 +60,9 @@ public class HashIndexTest {
                 ws.add(new DataModel.Producer.TypeA(1, "TypeA" + i));
                 ws.add(new DataModel.Producer.TypeB(1, "TypeB" + i));
             }
+            ws.add(new DataModel.Producer.TypeWithTypeB("bar", new DataModel.Producer.TypeB(7, "c")));
+            ws.add(new DataModel.Producer.TypeWithTypeB("foo", new DataModel.Producer.TypeB(8, "a")));
+            ws.add(new DataModel.Producer.TypeWithTypeB("foo", new DataModel.Producer.TypeB(7, "b")));
         });
 
         consumer = HollowConsumer.withBlobRetriever(blobStore)
@@ -75,7 +79,7 @@ public class HashIndexTest {
         final Q value;
         final Class<T> selectType;
 
-        public MatchTestParameterized(String path, Class<Q> type, Q value, Class<T> selectType) {
+        MatchTestParameterized(String path, Class<Q> type, Q value, Class<T> selectType) {
             this.path = path;
             this.type = type;
             this.value = value;
@@ -99,7 +103,7 @@ public class HashIndexTest {
     }
 
     // path, type, value
-    static List<Object[]> valuesDataProvider() {
+    private static List<Object[]> valuesDataProvider() {
         DataModel.Producer.Values values = new DataModel.Producer.Values();
         return Stream.of(DataModel.Producer.Values.class.getDeclaredFields())
                 .flatMap(f -> {
@@ -218,6 +222,7 @@ public class HashIndexTest {
             Assert.assertEquals(0, r.get(0).getOrdinal());
         }
 
+        @SuppressWarnings("unused")
         static class ValueMethodsQuery {
             boolean _boolean;
             byte _byte;
@@ -313,7 +318,7 @@ public class HashIndexTest {
     }
 
     // path, type, value
-    static List<Object[]> boxesDataProvider() {
+    private static List<Object[]> boxesDataProvider() {
         DataModel.Producer.Boxes values = new DataModel.Producer.Boxes();
         return Stream.of(DataModel.Producer.Boxes.class.getDeclaredFields())
                 .map(f -> {
@@ -345,7 +350,7 @@ public class HashIndexTest {
     }
 
 
-    static List<Object[]> inlineBoxesDataProvider() {
+    private static List<Object[]> inlineBoxesDataProvider() {
         DataModel.Producer.InlineBoxes values = new DataModel.Producer.InlineBoxes();
         return Stream.of(DataModel.Producer.InlineBoxes.class.getDeclaredFields())
                 .map(f -> {
@@ -382,7 +387,7 @@ public class HashIndexTest {
         // path[type] = value
         @Parameters(name = "{index}: {0}[{1}] = {2}")
         public static Collection<Object[]> data() {
-            return Arrays.<Object[]>asList(
+            return Arrays.asList(
                     new Object[] {"date.value", long.class, 0L},
                     new Object[] {"number._name", String.class, "ONE"}
             );
@@ -563,8 +568,8 @@ public class HashIndexTest {
 
         @Test
         public void testTypeBWithSelect() {
-            HashIndexSelect<DataModel.Consumer.TypeB, DataModel.Consumer.HString, Integer> hi = HashIndex
-                    .from(consumer, DataModel.Consumer.TypeB.class)
+            HashIndexSelect<DataModel.Consumer.TypeBSuffixed, DataModel.Consumer.HString, Integer> hi = HashIndex
+                    .from(consumer, DataModel.Consumer.TypeBSuffixed.class)
                     .selectField("s", DataModel.Consumer.HString.class)
                     .usingPath("i", int.class);
 
@@ -638,6 +643,44 @@ public class HashIndexTest {
             HashIndex
                     .from(consumer, DataModel.Consumer.References.class)
                     .usingPath("", DataModel.Consumer.References.class);
+        }
+    }
+
+    public static class GeneratedSuffixTest extends HashIndexTest {
+        @Test
+        public void testMatch() {
+            HashIndex<DataModel.Consumer.TypeBSuffixed, Integer> hi = HashIndex
+                    .from(consumer, DataModel.Consumer.TypeBSuffixed.class)
+                    .usingPath("i", int.class);
+
+            List<DataModel.Consumer.TypeBSuffixed> r = hi.findMatches(1)
+                    .sorted(Comparator.comparingInt(HollowObject::getOrdinal)).collect(toList());
+            Assert.assertEquals(100, r.size());
+            for (int i = 0; i < r.size(); i++) {
+                Assert.assertEquals(i, r.get(i).getOrdinal());
+            }
+        }
+
+        @Test
+        public void testSelect() {
+            HashIndexSelect<DataModel.Consumer.TypeWithTypeB, DataModel.Consumer.TypeBSuffixed, String> his =
+                    HashIndex.from(consumer, DataModel.Consumer.TypeWithTypeB.class)
+                            .selectField("typeB", DataModel.Consumer.TypeBSuffixed.class)
+                            .usingPath("foo.value", String.class);
+            List<Integer> r = his.findMatches("foo")
+                    .map(HollowObject::getOrdinal).sorted().collect(Collectors.toList());
+            Assert.assertEquals(Arrays.asList(101, 102), r);
+        }
+
+        @Test
+        public void testSelectRootTypeSuffixed() {
+            HashIndexSelect<DataModel.Consumer.TypeBSuffixed, DataModel.Consumer.HString, Integer> his =
+                    HashIndex.from(consumer, DataModel.Consumer.TypeBSuffixed.class)
+                            .selectField("s", DataModel.Consumer.HString.class)
+                            .usingPath("i", int.class);
+            List<Integer> r = his.findMatches(7)
+                    .map(HollowObject::getOrdinal).sorted().collect(Collectors.toList());
+            Assert.assertEquals(Arrays.asList(203, 206), r);
         }
     }
 }

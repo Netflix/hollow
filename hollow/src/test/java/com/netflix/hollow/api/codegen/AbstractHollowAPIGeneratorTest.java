@@ -15,11 +15,17 @@
  */
 package com.netflix.hollow.api.codegen;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.netflix.hollow.core.write.objectmapper.HollowTypeName;
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.function.UnaryOperator;
 import org.junit.After;
 
@@ -55,7 +61,15 @@ public class AbstractHollowAPIGeneratorTest {
         assertTrue("File at " + relativePath + " should exist", f.exists() && f.length() > 0L);
     }
 
-    void assertFileDoesNotExist(String relativePath) throws IOException {
+    void assertClassHasHollowTypeName(String clazz, String typeName) throws IOException, ClassNotFoundException {
+        ClassLoader cl = new URLClassLoader(new URL[]{new File(clazzFolder).toURI().toURL()});
+        Class cls = cl.loadClass(clazz);
+        Annotation annotation = cls.getAnnotation(HollowTypeName.class);
+        assertNotNull(annotation);
+        assertEquals(typeName, ((HollowTypeName) annotation).name());
+    }
+
+    void assertFileDoesNotExist(String relativePath) {
         if (relativePath.startsWith("/")) {
             throw new IllegalArgumentException("Relative paths should not start with /");
         }

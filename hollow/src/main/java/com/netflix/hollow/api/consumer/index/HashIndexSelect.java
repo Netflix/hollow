@@ -25,6 +25,7 @@ import com.netflix.hollow.core.index.FieldPaths;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.write.objectmapper.HollowObjectTypeMapper;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +80,7 @@ public class HashIndexSelect<T extends HollowRecord, S extends HollowRecord, Q>
                 .map(mf -> mf.fieldPath.getSegments().stream().map(FieldPaths.FieldSegment::getName)
                         .collect(joining(".")))
                 .toArray(String[]::new);
-        this.rootTypeName = rootType.getSimpleName();
+        this.rootTypeName = HollowObjectTypeMapper.getDefaultTypeName(rootType);
 
         this.hhi = new HollowHashIndex(consumer.getStateEngine(), rootTypeName, selectFieldPath, matchFieldPaths);
     }

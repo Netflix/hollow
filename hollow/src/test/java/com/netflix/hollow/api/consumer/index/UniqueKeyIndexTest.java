@@ -71,6 +71,7 @@ public class UniqueKeyIndexTest {
             for (int i = 0; i < 100; i++) {
                 ws.add(new DataModel.Producer.TypeA(1, "TypeA" + i));
             }
+            ws.add(new DataModel.Producer.TypeWithPrimaryKey2(1));
         });
 
         consumer = HollowConsumer.withBlobRetriever(blobStore)
@@ -543,6 +544,15 @@ public class UniqueKeyIndexTest {
             }
         }
 
+        static class KeyWithSinglePath {
+            @FieldPath("i")
+            int i;
+
+            KeyWithSinglePath(int i) {
+                this.i = i;
+            }
+        }
+
         public <T> void test(Class<T> keyType, T key) {
             UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKey, T> pki = UniqueKeyIndex
                     .from(consumer, DataModel.Consumer.TypeWithPrimaryKey.class)
@@ -557,6 +567,26 @@ public class UniqueKeyIndexTest {
         @Test
         public void testSameOrder() {
             test(KeyTypeSameOrder.class, new KeyTypeSameOrder(1, "1", 2));
+        }
+
+        @Test
+        public void testWithHollowTypeName() {
+            UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKeySuffixed, Integer> pki =
+                    UniqueKeyIndex.from(consumer, DataModel.Consumer.TypeWithPrimaryKeySuffixed.class)
+                            .bindToPrimaryKey()
+                            .usingPath("i", Integer.class);
+
+            DataModel.Consumer.TypeWithPrimaryKeySuffixed match = pki.findMatch(1);
+            Assert.assertNotNull(match);
+            Assert.assertEquals(0, match.getOrdinal());
+
+            UniqueKeyIndex<DataModel.Consumer.TypeWithPrimaryKeySuffixed, KeyWithSinglePath> pki2 =
+                    UniqueKeyIndex.from(consumer, DataModel.Consumer.TypeWithPrimaryKeySuffixed.class)
+                            .bindToPrimaryKey()
+                            .usingBean(KeyWithSinglePath.class);
+            match = pki2.findMatch(new KeyWithSinglePath(1));
+            Assert.assertNotNull(match);
+            Assert.assertEquals(0, match.getOrdinal());
         }
 
         @Test
