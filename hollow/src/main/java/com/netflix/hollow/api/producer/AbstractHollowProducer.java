@@ -654,16 +654,16 @@ abstract class AbstractHollowProducer {
 
     /**
      * Given these read states
-     * <p>
-     * * S(cur) at the currently announced version
-     * * S(pnd) at the pending version
-     * <p>
-     * Ensure that:
-     * <p>
-     * S(cur).apply(forwardDelta).checksum == S(pnd).checksum
-     * S(pnd).apply(reverseDelta).checksum == S(cur).checksum
      *
-     * @return updated read states
+     * * S(cur) at the currently announced version
+     * * S(pnd) = empty read state
+     *
+     * 1. Read in the snapshot artifact to initialize S(pnd)
+     * 2. Ensure that:
+     *   - S(cur).apply(forwardDelta).checksum == S(pnd).checksum
+     *   - S(pnd).apply(reverseDelta).checksum == S(cur).checksum
+     *
+     * @return S(cur) and S(pnd)
      */
     private ReadStateHelper checkIntegrity(
             ListenerSupport.Listeners listeners, ReadStateHelper readStates, Artifacts artifacts) throws Exception {
@@ -702,7 +702,16 @@ abstract class AbstractHollowProducer {
                     if (!reverseChecksum.equals(currentChecksum)) {
                         throw new HollowProducer.ChecksumValidationException(HollowProducer.Blob.Type.REVERSE_DELTA);
                     }
-                    result = readStates.swap();
+                    if (current.hasIdenticalSchemas(pending)) {
+                        // optimization - they have identical schemas, so just swap them
+                        log.log(Level.FINE, "current and pending have identical schemas, swapping");
+                        result = readStates.swap();
+                    } else {
+                        // undo the changes we made to the read states
+                        log.log(Level.FINE, "current and pending have non-identical schemas, reverting");
+                        applyDelta(artifacts.reverseDelta, current);
+                        applyDelta(artifacts.delta, pending);
+                    }
                 }
             }
             status.success();
