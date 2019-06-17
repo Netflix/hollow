@@ -18,7 +18,6 @@ public interface TransformerMetricRecorder {
     void incrementCounter(Metric name, long incrementBy, String... tagKeyValues);
 
     public static enum DurationMetric {
-        P0_RestoreDataDuration,
         P1_ReadInputDataDuration,
         P2_ProcessDataDuration,
         P3_WriteOutputDataDuration,

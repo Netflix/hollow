@@ -38,6 +38,10 @@ public class UpstreamDatasetHolder {
         return upstreamDatasetHolder;
     }
 
+    /**
+     * Input datasets are enumerated here. NOTE: some metadata attributes are computed based on calling toString() on these
+     * enumerators so avoid renaming these enumerators as changes won't be backwards compatible.
+     */
     public enum Dataset {
         CONVERTER,
         GATEKEEPER2
@@ -70,11 +74,13 @@ public class UpstreamDatasetHolder {
         /**
          * Returns a string that is used as the key to create input version attributes in the transformer output header
          * and metadata for all Cinder inputs.
+         * NOTE: the attribute is computed based on enumerators in the {@code Dataset} enum instead of namespace so that
+         * namespace changes are backwards compatible. The dot separator can not exist in the enum's enumerators.
          * @param dataset The dataset for which input version attribute key is to be computed
-         * @return input version attribtue key. For eg.  "muonInputVersion", "gatekeeper2InputVersion", etc.
+         * @return input version attribtue key. For eg.  "cinder.converter.input.version", "cinder.gatekeeper2.input.version", etc.
          */
         public static String getInputVersionAttribute(UpstreamDatasetHolder.Dataset dataset) {
-            return dataset.toString().toLowerCase() + "InputVersion";
+            return "cinder." + dataset.toString().toLowerCase() + ".input.version";
         }
     }
 

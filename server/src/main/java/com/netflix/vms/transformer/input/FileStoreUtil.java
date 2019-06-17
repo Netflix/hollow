@@ -5,6 +5,7 @@ import com.netflix.aws.file.FileAccessItem;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,16 +42,16 @@ public class FileStoreUtil {
         return getAttribute(fileItem, "converterVip");
     }
 
-    public static Long getInputVersion(FileAccessItem fileItem, UpstreamDatasetHolder.Dataset dataset) {
+    public static Optional<Long> getInputVersion(FileAccessItem fileItem, UpstreamDatasetHolder.Dataset dataset) {
 
         String inputVersionStr = getAttribute(fileItem, UpstreamDatasetConfig.getInputVersionAttribute(dataset));
-        if (inputVersionStr == null || inputVersionStr.isEmpty()) return null;
+        if (inputVersionStr == null || inputVersionStr.isEmpty()) return Optional.empty();
 
         try {
-            return Long.parseLong(inputVersionStr);
+            return Optional.of(Long.parseLong(inputVersionStr));
         } catch(Throwable th) {
             LOGGER.error("Failed to parse version for input {} from FileStore: ", dataset, th);
-            return null;
+            return Optional.empty();
         }
     }
 

@@ -776,8 +776,7 @@ public class TransformCycle {
             VMSInputDataVersionLogger.logInputVersions(inputConsumers, ctx);
 
             ctx.getLogger().info(ProcessNowMillis,
-                    "Using transform timestamp of {} ({})",
-                    nowMillis, new Date(nowMillis));
+                    "Using transform timestamp of {} ({})", nowMillis, new Date(nowMillis));
 
             VMSInputDataVersionLogger.logConverterInputVersions(
                     inputConsumers.get(CONVERTER).getStateEngine().getHeaderTags(), ctx.getLogger());

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -127,12 +128,12 @@ public class VMSFollowVipSameVersionAdmin {
 
         for(FileAccessItem item : allVersionItems) {
             Long outputVersion = FileStoreUtil.getToVersion(item);
-            Long converterInputVersion = FileStoreUtil.getInputVersion(item, CONVERTER);
-            if (converterInputVersion == null)
-                converterInputVersion = Long.MIN_VALUE;
+            Optional<Long> converterInputVersion = FileStoreUtil.getInputVersion(item, CONVERTER);
+            if (!converterInputVersion.isPresent())
+                converterInputVersion = Optional.of(Long.MIN_VALUE);
             Long cycleDataTimestamp = FileStoreUtil.getPublishCycleDataTS(item);
 
-            String key = converterInputVersion + "_" + cycleDataTimestamp;
+            String key = converterInputVersion.get() + "_" + cycleDataTimestamp;
             Set<Long> outputVersionSet = map.get(key);
             if (outputVersionSet == null) {
                 outputVersionSet = new HashSet<>();

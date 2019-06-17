@@ -10,6 +10,7 @@ import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDa
 import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FollowVipPinExtractor {
@@ -35,22 +36,17 @@ public class FollowVipPinExtractor {
             long dataVersion = snapshotVersion > deltaVersion ? snapshotVersion : deltaVersion;
             
             if(latestItem != null) {
-                String converterVip = FileStoreUtil.getConverterVip(latestItem);
-                if(!ctx.getConfig().getConverterVip().equals(converterVip)) {
-                    ctx.getLogger().warn(FollowVip, "Could not follow VIP " + followVip
-                            + ": not using same converter VIP (I'm using " + ctx.getConfig().getConverterVip()
-                            + " and it's using " + converterVip + ")");
-                    return null;
-                }
-                
                 Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
                 UpstreamDatasetConfig.getNamespaces().keySet().forEach(dataset -> {
-                    Long inputVersion = FileStoreUtil.getInputVersion(latestItem, dataset);
-                    if (inputVersion != null)
-                        inputVersions.put(dataset, inputVersion);
-                    else
-                        ctx.getLogger().error(FollowVip, "Could not find input version for dataset={} in followVip={}."
-                                + " Continuing with remaining inputs.", dataset, followVip);
+                    Optional<Long> inputVersion = FileStoreUtil.getInputVersion(latestItem, dataset);
+                    if (inputVersion.isPresent())
+                        inputVersions.put(dataset, inputVersion.get());
+                    else {
+                        ctx.getLogger().error(FollowVip, "Could not find input version for dataset={} in followVip={}.",
+                                dataset, followVip);
+                        throw new RuntimeException("Could not find input version for dataset=" + dataset
+                                + " in followVip=" + followVip);
+                    }
                 });
 
                 String logInputVersions = inputVersions.entrySet().stream()
@@ -66,13 +62,15 @@ public class FollowVipPinExtractor {
                             + " inputs= (" + logInputVersions + ")");
                     return new FollowVipPin(followVip, inputVersions, publishCycleDataTS);
                 } else {
-                    ctx.getLogger().warn(FollowVip, "Could not determine pin values from " + followVip);
+                    ctx.getLogger().error(FollowVip, "Could not determine pin values from " + followVip);
+                    throw new RuntimeException("Could not determine pin values from " + followVip);
                 }
             } else {
-                ctx.getLogger().warn(FollowVip, "Could not follow VIP " + followVip + ": no existing data discovered!");
+                ctx.getLogger().error(FollowVip, "Could not follow VIP " + followVip + ": no existing data discovered!");
+                throw new RuntimeException("Could not follow VIP " + followVip + ": no existing data discovered!");
             }
         }
-        
+
         return null;
     }
     

@@ -6,7 +6,6 @@ import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.publish.workflow.job.impl.BlobMetaDataUtil;
 import java.util.Map;
@@ -23,9 +22,8 @@ public class TransformerOutputBlobHeaderPopulator {
     public Map<String, String> addHeaders(CycleInputs cycleInputs, HollowWriteStateEngine outputStateEngine, long previousCycleNumber, long currentCycleNumber) {
 
         // input version header tags for all inputs
-        for (Map.Entry<UpstreamDatasetHolder.Dataset, InputState> entry : cycleInputs.getInputs().entrySet())
-            outputStateEngine.addHeaderTag(UpstreamDatasetConfig.getInputVersionAttribute(entry.getKey()),
-                    String.valueOf(entry.getValue().getVersion()));
+        cycleInputs.getInputs().forEach(
+                (k, v) -> outputStateEngine.addHeaderTag(UpstreamDatasetConfig.getInputVersionAttribute(k), String.valueOf(v.getVersion())));
         InputState converterInput = cycleInputs.getInputs().get(CONVERTER);
         outputStateEngine.addHeaderTag("sourceDataVersion", String.valueOf(converterInput.getVersion()));    // for backwards compatibility, indicates converter input version
 

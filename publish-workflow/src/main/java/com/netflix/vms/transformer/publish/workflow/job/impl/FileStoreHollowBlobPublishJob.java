@@ -11,8 +11,6 @@ import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.HollowProducer.Blob;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
@@ -22,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.FileRegionUploadStatus;
 import netflix.admin.videometadata.uploadstat.FileUploadStatus.UploadStatus;
 
@@ -154,9 +151,8 @@ public class FileStoreHollowBlobPublishJob extends HollowBlobPublishJob {
                         : cycleInputs.getInputs().get(GATEKEEPER2).getVersion()));
 
         // Add input version attributes for all inputs
-        for (Map.Entry<UpstreamDatasetHolder.Dataset, InputState> entry : cycleInputs.getInputs().entrySet())
-            BlobMetaDataUtil.addAttribute(att, UpstreamDatasetConfig.getInputVersionAttribute(entry.getKey()),
-                    String.valueOf(entry.getValue().getVersion()));
+        cycleInputs.getInputs().forEach((k, v) ->
+                BlobMetaDataUtil.addAttribute(att, UpstreamDatasetConfig.getInputVersionAttribute(k), String.valueOf(v.getVersion())));
 
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
