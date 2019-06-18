@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.input;
 
-import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataConverterVersionId;
+import static com.netflix.vms.transformer.common.io.TransformerLogTag.CinderInputDataVersions;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataVersionIds;
 
 import com.netflix.hollow.api.consumer.HollowConsumer;
@@ -10,26 +10,18 @@ import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 public class VMSInputDataVersionLogger {
-    private static final String CONVERTER_VIP_PREFIX_FOR_HOLLOW_CONSUMER = "vmsconverter-";
-
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz");
 
     public static void logInputVersions(Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers, TransformerContext ctx) {
-        Map<String, Long> inputs = new HashMap<>();
-        for (UpstreamDatasetHolder.Dataset dataset : inputConsumers.keySet()) {
-            inputs.put(UpstreamDatasetConfig.getNamespaces().get(dataset), inputConsumers.get(dataset).getCurrentVersionId());
-        }
-        // This log msg is rendered in the "Inputs to transformer" widget on dashboard
-        String intputsLogLine = inputs.entrySet().stream()
-                .map(Map.Entry::toString)
-                .collect(Collectors.joining(" "));
-        ctx.getLogger().info(InputDataConverterVersionId, intputsLogLine);
+        inputConsumers.forEach((k, v) -> {
+            // These log msgs are rendered in the "Inputs" widget on dashboard
+            ctx.getLogger().info(CinderInputDataVersions, "Input={} Version={}",
+                    UpstreamDatasetConfig.getNamespaces().get(k), v.getCurrentVersionId());
+        });
     }
 
     public static void logConverterInputVersions(Map<String, String> inputBlobHeaders, TaggingLogger logger) {

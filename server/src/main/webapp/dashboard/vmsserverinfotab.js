@@ -538,7 +538,6 @@ function CycleErrorCodesTab(serverInfoView) {
 // --------------------------------------------------------------------
 function CycleInputDataInformation(serverInfoView) {
     this.init = false;
-    this.inputDataWidget = new PlainTextViewWidget("#id-cycle-data-version-locations", "value");
 
     this.initialized = function() {
         return this.init;
@@ -546,7 +545,6 @@ function CycleInputDataInformation(serverInfoView) {
 
     this.clear = function() {
         $("#id-cycle-input-shardinfo-locations").html("");
-        this.inputDataWidget.clear();
         $("#id-cycle-output-shardinfo-locations").html("");
         this.init = false;
     };
@@ -559,17 +557,22 @@ function CycleInputDataInformation(serverInfoView) {
     };
 
     this.refresh = function() {
-        var inputParams = [ "Input", "Keybase", "Type", "Version", "EventId", "EventCheckpoint", "FileName", "PublishTime" ];
-        var tableWidget = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", inputParams);
-        var widgetExecutor = new RegexSearchWidgetExecutor(tableWidget, RegexParserMapper.prototype.getInputDataRegexInfo());
-        var inputDataWidgetExecutor = new InputDataVersionWidgetExecutor(this.inputDataWidget);
+        // Render the "Inputs to the transformer" table
+        var transformerInputFields = [ "Input", "Version"];
+        var transformerInputsWidget = new DataTableWidget("#id-cycle-input-data-versions", "id-table-cycle-input-data-versions", transformerInputFields);
+        var transformerInputsWidgetExecutor = new RegexSearchWidgetExecutor(transformerInputsWidget, RegexParserMapper.prototype.getCinderInputDataVersionsRegexInfo());
+        this.setPropertiesForQueryObject(transformerInputsWidgetExecutor.searchQuery, "vmsserver", "50");
+        transformerInputsWidgetExecutor.searchQuery.add("eventInfo.tag:CinderInputDataVersions");
+        transformerInputsWidgetExecutor.updateJsonFromSearch();
 
-        this.setPropertiesForQueryObject(widgetExecutor.searchQuery, "vmsserver", "50");
-        widgetExecutor.searchQuery.add("eventInfo.tag:InputDataVersionIds");
-        this.setPropertiesForQueryObject(inputDataWidgetExecutor.searchQuery, "vmsserver", "1");
-        inputDataWidgetExecutor.searchQuery.add("eventInfo.tag:InputDataConverterVersionId");
-        widgetExecutor.updateJsonFromSearch();
-        inputDataWidgetExecutor.updateJsonFromSearch();
+        // Render the "Inputs to the converter" table
+        var converterInputFields = [ "Input", "Keybase", "Type", "Version", "EventId", "EventCheckpoint", "FileName", "PublishTime" ];
+        var converterInputsWidget = new DataTableWidget("#id-cycle-input-shardinfo-locations", "id-table-input-shardinfo-results", converterInputFields);
+        var converterInputsWidgetExecutor = new RegexSearchWidgetExecutor(converterInputsWidget, RegexParserMapper.prototype.getInputDataRegexInfo());
+        this.setPropertiesForQueryObject(converterInputsWidgetExecutor.searchQuery, "vmsserver", "50");
+        converterInputsWidgetExecutor.searchQuery.add("eventInfo.tag:InputDataVersionIds");
+        converterInputsWidgetExecutor.updateJsonFromSearch();
+
         this.init = true;
     };
 }

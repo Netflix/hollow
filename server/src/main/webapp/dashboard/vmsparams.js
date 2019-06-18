@@ -74,6 +74,15 @@ RegexParserMapper.prototype.getJobBuilderRegexInfo = function() {
     return fieldRegex;
 };
 
+// "Input=vmsconverter-muon Version=20190617232848627"
+RegexParserMapper.prototype.getCinderInputDataVersionsRegexInfo = function() {
+    var fieldRegex = new Object();
+    fieldRegex["Input"] = [ /^Input=(.*)/, 1 ];
+    fieldRegex["Version"] = [ /^Version=(.*)/, 1 ];
+    return fieldRegex;
+};
+
+
 // "mutationGroup=PERSON_BIO latestEventId=1125975801 coldstartVersionId=1463012034071 coldstartKeybase=dummyValue coldstartS3Filename=anotherDummyValue"
 RegexParserMapper.prototype.getInputDataRegexInfo = function() {
     var fieldRegex = new Object();
