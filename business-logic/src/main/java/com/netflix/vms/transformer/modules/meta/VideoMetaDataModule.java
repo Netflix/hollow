@@ -40,6 +40,7 @@ import com.netflix.vms.transformer.hollowinput.VideoGeneralTitleTypeHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Hook;
 import com.netflix.vms.transformer.hollowoutput.HookType;
+import com.netflix.vms.transformer.hollowoutput.InteractiveData;
 import com.netflix.vms.transformer.hollowoutput.MerchBehavior;
 import com.netflix.vms.transformer.hollowoutput.NFLocale;
 import com.netflix.vms.transformer.hollowoutput.Strings;
@@ -52,6 +53,7 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -438,6 +440,16 @@ public class VideoMetaDataModule {
 
             vmd.isTestTitle = general._getTestTitle();
             vmd.metadataReleaseDays = OutputUtil.getNullableInteger(general._getMetadataReleaseDays());
+
+            // yes the long to int downcast isn't the best, but it follows the precedent (of modeling with long and casting to int
+            // ref VideoMediaDataModule:  vmd.approximateRuntimeInSeconds = (int) general._getRuntime();
+            vmd.displayRuntimeInSeconds = OutputUtil.getNullableInteger((int)general._getDisplayRuntime());
+            if (general._getInteractiveData()!=null) {
+                vmd.interactiveData = new InteractiveData();
+                if (general._getInteractiveData()._getInteractiveType()!=null) {
+                    vmd.interactiveData.interactiveType = general._getInteractiveData()._getInteractiveType()._getValue();
+                }
+            }
         }
 
         if (vmd.titleTypes == null) vmd.titleTypes = Collections.emptySet();
