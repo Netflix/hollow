@@ -22,6 +22,7 @@ public class PackageData implements Cloneable {
     public Set<ISOCountry> allDeployableCountries = null;
     public int runtimeInSeconds = 0;
     public List<TimecodeAnnotation> timecodes = null;
+    public List<Strings> recipeGroups = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;
@@ -63,6 +64,9 @@ public class PackageData implements Cloneable {
         if(o.timecodes == null) {
         	if(timecodes != null) return false;
         } else if(!o.timecodes.equals(timecodes)) return false;
+        if(o.recipeGroups == null) {
+            if(recipeGroups != null) return false;
+        }else if(!o.recipeGroups.equals(recipeGroups)) return false;
         return true;
     }
 

@@ -21,6 +21,7 @@ import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoHollow;
 import com.netflix.vms.transformer.hollowinput.DrmHeaderInfoListHollow;
 import com.netflix.vms.transformer.hollowinput.ListOfPackageTagsHollow;
+import com.netflix.vms.transformer.hollowinput.ListOfStringHollow;
 import com.netflix.vms.transformer.hollowinput.PackageDrmInfoHollow;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageMovieDealCountryGroupHollow;
@@ -210,7 +211,15 @@ public class PackageDataModule {
         pkg.id = (int) packages._getPackageId();
         pkg.video = new Video((int) packages._getMovieId());
         pkg.isPrimaryPackage = true;
-
+        
+        pkg.recipeGroups = new ArrayList<>();
+        ListOfStringHollow recipeGroups = packages._getRecipeGroups();
+        if(recipeGroups != null) {
+            for(StringHollow recipeGroup : recipeGroups) {
+                pkg.recipeGroups.add(new Strings(recipeGroup._getValue()));
+            }
+        }
+        
         /// also create the DrmInfoData while iterating over the streams
         DrmInfoData drmInfoData = new DrmInfoData();
         drmInfoData.packageId = pkg.id;
@@ -293,7 +302,7 @@ public class PackageDataModule {
         //////////// ENCODE SUMMARY DESCRIPTORS /////////////////
 
         encodeSummaryModule.summarize(pkg);
-
+        
         mapper.add(drmInfoData);
 
         return packageDataCollection;
