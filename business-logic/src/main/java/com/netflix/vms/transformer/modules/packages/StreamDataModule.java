@@ -33,6 +33,7 @@ import com.netflix.vms.transformer.hollowoutput.DownloadDescriptor;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocation;
 import com.netflix.vms.transformer.hollowoutput.DownloadLocationSet;
 import com.netflix.vms.transformer.hollowoutput.DownloadableId;
+import com.netflix.vms.transformer.hollowoutput.DrmHeader;
 import com.netflix.vms.transformer.hollowoutput.DrmInfo;
 import com.netflix.vms.transformer.hollowoutput.DrmInfoData;
 import com.netflix.vms.transformer.hollowoutput.DrmKey;
@@ -56,6 +57,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoResolution;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,10 +68,11 @@ import java.util.Objects;
 import java.util.Set;
 
 public class StreamDataModule {
-	private static final String DEFAULT_ENCODING_ALGORITHM = "default";
+    private static final String DEFAULT_ENCODING_ALGORITHM = "default";
 
     public static final VideoFormatDebugMap debugVideoFormatMap = new VideoFormatDebugMap();
     public static final DebugLogConfig debugLogConfig = new DebugLogConfig();
+    public static final int PLAYREADY_SYSTEM = 1;
 
     private final StreamDrmData EMPTY_DRM_DATA = new StreamDrmData();
     private final DownloadLocationSet EMPTY_DOWNLOAD_LOCATIONS = new DownloadLocationSet();
@@ -120,7 +123,7 @@ public class StreamDataModule {
         if (streamProfile._getProfileType()._isValueEqual("MERCHSTILL")) {
             return null;
         }
-        
+
         ImageStreamInfoHollow inputStreamImageInfo = inputStream._getImageInfo();
         StreamFileIdentificationHollow inputStreamIdentity = inputStream._getFileIdentification();
         StreamDeploymentHollow inputStreamDeployment = inputStream._getDeployment();
@@ -338,15 +341,27 @@ public class StreamDataModule {
                 } else {
                     ///TODO: Why exclude WmDrmKeys?
                     if(drmKeyGroup.intValue() != PackageDataModule.WMDRMKEY_GROUP)
-                        objectMapper.addObject(drmKey);
+                        objectMapper.add(drmKey);
                 }
 
                 DrmInfo drmInfo = drmInfoByGroupId.get(drmKeyGroup);
-                if(drmInfo != null) {
+                if (drmInfo != null) {
+                    if (drmInfo.drmHeaders != null) {
+                        DrmHeader header = drmInfo.drmHeaders.get(PLAYREADY_SYSTEM);
+                        if (header != null) {
+                            StringHollow playreadyHeaderVersion = streamProfile._getPlayreadyHeaderVersion();
+                            if (playreadyHeaderVersion != null) {
+                                if (header.attributes == null || header.attributes.isEmpty()) {
+                                    header.attributes = new HashMap<>();
+                                }
+                                header.attributes.put(DrmHeader.HEADER_VERSION,
+                                        DrmHeader.newHeaderVersionAttributeValue(playreadyHeaderVersion._getValue()));
+                            }
+                        }
+                    }
                     drmInfoData.downloadableIdToDrmInfoMap.put(outputStream.downloadableId, drmInfo);
                 }
             }
-
         }
 
         outputStream.downloadDescriptor.encodingProfileId = (int)inputStream._getStreamProfileId();

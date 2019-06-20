@@ -2,54 +2,64 @@ package com.netflix.vms.transformer.hollowoutput;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DrmHeader implements Cloneable {
+    public static Strings HEADER_VERSION = new Strings("headerVersion");
+
+    private static final Map<String, Strings> headerVersionattributeValueToInstanceMap = new ConcurrentHashMap<>();
 
     public int drmSystemId = java.lang.Integer.MIN_VALUE;
     public byte[] keyId = null;
     public byte[] checksum = null;
     public Map<Strings, Strings> attributes = null;
 
-    public boolean equals(Object other) {
-        if(other == this)  return true;
-        if(!(other instanceof DrmHeader))
+    public static Strings newHeaderVersionAttributeValue(String value) {
+        return headerVersionattributeValueToInstanceMap.computeIfAbsent(value, val -> new Strings(val));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DrmHeader)) {
             return false;
-
-        DrmHeader o = (DrmHeader) other;
-        if(o.drmSystemId != drmSystemId) return false;
-        if(!Arrays.equals(o.keyId, keyId)) return false;
-        if(!Arrays.equals(o.checksum, checksum)) return false;
-        if(o.attributes == null) {
-            if(attributes != null) return false;
-        } else if(!o.attributes.equals(attributes)) return false;
-        return true;
+        }
+        DrmHeader drmHeader = (DrmHeader) o;
+        return drmSystemId == drmHeader.drmSystemId &&
+                Arrays.equals(keyId, drmHeader.keyId) &&
+                Arrays.equals(checksum, drmHeader.checksum) &&
+                Objects.equals(attributes, drmHeader.attributes);
     }
 
+    @Override
     public int hashCode() {
-        int hashCode = 1;
-        hashCode = hashCode * 31 + drmSystemId;
-        hashCode = hashCode * 31 + Arrays.hashCode(keyId);
-        hashCode = hashCode * 31 + Arrays.hashCode(checksum);
-        hashCode = hashCode * 31 + (attributes == null ? 1237 : attributes.hashCode());
-        return hashCode;
+        int result = Objects.hash(drmSystemId, attributes);
+        result = 31 * result + Arrays.hashCode(keyId);
+        result = 31 * result + Arrays.hashCode(checksum);
+        return result;
     }
 
+    @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("DrmHeader{");
-        builder.append("drmSystemId=").append(drmSystemId);
-        builder.append(",keyId=").append(keyId);
-        builder.append(",checksum=").append(checksum);
-        builder.append(",attributes=").append(attributes);
-        builder.append("}");
-        return builder.toString();
+        return "DrmHeader{" +
+                "drmSystemId=" + drmSystemId +
+                ", keyId=" + Arrays.toString(keyId) +
+                ", checksum=" + Arrays.toString(checksum) +
+                ", attributes=" + attributes +
+                '}';
     }
 
     public DrmHeader clone() {
         try {
-            DrmHeader clone = (DrmHeader)super.clone();
+            DrmHeader clone = (DrmHeader) super.clone();
             clone.__assigned_ordinal = -1;
             return clone;
-        } catch (CloneNotSupportedException cnse) { throw new RuntimeException(cnse); }
+        } catch (CloneNotSupportedException cnse) {
+            throw new RuntimeException(cnse);
+        }
     }
 
     @SuppressWarnings("unused")
