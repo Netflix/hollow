@@ -35,8 +35,6 @@ public class VideoMetaData implements Cloneable {
     public Strings broadcastDistributorName = null;
     public Integer metadataReleaseDays = null;
     public MerchBehavior merchBehavior = null;
-    public Integer displayRuntimeInSeconds = null;
-    public InteractiveData interactiveData = null;
 
     public boolean equals(Object other) {
         if (other == this) return true;
@@ -113,12 +111,6 @@ public class VideoMetaData implements Cloneable {
         if (o.merchBehavior == null) {
             if (merchBehavior != null) return false;
         } else if (!o.merchBehavior.equals(merchBehavior)) return false;
-        if (o.displayRuntimeInSeconds == null) {
-            if (displayRuntimeInSeconds != null) return false;
-        } else if (!o.displayRuntimeInSeconds.equals(displayRuntimeInSeconds)) return false;
-        if (o.interactiveData == null) {
-            if (interactiveData != null) return false;
-        } else if (!o.interactiveData.equals(interactiveData)) return false;
         return true;
     }
 
@@ -153,8 +145,6 @@ public class VideoMetaData implements Cloneable {
         hashCode = hashCode * 31 + (broadcastDistributorName == null ? 1237 : broadcastDistributorName.hashCode());
         hashCode = hashCode * 31 + (metadataReleaseDays == null ? 1237 : metadataReleaseDays.hashCode());
         hashCode = hashCode * 31 + (merchBehavior == null ? 1237 : merchBehavior.hashCode());
-        hashCode = hashCode * 31 + (displayRuntimeInSeconds == null ? 1237 : displayRuntimeInSeconds.hashCode());
-        hashCode = hashCode * 31 + (interactiveData == null ? 1237 : interactiveData.hashCode());
         return hashCode;
     }
 
@@ -189,8 +179,6 @@ public class VideoMetaData implements Cloneable {
         builder.append(",broadcastDistributorName=").append(broadcastDistributorName);
         builder.append(",metadataReleaseDays=").append(metadataReleaseDays);
         builder.append(",merchBehavior=").append(merchBehavior);
-        builder.append(",displayRuntimeInSeconds=").append(displayRuntimeInSeconds);
-        builder.append(",interactiveData=").append(interactiveData);
         builder.append("}");
         return builder.toString();
     }
