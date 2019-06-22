@@ -1,17 +1,17 @@
 package com.netflix.vms.transformer.override;
 
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.SimpleTransformer;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.File;

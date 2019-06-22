@@ -17,4 +17,5 @@ public class HollowReadStateEngineBuilder extends
     public HollowReadStateEngineBuilder() {
         super(TOP_LEVEL_TYPES);
     }
+
 }

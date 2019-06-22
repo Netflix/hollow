@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.common.TransformerMetricRecorder.Metric.FailedProcessingIndividualHierarchies;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CycleInterrupted;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.IndividualTransformFailed;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MultiLocaleCountries;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.NonVideoSpecificTransformDuration;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformInfo;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.TransformProgress;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
@@ -18,15 +17,9 @@ import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
-import com.netflix.vms.transformer.common.input.CycleInputs;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
-import com.netflix.vms.transformer.common.input.datasets.ConverterDataset;
-import com.netflix.vms.transformer.common.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.CharacterListHollow;
 import com.netflix.vms.transformer.hollowinput.MovieCharacterPersonHollow;
 import com.netflix.vms.transformer.hollowinput.PersonCharacterHollow;
@@ -46,6 +39,9 @@ import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.logmessage.ProgressMessage;
 import com.netflix.vms.transformer.misc.TopNVideoDataModule;
 import com.netflix.vms.transformer.modules.TransformModule;
@@ -96,8 +92,7 @@ public class SimpleTransformer {
     private final TransformerContext ctx;
     private final CycleConstants cycleConstants;
     private final VMSTransformerIndexer indexer;
-    
-    private final GatekeeperStatusRetriever statusRetriever;
+    private final UpstreamDatasetHolder upstream;
 
     public SimpleTransformer(CycleInputs cycleInputs,
                              HollowWriteStateEngine outputStateEngine, 
@@ -106,50 +101,19 @@ public class SimpleTransformer {
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;
 
-        UpstreamDatasetHolder upstream = UpstreamDatasetHolder.getNewDatasetHolder(cycleInputs.getInputs());
+        // See {@Code UpstreamDatasetHolder} and {@Code GenerateCinderInputArtifacts} for onboarding new Cinder inputs
+        this.upstream = UpstreamDatasetHolder.getNewDatasetHolder(cycleInputs.getInputs());
 
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
         this.converterAPI = converterDataset.getAPI();
         HollowReadStateEngine converterInputStateEngine = converterDataset.getInputState().getStateEngine();
 
-        Gatekeeper2Dataset gk2Dataset = upstream.getDataset(GATEKEEPER2);
-        VMSHollowInputAPI gk2StatusAPI = gk2Dataset.getAPI();
-        HollowReadStateEngine gk2InputStateEngine = gk2Dataset.getInputState().getStateEngine();
-
-        this.cycleConstants = new CycleConstants(converterInputStateEngine, gk2StatusAPI == null ? converterInputStateEngine : gk2InputStateEngine);
+        this.cycleConstants = new CycleConstants(upstream);
         long startTime = System.currentTimeMillis();
-        this.indexer = new VMSTransformerIndexer(converterInputStateEngine, ctx);
+        this.indexer = new VMSTransformerIndexer(converterInputStateEngine, ctx);   // indexes converter data
         long endTime = System.currentTimeMillis();
         
         System.out.println("INDEXED IN " + (endTime - startTime) + "ms");
-        
-        this.statusRetriever = createGatekeeperStatusRetriever(gk2Dataset, outputStateEngine, ctx);
-    }
-
-    /// TODO: Remove after full GK2 migration.
-    private GatekeeperStatusRetriever createGatekeeperStatusRetriever(
-            Gatekeeper2Dataset gk2Dataset,
-            HollowWriteStateEngine outputStateEngine,
-            TransformerContext ctx) {
-        GatekeeperStatusRetriever statusRetriever;
-        VMSHollowInputAPI gk2StatusAPI = gk2Dataset.getAPI();
-        if(gk2StatusAPI == null) {
-            statusRetriever = new GatekeeperStatusRetriever(converterAPI, indexer);
-        } else {
-            String gk2CountriesStr = ctx.getConfig().getGatekeeper2Countries();
-            Set<String> gk2Countries = Collections.emptySet();
-            if(gk2CountriesStr != null && !"".equals(gk2CountriesStr)) {
-                gk2Countries = new HashSet<>(Arrays.asList(gk2CountriesStr.split(",")));
-            }
-            
-            outputStateEngine.addHeaderTag("gatekeeper2_countries", gk2CountriesStr == null ? "" : gk2CountriesStr);
-            outputStateEngine.addHeaderTag("gatekeeper2_status_namespace", UpstreamDatasetConfig.getNamespaces().get(GATEKEEPER2));
-            outputStateEngine.addHeaderTag("gatekeeper2_status_version", String.valueOf(gk2Dataset.getInputState().getVersion()));
-
-            statusRetriever = new GatekeeperStatusRetriever(gk2StatusAPI, converterAPI, gk2Countries, indexer);
-        }
-        
-        return statusRetriever;
     }
 
     public void setPublishCycleDataTS(long time) {
@@ -160,7 +124,7 @@ public class SimpleTransformer {
         StreamDataModule.clearVideoFormatDiffs();
 
         // hierarchy initializer, HollowObjectMapper and namedListModule
-        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(converterAPI, indexer, statusRetriever, ctx);
+        final VideoHierarchyInitializer hierarchyInitializer = new VideoHierarchyInitializer(upstream, indexer, ctx);
         final HollowObjectMapper objectMapper = new HollowObjectMapper(writeStateEngine);
         objectMapper.doNotUseDefaultHashKeys();
         this.videoNamedListModule = new VideoNamedListModule(ctx, cycleConstants, objectMapper);
@@ -205,15 +169,14 @@ public class SimpleTransformer {
             executor.execute(() -> {
 
                 // create new modules for each executor thread
-                PackageDataModule packageDataModule = new PackageDataModule(converterAPI, ctx, objectMapper, cycleConstants,
-                        indexer, statusRetriever, cupTokenFetcher);
+                PackageDataModule packageDataModule = new PackageDataModule(upstream, ctx, objectMapper, cycleConstants, indexer, cupTokenFetcher);
                 VideoCollectionsModule collectionsModule = new VideoCollectionsModule(converterAPI, ctx, cycleConstants, indexer);
-                VideoMetaDataModule metadataModule = new VideoMetaDataModule(converterAPI, ctx, cycleConstants, indexer, statusRetriever);
-                VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(converterAPI, indexer, statusRetriever);
-                VideoMiscDataModule miscDataModule = new VideoMiscDataModule(converterAPI, indexer);
-                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(converterAPI, ctx, objectMapper, cycleConstants, indexer, statusRetriever);
-                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(converterAPI, ctx,
-                        objectMapper, cycleConstants, indexer, statusRetriever, cycleDataAggregator, cupTokenFetcher);
+                VideoMetaDataModule metadataModule = new VideoMetaDataModule(upstream, ctx, cycleConstants, indexer);
+                VideoMediaDataModule mediaDataModule = new VideoMediaDataModule(upstream, indexer);
+                VideoMiscDataModule miscDataModule = new VideoMiscDataModule(upstream, indexer);
+                VideoImagesDataModule imagesDataModule = new VideoImagesDataModule(converterAPI, upstream, ctx, objectMapper, cycleConstants, indexer);
+                CountrySpecificDataModule countrySpecificModule = new CountrySpecificDataModule(converterAPI, upstream, ctx,
+                        objectMapper, cycleConstants, indexer, cycleDataAggregator, cupTokenFetcher);
                 L10NVideoResourcesModule l10nVideoResourcesModule = new L10NVideoResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer);
 
                 int idx = processedCount.getAndIncrement();

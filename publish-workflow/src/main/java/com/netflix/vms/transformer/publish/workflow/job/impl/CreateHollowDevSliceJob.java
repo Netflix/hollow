@@ -1,8 +1,8 @@
 package com.netflix.vms.transformer.publish.workflow.job.impl;
 
 import static com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper.TransformerColumnFamily.DEV_SLICE_TOPNODE_IDS;
-import static com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CreateDevSlice;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 
 import com.netflix.astyanax.connectionpool.exceptions.ConnectionException;
 import com.netflix.aws.db.ItemAttribute;
@@ -12,8 +12,8 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.common.input.CycleInputs;
 import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;

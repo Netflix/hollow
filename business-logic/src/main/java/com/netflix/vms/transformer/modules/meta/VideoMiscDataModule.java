@@ -2,6 +2,7 @@ package com.netflix.vms.transformer.modules.meta;
 
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_AWARD;
 import static com.netflix.vms.transformer.index.IndexSpec.VMS_AWARD;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 
 import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -21,6 +22,8 @@ import com.netflix.vms.transformer.hollowoutput.VideoAwardFestival;
 import com.netflix.vms.transformer.hollowoutput.VideoAwardType;
 import com.netflix.vms.transformer.hollowoutput.VideoMiscData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,8 +40,9 @@ public class VideoMiscDataModule {
     private final HollowPrimaryKeyIndex awardIdx;
     private static FastProperty.BooleanProperty DISABLE_VIDEO_AWARDS = new FastProperty.BooleanProperty("transformer.videoMisc.disable.awardAttributes", true);
 
-    public VideoMiscDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
-        this.api = api;
+    public VideoMiscDataModule(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer) {
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.api = converterDataset.getAPI();
         this.videoAwardIdx = indexer.getPrimaryKeyIndex(VIDEO_AWARD);
         this.awardIdx = indexer.getPrimaryKeyIndex(VMS_AWARD);
     }

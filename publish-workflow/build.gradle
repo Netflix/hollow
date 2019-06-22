@@ -2,6 +2,7 @@ dependencies {
     compile project(':vmstransformer-common-interfaces')
     compile project(':vmstransformer-io')
     compile project(':vmstransformer-hollowoutput-api-notemplate')
+    compile project(':vmstransformer-business-logic')
 
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile 'netflix:playback-monkey-model:latest.release'
@@ -12,7 +13,6 @@ dependencies {
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'
     testCompile 'netflix:nflibrary-junit-util'
-
 }
 
 configurations {

@@ -6,7 +6,6 @@ import static com.netflix.vms.transformer.index.IndexSpec.IndexType.PRIMARY_KEY;
 public enum IndexSpec {
 
     SUPPLEMENTAL(PRIMARY_KEY, "Supplementals", "movieId"),
-    VIDEO_STATUS(PRIMARY_KEY, "Status", "movieId", "countryCode.value"),
     VIDEO_TYPE(PRIMARY_KEY, "VideoType", "videoId"),
     VIDEO_GENERAL(PRIMARY_KEY, "VideoGeneral", "videoId"),
     STORAGE_GROUPS(PRIMARY_KEY, "StorageGroups", "id.value"),
@@ -44,7 +43,6 @@ public enum IndexSpec {
     PERSON_ROLES_BY_VIDEO_ID(HASH, "PersonVideo", "roles.element", "personId", "roles.element.videoId"),
     VIDEO_TYPE_COUNTRY(HASH, "VideoType", "countryInfos.element", "videoId", "countryInfos.element.countryCode.value"),
     PACKAGES_BY_VIDEO(HASH, "Package", "", "movieId"),
-    ALL_VIDEO_STATUS(HASH, "Status", "", "movieId"),
     ROLLOUT_VIDEO_TYPE(HASH, "Rollout", "", "movieId", "rolloutType.value"),
     SHOW_COUNTRY_LABEL(HASH, "ShowCountryLabel", "showMemberTypes.element", "videoId", "showMemberTypes.element.countryCodes.element.value"),
     MOVIE_CHARACTER_PERSON_MOVIES_BY_PERSON_ID(HASH, "MovieCharacterPerson", "", "characters.element.personId"),

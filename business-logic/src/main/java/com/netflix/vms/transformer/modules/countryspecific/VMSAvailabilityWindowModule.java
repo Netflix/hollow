@@ -14,15 +14,8 @@ import com.netflix.vms.transformer.contract.ContractAssetType;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.hollowinput.FeedMovieCountryLanguagesHollow;
-import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.LongHollow;
 import com.netflix.vms.transformer.hollowinput.MapOfStringToLongHollow;
-import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
-import com.netflix.vms.transformer.hollowinput.RightsContractPackageHollow;
-import com.netflix.vms.transformer.hollowinput.RightsHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
@@ -37,10 +30,16 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractPackage;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -107,7 +106,7 @@ public class VMSAvailabilityWindowModule {
         this.transformedVideoData = transformedVideoData;
     }
 
-    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, StatusHollow videoRights, CountrySpecificRollupValues rollup) {
+    public List<VMSAvailabilityWindow> populateWindowData(Integer videoId, String country, CompleteVideoCountrySpecificData data, Status videoRights, CountrySpecificRollupValues rollup) {
         boolean isGoLive = isGoLive(videoRights);
 
         List<VMSAvailabilityWindow> windows = calculateWindowData(videoId, country, null, videoRights, rollup, isGoLive);
@@ -117,10 +116,10 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
-    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String language, StatusHollow videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
+    List<VMSAvailabilityWindow> calculateWindowData(Integer videoId, String country, String language, Status videoRights, CountrySpecificRollupValues rollup, boolean isGoLive) {
         List<VMSAvailabilityWindow> windows = null;
 
-        RightsHollow rights = videoRights._getRights();
+        Rights rights = videoRights.getRights();
         if ((rollup.doShow() && rollup.wasShowEpisodeFound()) || (rollup.doSeason() && rollup.wasSeasonEpisodeFound())) {
             windows = populateRolledUpWindowData(videoId, rollup, rights, isGoLive, language != null);
         } else {
@@ -132,12 +131,12 @@ public class VMSAvailabilityWindowModule {
         return windows;
     }
 
-    private VMSAvailabilityWindow newVMSAvailabilityWindow(RightsWindowHollow rightsWindowHollow) {
+    private VMSAvailabilityWindow newVMSAvailabilityWindow(RightsWindow rightsWindowHollow) {
         VMSAvailabilityWindow outputWindow = new VMSAvailabilityWindow();
         outputWindow.windowInfosByPackageId = new HashMap<>();
-        outputWindow.startDate = OutputUtil.getRoundedDate(rightsWindowHollow._getStartDate());
-        outputWindow.endDate = OutputUtil.getRoundedDate(rightsWindowHollow._getEndDate());
-        if (rightsWindowHollow._getOnHold()) {
+        outputWindow.startDate = OutputUtil.getRoundedDate(rightsWindowHollow.getStartDate());
+        outputWindow.endDate = OutputUtil.getRoundedDate(rightsWindowHollow.getEndDate());
+        if (rightsWindowHollow.getOnHold()) {
             outputWindow.startDate.val += ONE_THOUSAND_YEARS;
             outputWindow.endDate.val += ONE_THOUSAND_YEARS;
             outputWindow.onHold = true;
@@ -145,7 +144,7 @@ public class VMSAvailabilityWindowModule {
         return outputWindow;
     }
 
-    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, VmsAttributeFeedEntryHollow contractAttributes, List<RightsContractAssetHollow> contractAssets, boolean isAvailableForDownload, int packageId) {
+    WindowPackageContractInfo cloneWindowPackageContractInfo(int videoId, WindowPackageContractInfo existingInfo, long contractId, VmsAttributeFeedEntryHollow contractAttributes, List<RightsContractAsset> contractAssets, boolean isAvailableForDownload, int packageId) {
 
         // 1. merge cup token values
         List<Strings> cupTokens = new ArrayList<>();
@@ -161,8 +160,8 @@ public class VMSAvailabilityWindowModule {
         }
         // 2. merge bcp47 code values
         Set<Strings> bcp47Codes = new HashSet<>(existingInfo.videoContractInfo.assetBcp47Codes);
-        for (RightsContractAssetHollow asset : contractAssets) {
-            bcp47Codes.add(new Strings(asset._getBcp47Code()._getValue()));
+        for (RightsContractAsset asset : contractAssets) {
+            bcp47Codes.add(new Strings(asset.getBcp47Code()));
         }
 
         // 3. clone the exiting contract info, and assign all new values
@@ -183,7 +182,7 @@ public class VMSAvailabilityWindowModule {
     }
 
     // todo need to split this out in a separate class. It's humongous. Not good. I promise to improve this one day.
-    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String language, CountrySpecificRollupValues rollup, boolean isGoLive, RightsHollow rights, boolean isMulticatalogRollup, StatusHollow statusHollow) {
+    private List<VMSAvailabilityWindow> populateEpisodeOrStandaloneWindowData(Integer videoId, String country, String language, CountrySpecificRollupValues rollup, boolean isGoLive, Rights rights, boolean isMulticatalogRollup, Status status) {
 
         List<VMSAvailabilityWindow> availabilityWindows = new ArrayList<>();
         VMSAvailabilityWindow currentOrFirstFutureWindow = null;
@@ -205,15 +204,15 @@ public class VMSAvailabilityWindowModule {
         int maxPackageId = 0;
         int dealIdForMaxPackageId = 0;
 
-        List<RightsWindowHollow> sortedWindows = new ArrayList<>(rights._getWindows());
+        List<RightsWindow> sortedWindows = new ArrayList<>(rights.getWindows());
         Collections.sort(sortedWindows, RIGHTS_WINDOW_COMPARATOR);
 
         boolean grandfatherEnabled = ctx.getConfig().isGrandfatherEnabled();
         Set<String> grandfatherLanguages = Collections.EMPTY_SET;
-        if (language != null && statusHollow._getFlags()!= null && statusHollow._getFlags()._getGrandfatheredLanguages() != null)
-            grandfatherLanguages = statusHollow._getFlags()._getGrandfatheredLanguages().stream().map(l -> l._getValue()).collect(Collectors.toSet());
+        if (language != null && status.getFlags()!= null && status.getFlags().getGrandfatheredLanguages() != null)
+            grandfatherLanguages = status.getFlags().getGrandfatheredLanguages().stream().map(l -> l.getValue()).collect(Collectors.toSet());
 
-        for (RightsWindowHollow window : sortedWindows) {
+        for (RightsWindow window : sortedWindows) {
 
             int packageIdForWindow = 0;
             int thisWindowBundledAssetsGroupId = 0;
@@ -224,25 +223,25 @@ public class VMSAvailabilityWindowModule {
 
             // create new window
             VMSAvailabilityWindow outputWindow = newVMSAvailabilityWindow(window);
-            boolean isOpenWindow = window._getStartDate() <= ctx.getNowMillis() && window._getEndDate() > ctx.getNowMillis();
-            boolean isFutureWindow = window._getStartDate() > ctx.getNowMillis();
+            boolean isOpenWindow = window.getStartDate() <= ctx.getNowMillis() && window.getEndDate() > ctx.getNowMillis();
+            boolean isFutureWindow = window.getStartDate() > ctx.getNowMillis();
             boolean hasMerchIntentForLanguage = language != null ?
                     getEarliestWindowStartDateForTheLanguage(videoId, country, language, originalLanguageBCPCodeForVideo) != null : false;
-            List<RightsWindowContractHollow> windowContracts = window._getContractIdsExt() != null ?  window._getContractIdsExt().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
-            boolean shouldFilterWindowPackageContractData = shouldFilterWindowPackageContractData(window._getStartDate(), window._getEndDate());
+            List<RightsWindowContract> windowContracts = window.getContractIdsExt() != null ?  window.getContractIdsExt().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
+            boolean shouldFilterWindowPackageContractData = shouldFilterWindowPackageContractData(window.getStartDate(), window.getEndDate());
 
-            for (RightsWindowContractHollow windowContractHollow : windowContracts) {
+            for (RightsWindowContract windowContract : windowContracts) {
 
                 // get contract ID, contract data, and contract for download availability, contract packages -> A contract could have multiple packages & contract assets
-                long dealId = windowContractHollow._getDealId();
-                
+                long dealId = windowContract.getDealId();
+
                 VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, videoId, country, dealId);
-                boolean isAvailableForDownload = windowContractHollow._getDownload();
-                List<RightsContractPackageHollow> contractPackages = windowContractHollow._getPackages() != null ? windowContractHollow._getPackages().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
-                List<RightsContractAssetHollow> contractAssetRights = windowContractHollow._getAssets() != null ? windowContractHollow._getAssets().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
+                boolean isAvailableForDownload = windowContract.getDownload();
+                List<RightsContractPackage> contractPackages = windowContract.getPackages() != null ? windowContract.getPackages().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
+                List<RightsContractAsset> contractAssetRights = windowContract.getAssets() != null ? windowContract.getAssets().stream().collect(Collectors.toList()) : Collections.EMPTY_LIST;
 
                 // CASE 1: NO packages and Assets in the contract -> Build info using only the videoID and contractID
-                if (windowContractHollow._getPackageIdBoxed() == null && contractAssetRights.isEmpty() && contractPackages.isEmpty()) {
+                if (windowContract.getPackageIdBoxed() == null && contractAssetRights.isEmpty() && contractPackages.isEmpty()) {
 
                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfoModule.buildFilteredWindowPackageContractInfo((int) dealId, videoId));
                     if (maxPackageId == 0) {
@@ -258,7 +257,7 @@ public class VMSAvailabilityWindowModule {
                     	rollup.foundRollingEpisodes();
 
                     // build info without package data, Use the assets and contract data though
-                    WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContractHollow, contractAttributes, videoId);
+                    WindowPackageContractInfo windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(0, windowContract, contractAttributes, videoId);
                     outputWindow.windowInfosByPackageId.put(ZERO, windowPackageContractInfo);
 
                     if (packageIdForWindow == 0) thisWindowBundledAssetsGroupId = Math.max((int) dealId, thisWindowBundledAssetsGroupId);
@@ -267,11 +266,11 @@ public class VMSAvailabilityWindowModule {
                 } else {
 
                         // CASE 3: packages and assets are present for the contract.
-                        for (RightsContractPackageHollow contractPackageHollow : contractPackages) {
+                        for (RightsContractPackage contractPackage : contractPackages) {
 
                             // create packageId, get packageDataCollection and packageData for the given package in the contract
-                            com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int) contractPackageHollow._getPackageId());
-                            PackageDataCollection packageDataCollection = getPackageDataCollection(videoId, contractPackageHollow._getPackageId());
+                            com.netflix.vms.transformer.hollowoutput.Integer packageId = new com.netflix.vms.transformer.hollowoutput.Integer((int) contractPackage.getPackageId());
+                            PackageDataCollection packageDataCollection = getPackageDataCollection(videoId, contractPackage.getPackageId());
                             PackageData packageData = null;
                             if (packageDataCollection != null)
                                 packageData = packageDataCollection.getPackageData();
@@ -306,7 +305,7 @@ public class VMSAvailabilityWindowModule {
                                         skipPackage = false;
                                     }
                                     if (skipPackage) {
-                                        reportMissingAssets(videoId, country, language, packageId.val, dealId, window._getStartDate(), window._getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
+                                        reportMissingAssets(videoId, country, language, packageId.val, dealId, window.getStartDate(), window.getEndDate(), thisWindowFoundLocalText, thisWindowFoundLocalAudio);
                                         continue;
                                     }
                                 }
@@ -388,7 +387,7 @@ public class VMSAvailabilityWindowModule {
                                         includedWindowPackageData = true;
 
                                         // package data is available
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(videoId, packageData, windowContractHollow, contractAttributes, country, isAvailableForDownload, packageDataCollection);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfo(videoId, packageData, windowContract, contractAttributes, country, isAvailableForDownload, packageDataCollection);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
                                         boolean considerForPackageSelection = contractPackages == null ? true : packageData.isDefaultPackage;
                                         if (!considerForPackageSelection) {
@@ -413,7 +412,7 @@ public class VMSAvailabilityWindowModule {
 
                                     } else {
                                         // package data not available -- use the contract only
-                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContractHollow, contractAttributes, videoId);
+                                        windowPackageContractInfo = windowPackageContractInfoModule.buildWindowPackageContractInfoWithoutPackage(packageId.val, windowContract, contractAttributes, videoId);
                                         outputWindow.windowInfosByPackageId.put(packageId, windowPackageContractInfo);
 
                                         // if fist package, then update contract id for the current window
@@ -427,14 +426,14 @@ public class VMSAvailabilityWindowModule {
 
                                 // if window is open then rollup the start window availability date and update the flag isInWindow
                                 if (isGoLive && isOpenWindow) {
-                                    rollup.newInWindowAvailabilityDate(window._getStartDate());
+                                    rollup.newInWindowAvailabilityDate(window.getStartDate());
                                     isInWindow = true;
                                 }
 
                                 // keep track if minimum window start date, only for windows where end date is greater than now
                                 // also update currentOrFutureWindow and local audio/text values
-                                if (window._getEndDate() > ctx.getNowMillis() && window._getStartDate() < minWindowStartDate) {
-                                    minWindowStartDate = window._getStartDate();
+                                if (window.getEndDate() > ctx.getNowMillis() && window.getStartDate() < minWindowStartDate) {
+                                    minWindowStartDate = window.getStartDate();
                                     currentOrFirstFutureWindow = outputWindow;
                                     currentOrFirstFutureWindowFoundLocalAudio = thisWindowFoundLocalAudio;
                                     currentOrFirstFutureWindowFoundLocalText = thisWindowFoundLocalText;
@@ -518,23 +517,23 @@ public class VMSAvailabilityWindowModule {
 
     // Return AvailabilityWindow from MediaData
     private List<VMSAvailabilityWindow> populateRolledUpWindowData(Integer videoId, CountrySpecificRollupValues
-            rollup, RightsHollow rights, boolean isGoLive, boolean isMulticatalogRollup) {
+            rollup, Rights rights, boolean isGoLive, boolean isMulticatalogRollup) {
 
-        List<RightsWindowHollow> rightsWindowHollows = new ArrayList<>(rights._getWindows());
-        if (!rightsWindowHollows.isEmpty()) {
+        List<RightsWindow> rightsWindows = new ArrayList<>(rights.getWindows());
+        if (!rightsWindows.isEmpty()) {
 
             boolean isInWindow = false;
             int maxDealId = Integer.MIN_VALUE;
 
-            Collections.sort(rightsWindowHollows, RIGHTS_WINDOW_COMPARATOR);
-            List<VMSAvailabilityWindow> windowList = new ArrayList<>(rightsWindowHollows.size());
+            Collections.sort(rightsWindows, RIGHTS_WINDOW_COMPARATOR);
+            List<VMSAvailabilityWindow> windowList = new ArrayList<>(rightsWindows.size());
 
-            for (RightsWindowHollow window : rightsWindowHollows) {
-                long startDate = window._getStartDate();
-                long endDate = window._getEndDate();
-                boolean isOnHold = window._getOnHold();
+            for (RightsWindow window : rightsWindows) {
+                long startDate = window.getStartDate();
+                long endDate = window.getEndDate();
+                boolean isOnHold = window.getOnHold();
 
-                if (window._getOnHold()) {
+                if (window.getOnHold()) {
                     startDate += ONE_THOUSAND_YEARS;
                     endDate += ONE_THOUSAND_YEARS;
                 }
@@ -542,10 +541,10 @@ public class VMSAvailabilityWindowModule {
                 if (startDate < ctx.getNowMillis() && endDate > ctx.getNowMillis())
                     isInWindow = true;
 
-                if (window._getContractIdsExt() != null) {
-                    for (RightsWindowContractHollow rightsWindowContract : window._getContractIdsExt()) {
-                        if ((int) rightsWindowContract._getDealId() > maxDealId)
-                            maxDealId = (int) rightsWindowContract._getDealId();                    		
+                if (window.getContractIdsExt() != null) {
+                    for (RightsWindowContract rightsWindowContract : window.getContractIdsExt()) {
+                        if ((int) rightsWindowContract.getDealId() > maxDealId)
+                            maxDealId = (int) rightsWindowContract.getDealId();
                     }
                 }
 
@@ -702,14 +701,14 @@ public class VMSAvailabilityWindowModule {
     }
 
 
-    boolean isGoLive(StatusHollow status) {
-        FlagsHollow flags = status._getFlags();
-        return flags != null && flags._getGoLive();
+    boolean isGoLive(Status status) {
+        Flags flags = status.getFlags();
+        return flags != null && flags.getGoLive();
     }
 
-    boolean isLanguageOverride(StatusHollow status) {
-        FlagsHollow flags = status._getFlags();
-        return flags != null && flags._getLanguageOverride();
+    boolean isLanguageOverride(Status status) {
+        Flags flags = status.getFlags();
+        return flags != null && flags.getLanguageOverride();
     }
 
     public void reset() {
@@ -757,9 +756,9 @@ public class VMSAvailabilityWindowModule {
         }
     }
 
-    private static final Comparator<RightsWindowHollow> RIGHTS_WINDOW_COMPARATOR = (o1, o2) -> {
-        long t1 = o1._getOnHold() ? o1._getStartDate() + ONE_THOUSAND_YEARS : o1._getStartDate();
-        long t2 = o2._getOnHold() ? o2._getStartDate() + ONE_THOUSAND_YEARS : o2._getStartDate();
+    private static final Comparator<RightsWindow> RIGHTS_WINDOW_COMPARATOR = (o1, o2) -> {
+        long t1 = o1.getOnHold() ? o1.getStartDate() + ONE_THOUSAND_YEARS : o1.getStartDate();
+        long t2 = o2.getOnHold() ? o2.getStartDate() + ONE_THOUSAND_YEARS : o2.getStartDate();
         return t1 < t2 ? -1 : (t1 == t2 ? 0 : 1);
     };
 }

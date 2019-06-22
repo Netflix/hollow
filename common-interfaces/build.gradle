@@ -1,11 +1,13 @@
 dependencies {
-    compile 'com.netflix.hollow:hollow:2.+'
     compile 'com.netflix.archaius:archaius2-api'
     compile 'com.netflix.astyanax:astyanax-cassandra'
     compile 'com.netflix.vms.logging:vmslogging-api:latest.release'
     compile "netflix:videoresolutiontypelibrary:latest.release"
     compile 'netflix:vmsconverter-hollow-api:latest.release'
     compile 'netflix:netflix-config'
+
+    compile 'netflix:cinder-lifecycle:latest.release'
+    compile 'netflix:hollow-testdata-generator:latest.release'
 
     testCompile 'junit:junit'
     testCompile 'org.assertj:assertj-core'

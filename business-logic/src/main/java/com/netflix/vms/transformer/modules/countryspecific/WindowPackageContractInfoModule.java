@@ -6,7 +6,6 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
@@ -18,8 +17,8 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
-
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -48,7 +47,7 @@ public class WindowPackageContractInfoModule {
     }
 
     WindowPackageContractInfo buildWindowPackageContractInfo(int videoId, PackageData packageData,
-            RightsWindowContractHollow windowContractHollow, VmsAttributeFeedEntryHollow contractAttributes, String country, 
+            RightsWindowContract windowContract, VmsAttributeFeedEntryHollow contractAttributes, String country,
             boolean isAvailableForDownload, PackageDataCollection packageDataCollection) {
         PackageHollow inputPackage = api.getPackageHollow(packageIdx.getMatchingOrdinal((long) packageData.id));
 
@@ -56,11 +55,11 @@ public class WindowPackageContractInfoModule {
         // create contract info
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = (int) windowContract.getDealId();
         info.videoContractInfo.isAvailableForDownload = isAvailableForDownload;
-        info.videoContractInfo.primaryPackageId = (int) windowContractHollow._getPackageId();
+        info.videoContractInfo.primaryPackageId = (int) windowContract.getPackageId();
         assignContractInfo(info, contractAttributes, videoId);
-        info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
+        info.videoContractInfo.assetBcp47Codes = windowContract.getAssets().stream().map(a -> new Strings(a.getBcp47Code().toCharArray())).collect(Collectors.toSet());
 
         // create package info
 
@@ -86,14 +85,14 @@ public class WindowPackageContractInfoModule {
     }
 
 
-    WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContractHollow windowContractHollow,
+    WindowPackageContractInfo buildWindowPackageContractInfoWithoutPackage(int packageId, RightsWindowContract windowContract,
     		VmsAttributeFeedEntryHollow contractAttributes, int videoId) {
         WindowPackageContractInfo info = new WindowPackageContractInfo();
         info.videoContractInfo = new VideoContractInfo();
-        info.videoContractInfo.contractId = (int) windowContractHollow._getDealId();
+        info.videoContractInfo.contractId = (int) windowContract.getDealId();
         info.videoContractInfo.primaryPackageId = packageId;
         assignContractInfo(info, contractAttributes, videoId);
-        info.videoContractInfo.assetBcp47Codes = windowContractHollow._getAssets().stream().map(a -> new Strings(a._getBcp47Code()._getValue().toCharArray())).collect(Collectors.toSet());
+        info.videoContractInfo.assetBcp47Codes = windowContract.getAssets().stream().map(a -> new Strings(a.getBcp47Code().toCharArray())).collect(Collectors.toSet());
         info.videoPackageInfo = getFilteredVideoPackageInfo(videoId, packageId);
         return info;
     }

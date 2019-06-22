@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.publish.workflow.job;
 
-import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import java.io.File;

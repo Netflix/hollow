@@ -3,15 +3,14 @@ package com.netflix.vms.transformer.modules.countryspecific;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.contract.ContractAssetType;
-import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptor;
 import com.netflix.vms.transformer.hollowoutput.EncodeSummaryDescriptorData;
 import com.netflix.vms.transformer.hollowoutput.PackageData;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +18,6 @@ public class MultilanguageCountryWindowFilter {
 
     private final VMSHollowInputAPI api;
     
-    private final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     private final InputOrdinalResultCache<ContractAsset> gk2RightsContractAssetCache;
     
     private final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner;
@@ -27,7 +25,6 @@ public class MultilanguageCountryWindowFilter {
 
     public MultilanguageCountryWindowFilter(VMSHollowInputAPI api, CycleConstants cycleConstants) {
         this.api = api;
-        this.rightsContractAssetCache = cycleConstants.rightsContractAssetCache;
         this.gk2RightsContractAssetCache = cycleConstants.gk2RightsContractAssetCache;
         this.dialectOrdinalAssigner = cycleConstants.dialectOrdinalAssigner;
     }
@@ -41,11 +38,11 @@ public class MultilanguageCountryWindowFilter {
      * @param contractAssets
      * @return
      */
-    public long contractAvailabilityForLanguage(String language, List<RightsContractAssetHollow> contractAssets) {
+    public long contractAvailabilityForLanguage(String language, List<RightsContractAsset> contractAssets) {
 
         long availability = 0;
 
-        for (RightsContractAssetHollow assetInput : contractAssets) {
+        for (RightsContractAsset assetInput : contractAssets) {
             ContractAsset asset = cachedAsset(assetInput);
 
             if (language.equals(asset.getLanguage())) {
@@ -69,9 +66,9 @@ public class MultilanguageCountryWindowFilter {
      * @param contractAssets
      * @return
      */
-    public long contractAvailabilityForLocale(String locale, List<RightsContractAssetHollow> contractAssets) {
+    public long contractAvailabilityForLocale(String locale, List<RightsContractAsset> contractAssets) {
         long availability = 0;
-        for (RightsContractAssetHollow assetInput : contractAssets) {
+        for (RightsContractAsset assetInput : contractAssets) {
             ContractAsset asset = cachedAsset(assetInput);
             if (locale.equals(asset.getLocale())) {
                 availability |= asset.getType().getBitIdentifier();
@@ -80,17 +77,11 @@ public class MultilanguageCountryWindowFilter {
         // either 0 or non-zero -> rights are there or not.
         return availability;
     }
-    private ContractAsset cachedAsset(RightsContractAssetHollow assetInput) {
-        InputOrdinalResultCache<ContractAsset> cache;
-        if(assetInput.getTypeDataAccess().getDataAccess() == api.getDataAccess())
-            cache = rightsContractAssetCache;
-        else
-            cache = gk2RightsContractAssetCache;
-        
-        ContractAsset asset = cache.getResult(assetInput.getOrdinal());
+    private ContractAsset cachedAsset(RightsContractAsset assetInput) {
+        ContractAsset asset = gk2RightsContractAssetCache.getResult(assetInput.getOrdinal());
         if(asset == null) {
             asset = new ContractAsset(assetInput);
-            asset = cache.setResult(assetInput.getOrdinal(), asset);
+            asset = gk2RightsContractAssetCache.setResult(assetInput.getOrdinal(), asset);
         }
         return asset;
     }

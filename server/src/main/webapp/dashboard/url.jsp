@@ -1,4 +1,5 @@
-<%@ page import="java.net.*"%>
+<%@ page import="java.net.HttpURLConnection"%>
+<%@ page import="java.net.URL" %>
 
 <%!
 public static int getRespCode(String urlStr) throws Exception {

@@ -7,6 +7,8 @@ import static com.netflix.vms.transformer.index.IndexSpec.PERSON_ROLES_BY_VIDEO_
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
@@ -18,16 +20,10 @@ import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
-import com.netflix.vms.transformer.hollowinput.DateHollow;
-import com.netflix.vms.transformer.hollowinput.FlagsHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoHollow;
 import com.netflix.vms.transformer.hollowinput.PersonVideoRoleHollow;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.ShowMemberTypeHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHollow;
 import com.netflix.vms.transformer.hollowinput.StoriesSynopsesHookHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -50,6 +46,13 @@ import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.hollowoutput.VideoMetaData;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
@@ -80,7 +83,7 @@ public class VideoMetaDataModule {
     private final HollowHashIndex personVideoIdx;
     private final HollowHashIndex personVideoRoleIdx;
     private final HollowHashIndex showCountryLabelIdx;
-    private final GatekeeperStatusRetriever statusRetriever;
+    private final Gatekeeper2Dataset gk2Dataset;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
     private final int newContentFlagDuration;
@@ -90,8 +93,10 @@ public class VideoMetaDataModule {
 
     private final Map<String, HookType> hookTypeMap = new HashMap<>();
 
-    public VideoMetaDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
-        this.api = api;
+    public VideoMetaDataModule(UpstreamDatasetHolder upstream, TransformerContext ctx, CycleConstants constants, VMSTransformerIndexer indexer) {
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.api = converterDataset.getAPI();
+        this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
         this.ctx = ctx;
         this.constants = constants;
         this.indexer = indexer;
@@ -100,7 +105,6 @@ public class VideoMetaDataModule {
         this.personVideoRoleIdx = indexer.getHashIndex(PERSON_ROLES_BY_VIDEO_ID);
         this.showCountryLabelIdx = indexer.getHashIndex(IndexSpec.SHOW_COUNTRY_LABEL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
-        this.statusRetriever = statusRetriever;
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.storiesSynopsesIdx = indexer.getPrimaryKeyIndex(L10N_STORIES_SYNOPSES);
 
@@ -233,9 +237,9 @@ public class VideoMetaDataModule {
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = new VideoMetaDataCountrySpecificDataKey();
 
-        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        Status status = gk2Dataset.getStatus(videoId.longValue(), countryCode);
         if (status != null) {
-            countrySpecificKey.isSearchOnly = status._getFlags()._getSearchOnly();
+            countrySpecificKey.isSearchOnly = status.getFlags().getSearchOnly();
         }
 
         populateSetTypes(videoId, countryCode, status, countrySpecificKey);
@@ -247,22 +251,22 @@ public class VideoMetaDataModule {
         long firstDisplayTimestamp = -1;
 
         if (status != null) {
-            FlagsHollow flags = status._getFlags();
+            Flags flags = status.getFlags();
             if (flags != null) {
-                isGoLive = flags._getGoLive();
-                DateHollow firstDisplayDate = flags._getFirstDisplayDate();
-                if (firstDisplayDate != null) {
-                    firstDisplayTimestamp = firstDisplayDate._getValue();
+                isGoLive = flags.getGoLive();
+                long firstDisplayDate = flags.getFirstDisplayDate();
+                if (firstDisplayDate != Long.MIN_VALUE) {
+                    firstDisplayTimestamp = firstDisplayDate;
                     hasFirstDisplayDate = true;
                 }
 
             }
 
-            ListOfRightsWindowHollow windows = status._getRights()._getWindows();
-            for (RightsWindowHollow window : windows) {
-                long startDate = window._getStartDate();
-                long endDate = window._getEndDate();
-                if (window._getOnHold()) {
+            ListOfRightsWindow windows = status.getRights().getWindows();
+            for (RightsWindow window : windows) {
+                long startDate = window.getStartDate();
+                long endDate = window.getEndDate();
+                if (window.getOnHold()) {
                     startDate += ONE_THOUSAND_YEARS;
                     endDate += ONE_THOUSAND_YEARS;
                 }
@@ -374,14 +378,14 @@ public class VideoMetaDataModule {
         }
     }
 
-    private void populateSetTypes(Integer videoId, String countryCode, StatusHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
+    private void populateSetTypes(Integer videoId, String countryCode, Status rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches((long) videoId, countryCode);
         VideoTypeDescriptorHollow typeDescriptor = null;
         if (videoTypeMatches != null) {
             typeDescriptor = api.getVideoTypeDescriptorHollow(videoTypeMatches.iterator().next());
         }
 
-        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer, statusRetriever);
+        vmd.videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, rights, typeDescriptor, api, ctx, constants, indexer, gk2Dataset);
 
         StringHollow copyright = typeDescriptor == null ? null : typeDescriptor._getCopyright();
         if (copyright != null) {
@@ -457,7 +461,7 @@ public class VideoMetaDataModule {
         if (vmd.aliases == null) vmd.aliases = Collections.emptySet();
     }
 
-    private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, StatusHollow rights, VideoMetaDataCountrySpecificDataKey vmd) {
+    private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, Status rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult dateResult = videoDateIdx.findMatches((long) videoId, countryCode);
         if (dateResult != null) {
             int ordinal = dateResult.iterator().next();

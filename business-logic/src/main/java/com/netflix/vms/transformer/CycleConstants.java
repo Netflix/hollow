@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.contract.ContractAsset;
 import com.netflix.vms.transformer.hollowoutput.ArtworkDerivative;
@@ -14,6 +17,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoFormatDescriptor;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.hollowoutput.VideoNodeType;
 import com.netflix.vms.transformer.hollowoutput.VideoSetType;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.modules.countryspecific.MultilanguageCountryDialectOrdinalAssigner;
 import com.netflix.vms.transformer.util.InputOrdinalResultCache;
 import java.util.Collections;
@@ -58,26 +62,27 @@ public class CycleConstants {
     public final InputOrdinalResultCache<String> artworkDerivativeOverlayTypes;
     public final InputOrdinalResultCache<Boolean> isNewEpisodeOverlayTypes;
 
-    public final InputOrdinalResultCache<ContractAsset> rightsContractAssetCache;
     public final InputOrdinalResultCache<ContractAsset> gk2RightsContractAssetCache;
     public final MultilanguageCountryDialectOrdinalAssigner dialectOrdinalAssigner = new MultilanguageCountryDialectOrdinalAssigner();
 
     private final ConcurrentHashMap<String, ISOCountry> isoCountryMap = new ConcurrentHashMap<String, ISOCountry>();
 
 
-    public CycleConstants(HollowReadStateEngine inputStateEngine, HollowReadStateEngine gatekeeper2StateEngine) {
-        this.artworkDerivativeCache = new InputOrdinalResultCache<ArtworkDerivative>(inputStateEngine.getTypeState("IPLArtworkDerivative").maxOrdinal());
-        this.artworkDerivativesCache = new InputOrdinalResultCache<ArtworkDerivatives>(inputStateEngine.getTypeState("IPLDerivativeSet").maxOrdinal());
-        this.rightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(inputStateEngine.getTypeState("RightsContractAsset").maxOrdinal());
-        this.gk2RightsContractAssetCache = new InputOrdinalResultCache<ContractAsset>(gatekeeper2StateEngine.getTypeState("RightsContractAsset").maxOrdinal());
-        this.artworkDerivativeOverlayTypes = new InputOrdinalResultCache<String>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
-        this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<Boolean>(inputStateEngine.getTypeState("ListOfDerivativeTag").maxOrdinal());
+    public CycleConstants(UpstreamDatasetHolder upstream) {
+
+        HollowReadStateEngine converter = upstream.getDataset(CONVERTER).getInputState().getStateEngine();
+        HollowReadStateEngine gk2 = upstream.getDataset(GATEKEEPER2).getInputState().getStateEngine();
+
+        this.artworkDerivativeCache = new InputOrdinalResultCache<>(converter.getTypeState("IPLArtworkDerivative").maxOrdinal());
+        this.artworkDerivativesCache = new InputOrdinalResultCache<>(converter.getTypeState("IPLDerivativeSet").maxOrdinal());
+        this.gk2RightsContractAssetCache = new InputOrdinalResultCache<>(gk2.getTypeState("RightsContractAsset").maxOrdinal());
+        this.artworkDerivativeOverlayTypes = new InputOrdinalResultCache<>(converter.getTypeState("ListOfDerivativeTag").maxOrdinal());
+        this.isNewEpisodeOverlayTypes = new InputOrdinalResultCache<>(converter.getTypeState("ListOfDerivativeTag").maxOrdinal());
     }
 
     private CycleConstants() {
         this.artworkDerivativeCache = null;
         this.artworkDerivativesCache = null;
-        this.rightsContractAssetCache = null;
         this.gk2RightsContractAssetCache = null;
         this.artworkDerivativeOverlayTypes = null;
         this.isNewEpisodeOverlayTypes = null;

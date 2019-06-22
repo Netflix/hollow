@@ -19,7 +19,6 @@ import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.logmessage.PbmsMessage;
 import com.netflix.vms.transformer.publish.workflow.logmessage.ViewShareMessage;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.VMSDataCanaryResult;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

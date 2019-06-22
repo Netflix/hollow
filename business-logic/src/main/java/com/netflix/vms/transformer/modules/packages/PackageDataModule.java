@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
@@ -14,7 +16,6 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.ChunkDurationsStringHollow;
 import com.netflix.vms.transformer.hollowinput.CodecPrivateDataStringHollow;
 import com.netflix.vms.transformer.hollowinput.DashStreamHeaderDataHollow;
@@ -56,6 +57,9 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageData;
 import com.netflix.vms.transformer.hollowoutput.WmDrmKey;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.modules.packages.contracts.ContractRestrictionModule;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,11 +97,13 @@ public class PackageDataModule {
     private final EncodeSummaryDescriptorModule encodeSummaryModule;
     private final TransformerContext ctx;
 
-    public PackageDataModule(VMSHollowInputAPI api, TransformerContext ctx,
+    public PackageDataModule(UpstreamDatasetHolder upstream, TransformerContext ctx,
             HollowObjectMapper objectMapper, CycleConstants cycleConstants,
-            VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever, 
-            CupTokenFetcher cupTokenFetcher) {
-        this.api = api;
+            VMSTransformerIndexer indexer, CupTokenFetcher cupTokenFetcher) {
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.api = converterDataset.getAPI();
+        Gatekeeper2Dataset gk2Dataset = upstream.getDataset(GATEKEEPER2);
+
         this.ctx = ctx;
         this.mapper = objectMapper;
         this.cycleConstants = cycleConstants;
@@ -110,7 +116,7 @@ public class PackageDataModule {
         this.drmInfoByGroupId = new HashMap<>();
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
-        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, statusRetriever, cupTokenFetcher);
+        this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, gk2Dataset, cupTokenFetcher);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
         this.hdrProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "HDR");

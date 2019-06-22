@@ -17,9 +17,9 @@ import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.cinder.producer.NFHollowAnnouncer;
 import com.netflix.cinder.producer.NFHollowPublisher;
 import com.netflix.gutenberg.GutenbergIdentifiers;
-import com.netflix.gutenberg.api.publisher.GutenbergFilePublisher;
-import com.netflix.gutenberg.api.publisher.GutenbergValuePublisher;
 import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
+import com.netflix.gutenberg.publisher.GutenbergFilePublisher;
+import com.netflix.gutenberg.publisher.GutenbergValuePublisher;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
@@ -32,13 +32,13 @@ import com.netflix.vms.transformer.common.cassandra.TransformerCassandraHelper;
 import com.netflix.vms.transformer.common.config.OctoberSkyData;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.cup.CupLibrary;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.context.TransformerServerContext;
 import com.netflix.vms.transformer.elasticsearch.ElasticSearchClient;
 import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
@@ -142,9 +142,9 @@ public class TransformerCycleKickoff {
         //      √ Load/refresh data from n consumers concurrently.
         //      √ Apply output blob header tags consistently.
         //      √ Switch from custom FP-based input-pinning to Gutenberg pinning.
-        //      • Consumer-specific APIs (instead of VMSHollowInputAPI for all consumers)
+        //      √ Consumer-specific APIs (instead of VMSHollowInputAPI for all consumers)
         //      • Store output metadata (currently in Cassandra) and blob headers (currently in output blob) in Gutenberg
-        //      • Update "Inputs" widget on hosted dashboard to present input versions in table
+        //      √ Update "Inputs" widget on hosted dashboard to present input versions in table
         //
         // - Follow VIP
         //      √ Get FollowVIP transform cycle working for n inputs.

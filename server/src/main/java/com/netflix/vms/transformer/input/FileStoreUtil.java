@@ -2,8 +2,7 @@ package com.netflix.vms.transformer.input;
 
 import com.netflix.aws.db.ItemAttribute;
 import com.netflix.aws.file.FileAccessItem;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;

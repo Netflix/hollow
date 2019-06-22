@@ -3,7 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
 import com.netflix.hollow.api.producer.listener.PublishListener;
-import com.netflix.vms.transformer.common.input.CycleInputs;
+import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
 import com.netflix.vms.transformer.publish.workflow.job.impl.FileStoreHollowBlobPublishJob;

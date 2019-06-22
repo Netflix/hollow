@@ -15,7 +15,6 @@ import com.netflix.vms.transformer.hollowoutput.VideoDimensionsDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

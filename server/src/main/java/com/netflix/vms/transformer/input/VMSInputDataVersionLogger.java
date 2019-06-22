@@ -6,8 +6,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.InputDataV
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.vms.logging.TaggingLogger;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;

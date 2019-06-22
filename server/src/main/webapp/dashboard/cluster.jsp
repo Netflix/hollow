@@ -1,11 +1,13 @@
-<%@ page import="java.net.*"%>
-<%@ page import="java.io.*"%>
-<%@ page import="java.util.*"%>
-<%@ page import="org.codehaus.jackson.map.ObjectMapper"%>
-<%@ page import="org.codehaus.jackson.JsonNode"%>
-<%@ page import="org.codehaus.jackson.node.ObjectNode"%>
-<%@ page import="org.codehaus.jackson.node.ArrayNode"%>
 <%@ page import="com.netflix.videometadata.config.DataIOManager"%>
+<%@ page import="java.io.BufferedReader"%>
+<%@ page import="java.io.InputStream"%>
+<%@ page import="java.io.InputStreamReader"%>
+<%@ page import="java.net.HttpURLConnection"%>
+<%@ page import="java.net.URL"%>
+<%@ page import="java.util.Iterator"%>
+<%@ page import="org.codehaus.jackson.JsonNode"%>
+<%@ page import="org.codehaus.jackson.map.ObjectMapper" %>
+<%@ page import="org.codehaus.jackson.node.ArrayNode" %>
 
 
 <%!

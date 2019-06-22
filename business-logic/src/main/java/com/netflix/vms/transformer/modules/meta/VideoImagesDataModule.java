@@ -4,6 +4,7 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.ArtworkFal
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidImagesTerritoryCode;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.InvalidPhaseTagForArtwork;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.MissingLocaleForArtwork;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -18,19 +19,15 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.AbsoluteScheduleHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkAttributesHollow;
 import com.netflix.vms.transformer.hollowinput.ArtworkLocaleHollow;
 import com.netflix.vms.transformer.hollowinput.DamMerchStillsHollow;
-import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.LocaleTerritoryCodeHollow;
 import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagHollow;
 import com.netflix.vms.transformer.hollowinput.PhaseTagListHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseArtworkSourceFileIdHollow;
@@ -38,7 +35,6 @@ import com.netflix.vms.transformer.hollowinput.RolloutPhaseElementsHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowMapHollow;
 import com.netflix.vms.transformer.hollowinput.SingleValuePassthroughMapHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.TerritoryCountriesHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
@@ -50,6 +46,12 @@ import com.netflix.vms.transformer.hollowoutput.SchedulePhaseInfo;
 import com.netflix.vms.transformer.hollowoutput.VideoImages;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.modules.artwork.ArtWorkModule;
 import com.netflix.vms.transformer.util.NFLocaleUtil;
 import java.util.ArrayList;
@@ -69,7 +71,7 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     private final HollowHashIndex videoArtworkIndex;
     private final HollowPrimaryKeyIndex videoArtworkBySourceFileIdIndex;
     private final HollowPrimaryKeyIndex damMerchStillsIdx;
-    private final GatekeeperStatusRetriever statusRetriever;
+    private final Gatekeeper2Dataset gk2Dataset;
     private HollowHashIndex rolloutIndex;
 
     private HollowHashIndex overrideScheduleIndex;
@@ -79,13 +81,13 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     private final static String MERCH_STILL_TYPE = "MERCH_STILL";
     private final int MIN_ROLLUP_SIZE = 4; // 3
 
-    public VideoImagesDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
+    public VideoImagesDataModule(VMSHollowInputAPI api, UpstreamDatasetHolder upstream, TransformerContext ctx, HollowObjectMapper mapper, CycleConstants cycleConstants, VMSTransformerIndexer indexer) {
         super("Video", api, ctx, mapper, cycleConstants, indexer);
 
         this.videoArtworkIndex = indexer.getHashIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_VIDEO_ID);
         this.videoArtworkBySourceFileIdIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_ARTWORK_SOURCE_BY_SOURCE_ID);
         this.damMerchStillsIdx = indexer.getPrimaryKeyIndex(IndexSpec.DAM_MERCHSTILLS);
-        this.statusRetriever = statusRetriever;
+        this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
         this.rolloutIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
 
         overrideScheduleIndex = indexer.getHashIndex(IndexSpec.OVERRIDE_SCHEDULE_BY_VIDEO_ID);
@@ -384,22 +386,22 @@ public class VideoImagesDataModule extends ArtWorkModule implements EDAvailabili
     }
 
     public boolean isAvailableForED(int videoId, String countryCode) {
-        StatusHollow status = statusRetriever.getStatus((long) videoId, countryCode);
+        Status status = gk2Dataset.getStatus((long) videoId, countryCode);
 
         boolean isGoLive = false;
         boolean isInWindow = false;
 
         if (status != null) {
-            FlagsHollow flags = status._getFlags();
+            Flags flags = status.getFlags();
             if (flags != null) {
-                isGoLive = flags._getGoLive();
+                isGoLive = flags.getGoLive();
             }
 
-            ListOfRightsWindowHollow windows = status._getRights()._getWindows();
-            for (RightsWindowHollow window : windows) {
-                long windowStart = window._getStartDate();
-                long windowEnd = window._getEndDate();
-                if (window._getOnHold()) {
+            ListOfRightsWindow windows = status.getRights().getWindows();
+            for (RightsWindow window : windows) {
+                long windowStart = window.getStartDate();
+                long windowEnd = window.getEndDate();
+                if (window.getOnHold()) {
                     windowStart += ONE_THOUSAND_YEARS;
                     windowEnd += ONE_THOUSAND_YEARS;
                 }

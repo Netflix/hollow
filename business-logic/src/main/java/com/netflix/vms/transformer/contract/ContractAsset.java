@@ -1,7 +1,7 @@
 package com.netflix.vms.transformer.contract;
 
-import com.netflix.vms.transformer.hollowinput.RightsContractAssetHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
 
 public class ContractAsset {
     
@@ -9,8 +9,8 @@ public class ContractAsset {
     private final String language;
     private final String locale;
     
-    public ContractAsset(RightsContractAssetHollow assetInput) {
-        this(ContractAssetType.fromAssetTypeString(assetInput._getAssetType()._getValue()), assetInput._getBcp47Code()._getValue());
+    public ContractAsset(RightsContractAsset assetInput) {
+        this(ContractAssetType.fromAssetTypeString(assetInput.getAssetType()), assetInput.getBcp47Code());
     }
     
     public ContractAsset(ContractAssetType type, String locale) {

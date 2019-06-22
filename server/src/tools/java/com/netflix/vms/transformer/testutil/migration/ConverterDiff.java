@@ -126,7 +126,6 @@ public class ConverterDiff {
         diff.addTypeDiff("ProtectionTypes", "id");
         diff.addTypeDiff("Rollout", "movieId", "rolloutId");
         diff.addTypeDiff("ShowMemberTypes", "showMemberTypeId");
-        diff.addTypeDiff("Status", "movieId", "countryCode.value");
         diff.addTypeDiff("StorageGroups", "id.value"); // TODO: timt: was "id"
         diff.addTypeDiff("StreamProfileGroups", "groupName.value");
         diff.addTypeDiff("StreamProfiles", "id");

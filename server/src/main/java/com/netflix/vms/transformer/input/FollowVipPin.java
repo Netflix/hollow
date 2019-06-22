@@ -1,6 +1,5 @@
 package com.netflix.vms.transformer.input;
 
-import com.netflix.vms.transformer.common.input.UpstreamDatasetHolder;
 import java.util.Map;
 
 public class FollowVipPin {

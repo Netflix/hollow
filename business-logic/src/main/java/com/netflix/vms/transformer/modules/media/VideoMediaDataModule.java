@@ -3,6 +3,8 @@ package com.netflix.vms.transformer.modules.media;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_DATE;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -10,10 +12,8 @@ import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.VideoHierarchy;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.ReleaseDateHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfStringHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoDateWindowHollow;
@@ -22,6 +22,10 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,7 +35,7 @@ import java.util.Set;
 public class VideoMediaDataModule {
 
     private final VMSHollowInputAPI api;
-    private final GatekeeperStatusRetriever statusRetriever;
+    private final Gatekeeper2Dataset gk2Dataset;
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoDateIdx;
@@ -43,9 +47,10 @@ public class VideoMediaDataModule {
         SHOW, SEASON, EPISODE, SUPPLEMENTAL
     }
 
-    public VideoMediaDataModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever) {
-        this.api = api;
-        this.statusRetriever = statusRetriever;
+    public VideoMediaDataModule(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer) {
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.api = converterDataset.getAPI();
+        this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
@@ -98,14 +103,14 @@ public class VideoMediaDataModule {
     }
 
     private boolean populateRights(Integer videoId, String countryCode, VideoMediaData vmd) {
-        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        Status status = gk2Dataset.getStatus(videoId.longValue(), countryCode);
 
         if (status != null) {
-            vmd.isGoLive = status._getFlags()._getGoLive();
-            vmd.isAutoPlayEnabled = status._getFlags()._getAutoPlay();
-            vmd.isLanguageOverride = status._getFlags()._getLanguageOverride();
-            vmd.hasLocalText = status._getFlags()._getLocalText();
-            vmd.hasLocalAudio = status._getFlags()._getLocalAudio();
+            vmd.isGoLive = status.getFlags().getGoLive();
+            vmd.isAutoPlayEnabled = status.getFlags().getAutoPlay();
+            vmd.isLanguageOverride = status.getFlags().getLanguageOverride();
+            vmd.hasLocalText = status.getFlags().getLocalText();
+            vmd.hasLocalAudio = status.getFlags().getLocalAudio();
 
             HollowHashIndexResult videoTypeMatches = videoTypeCountryIdx.findMatches(videoId.longValue(), countryCode);
             VideoTypeDescriptorHollow typeDescriptor = null;

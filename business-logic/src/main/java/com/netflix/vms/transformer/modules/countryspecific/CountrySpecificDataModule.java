@@ -1,5 +1,7 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -13,16 +15,10 @@ import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.data.CupTokenFetcher;
 import com.netflix.vms.transformer.data.TransformedVideoData;
 import com.netflix.vms.transformer.data.VideoDataCollection;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
-import com.netflix.vms.transformer.hollowinput.DateHollow;
-import com.netflix.vms.transformer.hollowinput.FlagsHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
-import com.netflix.vms.transformer.hollowinput.MapKeyHollow;
-import com.netflix.vms.transformer.hollowinput.MapOfFlagsFirstDisplayDatesHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
@@ -41,6 +37,12 @@ import com.netflix.vms.transformer.hollowoutput.VideoSetType;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapKey;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapOfFlagsFirstDisplayDates;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -61,7 +63,7 @@ public class CountrySpecificDataModule {
     private final CycleConstants constants;
     private final VMSTransformerIndexer indexer;
 
-    private final GatekeeperStatusRetriever statusRetriever;
+    private final Gatekeeper2Dataset gk2Dataset;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
@@ -71,15 +73,16 @@ public class CountrySpecificDataModule {
 
     private VideoDataCollection videoDataCollection;
 
-    public CountrySpecificDataModule(VMSHollowInputAPI api, TransformerContext ctx, HollowObjectMapper mapper,
-            CycleConstants constants, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever,
+    public CountrySpecificDataModule(VMSHollowInputAPI api, UpstreamDatasetHolder upstream,
+            TransformerContext ctx, HollowObjectMapper mapper,
+            CycleConstants constants, VMSTransformerIndexer indexer,
             CycleDataAggregator cycleDataAggregator, CupTokenFetcher cupTokenFetcher) {
         this.api = api;
         this.ctx = ctx;
         this.mapper = mapper;
         this.constants = constants;
         this.indexer = indexer;
-        this.statusRetriever = statusRetriever;
+        this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
@@ -96,7 +99,7 @@ public class CountrySpecificDataModule {
         this.mapper = null;
         this.constants = null;
         this.indexer = null;
-        this.statusRetriever = null;
+        this.gk2Dataset = null;
         this.videoGeneralIdx = null;
         this.rolloutVideoTypeIndex = null;
         this.videoTypeCountryIndex = null;
@@ -222,7 +225,7 @@ public class CountrySpecificDataModule {
     }
 
     private void convertLocale(Integer videoId, boolean isStandalone, String countryCode, String language, CountrySpecificRollupValues rollup, Map<Integer, MulticatalogCountryData> data) {
-        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        Status status = gk2Dataset.getStatus(videoId.longValue(), countryCode);
         if (status != null) {
             /// in order to calculate the hasNewContent flag, we need to know the latest in-window episode launch date for this hierarchy
             if (rollup.doEpisode()) {
@@ -287,7 +290,7 @@ public class CountrySpecificDataModule {
         Long firstDisplayDate = null;
         List<VMSAvailabilityWindow> availabilityWindowList = null;
 
-        StatusHollow status = statusRetriever.getStatus(videoId.longValue(), countryCode);
+        Status status = gk2Dataset.getStatus(videoId.longValue(), countryCode);
         if (status != null) {
             availabilityWindowList = availabilityWindowModule.populateWindowData(videoId, countryCode, data, status, rollup);
             firstDisplayDate = populateFirstDisplayDateData(data, status, availabilityWindowList);
@@ -301,42 +304,42 @@ public class CountrySpecificDataModule {
     }
 
     // Return firstDisplayDate as long
-    private Long populateFirstDisplayDateData(CompleteVideoCountrySpecificData data, StatusHollow status, List<VMSAvailabilityWindow> availabilityWindowList) {
+    private Long populateFirstDisplayDateData(CompleteVideoCountrySpecificData data, Status status, List<VMSAvailabilityWindow> availabilityWindowList) {
         VMSAvailabilityWindow activeWindow = getActiveWindow(availabilityWindowList, ctx.getNowMillis());
         Date availabilityDate = activeWindow == null ? null : activeWindow.startDate;
 
-        FlagsHollow flags = status._getFlags();
-        DateHollow firstDisplayDate = flags._getFirstDisplayDate();
-        if (firstDisplayDate != null) {
-            data.firstDisplayDate = VideoDateUtil.roundToHour(new Date(firstDisplayDate._getValue()), availabilityDate);
+        Flags flags = status.getFlags();
+        long firstDisplayDate = flags.getFirstDisplayDate();
+        if (firstDisplayDate != Long.MIN_VALUE) {
+            data.firstDisplayDate = VideoDateUtil.roundToHour(new Date(firstDisplayDate), availabilityDate);
         }
 
-        MapOfFlagsFirstDisplayDatesHollow firstDisplayDatesByLocale = flags._getFirstDisplayDates();
+        MapOfFlagsFirstDisplayDates firstDisplayDatesByLocale = flags.getFirstDisplayDates();
         if (firstDisplayDatesByLocale != null) {
             data.firstDisplayDateByLocale = new HashMap<NFLocale, Date>();
-            for (Map.Entry<MapKeyHollow, DateHollow> entry : firstDisplayDatesByLocale.entrySet()) {
-                data.firstDisplayDateByLocale.put(new NFLocale(entry.getKey()._getValue().replace('-', '_')), VideoDateUtil.roundToHour(new Date(entry.getValue()._getValue()), availabilityDate));
+            for (Map.Entry<MapKey, com.netflix.vms.transformer.input.api.gen.gatekeeper2.Date> entry : firstDisplayDatesByLocale.entrySet()) {
+                data.firstDisplayDateByLocale.put(new NFLocale(entry.getKey().getValue().replace('-', '_')), VideoDateUtil.roundToHour(new Date(entry.getValue().getValue()), availabilityDate));
             }
         }
 
         return data.firstDisplayDate == null ? null : data.firstDisplayDate.val;
     }
 
-    private Long getLaunchDateForLanguage(StatusHollow status, String locale) {
-        FlagsHollow flags = status._getFlags();
-        MapOfFlagsFirstDisplayDatesHollow firstDisplayDatesByLocale = flags._getFirstDisplayDates();
+    private Long getLaunchDateForLanguage(Status status, String locale) {
+        Flags flags = status.getFlags();
+        MapOfFlagsFirstDisplayDates firstDisplayDatesByLocale = flags.getFirstDisplayDates();
         if (firstDisplayDatesByLocale != null && !firstDisplayDatesByLocale.isEmpty()) {
-            for (Map.Entry<MapKeyHollow, DateHollow> entry : firstDisplayDatesByLocale.entrySet()) {
-                String loc = entry.getKey()._getValue();
+            for (Map.Entry<MapKey, com.netflix.vms.transformer.input.api.gen.gatekeeper2.Date> entry : firstDisplayDatesByLocale.entrySet()) {
+                String loc = entry.getKey().getValue();
                 if (loc.length() > 2)
                     loc = loc.substring(0, 2);
                 if (loc.equals(locale))
-                    return entry.getValue()._getValue();
+                    return entry.getValue().getValue();
             }
         } else {
-            DateHollow firstDisplayDate = flags._getFirstDisplayDate();
-            if (firstDisplayDate != null)
-                return firstDisplayDate._getValue();
+            long firstDisplayDate = flags.getFirstDisplayDate();
+            if (firstDisplayDate != Long.MIN_VALUE)
+                return firstDisplayDate;
         }
 
         return null;
@@ -375,7 +378,7 @@ public class CountrySpecificDataModule {
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
-        Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer, statusRetriever);
+        Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer, gk2Dataset);
         VideoTypeDescriptorHollow videoType = getVideoTypeDescriptor(videoId, countryCode);
         boolean isOriginal = videoType == null ? false : videoType._getOriginal();
         boolean inDVDCatalog = DVDCatalogUtil.isVideoInDVDCatalog(api, videoType, videoId, countryCode);
@@ -517,11 +520,11 @@ public class CountrySpecificDataModule {
     }
 
     private boolean isTopNodeGoLive(int topNodeId, String countryCode) {
-        StatusHollow status = statusRetriever.getStatus(Long.valueOf(topNodeId), countryCode);
+        Status status = gk2Dataset.getStatus(Long.valueOf(topNodeId), countryCode);
         if (status != null) {
-            FlagsHollow flags = status._getFlags();
+            Flags flags = status.getFlags();
             if (flags != null)
-                return flags._getGoLive();
+                return flags.getGoLive();
         }
         return false;
     }

@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -7,17 +10,14 @@ import com.netflix.hollow.core.read.iterator.HollowOrdinalIterator;
 import com.netflix.hollow.core.util.IntList;
 import com.netflix.vms.transformer.VideoHierarchyGrouper.VideoHierarchyGroup;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.gatekeeper2migration.GatekeeperStatusRetriever;
 import com.netflix.vms.transformer.hollowinput.EpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.ISOCountryHollow;
 import com.netflix.vms.transformer.hollowinput.IndividualSupplementalHollow;
-import com.netflix.vms.transformer.hollowinput.ListOfRightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseHollow;
 import com.netflix.vms.transformer.hollowinput.RolloutPhaseWindowHollow;
 import com.netflix.vms.transformer.hollowinput.SeasonHollow;
 import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
@@ -25,6 +25,11 @@ import com.netflix.vms.transformer.hollowinput.VideoTypeDescriptorHollow;
 import com.netflix.vms.transformer.hollowinput.VideoTypeHollow;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.ConverterDataset;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,24 +42,25 @@ import java.util.Set;
  */
 public class VideoHierarchyInitializer {
 
-    private final VMSHollowInputAPI api;
+    private final VMSHollowInputAPI converterApi;
+    private final Gatekeeper2Dataset gk2Dataset;
     private final HollowPrimaryKeyIndex supplementalIndex;
     private final HollowPrimaryKeyIndex videoTypeIndex;
     private final HollowPrimaryKeyIndex videoGeneralIndex;
     private final HollowHashIndex showSeasonEpisodeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
-    private final GatekeeperStatusRetriever statusRetriever;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
 
-    public VideoHierarchyInitializer(VMSHollowInputAPI api, VMSTransformerIndexer indexer, GatekeeperStatusRetriever statusRetriever, TransformerContext ctx) {
-        this.api = api;
+    public VideoHierarchyInitializer(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer, TransformerContext ctx) {
+        ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
+        this.converterApi = converterDataset.getAPI();
+        this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
         this.supplementalIndex = indexer.getPrimaryKeyIndex(IndexSpec.SUPPLEMENTAL);
         this.videoTypeIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_TYPE);
         this.videoGeneralIndex = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.showSeasonEpisodeIndex = indexer.getHashIndex(IndexSpec.SHOW_SEASON_EPISODE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
-        this.statusRetriever = statusRetriever;
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
     }
@@ -70,7 +76,7 @@ public class VideoHierarchyInitializer {
 
             int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topParentId);
             if (videoGeneralOrdinal != -1) {
-                VideoGeneralHollow videoGeneral = api.getVideoGeneralHollow(videoGeneralOrdinal);
+                VideoGeneralHollow videoGeneral = converterApi.getVideoGeneralHollow(videoGeneralOrdinal);
                 VideoNodeType nodeType = VideoNodeType.of(videoGeneral._getVideoType()._getValue());
                 isTopNode = VideoNodeType.isTopNode(nodeType);
                 isStandalone = VideoNodeType.isStandalone(nodeType);
@@ -88,7 +94,7 @@ public class VideoHierarchyInitializer {
                 HollowOrdinalIterator iter = matches.iterator();
                 int showSeasonEpisodeOrdinal = iter.next();
                 while (showSeasonEpisodeOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                    ShowSeasonEpisodeHollow showSeasonEpisode = api.getShowSeasonEpisodeHollow(showSeasonEpisodeOrdinal);
+                    ShowSeasonEpisodeHollow showSeasonEpisode = converterApi.getShowSeasonEpisodeHollow(showSeasonEpisodeOrdinal);
 
                     for (ISOCountryHollow country : showSeasonEpisode._getCountryCodes()) {
                         String countryCode = country._getValue();
@@ -121,7 +127,7 @@ public class VideoHierarchyInitializer {
 
             // Add standalones for countries that are not defined in hierarchy feed (Show,Movie,Supplemental)
             int videoTypeOrdinal = videoTypeIndex.getMatchingOrdinal(topParentId);
-            VideoTypeHollow videoType = api.getVideoTypeHollow(videoTypeOrdinal);
+            VideoTypeHollow videoType = converterApi.getVideoTypeHollow(videoTypeOrdinal);
             if (videoTypeOrdinal == -1 || videoType._getCountryInfos().isEmpty()) {
                 addVideoAndAssociatedSupplementals(topParentId, droppedIds);
             } else {
@@ -171,7 +177,7 @@ public class VideoHierarchyInitializer {
         if (isGoLiveOrHasFirstDisplayDate(videoId, countryCode))
             return true;
 
-        if (DVDCatalogUtil.isVideoInDVDCatalog(api, videoTypeCountryIndex, videoId, countryCode))
+        if (DVDCatalogUtil.isVideoInDVDCatalog(converterApi, videoTypeCountryIndex, videoId, countryCode))
             return true;
 
         if (hasCurrentOrFutureRollout(videoId, "DISPLAY_PAGE", countryCode))
@@ -199,22 +205,22 @@ public class VideoHierarchyInitializer {
             return false;
 
         int ordinal = queryResult.iterator().next();
-        VideoTypeDescriptorHollow countryType = api.getVideoTypeDescriptorHollow(ordinal);
+        VideoTypeDescriptorHollow countryType = converterApi.getVideoTypeDescriptorHollow(ordinal);
         return countryType != null;
     }
 
     boolean isGoLiveOrHasFirstDisplayDate(long videoId, String countryCode) {
-        StatusHollow videoStatus = statusRetriever.getStatus(videoId, countryCode);
+        Status videoStatus = gk2Dataset.getStatus(videoId, countryCode);
         if(videoStatus == null)
             return false;
 
-        if (videoStatus._getFlags()._getGoLive())
+        if (videoStatus.getFlags().getGoLive())
             return true;
 
-        if (videoStatus._getFlags()._getFirstDisplayDate() != null)
+        if (videoStatus.getFlags().getFirstDisplayDate() != Long.MIN_VALUE)
             return true;
 
-        ListOfRightsWindowHollow windows = videoStatus._getRights()._getWindows();
+        ListOfRightsWindow windows = videoStatus.getRights().getWindows();
         if (!windows.isEmpty())
             return true;
 
@@ -231,7 +237,7 @@ public class VideoHierarchyInitializer {
 
         int rolloutOrdinal = iter.next();
         while(rolloutOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-            RolloutHollow rollout = api.getRolloutHollow(rolloutOrdinal);
+            RolloutHollow rollout = converterApi.getRolloutHollow(rolloutOrdinal);
 
             for(RolloutPhaseHollow phase : rollout._getPhases()) {
                 for(Map.Entry<ISOCountryHollow, RolloutPhaseWindowHollow> entry : phase._getWindows().entrySet()) {
@@ -256,7 +262,7 @@ public class VideoHierarchyInitializer {
             return Collections.emptySet();
 
         Set<Integer> addedSupplementals = new HashSet<>();
-        SupplementalsHollow supplementals = api.getSupplementalsHollow(supplementalsOrdinal);
+        SupplementalsHollow supplementals = converterApi.getSupplementalsHollow(supplementalsOrdinal);
         for (IndividualSupplementalHollow supplemental : supplementals._getSupplementals()) {
             int supplementalId = (int)supplemental._getMovieId();
             if (isChildNodeIncluded(supplementalId, countryCode)) {
@@ -290,7 +296,7 @@ public class VideoHierarchyInitializer {
         int supOrdinal = supplementalIndex.getMatchingOrdinal(videoId);
         if (supOrdinal == -1) return;
 
-        SupplementalsHollow sups = api.getSupplementalsHollow(supOrdinal);
+        SupplementalsHollow sups = converterApi.getSupplementalsHollow(supOrdinal);
         for (IndividualSupplementalHollow supplemental : sups._getSupplementals()) {
             toSet.add((int) supplemental._getMovieId());
         }
