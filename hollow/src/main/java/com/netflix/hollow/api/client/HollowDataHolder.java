@@ -39,6 +39,7 @@ class HollowDataHolder {
     private final HollowReadStateEngine stateEngine;
     private final HollowAPIFactory apiFactory;
     private final HollowBlobReader reader;
+    private final HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig;
     private final FailedTransitionTracker failedTransitionTracker;
     private final StaleHollowReferenceDetector staleReferenceDetector;
     private final HollowConsumer.ObjectLongevityConfig objLongevityConfig;
@@ -52,13 +53,15 @@ class HollowDataHolder {
     private long currentVersion = HollowConstants.VERSION_NONE;
 
     HollowDataHolder(HollowReadStateEngine stateEngine,
-                            HollowAPIFactory apiFactory, 
+                            HollowAPIFactory apiFactory,
+                            HollowConsumer.DoubleSnapshotConfig doubleSnapshotConfig,
                             FailedTransitionTracker failedTransitionTracker, 
                             StaleHollowReferenceDetector staleReferenceDetector, 
                             HollowConsumer.ObjectLongevityConfig objLongevityConfig) {
         this.stateEngine = stateEngine;
         this.apiFactory = apiFactory;
         this.reader = new HollowBlobReader(stateEngine);
+        this.doubleSnapshotConfig = doubleSnapshotConfig;
         this.failedTransitionTracker = failedTransitionTracker;
         this.staleReferenceDetector = staleReferenceDetector;
         this.objLongevityConfig = objLongevityConfig;
@@ -82,8 +85,20 @@ class HollowDataHolder {
     }
 
     void update(HollowUpdatePlan updatePlan, HollowConsumer.RefreshListener[] refreshListeners) throws Throwable {
-        if(failedTransitionTracker.anyTransitionWasFailed(updatePlan))
+        // Only fail if double snapshot is configured.
+        // This is a short term solution until it is decided to either remove this feature
+        // or refine it.
+        // If the consumer is configured to only follow deltas (no double snapshot) then
+        // any failure to transition will cause the consumer to become "stuck" on stale data
+        // unless the failed transitions are explicitly cleared or a new consumer is created.
+        // A transition failure is very broad encompassing many forms of transitory failure,
+        // such as network failures when accessing a blob, where the consumer might recover,
+        // such as when a new delta is published.
+        // Note that a refresh listener may also induce a failed transition, likely unknowingly,
+        // by throwing an exception.
+        if(doubleSnapshotConfig.allowDoubleSnapshot() && failedTransitionTracker.anyTransitionWasFailed(updatePlan)) {
             throw new RuntimeException("Update plan contains known failing transition!");
+        }
 
         if(updatePlan.isSnapshotPlan())
             applySnapshotPlan(updatePlan, refreshListeners);

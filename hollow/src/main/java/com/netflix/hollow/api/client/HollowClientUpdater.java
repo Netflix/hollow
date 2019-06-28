@@ -222,8 +222,9 @@ public class HollowClientUpdater {
 
     private HollowDataHolder newHollowDataHolder() {
         return new HollowDataHolder(newStateEngine(), apiFactory,
-                failedTransitionTracker, staleReferenceDetector,
-                objectLongevityConfig).setFilter(filter);
+                doubleSnapshotConfig, failedTransitionTracker,
+                staleReferenceDetector, objectLongevityConfig)
+                .setFilter(filter);
     }
 
     private HollowReadStateEngine newStateEngine() {
