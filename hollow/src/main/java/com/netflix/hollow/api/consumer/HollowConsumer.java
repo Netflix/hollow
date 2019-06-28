@@ -130,8 +130,8 @@ public class HollowConsumer {
                              HollowObjectHashCodeFinder hashCodeFinder,
                              Executor refreshExecutor) {
         this(blobRetriever, announcementWatcher, refreshListeners, apiFactory, dataFilter,
-                objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig
-                , hashCodeFinder, refreshExecutor, null);
+                objectLongevityConfig, objectLongevityDetector, doubleSnapshotConfig,
+                hashCodeFinder, refreshExecutor, null);
     }
 
     protected HollowConsumer(BlobRetriever blobRetriever,
