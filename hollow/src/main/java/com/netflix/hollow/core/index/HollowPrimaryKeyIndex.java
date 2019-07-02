@@ -375,6 +375,9 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
     @Override
     public void removedOrdinal(int ordinal) { }
 
+    private static final boolean ALLOW_DELTA_UPDATE =
+            Boolean.getBoolean("com.netflix.hollow.core.index.HollowPrimaryKeyIndex.allowDeltaUpdate");
+
     @Override
     public synchronized void endUpdate() {
         BitSet ordinals = typeState.getListener(PopulatedOrdinalListener.class).getPopulatedOrdinals();
@@ -383,7 +386,8 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
         int bitsPerElement = (32 - Integer.numberOfLeadingZeros(typeState.maxOrdinal() + 1));
 
         PrimaryKeyIndexHashTable hashTable = hashTableVolatile;
-        if(hashTableSize == hashTable.hashTableSize
+        if(ALLOW_DELTA_UPDATE
+                && hashTableSize == hashTable.hashTableSize
                 && bitsPerElement == hashTable.bitsPerElement
                 && shouldPerformDeltaUpdate()) {
             try {
@@ -398,6 +402,11 @@ public class HollowPrimaryKeyIndex implements HollowTypeStateListener {
                 well fix that.  Attempts to reproduce this locally has so far failed.
                 Given the importance of indexing a full reindex is performed on such a failure.  This, however,
                 will make it more difficult to detect such issues.
+
+                This approach does not protect against the case where the index is corrupt and not yet
+                detected, until a further update.  In such cases it may be possible for clients, in the interim
+                of a forced reindex, to operate on a corrupt index: queries may incorrectly return no match.  As such
+                delta update of the index have been disabled by default.
                  */
                 LOG.log(Level.SEVERE, "Delta update of index failed.  Performing a full reindex", e);
                 reindex();
