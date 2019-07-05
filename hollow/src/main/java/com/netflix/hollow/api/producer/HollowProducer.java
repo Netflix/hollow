@@ -40,7 +40,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
@@ -627,6 +630,27 @@ public class HollowProducer extends AbstractHollowProducer {
     }
 
     public interface Announcer {
+
+        Map<Long, Map<String, String>> metadataMap = new HashMap<>();
+
+        // will replace any existing metadata for version
+        default Map<String, String> getMetadata(long stateVersion) {
+            return metadataMap.getOrDefault(stateVersion, Collections.emptyMap());
+        }
+
+        default void setMetadata(long stateVersion, Map<String, String> metadata) {
+            metadataMap.put(stateVersion, metadata);
+        }
+
+        default void addMetadata(long stateVersion, Map<String, String> moreMetadata) {
+            Map<String, String> existingMetadata = metadataMap.computeIfAbsent(stateVersion, k -> new HashMap<>());
+            existingMetadata.putAll(moreMetadata);
+        }
+
+        default void clearMetaData(long stateVersion) {
+            metadataMap.remove(stateVersion);
+        }
+
         void announce(long stateVersion);
     }
 
