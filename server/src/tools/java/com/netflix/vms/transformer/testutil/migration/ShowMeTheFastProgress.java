@@ -1,12 +1,22 @@
 package com.netflix.vms.transformer.testutil.migration;
 
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.INPUT_VERSION_KEY_PREFIX;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.getNamespacesforEnv;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.lookupDatasetForNamespace;
 
-import com.netflix.aws.file.FileStore;
-import com.netflix.governator.InjectorBuilder;
-import com.netflix.governator.LifecycleInjector;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.inject.Inject;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
+import com.netflix.governator.guice.test.ModulesForTesting;
+import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.runtime.lifecycle.RuntimeCoreModule;
@@ -15,17 +25,13 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.input.VMSInputDataKeybaseBuilder;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleProcessor.TYPE;
-import com.netflix.vms.transformer.util.HollowBlobKeybaseBuilder;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,78 +45,68 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(GovernatorJunit4ClassRunner.class)
+@ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class ShowMeTheFastProgress {
-    private static final boolean isProd = false;
+    private static final boolean isProd = true;
     private static final boolean isPerformDiff = true;
-    private static final boolean isPublishPinnedData = false;
     private static final boolean isUseRemotePinTitleSlicer = true;
     private static final boolean isFallBackToLocalSlicer = false;
 
-    private static final String VIP_NAME = "feather";
-    private static final String CONVERTER_VIP_NAME = "muon";
-    private static final String VMSSLICER_INSTANCE = "vmstransformer-feather_override-muon";
+    private static final String OUTPUT_NAMESPACE = "vms-vmsdev_sunjeetsn";
+    private static final String VMSSLICER_INSTANCE = "vmstransformer-vmsdev_sunjeetsn_override-muon";
 
     private static final String WORKING_DIR = "/space/transformer-data/fast";
-    private static final String PROXY = isProd ? VMSInputDataClient.PROD_PROXY_URL : VMSInputDataClient.TEST_PROXY_URL;
     private static final String REMOTE_SLICER_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/" + VMSSLICER_INSTANCE + ":7101/REST/vms/pintitleslicer"; // NOTE: SLICER must be in TEST env hence cloudqa
     private static final String PUBLISH_CYCLE_DATATS_HEADER = "publishCycleDataTS";
 
-    private FileStore pinTitleFileStore;
+    @Inject
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private S3Direct s3Direct;
+
 
     @Before
     public void setup() throws Exception {
         File workingDir = new File(WORKING_DIR);
         if (!workingDir.exists()) workingDir.mkdirs();
-
-        if (isPublishPinnedData) {
-            LifecycleInjector lInjector = InjectorBuilder.fromModules(new RuntimeCoreModule()).createInjector();
-            pinTitleFileStore = lInjector.getInstance(FileStore.class);
-        }
-    }
-
-    @Test
-    public void getLatestTransformerVersion() {
-        long version = getLatestVersion(new HollowBlobKeybaseBuilder(VIP_NAME).getSnapshotKeybase());
-        System.out.println("getLatestTransformerVersion: " + version);
-    }
-
-    @Test
-    public void getLatestConverterVersion() {
-        long version = getLatestVersion(new VMSInputDataKeybaseBuilder(CONVERTER_VIP_NAME).getSnapshotKeybase());
-        System.out.println("getLatestConverterVersion: " + version);
     }
 
     @Test
     public void diffTwoVips() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        String FROM_VIP = "feather";
-        String TO_VIP = "whiplash";
+        String FROM_NAMESPACE = "vms-vmsdev_sunjeetsn_override";
+        String TO_NAMESPACE = "vms-vmsdev_sunjeetsn_override";
 
-        long FROM_VER = 20171106215605001L;
-        long TO_VER = 20171106191033375L;
-        int[] topNodes = { 80126024 };
+        long FROM_VER = 20190625235018013l;
+        long TO_VER = 20190625235433014l;
+        int[] topNodes = { 80191680 };
 
         long start = System.currentTimeMillis();
         try {
             SimpleTransformerContext ctx = new SimpleTransformerContext();
-            HollowReadStateEngine from_ReadStateEngine = loadTransformerEngine(ctx, FROM_VIP, FROM_VER, topNodes);
-            HollowReadStateEngine to_ReadStateEngine = loadTransformerEngine(ctx, TO_VIP, TO_VER, topNodes);
+            HollowReadStateEngine from_ReadStateEngine = loadTransformerEngine(ctx, FROM_NAMESPACE, FROM_VER, topNodes);
+            HollowReadStateEngine to_ReadStateEngine = loadTransformerEngine(ctx, TO_NAMESPACE, TO_VER, topNodes);
             ShowMeTheProgressDiffTool.startTheDiff(to_ReadStateEngine, from_ReadStateEngine);
         } finally {
-            trackDuration(start, "diffTwoVips: %s:%s vs %s:%s - topNodes=%s", FROM_VIP, FROM_VER, TO_VIP, TO_VER, toString(topNodes));
+            trackDuration(start, "diffTwoVips: %s:%s vs %s:%s - topNodes=%s", FROM_NAMESPACE, FROM_VER, TO_NAMESPACE, TO_VER, toString(topNodes));
         }
     }
 
     @Test
     public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20180131174740436L;
-        int[] topNodes = { 80240512 };
+        long transformerVersion = 20190703002748059l;
+        int[] topNodes = { 80049870 };
 
         long start = System.currentTimeMillis();
 
@@ -118,18 +114,12 @@ public class ShowMeTheFastProgress {
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         //ctx.overrideSupportedCountries("US");
 
-        // Load Expected StateEngine
-        HollowReadStateEngine expectedOutputStateEngine = loadTransformerEngine(ctx, VIP_NAME, transformerVersion, topNodes);
+        // Load Expected state engines
+        HollowReadStateEngine expectedOutputStateEngine = loadTransformerEngine(ctx, OUTPUT_NAMESPACE, transformerVersion, topNodes);
         String value = expectedOutputStateEngine.getHeaderTag(PUBLISH_CYCLE_DATATS_HEADER);
         long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
-        long converterBlobVersion = Long.parseLong(expectedOutputStateEngine.getHeaderTag("sourceDataVersion"));
-
-        // Load Transformer input based on converterBlobVersion
-        VMSHollowInputAPI muonAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterBlobVersion, topNodes);
-        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
-        inputs.put(CONVERTER, new InputState((HollowReadStateEngine) muonAPI.getDataAccess(), converterBlobVersion));   // TODO: Add all Cinder inputs
-        CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
-
+        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = getInputVersionsFromStateEngine(expectedOutputStateEngine);
+        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx,topNodes);
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
@@ -152,27 +142,24 @@ public class ShowMeTheFastProgress {
     }
 
     @Test
-    public void runFastLaneWithConverterData() throws Throwable {
+    public void runFastLaneWithSpecificInputVersions() throws Throwable {
         // NOTE: the specified converterVersion must be valid or already in local HD; otherwise, run  getLatestConverterVersion();
         int[] topNodes = { 80104350 };
-        long converterVersion = 20171115044410018L;
+
+        // NOTE: This map might not be up to date. There should be entries for all Cinder inputs
+        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
+        inputVersions.put(CONVERTER, 20190619233752482l);
+        inputVersions.put(GATEKEEPER2, 20190619233729375l);
 
         // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         //ctx.overrideSupportedCountries("US");
-
-        // Load Transformer input based on converterBlobVersion
-        VMSHollowInputAPI muonAPI = loadVMSHollowInputAPI(ctx, CONVERTER_VIP_NAME, converterVersion, topNodes);
+        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx, topNodes);
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
         ctx.setFastlaneIds(new HashSet<>(fastlaneIds));
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-
-        // Run Transformer
-        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
-        inputs.put(CONVERTER, new InputState((HollowReadStateEngine) muonAPI.getDataAccess(), converterVersion));   // TODO: Add all Cinder inputs
-        CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 
         SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
         transformer.transform();
@@ -180,17 +167,48 @@ public class ShowMeTheFastProgress {
         System.out.println(actualOutputReadStateEngine.getHeaderTags());
     }
 
-    private static long getLatestVersion(String keybase) {
-        String proxyUrl = PROXY + "/filestore-version?keybase=" + keybase;
-        String version = HttpHelper.getStringResponse(proxyUrl);
-        System.out.println(String.format(">>> getLatestVersion: keybase=%s, version=%s", keybase, version));
-        return Long.parseLong(version);
+    private Map<UpstreamDatasetHolder.Dataset, Long> getInputVersionsFromStateEngine(HollowReadStateEngine stateEngine) {
+        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
+        final BiMap<UpstreamDatasetHolder.Dataset, String> namespaces = HashBiMap.create(getNamespacesforEnv(isProd));
+        stateEngine.getHeaderTags().forEach((k,v) -> {
+            if (k.startsWith(INPUT_VERSION_KEY_PREFIX) && k.length() != INPUT_VERSION_KEY_PREFIX.length()) {
+                String namespace = k.substring(INPUT_VERSION_KEY_PREFIX.length());
+                inputVersions.put(lookupDatasetForNamespace(namespace, isProd), Long.valueOf(v));
+            }
+        });
+        if (inputVersions.size() != namespaces.size()) {
+            String msg = "There was a mismatch in inputs expected of the env and inputs present in the state engine "
+                    + "(expected=" + namespaces.size() + ", actual=" + inputVersions.size() + ").";
+            System.out.println("FATAL: " + msg);
+            throw new IllegalArgumentException(msg);
+        }
+        return inputVersions;
     }
 
-    private static void downloadSlice(File downloadTo, String baseURL, boolean isProd, boolean isOutput, String vipName, long version, int... topNodes) throws Exception {
+    // Load Transformer inputs based on input versions
+    private CycleInputs getCycleInputs(Map<UpstreamDatasetHolder.Dataset, Long> inputVersions, SimpleTransformerContext ctx, int[] topNodes)
+            throws Throwable{
+
+        Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new ConcurrentHashMap<>();
+        SimultaneousExecutor executor = new SimultaneousExecutor(5, ShowMeTheFastProgress.class.getName());
+        for (UpstreamDatasetHolder.Dataset dataset : inputVersions.keySet()) {
+            executor.execute(() -> {
+                try {
+                    HollowReadStateEngine stateEngine = loadInputState(ctx, getNamespacesforEnv(isProd).get(dataset),
+                            inputVersions.get(dataset), topNodes);
+                    inputs.put(dataset, new InputState(stateEngine, inputVersions.get(dataset)));
+                } catch (Throwable t) {}
+            });
+        }
+        executor.awaitSuccessfulCompletion();
+
+        return new CycleInputs(inputs, 1l);
+    }
+
+    private static void downloadSlice(File downloadTo, String baseURL, boolean isProd, boolean isOutput, String namespace, long version, int... topNodes) throws Exception {
         InputStream is = null;
         OutputStream os = null;
-        String proxyURL = String.format("%s?prod=%s&output=%s&vip=%s&version=%s&topnodes=%s", baseURL, isProd, isOutput, vipName, version, toString(topNodes));
+        String proxyURL = String.format("%s?prod=%s&output=%s&namespace=%s&version=%s&topnodes=%s", baseURL, isProd, isOutput, namespace, version, toString(topNodes));
         try {
             System.out.println(">>> Requesting a slice from: " + proxyURL);
             is = HttpHelper.getInputStream(proxyURL, false);
@@ -204,16 +222,16 @@ public class ShowMeTheFastProgress {
     }
 
     @SuppressWarnings("unused")
-    private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
+    private HollowReadStateEngine loadTransformerEngine(TransformerContext ctx, String outputNamespace, long version, int... topNodes) throws Throwable {
         System.out.println("loadTransformerEngine: Loading version=" + version);
         long start = System.currentTimeMillis();
         try {
-            OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
-            processor.setPinTitleFileStore(pinTitleFileStore);
-            File slicedFile = processor.getFile(TYPE.OUTPUT, version, topNodes);
+            OutputSlicePinTitleProcessor processor = new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
+                    outputNamespace, WORKING_DIR, isProd, ctx);
+            File slicedFile = processor.getFile(outputNamespace, TYPE.OUTPUT, version, topNodes);
             if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {
-                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, vipName, version, topNodes);
+                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, true, outputNamespace, version, topNodes);
                     return processor.readStateEngine(slicedFile);
                 } catch (Exception ex) {
                     System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
@@ -222,40 +240,35 @@ public class ShowMeTheFastProgress {
             }
             return processor.process(version, topNodes);
         } finally {
-            trackDuration(start, "loadTransformerEngine: vipName=%s, version=%s, topNodes=%s", vipName, version, toString(topNodes));
+            trackDuration(start, "loadTransformerEngine: outputNamespace=%s, version=%s, topNodes=%s", outputNamespace, version, toString(topNodes));
         }
     }
 
     @SuppressWarnings("unused")
-    private VMSHollowInputAPI loadVMSHollowInputAPI(TransformerContext ctx, String vipName, long version, int... topNodes) throws Throwable {
-        boolean isUseInputSlicing = true;
-        System.out.println("loadVMSHollowInputAPI: Loading version=" + version);
+    private HollowReadStateEngine loadInputState(TransformerContext ctx, String inputNamespace, long inputDataVersion, int... topNodes) throws Throwable {
+        System.out.println("loadInputState: Loading inputNamespace=" + inputNamespace + " version=" + inputDataVersion);
         long start = System.currentTimeMillis();
         try {
-            HollowReadStateEngine stateEngine = null;
-            if (isUseInputSlicing) {
-                InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(vipName, PROXY, WORKING_DIR, ctx);
-                processor.setPinTitleFileStore(pinTitleFileStore);
-                File slicedFile = processor.getFile(TYPE.INPUT, version, topNodes);
-                if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
-                    try {
-                        downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, vipName, version, topNodes);
-                    } catch (Exception ex) {
-                        System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
-                        if (isFallBackToLocalSlicer) System.out.println("Failling back to local slicer."); else throw ex;
-                    }
+            HollowReadStateEngine stateEngine;
+            InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
+                    inputNamespace, WORKING_DIR, isProd, ctx);
+            File slicedFile = processor.getFile(inputNamespace, TYPE.INPUT, inputDataVersion, topNodes);
+            if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
+                try {
+                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, inputNamespace, inputDataVersion, topNodes);
+                } catch (Exception ex) {
+                    System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
+                    if (isFallBackToLocalSlicer) System.out.println("Failling back to local slicer."); else throw ex;
                 }
-
-                if (!slicedFile.exists()) slicedFile = processor.process(TYPE.INPUT, version, topNodes);
-                stateEngine = processor.readStateEngine(slicedFile);
-            } else {
-                VMSInputDataClient inputClient = new VMSInputDataClient(PROXY, WORKING_DIR, vipName);
-                inputClient.triggerRefreshTo(version);
-                stateEngine = inputClient.getStateEngine();
             }
-            return new VMSHollowInputAPI(stateEngine);
+
+            if (!slicedFile.exists()) slicedFile = processor.process(TYPE.INPUT, inputDataVersion, topNodes);
+            stateEngine = processor.readStateEngine(slicedFile);
+
+            return stateEngine;
         } finally {
-            trackDuration(start, "loadVMSHollowInputAPI: isUseInputSlicing=%s, version=%s, topNodes=%s", isUseInputSlicing, version, toString(topNodes));
+            trackDuration(start, "loadInputState: inputNamespace=%s, inputDataVersion=%s, topNodes=%s",
+                    inputNamespace, inputDataVersion, toString(topNodes));
         }
     }
 

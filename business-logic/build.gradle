@@ -9,6 +9,7 @@ dependencies {
     compile 'commons-codec:commons-codec'
     compile 'org.mockito:mockito-all:1.3'
     compile 'netflix:vmsconverter-hollow-api:latest.release'
+    implementation project(':vmstransformer-hollowoutput-api-notemplate')
 
     testCompile 'junit:junit'
     testCompile 'com.netflix.hollow:hollow-test:latest.release'

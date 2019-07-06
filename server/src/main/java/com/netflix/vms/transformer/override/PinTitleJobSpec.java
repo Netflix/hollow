@@ -8,13 +8,11 @@ public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
     final String id;
     final long version;
     final int[] topNodes;
-    final boolean isInputBased;
 
-    public PinTitleJobSpec(boolean isInputBased, long version, int... topNodes) {
+    public PinTitleJobSpec(long version, int... topNodes) {
         this.version = version;
-        this.isInputBased = isInputBased;
         this.topNodes = topNodes;
-        this.id = createId(version, isInputBased);
+        this.id = createId(version);
     }
 
     public PinTitleJobSpec merge(PinTitleJobSpec other) {
@@ -36,12 +34,12 @@ public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
             newTopNodes[i++] = id;
         }
 
-        PinTitleJobSpec spec = new PinTitleJobSpec(this.isInputBased, this.version, newTopNodes);
+        PinTitleJobSpec spec = new PinTitleJobSpec(this.version, newTopNodes);
         return spec;
     }
 
-    private static String createId(long version, boolean isInputBased) {
-        return isInputBased ? "i" : "o" + ":" + version;
+    private static String createId(long version) {
+        return "o" + ":" + version; // o represents output-based pinning
     }
 
     public String getID() {
@@ -52,9 +50,7 @@ public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
     @Override
     public int compareTo(PinTitleJobSpec o) {
         int result = Long.compare(this.version, o.version);
-        if (result != 0) return result;
-
-        return Boolean.compare(this.isInputBased, o.isInputBased);
+        return result;
     }
 
     @Override
@@ -63,7 +59,6 @@ public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         PinTitleJobSpec other = (PinTitleJobSpec) obj;
-        if (isInputBased != other.isInputBased) return false;
         if (!Arrays.equals(topNodes, other.topNodes)) return false;
         if (version != other.version) return false;
         return true;
@@ -73,7 +68,6 @@ public class PinTitleJobSpec implements Comparable<PinTitleJobSpec> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (isInputBased ? 1231 : 1237);
         result = prime * result + Arrays.hashCode(topNodes);
         result = prime * result + (int) (version ^ (version >>> 32));
         return result;

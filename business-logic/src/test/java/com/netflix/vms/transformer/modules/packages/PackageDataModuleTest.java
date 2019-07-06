@@ -74,7 +74,7 @@ public class PackageDataModuleTest {
         when(mockGk2StatusAPI.getDataAccess()).thenReturn(mockHollowReadStateEngine);
     }
     @Test
-    public void testConvertPackage_notInPackageMovieDealCountryGroup() {
+    public void testConvertPackage_notInPackageMovieDealCountryGroup() throws Exception {
         VMSHollowInputAPI api = createAPI(createPackage());
         PackageHollow packageHollow = api.getAllPackageHollow().iterator().next();
         PackageDataModule packageDataModule = getPackageDataModule(api);
@@ -119,7 +119,7 @@ public class PackageDataModuleTest {
     }
 
     @Test
-    public void testConvertPackage_noDeployableCountries() {
+    public void testConvertPackage_noDeployableCountries() throws Exception {
         VMSHollowInputAPI api = createAPI(createPackage(),
                 new PackageMovieDealCountryGroup((long) VIDEO_ID, PACKAGE_ID)
                         .setDealCountryGroups(new ArrayList<>()));
@@ -129,7 +129,7 @@ public class PackageDataModuleTest {
     }
 
     @Test
-    public void testConvertPackage_hasDeployableCountries() {
+    public void testConvertPackage_hasDeployableCountries() throws Exception {
         Map<String, Boolean> countryWindow = ImmutableMap.of(NFCountry.US.getId(), true);
         DealCountryGroup group = new DealCountryGroup(7L).setCountryWindow(countryWindow);
         VMSHollowInputAPI api = createAPI(createPackage(),
@@ -152,7 +152,7 @@ public class PackageDataModuleTest {
         return new VMSHollowInputAPI(builder.build());
     }
 
-    private PackageDataModule getPackageDataModule(VMSHollowInputAPI api) {
+    private PackageDataModule getPackageDataModule(VMSHollowInputAPI api) throws Exception {
         HollowReadStateEngine readStateEngine = (HollowReadStateEngine)  api.getDataAccess();
         TransformerContext mockContext = mock(TransformerContext.class);
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(readStateEngine, mockContext);

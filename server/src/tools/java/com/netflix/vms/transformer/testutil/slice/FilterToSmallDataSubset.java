@@ -4,8 +4,9 @@ import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
+import com.netflix.vms.transformer.input.datasets.slicers.TransformerOutputDataSlicer;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,14 +32,16 @@ public class FilterToSmallDataSubset {
     
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
 
-    private DataSlicer.SliceTask slicer;
-    
+    private InputDataSlicer inputSlicer;
+    private TransformerOutputDataSlicer outputSlicer;
+
     @Before
     public void setUp() {
-        slicer = new DataSlicerImpl().getSliceTask(TARGET_NUMBER_OF_TOPNODES, 
-        		                                    80097047,70305883);
+        inputSlicer = new ConverterDataSlicerImpl(TARGET_NUMBER_OF_TOPNODES, 80097047,70305883);
+
+        outputSlicer = new TransformerOutputDataSlicer(TARGET_NUMBER_OF_TOPNODES, 80097047,70305883);
     }
-    
+
     @Test
     public void doFilter() throws Exception {
         if (IS_FILTER_BASED_ON_INPUT_DATA) {
@@ -49,21 +52,21 @@ public class FilterToSmallDataSubset {
             sliceInputBlob();
         }
     }
-    
+
     private void sliceInputBlob() throws IOException {
         HollowReadStateEngine inputStateEngine = readInputStateEngine();
-        HollowWriteStateEngine slicedInputStateEngine = slicer.sliceInputBlob(inputStateEngine);
+        HollowWriteStateEngine slicedInputStateEngine = inputSlicer.sliceInputBlob(inputStateEngine);
         inputStateEngine = null;
         writeBlob(FILTERED_INPUT_BLOB_LOCATION, slicedInputStateEngine);
     }
-    
+
     private void sliceOutputBlob() throws IOException {
         HollowReadStateEngine outputStateEngine = readOutputStateEngine();
-        HollowWriteStateEngine slicedOutputStateEngine = slicer.sliceOutputBlob(outputStateEngine);
+        HollowWriteStateEngine slicedOutputStateEngine = outputSlicer.sliceOutputBlob(outputStateEngine);
         outputStateEngine = null;
         writeBlob(FILTERED_OUTPUT_BLOB_LOCATION, slicedOutputStateEngine);
     }
-    
+
     private HollowReadStateEngine readInputStateEngine() throws IOException {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
@@ -72,7 +75,7 @@ public class FilterToSmallDataSubset {
             return stateEngine;
         }
     }
-    
+
     private final HollowReadStateEngine readOutputStateEngine() throws IOException {
         HollowReadStateEngine stateEngine = new HollowReadStateEngine();
         HollowBlobReader reader = new HollowBlobReader(stateEngine);
@@ -81,7 +84,7 @@ public class FilterToSmallDataSubset {
             return stateEngine;
         }
     }
-    
+
     private static void writeBlob(String filename, HollowWriteStateEngine stateEngine) throws IOException {
         HollowBlobWriter writer = new HollowBlobWriter(stateEngine);
         try (BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(filename))){

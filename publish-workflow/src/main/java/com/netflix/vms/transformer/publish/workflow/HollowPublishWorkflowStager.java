@@ -14,8 +14,8 @@ import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.TransformerMetricRecorder;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.publish.status.CycleStatusFuture;
 import com.netflix.vms.transformer.publish.status.WorkflowCycleStatusFuture;
 import com.netflix.vms.transformer.publish.workflow.job.AfterCanaryAnnounceJob;
@@ -65,14 +65,14 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             Announcer canaryAnnouncer,
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
-            DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx, fileStore,
                 publisher, nostreamsPublisher,
                 announcer, nostreamsAnnouncer,
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer,
-                new HollowBlobDataProvider(ctx), dataSlicer, uploadStatus, vip);
+                new HollowBlobDataProvider(ctx), slicerFactory, uploadStatus, vip);
     }
 
     private HollowPublishWorkflowStager(TransformerContext ctx, FileStore fileStore,
@@ -82,7 +82,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             Publisher devSlicePublisher, Announcer devSliceAnnouncer,
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider circuitBreakerDataProvider,
-            DataSlicer dataSlicer, Supplier<ServerUploadStatus> uploadStatus, String vip) {
+            SlicerFactory slicerFactory, Supplier<ServerUploadStatus> uploadStatus, String vip) {
         this(ctx,
                 new DefaultHollowPublishJobCreator(ctx, fileStore,
                         publisher, nostreamsPublisher,
@@ -93,7 +93,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                         circuitBreakerDataProvider,
                         new PlaybackMonkeyTester(),
                         new ValuableVideoHolder(),
-                        dataSlicer, uploadStatus, vip),
+                        slicerFactory, uploadStatus, vip),
                 vip);
         this.circuitBreakerDataProvider = circuitBreakerDataProvider;
     }

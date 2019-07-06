@@ -96,7 +96,7 @@ public class SimpleTransformer {
 
     public SimpleTransformer(CycleInputs cycleInputs,
                              HollowWriteStateEngine outputStateEngine, 
-                             TransformerContext ctx) {
+                             TransformerContext ctx) throws Exception {
 
         this.writeStateEngine = outputStateEngine;
         this.ctx = ctx;

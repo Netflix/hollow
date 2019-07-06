@@ -1,4 +1,4 @@
-package com.netflix.vms.transformer.util.slice;
+package com.netflix.vms.transformer.input.datasets.slicers;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;

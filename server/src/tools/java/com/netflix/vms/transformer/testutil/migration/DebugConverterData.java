@@ -1,6 +1,13 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+
+import com.google.inject.Inject;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.cinder.consumer.NFHollowBlobRetriever;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
+import com.netflix.governator.guice.test.ModulesForTesting;
+import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
 import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.consumer.HollowConsumer.BlobRetriever;
@@ -21,13 +28,14 @@ import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
 import com.netflix.hollow.tools.stringifier.HollowRecordStringifier;
 import com.netflix.hollow.tools.traverse.TransitiveSetTraverser;
+import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.hollowinput.PackageHollow;
 import com.netflix.vms.transformer.hollowinput.PackageStreamHollow;
 import com.netflix.vms.transformer.hollowinput.StreamDeploymentHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.util.OutputUtil;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -54,27 +62,33 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(GovernatorJunit4ClassRunner.class)
+@ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class DebugConverterData {
     private HollowRecordStringifier stringifier = new HollowRecordStringifier(true, true, false);
     private NumberFormat percentFormat = NumberFormat.getPercentInstance();
 
     private static final String MODIFIED_PACKAGE_KEY_FILENAME = "modified-package-keys.txt";
     private static final String IMPACTED_PACKAGE_KEY_FILENAME = "impacted-package-keys.txt";
-    private static final String CONVERTER_VIP_NAME = "muon";
     private static final String CONVERTER_NAMESPACE = "vmsconverter-muon";
     private static final String WORKING_DIR = "/space/converter-data/debug";
     private static final String REPRO_DIR = WORKING_DIR + "/repro";
     private static final Path REPRO_PATH = Paths.get(REPRO_DIR);
-    private static final String WORKING_DIR_FOR_INPUTCLIENT = "/space/converter-data/inputclient";
+    private static final String WORKING_DIR_FOR_INPUTCONSUMER = "/space/converter-data/inputclient";
+
+    @Inject
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
 
     @Before
     public void setup() {
         percentFormat.setMinimumFractionDigits(1);
-        for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCLIENT, REPRO_DIR)) {
+        for (String folder : Arrays.asList(WORKING_DIR, WORKING_DIR_FOR_INPUTCONSUMER, REPRO_DIR)) {
             File workingDir = new File(folder);
             if (!workingDir.exists()) workingDir.mkdirs();
         }
@@ -83,11 +97,12 @@ public class DebugConverterData {
     @Test
     public void show_DABorDOB_ConverterData() {
         long version = 20180131173015308L;
-        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.TEST_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
-        inputClient.triggerRefreshTo(version);
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, false, CONVERTER.getAPI());
+        inputConsumer.triggerRefreshTo(version);
 
         Set<Long> newHasRollingEpisodes = new HashSet<>();
-        VMSHollowInputAPI api = inputClient.getAPI();
+        VMSHollowInputAPI api = (VMSHollowInputAPI) inputConsumer.getAPI();
         for (VmsAttributeFeedEntryHollow contractAttributes : api.getAllVmsAttributeFeedEntryHollow()) {
             long videoId = contractAttributes._getMovieId()._getValue();
             String countryCode = contractAttributes._getCountryCode()._getValue();
@@ -108,11 +123,12 @@ public class DebugConverterData {
     @Test
     public void debugStreamDeploymentS3PathToStreamIds() {
         long version = 20170824034503068L;
-        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
-        inputClient.triggerRefreshTo(version);
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, CONVERTER.getAPI());
+        inputConsumer.triggerRefreshTo(version);
 
         Map<String, Set<Long>> map = new TreeMap<>();
-        VMSHollowInputAPI api = inputClient.getAPI();
+        VMSHollowInputAPI api = (VMSHollowInputAPI) inputConsumer.getAPI();
 
         for (PackageStreamHollow stream : api.getAllPackageStreamHollow()) {
             StreamDeploymentHollow deployment = stream._getDeployment();
@@ -145,13 +161,15 @@ public class DebugConverterData {
         // FOUND: 1) Celeste Holm (1961-1996) = [size=2] downloadIds=[572674263, 572672107]
         int i = 1;
         long badDownloadableId = 572674263L; // long badDownloadableId2 = 572672107L;
-        VMSInputDataClient inputClient = new VMSInputDataClient(VMSInputDataClient.PROD_PROXY_URL, WORKING_DIR_FOR_INPUTCLIENT, CONVERTER_VIP_NAME);
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
+                CONVERTER_NAMESPACE, WORKING_DIR_FOR_INPUTCONSUMER, true, CONVERTER.getAPI());
+
         for (long version : versions) {
-            inputClient.triggerRefreshTo(version);
-            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(inputClient.getStateEngine(), "PackageStream", "downloadableId");
+            inputConsumer.triggerRefreshTo(version);
+            HollowPrimaryKeyIndex index = new HollowPrimaryKeyIndex(inputConsumer.getStateEngine(), "PackageStream", "downloadableId");
             int ordinal = index.getMatchingOrdinal(badDownloadableId);
 
-            VMSHollowInputAPI api = inputClient.getAPI();
+            VMSHollowInputAPI api = (VMSHollowInputAPI) inputConsumer.getAPI();
             PackageStreamHollow stream = api.getPackageStreamHollow(ordinal);
             if (stream._getDeployment()._getS3PathComponent() != null) {
                 System.out.printf("%d) version=%s, dId=%s, deployment=%s\n", i++, version, stream._getDownloadableId(), stringifier.stringify(stream._getDeployment()));

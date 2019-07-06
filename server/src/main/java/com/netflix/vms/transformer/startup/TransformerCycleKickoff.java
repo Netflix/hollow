@@ -20,6 +20,7 @@ import com.netflix.gutenberg.GutenbergIdentifiers;
 import com.netflix.gutenberg.consumer.GutenbergFileConsumer;
 import com.netflix.gutenberg.publisher.GutenbergFilePublisher;
 import com.netflix.gutenberg.publisher.GutenbergValuePublisher;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
@@ -39,6 +40,7 @@ import com.netflix.vms.transformer.fastlane.FastlaneIdRetriever;
 import com.netflix.vms.transformer.health.TransformerServerHealthIndicator;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.io.LZ4VMSTransformerFiles;
 import com.netflix.vms.transformer.logger.TransformerServerLogger;
 import com.netflix.vms.transformer.publish.workflow.HollowPublishWorkflowStager;
@@ -49,7 +51,6 @@ import com.netflix.vms.transformer.publish.workflow.job.impl.HermesTopicProvider
 import com.netflix.vms.transformer.publish.workflow.util.VipNameUtil;
 import com.netflix.vms.transformer.rest.VMSPublishWorkflowHistoryAdmin;
 import com.netflix.vms.transformer.util.OutputUtil;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -68,7 +69,8 @@ public class TransformerCycleKickoff {
             TransformerCassandraHelper cassandraHelper,
             Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
             FileStore fileStore,
-            Supplier<CinderProducerBuilder> cinderBuilder,
+            Supplier<CinderProducerBuilder> cinderProducerBuilder,
+            S3Direct s3Direct,
             GutenbergFilePublisher gutenbergFilePublisher,
             GutenbergFileConsumer gutenbergFileConsumer,
             GutenbergValuePublisher gutenbergValuePublisher,
@@ -152,16 +154,14 @@ public class TransformerCycleKickoff {
         //      • [desirable] replace FileStore metadata with Gutenberg metadata.
         //
         // - Input slicing
-        //      • Get input slicing working for n inputs.
-        //      • [desirable] replace HollowClient with HollowConsumer thereby also removing FileStore usage.
+        //      √ Get input slicing working for n inputs.
+        //      √ [desirable] replace HollowClient with HollowConsumer thereby also removing FileStore usage.
         //
-        // - Dev slice
-        //      • Get dev slice working for n inputs.
 
         Map<UpstreamDatasetHolder.Dataset, String> namespaces = UpstreamDatasetConfig.getNamespaces();
         for (UpstreamDatasetHolder.Dataset dataSet: namespaces.keySet()) {
             inputConsumers.put(dataSet, VMSInputDataConsumer.getNewConsumer(
-                    cinderConsumerBuilder, namespaces.get(dataSet), UpstreamDatasetConfig.INPUT_APIS.get(dataSet)));
+                    cinderConsumerBuilder, namespaces.get(dataSet), dataSet.getAPI()));
         }
 
         TransformCycle cycle = new TransformCycle(
@@ -171,7 +171,9 @@ public class TransformerCycleKickoff {
             hermesBlobAnnouncer,
             publishStager,
             transformerConfig.getTransformerVip(),
-            cinderBuilder);
+            cinderProducerBuilder,
+            cinderConsumerBuilder,
+            s3Direct);
 
         Thread t = new Thread(new Runnable() {
             private long cycleStartTime = 0;
@@ -296,6 +298,6 @@ public class TransformerCycleKickoff {
                 canaryAnnouncer,
                 devSlicePublisher, devSliceAnnouncer,
                 hermesBlobAnnouncer,
-                new DataSlicerImpl(), uploadStatus, ctx.getConfig().getTransformerVip());
+                new SlicerFactory(), uploadStatus, ctx.getConfig().getTransformerVip());
     }
 }

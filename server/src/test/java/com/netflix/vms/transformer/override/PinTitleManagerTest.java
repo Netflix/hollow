@@ -1,26 +1,41 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.aws.file.FileStore;
+import com.google.inject.Inject;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
+import com.netflix.governator.guice.test.ModulesForTesting;
+import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
+import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.transformer.SimpleTransformerContext;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
 import com.netflix.vms.transformer.override.PinTitleManager.PinTitleProcessorJob;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
+
+@RunWith(GovernatorJunit4ClassRunner.class)
+@ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class PinTitleManagerTest {
-    private static final String BASE_PROXY = VMSInputDataClient.TEST_PROXY_URL;
     private static final String LOCAL_BLOB_STORE = "/space/title-pinning";
 
     private SimpleTransformerContext ctx;
     private PinTitleManager mgr;
+
+    @Inject
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private S3Direct s3Direct;
 
     @Before
     public void setup() {
@@ -29,7 +44,7 @@ public class PinTitleManagerTest {
     }
 
     private PinTitleManager createNewMgr() {
-        return Mockito.spy(new PinTitleManager(BASE_PROXY, "boson", "berlin", LOCAL_BLOB_STORE, ctx));
+        return Mockito.spy(new PinTitleManager(cinderConsumerBuilder, s3Direct, "vms-berlin", LOCAL_BLOB_STORE, false, ctx));
     }
 
     @Test
@@ -220,12 +235,7 @@ public class PinTitleManagerTest {
         }
 
         @Override
-        public String getVip() {
-            return null;
-        }
-
-        @Override
-        public File getFile(TYPE type, long version, int... topNodes) throws Exception {
+        public File getFile(String namespace, TYPE type, long version, int... topNodes) throws Exception {
             // TODO Auto-generated method stub
             return null;
         }
@@ -234,12 +244,6 @@ public class PinTitleManagerTest {
         public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
             // TODO Auto-generated method stub
             return null;
-        }
-
-        @Override
-        public void setPinTitleFileStore(FileStore pinTitleFileStore) {
-            // TODO Auto-generated method stub
-
         }
     }
 }

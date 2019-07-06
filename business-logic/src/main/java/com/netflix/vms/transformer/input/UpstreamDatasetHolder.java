@@ -1,21 +1,27 @@
 package com.netflix.vms.transformer.input;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.input.UpstreamDataset;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
+import com.netflix.vms.transformer.input.datasets.slicers.Gk2StatusDataSlicerImpl;
+import java.lang.reflect.Constructor;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UpstreamDatasetHolder {
+
+    public static final String INPUT_VERSION_KEY_PREFIX = "input.cinder.version.";
 
     private final Map<Dataset, UpstreamDataset> inputs;
 
@@ -23,15 +29,99 @@ public class UpstreamDatasetHolder {
         this.inputs = new ConcurrentHashMap<>();
     }
 
-    public static UpstreamDatasetHolder getNewDatasetHolder(Map<Dataset, InputState> inputs) {
+    /**
+     * Input datasets are enumerated here.
+     */
+    public enum Dataset {
+
+        CONVERTER(ConverterDataset.class, VMSHollowInputAPI.class, ConverterDataSlicerImpl.class),
+        GATEKEEPER2(Gatekeeper2Dataset.class, Gk2StatusAPI.class, Gk2StatusDataSlicerImpl.class);
+
+        private Class<? extends UpstreamDataset> upstream;
+        private Class<? extends HollowAPI> api;
+        private Class<? extends InputDataSlicer> slicer;
+        public static final Map<Dataset, String> PROD_INPUT_NAMESPACES = new EnumMap<>(Dataset.class);
+        public static final Map<Dataset, String> TEST_INPUT_NAMESPACES = new EnumMap<>(Dataset.class);
+
+        static {
+            PROD_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
+            PROD_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_prod");
+
+            TEST_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
+            TEST_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_test");
+        }
+
+        Dataset(Class<? extends UpstreamDataset> upstream, Class<? extends HollowAPI> api, Class<? extends InputDataSlicer> slicer) {
+            this.upstream = upstream;
+            this.api = api;
+            this.slicer = slicer;
+        }
+
+        public Class<? extends UpstreamDataset> getUpstream() {
+            return upstream;
+        }
+
+        public Class<? extends HollowAPI> getAPI() {
+            return api;
+        }
+
+        public Class<? extends InputDataSlicer> getSlicer() {
+            return slicer;
+        }
+    }
+
+    public static class UpstreamDatasetConfig {
+        public static Map<Dataset, String> getNamespaces() {
+            return getNamespacesforEnv(NetflixConfiguration.getEnvironmentEnum() == NetflixConfiguration.EnvironmentEnum.prod);
+        }
+
+        // For tooling that seeks test/prod data from dev boxes
+        public static Map<Dataset, String> getNamespacesforEnv(boolean isProd) {
+            if(isProd)
+                return Dataset.PROD_INPUT_NAMESPACES;
+            else
+                return Dataset.TEST_INPUT_NAMESPACES;
+        }
+
+        public static Dataset lookupDatasetForNamespace(String namespace, boolean isProd) {
+            final BiMap<Dataset, String> namespaces = HashBiMap.create(getNamespacesforEnv(isProd));
+            return namespaces.inverse().get(namespace);
+        }
+
+        /**
+         * Returns a the key used to identify input version attributes in the transformer output header and metadata.
+         * There is an entry for every Cinder input into the transformer. The key contains Cinder namespace which itself
+         * may contain dot characters.
+         * @param dataset The dataset for which input version attribute key is to be computed.
+         * @return input version attribute key. For eg.  "input.cinder.version.vmsconverter-muon".
+         */
+        public static String getInputVersionAttribute(Dataset dataset) {
+            return INPUT_VERSION_KEY_PREFIX + getNamespaces().get(dataset);
+        }
+    }
+
+    /**
+     * Returns a new {@code UpstreamDataHolder} containing inputs
+     */
+    public static UpstreamDatasetHolder getNewDatasetHolder(Map<Dataset, InputState> inputs) throws Exception {
 
         SimultaneousExecutor executor = new SimultaneousExecutor(Runtime.getRuntime().availableProcessors(), UpstreamDatasetHolder.class.getName());
 
         UpstreamDatasetHolder upstreamDatasetHolder = new UpstreamDatasetHolder();
-        executor.execute(() -> upstreamDatasetHolder.setDataset(CONVERTER, new ConverterDataset(inputs.get(CONVERTER))));
 
-        if (inputs.get(GATEKEEPER2) != null)
-            executor.execute(() -> upstreamDatasetHolder.setDataset(GATEKEEPER2, new Gatekeeper2Dataset(inputs.get(GATEKEEPER2))));
+        for (Dataset dataset : Dataset.values()) {
+            Class datasetClasz = dataset.getUpstream();
+            Constructor datasetConstructor = datasetClasz.getConstructor(new Class[]{InputState.class});
+            executor.execute(() -> {
+                try {
+                    if (inputs.get(dataset) != null) {
+                        upstreamDatasetHolder.setDataset(dataset, (UpstreamDataset) datasetConstructor.newInstance(inputs.get(dataset)));
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException("Unable to instantiate upstream data holder for input " + dataset);
+                }
+            });
+        }
 
         try {
             executor.awaitSuccessfulCompletion();
@@ -42,51 +132,6 @@ public class UpstreamDatasetHolder {
         return upstreamDatasetHolder;
     }
 
-    /**
-     * Input datasets are enumerated here. NOTE: some metadata attributes are computed based on calling toString() on these
-     * enumerators so avoid renaming these enumerators as changes won't be backwards compatible.
-     */
-    public enum Dataset {
-        CONVERTER,
-        GATEKEEPER2
-    }
-
-    public static class UpstreamDatasetConfig {
-        private static final Map<UpstreamDatasetHolder.Dataset, String> PROD_INPUT_NAMESPACES = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
-        private static final Map<UpstreamDatasetHolder.Dataset, String> TEST_INPUT_NAMESPACES = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
-        static {
-            PROD_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
-            PROD_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_prod");
-
-            TEST_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
-            TEST_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_test");
-        }
-
-        public static final Map<UpstreamDatasetHolder.Dataset, Class<? extends HollowAPI>> INPUT_APIS = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
-        static {
-            INPUT_APIS.put(CONVERTER, VMSHollowInputAPI.class);
-            INPUT_APIS.put(GATEKEEPER2, VMSHollowInputAPI.class);
-        }
-
-        public static Map<UpstreamDatasetHolder.Dataset, String> getNamespaces() {
-            if(NetflixConfiguration.getEnvironmentEnum() == NetflixConfiguration.EnvironmentEnum.prod)
-                return PROD_INPUT_NAMESPACES;
-            else
-                return TEST_INPUT_NAMESPACES;
-        }
-
-        /**
-         * Returns a string that is used as the key to create input version attributes in the transformer output header
-         * and metadata for all Cinder inputs.
-         * NOTE: the attribute is computed based on enumerators in the {@code Dataset} enum instead of namespace so that
-         * namespace changes are backwards compatible. The dot separator can not exist in the enum's enumerators.
-         * @param dataset The dataset for which input version attribute key is to be computed
-         * @return input version attribtue key. For eg.  "cinder.converter.input.version", "cinder.gatekeeper2.input.version", etc.
-         */
-        public static String getInputVersionAttribute(UpstreamDatasetHolder.Dataset dataset) {
-            return "cinder." + dataset.toString().toLowerCase() + ".input.version";
-        }
-    }
 
     public void setDataset(Dataset key, UpstreamDataset dataset) {
         this.inputs.put(key, dataset);

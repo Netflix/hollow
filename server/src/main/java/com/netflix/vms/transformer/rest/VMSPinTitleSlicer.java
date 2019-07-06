@@ -2,9 +2,10 @@ package com.netflix.vms.transformer.rest;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
@@ -12,7 +13,6 @@ import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleProcessor.TYPE;
-import com.netflix.vms.transformer.util.VMSProxyUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -43,12 +44,14 @@ import org.apache.commons.lang3.StringUtils;
 public class VMSPinTitleSlicer {
     private final Set<EnvironmentEnum> supportedEnvs = EnumSet.of(EnvironmentEnum.test);
     private final File localBlobStore;
-    private final FileStore fileStore;
+    private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+    private final S3Direct s3Direct;
     private final TransformerContext ctx;
 
     @Inject
-    public VMSPinTitleSlicer(FileStore fileStore) {
-        this.fileStore = fileStore;
+    public VMSPinTitleSlicer(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct) {
+        this.cinderConsumerBuilder = cinderConsumerBuilder;
+        this.s3Direct = s3Direct;
         ctx = new SimpleTransformerContext();
 
         localBlobStore = new File(System.getProperty("java.io.tmpdir"), "VMSPinTitleSlicer");
@@ -60,7 +63,7 @@ public class VMSPinTitleSlicer {
     public Response doGet(@Context HttpServletRequest req,
             @QueryParam("prod") boolean isProd,
             @QueryParam("output") boolean isOutput,
-            @QueryParam("vip") String vip,
+            @QueryParam("namespace") String namespace,
             @QueryParam("version") String versionStr,
             @QueryParam("topnodes") String topNodesStr) throws Exception, Throwable {
 
@@ -68,11 +71,11 @@ public class VMSPinTitleSlicer {
         EnvironmentEnum envEnum = NetflixConfiguration.getEnvironmentEnum();
         if (!supportedEnvs.contains(envEnum)) {
             return Response.status(Status.BAD_REQUEST)
-                    .entity(String.format("ERROR: Feature is not supported in %s - Supported envs:%s.  Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s", envEnum, supportedEnvs, isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore))
+                    .entity(String.format("ERROR: Feature is not supported in %s - Supported envs:%s.  Specified params[prod=%s, output=%s, namespace=%s, version=%s, topnodes=%s], localBlobStore=%s", envEnum, supportedEnvs, isProd, isOutput, namespace, versionStr, topNodesStr, localBlobStore))
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
-        } else if (StringUtils.isEmpty(vip) || StringUtils.isEmpty(topNodesStr) || versionStr == null) {
+        } else if (StringUtils.isEmpty(namespace) || StringUtils.isEmpty(topNodesStr) || versionStr == null) {
             return Response.status(Status.BAD_REQUEST)
-                    .entity(String.format("ERROR: vip, topnodes and version parameters are required. Specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s], localBlobStore=%s", isProd, isOutput, vip, versionStr, topNodesStr, localBlobStore))
+                    .entity(String.format("ERROR: namespace, topnodes and version parameters are required. Specified params[prod=%s, output=%s, namespace=%s, version=%s, topnodes=%s], localBlobStore=%s", isProd, isOutput, namespace, versionStr, topNodesStr, localBlobStore))
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
 
@@ -80,13 +83,13 @@ public class VMSPinTitleSlicer {
             // cleanup files older than 7 days or oldest files to keep the max temp files to 20
             long version = Long.parseLong(versionStr);
             int[] topNodes = PinTitleHelper.parseTopNodes(topNodesStr);
-            String proxyURL = VMSProxyUtil.getProxyURL(isProd);
 
             // Determine whether to process input or output data slicing
             TYPE type = isOutput ? TYPE.OUTPUT : TYPE.INPUT;
-            PinTitleProcessor processor = isOutput ? new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx) : new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore.getPath(), ctx);
-            processor.setPinTitleFileStore(fileStore);
-            File slicedFile = processor.getFile(type, version, topNodes);
+            PinTitleProcessor processor = isOutput ?
+                    new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx)
+                    : new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore.getPath(), isProd, ctx);
+            File slicedFile = processor.getFile(namespace, type, version, topNodes);
 
             if (!slicedFile.exists()) { // Perform slicing if it does not exists
                 synchronized (this) {
@@ -99,7 +102,7 @@ public class VMSPinTitleSlicer {
                     .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
         } catch (Exception ex) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, vip=%s, version=%s, topnodes=%s] - Make sure version and vip are valid. Exception=%s", isProd, isOutput, vip, versionStr, topNodesStr, ex))
+                    .entity(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, namespace=%s, version=%s, topnodes=%s] - Make sure version and namespace are valid. Exception=%s", isProd, isOutput, namespace, versionStr, topNodesStr, ex))
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
     }

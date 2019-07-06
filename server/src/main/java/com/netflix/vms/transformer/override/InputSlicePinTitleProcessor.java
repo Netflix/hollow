@@ -1,51 +1,53 @@
 package com.netflix.vms.transformer.override;
 
-import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.lookupDatasetForNamespace;
 
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.gutenberg.s3access.S3Direct;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
-import com.netflix.vms.transformer.SimpleTransformer;
-import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
-import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Generates Title Override based on Input Slice
- *
- * TODO: Remove this functionality.
  */
 public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
 
-    private final VMSInputDataClient inputDataClient;
+    private final HollowConsumer inputConsumer;
+    private final UpstreamDatasetHolder.Dataset dataset;
 
-    public InputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
-        super(vip, localBlobStore, ctx);
+    public InputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
+            String namespace, String localBlobStore, boolean isProd, TransformerContext ctx) {
+        super(builder, s3Direct, namespace, localBlobStore, Optional.of(isProd), ctx);
 
-        this.inputDataClient = new VMSInputDataClient(baseProxyURL, localBlobStore, vip);
+        this.dataset = lookupDatasetForNamespace(namespace, isProd);
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles,
+                "Created InputSlicePinTitleProcessor instance for dataset={} api={}", dataset, dataset.getAPI());
+
+        inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(builder, namespace, localBlobStore,
+                isProd, this.dataset.getAPI());
     }
 
     @Override
     public HollowReadStateEngine process(long inputDataVersion, int... topNodes) throws Throwable {
-        File localFile = performOutputSlice(inputDataVersion, topNodes);
-        return readStateEngine(localFile);
+        throw new UnsupportedOperationException("Performing output slice using input pinning is not supported");
     }
 
     @Override
     public File process(TYPE type, long dataVersion, int... topNodes) throws Throwable {
         switch (type) {
             case OUTPUT:
-                return performOutputSlice(dataVersion, topNodes);
+                throw new UnsupportedOperationException("Performing output slice using input pinning is not supported");
             case INPUT:
                 return performInputSlice(dataVersion, topNodes);
             default:
@@ -53,44 +55,34 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
         }
     }
 
-    private File performOutputSlice(long inputDataVersion, int... topNodes) throws Exception, Throwable {
-        File localFile = getFile(TYPE.OUTPUT, inputDataVersion, topNodes);
-        if (!localFile.exists()) {
-            File slicedFile = performInputSlice(inputDataVersion, topNodes);
-            HollowReadStateEngine inputStateEngineSlice = readStateEngine(slicedFile);
+    // loads slice of one input
+    private File performInputSlice(Long inputDataVersion, int... topNodes) throws Exception {
+        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles,
+                "Slicing input file for namespace={} version={}", namespace, inputDataVersion);
 
-            VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
-
-            Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
-            inputs.put(CONVERTER, new InputState(inputStateEngineSlice, inputDataVersion));   // TODO: Add all Cinder inputs
-            CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
-
-            new SimpleTransformer(cycleInputs, outputStateEngine, ctx).transform();
-
-            String blobID = PinTitleHelper.createBlobID("i", inputDataVersion, topNodes);
-            writeStateEngine(outputStateEngine, localFile, blobID, inputDataVersion, topNodes);
-        }
-        return localFile;
-    }
-
-    private File performInputSlice(Long inputDataVersion, int... topNodes) throws Exception, IOException {
-        File slicedFile = getFile(TYPE.INPUT, inputDataVersion, topNodes);
+        File slicedFile = getFile(namespace, TYPE.INPUT, inputDataVersion, topNodes);
         if (!slicedFile.exists()) {
             long start = System.currentTimeMillis();
             HollowReadStateEngine inputStateEngine = readInputData(inputDataVersion);
 
-            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, topNodes);
-            HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
+            if (dataset.getSlicer() == null) {
+                throw new UnsupportedOperationException("Input slicer missing for namespace= " + namespace);
+            }
 
-            String blobID = PinTitleHelper.createBlobID("sliced_input", inputDataVersion, topNodes);
+            InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, 0, topNodes);
+            HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputStateEngine);
+
+            String blobID = PinTitleHelper.createBlobID("sliced_input_" + namespace, inputDataVersion, topNodes);
             writeStateEngine(slicedStateEngine, slicedFile, blobID, inputDataVersion, topNodes);
-            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[INPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, inputDataVersion, (System.currentTimeMillis() - start));
+            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles,
+                    "Sliced[INPUT] videoId={} from namespace={}, version={}, duration={}",
+                    Arrays.toString(topNodes), namespace, inputDataVersion, (System.currentTimeMillis() - start));
         }
         return slicedFile;
     }
 
-    private HollowReadStateEngine readInputData(long inputDataVersion) throws IOException {
-        inputDataClient.triggerRefreshTo(inputDataVersion);
-        return inputDataClient.getStateEngine();
+    private HollowReadStateEngine readInputData(long inputDataVersion) {
+        inputConsumer.triggerRefreshTo(inputDataVersion);
+        return inputConsumer.getStateEngine();
     }
 }

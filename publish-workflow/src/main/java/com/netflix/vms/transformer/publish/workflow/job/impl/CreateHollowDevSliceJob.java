@@ -12,8 +12,10 @@ import com.netflix.hollow.core.util.IntList;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.cassandra.TransformerCassandraColumnFamilyHelper;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.vms.transformer.common.slice.OutputDataSlicer;
 import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobFileNamer;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
@@ -37,17 +39,17 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 public class CreateHollowDevSliceJob extends CreateDevSliceJob {
 
     private final HollowBlobDataProvider dataProvider;
-    private final DataSlicer dataSlicer;
+    private final SlicerFactory slicerFactory;
     private final String sliceVip;
     CycleInputs cycleInputs;
     private final HollowProducer.Publisher publisher;
     private final HollowProducer.Announcer announcer;
     
     public CreateHollowDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency, HollowBlobDataProvider dataProvider,
-            DataSlicer dataSlicer, CycleInputs cycleInputs, long currentCycleId) {
+            SlicerFactory slicerFactory, CycleInputs cycleInputs, long currentCycleId) {
         super(ctx, dependency, currentCycleId);
         this.dataProvider = dataProvider;
-        this.dataSlicer = dataSlicer;
+        this.slicerFactory = slicerFactory;
         this.cycleInputs = cycleInputs;
         this.sliceVip = HermesTopicProvider.getDevSliceTopic(ctx.getVip());
         this.publisher = ctx.getDevSlicePublisher();
@@ -78,8 +80,8 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
     }
 
     private HollowWriteStateEngine createSlice() throws ConnectionException {
-        DataSlicer.SliceTask sliceTask = dataSlicer.getSliceTask(0, getTopNodeIdsToInclude());
-        HollowWriteStateEngine sliceOutputBlob = sliceTask.sliceOutputBlob(dataProvider.getStateEngine());
+        OutputDataSlicer dataSlicer = slicerFactory.getOutputDataSlicer(0, getTopNodeIdsToInclude());
+        HollowWriteStateEngine sliceOutputBlob = dataSlicer.sliceOutputBlob(dataProvider.getStateEngine());
         return sliceOutputBlob;
     }
 
@@ -143,7 +145,14 @@ public class CreateHollowDevSliceJob extends CreateDevSliceJob {
         BlobMetaDataUtil.addAttribute(att, "toVersion", String.valueOf(getCycleVersion()));
         
         BlobMetaDataUtil.addAttribute(att, "converterVip", ctx.getConfig().getConverterVip());
-        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(cycleInputs.getInputs().get(CONVERTER).getVersion()));
+
+        BlobMetaDataUtil.addAttribute(att, "inputVersion", String.valueOf(cycleInputs.getInputs().get(CONVERTER).getVersion()));    // for backwards compatibility
+
+        // input version attributes for all inputs
+        cycleInputs.getInputs().forEach(
+                (k, v) -> BlobMetaDataUtil.addAttribute(att, UpstreamDatasetHolder.UpstreamDatasetConfig.getInputVersionAttribute(k),
+                        String.valueOf(v.getVersion())));
+
         BlobMetaDataUtil.addAttribute(att, "publishCycleDataTS", String.valueOf(ctx.getNowMillis()));
 
         return att;

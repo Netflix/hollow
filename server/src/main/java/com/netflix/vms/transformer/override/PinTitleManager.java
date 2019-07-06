@@ -1,7 +1,8 @@
 package com.netflix.vms.transformer.override;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -14,42 +15,47 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 /**
  * Manager to support Pinned Titles
- *
- * @author dsu
  */
 public class PinTitleManager {
-    private String proxyURL;
-    private String inputDataVip;
-    private String outputDataVip;
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+    private S3Direct s3Direct;
+    private final boolean proxySet;
+    private String outputNamespace;
 
     private final String localBlobStore;
+    private final Optional<Boolean> isProd;
     private final TransformerContext ctx;
-    private final FileStore fileStore;
 
     private final SimultaneousExecutor mainExecutor = new SimultaneousExecutor(getClass(), "pin-title-jobs");
-    private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
-    private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
-    private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<PinTitleJobSpec, PinTitleProcessorJob>();
+    private Map<PinTitleJobSpec, PinTitleProcessorJob> completedJobs = new HashMap<>();
+    private Map<PinTitleJobSpec, PinTitleProcessorJob> failedJobs = new HashMap<>();
+    private Map<PinTitleJobSpec, PinTitleProcessorJob> activeJobs = new HashMap<>();
 
-    public PinTitleManager(FileStore fileStore, TransformerContext ctx) {
-        this.fileStore = fileStore;
+    public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, TransformerContext ctx) {
+        this.cinderConsumerBuilder = cinderConsumerBuilder;
+        this.s3Direct = s3Direct;
         this.localBlobStore = null;
+        this.isProd = null;
         this.ctx = ctx;
+        this.proxySet = false;
     }
 
-    public PinTitleManager(String proxyURL, String inputDataVip, String outputDataVip, String localBlobStore, TransformerContext ctx) {
-        this.fileStore = null;
+    public PinTitleManager(Supplier<CinderConsumerBuilder> cinderConsumerBuilder, S3Direct s3Direct, String outputNamespace,
+            String localBlobStore, boolean isProd, TransformerContext ctx) {
+        this.cinderConsumerBuilder = cinderConsumerBuilder;
+        this.s3Direct = s3Direct;
         this.localBlobStore = localBlobStore;
+        this.isProd = Optional.of(isProd);
         this.ctx = ctx;
-
-        this.proxyURL = proxyURL;
-        this.inputDataVip = inputDataVip;
-        this.outputDataVip = outputDataVip;
+        this.proxySet = true;
+        this.outputNamespace = outputNamespace;
     }
 
     public synchronized void prepareForNextCycle() {
@@ -183,12 +189,7 @@ public class PinTitleManager {
         String parts[] = spec.split(":");
         long version = Long.parseLong(parts[0].trim());
         int[] topNodes = parseTopNodes(parts[1]);
-        boolean isInputBased = false;
-        if (parts.length >= 3) {
-            isInputBased = "in".equals(parts[2]);
-        }
-
-        PinTitleJobSpec jobSpec = new PinTitleJobSpec(isInputBased, version, topNodes);
+        PinTitleJobSpec jobSpec = new PinTitleJobSpec(version, topNodes);
         return jobSpec;
     }
 
@@ -237,12 +238,7 @@ public class PinTitleManager {
     // Create Job
     @VisibleForTesting
     PinTitleProcessorJob createNewProcessJob(PinTitleJobSpec jobSpec) {
-        PinTitleProcessor processor;
-        if (jobSpec.isInputBased) {
-            processor = createInputBasedProcessor();
-        } else {
-            processor = createOutputBasedProcessor();
-        }
+        PinTitleProcessor processor = createOutputBasedProcessor();
 
         return new PinTitleProcessorJob(processor, jobSpec, ctx, new CompleteJobCallback() {
             @Override
@@ -258,21 +254,14 @@ public class PinTitleManager {
         });
     }
 
-    // Create Input Based Processor
-    @VisibleForTesting
-    PinTitleProcessor createInputBasedProcessor() {
-        String vip = inputDataVip != null ? inputDataVip : ctx.getConfig().getConverterVip();
-        return new InputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
-    }
-
     // Create Output Based Processor
     @VisibleForTesting
     PinTitleProcessor createOutputBasedProcessor() {
-        String vip = outputDataVip != null ? outputDataVip : VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig());
-        if (fileStore != null) {
-            return new OutputSlicePinTitleProcessor(vip, fileStore, localBlobStore, ctx);
-        } else {
-            return new OutputSlicePinTitleProcessor(vip, proxyURL, localBlobStore, ctx);
+        String namespace = outputNamespace != null ? outputNamespace : ("vms-" + VipNameUtil.getPinTitleDataTransformerVip(ctx.getConfig()));
+        if (proxySet == false) { // Used in transformer deployments
+            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, ctx);
+        } else {    // Used in tooling run by devs
+            return new OutputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct, namespace, localBlobStore, isProd.get(), ctx);
         }
     }
 
@@ -331,8 +320,8 @@ public class PinTitleManager {
             } catch (Throwable ex) {
                 status = JobStatus.COMPLETED_FAIL;
                 String topNodes = Arrays.toString(jobSpec.topNodes);
-                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={} and vip={}", topNodes, jobSpec.version, processor.getVip(), ex);
-                failure = new Exception("Failed to process topNodes=" + topNodes + " for version=" + jobSpec.version + " on vip=" + processor.getVip(), ex);
+                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to process override topNodes={} for version={}", topNodes, jobSpec.version, ex);
+                failure = new Exception("Failed to process topNodes=" + topNodes + " for version=" + jobSpec.version, ex);
             } finally {
                 callback.completedJob(jobSpec, this, isCompletedSuccessfully());
             }

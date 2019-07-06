@@ -59,7 +59,7 @@
    *  `foreach` method which traverses all the
    *  elements contained in the collection, applying a given function to each.
    *  They also need to provide a method `newBuilder`
-   *  which creates a builder for collections of the same kind.
+   *  which creates a cinderConsumerBuilder for collections of the same kind.
    *  
    *  A traversable class might or might not have two properties: strictness
    *  and orderedness. Neither is represented as a type.
@@ -125,7 +125,7 @@
      */
     protected[this] def toCollection(repr: Repr): Traversable[A] = repr.asInstanceOf[Traversable[A]]
 
-    /** Creates a new builder for this collection type.
+    /** Creates a new cinderConsumerBuilder for this collection type.
      */
     protected[this] def newBuilder: Builder[A, Repr]
 
@@ -476,7 +476,7 @@
 
     def slice(from: Int, until: Int): Repr = sliceWithKnownBound(math.max(from, 0), until)
 
-    // Precondition: from >= 0, until > 0, builder already configured for building.
+    // Precondition: from >= 0, until > 0, cinderConsumerBuilder already configured for building.
     private[this] def sliceInternal(from: Int, until: Int, b: Builder[A, Repr]): Repr = {
       var i = 0
       breakable {

@@ -1,37 +1,38 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.gutenberg.s3access.S3Direct;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.input.VMSOutputDataClient;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import com.netflix.vms.transformer.consumer.VMSOutputDataConsumer;
+import com.netflix.vms.transformer.input.datasets.slicers.TransformerOutputDataSlicer;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Generates Title Override based on Output Slice
- *
- * @author dsu
  */
 public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
-    private final VMSOutputDataClient outputDataClient;
+    private final HollowConsumer outputDataConsumer;
 
-    public OutputSlicePinTitleProcessor(String vip, FileStore fileStore, String localBlobStore, TransformerContext ctx) {
-        super(vip, localBlobStore, ctx);
-
-        this.outputDataClient = new VMSOutputDataClient(fileStore, vip);
+    public OutputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
+            String namespace, TransformerContext ctx) {
+        super(builder, s3Direct, namespace, null, null, ctx);
+        this.outputDataConsumer = VMSOutputDataConsumer.getNewConsumer(builder, namespace);
     }
 
-    public OutputSlicePinTitleProcessor(String vip, String baseProxyURL, String localBlobStore, TransformerContext ctx) {
-        super(vip, localBlobStore, ctx);
-
-        this.outputDataClient = new VMSOutputDataClient(baseProxyURL, localBlobStore, vip);
+    public OutputSlicePinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct s3Direct,
+            String namespace, String localBlobStore, boolean isProd, TransformerContext ctx) {
+        super(builder, s3Direct, namespace, localBlobStore, Optional.of(isProd), ctx);
+        this.outputDataConsumer = VMSOutputDataConsumer.getNewProxyConsumer(builder, namespace, isProd);
     }
 
     @Override
@@ -51,22 +52,22 @@ public class OutputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
     }
 
     private File performOutputSlice(long version, int... topNodes) throws Exception {
-        File localFile = getFile(TYPE.OUTPUT, version, topNodes);
+        File localFile = getFile(namespace, TYPE.OUTPUT, version, topNodes);
         if (!localFile.exists()) {
             long start = System.currentTimeMillis();
-            outputDataClient.triggerRefreshTo(version);
+            outputDataConsumer.triggerRefreshTo(version);
 
             Set<String> excludedTypes = new HashSet<>();
             for (OutputTypeConfig type : OutputTypeConfig.FASTLANE_EXCLUDED_TYPES) {
                 excludedTypes.add(type.getType());
             }
 
-            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(excludedTypes, false, 0, topNodes);
-            HollowWriteStateEngine slicedStateEngine = slicer.sliceOutputBlob(outputDataClient.getStateEngine());
+            TransformerOutputDataSlicer transformerOutputDataSlicer = new TransformerOutputDataSlicer(excludedTypes, false, 0, topNodes);
+            HollowWriteStateEngine slicedStateEngine = transformerOutputDataSlicer.sliceOutputBlob(outputDataConsumer.getStateEngine());
 
             String blobID = PinTitleHelper.createBlobID("o", version, topNodes);
             writeStateEngine(slicedStateEngine, localFile, blobID, version, topNodes);
-            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[OUTPUT] videoId={} from vip={}, version={}, duration={}", Arrays.toString(topNodes), vip, version, (System.currentTimeMillis() - start));
+            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Sliced[OUTPUT] videoId={} from namespace={}, version={}, duration={}", Arrays.toString(topNodes), namespace, version, (System.currentTimeMillis() - start));
         }
         return localFile;
     }

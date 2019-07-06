@@ -74,7 +74,7 @@ public class VideoHierarchyTest {
     }
 
     @Test
-    public void testExcludedFromVideoGeneral_episode() {
+    public void testExcludedFromVideoGeneral_episode() throws Exception {
         VideoHierarchy hierarchy = getVideoHierarchy(createConverterReadStateEngine(S1E1));
         assertArrayEquals("Should have all seasons", new int[]{S1, S2}, hierarchy.getSeasonIds());
         assertArrayEquals("Season 1 should have one episode", new int[]{S1E2},
@@ -87,7 +87,7 @@ public class VideoHierarchyTest {
                 new HashSet<>(Arrays.asList(S1E1, S1E1SUP1, S1E1SUP2)), hierarchy.getDroppedIds());
     }
     @Test
-    public void testExcludedFromVideoGeneral_season() {
+    public void testExcludedFromVideoGeneral_season() throws Exception {
         VideoHierarchy hierarchy = getVideoHierarchy(createConverterReadStateEngine(S2));
         assertArrayEquals("Should have Season 1", new int[]{S1}, hierarchy.getSeasonIds());
         assertArrayEquals("Season 1 should have two episodes", new int[]{S1E1, S1E2},
@@ -99,7 +99,7 @@ public class VideoHierarchyTest {
     }
 
     @Test
-    public void testExcludedFromVideoGeneral_supplemental() {
+    public void testExcludedFromVideoGeneral_supplemental() throws Exception {
         VideoHierarchy hierarchy = getVideoHierarchy(createConverterReadStateEngine(S1E1SUP1));
         assertArrayEquals("Should have all seasons", new int[]{S1, S2}, hierarchy.getSeasonIds());
         assertArrayEquals("Season 1 should have two episodes", new int[]{S1E1, S1E2},
@@ -165,7 +165,7 @@ public class VideoHierarchyTest {
         return data.build();
     }
 
-    private VideoHierarchy getVideoHierarchy(HollowReadStateEngine readStateEngine) {
+    private VideoHierarchy getVideoHierarchy(HollowReadStateEngine readStateEngine) throws Exception {
         VMSTransformerIndexer indexer = new VMSTransformerIndexer(readStateEngine, mockContext);
 
         Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();

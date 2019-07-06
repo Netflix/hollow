@@ -1,6 +1,6 @@
 package com.netflix.vms.transformer.testutil.migration;
 
-import static com.netflix.vms.transformer.input.VMSInputDataClient.PROD_PROXY_URL;
+import static com.netflix.vms.transformer.consumer.VMSInputDataConsumer.PROD_PROXY_URL;
 
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
@@ -184,7 +184,7 @@ public class RollingDiff {
     private void downloadNewPipelineInput() throws IOException {
         File dir = new File(WORKING_DIR, "rolling-diff");
         HollowBlobHeader header = new HollowBlobHeaderReader().readHeader(new LZ4BlockInputStream(new FileInputStream(new File(dir, "newpipeline-snapshot"))));
-        String inputVersionId = header.getHeaderTags().get("sourceDataVersion");
+        String inputVersionId = header.getHeaderTags().get("sourceDataVersion");    // TODO: Add all Cinder inputs
 
         InputStream is = HttpHelper.getInputStream(PROD_PROXY_URL + "/" + "filestore-download?keybase=" + new VMSInputDataKeybaseBuilder(CONTROL_PIPELINE_VIP).getSnapshotKeybase() + "&version=" + inputVersionId);
         FileOutputStream fos = new FileOutputStream(new File(dir, "input-snapshot"));

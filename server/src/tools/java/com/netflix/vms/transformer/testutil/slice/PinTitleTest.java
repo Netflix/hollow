@@ -2,12 +2,22 @@ package com.netflix.vms.transformer.testutil.slice;
 
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.CyclePinnedTitles;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.UpstreamDatasetConfig.getNamespacesforEnv;
 
+import com.google.inject.Inject;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
+import com.netflix.governator.guice.test.ModulesForTesting;
+import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
+import com.netflix.gutenberg.s3access.S3Direct;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.util.HollowWriteStateCreator;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
+import com.netflix.runtime.lifecycle.RuntimeCoreModule;
 import com.netflix.vms.generated.notemplate.GlobalVideoHollow;
 import com.netflix.vms.generated.notemplate.VMSRawHollowAPI;
 import com.netflix.vms.transformer.SimpleTransformer;
@@ -15,17 +25,17 @@ import com.netflix.vms.transformer.SimpleTransformerContext;
 import com.netflix.vms.transformer.VMSTransformerWriteStateEngine;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.input.InputState;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
 import com.netflix.vms.transformer.override.PinTitleManager;
 import com.netflix.vms.transformer.publish.workflow.IndexDuplicateChecker;
 import com.netflix.vms.transformer.testutil.migration.ShowMeTheProgressDiffTool;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,24 +52,35 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(GovernatorJunit4ClassRunner.class)
+@ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class PinTitleTest {
-    private static final String LOCAL_BLOB_STORE = "/space/title-pinning";
 
-    private Environment env = Environment.PROD;
+    private static final String LOCAL_BLOB_STORE = System.getProperty("java.io.tmpdir");
+
+    boolean isProd = false;
     private static boolean reuseSliceFiles = true;
+
+    @Inject
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
+
+    @Inject
+    private S3Direct s3Direct;
+
 
     @Test
     public void testTitlePinning() throws Throwable {
-        final String CONVERTER_VIP = "muon";
-        final String TRANSFORMER_VIP = "feather";
-        final long version = 20180205231304559L;
-        final int PINTITLE_ID = 80167498;
-        final int FASTLANE_ID = 80049872;
+        final String OUTPUT_NAMESPACE = "vms-feather";
+        final long version = 20190621163134023L;
+        final int PINTITLE_ID = 80066080;
+        final int FASTLANE_ID = 80133542;
 
         int[] fastlaneIds = new int[] { FASTLANE_ID };
         Set<String> pinTitleSpecs = Collections.singleton(String.format("%s:%s", version, PINTITLE_ID));
@@ -67,18 +88,23 @@ public class PinTitleTest {
         ctx.setFastlaneIds(toSet(fastlaneIds));
         ctx.setPinTitleSpecs(pinTitleSpecs);
 
-        final long converterVersion = 20180205231110642L;
-        // Fetch Input State Engine
-        HollowReadStateEngine inputStateEngine = fetchInputStateEngine(CONVERTER_VIP, converterVersion, FASTLANE_ID, PINTITLE_ID);
+        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
+        inputVersions.put(CONVERTER, 20190628000703051L);
+        inputVersions.put(GATEKEEPER2, 20190620023818465L);
 
         {
-            PinTitleManager mgr = new PinTitleManager(env.proxyURL, CONVERTER_VIP, TRANSFORMER_VIP, LOCAL_BLOB_STORE, ctx);
+            PinTitleManager mgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, OUTPUT_NAMESPACE,
+                    LOCAL_BLOB_STORE, isProd, ctx);
             mgr.submitJobsToProcessASync(pinTitleSpecs);
 
             final VMSTransformerWriteStateEngine fastlaneOutput = new VMSTransformerWriteStateEngine();
 
             Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
-            inputs.put(CONVERTER, new InputState(inputStateEngine, converterVersion));   // TODO: Add all Cinder inputs
+            for (UpstreamDatasetHolder.Dataset dataset : getNamespacesforEnv(isProd).keySet()) {
+                // Fetch Input State Engine
+                HollowReadStateEngine inputStateEngine = fetchInputStateEngine(dataset, inputVersions.get(dataset), FASTLANE_ID, PINTITLE_ID);
+                inputs.put(dataset, new InputState(inputStateEngine, inputVersions.get(dataset)));
+            }
             CycleInputs cycleInputs = new CycleInputs(inputs, 1l);
 
             SimpleTransformer transformer = new SimpleTransformer(cycleInputs, fastlaneOutput, ctx);
@@ -125,23 +151,23 @@ public class PinTitleTest {
         return readEngine;
     }
 
-    private HollowReadStateEngine fetchInputStateEngine(String converterVip, long version, int... specificTopNodeIdsToInclude) throws Exception {
+    private HollowReadStateEngine fetchInputStateEngine(UpstreamDatasetHolder.Dataset dataset, long version, int... specificTopNodeIdsToInclude) throws Exception {
         boolean isSlicing = specificTopNodeIdsToInclude != null && specificTopNodeIdsToInclude.length > 0;
 
-        String filename = createFileName("input", converterVip, version, specificTopNodeIdsToInclude);
-        File blobFile = env.localBlobStore().resolve(filename).toFile();
+        String filename = createFileName("input", getNamespacesforEnv(isProd).get(dataset), version, specificTopNodeIdsToInclude);
+        File blobFile = localBlobStore(isProd).resolve(filename).toFile();
         if (blobFile.exists() && !reuseSliceFiles) blobFile.delete();
         if (blobFile.exists()) return readStateEngine(blobFile);
 
-        VMSInputDataClient client = new VMSInputDataClient(env.proxyURL(), env.localBlobStore().toString(), converterVip);
-        client.triggerRefreshTo(version);
+        HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder, getNamespacesforEnv(isProd).get(dataset),
+                localBlobStore(isProd).toString(), isProd, dataset.getAPI());
+        inputConsumer.triggerRefreshTo(version);
         HollowWriteStateEngine writeStateEngine = null;
         if (isSlicing) {
-            DataSlicer.SliceTask slicer = new DataSlicerImpl().getSliceTask(0, specificTopNodeIdsToInclude);
-            writeStateEngine = slicer.sliceInputBlob(client.getStateEngine());
+            InputDataSlicer slicer = new SlicerFactory().getInputDataSlicer(dataset, 0, specificTopNodeIdsToInclude);
+            writeStateEngine = slicer.sliceInputBlob(inputConsumer.getStateEngine());
         } else {
-            client.triggerRefreshTo(version);
-            writeStateEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(client.getStateEngine());
+            writeStateEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(inputConsumer.getStateEngine());
         }
 
         writeStateEngine(writeStateEngine, blobFile);
@@ -162,7 +188,7 @@ public class PinTitleTest {
 
     private HollowReadStateEngine transform(String name, TransformerContext ctx, VMSHollowInputAPI api, long version, int... specificTopNodeIdsToInclude) throws Throwable {
         String filename = createFileName("output", name, version, specificTopNodeIdsToInclude);
-        File blobFile = env.localBlobStore().resolve(filename).toFile();
+        File blobFile = localBlobStore(isProd).resolve(filename).toFile();
 
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
         Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new HashMap<>();
@@ -264,29 +290,13 @@ public class PinTitleTest {
                 + "\n\t extra   - (" + extra.size() + ") : " + extra);
     }
 
-    private static enum Environment {
-        TEST("http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-test"), PROD("http://discovery.cloud.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-prod");
-
-        private final String proxyURL;
-
-        private Environment(String proxyURL) {
-            this.proxyURL = proxyURL;
-        }
-
-        String proxyURL() {
-            return proxyURL;
-        }
-
-        Path localBlobStore() {
-            try {
-                Path path = Paths.get(LOCAL_BLOB_STORE, name().toLowerCase());
-                Files.createDirectories(path);
-                return path;
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+    private Path localBlobStore(boolean isProd) {
+        try {
+            Path path = Paths.get(LOCAL_BLOB_STORE, (isProd ? "PROD" : "TEST").toLowerCase());
+            Files.createDirectories(path);
+            return path;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
-
-    // ------
 }

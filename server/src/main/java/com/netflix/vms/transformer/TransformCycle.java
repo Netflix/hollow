@@ -20,8 +20,10 @@ import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CO
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
 import com.netflix.cinder.producer.CinderProducerBuilder;
 import com.netflix.gutenberg.GutenbergException;
+import com.netflix.gutenberg.s3access.S3Direct;
 import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.hollow.api.producer.Status;
@@ -120,7 +122,9 @@ public class TransformCycle {
     public TransformCycle(TransformerContext ctx, Map<UpstreamDatasetHolder.Dataset, HollowConsumer> inputConsumers,
             FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer, PublishWorkflowStager publishStager,
             String transformerVip,
-            Supplier<CinderProducerBuilder> cinderBuilder) {
+            Supplier<CinderProducerBuilder> cinderProducerBuilder,
+            Supplier<CinderConsumerBuilder> cinderConsumerBuilder,
+            S3Direct s3Direct) {
         this.ctx = ctx;
         this.versionMinter = new SequenceVersionMinter();
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
@@ -133,7 +137,7 @@ public class TransformCycle {
         this.headerPopulator = new TransformerOutputBlobHeaderPopulator(ctx);
         this.publishWorkflowStager = publishStager;
         this.followVipPinExtractor = new FollowVipPinExtractor(fileStore);
-        this.pinTitleMgr = new PinTitleManager(fileStore, ctx);
+        this.pinTitleMgr = new PinTitleManager(cinderConsumerBuilder, s3Direct, ctx);
         this.timeSinceLastPublishGauge = new TransformerTimeSinceLastPublishGauge();
         this.cycleMonkey = ctx.getCycleMonkey();
 
@@ -193,7 +197,7 @@ public class TransformCycle {
             });
             String cinderVip = ctx.getConfig().getTransformerVip();
             String cinderOutputNamespace = "vms-" + cinderVip;
-            CinderProducerBuilder producerBuilder = cinderBuilder.get()
+            CinderProducerBuilder producerBuilder = cinderProducerBuilder.get()
                     .withSnapshotPublishExecutor(produceExecutor)
                     .forNamespace(cinderOutputNamespace)
                     .withVersionMinter(mainVersion::getAsLong)
@@ -208,7 +212,7 @@ public class TransformCycle {
             String nostreamsCinderVip = cinderVip + "_nostreams";
             String cinderNostreamsOutputNamespace = "vms-" + nostreamsCinderVip;
 
-            CinderProducerBuilder noStreamsProducerBuilder = cinderBuilder.get()
+            CinderProducerBuilder noStreamsProducerBuilder = cinderProducerBuilder.get()
                     .withSnapshotPublishExecutor(produceExecutor)
                     .forNamespace(cinderNostreamsOutputNamespace)
                     .withVersionMinter(mainVersion::getAsLong)

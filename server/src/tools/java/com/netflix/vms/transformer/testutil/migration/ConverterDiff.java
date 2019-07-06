@@ -1,16 +1,24 @@
 package com.netflix.vms.transformer.testutil.migration;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static java.lang.String.format;
 
+import com.google.inject.Inject;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.cinder.lifecycle.CinderConsumerModule;
+import com.netflix.governator.guice.test.ModulesForTesting;
+import com.netflix.governator.guice.test.junit4.GovernatorJunit4ClassRunner;
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.diff.ui.jetty.HollowDiffUIServer;
 import com.netflix.hollow.tools.diff.HollowDiff;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
-import com.netflix.vms.transformer.input.VMSInputDataClient;
-import com.netflix.vms.transformer.util.slice.DataSlicerImpl;
+import com.netflix.runtime.lifecycle.RuntimeCoreModule;
+import com.netflix.vms.transformer.common.slice.InputDataSlicer;
+import com.netflix.vms.transformer.consumer.VMSInputDataConsumer;
+import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,14 +26,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Supplier;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
-
+@RunWith(GovernatorJunit4ClassRunner.class)
+@ModulesForTesting({CinderConsumerModule.class, RuntimeCoreModule.class})
 public class ConverterDiff {
     private static final String LOCAL_BLOB_STORE = "/space/local-blob-store";
     private static final int TARGET_NUMBER_OF_TOPNODES = 1000;
@@ -33,8 +44,11 @@ public class ConverterDiff {
     private static HollowDiffUIServer server;
     private static boolean reuseSliceFiles;
 
-    private Environment env;
-    private DataSlicer.SliceTask slicer;
+    private boolean isProd;
+    private InputDataSlicer slicer;
+
+    @Inject
+    private Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
 
     @BeforeClass
     public static void createServer() throws Exception {
@@ -45,8 +59,8 @@ public class ConverterDiff {
 
     @Before
     public void setUp() {
-        env = Environment.TEST;
-        slicer = new DataSlicerImpl().getSliceTask(TARGET_NUMBER_OF_TOPNODES);
+        isProd = false;
+        slicer = new ConverterDataSlicerImpl(TARGET_NUMBER_OF_TOPNODES);
     }
 
     @AfterClass
@@ -57,19 +71,21 @@ public class ConverterDiff {
     @Test
     public void pr61_converterCodeCleanup() throws Exception {
         String name = "pr61";
-        HollowReadStateEngine from = slice(name, "muon", 20170315214609500L);
-        HollowReadStateEngine to = slice(name, "pr61", 20170315215144811L);
+        HollowReadStateEngine from = slice(name, "vmsconverter-muon", 20170315214609500L);
+        HollowReadStateEngine to = slice(name, "vmsconverter-pr61", 20170315215144811L);
 
         server.addDiff(name, createDiff(from, to));
     }
 
-    private HollowReadStateEngine slice(String diff, String converterVip, long version) throws IOException {
-        File sliceFile = env.localBlobStore().resolve(format("vms.%s-%s_sliced-%d", converterVip, diff, version)).toFile();
+    private HollowReadStateEngine slice(String diff, String converterNamespace, long version) throws IOException {
+        File sliceFile = localBlobStore(isProd).resolve(format("vms.%s-%s_sliced-%d", converterNamespace, diff, version)).toFile();
         if(sliceFile.exists() && !reuseSliceFiles) sliceFile.delete();
         if(!sliceFile.exists()) {
-            VMSInputDataClient client = new VMSInputDataClient(env.proxyURL(), env.localBlobStore().toString(), converterVip);
-            client.triggerRefreshTo(version);
-            HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(client.getStateEngine());
+            HollowConsumer inputConsumer = VMSInputDataConsumer.getNewProxyConsumer(cinderConsumerBuilder,
+                    converterNamespace, localBlobStore(isProd).toString(), isProd, CONVERTER.getAPI());
+            inputConsumer.triggerRefreshTo(version);
+
+            HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputConsumer.getStateEngine());
             writeStateEngineSlice(slicedStateEngine, sliceFile);
         }
         return readStateEngineSlice(sliceFile);
@@ -345,28 +361,13 @@ public class ConverterDiff {
         return diff;
     }
 
-    private static enum Environment {
-        TEST("http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-test"),
-        PROD("http://us-west-2.discoveryprod.netflix.net:7001/discovery/resolver/cluster/vmshollowloaderblobproxy-vmstools-west-prod");
-
-        private final String proxyURL;
-
-        private Environment(String proxyURL) {
-            this.proxyURL = proxyURL;
-        }
-
-        String proxyURL() {
-            return proxyURL;
-        }
-
-        Path localBlobStore() {
-            try {
-                Path path = Paths.get(LOCAL_BLOB_STORE, name().toLowerCase());
-                Files.createDirectories(path);
-                return path;
-            } catch(IOException ex) {
-                throw new RuntimeException(ex);
-            }
+    private Path localBlobStore(boolean isProd) {
+        try {
+            Path path = Paths.get(LOCAL_BLOB_STORE, (isProd ? "PROD" : "TEST").toLowerCase());
+            Files.createDirectories(path);
+            return path;
+        } catch(IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 }

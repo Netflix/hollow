@@ -6,8 +6,8 @@ import com.netflix.hollow.api.producer.HollowProducer.Announcer;
 import com.netflix.hollow.api.producer.HollowProducer.Publisher;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.publish.workflow.PublicationJob;
-import com.netflix.vms.transformer.common.slice.DataSlicer;
 import com.netflix.vms.transformer.input.CycleInputs;
+import com.netflix.vms.transformer.input.datasets.slicers.SlicerFactory;
 import com.netflix.vms.transformer.publish.workflow.HollowBlobDataProvider;
 import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.TransformerPublishWorkflowContext;
@@ -40,7 +40,7 @@ public class DefaultHollowPublishJobCreator {
     /* fields */
     ///TODO: VIP changes for red/black?
     private PublishWorkflowContext ctx;
-    private final DataSlicer dataSlicer;
+    private final SlicerFactory slicerFactory;
 
     public DefaultHollowPublishJobCreator(TransformerContext transformerContext,
             FileStore fileStore,
@@ -51,14 +51,14 @@ public class DefaultHollowPublishJobCreator {
             HermesBlobAnnouncer hermesBlobAnnouncer,
             HollowBlobDataProvider hollowBlobDataProvider, 
             PlaybackMonkeyTester playbackMonkeyTester,
-            ValuableVideoHolder videoRanker, 
-            DataSlicer dataSlicer,
-            Supplier<ServerUploadStatus> serverUploadStatus, 
+            ValuableVideoHolder videoRanker,
+            SlicerFactory slicerFactory,
+            Supplier<ServerUploadStatus> serverUploadStatus,
             String vip) {
         this.hollowBlobDataProvider = hollowBlobDataProvider;
         this.playbackMonkeyTester = playbackMonkeyTester;
         this.videoRanker = videoRanker;
-        this.dataSlicer = dataSlicer;
+        this.slicerFactory = slicerFactory;
         this.ctx = new TransformerPublishWorkflowContext(transformerContext,
                 new HermesVipAnnouncer(hermesBlobAnnouncer),
                 serverUploadStatus,
@@ -161,7 +161,7 @@ public class DefaultHollowPublishJobCreator {
 
     public CreateDevSliceJob createDevSliceJob(PublishWorkflowContext ctx, AnnounceJob dependency,
             CycleInputs cycleInputs, long cycleVersion) {
-        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, dataSlicer,
+        return new CreateHollowDevSliceJob(ctx, dependency, hollowBlobDataProvider, slicerFactory,
                 cycleInputs, cycleVersion);
     }
 }

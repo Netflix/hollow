@@ -1,7 +1,9 @@
 package com.netflix.vms.transformer.override;
 
-import com.netflix.aws.S3.S3Object;
-import com.netflix.aws.file.FileStore;
+import com.netflix.cinder.consumer.CinderConsumerBuilder;
+import com.netflix.gutenberg.grpc.shared.DataPointer;
+import com.netflix.gutenberg.s3access.S3Direct;
+import com.netflix.gutenberg.s3access.S3Util;
 import com.netflix.hollow.core.read.engine.HollowBlobReader;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 import com.netflix.hollow.core.write.HollowBlobWriter;
@@ -13,38 +15,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Supplier;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
 public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
-    protected final String vip;
+    protected final Supplier<CinderConsumerBuilder> builder;
+    protected final String namespace;
     protected final String localBlobStore;
+    protected final Optional<Boolean> isProd;
     protected final TransformerContext ctx;
+    protected final S3Direct pinTitleS3Access;
 
-    protected FileStore pinTitleFileStore;
-
-    protected AbstractPinTitleProcessor(String vip, String localBlobStore, TransformerContext ctx) {
-        this.vip = vip;
+    protected AbstractPinTitleProcessor(Supplier<CinderConsumerBuilder> builder, S3Direct pinTitleS3Access,
+            String namespace, String localBlobStore, Optional<Boolean> isProd, TransformerContext ctx) {
+        this.namespace = namespace;
+        this.builder = builder;
+        this.pinTitleS3Access = pinTitleS3Access;
         this.localBlobStore = localBlobStore;
+        this.isProd = isProd;
         this.ctx = ctx;
 
         mkdir(localBlobStore);
     }
 
     @Override
-    public String getVip() {
-        return vip;
-    }
-
-    @Override
-    public void setPinTitleFileStore(FileStore pinTitleFileStore) {
-        this.pinTitleFileStore = pinTitleFileStore;
-    }
-
-    @Override
-    public File getFile(TYPE type, long version, int... topNodes) throws Exception {
-        String fileVIP = vip + "_" + type.name().toLowerCase();
-        HollowBlobFileNamer namer = new HollowBlobFileNamer(fileVIP);
+    public File getFile(String namespace, TYPE type, long version, int... topNodes) throws Exception {
+        String fileNamespace = namespace + "_" + type.name().toLowerCase();
+        HollowBlobFileNamer namer = new HollowBlobFileNamer(fileNamespace);
 
         File file = null;
         if (localBlobStore != null) {
@@ -53,19 +52,15 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
             file = new File(namer.getPinTitleFileName(version, true, topNodes));
         }
 
-        // Determine whether the file exist in the cloud
+        // If the file already exists in the cloud then download it
         if (!file.exists()) {
-            String keybase = file.getName();
+            String s3Key = file.getName();
             try {
-                if (pinTitleFileStore != null) {
-                    S3Object publishedFile = pinTitleFileStore.getPublishedFile(keybase);
-                    if (publishedFile != null) {
-                        pinTitleFileStore.copyFile(publishedFile, file);
-                        ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{}", file);
-                    }
-                }
+                pinTitleS3Access.retrieve(PIN_TITLE_S3_BUCKET, PIN_TITLE_S3_PATH + "/" + s3Key, file);
+                ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Fetched file:{}", file);
             } catch (Exception ex) {
-                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to Fetch file from keybase:{}", keybase, ex);
+                ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Did not find S3 object for key:{}. "
+                        + "It might not have existed, no worries, this lookup is just as an optimization", s3Key);
             }
         }
 
@@ -96,15 +91,20 @@ public abstract class AbstractPinTitleProcessor implements PinTitleProcessor {
             writer.writeSnapshot(os);
         }
 
-        // Try to published the Pinned Title blob
-        if (pinTitleFileStore != null) {
-            String keybase = outputFile.getName();
-            try {
-                pinTitleFileStore.publish(outputFile, keybase);
-                ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Published file:{}", outputFile);
-            } catch (Exception ex) {
-                ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to Publish file to keybase:{}", keybase, ex);
-            }
+        // Cache the Pinned Title blob to S3
+        String s3Key = outputFile.getName();
+        try {
+            DataPointer.S3DataPointer outputS3DataPointer = DataPointer.S3DataPointer.newBuilder()
+                .addS3Objects(DataPointer.S3DataPointer.S3ObjectInfo.newBuilder()
+                    .setBucket(PIN_TITLE_S3_BUCKET)
+                    .setKey(PIN_TITLE_S3_PATH + "/" + s3Key)
+                    .setRegion(PIN_TITLE_S3_REGION)
+                    .build())
+                .build();
+            pinTitleS3Access.publish(outputFile, S3Util.getFileStoreCompatibleObjectMetadata(outputFile), outputS3DataPointer);
+            ctx.getLogger().info(TransformerLogTag.CyclePinnedTitles, "Published file:{}", outputFile);
+        } catch (Exception ex) {
+            ctx.getLogger().error(TransformerLogTag.CyclePinnedTitles, "Failed to Publish file to s3Key:{}", s3Key, ex);
         }
     }
 
