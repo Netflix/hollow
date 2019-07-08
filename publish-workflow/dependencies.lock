@@ -1060,13 +1060,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -1083,7 +1083,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.governator:governator-archaius",
@@ -1101,7 +1101,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -1118,14 +1118,14 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon2-archaius"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -1137,13 +1137,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -1845,7 +1845,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -2951,7 +2954,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -2960,7 +2963,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -3043,19 +3046,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -3401,7 +3404,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -3487,7 +3490,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -5089,13 +5092,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -5112,7 +5115,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.suro:suro-client",
@@ -5125,7 +5128,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -5142,7 +5145,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -5154,13 +5157,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -6810,7 +6813,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -6819,7 +6822,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -6902,19 +6905,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -7260,7 +7263,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -7346,7 +7349,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -8967,13 +8970,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -8990,7 +8993,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.governator:governator-archaius",
@@ -9008,7 +9011,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -9025,14 +9028,14 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon2-archaius"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -9044,13 +9047,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -9752,7 +9755,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -10858,7 +10864,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -10867,7 +10873,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -10950,19 +10956,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -11308,7 +11314,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -11394,7 +11400,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -13207,13 +13213,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -13230,7 +13236,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.governator:governator-archaius",
@@ -13248,7 +13254,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -13265,14 +13271,14 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon2-archaius"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -13284,13 +13290,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -13992,7 +13998,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -15098,7 +15107,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -15107,7 +15116,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -15190,19 +15199,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -15548,7 +15557,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -15634,7 +15643,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -17304,13 +17313,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -17327,7 +17336,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "com.netflix.governator:governator-archaius",
@@ -17345,7 +17354,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -17362,14 +17371,14 @@
             ]
         },
         "com.netflix.governator:governator-archaius": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-core",
                 "com.netflix.karyon:karyon2-archaius"
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -17381,13 +17390,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -18089,7 +18098,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -19195,7 +19207,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -19204,7 +19216,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -19287,19 +19299,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -19645,7 +19657,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -19731,7 +19743,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -21410,13 +21422,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -22210,7 +22222,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -23324,7 +23339,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -23333,7 +23348,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -23416,19 +23431,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -23779,7 +23794,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -23877,7 +23892,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -25500,13 +25515,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -27244,7 +27259,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -27253,7 +27268,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -27336,19 +27351,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -27699,7 +27714,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -27797,7 +27812,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -29439,13 +29454,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -30239,7 +30254,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -31353,7 +31371,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -31362,7 +31380,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -31445,19 +31463,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -31808,7 +31826,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -31906,7 +31924,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -33597,13 +33615,13 @@
             ]
         },
         "com.netflix.evcache:evcache-client": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "netflix:evcache-nflx-client"
             ]
         },
         "com.netflix.evcache:evcache-core": {
-            "locked": "5.9.0",
+            "locked": "5.10.0",
             "transitive": [
                 "com.netflix.evcache:evcache-client",
                 "netflix:evcache-nflx-client"
@@ -34397,7 +34415,10 @@
             ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-api-notemplate": {
-            "project": true
+            "project": true,
+            "transitive": [
+                "com.netflix.vms.transformer:vmstransformer-business-logic"
+            ]
         },
         "com.netflix.vms.transformer:vmstransformer-hollowoutput-model": {
             "project": true,
@@ -35511,7 +35532,7 @@
             ]
         },
         "netflix:evcache-client2": {
-            "locked": "4.233.0",
+            "locked": "4.234.0",
             "transitive": [
                 "netflix.grpc:netflix-grpc-evcache",
                 "netflix:edgar_client",
@@ -35520,7 +35541,7 @@
             ]
         },
         "netflix:evcache-nflx-client": {
-            "locked": "5.27.0",
+            "locked": "5.31.0",
             "transitive": [
                 "netflix:evcache-client2"
             ]
@@ -35603,19 +35624,19 @@
             ]
         },
         "netflix:metatron-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "netflix:metatron-decrypt"
             ]
         },
         "netflix:metatron-decrypt": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core"
             ]
         },
         "netflix:metatron-ipc-common": {
-            "locked": "1.226.0",
+            "locked": "1.227.0",
             "transitive": [
                 "com.netflix.nflxssofilter:nflx-sso-filter-core",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -35966,7 +35987,7 @@
             ]
         },
         "netflix:playback-monkey-model": {
-            "locked": "2.178",
+            "locked": "2.179",
             "requested": "latest.release"
         },
         "netflix:request-expiry": {
@@ -36064,7 +36085,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"

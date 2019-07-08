@@ -928,7 +928,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -941,7 +941,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -954,7 +954,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -966,13 +966,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -2722,7 +2722,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -3992,7 +3992,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -4003,7 +4003,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -4016,7 +4016,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -4028,13 +4028,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -5682,7 +5682,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -6966,7 +6966,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -6979,7 +6979,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -6992,7 +6992,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -7004,13 +7004,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -8760,7 +8760,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -10237,7 +10237,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -10250,7 +10250,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -10263,7 +10263,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -10275,13 +10275,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -12031,7 +12031,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -13365,7 +13365,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -13378,7 +13378,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -13391,7 +13391,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -13403,13 +13403,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -15159,7 +15159,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -16493,7 +16493,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -16506,7 +16506,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -16519,7 +16519,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -16531,13 +16531,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -18290,7 +18290,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -19569,7 +19569,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.suro:suro-client",
                 "com.netflix.suro:suro-core",
@@ -19580,7 +19580,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -19593,7 +19593,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -19605,13 +19605,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -21262,7 +21262,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -22555,7 +22555,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -22568,7 +22568,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -22581,7 +22581,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -22593,13 +22593,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -24352,7 +24352,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -25695,7 +25695,7 @@
             ]
         },
         "com.netflix.governator:governator": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.karyon:karyon-spi",
                 "com.netflix.pytheas:pytheas-core",
@@ -25708,7 +25708,7 @@
             ]
         },
         "com.netflix.governator:governator-api": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.chaski2:chaski2-core",
                 "com.netflix.chaski3:chaski3-core",
@@ -25721,7 +25721,7 @@
             ]
         },
         "com.netflix.governator:governator-core": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator",
                 "com.netflix.governator:governator-jersey",
@@ -25733,13 +25733,13 @@
             ]
         },
         "com.netflix.governator:governator-jersey": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.runtime:runtime-lifecycle"
             ]
         },
         "com.netflix.governator:governator-providers": {
-            "locked": "1.17.7",
+            "locked": "1.17.8",
             "transitive": [
                 "com.netflix.governator:governator-jersey",
                 "netflix.grpc:netflix-grpc-metatron",
@@ -27492,7 +27492,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.780",
+            "locked": "100.0.781",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
