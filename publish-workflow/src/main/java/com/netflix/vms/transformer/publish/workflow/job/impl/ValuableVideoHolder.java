@@ -295,7 +295,10 @@ public class ValuableVideoHolder {
 
 	private boolean isAvailableForDownload(CompleteVideoHollow cv) {
 	   	//Find the current or future window, then pick the contract info for highest package id.
-	   	for(VMSAvailabilityWindowHollow window : cv._getData()._getCountrySpecificData()._getAvailabilityWindows()) {
+		if (cv._getData()._getCountrySpecificData() == null)
+			return false;
+
+		for(VMSAvailabilityWindowHollow window : cv._getData()._getCountrySpecificData()._getAvailabilityWindows()) {
 		   	if(isCurrentOrFutureWindow(window._getStartDate()._getVal(), window._getEndDate()._getVal())) {
 			   	MapOfIntegerToWindowPackageContractInfoHollow map = window._getWindowInfosByPackageId();
                	Entry<IntegerHollow, WindowPackageContractInfoHollow> highestPackageEntry = getHighestPackageEntry(map);

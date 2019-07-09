@@ -26,8 +26,10 @@ public class CertificationSystemCircuitBreaker extends HollowPerCountryCompleteV
 
     @Override
     protected int getVideoScore(CompleteVideoHollow cv) {
-        ListOfCertificationHollow certList = cv._getData()._getCountrySpecificData()._getCertificationList();
+        if (cv._getData()._getCountrySpecificData() == null)
+            return 0;
 
+        ListOfCertificationHollow certList = cv._getData()._getCountrySpecificData()._getCertificationList();
         if (certList == null)
             return 0;
 
