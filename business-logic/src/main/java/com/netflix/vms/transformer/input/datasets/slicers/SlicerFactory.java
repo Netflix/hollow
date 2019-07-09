@@ -11,7 +11,7 @@ public class SlicerFactory {
             int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) throws Exception {
 
         Class slicerClasz =  dataset.getSlicer();
-        Constructor slicerConstructor = slicerClasz.getConstructor(new Class[]{int[].class});
+        Constructor slicerConstructor = slicerClasz.getConstructor(new Class[]{int.class, int[].class});
         return (InputDataSlicer) slicerConstructor.newInstance(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
     }
 

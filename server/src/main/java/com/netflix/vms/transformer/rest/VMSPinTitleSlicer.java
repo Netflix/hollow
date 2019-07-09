@@ -102,7 +102,8 @@ public class VMSPinTitleSlicer {
                     .header("content-disposition", "attachment; filename = " + slicedFile.getName()).build();
         } catch (Exception ex) {
             return Response.status(Status.INTERNAL_SERVER_ERROR)
-                    .entity(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, namespace=%s, version=%s, topnodes=%s] - Make sure version and namespace are valid. Exception=%s", isProd, isOutput, namespace, versionStr, topNodesStr, ex))
+                    .entity(String.format("ERROR: Failed to slice data with specified params[prod=%s, output=%s, namespace=%s, version=%s, topnodes=%s] "
+                            + "- Make sure version and namespace are valid. Exception=%s", isProd, isOutput, namespace, versionStr, topNodesStr, ex))
                     .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
     }
