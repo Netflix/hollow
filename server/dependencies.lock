@@ -3563,7 +3563,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -3732,19 +3732,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -4040,10 +4033,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -7540,7 +7531,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -7703,19 +7694,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -8004,10 +7988,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -11706,7 +11688,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -11875,19 +11857,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -12183,10 +12158,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -16005,7 +15978,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -16174,19 +16147,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -16482,10 +16448,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -18639,36 +18603,36 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.4",
+            "requested": "0.8.4"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.4",
+            "requested": "0.8.4"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.ow2.asm:asm": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
                 "org.ow2.asm:asm-commons",
@@ -18676,19 +18640,19 @@
             ]
         },
         "org.ow2.asm:asm-analysis": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.ow2.asm:asm-commons"
             ]
         },
         "org.ow2.asm:asm-commons": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core"
             ]
         },
         "org.ow2.asm:asm-tree": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
                 "org.ow2.asm:asm-analysis",
@@ -22274,7 +22238,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -22443,19 +22407,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -22751,10 +22708,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -26489,7 +26444,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -26658,19 +26613,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -26966,10 +26914,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -30703,7 +30649,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
                 "netflix:content-usage-policy"
@@ -30872,19 +30818,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -31149,10 +31088,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -35007,7 +34944,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -35184,19 +35121,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -35512,10 +35442,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -39143,7 +39071,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -39314,19 +39242,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -39635,10 +39556,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -43472,7 +43391,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -43649,19 +43568,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -43977,10 +43889,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -47850,7 +47760,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -48027,19 +47937,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -48355,10 +48258,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -52228,7 +52129,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -52405,19 +52306,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -52733,10 +52627,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -56364,7 +56256,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -56535,19 +56427,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -56856,10 +56741,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -60693,7 +60576,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -60870,19 +60753,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -61198,10 +61074,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },
@@ -65071,7 +64945,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release",
             "transitive": [
                 "com.netflix.vms.transformer:vmstransformer-common-interfaces",
@@ -65248,19 +65122,12 @@
                 "org.apache.lucene:lucene-analyzers-common",
                 "org.apache.lucene:lucene-backward-codecs",
                 "org.apache.lucene:lucene-highlighter",
-                "org.apache.lucene:lucene-join",
                 "org.apache.lucene:lucene-memory",
                 "org.apache.lucene:lucene-queries",
                 "org.apache.lucene:lucene-queryparser",
                 "org.apache.lucene:lucene-spatial",
                 "org.apache.lucene:lucene-suggest",
                 "org.elasticsearch:elasticsearch"
-            ]
-        },
-        "org.apache.lucene:lucene-grouping": {
-            "locked": "5.5.2",
-            "transitive": [
-                "org.apache.lucene:lucene-join"
             ]
         },
         "org.apache.lucene:lucene-highlighter": {
@@ -65576,10 +65443,8 @@
             ]
         },
         "org.json:json": {
-            "locked": "20180813",
+            "locked": "20141113",
             "transitive": [
-                "com.netflix.evcache:evcache-client",
-                "com.netflix.evcache:evcache-core",
                 "netflix:simone-client"
             ]
         },

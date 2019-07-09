@@ -1946,12 +1946,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -2722,7 +2716,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -4914,12 +4908,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -5682,7 +5670,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -7984,12 +7972,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -8760,7 +8742,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -9329,36 +9311,36 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.4",
+            "requested": "0.8.4"
         }
     },
     "jacocoAnt": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.2",
-            "requested": "0.8.2"
+            "locked": "0.8.4",
+            "requested": "0.8.4"
         },
         "org.jacoco:org.jacoco.core": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant",
                 "org.jacoco:org.jacoco.report"
             ]
         },
         "org.jacoco:org.jacoco.report": {
-            "locked": "0.8.2",
+            "locked": "0.8.4",
             "transitive": [
                 "org.jacoco:org.jacoco.ant"
             ]
         },
         "org.ow2.asm:asm": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
                 "org.ow2.asm:asm-commons",
@@ -9366,19 +9348,19 @@
             ]
         },
         "org.ow2.asm:asm-analysis": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.ow2.asm:asm-commons"
             ]
         },
         "org.ow2.asm:asm-commons": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core"
             ]
         },
         "org.ow2.asm:asm-tree": {
-            "locked": "6.2.1",
+            "locked": "7.1",
             "transitive": [
                 "org.jacoco:org.jacoco.core",
                 "org.ow2.asm:asm-analysis",
@@ -11255,12 +11237,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -12031,7 +12007,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -14383,12 +14359,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -15159,7 +15129,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -17511,12 +17481,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -18290,7 +18254,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -20491,12 +20455,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -21262,7 +21220,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -23573,12 +23531,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -24352,7 +24304,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -26713,12 +26665,6 @@
                 "netflix:request-expiry-impl"
             ]
         },
-        "javax.persistence:persistence-api": {
-            "locked": "1.0",
-            "transitive": [
-                "netflix:platform-aws"
-            ]
-        },
         "javax.servlet:javax.servlet-api": {
             "locked": "3.1.0",
             "transitive": [
@@ -27492,7 +27438,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.781",
+            "locked": "100.0.783",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
