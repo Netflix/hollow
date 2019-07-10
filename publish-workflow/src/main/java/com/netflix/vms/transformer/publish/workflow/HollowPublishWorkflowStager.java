@@ -326,7 +326,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
             @Override
             void announce(
                     PublishWorkflowContext ctx, String vip, long previousVersion, long currentVersion,
-                    RegionEnum region) {
+                    RegionEnum region, Map<String, String> metadata) {
                 boolean success = ctx.getVipAnnouncer()
                         .announce(vip, region, false, currentVersion, previousVersion);
 
@@ -335,12 +335,12 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
                 // However, the nostreams producer announcement still needs to be bound
                 // to the main producer announcement
                 ((NFHollowAnnouncer) ctx.getStateAnnouncer())
-                        .announce(previousVersion, currentVersion, region);
+                        .announce(previousVersion, currentVersion, region, metadata);
 
                 if (noStreamsVersion.getAsLong() == currentVersion) {
                     // No streams may not have published anything because there are no changes
                     ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer())
-                            .announce(noStreamsPreviousVersion.getAsLong(), currentVersion, region);
+                            .announce(noStreamsPreviousVersion.getAsLong(), currentVersion, region, metadata);
                 }
                 logResult(success, ctx, vip, currentVersion, region);
             }

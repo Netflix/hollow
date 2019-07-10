@@ -3,6 +3,7 @@ package com.netflix.vms.transformer.publish.workflow;
 import com.netflix.config.NetflixConfiguration;
 import com.netflix.hollow.api.producer.HollowProducer;
 import com.netflix.vms.transformer.publish.workflow.job.impl.DefaultHollowPublishJobCreator;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,21 +29,26 @@ public abstract class DelayedAnnouncer implements HollowProducer.Announcer {
 
     @Override
     public void announce(long version) {
+        announce(version, null);
+    }
+
+    @Override
+    public void announce(long version, Map<String, String> metadata) {
         PublishWorkflowContext ctx = jobCreator.getContext();
         PublishRegionProvider regionProvider = new PublishRegionProvider(
                 ctx.getLogger());
 
         long pv = previousVersion.getAsLong();
         // Announce to primary region
-        announce(ctx, vip, pv, version, regionProvider.getPrimaryRegion());
+        announce(ctx, vip, pv, version, regionProvider.getPrimaryRegion(), metadata);
 
         for (NetflixConfiguration.RegionEnum region : regionProvider.getNonPrimaryRegions()) {
             long delay = regionProvider.getPublishDelayInSeconds(region);
             if (delay == 0) {
-                announce(ctx, vip, pv, version, region);
+                announce(ctx, vip, pv, version, region, metadata);
             } else {
                 ses.schedule(
-                        () -> announce(ctx, vip, pv, version, region),
+                        () -> announce(ctx, vip, pv, version, region, metadata),
                         delay, TimeUnit.SECONDS);
             }
         }
@@ -51,5 +57,5 @@ public abstract class DelayedAnnouncer implements HollowProducer.Announcer {
     abstract void announce(
             PublishWorkflowContext ctx,
             String vip, long previousVersion, long currentVersion,
-            NetflixConfiguration.RegionEnum region);
+            NetflixConfiguration.RegionEnum region, Map<String, String> metadata);
 }
