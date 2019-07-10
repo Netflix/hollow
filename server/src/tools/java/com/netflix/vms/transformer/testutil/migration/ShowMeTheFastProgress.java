@@ -61,8 +61,8 @@ public class ShowMeTheFastProgress {
     private static final boolean isUseRemotePinTitleSlicer = true;
     private static final boolean isFallBackToLocalSlicer = false;
 
-    private static final String OUTPUT_NAMESPACE = "vms-feather";
-    private static final String VMSSLICER_INSTANCE = "vmstransformer-feather-muon";
+    private static final String OUTPUT_NAMESPACE = "vms-vmsdev_sunjeetsn";
+    private static final String VMSSLICER_INSTANCE = "vmstransformer-vmsdev_sunjeetsn_override-muon";
 
     private static final String WORKING_DIR = "/space/transformer-data/fast";
     private static final String REMOTE_SLICER_URL = "http://discovery.cloudqa.netflix.net:7001/discovery/resolver/cluster/" + VMSSLICER_INSTANCE + ":7101/REST/vms/pintitleslicer"; // NOTE: SLICER must be in TEST env hence cloudqa
@@ -105,7 +105,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20190709155933003l;
+        long transformerVersion = 20190703221201051l;
         int[] topNodes = { 80133542 };
 
         long start = System.currentTimeMillis();

@@ -50,13 +50,13 @@ import com.netflix.vms.transformer.common.VersionMinter;
 import com.netflix.vms.transformer.common.config.TransformerConfig;
 import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.common.io.TransformerLogTag;
+import com.netflix.vms.transformer.consumer.VMSOutputDataConsumer;
 import com.netflix.vms.transformer.health.TransformerTimeSinceLastPublishGauge;
 import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.input.FollowVipPin;
 import com.netflix.vms.transformer.input.FollowVipPinExtractor;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.VMSInputDataVersionLogger;
-import com.netflix.vms.transformer.input.VMSOutputDataClient;
 import com.netflix.vms.transformer.override.PinTitleHelper;
 import com.netflix.vms.transformer.override.PinTitleHollowCombiner;
 import com.netflix.vms.transformer.override.PinTitleManager;
@@ -98,7 +98,7 @@ public class TransformCycle {
     private final PublishWorkflowStager publishWorkflowStager;
     private final VersionMinter versionMinter;
     private final FollowVipPinExtractor followVipPinExtractor;
-    private final FileStore filestore;
+    private final Supplier<CinderConsumerBuilder> cinderConsumerBuilder;
     private final HermesBlobAnnouncer hermesBlobAnnouncer;
     private final PinTitleManager pinTitleMgr;
     private final TransformerTimeSinceLastPublishGauge timeSinceLastPublishGauge;
@@ -130,7 +130,7 @@ public class TransformCycle {
         currentCycleNumber = initCycleNumber(ctx, versionMinter); // Init first cycle here so logs can be grouped properly
 
         this.transformerVip = transformerVip;
-        this.filestore = fileStore;
+        this.cinderConsumerBuilder = cinderConsumerBuilder;
         this.hermesBlobAnnouncer = hermesBlobAnnouncer;
         this.outputStateEngine = new VMSTransformerWriteStateEngine();
         this.fastlaneOutputStateEngine = new VMSTransformerWriteStateEngine();
@@ -424,7 +424,7 @@ public class TransformCycle {
         return !isFastlane; // Fastlane does not deal with NoStreams blob
     }
 
-    private void restoreOutputs(VMSOutputDataClient restoreFrom, VMSOutputDataClient nostreamsRestoreFrom, boolean isNoStreamsBlobEnabled) {
+    private void restoreOutputs(HollowConsumer restoreFrom, HollowConsumer nostreamsRestoreFrom, boolean isNoStreamsBlobEnabled) {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
         HollowReadStateEngine restoreNoStreamStateEngine = isNoStreamsBlobEnabled ? nostreamsRestoreFrom.getStateEngine() : null;
 
@@ -598,23 +598,23 @@ public class TransformCycle {
     }
 
     private static CompletableFuture<Void> restoreOutputAsync(Executor executor,
-            String name, TransformerContext ctx, VMSOutputDataClient outputClient, long restoreVersion) {
-        return CompletableFuture.runAsync(() -> restoreOutput(name, ctx, outputClient, restoreVersion), executor);
+            String name, TransformerContext ctx, HollowConsumer outputConsumer, long restoreVersion) {
+        return CompletableFuture.runAsync(() -> restoreOutput(name, ctx, outputConsumer, restoreVersion), executor);
     }
 
     private static void restoreOutput(String name, TransformerContext ctx,
-            VMSOutputDataClient outputClient, long restoreVersion) {
+            HollowConsumer outputConsumer, long restoreVersion) {
         try {
             // Spot to trigger Cycle Monkey if enabled
             ctx.getCycleMonkey().doMonkeyBusiness(name);
 
             long start = System.currentTimeMillis();
-            outputClient.triggerRefreshTo(restoreVersion);
+            outputConsumer.triggerRefreshTo(restoreVersion);
 
             ctx.getLogger().info(Arrays.asList(TransformRestore, BlobState),
                     "Restored {} version={}, duration={}, header={}",
                     name, restoreVersion, (System.currentTimeMillis() - start),
-                    BlobMetaDataUtil.fetchCoreHeaders(outputClient.getStateEngine()));
+                    BlobMetaDataUtil.fetchCoreHeaders(outputConsumer.getStateEngine()));
         } catch (RuntimeException e) {
             ctx.getLogger().error(TransformRestore,
                     "Failed to restore {} version={}",
@@ -625,13 +625,13 @@ public class TransformCycle {
 
     private static void restoreOutputsInParallel(SimultaneousExecutor executor,
             TransformerContext ctx, long restoreVersion,
-            VMSOutputDataClient outputClient, VMSOutputDataClient nostreamsOutputClient,
+            HollowConsumer outputConsumer, HollowConsumer nostreamsOutputConsumer,
             boolean isNoStreamsBlobEnabled) throws Exception {
         // Execute Restore in background
         CompletableFuture<Void> restoreNormalBlobResult =
-                restoreOutputAsync(executor, "restoreNormalBlob", ctx, outputClient, restoreVersion);
+                restoreOutputAsync(executor, "restoreNormalBlob", ctx, outputConsumer, restoreVersion);
         CompletableFuture<Void> restoreNoStreamsBlobResult = isNoStreamsBlobEnabled
-                ? restoreOutputAsync(executor, "restoreNoStreamsBlob", ctx, nostreamsOutputClient, restoreVersion)
+                ? restoreOutputAsync(executor, "restoreNoStreamsBlob", ctx, nostreamsOutputConsumer, restoreVersion)
                 : null;
 
         // Wait for all executions to complete, including loading the input
@@ -643,19 +643,19 @@ public class TransformCycle {
         }
 
         // Validate that both have restored to the specified version
-        if (outputClient.getCurrentVersionId() != restoreVersion) {
+        if (outputConsumer.getCurrentVersionId() != restoreVersion) {
             throw new IllegalStateException(
                     "Failed to restore (with streams) to specified restoreVersion: " + restoreVersion
-                            + ",  currentVersion=" + outputClient.getCurrentVersionId());
-        } else if (isNoStreamsBlobEnabled && nostreamsOutputClient.getCurrentVersionId() != restoreVersion) {
+                            + ",  currentVersion=" + outputConsumer.getCurrentVersionId());
+        } else if (isNoStreamsBlobEnabled && nostreamsOutputConsumer.getCurrentVersionId() != restoreVersion) {
             throw new IllegalStateException(
                     "Failed to restore (nostreams) to specified restoreVersion: " + restoreVersion
-                            + ",  currentVersion=" + nostreamsOutputClient.getCurrentVersionId());
+                            + ",  currentVersion=" + nostreamsOutputConsumer.getCurrentVersionId());
         }
     }
 
-    public static void triggerAsyncRestoreOutputs(SimultaneousExecutor executor,
-            TransformerContext ctx, TransformCycle cycle, FileStore fileStore, HermesBlobAnnouncer hermesBlobAnnouncer,
+    public void triggerAsyncRestoreOutputs(SimultaneousExecutor executor,
+            TransformerContext ctx, TransformCycle cycle, HermesBlobAnnouncer hermesBlobAnnouncer,
             boolean isFastlane) {
         try {
             TransformerConfig cfg = ctx.getConfig();
@@ -667,16 +667,18 @@ public class TransformCycle {
 
                 if (restoreVersion != Long.MIN_VALUE) {
                     // Restore in parallel
-                    VMSOutputDataClient outputClient = new VMSOutputDataClient(fileStore, cfg.getTransformerVip());
-                    VMSOutputDataClient nostreamsOutputClient = new VMSOutputDataClient(fileStore,
-                            VipNameUtil.getNoStreamsVip(cfg.getTransformerVip()));
+                    HollowConsumer outputConsumer = VMSOutputDataConsumer.getNewConsumer(
+                            this.cinderConsumerBuilder, "vms-" + cfg.getTransformerVip());
+
+                    HollowConsumer nostreamsOutputConsumers = VMSOutputDataConsumer.getNewConsumer(
+                            this.cinderConsumerBuilder, "vms-" + VipNameUtil.getNoStreamsVip(cfg.getTransformerVip()));
 
                     boolean isNoStreamsBlobEnabled = isNoStreamsBlobEnabled(isFastlane);
-                    restoreOutputsInParallel(executor, ctx, restoreVersion, outputClient, nostreamsOutputClient,
+                    restoreOutputsInParallel(executor, ctx, restoreVersion, outputConsumer, nostreamsOutputConsumers,
                             isNoStreamsBlobEnabled);
 
                     // Let TransformCycle complete the restore process
-                    cycle.restoreOutputs(outputClient, nostreamsOutputClient, isNoStreamsBlobEnabled);
+                    cycle.restoreOutputs(outputConsumer, nostreamsOutputConsumers, isNoStreamsBlobEnabled);
                 } else if (cfg.isFailIfRestoreNotAvailable()) {
                     // @TODO: Wonder if restoreVersion==Long.MIN_VALUE is sufficient to detect new namespace,
                     //  if so this exception is not needed
@@ -764,7 +766,7 @@ public class TransformCycle {
             // Determine whether to process restore here; only restore once
             if (isRestoreNeeded) {
                 // Restore outputs concurrently
-                triggerAsyncRestoreOutputs(executor, ctx, this, filestore, hermesBlobAnnouncer, isFastlane);
+                triggerAsyncRestoreOutputs(executor, ctx, this, hermesBlobAnnouncer, isFastlane);
             }
 
             executor.awaitSuccessfulCompletion();
