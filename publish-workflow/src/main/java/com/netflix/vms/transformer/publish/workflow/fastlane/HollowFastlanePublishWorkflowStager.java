@@ -62,14 +62,16 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
     }
 
     @Override
-    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion) {
+    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion,
+            Map<String, String> metadata) {
     	ctx = ctx.withCurrentLoggerAndConfig();
 
         // Add publish jobs
         List<PublicationJob> allPublishJobs = addPublishJobs(cycleInputs, previousVersion, newVersion);
 
+        // add announcement jobs, with blob headers passed in as announcement metadata
         for(RegionEnum region : PublishRegionProvider.ALL_REGIONS) {
-            createAnnounceJobForRegion(region, previousVersion, newVersion, allPublishJobs);
+            createAnnounceJobForRegion(region, previousVersion, newVersion, allPublishJobs, metadata);
         }
 
         addDeleteJob(previousVersion, newVersion, allPublishJobs);
@@ -102,8 +104,10 @@ public class HollowFastlanePublishWorkflowStager implements PublishWorkflowStage
 
     }
 
-    private FastlaneHermesAnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion, List<PublicationJob> publishJobsForRegion) {
-        FastlaneHermesAnnounceJob announceJob = new FastlaneHermesAnnounceJob(ctx, previousVerion, newVersion, region, publishJobsForRegion, priorAnnouncedJobs.get(region));
+    private FastlaneHermesAnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion,
+            List<PublicationJob> publishJobsForRegion, Map<String, String> metadata) {
+        FastlaneHermesAnnounceJob announceJob = new FastlaneHermesAnnounceJob(ctx, previousVerion, newVersion, region,
+                publishJobsForRegion, priorAnnouncedJobs.get(region), metadata);
         scheduler.submitJob(announceJob);
 
         priorAnnouncedJobs.put(region, announceJob);

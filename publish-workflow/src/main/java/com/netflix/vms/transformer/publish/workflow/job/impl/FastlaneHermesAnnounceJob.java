@@ -11,6 +11,7 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob;
 import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.PublishType;
 import com.netflix.vms.transformer.publish.workflow.job.framework.PublishWorkflowPublicationJob;
 import java.util.List;
+import java.util.Map;
 
 public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
@@ -20,8 +21,10 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
     private final HollowBlobPublishJob snapshotPublishJob;
     private final HollowBlobPublishJob deltaPublishJob;
     private final FastlaneHermesAnnounceJob previousAnnounceJob;
+    private final Map<String, String> metadata;
 
-    public FastlaneHermesAnnounceJob(PublishWorkflowContext ctx, long priorVersion, long newVersion, RegionEnum region, List<PublicationJob> newPublishJobs, FastlaneHermesAnnounceJob previousAnnounceJob) {
+    public FastlaneHermesAnnounceJob(PublishWorkflowContext ctx, long priorVersion, long newVersion, RegionEnum region,
+            List<PublicationJob> newPublishJobs, FastlaneHermesAnnounceJob previousAnnounceJob, Map<String, String> metadata) {
         super(ctx, "announce-" + region, newVersion);
         this.vip = ctx.getVip();
         this.priorVersion = priorVersion;
@@ -29,6 +32,7 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
         this.snapshotPublishJob = findJob(newPublishJobs, PublishType.SNAPSHOT);
         this.deltaPublishJob = findJob(newPublishJobs, PublishType.DELTA);
         this.previousAnnounceJob = previousAnnounceJob;
+        this.metadata = metadata;
     }
 
     private HollowBlobPublishJob findJob(List<PublicationJob> jobs, PublishType type) {
@@ -43,8 +47,12 @@ public class FastlaneHermesAnnounceJob extends PublishWorkflowPublicationJob {
 
 
     @Override public boolean executeJob() {
+        // VIP announcer using Hermes
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
-        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
+
+        // State announcer using Gutenberg
+        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region, metadata);
+
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;

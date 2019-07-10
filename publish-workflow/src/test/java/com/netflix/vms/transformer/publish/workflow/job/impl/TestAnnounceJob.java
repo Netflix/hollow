@@ -5,6 +5,7 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
+import java.util.Map;
 
 /**
  * A version of an {@link AnnounceJob} used in unit tests. It does nothing except for mark
@@ -12,8 +13,9 @@ import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
  */
 public class TestAnnounceJob extends AnnounceJob {
     public TestAnnounceJob(PublishWorkflowContext context, String vip, long priorVersion, long newVersion,
-            RegionEnum region, CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-        super(context, vip, priorVersion, newVersion, region, validationJob, delayJob, previousAnnounceJob);
+            RegionEnum region, Map<String, String> metadata, CanaryValidationJob validationJob, DelayJob delayJob,
+            AnnounceJob previousAnnounceJob) {
+        super(context, vip, priorVersion, newVersion, region, metadata, validationJob, delayJob, previousAnnounceJob);
     }
 
     @Override public boolean executeJob() {

@@ -145,7 +145,8 @@ public class TransformerCycleKickoff {
         //      √ Apply output blob header tags consistently.
         //      √ Switch from custom FP-based input-pinning to Gutenberg pinning.
         //      √ Consumer-specific APIs (instead of VMSHollowInputAPI for all consumers)
-        //      • Store output metadata (currently in Cassandra) and blob headers (currently in output blob) in Gutenberg
+        //      √ Store blob headers in Gutenberg as metadata
+        //      • Use Gutenberg metadata for followVip
         //      √ Update "Inputs" widget on hosted dashboard to present input versions in table
         //
         // - Follow VIP

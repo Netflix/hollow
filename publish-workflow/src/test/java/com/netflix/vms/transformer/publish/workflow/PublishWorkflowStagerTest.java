@@ -128,7 +128,7 @@ public class PublishWorkflowStagerTest {
             return true;
         });
 
-        stager.triggerPublish(testCycleInputs, CURRENT_VERSION, LATEST_VERSION).awaitStatus();
+        stager.triggerPublish(testCycleInputs, CURRENT_VERSION, LATEST_VERSION, null).awaitStatus();
         // grab exception from worker thread, throw here
         Throwable thrown = f.get();
         if (thrown != null) {

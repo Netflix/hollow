@@ -129,7 +129,7 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     @Override
-    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion) {
+    public CycleStatusFuture triggerPublish(CycleInputs cycleInputs, long previousVersion, long newVersion, Map<String, String> metadata) {
         PublishWorkflowContext ctx = jobCreator.beginStagingNewCycle();
 
         // Add validation job
@@ -142,11 +142,11 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
         final CanaryValidationJob canaryValidationJob = addCanaryJobs(previousVersion, newVersion, circuitBreakerJob, publishJobs);
 
         final AnnounceJob primaryRegionAnnounceJob = createAnnounceJobForRegion(regionProvider.getPrimaryRegion(),
-                previousVersion, newVersion, canaryValidationJob, null);
+                previousVersion, newVersion, canaryValidationJob, null, metadata);
 
         // / add secondary regions
         for (final RegionEnum region : regionProvider.getNonPrimaryRegions()) {
-            createAnnounceJobForRegion(region, previousVersion, newVersion, canaryValidationJob, primaryRegionAnnounceJob);
+            createAnnounceJobForRegion(region, previousVersion, newVersion, canaryValidationJob, primaryRegionAnnounceJob, metadata);
         }
 
         addDeleteJob(previousVersion, newVersion, circuitBreakerJob, publishJobs);
@@ -158,13 +158,13 @@ public class HollowPublishWorkflowStager implements PublishWorkflowStager {
     }
 
     private AnnounceJob createAnnounceJobForRegion(RegionEnum region, long previousVerion, long newVersion,
-            CanaryValidationJob validationJob, AnnounceJob primaryRegionAnnounceJob) {
+            CanaryValidationJob validationJob, AnnounceJob primaryRegionAnnounceJob, Map<String, String> metadata) {
         DelayJob delayJob = jobCreator.createDelayJob(primaryRegionAnnounceJob,
                 regionProvider.getPublishDelayInSeconds(region) * 1000, newVersion);
         scheduler.submitJob(delayJob);
 
         AnnounceJob announceJob = jobCreator.createAnnounceJob(vip, previousVerion, newVersion, region,
-                validationJob, delayJob, priorAnnouncedJobs.get(region));
+                validationJob, delayJob, priorAnnouncedJobs.get(region), metadata);
         scheduler.submitJob(announceJob);
 
         priorAnnouncedJobs.put(region, announceJob);

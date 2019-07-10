@@ -20,6 +20,7 @@ import com.netflix.vms.transformer.publish.workflow.job.HollowBlobPublishJob.Pub
 import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -53,8 +54,9 @@ public class TestDefaultHollowPublishJobCreator extends DefaultHollowPublishJobC
 
 	@Override
 	public AnnounceJob createAnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region,
-            CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-		return new TestAnnounceJob(context, vip, priorVersion, newVersion, region, validationJob,
+            CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob,
+			Map<String, String> metadata) {
+		return new TestAnnounceJob(context, vip, priorVersion, newVersion, region, metadata, validationJob,
                 delayJob, previousAnnounceJob);
 	}
 

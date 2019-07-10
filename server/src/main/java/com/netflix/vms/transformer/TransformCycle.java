@@ -1043,7 +1043,8 @@ public class TransformCycle {
 
         ctx.getMetricRecorder().startTimer(P4_WaitForPublishWorkflowDuration);
         try {
-            CycleStatusFuture future = publishWorkflowStager.triggerPublish(cycleInputs, previousCycleNumber, currentCycleNumber);
+            CycleStatusFuture future = publishWorkflowStager.triggerPublish(cycleInputs, previousCycleNumber,
+                    currentCycleNumber, outputStateEngine.getHeaderTags());
             if(!future.awaitStatus())
                 throw new RuntimeException("Publish Workflow Failed!");
 

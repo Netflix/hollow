@@ -28,6 +28,7 @@ import com.netflix.vms.transformer.publish.workflow.job.PoisonStateMarkerJob;
 import com.netflix.vms.transformer.publish.workflow.playbackmonkey.PlaybackMonkeyTester;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import netflix.admin.videometadata.uploadstat.ServerUploadStatus;
 
@@ -80,8 +81,9 @@ public class DefaultHollowPublishJobCreator {
     }
 
     public AnnounceJob createAnnounceJob(String vip, long priorVersion, long newVersion, RegionEnum region,
-            CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob) {
-        return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, validationJob, delayJob,
+            CanaryValidationJob validationJob, DelayJob delayJob, AnnounceJob previousAnnounceJob,
+            Map<String, String> metadata) {
+        return new HermesAnnounceJob(ctx, priorVersion, newVersion, region, metadata, validationJob, delayJob,
                 previousAnnounceJob);
     }
 

@@ -10,18 +10,24 @@ import com.netflix.vms.transformer.publish.workflow.PublishWorkflowContext;
 import com.netflix.vms.transformer.publish.workflow.job.AnnounceJob;
 import com.netflix.vms.transformer.publish.workflow.job.CanaryValidationJob;
 import com.netflix.vms.transformer.publish.workflow.job.DelayJob;
+import java.util.Map;
 
 public class HermesAnnounceJob extends AnnounceJob {
     HermesAnnounceJob(PublishWorkflowContext ctx, long priorVersion, long newVersion,
-            RegionEnum region, CanaryValidationJob validationJob, DelayJob delayJob,
+            RegionEnum region, Map<String, String> metadata, CanaryValidationJob validationJob, DelayJob delayJob,
             AnnounceJob previousAnnounceJob) {
-        super(ctx, ctx.getVip(), priorVersion, newVersion, region, validationJob, delayJob,
+        super(ctx, ctx.getVip(), priorVersion, newVersion, region, metadata, validationJob, delayJob,
                 previousAnnounceJob);
     }
 
     @Override public boolean executeJob() {
+        // VIP announcer using Hermes
         boolean success = ctx.getVipAnnouncer().announce(vip, region, false, getCycleVersion(), priorVersion);
-        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
+
+        // State announcer using Gutenberg
+        ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region, metadata);
+
+        // Nostreams announcer using Gutenberg
         ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
