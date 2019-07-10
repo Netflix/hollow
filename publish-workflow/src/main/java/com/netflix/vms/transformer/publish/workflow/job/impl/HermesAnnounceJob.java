@@ -28,7 +28,7 @@ public class HermesAnnounceJob extends AnnounceJob {
         ((NFHollowAnnouncer) ctx.getStateAnnouncer()).announce(priorVersion, getCycleVersion(), region, metadata);
 
         // Nostreams announcer using Gutenberg
-        ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer()).announce(priorVersion, getCycleVersion(), region);
+        ((NFHollowAnnouncer) ctx.getNostreamsStateAnnouncer()).announce(priorVersion, getCycleVersion(), region, metadata);
         ctx.getStatusIndicator().markSuccess(getCycleVersion());
         logResult(success);
         return success;
