@@ -31,8 +31,7 @@
             ]
         },
         "com.puppycrawl.tools:checkstyle": {
-            "locked": "8.8",
-            "requested": "8.8"
+            "locked": "8.8"
         },
         "commons-beanutils:commons-beanutils": {
             "locked": "1.9.3",
@@ -986,7 +985,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -997,19 +996,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -2254,17 +2253,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -2337,25 +2336,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -4042,7 +4041,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -4053,19 +4052,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -5208,17 +5207,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -5291,25 +5290,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -7012,7 +7011,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -7023,19 +7022,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -8280,17 +8279,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -8363,25 +8362,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -9239,8 +9238,7 @@
             ]
         },
         "com.google.code.findbugs:findbugs": {
-            "locked": "3.0.1",
-            "requested": "3.0.1"
+            "locked": "3.0.1"
         },
         "com.google.code.findbugs:jFormatString": {
             "locked": "2.0.1",
@@ -9311,8 +9309,7 @@
     },
     "jacocoAgent": {
         "org.jacoco:org.jacoco.agent": {
-            "locked": "0.8.4",
-            "requested": "0.8.4"
+            "locked": "0.8.4"
         }
     },
     "jacocoAnt": {
@@ -9323,8 +9320,7 @@
             ]
         },
         "org.jacoco:org.jacoco.ant": {
-            "locked": "0.8.4",
-            "requested": "0.8.4"
+            "locked": "0.8.4"
         },
         "org.jacoco:org.jacoco.core": {
             "locked": "0.8.4",
@@ -10277,7 +10273,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -10288,19 +10284,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -11545,17 +11541,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -11628,25 +11624,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -13399,7 +13395,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -13410,19 +13406,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -14667,17 +14663,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -14750,25 +14746,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -16521,7 +16517,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -16532,19 +16528,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -17792,17 +17788,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -17875,25 +17871,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -19589,7 +19585,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -19600,19 +19596,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -20758,17 +20754,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -20841,25 +20837,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -22571,7 +22567,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -22582,19 +22578,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -23842,17 +23838,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -23925,25 +23921,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
@@ -25705,7 +25701,7 @@
             ]
         },
         "com.netflix.hollow:hollow": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui",
@@ -25716,19 +25712,19 @@
             ]
         },
         "com.netflix.hollow:hollow-diff-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-explorer-ui": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "com.netflix.hollow:hollow-ui-tools": {
-            "locked": "4.7.8",
+            "locked": "4.7.9",
             "transitive": [
                 "com.netflix.hollow:hollow-diff-ui",
                 "com.netflix.hollow:hollow-explorer-ui"
@@ -26976,17 +26972,17 @@
             ]
         },
         "netflix:cinder-core": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-lifecycle"
             ]
         },
         "netflix:cinder-lifecycle": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "requested": "latest.release"
         },
         "netflix:cinder-proto-definition": {
-            "locked": "4.8.4",
+            "locked": "4.8.9",
             "transitive": [
                 "netflix:cinder-core"
             ]
@@ -27059,25 +27055,25 @@
             ]
         },
         "netflix:gutenberg-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:cinder-core"
             ]
         },
         "netflix:gutenberg-common": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-grpc-client": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-client"
             ]
         },
         "netflix:gutenberg-proto-definition": {
-            "locked": "5.0.4",
+            "locked": "5.0.5",
             "transitive": [
                 "netflix:gutenberg-common",
                 "netflix:gutenberg-grpc-client"
