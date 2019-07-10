@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
@@ -627,7 +628,12 @@ public class HollowProducer extends AbstractHollowProducer {
     }
 
     public interface Announcer {
+
         void announce(long stateVersion);
+
+        default void announce(long stateVersion, Map<String, String> metadata) {
+            announce(stateVersion);
+        }
     }
 
     public static HollowProducer.Builder<?> withPublisher(HollowProducer.Publisher publisher) {
