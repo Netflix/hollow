@@ -786,10 +786,7 @@ abstract class AbstractHollowProducer {
         if (announcer != null) {
             Status.StageWithStateBuilder status = listeners.fireAnnouncementStart(readState);
             try {
-                if (readState.getStateEngine().getHeaderTags() != null)
-                    announcer.addMetadata(readState.getVersion(), readState.getStateEngine().getHeaderTags());
-
-                announcer.announce(readState.getVersion());
+                announcer.announce(readState.getVersion(), readState.getStateEngine().getHeaderTags());
                 status.success();
             } catch (Throwable th) {
                 status.fail(th);
