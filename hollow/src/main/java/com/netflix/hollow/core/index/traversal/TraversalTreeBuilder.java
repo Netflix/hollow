@@ -100,7 +100,7 @@ class TraversalTreeBuilder {
                         fieldTypeDataAccess[i] = typeDataAccess;
                         if(typeDataAccess instanceof HollowObjectTypeDataAccess) {
                             HollowObjectSchema schema = (HollowObjectSchema)typeDataAccess.getSchema();
-                            if(schema.getFieldType(fieldSchemaPositions[i]) == FieldType.REFERENCE) {
+                            if(schema.getFieldType(pathElement) == FieldType.REFERENCE) {
                                 fieldSchemaPositions[i] = -1;
                                 fieldTypeDataAccess[i] = getChildDataAccess(typeDataAccess, pathElement);
                             } else {
