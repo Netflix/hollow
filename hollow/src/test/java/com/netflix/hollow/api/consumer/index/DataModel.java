@@ -139,6 +139,16 @@ public class DataModel {
             }
         }
 
+        public static class TypeB {
+            final int i;
+            final String s;
+
+            public TypeB(int i, String s) {
+                this.i = i;
+                this.s = s;
+            }
+        }
+
         @HollowPrimaryKey(fields = {"i", "sub1.s", "sub2.i"})
         public static class TypeWithPrimaryKey {
             final int i;
@@ -270,6 +280,10 @@ public class DataModel {
                 return new TypeA(null, ordinal);
             }
 
+            public TypeB getTypeB(int ordinal) {
+                return new TypeB(null, ordinal);
+            }
+
             public TypeWithPrimaryKey getTypeWithPrimaryKey(int ordinal) {
                 return new TypeWithPrimaryKey(null, ordinal);
             }
@@ -347,6 +361,12 @@ public class DataModel {
 
         public static class TypeA extends HollowObject {
             public TypeA(HollowObjectDelegate delegate, int ordinal) {
+                super(delegate, ordinal);
+            }
+        }
+
+        public static class TypeB extends HollowObject {
+            public TypeB(HollowObjectDelegate delegate, int ordinal) {
                 super(delegate, ordinal);
             }
         }

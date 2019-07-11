@@ -57,6 +57,7 @@ public class HashIndexTest {
 
             for (int i = 0; i < 100; i++) {
                 ws.add(new DataModel.Producer.TypeA(1, "TypeA" + i));
+                ws.add(new DataModel.Producer.TypeB(1, "TypeB" + i));
             }
         });
 
@@ -544,7 +545,7 @@ public class HashIndexTest {
         }
 
         @Test
-        public void testWithSelect() {
+        public void testTypeAWithSelect() {
             HashIndexSelect<DataModel.Consumer.TypeA, DataModel.Consumer.HString, Integer> hi = HashIndex
                     .from(consumer, DataModel.Consumer.TypeA.class)
                     .selectField("s", DataModel.Consumer.HString.class)
@@ -557,6 +558,23 @@ public class HashIndexTest {
             Assert.assertEquals(100, r.size());
             for (int i = 0; i < r.size(); i++) {
                 Assert.assertEquals("TypeA" + i, r.get(i));
+            }
+        }
+
+        @Test
+        public void testTypeBWithSelect() {
+            HashIndexSelect<DataModel.Consumer.TypeB, DataModel.Consumer.HString, Integer> hi = HashIndex
+                    .from(consumer, DataModel.Consumer.TypeB.class)
+                    .selectField("s", DataModel.Consumer.HString.class)
+                    .usingPath("i", int.class);
+
+            List<String> r = hi.findMatches(1)
+                    .sorted(Comparator.comparingInt(HollowObject::getOrdinal))
+                    .map(DataModel.Consumer.HString::getValue)
+                    .collect(toList());
+            Assert.assertEquals(100, r.size());
+            for (int i = 0; i < r.size(); i++) {
+                Assert.assertEquals("TypeB" + i, r.get(i));
             }
         }
 
