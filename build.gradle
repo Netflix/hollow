@@ -34,6 +34,7 @@ subprojects {
         resolutionStrategy {
             force 'com.google.inject.extensions:guice-servlet:latest.release'
             force 'org.apache.commons:commons-lang3:latest.release'
+            force 'netflix.grpc:netflix-grpc-common:1.15.2' // ToDo: Can be dropped after 07/16/2019
 
             def platform_components = [
                 'adminresources',
