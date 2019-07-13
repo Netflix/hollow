@@ -85,7 +85,7 @@ public class Gk2StatusAPI extends HollowAPI  {
         this(dataAccess, cachedTypes, factoryOverrides, null);
     }
 
-    public Gk2StatusAPI(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, Gk2StatusAPI previousCycleAPI) {
+    public Gk2StatusAPI(HollowDataAccess dataAccess, Set<String> cachedTypes, Map<String, HollowFactory<?>> factoryOverrides, com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI previousCycleAPI) {
         super(dataAccess);
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;

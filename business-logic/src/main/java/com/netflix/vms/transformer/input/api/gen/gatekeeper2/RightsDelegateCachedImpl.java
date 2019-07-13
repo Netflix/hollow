@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class RightsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsDelegate {
+public class RightsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        RightsDelegate {
 
     private final int windowsOrdinal;
     private RightsTypeAPI typeAPI;

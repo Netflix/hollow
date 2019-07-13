@@ -35,12 +35,6 @@ public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlic
                 return Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId());
             }
         });
-        findIncludedOrdinals(stateEngine, "Status", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int) inputAPI.getStatusHollow(ordinal)._getMovieId());
-            }
-        });
         findIncludedOrdinals(stateEngine, "PackageMovieDealCountryGroup", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
             @Override
             public Integer deriveId(int ordinal) {

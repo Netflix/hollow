@@ -28,7 +28,7 @@ public class StringTestData extends HollowTestObjectRecord {
         return f == null ? null : (String)f.value;
     }
 
-    public static class StringField extends HollowTestObjectRecord.Field {
+    public static class StringField extends Field {
 
         private StringField(String name, Object val) { super(name, val); }
 

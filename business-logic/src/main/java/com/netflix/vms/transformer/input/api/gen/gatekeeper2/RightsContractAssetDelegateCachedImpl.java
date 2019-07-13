@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class RightsContractAssetDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsContractAssetDelegate {
+public class RightsContractAssetDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        RightsContractAssetDelegate {
 
     private final String bcp47Code;
     private final int bcp47CodeOrdinal;

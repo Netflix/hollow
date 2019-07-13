@@ -242,7 +242,7 @@ public class SimpleTransformer {
                 new EncodingProfileGroupModule(converterAPI, ctx, cycleConstants, objectMapper),
 
                 new L10NMiscResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new LanguageRightsModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
+                new LanguageRightsModule(upstream, converterAPI, ctx, cycleConstants, objectMapper, indexer),
                 new TopNVideoDataModule(converterAPI, ctx, cycleConstants, objectMapper),
                 new RolloutVideoModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),

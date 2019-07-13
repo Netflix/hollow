@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsWindowDelegate {
+public class RightsWindowDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        RightsWindowDelegate {
 
     private final Long startDate;
     private final Long endDate;

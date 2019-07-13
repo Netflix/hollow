@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, FlagsDelegate {
+public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        FlagsDelegate {
 
     private final Boolean searchOnly;
     private final Boolean localText;

@@ -196,7 +196,7 @@ public class FlagsTestData extends HollowTestObjectRecord {
         return f == null ? null : (Boolean)f.value;
     }
 
-    public static class FlagsField extends HollowTestObjectRecord.Field {
+    public static class FlagsField extends Field {
 
         private FlagsField(String name, Object val) { super(name, val); }
 

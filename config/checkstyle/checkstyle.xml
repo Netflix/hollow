@@ -7,13 +7,5 @@
     <!-- Import rules -->
     <module name="AvoidStarImport"/>
     <module name="RedundantImport"/>
-    <module name="UnusedImports"/>
-    <!-- The vanilla ImportOrder module doesn't enforce separation between static and non-static imports. -->
-    <module name="CustomImportOrder">
-      <property name="customImportOrderRules" value="STATIC###THIRD_PARTY_PACKAGE"/>
-      <property name="standardPackageRegExp" value=""/> <!-- don't special case java/javax -->
-      <property name="sortImportsInGroupAlphabetically" value="true"/>
-      <property name="separateLineBetweenGroups" value="true"/>
-    </module>
   </module>
 </module>

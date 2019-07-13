@@ -28,7 +28,7 @@ public class DateTestData extends HollowTestObjectRecord {
         return f == null ? Long.MIN_VALUE : (Long)f.value;
     }
 
-    public static class DateField extends HollowTestObjectRecord.Field {
+    public static class DateField extends Field {
 
         private DateField(String name, Object val) { super(name, val); }
 

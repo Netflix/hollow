@@ -77,7 +77,7 @@ public class Status extends HollowObject {
 
     /**
      * Creates a unique key index for {@code Status} that has a primary key.
-     * The primary key is represented by the class {@link Status.Key}.
+     * The primary key is represented by the class {@link com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status.Key}.
      * <p>
      * By default the unique key index will not track updates to the {@code consumer} and thus
      * any changes will not be reflected in matched results.  To track updates the index must be
@@ -87,10 +87,10 @@ public class Status extends HollowObject {
      * @param consumer the consumer
      * @return the unique key index
      */
-    public static UniqueKeyIndex<Status, Status.Key> uniqueIndex(HollowConsumer consumer) {
-        return UniqueKeyIndex.from(consumer, Status.class)
+    public static UniqueKeyIndex<com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status, com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status.Key> uniqueIndex(HollowConsumer consumer) {
+        return UniqueKeyIndex.from(consumer, com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status.class)
             .bindToPrimaryKey()
-            .usingBean(Status.Key.class);
+            .usingBean(com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status.Key.class);
     }
 
     public static class Key {

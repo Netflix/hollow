@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class ParentNodeIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, ParentNodeIdDelegate {
+public class ParentNodeIdDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        ParentNodeIdDelegate {
 
     private final Long value;
     private ParentNodeIdTypeAPI typeAPI;

@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class VideoHierarchyInfoDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, VideoHierarchyInfoDelegate {
+public class VideoHierarchyInfoDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        VideoHierarchyInfoDelegate {
 
     private final Long topNodeId;
     private final int topNodeIdOrdinal;

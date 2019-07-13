@@ -193,6 +193,11 @@ public class TransformerCycleKickoff {
                         waitForMinCycleTimeToPass();
                     } catch(Throwable th) {
                         markCycleFailed(th);
+                        try {
+                            Thread.sleep(5*1000);   // short sleep at the end of failed cycles to avoid thrashing
+                        } catch (InterruptedException ex) {
+                        }
+
                     } finally {
                         ctx.getMetricRecorder().recordMetric(ConsecutiveCycleFailures, consecutiveCycleFailures);
 

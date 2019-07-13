@@ -5,7 +5,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class RightsContractPackageDelegateLookupImpl extends HollowObjectAbstractDelegate implements RightsContractPackageDelegate {
+public class RightsContractPackageDelegateLookupImpl extends HollowObjectAbstractDelegate implements
+        RightsContractPackageDelegate {
 
     private final RightsContractPackageTypeAPI typeAPI;
 

@@ -242,4 +242,9 @@ public interface TransformerConfig {
     boolean isCinderEnabled();
     
     String getGatekeeper2Countries();
+
+    // Input pinning spec, in the format "<namespace>:<version>[;<namespace>:<version>]"
+    // Eg. "vmsconverter-muon:20190712163036178;gatekeeper2_status_test:20190712163404608"
+    @DefaultValue("")
+    String getStaticInputVersions();
 }

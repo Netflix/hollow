@@ -57,7 +57,7 @@ public class VideoHierarchyInfoTestData extends HollowTestObjectRecord {
         return ref.nodeType();
     }
 
-    public static class VideoHierarchyInfoField extends HollowTestObjectRecord.Field {
+    public static class VideoHierarchyInfoField extends Field {
 
         private VideoHierarchyInfoField(String name, Object val) { super(name, val); }
 

@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class MapKeyDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, MapKeyDelegate {
+public class MapKeyDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        MapKeyDelegate {
 
     private final String value;
     private MapKeyTypeAPI typeAPI;

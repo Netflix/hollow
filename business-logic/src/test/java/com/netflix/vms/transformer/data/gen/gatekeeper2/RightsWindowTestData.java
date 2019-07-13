@@ -39,7 +39,7 @@ public class RightsWindowTestData extends HollowTestObjectRecord {
         return f == null ? null : (ListOfRightsWindowContractTestData)f.value;
     }
 
-    public static class RightsWindowField extends HollowTestObjectRecord.Field {
+    public static class RightsWindowField extends Field {
 
         private RightsWindowField(String name, Object val) { super(name, val); }
 

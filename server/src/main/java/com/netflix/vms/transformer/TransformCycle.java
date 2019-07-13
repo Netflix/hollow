@@ -88,6 +88,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+import org.apache.commons.lang.StringUtils;
 
 public class TransformCycle {
     private final String transformerVip;
@@ -757,7 +758,13 @@ public class TransformCycle {
         ctx.getMetricRecorder().startTimer(P1_ReadInputDataDuration);
         Map<UpstreamDatasetHolder.Dataset, InputState> updatedInputs = new ConcurrentHashMap<>();
         try {
-            FollowVipPin followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+            FollowVipPin followVipPin;
+            if (!ctx.getConfig().getStaticInputVersions().equals(StringUtils.EMPTY))
+                // FP ""vms.staticInputVersions" is useful for migration of feeds from Converter to Transformer input
+                followVipPin = followVipPinExtractor.getStaticInputVersions(ctx);
+            else
+                followVipPin = followVipPinExtractor.retrieveFollowVipPin(ctx);
+
             SimultaneousExecutor executor = new SimultaneousExecutor(12,
                     TransformCycle.class, "vms-restore-and-input-processing");
 

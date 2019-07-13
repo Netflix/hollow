@@ -1,16 +1,14 @@
 package com.netflix.vms.transformer.modules.packages.contracts;
 
+import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+
 import com.netflix.config.utils.Pair;
 import com.netflix.hollow.core.write.objectmapper.HollowObjectMapper;
 import com.netflix.vms.transformer.CycleConstants;
 import com.netflix.vms.transformer.common.TransformerContext;
 import com.netflix.vms.transformer.common.config.OutputTypeConfig;
 import com.netflix.vms.transformer.hollowinput.DisallowedAssetBundleEntryHollow;
-import com.netflix.vms.transformer.hollowinput.RightsHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowContractHollow;
-import com.netflix.vms.transformer.hollowinput.RightsWindowHollow;
 import com.netflix.vms.transformer.hollowinput.SetOfDisallowedAssetBundleEntryHollow;
-import com.netflix.vms.transformer.hollowinput.StatusHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VmsAttributeFeedEntryHollow;
@@ -19,6 +17,13 @@ import com.netflix.vms.transformer.hollowoutput.LanguageRights;
 import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.Video;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
+import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.modules.AbstractTransformModule;
 import com.netflix.vms.transformer.util.VideoContractUtil;
 import java.util.ArrayList;
@@ -30,12 +35,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LanguageRightsModule extends AbstractTransformModule {
-    private final VMSHollowInputAPI api;
+    private final VMSHollowInputAPI converterAPI;
+    private final Gk2StatusAPI gk2StatusAPI;
     private final VMSTransformerIndexer indexer;
 
-    public LanguageRightsModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
-        super(api, ctx, cycleConstants, mapper);
-        this.api = api;
+    public LanguageRightsModule(UpstreamDatasetHolder upstream, VMSHollowInputAPI converterAPI, TransformerContext ctx, CycleConstants cycleConstants, HollowObjectMapper mapper, VMSTransformerIndexer indexer) {
+        super(converterAPI, ctx, cycleConstants, mapper);
+        this.converterAPI = converterAPI;
+        this.gk2StatusAPI = ((Gatekeeper2Dataset) upstream.getDataset(GATEKEEPER2)).getAPI();
         this.indexer = indexer;
     }
 
@@ -47,25 +54,26 @@ public class LanguageRightsModule extends AbstractTransformModule {
 
         Map<Pair<Integer, Integer>, LanguageRights> contractMovieRights = new HashMap<>();
 
-        for (StatusHollow status : api.getAllStatusHollow()) {
-            int movieId = (int) status._getMovieId();
-            String countryCode = status._getCountryCode()._getValue();
+        for (Status status : gk2StatusAPI.getAllStatus()) {
+            int movieId = (int) status.getMovieId();
+            String countryCode = status.getCountryCode();
 
-            List<RightsWindowContractHollow> windowContracts = new ArrayList<>();
-            RightsHollow rightsHollow = status._getRights();
-            List<RightsWindowHollow> windows = rightsHollow._getWindows();
-            for (RightsWindowHollow windowHollow : windows) {
-                if (windowHollow._getContractIdsExt() != null && !windowHollow._getContractIdsExt().isEmpty()) {
-                    windowContracts.addAll(windowHollow._getContractIdsExt().stream().collect(Collectors.toList()));
+            List<RightsWindowContract> windowContracts = new ArrayList<>();
+            Rights rightsHollow = status.getRights();
+            List<RightsWindow> windows = rightsHollow.getWindows();
+            for (RightsWindow windowHollow : windows) {
+                if (windowHollow.getContractIdsExt() != null && !windowHollow.getContractIdsExt().isEmpty()) {
+                    windowContracts.addAll(windowHollow.getContractIdsExt().stream().collect(Collectors.toList()));
                 }
             }
 
-            for (RightsWindowContractHollow windowContract : windowContracts) {
-                int intDealId = (int) windowContract._getDealId();
+            for (RightsWindowContract windowContract : windowContracts) {
+                int intDealId = (int) windowContract.getDealId();
                 Pair<Integer, Integer> rightsKey = new Pair<>(intDealId, movieId);
 
-                long dealId = windowContract._getDealId();
-                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(api, indexer, ctx, movieId, countryCode, dealId);
+                long dealId = windowContract.getDealId();
+                VmsAttributeFeedEntryHollow contractAttributes = VideoContractUtil.getVmsAttributeFeedEntry(
+                        converterAPI, indexer, ctx, movieId, countryCode, dealId);
                 SetOfDisallowedAssetBundleEntryHollow disallowedBundleSet_ = contractAttributes == null ? null : contractAttributes._getDisallowedAssetBundles();
                 if (disallowedBundleSet_ == null || disallowedBundleSet_.isEmpty()) {
                     continue;

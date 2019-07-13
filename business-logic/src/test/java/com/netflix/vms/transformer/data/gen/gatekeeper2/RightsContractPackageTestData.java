@@ -49,7 +49,7 @@ public class RightsContractPackageTestData extends HollowTestObjectRecord {
         return f == null ? null : (Boolean)f.value;
     }
 
-    public static class RightsContractPackageField extends HollowTestObjectRecord.Field {
+    public static class RightsContractPackageField extends Field {
 
         private RightsContractPackageField(String name, Object val) { super(name, val); }
 

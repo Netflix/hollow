@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class StringDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StringDelegate {
+public class StringDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        StringDelegate {
 
     private final String value;
     private StringTypeAPI typeAPI;

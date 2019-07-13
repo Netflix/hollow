@@ -28,7 +28,7 @@ public class VideoNodeTypeTestData extends HollowTestObjectRecord {
         return f == null ? null : (String)f.value;
     }
 
-    public static class VideoNodeTypeField extends HollowTestObjectRecord.Field {
+    public static class VideoNodeTypeField extends Field {
 
         private VideoNodeTypeField(String name, Object val) { super(name, val); }
 

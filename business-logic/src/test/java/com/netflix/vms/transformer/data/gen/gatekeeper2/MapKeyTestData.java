@@ -28,7 +28,7 @@ public class MapKeyTestData extends HollowTestObjectRecord {
         return f == null ? null : (String)f.value;
     }
 
-    public static class MapKeyField extends HollowTestObjectRecord.Field {
+    public static class MapKeyField extends Field {
 
         private MapKeyField(String name, Object val) { super(name, val); }
 

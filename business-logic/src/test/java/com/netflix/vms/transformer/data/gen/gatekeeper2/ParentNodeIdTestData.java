@@ -28,7 +28,7 @@ public class ParentNodeIdTestData extends HollowTestObjectRecord {
         return f == null ? Long.MIN_VALUE : (Long)f.value;
     }
 
-    public static class ParentNodeIdField extends HollowTestObjectRecord.Field {
+    public static class ParentNodeIdField extends Field {
 
         private ParentNodeIdField(String name, Object val) { super(name, val); }
 

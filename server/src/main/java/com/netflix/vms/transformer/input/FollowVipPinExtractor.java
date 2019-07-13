@@ -11,15 +11,55 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
 
 public class FollowVipPinExtractor {
 
     private final FileStore fileStore;
-    
+
     public FollowVipPinExtractor(FileStore fileStore) {
         this.fileStore = fileStore;
     }
-    
+
+    /**
+     * This method is used to pin inputs to the transformer for specific versions. To achieve pinning, set-
+     * FP "vms.staticInputVersions" to something like "vmsconverter-muon:20190712163036178;gatekeeper2_status_test:201907121634046"
+     */
+    public FollowVipPin getStaticInputVersions(TransformerContext ctx) {
+        Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new EnumMap<>(UpstreamDatasetHolder.Dataset.class);
+        String staticInputVerions = ctx.getConfig().getStaticInputVersions();
+        for (String inputPair : staticInputVerions.split(";")) {
+            if (inputPair.trim().equals(StringUtils.EMPTY))
+                continue;
+            String[] parts = inputPair.split(":");
+            if (parts.length != 2) {
+                String msg = "Invalid static input config: %s" + staticInputVerions;
+                ctx.getLogger().error(FollowVip, msg);
+                throw new RuntimeException(msg);
+            }
+
+            UpstreamDatasetHolder.Dataset dataset = UpstreamDatasetConfig.lookupDatasetForNamespaceInCurrentEnv(parts[0]);
+            if (dataset == null) {
+                String msg = "Transformer is missing implementation to consume feed: %s" + parts[0];
+                ctx.getLogger().error(FollowVip, msg);
+                throw new RuntimeException(msg);
+            }
+
+            inputVersions.put(dataset, Long.valueOf(parts[1]));
+        }
+
+        if (inputVersions.size() != UpstreamDatasetConfig.getNamespaces().size()) {
+            String msg = String.format("Static input values are missing for some inputs. Expected= %s, "
+                    + "Actual= %s", UpstreamDatasetConfig.getNamespaces(), inputVersions.keySet());
+            ctx.getLogger().info(FollowVip, msg);
+            throw new RuntimeException(msg);
+        }
+
+        ctx.getLogger().info(FollowVip, "Static inputs configured to " + staticInputVerions);
+        return new FollowVipPin("static-inputs", inputVersions, System.currentTimeMillis());
+    }
+
+
     public FollowVipPin retrieveFollowVipPin(TransformerContext ctx) {
         String followVip = ctx.getConfig().getFollowVip();
         if(followVip != null) {

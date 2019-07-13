@@ -44,7 +44,7 @@ public class RightsContractAssetTestData extends HollowTestObjectRecord {
         return ref.value();
     }
 
-    public static class RightsContractAssetField extends HollowTestObjectRecord.Field {
+    public static class RightsContractAssetField extends Field {
 
         private RightsContractAssetField(String name, Object val) { super(name, val); }
 

@@ -49,7 +49,7 @@ public class AvailableAssetsTestData extends HollowTestObjectRecord {
         return f == null ? null : (SetOfStringTestData)f.value;
     }
 
-    public static class AvailableAssetsField extends HollowTestObjectRecord.Field {
+    public static class AvailableAssetsField extends Field {
 
         private AvailableAssetsField(String name, Object val) { super(name, val); }
 

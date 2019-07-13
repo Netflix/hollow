@@ -62,7 +62,7 @@ public class StatusTestData extends HollowTestObjectRecord {
         return f == null ? null : (VideoHierarchyInfoTestData)f.value;
     }
 
-    public static class StatusField extends HollowTestObjectRecord.Field {
+    public static class StatusField extends Field {
 
         private StatusField(String name, Object val) { super(name, val); }
 

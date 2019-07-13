@@ -24,7 +24,7 @@ public class RightsTestData extends HollowTestObjectRecord {
         return f == null ? null : (ListOfRightsWindowTestData)f.value;
     }
 
-    public static class RightsField extends HollowTestObjectRecord.Field {
+    public static class RightsField extends Field {
 
         private RightsField(String name, Object val) { super(name, val); }
 

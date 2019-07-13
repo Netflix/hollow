@@ -49,6 +49,26 @@ public class UpstreamDatasetHolder {
 
             TEST_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
             TEST_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_test");
+
+            //
+            // Cinder inputs to Converter that need to be migrated to transformer:
+            //
+            // .put(SHOW_SEASON_EPISODE, "cinder.oscar.memento.showSeasonEpisode");
+            // .put(OSCAR_VIDEO_GENERAL, "cinder.oscar.memento.videoGeneral");  // NOTE: requires Hollow incremental production
+            // .put(CUPTOKENRECORDS_V3, "cuptokenrecords.v3");
+            // .put(MCL_EARLIEST_DATE, "movie-country-language-earliestdate-namespace");
+            // .put(OSCAR_VIDEO_DATE, "cinder.oscar.memento.videoDate");
+            // .put(AWARD, "cinder.award.award");
+            // .put(VIDEO_AWARD, "cinder.award.videoAward");
+            // .put(OSCAR_VIDEO_TYPE, "cinder.oscar.memento.videoType");
+            // .put(OSCAR_COUNTRY_LABEL, "cinder.oscar.memento.showCountryLabel");
+            // .put(OSCAR_LOCALIZED_METADATA, "cinder.oscar.memento.localizedMetaData");
+            // .put(OSCAR_PERSON_VIDEO, "cinder.oscar.memento.personVideo");
+            // .put(OSCAR_ROLLOUT, "cinder.oscar.memento.rollout");
+            // .put(OSCAR_SUPPLEMENTAL, "cinder.oscar.memento.supplemental");
+            // .put(PACKAGE_DEAL_COUNTRY, "packageDealCountry-feed");
+            // .put(MCE_IMAGE_V3, "mcevmsfeeds.image.v3");
+            // .put(EXHIBIT_DEAL_ATTRIBUTE_V1, "exhibit.deal.attribute.v1");
         }
 
         Dataset(Class<? extends UpstreamDataset> upstream, Class<? extends HollowAPI> api, Class<? extends InputDataSlicer> slicer) {
@@ -86,6 +106,10 @@ public class UpstreamDatasetHolder {
         public static Dataset lookupDatasetForNamespace(String namespace, boolean isProd) {
             final BiMap<Dataset, String> namespaces = HashBiMap.create(getNamespacesforEnv(isProd));
             return namespaces.inverse().get(namespace);
+        }
+
+        public static Dataset lookupDatasetForNamespaceInCurrentEnv(String namespace) {
+            return lookupDatasetForNamespace(namespace, NetflixConfiguration.getEnvironment().equals("prod"));
         }
 
         /**

@@ -7,7 +7,8 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class StatusDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, StatusDelegate {
+public class StatusDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
+        StatusDelegate {
 
     private final Long movieId;
     private final String countryCode;
