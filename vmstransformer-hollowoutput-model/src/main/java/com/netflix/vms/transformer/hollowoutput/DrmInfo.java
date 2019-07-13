@@ -6,7 +6,8 @@ public class DrmInfo implements Cloneable {
 
     public int drmKeyGroup = java.lang.Integer.MIN_VALUE;
     public DrmKey drmKey = null;
-    public Map<Integer, DrmHeader> drmHeaders = null;
+    // TODO(timt): make `java.lang.Integer` do the right thing here
+    public Map<com.netflix.vms.transformer.hollowoutput.Integer, DrmHeader> drmHeaders = null;
 
     public boolean equals(Object other) {
         if(other == this)  return true;

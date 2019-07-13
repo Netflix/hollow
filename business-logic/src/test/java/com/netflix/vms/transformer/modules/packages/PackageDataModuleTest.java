@@ -78,7 +78,7 @@ public class PackageDataModuleTest {
         VMSHollowInputAPI api = createAPI(createPackage());
         PackageHollow packageHollow = api.getAllPackageHollow().iterator().next();
         PackageDataModule packageDataModule = getPackageDataModule(api);
-        assertNull(packageDataModule.convertPackage(packageHollow, VIDEO_ID));
+        assertNull(packageDataModule.convertPackage(packageHollow, VIDEO_ID, newCache(), newCache()));
     }
 
     private HollowReadStateEngine createGatekeeper2ReadStateEngine() {
@@ -125,7 +125,7 @@ public class PackageDataModuleTest {
                         .setDealCountryGroups(new ArrayList<>()));
         PackageHollow packageHollow = api.getAllPackageHollow().iterator().next();
         PackageDataModule packageDataModule = getPackageDataModule(api);
-        assertNull(packageDataModule.convertPackage(packageHollow, VIDEO_ID));
+        assertNull(packageDataModule.convertPackage(packageHollow, VIDEO_ID, newCache(), newCache()));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class PackageDataModuleTest {
                         .setDealCountryGroups(Collections.singletonList(group)));
         PackageHollow packageHollow = api.getAllPackageHollow().iterator().next();
         PackageDataModule packageDataModule = getPackageDataModule(api);
-        PackageDataCollection data = packageDataModule.convertPackage(packageHollow, VIDEO_ID);
+        PackageDataCollection data = packageDataModule.convertPackage(packageHollow, VIDEO_ID, newCache(), newCache());
         assertEquals(Collections.singleton(new ISOCountry("US")),
                 data.getPackageData().allDeployableCountries);
     }
@@ -164,5 +164,9 @@ public class PackageDataModuleTest {
 
         return new PackageDataModule(upstream, mockContext, mock(HollowObjectMapper.class),
                 new CycleConstants(upstream),  indexer, null);
+    }
+
+    private static <V> Map<Integer,V> newCache() {
+        return new HashMap<>();
     }
 }

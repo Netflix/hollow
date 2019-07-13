@@ -71,7 +71,9 @@ public class StreamDataModule {
 
     public static final VideoFormatDebugMap debugVideoFormatMap = new VideoFormatDebugMap();
     public static final DebugLogConfig debugLogConfig = new DebugLogConfig();
-    public static final int PLAYREADY_SYSTEM = 1;
+    // TODO(timt): make `java.lang.Integer` do the right thing here
+    public static final com.netflix.vms.transformer.hollowoutput.Integer PLAYREADY_SYSTEM =
+            new com.netflix.vms.transformer.hollowoutput.Integer(1);
 
     private final StreamDrmData EMPTY_DRM_DATA = new StreamDrmData();
     private final DownloadLocationSet EMPTY_DOWNLOAD_LOCATIONS = new DownloadLocationSet();
@@ -80,8 +82,6 @@ public class StreamDataModule {
     private final Map<String, TimedTextTypeDescriptor> timedTextTypeDescriptorMap;
     private final Map<String, Integer> deploymentLabelBitsetOffsetMap;
     private final Map<String, List<Strings>> tagsLists;
-    private final Map<Integer, Object> drmKeysByGroupId;
-    private final Map<Integer, DrmInfo> drmInfoByGroupId;
 
     private final VideoFormatDescriptorIdentifier videoFormatIdentifier;
     private final HollowPrimaryKeyIndex streamProfileIdx;
@@ -90,7 +90,11 @@ public class StreamDataModule {
     private final CycleConstants cycleConstants;
     private final HollowObjectMapper objectMapper;
 
-    public StreamDataModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants, VMSTransformerIndexer indexer, HollowObjectMapper objectMapper, Map<Integer, Object> drmKeysByGroupId, Map<Integer, DrmInfo> drmInfoByGroupId) {
+    public StreamDataModule(VMSHollowInputAPI api,
+                            TransformerContext ctx,
+                            CycleConstants cycleConstants,
+                            VMSTransformerIndexer indexer,
+                            HollowObjectMapper objectMapper) {
         this.api = api;
         this.ctx = ctx;
         this.cycleConstants = cycleConstants;
@@ -98,8 +102,6 @@ public class StreamDataModule {
         this.timedTextTypeDescriptorMap = getTimedTextTypeDescriptorMap();
         this.deploymentLabelBitsetOffsetMap = getDeploymentLabelBitsetOffsetMap();
         this.tagsLists = new HashMap<>();
-        this.drmKeysByGroupId = drmKeysByGroupId;
-        this.drmInfoByGroupId = drmInfoByGroupId;
 
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
@@ -112,7 +114,11 @@ public class StreamDataModule {
         EMPTY_DOWNLOAD_LOCATIONS.locations = Collections.emptyList();
     }
 
-    StreamData convertStreamData(PackageHollow packages, PackageStreamHollow inputStream, DrmInfoData drmInfoData) {
+    StreamData convertStreamData(PackageHollow packages,
+                                 PackageStreamHollow inputStream,
+                                 DrmInfoData drmInfoData,
+                                 Map<Integer, Object> drmKeysByGroupId,
+                                 Map<Integer, DrmInfo> drmInfoByGroupId) {
         int encodingProfileId = (int) inputStream._getStreamProfileId();
         int streamProfileOrdinal = streamProfileIdx.getMatchingOrdinal(Long.valueOf(encodingProfileId));
         StreamProfilesHollow streamProfile = api.getStreamProfilesHollow(streamProfileOrdinal);

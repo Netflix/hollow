@@ -84,9 +84,6 @@ public class PackageDataModule {
     private final HollowPrimaryKeyIndex packageMovieDealCountryGroupIndex;
     private final HollowHashIndex packagesByVideoIdx;
 
-    private final Map<Integer, Object> drmKeysByGroupId;
-    private final Map<Integer, DrmInfo> drmInfoByGroupId;
-
     private Set<Integer> fourKProfileIds;
     private Set<Integer> hdrProfileIds;
     private Set<Integer> atmosStreamProfileIds;
@@ -112,10 +109,7 @@ public class PackageDataModule {
         this.packagesByVideoIdx = indexer.getHashIndex(IndexSpec.PACKAGES_BY_VIDEO);
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
 
-        this.drmKeysByGroupId = new HashMap<>();
-        this.drmInfoByGroupId = new HashMap<>();
-
-        this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper, drmKeysByGroupId, drmInfoByGroupId);
+        this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper);
         this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, gk2Dataset, cupTokenFetcher);
         this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
 
@@ -137,11 +131,13 @@ public class PackageDataModule {
 
                     int packageOrdinal = iter.next();
                     while (packageOrdinal != HollowOrdinalIterator.NO_MORE_ORDINALS) {
-                        drmKeysByGroupId.clear();
-                        drmInfoByGroupId.clear();
+                        Map<Integer, Object> drmKeysByGroupId = new HashMap<>();
+                        Map<Integer, DrmInfo> drmInfoByGroupId = new HashMap<>();
+
                         PackageHollow packages = api.getPackageHollow(packageOrdinal);
-                        populateDrmKeysByGroupId(packages, videoId);
-                        PackageDataCollection packageDataCollection = convertPackage(packages, videoId);
+                        populateDrmKeysByGroupId(packages, videoId, drmKeysByGroupId, drmInfoByGroupId);
+                        PackageDataCollection packageDataCollection = convertPackage(
+                                packages, videoId, drmKeysByGroupId, drmInfoByGroupId);
                         if (packageDataCollection != null) {
                             allPackageDataCollection.add(packageDataCollection);
                             mapper.add(packageDataCollection.getPackageData());
@@ -162,14 +158,17 @@ public class PackageDataModule {
         }
     }
 
-    private void populateDrmKeysByGroupId(PackageHollow packageInput, Integer videoId) {
+    private void populateDrmKeysByGroupId(PackageHollow packageInput,
+                                          Integer videoId,
+                                          Map<Integer, Object> drmKeysByGroupId,
+                                          Map<Integer, DrmInfo> drmInfoByGroupId) {
         for (PackageDrmInfoHollow inputDrmInfo : packageInput._getDrmInfo()) {
             int drmKeyGroup = (int) inputDrmInfo._getDrmKeyGroup();
             if (drmKeyGroup == WMDRMKEY_GROUP) {
                 WmDrmKey wmDrmKey = new WmDrmKey();
                 wmDrmKey.contentPackagerPublicKey = new DrmKeyString(inputDrmInfo._getContentPackagerPublicKey()._getValue());
                 wmDrmKey.encryptedContentKey = new DrmKeyString(inputDrmInfo._getKeySeed()._getValue());
-                drmKeysByGroupId.put(Integer.valueOf(drmKeyGroup), wmDrmKey);
+                drmKeysByGroupId.put(drmKeyGroup, wmDrmKey);
             } else {
                 DrmKey drmKey = new DrmKey();
                 drmKey.keyId = inputDrmInfo._getKeyId();
@@ -177,7 +176,7 @@ public class PackageDataModule {
                 drmKey.keyDecrypted = false;
                 drmKey.videoId = new Video(videoId);
                 drmKey.keyDecrypted = inputDrmInfo._getKeyDecrypted();
-                drmKeysByGroupId.put(Integer.valueOf(drmKeyGroup), drmKey);
+                drmKeysByGroupId.put(drmKeyGroup, drmKey);
 
                 DrmInfo drmInfo = new DrmInfo();
                 drmInfo.drmKeyGroup = drmKeyGroup;
@@ -195,16 +194,20 @@ public class PackageDataModule {
                         outputHeader.drmSystemId = (int) header._getDrmSystemId();
                         outputHeader.keyId = DatatypeConverter.parseHexBinary(header._getKeyId()._getValue());
                         outputHeader.attributes = Collections.emptyMap();
+                        // TODO(timt): make `java.lang.Integer` do the right thing here
                         drmInfo.drmHeaders.put(new com.netflix.vms.transformer.hollowoutput.Integer(outputHeader.drmSystemId), outputHeader);
                     }
                 }
-                drmInfoByGroupId.put(Integer.valueOf(drmKeyGroup), drmInfo);
+                drmInfoByGroupId.put(drmKeyGroup, drmInfo);
             }
         }
     }
 
     @VisibleForTesting
-    PackageDataCollection convertPackage(PackageHollow packages, int videoId) {
+    PackageDataCollection convertPackage(PackageHollow packages,
+                                         int videoId,
+                                         Map<Integer, Object> drmKeysByGroupId,
+                                         Map<Integer, DrmInfo> drmInfoByGroupId) {
         int packageMovieDealCountryGroupOrdinal = packageMovieDealCountryGroupIndex.getMatchingOrdinal(
                 (long) videoId, packages._getPackageId());
         if (packageMovieDealCountryGroupOrdinal == ORDINAL_NONE) {
@@ -260,7 +263,8 @@ public class PackageDataModule {
         pkg.streams = new HashSet<>();
 
         for (PackageStreamHollow inputStream : packages._getDownloadables()) {
-            StreamData outputStream = streamDataModule.convertStreamData(packages, inputStream, drmInfoData);
+            StreamData outputStream = streamDataModule.convertStreamData(
+                    packages, inputStream, drmInfoData, drmKeysByGroupId, drmInfoByGroupId);
 
             if (outputStream != null) {
                 pkg.streams.add(outputStream);
@@ -378,7 +382,7 @@ public class PackageDataModule {
     private Set<Integer> gatherVideoIds(Map<String, Set<VideoHierarchy>> showHierarchyByCountry, Set<Integer> extraVideoIds) {
         if (showHierarchyByCountry == null) return extraVideoIds;
 
-        Set<Integer> videoIds = new HashSet<Integer>(extraVideoIds);
+        Set<Integer> videoIds = new HashSet<>(extraVideoIds);
         for (Map.Entry<String, Set<VideoHierarchy>> entry : showHierarchyByCountry.entrySet()) {
             for (VideoHierarchy showHierarchy : entry.getValue()) {
                 videoIds.add(showHierarchy.getTopNodeId());
