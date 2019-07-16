@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+
 import com.netflix.vms.transformer.data.gen.gatekeeper2.StringTestData.StringField;
 
 public class RightsContractAssetTestData extends HollowTestObjectRecord {
@@ -44,7 +46,7 @@ public class RightsContractAssetTestData extends HollowTestObjectRecord {
         return ref.value();
     }
 
-    public static class RightsContractAssetField extends Field {
+    public static class RightsContractAssetField extends HollowTestObjectRecord.Field {
 
         private RightsContractAssetField(String name, Object val) { super(name, val); }
 

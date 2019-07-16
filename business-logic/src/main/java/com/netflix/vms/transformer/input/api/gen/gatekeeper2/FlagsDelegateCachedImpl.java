@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
-import com.netflix.hollow.api.custom.HollowTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
-public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
-        FlagsDelegate {
+public class FlagsDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, FlagsDelegate {
 
     private final Boolean searchOnly;
     private final Boolean localText;

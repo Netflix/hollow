@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
 import com.netflix.hollow.api.custom.HollowSetTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
+
 import com.netflix.hollow.core.read.dataaccess.HollowSetTypeDataAccess;
+import com.netflix.hollow.api.objects.delegate.HollowSetLookupDelegate;
 
 @SuppressWarnings("all")
 public class SetOfStringTypeAPI extends HollowSetTypeAPI {

@@ -30,4 +30,5 @@ jar {
 
 tasks.checkstyleMain {
   exclude '**/hollowinput/**'
+  exclude '**/api.gen/**'
 }

@@ -10,10 +10,14 @@ import com.netflix.vms.transformer.common.input.UpstreamDataset;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
+import com.netflix.vms.transformer.input.api.gen.oscar.OscarAPI;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
 import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
 import com.netflix.vms.transformer.input.datasets.slicers.Gk2StatusDataSlicerImpl;
+import com.netflix.vms.transformer.input.datasets.slicers.OscarMovieDataSlicerImpl;
+
 import java.lang.reflect.Constructor;
 import java.util.EnumMap;
 import java.util.Map;
@@ -36,6 +40,8 @@ public class UpstreamDatasetHolder {
 
         CONVERTER(ConverterDataset.class, VMSHollowInputAPI.class, ConverterDataSlicerImpl.class),
         GATEKEEPER2(Gatekeeper2Dataset.class, Gk2StatusAPI.class, Gk2StatusDataSlicerImpl.class);
+        //TODO: enable me once we can turn on the new data set including follow vip functionality
+//        OSCAR(OscarDataset.class, OscarAPI.class, OscarMovieDataSlicerImpl.class);
 
         private Class<? extends UpstreamDataset> upstream;
         private Class<? extends HollowAPI> api;

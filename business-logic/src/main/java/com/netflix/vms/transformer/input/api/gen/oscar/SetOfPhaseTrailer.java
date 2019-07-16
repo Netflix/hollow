@@ -1,0 +1,33 @@
+package com.netflix.vms.transformer.input.api.gen.oscar;
+
+import com.netflix.hollow.api.objects.HollowSet;
+import com.netflix.hollow.core.schema.HollowSetSchema;
+import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
+import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
+
+@SuppressWarnings("all")
+public class SetOfPhaseTrailer extends HollowSet<PhaseTrailer> {
+
+    public SetOfPhaseTrailer(HollowSetDelegate delegate, int ordinal) {
+        super(delegate, ordinal);
+    }
+
+    @Override
+    public PhaseTrailer instantiateElement(int ordinal) {
+        return (PhaseTrailer) api().getPhaseTrailer(ordinal);
+    }
+
+    @Override
+    public boolean equalsElement(int elementOrdinal, Object testObject) {
+        return GenericHollowRecordHelper.equalObject(getSchema().getElementType(), elementOrdinal, testObject);
+    }
+
+    public OscarAPI api() {
+        return typeApi().getAPI();
+    }
+
+    public SetOfPhaseTrailerTypeAPI typeApi() {
+        return (SetOfPhaseTrailerTypeAPI) delegate.getTypeAPI();
+    }
+
+}

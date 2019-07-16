@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
+import com.netflix.hollow.api.consumer.HollowConsumer;
 import com.netflix.hollow.api.objects.HollowObject;
+import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
 public class VideoHierarchyInfo extends HollowObject {

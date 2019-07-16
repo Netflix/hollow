@@ -5,8 +5,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class VideoHierarchyInfoDelegateLookupImpl extends HollowObjectAbstractDelegate implements
-        VideoHierarchyInfoDelegate {
+public class VideoHierarchyInfoDelegateLookupImpl extends HollowObjectAbstractDelegate implements VideoHierarchyInfoDelegate {
 
     private final VideoHierarchyInfoTypeAPI typeAPI;
 

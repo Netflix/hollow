@@ -5,8 +5,7 @@ import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 
 @SuppressWarnings("all")
-public class RightsWindowContractDelegateLookupImpl extends HollowObjectAbstractDelegate implements
-        RightsWindowContractDelegate {
+public class RightsWindowContractDelegateLookupImpl extends HollowObjectAbstractDelegate implements RightsWindowContractDelegate {
 
     private final RightsWindowContractTypeAPI typeAPI;
 

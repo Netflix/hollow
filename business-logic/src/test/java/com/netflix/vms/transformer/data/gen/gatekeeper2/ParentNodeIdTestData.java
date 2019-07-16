@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -28,7 +29,7 @@ public class ParentNodeIdTestData extends HollowTestObjectRecord {
         return f == null ? Long.MIN_VALUE : (Long)f.value;
     }
 
-    public static class ParentNodeIdField extends Field {
+    public static class ParentNodeIdField extends HollowTestObjectRecord.Field {
 
         private ParentNodeIdField(String name, Object val) { super(name, val); }
 

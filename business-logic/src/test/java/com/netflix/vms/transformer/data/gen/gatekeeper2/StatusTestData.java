@@ -4,6 +4,7 @@ import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
 import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+
 import com.netflix.vms.transformer.data.gen.gatekeeper2.AvailableAssetsTestData.AvailableAssetsField;
 import com.netflix.vms.transformer.data.gen.gatekeeper2.FlagsTestData.FlagsField;
 import com.netflix.vms.transformer.data.gen.gatekeeper2.RightsTestData.RightsField;
@@ -62,7 +63,7 @@ public class StatusTestData extends HollowTestObjectRecord {
         return f == null ? null : (VideoHierarchyInfoTestData)f.value;
     }
 
-    public static class StatusField extends Field {
+    public static class StatusField extends HollowTestObjectRecord.Field {
 
         private StatusField(String name, Object val) { super(name, val); }
 

@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
 import com.netflix.hollow.api.objects.HollowSet;
+import com.netflix.hollow.core.schema.HollowSetSchema;
 import com.netflix.hollow.api.objects.delegate.HollowSetDelegate;
 import com.netflix.hollow.api.objects.generic.GenericHollowRecordHelper;
 

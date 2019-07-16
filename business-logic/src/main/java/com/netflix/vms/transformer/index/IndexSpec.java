@@ -52,9 +52,7 @@ public enum IndexSpec {
     OVERRIDE_SCHEDULE_BY_VIDEO_ID(HASH, "OverrideSchedule", "", "movieId", "phaseTag.value"),
     MASTER_SCHEDULE_BY_TAG_SHOW(HASH, "MasterSchedule", "", "phaseTag.value", "scheduleId.value"),
     ABSOLUTE_SCHEDULE_BY_VIDEO_ID_TAG(HASH, "AbsoluteSchedule", "", "movieId", "phaseTag.value"),
-    
 
-    
     // Merch-language-dates
     MERCH_LANGUAGE_DATE(PRIMARY_KEY, "FeedMovieCountryLanguages", "movieId.value", "countryCode.value"),
     CUP_TOKEN_HINDEX(HASH, "CinderCupTokenRecord", "", "movieId.value", "dealId.value"),    

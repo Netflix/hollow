@@ -1,14 +1,13 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
-import com.netflix.hollow.api.custom.HollowTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 import com.netflix.hollow.api.objects.delegate.HollowObjectAbstractDelegate;
 import com.netflix.hollow.core.read.dataaccess.HollowObjectTypeDataAccess;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowCachedDelegate;
 
 @SuppressWarnings("all")
-public class RightsContractAssetDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate,
-        RightsContractAssetDelegate {
+public class RightsContractAssetDelegateCachedImpl extends HollowObjectAbstractDelegate implements HollowCachedDelegate, RightsContractAssetDelegate {
 
     private final String bcp47Code;
     private final int bcp47CodeOrdinal;

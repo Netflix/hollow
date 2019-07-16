@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -44,7 +45,7 @@ public class RightsWindowContractTestData extends HollowTestObjectRecord {
         return f == null ? null : (Boolean)f.value;
     }
 
-    public static class RightsWindowContractField extends Field {
+    public static class RightsWindowContractField extends HollowTestObjectRecord.Field {
 
         private RightsWindowContractField(String name, Object val) { super(name, val); }
 

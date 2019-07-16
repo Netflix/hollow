@@ -1,8 +1,9 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
 import com.netflix.hollow.api.custom.HollowListTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
+
 import com.netflix.hollow.core.read.dataaccess.HollowListTypeDataAccess;
+import com.netflix.hollow.api.objects.delegate.HollowListLookupDelegate;
 
 @SuppressWarnings("all")
 public class ListOfRightsContractAssetTypeAPI extends HollowListTypeAPI {

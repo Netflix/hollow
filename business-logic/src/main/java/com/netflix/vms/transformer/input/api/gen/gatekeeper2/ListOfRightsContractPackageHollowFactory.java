@@ -1,9 +1,9 @@
 package com.netflix.vms.transformer.input.api.gen.gatekeeper2;
 
-import com.netflix.hollow.api.custom.HollowTypeAPI;
-import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 import com.netflix.hollow.api.objects.provider.HollowFactory;
 import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
+import com.netflix.hollow.api.custom.HollowTypeAPI;
+import com.netflix.hollow.api.objects.delegate.HollowListCachedDelegate;
 
 @SuppressWarnings("all")
 public class ListOfRightsContractPackageHollowFactory<T extends ListOfRightsContractPackage> extends HollowFactory<T> {

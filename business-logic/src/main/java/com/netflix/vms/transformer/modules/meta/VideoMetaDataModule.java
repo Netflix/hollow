@@ -9,8 +9,11 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
+import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -51,18 +54,26 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.api.gen.oscar.MovieExtension;
+import com.netflix.vms.transformer.input.api.gen.oscar.MovieExtensionOverride;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
+
 
 public class VideoMetaDataModule {
 
@@ -87,6 +98,12 @@ public class VideoMetaDataModule {
 
     private final int newContentFlagDuration;
 
+    private static final FastProperty.BooleanProperty USE_OSCAR_INCREMENTAL = new FastProperty.BooleanProperty("use.oscar.incremental",false);
+    //TODO: enable me once we can turn on the new data set including follow vip functionality
+    //    private final OscarDataset oscarDataset;
+    private static final String OSCAR_EPISODE_TYPE = "OSCAR_EPISODE_TYPE";
+    private static final String OSCAR_COUNTRY = "COUNTRY";
+
     Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<>();
     Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<>();
 
@@ -96,6 +113,9 @@ public class VideoMetaDataModule {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
         this.api = converterDataset.getAPI();
         this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
+
+        //TODO: enable me once we can turn on the new data set including follow vip functionality
+        //        this.oscarDataset = upstream.getDataset(OSCAR);
         this.ctx = ctx;
         this.constants = constants;
         this.indexer = indexer;
@@ -114,6 +134,10 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Box Office Hook", new HookType("BOX_OFFICE"));
         hookTypeMap.put("Talent/Actors Hook", new HookType("TALENT_ACTORS"));
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
+    }
+
+    private boolean useOscarIncremental(){
+        return USE_OSCAR_INCREMENTAL.get();
     }
 
     public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
@@ -189,7 +213,14 @@ public class VideoMetaDataModule {
         countrySpecificClone = countryAgnosticVMD.clone();
         
         // Add the episode type override for the country if it exists
+
+        //TODO: enable me once we can turn on the new data set including follow vip functionality
+//        Strings epTypeOverride = (useOscarIncremental())?
+//                getEpisodeTypeOverrideOscar(videoId, countryCode)
+//                : getEpisodeTypeOverride(videoId, countryCode);
+
         Strings epTypeOverride = getEpisodeTypeOverride(videoId, countryCode);
+
         if(epTypeOverride != null)
         	countrySpecificClone.episodeTypes.add(epTypeOverride);
 
@@ -230,8 +261,25 @@ public class VideoMetaDataModule {
         }
         
         return null;
-	
     }
+
+//    private Strings getEpisodeTypeOverrideOscar(Integer videoId, String countryCode) {
+//        int ordinal = oscarDataset.getMoviePrimaryKeyIdx().getMatchingOrdinal((long) videoId);
+//        if (ordinal != -1) {
+//            Stream<MovieExtension> meStream = oscarDataset.getMovieExtensions((long)videoId, OSCAR_EPISODE_TYPE);
+//            Optional<MovieExtensionOverride> meOverride = meStream.flatMap(me->me.getOverrides().stream())
+//                    .filter(override -> override.getAttributeValue()!=null
+//                            && OSCAR_COUNTRY.equals(override.getEntityType())
+//                            && override.getEntityValue() != null
+//                            && override.getEntityValue().equals(countryCode))
+//                    .findFirst();
+//            if (meOverride.isPresent()) {
+//                return new Strings(meOverride.get().getAttributeValue());
+//            }
+//        }
+//
+//        return null;
+//    }
 
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
         VideoMetaDataCountrySpecificDataKey countrySpecificKey = new VideoMetaDataCountrySpecificDataKey();

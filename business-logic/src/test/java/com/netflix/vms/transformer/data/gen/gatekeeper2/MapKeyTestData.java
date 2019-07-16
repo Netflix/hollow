@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -28,7 +29,7 @@ public class MapKeyTestData extends HollowTestObjectRecord {
         return f == null ? null : (String)f.value;
     }
 
-    public static class MapKeyField extends Field {
+    public static class MapKeyField extends HollowTestObjectRecord.Field {
 
         private MapKeyField(String name, Object val) { super(name, val); }
 

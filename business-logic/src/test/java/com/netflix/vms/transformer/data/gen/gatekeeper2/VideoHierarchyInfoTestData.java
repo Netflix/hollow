@@ -1,8 +1,10 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
+
 import com.netflix.vms.transformer.data.gen.gatekeeper2.ParentNodeIdTestData.ParentNodeIdField;
 import com.netflix.vms.transformer.data.gen.gatekeeper2.VideoNodeTypeTestData.VideoNodeTypeField;
 
@@ -57,7 +59,7 @@ public class VideoHierarchyInfoTestData extends HollowTestObjectRecord {
         return ref.nodeType();
     }
 
-    public static class VideoHierarchyInfoField extends Field {
+    public static class VideoHierarchyInfoField extends HollowTestObjectRecord.Field {
 
         private VideoHierarchyInfoField(String name, Object val) { super(name, val); }
 

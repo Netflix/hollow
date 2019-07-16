@@ -1,6 +1,7 @@
 package com.netflix.vms.transformer.data.gen.gatekeeper2;
 
 import com.netflix.hollow.api.testdata.HollowTestObjectRecord;
+import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.schema.HollowObjectSchema;
 import com.netflix.hollow.core.schema.HollowObjectSchema.FieldType;
 
@@ -49,7 +50,7 @@ public class AvailableAssetsTestData extends HollowTestObjectRecord {
         return f == null ? null : (SetOfStringTestData)f.value;
     }
 
-    public static class AvailableAssetsField extends Field {
+    public static class AvailableAssetsField extends HollowTestObjectRecord.Field {
 
         private AvailableAssetsField(String name, Object val) { super(name, val); }
 
