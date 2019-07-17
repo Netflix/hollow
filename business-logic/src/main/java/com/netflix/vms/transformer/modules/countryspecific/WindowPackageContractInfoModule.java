@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.hollow.core.HollowConstants.ORDINAL_NONE;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.common.TransformerContext;
@@ -17,9 +19,13 @@ import com.netflix.vms.transformer.hollowoutput.VideoPackageInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WindowPackageContractInfoModule {
@@ -29,13 +35,14 @@ public class WindowPackageContractInfoModule {
     private final HollowPrimaryKeyIndex packageIdx;
     private final HollowPrimaryKeyIndex packageMovieDealCountryGroupIndex;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
+//    private final OscarDataset oscarDataset;
 
     private final CupTokenFetcher cupTokenFetcher;
     private final PackageMomentDataModule packageMomentDataModule;
     private final VideoPackageInfo FILTERED_VIDEO_PACKAGE_INFO;
 
     WindowPackageContractInfoModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer,
-            CupTokenFetcher cupTokenFetcher, TransformerContext ctx) {
+            CupTokenFetcher cupTokenFetcher, TransformerContext ctx, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.ctx = ctx;
         this.cupTokenFetcher = cupTokenFetcher;
@@ -43,6 +50,7 @@ public class WindowPackageContractInfoModule {
         this.packageMomentDataModule = new PackageMomentDataModule();
         this.packageIdx = indexer.getPrimaryKeyIndex(IndexSpec.PACKAGES);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
+//        this.oscarDataset = upstream.getHashIndex(OSCAR);
         FILTERED_VIDEO_PACKAGE_INFO = newEmptyVideoPackageInfo();
     }
 
@@ -131,7 +139,10 @@ public class WindowPackageContractInfoModule {
         return info;
     }
 
-    private int getApproximateRuntimeInSecods(long videoId) {
+    private int getApproximateRuntimeInSeconds(long videoId) {
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            return oscarDataset.mapWithMovieIfExists(videoId,(movie)->movie.getRunLenth()).orElse(0);
+//        }
         int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
         VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
         if (general != null)
@@ -140,7 +151,7 @@ public class WindowPackageContractInfoModule {
     }
 
     private VideoPackageInfo getFilteredVideoPackageInfo(long videoId) {
-        int approxRuntimeInSecs = getApproximateRuntimeInSecods(videoId);
+        int approxRuntimeInSecs = getApproximateRuntimeInSeconds(videoId);
         if (approxRuntimeInSecs == 0) return FILTERED_VIDEO_PACKAGE_INFO;
 
         VideoPackageInfo result = newEmptyVideoPackageInfo();
@@ -151,7 +162,7 @@ public class WindowPackageContractInfoModule {
     private VideoPackageInfo getFilteredVideoPackageInfo(long videoId, int packageId) {
         VideoPackageInfo result = newEmptyVideoPackageInfo();
         result.packageId = packageId;
-        result.runtimeInSeconds = getApproximateRuntimeInSecods(videoId);
+        result.runtimeInSeconds = getApproximateRuntimeInSeconds(videoId);
         return result;
     }
 

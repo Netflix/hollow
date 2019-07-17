@@ -2,6 +2,8 @@ package com.netflix.vms.transformer;
 
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
@@ -28,8 +30,11 @@ import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,6 +56,8 @@ public class VideoHierarchyInitializer {
     private final HollowHashIndex videoTypeCountryIndex;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final TransformerContext ctx;
+    //private final OscarDataset oscarDataset;
+
 
     public VideoHierarchyInitializer(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer, TransformerContext ctx) {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
@@ -63,6 +70,7 @@ public class VideoHierarchyInitializer {
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.ctx = ctx;
+        //this.oscarDataset = upstream.getDataset(OSCAR);
     }
 
 
@@ -81,6 +89,23 @@ public class VideoHierarchyInitializer {
                 isTopNode = VideoNodeType.isTopNode(nodeType);
                 isStandalone = VideoNodeType.isStandalone(nodeType);
             }
+
+//            if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//                if (oscarDataset.movieExists(topParentId)) {
+//                    Movie movie = oscarDataset.getMovie(topParentId);
+//                    VideoNodeType nodeType = VideoNodeType.of(movie.getType().get_name());
+//                    isTopNode = VideoNodeType.isTopNode(nodeType);
+//                    isStandalone = VideoNodeType.isStandalone(nodeType);
+//                }
+//            } else {
+//                int videoGeneralOrdinal = videoGeneralIndex.getMatchingOrdinal(topParentId);
+//                if (videoGeneralOrdinal != -1) {
+//                    VideoGeneralHollow videoGeneral = converterApi.getVideoGeneralHollow(videoGeneralOrdinal);
+//                    VideoNodeType nodeType = VideoNodeType.of(videoGeneral._getVideoType()._getValue());
+//                    isTopNode = VideoNodeType.isTopNode(nodeType);
+//                    isStandalone = VideoNodeType.isStandalone(nodeType);
+//                }
+//            }
 
             if (!isTopNode) { // track that non-topNode video are being dropped
                 addVideoAndAssociatedSupplementals(topParentId, droppedIds);
@@ -306,6 +331,8 @@ public class VideoHierarchyInitializer {
      * Returns true if the specified videoId is in the VideoGeneral feed.
      */
     private boolean isInVideoGeneral(long videoId) {
+//        return (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral())? oscarDataset.movieExists(videoId)
+//                : videoGeneralIndex.getMatchingOrdinal(videoId) != -1;
         return videoGeneralIndex.getMatchingOrdinal(videoId) != -1;
     }
 }

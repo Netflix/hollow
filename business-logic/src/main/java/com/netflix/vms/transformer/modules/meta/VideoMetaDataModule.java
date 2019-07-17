@@ -13,7 +13,6 @@ import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GA
 //import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 import static com.netflix.vms.transformer.modules.countryspecific.VMSAvailabilityWindowModule.ONE_THOUSAND_YEARS;
 
-import com.netflix.config.FastProperty;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -54,8 +53,6 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
-import com.netflix.vms.transformer.input.api.gen.oscar.MovieExtension;
-import com.netflix.vms.transformer.input.api.gen.oscar.MovieExtensionOverride;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.input.datasets.OscarDataset;
@@ -67,12 +64,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 
 public class VideoMetaDataModule {
@@ -96,13 +90,9 @@ public class VideoMetaDataModule {
     private final Gatekeeper2Dataset gk2Dataset;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
-    private final int newContentFlagDuration;
+    //private final OscarDataset oscarDataset;
 
-    private static final FastProperty.BooleanProperty USE_OSCAR_INCREMENTAL = new FastProperty.BooleanProperty("use.oscar.incremental",false);
-    //TODO: enable me once we can turn on the new data set including follow vip functionality
-    //    private final OscarDataset oscarDataset;
-    private static final String OSCAR_EPISODE_TYPE = "OSCAR_EPISODE_TYPE";
-    private static final String OSCAR_COUNTRY = "COUNTRY";
+    private final int newContentFlagDuration;
 
     Map<Integer, VideoMetaData> countryAgnosticMap = new HashMap<>();
     Map<Integer, Map<VideoMetaDataCountrySpecificDataKey, VideoMetaData>> countrySpecificMap = new HashMap<>();
@@ -115,7 +105,7 @@ public class VideoMetaDataModule {
         this.gk2Dataset = upstream.getDataset(GATEKEEPER2);
 
         //TODO: enable me once we can turn on the new data set including follow vip functionality
-        //        this.oscarDataset = upstream.getDataset(OSCAR);
+        //this.oscarDataset = upstream.getDataset(OSCAR);
         this.ctx = ctx;
         this.constants = constants;
         this.indexer = indexer;
@@ -134,10 +124,6 @@ public class VideoMetaDataModule {
         hookTypeMap.put("Box Office Hook", new HookType("BOX_OFFICE"));
         hookTypeMap.put("Talent/Actors Hook", new HookType("TALENT_ACTORS"));
         hookTypeMap.put("Unknown", new HookType("UNKNOWN"));
-    }
-
-    private boolean useOscarIncremental(){
-        return USE_OSCAR_INCREMENTAL.get();
     }
 
     public Map<String, Map<Integer, VideoMetaData>> buildVideoMetaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
@@ -215,7 +201,7 @@ public class VideoMetaDataModule {
         // Add the episode type override for the country if it exists
 
         //TODO: enable me once we can turn on the new data set including follow vip functionality
-//        Strings epTypeOverride = (useOscarIncremental())?
+//        Strings epTypeOverride = (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral())?
 //                getEpisodeTypeOverrideOscar(videoId, countryCode)
 //                : getEpisodeTypeOverride(videoId, countryCode);
 
@@ -263,22 +249,18 @@ public class VideoMetaDataModule {
         return null;
     }
 
-//    private Strings getEpisodeTypeOverrideOscar(Integer videoId, String countryCode) {
-//        int ordinal = oscarDataset.getMoviePrimaryKeyIdx().getMatchingOrdinal((long) videoId);
-//        if (ordinal != -1) {
-//            Stream<MovieExtension> meStream = oscarDataset.getMovieExtensions((long)videoId, OSCAR_EPISODE_TYPE);
-//            Optional<MovieExtensionOverride> meOverride = meStream.flatMap(me->me.getOverrides().stream())
-//                    .filter(override -> override.getAttributeValue()!=null
-//                            && OSCAR_COUNTRY.equals(override.getEntityType())
-//                            && override.getEntityValue() != null
-//                            && override.getEntityValue().equals(countryCode))
-//                    .findFirst();
-//            if (meOverride.isPresent()) {
-//                return new Strings(meOverride.get().getAttributeValue());
-//            }
+//    private Strings getEpisodeTypeOverrideOscar(long videoId, String countryCode) {
+//        if (!oscarDataset.movieExists(videoId)) {
+//            return null;
 //        }
-//
-//        return null;
+//        Stream<MovieExtension> meStream = oscarDataset.getMovieExtensions(videoId, OscarDataset.MovieExtensionAttributeName.EPISODE_TYPE);
+//        Optional<MovieExtensionOverride> meOverride = meStream.flatMap(me->me.getOverrides().stream())
+//                .filter(override -> override.getAttributeValue()!=null
+//                        && OscarDataset.MovieExtensionOverrideEntityType.COUNTRY.name().equals(override.getEntityType())
+//                        && override.getEntityValue() != null
+//                        && override.getEntityValue().equals(countryCode))
+//                .findFirst();
+//        return meOverride.map(meo->new Strings(meo.getAttributeValue())).orElse(null);
 //    }
 
     private VideoMetaDataCountrySpecificDataKey createCountrySpecificKey(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, VideoMetaDataRolldownValues rolldown) {
@@ -362,14 +344,30 @@ public class VideoMetaDataModule {
         populateRoleLists(videoId, vmd);
         populateHooks(videoId, vmd);
 
-        int genOrdinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
-        if (genOrdinal != -1)
-            vmd.isTV = api.getVideoGeneralTypeAPI().getTv(genOrdinal);
+        setIsTv(videoId,vmd);
+
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            populateGeneralOscar(videoId, vmd);
+//            setIsTvOscar(videoId,vmd);
+//        } else {
+//            populateGeneral(videoId, vmd);
+//            setIsTv(videoId,vmd);
+//        }
 
         countryAgnosticMap.put(videoId, vmd);
 
         return vmd;
     }
+
+    private void setIsTv(long videoId, VideoMetaData vmd) {
+        int genOrdinal = videoGeneralIdx.getMatchingOrdinal(videoId);
+        if (genOrdinal != -1)
+            vmd.isTV = api.getVideoGeneralTypeAPI().getTv(genOrdinal);
+    }
+
+//    private void setIsTvOscar(long videoId, VideoMetaData vmd) {
+//        oscarDataset.execWithMovieIfExists(videoId,(movie -> vmd.isTV = movie.getTv()));
+//    }
 
     private int getShowMemberTypeId(Integer videoId, String countryCode) {
         HollowHashIndexResult showCountryLabelMatches = showCountryLabelIdx.findMatches((long) videoId, countryCode);
@@ -508,6 +506,41 @@ public class VideoMetaDataModule {
         if (vmd.aliases == null) vmd.aliases = Collections.emptySet();
     }
 
+//    private void populateGeneralOscar(long videoId, VideoMetaData vmd) {
+//        if (!oscarDataset.movieExists(videoId)) {
+//            Movie movie = oscarDataset.getMovie(videoId);
+//            String origCountry = movie.getCountryOfOrigin();
+//            if (origCountry != null) {
+//                vmd.countryOfOrigin = constants.getISOCountry(origCountry);
+//            }
+//            String origLang = movie.getOriginalLanguageBcpCode();
+//            vmd.countryOfOriginNameLocale = new NFLocale(movie.getOriginalTitleBcpCode().replace('-', '_'));
+//            if (origLang != null) {
+//                vmd.originalLanguageBcp47code = new Strings(origLang);
+//            }
+//
+//            vmd.aliases = oscarDataset.getMovieTitleAkas(videoId)
+//                    .map(mta->new Strings(mta.getAlias()))
+//                    .collect(Collectors.toSet());
+//
+//            vmd.titleTypes = oscarDataset.getSetStringsFromMovieExtensions(videoId,OscarDataset.MovieExtensionAttributeName.TEST_TITLE_TYPE);
+//            vmd.episodeTypes = oscarDataset.getSetStringsFromMovieExtensions(videoId,OscarDataset.MovieExtensionAttributeName.EPISODE_TYPE);
+//
+//            vmd.isTestTitle = movie.getTestTitle();
+//            vmd.metadataReleaseDays = OutputUtil.getNullableInteger(movie.getMetadataReleaseDays());
+//
+//            // TODO:  this field is not yet exposed in incremental hollow
+////            vmd.displayRuntimeInSeconds = OutputUtil.getNullableInteger((int)movie.getDisplayRuntime());
+////            if (movie.getInteractiveData()!=null) {
+////                vmd.interactiveData = new InteractiveData();
+////                if (movie.getInteractiveData().getInteractiveType()!=null) {
+////                    vmd.interactiveData.interactiveType = movie.getInteractiveData().getInteractiveType();
+////                }
+////            }
+//
+//        }
+//    }
+
     private void populateDates(Integer videoId, String countryCode, VideoMetaDataRollupValues rollup, Status rights, VideoMetaDataCountrySpecificDataKey vmd) {
         HollowHashIndexResult dateResult = videoDateIdx.findMatches((long) videoId, countryCode);
         if (dateResult != null) {
@@ -532,13 +565,31 @@ public class VideoMetaDataModule {
             }
         }
 
-        int ordinal = videoGeneralIdx.getMatchingOrdinal((long) videoId);
+        populateVideoMetaDataCountrySpecificDataKeyYears(videoId,vmd);
+
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            populateVideoMetaDataCountrySpecificDataKeyYearsOscar(videoId,vmd);
+//        } else {
+//            populateVideoMetaDataCountrySpecificDataKeyYears(videoId,vmd);
+//        }
+
+    }
+
+    private void populateVideoMetaDataCountrySpecificDataKeyYears(long videoId, VideoMetaDataCountrySpecificDataKey vmd) {
+        int ordinal = videoGeneralIdx.getMatchingOrdinal(videoId);
         if (ordinal != -1) {
             VideoGeneralHollow general = api.getVideoGeneralHollow(ordinal);
             vmd.year = (int) general._getFirstReleaseYear();
             vmd.latestYear = vmd.year;
         }
     }
+
+//    private void populateVideoMetaDataCountrySpecificDataKeyYearsOscar(long videoId, VideoMetaDataCountrySpecificDataKey vmd) {
+//        oscarDataset.execWithMovieIfExists(videoId,(movie)->{
+//            vmd.year = movie.getFirstReleaseYear();
+//            vmd.latestYear = vmd.year;
+//        });
+//    }
 
     private void populateRoleLists(Integer videoId, VideoMetaData vmd) {
         Map<VRole, List<SequencedVPerson>> roles = new HashMap<>();

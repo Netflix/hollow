@@ -4,6 +4,8 @@ import static com.netflix.vms.transformer.common.io.TransformerLogTag.Interactiv
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_Catalog_Title_Availability;
 import static com.netflix.vms.transformer.common.io.TransformerLogTag.Language_catalog_NoWindows;
 import static com.netflix.vms.transformer.util.OutputUtil.minValueToZero;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.CycleConstants;
@@ -30,6 +32,7 @@ import com.netflix.vms.transformer.hollowoutput.VideoContractInfo;
 import com.netflix.vms.transformer.hollowoutput.WindowPackageContractInfo;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Rights;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractAsset;
@@ -37,6 +40,8 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsContractPacka
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindowContract;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.modules.packages.PackageDataCollection;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoContractUtil;
@@ -67,6 +72,7 @@ public class VMSAvailabilityWindowModule {
     private final VMSTransformerIndexer indexer;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowPrimaryKeyIndex merchLanguageDateIdx;
+//    private final OscarDataset oscarDataset;
 
     private final com.netflix.vms.transformer.hollowoutput.Integer ZERO = new com.netflix.vms.transformer.hollowoutput.Integer(0);
 
@@ -82,15 +88,16 @@ public class VMSAvailabilityWindowModule {
 
     public VMSAvailabilityWindowModule(VMSHollowInputAPI api, TransformerContext ctx, CycleConstants cycleConstants,
             VMSTransformerIndexer indexer, CycleDataAggregator cycleDataAggregator,
-            CupTokenFetcher cupTokenFetcher) {
+            CupTokenFetcher cupTokenFetcher, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.ctx = ctx;
         this.indexer = indexer;
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.merchLanguageDateIdx = indexer.getPrimaryKeyIndex(IndexSpec.MERCH_LANGUAGE_DATE);
         this.cupTokenFetcher = cupTokenFetcher;
+//        this.oscarDataset = upstream.getHashIndex(OSCAR);
 
-        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher, ctx);
+        this.windowPackageContractInfoModule = new WindowPackageContractInfoModule(api, indexer, cupTokenFetcher, ctx, upstream);
         this.multilanguageCountryWindowFilter = new MultilanguageCountryWindowFilter(api, cycleConstants);
         this.cycleDataAggregator = cycleDataAggregator;
 
@@ -194,6 +201,17 @@ public class VMSAvailabilityWindowModule {
             if (general._getOriginalLanguageBcpCode() != null)
                 originalLanguageBCPCodeForVideo = general._getOriginalLanguageBcpCode()._getValue();
         }
+
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            originalLanguageBCPCodeForVideo = oscarDataset.mapWithMovieIfExists(videoId,(movie)->movie.getOriginalLanguageBcpCode()).orElse("");
+//        } else {
+//            int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
+//            if (videoGeneralOrdinal != -1) {
+//                VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
+//                if (general._getOriginalLanguageBcpCode() != null)
+//                    originalLanguageBCPCodeForVideo = general._getOriginalLanguageBcpCode()._getValue();
+//            }
+//        }
 
         long minWindowStartDate = Long.MAX_VALUE;
 
@@ -587,6 +605,7 @@ public class VMSAvailabilityWindowModule {
                 if (!(isGoLive && isInWindow))
                     outputContractInfo.videoPackageInfo.formats = Collections.emptySet();  ///TODO: This seems totally unnecessary.  We should remove this line after parity testing.
 
+
                 int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
                 if (videoGeneralOrdinal != -1) {
                     VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
@@ -594,6 +613,23 @@ public class VMSAvailabilityWindowModule {
                     if (runtime != Long.MIN_VALUE)
                         outputContractInfo.videoPackageInfo.runtimeInSeconds = (int) runtime;
                 }
+
+//                if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//                    oscarDataset.execWithMovieIfExists(videoId,(movie) -> {
+//                        long runtime = movie.getRunLenth();
+//                        if (runtime != Long.MIN_VALUE) {
+//                            outputContractInfo.videoPackageInfo.runtimeInSeconds = (int) runtime;
+//                        }
+//                    });
+//                } else {
+//                    int videoGeneralOrdinal = videoGeneralIdx.getMatchingOrdinal(Long.valueOf(videoId.intValue()));
+//                    if (videoGeneralOrdinal != -1) {
+//                        VideoGeneralHollow general = api.getVideoGeneralHollow(videoGeneralOrdinal);
+//                        long runtime = general._getRuntime();
+//                        if (runtime != Long.MIN_VALUE)
+//                            outputContractInfo.videoPackageInfo.runtimeInSeconds = (int) runtime;
+//                    }
+//                }
 
                 windowList.add(outputWindow);
             }

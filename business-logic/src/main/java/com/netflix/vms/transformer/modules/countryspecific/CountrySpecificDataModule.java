@@ -1,6 +1,8 @@
 package com.netflix.vms.transformer.modules.countryspecific;
 
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.hollow.core.index.HollowHashIndex;
@@ -43,6 +45,8 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapKey;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.MapOfFlagsFirstDisplayDates;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.util.DVDCatalogUtil;
 import com.netflix.vms.transformer.util.SensitiveVideoServerSideUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
@@ -67,6 +71,7 @@ public class CountrySpecificDataModule {
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex rolloutVideoTypeIndex;
     private final HollowHashIndex videoTypeCountryIndex;
+    //private final OscarDataset oscarDataset;
 
     private final CertificationListsModule certificationListsModule;
     private final VMSAvailabilityWindowModule availabilityWindowModule;
@@ -86,10 +91,11 @@ public class CountrySpecificDataModule {
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
         this.rolloutVideoTypeIndex = indexer.getHashIndex(IndexSpec.ROLLOUT_VIDEO_TYPE);
         this.videoTypeCountryIndex = indexer.getHashIndex(IndexSpec.VIDEO_TYPE_COUNTRY);
+        //this.oscarDataset = upstream.getDataset(OSCAR);
 
         this.certificationListsModule = new CertificationListsModule(api, constants, indexer);
         this.availabilityWindowModule = new VMSAvailabilityWindowModule(api, ctx, constants, indexer,
-                cycleDataAggregator, cupTokenFetcher);
+                cycleDataAggregator, cupTokenFetcher, upstream);
     }
 
     @VisibleForTesting
@@ -103,6 +109,7 @@ public class CountrySpecificDataModule {
         this.videoGeneralIdx = null;
         this.rolloutVideoTypeIndex = null;
         this.videoTypeCountryIndex = null;
+//        this.oscarDataset = null;
 
         this.certificationListsModule = null;
         this.availabilityWindowModule = null;
@@ -376,6 +383,12 @@ public class CountrySpecificDataModule {
         Long earliestPhaseDate = getEarliestSchedulePhaseDate(videoId, videoImages, availabilityDate, rollup);
 
         Integer metadataReleaseDays = getMetaDataReleaseDays(videoId);
+
+//        Integer metadataReleaseDays =  (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral())?
+//                getMetaDataReleaseDays(videoId)
+//                : getMetaDataReleaseDaysOscar(videoId);
+
+
         Long firstPhaseStartDate = getFirstPhaseStartDate(videoId, countryCode);
 
         Set<VideoSetType> videoSetTypes = VideoSetTypeUtil.computeSetTypes(videoId, countryCode, api, ctx, constants, indexer, gk2Dataset);
@@ -518,6 +531,10 @@ public class CountrySpecificDataModule {
         }
         return null;
     }
+
+//    private Integer getMetaDataReleaseDaysOscar(long videoId) {
+//        return oscarDataset.mapWithMovieIfExists(videoId,(movie)-> movie.getMetadataReleaseDaysBoxed()).orElse(null);
+//    }
 
     private boolean isTopNodeGoLive(int topNodeId, String countryCode) {
         Status status = gk2Dataset.getStatus(Long.valueOf(topNodeId), countryCode);

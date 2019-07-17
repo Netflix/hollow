@@ -111,7 +111,7 @@ public class PackageDataModule {
 
         this.streamDataModule = new StreamDataModule(api, ctx, cycleConstants, indexer, objectMapper);
         this.contractRestrictionModule = new ContractRestrictionModule(api, ctx, cycleConstants, indexer, gk2Dataset, cupTokenFetcher);
-        this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer);
+        this.encodeSummaryModule = new EncodeSummaryDescriptorModule(api, indexer, upstream);
 
         this.hdrProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "HDR");
         this.fourKProfileIds = getEncodingProfileIds(api, indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE_GROUP), "4K");

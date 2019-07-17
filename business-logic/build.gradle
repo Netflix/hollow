@@ -29,6 +29,5 @@ jar {
 }
 
 tasks.checkstyleMain {
-  exclude '**/hollowinput/**'
-  exclude '**/api.gen/**'
+  exclude '**/hollowinput/**','**/input/api/gen/**'
 }

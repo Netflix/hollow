@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.input.datasets.slicers;
 
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -14,6 +17,10 @@ import com.netflix.vms.transformer.hollowinput.ShowSeasonEpisodeHollow;
 import com.netflix.vms.transformer.hollowinput.SupplementalsHollow;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.hollowinput.VideoGeneralHollow;
+import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
+
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Random;
@@ -25,6 +32,7 @@ public class RandomShowMovieHierarchyBasedSelector {
     private HollowPrimaryKeyIndex videoGeneralIdx;
     private HollowPrimaryKeyIndex supplementalIdx;
     private HollowHashIndex showSeasonEpisodeHashIdx;
+//    private final OscarDataset oscarDataset;
 
     public RandomShowMovieHierarchyBasedSelector(HollowReadStateEngine stateEngine) {
         this.stateEngine = stateEngine;
@@ -32,11 +40,20 @@ public class RandomShowMovieHierarchyBasedSelector {
         videoGeneralIdx = new HollowPrimaryKeyIndex(stateEngine, "VideoGeneral", "videoId");
         supplementalIdx = new HollowPrimaryKeyIndex(stateEngine, "Supplementals", "movieId");
         showSeasonEpisodeHashIdx = new HollowHashIndex(stateEngine, "ShowSeasonEpisode", "", "movieId");
+        // TODO:  the below won't work-- the slicer that calls this is not compatible with the need for multiple stateEngines as input, will probably back out of converting this class and leave it as-is
+//        this.oscarDataset = indexer.getHashIndex(OSCAR);
     }
 
     public Set<Integer> findRandomVideoIds(int numberOfRandomTopNodesToInclude, int[] specificIdsToInclude) {
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            return findRandomVideoIdsOscar(numberOfRandomTopNodesToInclude,specificIdsToInclude);
+//        }
+        return findRandomVideoIdsVideoGeneral(numberOfRandomTopNodesToInclude,specificIdsToInclude);
+    }
+
+    public Set<Integer> findRandomVideoIdsVideoGeneral(int numberOfRandomTopNodesToInclude, int[] specificIdsToInclude) {
         Random rand = new Random(1000);
-        Set<Integer> topNodeVideoIds = new HashSet<Integer>();
+        Set<Long> topNodeVideoIds = new HashSet<Long>();
         Set<Integer> allVideoIds = new HashSet<Integer>();
 
         int vGeneralMaxOrdinal = stateEngine.getTypeState("VideoGeneral").maxOrdinal();
@@ -44,7 +61,7 @@ public class RandomShowMovieHierarchyBasedSelector {
             int randomOrdinal = rand.nextInt(vGeneralMaxOrdinal + 1);
             if (ordinalIsPopulated("VideoGeneral", randomOrdinal)) {
                 VideoGeneralHollow vid = api.getVideoGeneralHollow(randomOrdinal);
-                addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid, true);
+                addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid._getVideoId(), VideoNodeType.of(vid._getVideoType()._getValue()), true);
             }
         }
 
@@ -56,23 +73,47 @@ public class RandomShowMovieHierarchyBasedSelector {
             if (vOrdinal == -1) continue;
 
             VideoGeneralHollow vid = api.getVideoGeneralHollow(vOrdinal);
-            addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid, false);
+            addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, vid._getVideoId(), VideoNodeType.of(vid._getVideoType()._getValue()), false);
         }
 
         return allVideoIds;
     }
 
-    private void addIdsBasedOnVideoGeneral(Set<Integer> topNodeVideoIds, Set<Integer> allVideoIds, VideoGeneralHollow vid, boolean isEnforceTopNode) {
-        VideoNodeType nodeType = VideoNodeType.of(vid._getVideoType()._getValue());
+//    public Set<Integer> findRandomVideoIdsOscar(int numberOfRandomTopNodesToInclude, int[] specificIdsToInclude) {
+//        Random rand = new Random(1000);
+//        Set<Long> topNodeVideoIds = new HashSet<Long>();
+//        Set<Integer> allVideoIds = new HashSet<Integer>();
+//
+//        int maxMovieOrdinal = oscarDataset.maxMovieOrdinal();
+//        while (topNodeVideoIds.size() < numberOfRandomTopNodesToInclude) {
+//            int randomOrdinal = rand.nextInt(maxMovieOrdinal + 1);
+//            Movie movie = oscarDataset.getAPI().getMovie(randomOrdinal);
+//            if (movie != null) {
+//                addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, movie.getMovieId(), VideoNodeType.of(movie.getType().get_name()), true);
+//            }
+//        }
+//
+//
+//        for (int videoId : specificIdsToInclude) {
+//            allVideoIds.add(videoId);
+//
+//            Movie movie = oscarDataset.getAPI().getMovie(videoId);
+//            if (movie == null) continue;
+//            addIdsBasedOnVideoGeneral(topNodeVideoIds, allVideoIds, movie.getMovieId(), VideoNodeType.of(movie.getType().get_name()), true);
+//        }
+//
+//        return allVideoIds;
+//    }
+
+    private void addIdsBasedOnVideoGeneral(Set<Long> topNodeVideoIds, Set<Integer> allVideoIds, long videoId, VideoNodeType nodeType, boolean isEnforceTopNode) {
         boolean isTopNode = VideoNodeType.isTopNode(nodeType);
         if (isEnforceTopNode && !isTopNode) return;
 
-        int videoId = (int) vid._getVideoId();
         if (isTopNode) topNodeVideoIds.add(videoId);
         addVideoAndAssociatedSupplementals(videoId, allVideoIds);
         if (!VideoNodeType.isStandalone(nodeType)) {
             // need to add show members
-            HollowHashIndexResult matches = showSeasonEpisodeHashIdx.findMatches(vid._getVideoId());
+            HollowHashIndexResult matches = showSeasonEpisodeHashIdx.findMatches(videoId);
             if (matches == null) return;
 
             HollowOrdinalIterator videoIterator = matches.iterator();
@@ -91,8 +132,8 @@ public class RandomShowMovieHierarchyBasedSelector {
         }
     }
 
-    private void addVideoAndAssociatedSupplementals(int videoId, Set<Integer> allVideoIds) {
-        allVideoIds.add(videoId);
+    private void addVideoAndAssociatedSupplementals(long videoId, Set<Integer> allVideoIds) {
+        allVideoIds.add((int)videoId);
         addAssociatedSupplementals(videoId, allVideoIds);
     }
 

@@ -5,7 +5,10 @@ import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_GENERAL;
 import static com.netflix.vms.transformer.index.IndexSpec.VIDEO_TYPE_COUNTRY;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.CONVERTER;
 import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.GATEKEEPER2;
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
 
+import com.netflix.hollow.core.HollowConstants;
 import com.netflix.hollow.core.index.HollowHashIndex;
 import com.netflix.hollow.core.index.HollowHashIndexResult;
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
@@ -24,8 +27,11 @@ import com.netflix.vms.transformer.hollowoutput.VideoMediaData;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,6 +45,7 @@ public class VideoMediaDataModule {
     private final HollowHashIndex videoTypeCountryIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
     private final HollowHashIndex videoDateIdx;
+    //private final OscarDataset oscarDataset;
 
     private VideoMediaData showData;
     private VideoMediaData seasonData;
@@ -47,6 +54,8 @@ public class VideoMediaDataModule {
         SHOW, SEASON, EPISODE, SUPPLEMENTAL
     }
 
+    private static final int SECONDS_IN_MIN = 60;
+
     public VideoMediaDataModule(UpstreamDatasetHolder upstream, VMSTransformerIndexer indexer) {
         ConverterDataset converterDataset = upstream.getDataset(CONVERTER);
         this.api = converterDataset.getAPI();
@@ -54,6 +63,7 @@ public class VideoMediaDataModule {
         this.videoTypeCountryIdx = indexer.getHashIndex(VIDEO_TYPE_COUNTRY);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(VIDEO_GENERAL);
         this.videoDateIdx = indexer.getHashIndex(VIDEO_DATE);
+        //this.oscarDataset = upstream.getDataset(OSCAR);
     }
 
     public void buildVideoMediaDataByCountry(Map<String, Set<VideoHierarchy>> showHierarchiesByCountry, TransformedVideoData transformedVideoData) {
@@ -92,6 +102,12 @@ public class VideoMediaDataModule {
             }
             videoDataCollection.addVideoMediaData(videoId, vmd);
         }
+
+//        if (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) {
+//            populateGeneralOscar(videoId, vmd);
+//        } else {
+//            populateGeneral(videoId, vmd);
+//        }
 
         populateGeneral(videoId, vmd);
         if (!populateDate(videoId, countryCode, vmd)) {
@@ -139,6 +155,13 @@ public class VideoMediaDataModule {
 
         if (vmd.regulatoryAdvisories == null) vmd.regulatoryAdvisories = Collections.emptySet();
     }
+
+//    private void populateGeneralOscar(long videoId, VideoMediaData vmd) {
+//        oscarDataset.execWithMovieIfExists(videoId,(movie)->{
+//            vmd.approximateRuntimeInSeconds = movie.getRunLenth()*SECONDS_IN_MIN;
+//            vmd.regulatoryAdvisories = oscarDataset.getSetStringsFromMovieExtensions(videoId,OscarDataset.MovieExtensionAttributeName.REGULATORY_ADVISORY);
+//        });
+//    }
 
     private boolean populateDate(Integer videoId, String countryCode, VideoMediaData vmd) {
         HollowHashIndexResult dateResult = videoDateIdx.findMatches((long) videoId, countryCode);

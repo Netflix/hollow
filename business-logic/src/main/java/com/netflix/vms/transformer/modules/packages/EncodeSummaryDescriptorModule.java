@@ -1,5 +1,8 @@
 package com.netflix.vms.transformer.modules.packages;
 
+//TODO: enable me once we can turn on the new data set including follow vip functionality
+//import static com.netflix.vms.transformer.input.UpstreamDatasetHolder.Dataset.OSCAR;
+
 import com.netflix.hollow.core.index.HollowPrimaryKeyIndex;
 import com.netflix.vms.transformer.hollowinput.StreamProfilesHollow;
 import com.netflix.vms.transformer.hollowinput.StringHollow;
@@ -14,6 +17,9 @@ import com.netflix.vms.transformer.hollowoutput.Strings;
 import com.netflix.vms.transformer.hollowoutput.TimedTextTypeDescriptor;
 import com.netflix.vms.transformer.index.IndexSpec;
 import com.netflix.vms.transformer.index.VMSTransformerIndexer;
+import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.modules.ModuleDataSourceTransitionUtil;
 import com.netflix.vms.transformer.modules.mpl.AudioChannelsDescriptorCache;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,11 +40,14 @@ public class EncodeSummaryDescriptorModule {
     private final VMSHollowInputAPI api;
     private final HollowPrimaryKeyIndex streamProfileIdx;
     private final HollowPrimaryKeyIndex videoGeneralIdx;
+//    private final OscarDataset oscarDataset;
 
-    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer) {
+
+    public EncodeSummaryDescriptorModule(VMSHollowInputAPI api, VMSTransformerIndexer indexer, UpstreamDatasetHolder upstream) {
         this.api = api;
         this.streamProfileIdx = indexer.getPrimaryKeyIndex(IndexSpec.STREAM_PROFILE);
         this.videoGeneralIdx = indexer.getPrimaryKeyIndex(IndexSpec.VIDEO_GENERAL);
+//        this.oscarDataset = upstream.getHashIndex(OSCAR);
     }
 
 
@@ -75,8 +84,13 @@ public class EncodeSummaryDescriptorModule {
             data.encodingProfileId = stream.downloadDescriptor.encodingProfileId;
             data.audioChannels = audioChannelsDescriptorCache.getAudioChannels(numAudioChannels);
 
+            String nativeLanguage = getNativeLanguage(packageData.video.value);
 
-            data.isNative = language != null && language.equals(getNativeLanguage(packageData.video.value));
+//            String nativeLanguage = (ModuleDataSourceTransitionUtil.useOscarFeedVideoGeneral()) ?
+//                    getNativeLanguageOscar(packageData.video.value)
+//                    : getNativeLanguage(packageData.video.value);
+
+            data.isNative = language != null && language.equals(nativeLanguage);
             data.isSubtitleBurnedIn = isSubtitleBurnedIn(profileType, data.textLanguage);
 
             // if MUXED or AUDIO
@@ -160,6 +174,10 @@ public class EncodeSummaryDescriptorModule {
             return originalLangCode._getValue();
         return null;
     }
+
+//    private String getNativeLanguageOscar(long videoId) {
+//        return oscarDataset.mapWithMovieIfExists(videoId,(movie)-> movie.getOriginalLanguageBcpCode()).orElse(null);
+//    }
 
     private boolean isSubtitleBurnedIn(String profileType, Strings language) {
         if(language != null) {
