@@ -50,18 +50,17 @@ public class ClientPinningUtil {
     public static void unpinClients(String vipName, RegionEnum region) throws IOException {
     	String key = propertyNameSuffix + "." + vipName;
     	EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-		PersistedPropertiesUtil.deleteFastProperty(key, null, env, region, null, null, null);
+		PersistedPropertiesUtil.deleteProperty(key, null, env, region, null, null, null, null, null);
 		String keyNoStreams = propertyNameSuffix + "." + vipName + "_nostreams";
-		PersistedPropertiesUtil.deleteFastProperty(keyNoStreams, null, env, region, null, null, null);
+		PersistedPropertiesUtil.deleteProperty(keyNoStreams, null, env, region, null, null, null, null, null);
 
 		// after deleting this FP, announcement watcher will get a null value
 		// null values are ignored, resulting in unpin action
 		String newFP = "hollow.pin.vms-" + vipName;
-		PersistedPropertiesUtil.deleteFastProperty(newFP, null, env, region, null, null, null);
+		PersistedPropertiesUtil.deleteProperty(newFP, null, env, region, null, null, null, null, null);
 
 		String noStreamsFP = "hollow.pin.vms-" + vipName + "_nostreams";
-		PersistedPropertiesUtil.deleteFastProperty(noStreamsFP, null, env, region, null, null, null);
-
+		PersistedPropertiesUtil.deleteProperty(noStreamsFP, null, env, region, null, null, null, null, null);
     }
 
     /**
@@ -91,23 +90,16 @@ public class ClientPinningUtil {
 
     private static void pinUsingFastProperty(String key, String value, RegionEnum region) throws IOException {
 		EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-		boolean exists = PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null);
-    	if(exists) {
-			// Update property
-			PersistedPropertiesUtil.updateFastProperty(key, value, null, env, region, null, null, null);
-		} else {
-			// create property
-			PersistedPropertiesUtil.createFastProperty(key, value, null, env, region, null, null, null);
-		}
+		PersistedPropertiesUtil.upsertProperty(key, value, null, env, region, null, null, null, null, null);
 	}
 
 
     public static String getPinnedVersion(String vipName, RegionEnum region) throws IOException {
     	String key = propertyNameSuffix + "." + vipName;
     	EnvironmentEnum env = NetflixConfiguration.getEnvironmentEnum();
-    	if(!PersistedPropertiesUtil.fastPropertyExists(key, null, env, region, null, null, null))
+    	if(!PersistedPropertiesUtil.propertyExists(key, null, env, region, null, null, null, null, null))
     		return null;
-    	return PersistedPropertiesUtil.getFastPropertyValue(key, null, env, region, null, null, null);
+    	return PersistedPropertiesUtil.getPropertyValue(key, null, env, region, null, null, null, null, null);
     }
 
 	private static Map<RegionEnum, String> consumeJson(String json) {

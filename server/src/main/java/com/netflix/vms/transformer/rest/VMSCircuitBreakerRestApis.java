@@ -240,13 +240,15 @@ public class VMSCircuitBreakerRestApis {
 			JsonObject exclusionObject = jobject.get("exclusions").getAsJsonObject();
 			String exclusionStr = getExclusionStringFromJson(exclusionObject);
 			try {
-				PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyVideoCountryToExclude", 
+				PersistedPropertiesUtil.upsertProperty("vms.playbackMonkeyVideoCountryToExclude", 
 						exclusionStr, 
 						"vmstransformer", 
 						NetflixConfiguration.getEnvironmentEnum(), 
 						NetflixConfiguration.getRegionEnum(), 
 						null, 
 						transformerConfig.getTransformerVip(), 
+						null, 
+						null, 
 						null);
 			} catch(Exception e) {
 				e.printStackTrace();
@@ -378,13 +380,15 @@ public class VMSCircuitBreakerRestApis {
 	
 	// Enable or disable playback monkey for this Vip
 	private void enableOrDisablePlaybackMonkey(boolean enabled) throws IOException {
-		PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyEnabled", 
+		PersistedPropertiesUtil.upsertProperty("vms.playbackMonkeyEnabled", 
 				Boolean.valueOf(enabled).toString(), 
 				"vmstransformer", 
 				NetflixConfiguration.getEnvironmentEnum(), 
 				NetflixConfiguration.getRegionEnum(), 
 				null, 
 				transformerConfig.getTransformerVip(), 
+				null, 
+				null, 
 				null);
 	}
 	
@@ -394,15 +398,16 @@ public class VMSCircuitBreakerRestApis {
 		// First convert the list of countries into comma separated list of countries
 		if(countries != null && countries.size() > 0)
 			value = Joiner.on(",").join(countries);
-		
-		PersistedPropertiesUtil.createOrUpdateFastProperty("vms.playbackMonkeyTestForCountries", 
+
+		PersistedPropertiesUtil.upsertProperty("vms.playbackMonkeyTestForCountries", 
 				value, 
 				"vmstransformer", 
 				NetflixConfiguration.getEnvironmentEnum(), 
 				NetflixConfiguration.getRegionEnum(), 
 				null, 
 				transformerConfig.getTransformerVip(), 
+				null, 
+				null, 
 				null);
-		
 	}
 }

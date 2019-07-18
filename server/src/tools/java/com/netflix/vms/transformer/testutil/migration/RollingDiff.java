@@ -97,30 +97,33 @@ public class RollingDiff {
                 String latestColdstartVersion = headerEntry.getValue().substring(8);
 
                 System.out.println("pinning " + mutationGroup + "=" + latestColdstartVersion);
-
-                PersistedPropertiesUtil.createOrUpdateFastProperty(
-                        "vms.pinnedColdstartVersion." + mutationGroup,
-                        latestColdstartVersion,
-                        "vmsconverter",
+        		PersistedPropertiesUtil.upsertProperty(
+        				"vms.pinnedColdstartVersion." + mutationGroup, 
+        				latestColdstartVersion,
+        				"vmstransformer", 
                         EnvironmentEnum.prod,
                         RegionEnum.US_EAST_1,
-                        null,
-                        CANARY_CONVERTER_VIP,
-                        null);
+        				null, 
+        				CANARY_CONVERTER_VIP, 
+        				null, 
+        				null, 
+        				null);
             }
         }
 
         String oldPipelineNowMillis = header.getHeaderTags().get("publishCycleDataTS");
         if(oldPipelineNowMillis != null) {
-            PersistedPropertiesUtil.createOrUpdateFastProperty(
+    		PersistedPropertiesUtil.upsertProperty(
                     "vms.nowMillis",
                     oldPipelineNowMillis,
                     "vmstransformer",
                     EnvironmentEnum.prod,
                     RegionEnum.US_EAST_1,
-                    null,
-                    CANARY_TRANSFORMER_VIP,
-                    null);
+    				null, 
+    				CANARY_CONVERTER_VIP, 
+    				null, 
+    				null, 
+    				null);
         }
 
     }
@@ -208,25 +211,29 @@ public class RollingDiff {
             if(headerEntry.getKey().endsWith("_ColdStartManager")) {
                 String mutationGroup = headerEntry.getKey().substring(6, headerEntry.getKey().indexOf("_ColdStartManager"));
 
-                PersistedPropertiesUtil.deleteFastProperty(
+                PersistedPropertiesUtil.deleteProperty(
                         "vms.pinnedColdstartVersion." + mutationGroup,
                         "vmsconverter",
                         EnvironmentEnum.prod,
                         RegionEnum.US_EAST_1,
-                        null,
-                        CANARY_CONVERTER_VIP,
-                        null);
+                		null, 
+                		CANARY_CONVERTER_VIP, 
+                		null, 
+                		null, 
+                		null);
             }
         }
 
-        PersistedPropertiesUtil.deleteFastProperty(
+        PersistedPropertiesUtil.deleteProperty(
                 "vms.nowMillis",
                 "vmstransformer",
                 EnvironmentEnum.prod,
                 RegionEnum.US_EAST_1,
-                null,
-                CANARY_TRANSFORMER_VIP,
-                null);
+        		null, 
+        		CANARY_CONVERTER_VIP, 
+        		null, 
+        		null, 
+        		null);
     }
 
 }

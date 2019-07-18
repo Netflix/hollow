@@ -30,6 +30,7 @@ ospackage {
     packageName = 'vmstransformer'
     preInstall file('scripts/ulog-preinstall.sh')
     requires('nflx-ezconfig')
+    requires('metatron-client')
     requires('nflx-base-www')
     requires('rsyslog', '8.32', GREATER | EQUAL)
     requires('rsyslog-mmnormalize', '8.32', GREATER | EQUAL)

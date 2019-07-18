@@ -115,13 +115,8 @@ public class VMSCircuitBreakerAdmin {
         String vip = transformerConfig.getTransformerVip();
 
         try {
-            if (PersistedPropertiesUtil.fastPropertyExists(key, APP_ID, env, region, null, vip, null)) {
-                PersistedPropertiesUtil.updateFastProperty(key, value, APP_ID, env, region, null, vip, null);
-                return "Updated property: " + key;
-            } else {
-                PersistedPropertiesUtil.createFastProperty(key, value, APP_ID, env, region, null, vip, null);
-                return "Created Property: " + key;
-            }
+        	PersistedPropertiesUtil.upsertProperty(key, value, APP_ID, env, region, null, vip, null, null, null);
+        	return "created/updated property: " + key + " with value: " + value;
         } catch (IOException e) {
             e.printStackTrace();
             return "error";
@@ -137,8 +132,8 @@ public class VMSCircuitBreakerAdmin {
         String vip = transformerConfig.getTransformerVip();
 
         try {
-            if (PersistedPropertiesUtil.fastPropertyExists(key, APP_ID, env, region, null, vip, null)) {
-                PersistedPropertiesUtil.deleteFastProperty(key, APP_ID, env, region, null, vip, null);
+            if (PersistedPropertiesUtil.propertyExists(key, APP_ID, env, region, null, vip, null, null, null)) {
+                PersistedPropertiesUtil.deleteProperty(key, APP_ID, env, region, null, vip, null, null, null);
                 return "Deleted: " + key;
             }
         } catch (IOException e) {

@@ -1,21 +1,24 @@
 package com.netflix.vms.transformer.fastproperties;
 
 import com.google.common.base.Strings;
-import com.netflix.config.NetflixConfiguration;
+import com.google.gson.Gson;
 import com.netflix.config.NetflixConfiguration.EnvironmentEnum;
 import com.netflix.config.NetflixConfiguration.RegionEnum;
+import com.netflix.metatron.ipc.security.MetatronSslContext;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -27,395 +30,262 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 public class PersistedPropertiesUtil {
 
-    private static final int PORT = 7001;
-    private static final String ENDPOINT_HOSTNAME_PROD = "platformservice.%s.dynprod.netflix.net";
-    private static final String ENDPOINT_HOSTNAME_TEST = "platformservice.%s.dyntest.netflix.net";
-    private static final String ENDPOINT_PATH = "/platformservice/REST/v1/props/property";
-    private static final String GET_PATH = ENDPOINT_PATH + "/getPropertyById";
-    private static final String DELETE_PATH = ENDPOINT_PATH + "/removePropertyById";
+	private static final String PROTOCOL_SCHEME = "https";
+	private static final String SPINNAKER_HOST = "api.spinnaker.mgmt.netflix.net";
+	private static final int SPINNAKER_PORT = 7004;
+    private static final String DEFAULT_CMC = "CMC-vms";
+    private static final String DEFAULT_EMAIL = "vms-team@netflix.com";
+    
+    public static boolean propertyExists(String key, String appId, EnvironmentEnum env, RegionEnum region, 
+    		String serverId, String stack, String asg, String cluster, String zone) throws IOException {
+    	
+    	//Create the fast property id
+    	String fastPropertyId = getPropertyId(key, appId, env, region, serverId, stack, asg, cluster, zone);
+    	
+    	// Now construct the URI
+    	URI uri = null;
+    	try {
+    		uri = new URIBuilder()
+    				.setScheme(PROTOCOL_SCHEME)
+    				.setHost(SPINNAKER_HOST)
+    				.setPort(SPINNAKER_PORT)
+    				.setPath("fastproperties/id")
+    				.setParameter("propertyId", fastPropertyId)
+    				.build();
+    	} catch(URISyntaxException e) {
+    		e.printStackTrace();
+    		throw new IllegalArgumentException("Exception while building URL: " + e.getMessage());
+    	}
 
-    // Some defaults
-    private static final String DEFAULT_SOURCE = "vms-utils";
-    private static final String DEFAULT_UPDATED_BY = "vms-team";
-    private static final String DEFAULT_CMC = "CMC-1234";
-
-    public static boolean fastPropertyExists(String key, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
-        String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
-        String myRegion = NetflixConfiguration.getRegion();
-        if(myRegion == null)
-            myRegion = RegionEnum.US_EAST_1.toString();
-        String host = null;
-        if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
-        else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
-        else throw new IllegalArgumentException(env + " is not a valid environment. Valid environments are: [test | prod]");
-
-        URI uri = null;
-        try {
-            uri = new URIBuilder()
-            .setScheme("http")
-            .setHost(host)
-            .setPort(PORT)
-            .setPath(GET_PATH)
-            .setParameter("id", fastPropertyId)
-            .build();
-        } catch(URISyntaxException e) {
-            throw new IllegalArgumentException("Error building valid uri to query fast property existance.");
-        }
-
-        // Query the fast property
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet(uri);
-        try {
-            System.out.println("Querying: " + uri);
-            CloseableHttpResponse response = httpClient.execute(get);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if(statusCode == 200) return true;
-            else if(statusCode == 404) return false;
-            else throw new IOException("Server returned with unexpected return code: " + statusCode);
-        } catch(ClientProtocolException e) {
-            throw new IOException("Failed to query for property: " + fastPropertyId, e);
-        } catch(IOException e) {
-            throw new IOException("Failed to query for property: " + fastPropertyId, e);
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }
+    	CloseableHttpClient client = null;
+    	CloseableHttpResponse response = null;
+    	// GET the above URI: 200 means that fp exists, 404 means it does not exist, everything else throws exception
+    	try {
+    		client = HttpClients.custom()
+    				   .setSSLContext(MetatronSslContext.forClient("gate"))
+    				   .setSSLHostnameVerifier(new NoopHostnameVerifier())
+    				   .build();
+    		HttpGet get = new HttpGet(uri);
+    		response = client.execute(get);
+    		int statusCode = response.getStatusLine().getStatusCode();
+    		if(statusCode == 200) return true;
+    		else if(statusCode == 404) return false;
+    		else throw new IOException(String.format("Invalid response (%d) when GETing %s", statusCode, uri.toString()));
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		throw new IOException(e.getMessage() + "GET: " + uri.toString());
+    	} finally {
+    		response.close();
+    		client.close();
+    	}
     }
+    
+    // Gets the value of the fast property if it exists, otherwise return null (signals absence of fast property)
+    public static String getPropertyValue(String key, String appId, EnvironmentEnum env, RegionEnum region, 
+    		String serverId, String stack, String asg, String cluster, String zone) throws IOException {
+    	//Create the fast property id
+    	String fastPropertyId = getPropertyId(key, appId, env, region, serverId, stack, asg, cluster, zone);
+    	
+    	// Now construct the URI
+    	URI uri = null;
+    	try {
+    		uri = new URIBuilder()
+    				.setScheme(PROTOCOL_SCHEME)
+    				.setHost(SPINNAKER_HOST)
+    				.setPort(SPINNAKER_PORT)
+    				.setPath("fastproperties/id")
+    				.setParameter("propertyId", fastPropertyId)
+    				.build();
+    	} catch(URISyntaxException e) {
+    		e.printStackTrace();
+    		throw new IllegalArgumentException("Exception while building URL: " + e.getMessage());
+    	}
 
-
-    public static String getFastPropertyValue(String key, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
-        String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
-
-        String myRegion = NetflixConfiguration.getRegion();
-        if(myRegion == null)
-            myRegion = RegionEnum.US_EAST_1.toString();
-        String host = null;
-        if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
-        else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
-        else throw new IllegalArgumentException(env + " is not a valid environment. Valid environments are: [test | prod]");
-
-        URI uri = null;
-        try {
-            uri = new URIBuilder()
-            .setScheme("http")
-            .setHost(host)
-            .setPort(PORT)
-            .setPath(GET_PATH)
-            .setParameter("id", fastPropertyId)
-            .build();
-        } catch(URISyntaxException e) {
-            throw new IllegalArgumentException("Error building valid uri to query fast property existance.");
-        }
-
-        // Query the fast property
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet(uri);
-        get.setHeader("accept", "application/json");
-        try {
-            System.out.println("Querying: " + uri);
-            CloseableHttpResponse response = httpClient.execute(get);
-            int statusCode = response.getStatusLine().getStatusCode();
-            String resp = EntityUtils.toString(response.getEntity());
-
-            if(statusCode == 200) {
-                // extract the value from the response
-                return extractValueFromResponseJson(resp);
-            } else {
-                // throw the exception
-                throw new IOException("Server responded with status code: " + statusCode + ".\n And sent the following response\n" + resp);
-            }
-        } catch(ClientProtocolException e) {
-            throw new IOException("Failed to query for property: " + fastPropertyId, e);
-        } catch(IOException e) {
-            throw new IOException("Failed to query for property: " + fastPropertyId, e);
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }
+    	// GET the above URI: 200 means that fp exists (parse and return the value), 404 means it does not exist (return null), throw exception otherwise
+    	CloseableHttpClient client = null;
+    	CloseableHttpResponse response = null;
+    	try {
+    		client = HttpClients.custom()
+    				   .setSSLContext(MetatronSslContext.forClient("gate"))
+    				   .setSSLHostnameVerifier(new NoopHostnameVerifier())
+    				   .build();
+    		HttpGet get = new HttpGet(uri);
+    		response = client.execute(get);
+    		int statusCode = response.getStatusLine().getStatusCode();
+    		if(statusCode == 200) {
+    			return extractValueFromResponseJson(EntityUtils.toString(response.getEntity()));
+    		} else if(statusCode == 404) {
+    			return null;
+    		} else {
+    			throw new IOException(String.format("Invalid response (%d) when GETing %s", statusCode, uri.toString())); 
+    		}
+    	} catch(IOException e) {
+    		e.printStackTrace();
+    		throw e;
+    	} finally {
+    		response.close();
+    		client.close();
+    	}
     }
-
-    public static void createOrUpdateFastProperty(String key, String value, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
-        if(fastPropertyExists(key, appId, env, region, serverId, stack, countries)) {
-            updateFastProperty(key, value, appId, env, region, serverId, stack, countries);
-        } else {
-            createFastProperty(key, value, appId, env, region, serverId, stack, countries);
+    
+    public static void upsertProperty(String key, String value, String appId, EnvironmentEnum env, RegionEnum region, 
+    		String serverId, String stack, String asg, String cluster, String zone) throws IOException {
+    	// Now construct the URI
+    	URI uri = null;
+    	try {
+    		uri = new URIBuilder()
+    				.setScheme(PROTOCOL_SCHEME)
+    				.setHost(SPINNAKER_HOST)
+    				.setPort(SPINNAKER_PORT)
+    				.setPath("fastproperties/upsert")
+    				.build();
+    	} catch(URISyntaxException e) {
+    		e.printStackTrace();
+    		throw new IllegalArgumentException("Exception while building URL: " + e.getMessage());
+    	}
+    	
+        // Create a map to hold the parameters for the POST call, will be converted to JSON and packed into the request body
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("env", env.toString());
+        if(!Strings.isNullOrEmpty(appId))
+        	params.put("appId", appId);
+        if(!Strings.isNullOrEmpty(stack))
+        	params.put("stack", stack);
+        if(region != null)
+        	params.put("region", region.toString());
+        if(!Strings.isNullOrEmpty(serverId))
+        	params.put("serverId", serverId);
+        if(!Strings.isNullOrEmpty(cluster))
+        	params.put("cluster", cluster);
+        if(!Strings.isNullOrEmpty(asg))
+        	params.put("asg", asg);
+        if(!Strings.isNullOrEmpty(zone))
+        	params.put("zone", zone);
+        params.put("key", key);
+        params.put("value", value);
+        params.put("cmcTicket", DEFAULT_CMC);
+        params.put("email", DEFAULT_EMAIL);
+        
+        String requestBody = new Gson().toJson(params);
+        
+        // Make the POST request
+        CloseableHttpClient client = null;
+        CloseableHttpResponse response = null;
+        try {
+        	client = HttpClients.custom()
+        			.setSSLContext(MetatronSslContext.forClient("gate"))
+        			.setSSLHostnameVerifier(new NoopHostnameVerifier())
+        			.build();
+        	
+        	// create the post request, decorate it with request body and a required header for content-type
+        	HttpPost post = new HttpPost(uri);
+        	post.setHeader("content-type", "application/json;charset=UTF-8");
+        	HttpEntity entity = new ByteArrayEntity(requestBody.getBytes());
+        	post.setEntity(entity);
+        	
+        	// Execute the response and check return status
+        	response = client.execute(post);
+        	int statusCode = response.getStatusLine().getStatusCode();
+        	
+        	// In case of upsert 200 (OK) and 201 (Created) are valid, rest are invalid
+        	if(statusCode != 200 && statusCode != 201) {
+    			throw new IOException(String.format("Invalid response (%d) when POSTing %s with data: \n%S", statusCode, uri.toString(), requestBody)); 
+        	}
+        }catch(Exception e) {
+        	//ignore at the moment
+        } finally {
+        	client.close();
+        	response.close();
         }
     }
     
-    public static void createFastProperty(String key, String value, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
+    public static void deleteProperty(String key, String appId, EnvironmentEnum env, RegionEnum region, 
+    		String serverId, String stack, String asg, String cluster, String zone) throws IOException{
+    	String fastPropertyId = getPropertyId(key, appId, env, region, serverId, stack, asg, cluster, zone);
+    	
+    	// Check if the property exists, if it does not return without fuss
+    	if(!propertyExists(key, appId, env, region, serverId, stack, asg, cluster, zone)) {
+    		return;
+    	}
 
-        // Create the fast propertyID
-        String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
-        System.out.println("Will be creating FP: " + fastPropertyId + " with value: " + value);
-
-        // Construct the xml data that will be posted to the server
-        String postDataXml = constructCreatePropertyXml(key, value, appId, env, region, serverId, stack, countries);
-
-        String myRegion = NetflixConfiguration.getRegion();
-        if(myRegion == null)
-            myRegion = RegionEnum.US_EAST_1.toString();
-        String host = null;
-        if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
-        else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
-        else throw new IllegalArgumentException(env + " is not a valid environment. Valid environments are: [test | prod]");
-
-        // Build the post uri
-        URI uri = null;
-        try {
-            uri = new URIBuilder()
-            .setScheme("http")
-            .setHost(host)
-            .setPort(PORT)
-            .setPath(ENDPOINT_PATH)
-            .build();
-        } catch(URISyntaxException e) {
-            throw new IOException("Error building POST uri to create fast property.", e);
-        }
-
-        System.out.println("POSTing to: " + uri.toString());
-        System.out.println("POST data:\n" + postDataXml);
-
-        // Do a POST request to create the fast property
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost post = new HttpPost(uri);
-        post.setHeader("Content-Type", "application/xml");
-        HttpEntity entity = new ByteArrayEntity(postDataXml.getBytes());
-        post.setEntity(entity);
-
-        try {
-            CloseableHttpResponse response = httpClient.execute(post);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if(statusCode == 200)
-                System.out.println("Property created successfully");
-            else {
-                String resp = EntityUtils.toString(response.getEntity());
-                throw new IOException("Server responded with status code: " + statusCode +
-                        ".\n And sent the following response\n" + resp);
-            }
-        } catch(ClientProtocolException e) {
-            throw new IOException("Error creating fast property: " + fastPropertyId, e);
-        } catch (IOException e) {
-            throw new IOException("Error creating fast property: " + fastPropertyId, e);
-        } finally {
-            try {
-                httpClient.close();
-            } catch(IOException e) {
-                // ignore
-            }
-        }
-
+        // Create URI for the POST request
+    	// Now construct the URI
+    	URI uri = null;
+    	try {
+    		uri = new URIBuilder()
+    				.setScheme(PROTOCOL_SCHEME)
+    				.setHost(SPINNAKER_HOST)
+    				.setPort(SPINNAKER_PORT)
+    				.setPath("fastproperties/delete")
+    				.setParameter("propId", fastPropertyId)  // use propertyId for get and propId for delete
+    				.setParameter("cmcTicket", DEFAULT_CMC)
+    				.build();
+    	} catch(URISyntaxException e) {
+    		e.printStackTrace();
+    		throw new IllegalArgumentException("Exception while building URL: " + e.getMessage());
+    	}
+    	
+    	// GET the above URI: 200 means that fp exists (parse and return the value), 404 means it does not exist (return null), throw exception otherwise
+    	CloseableHttpClient client = null;
+    	CloseableHttpResponse response = null;
+    	try {
+    		client = HttpClients.custom()
+    				   .setSSLContext(MetatronSslContext.forClient("gate"))
+    				   .setSSLHostnameVerifier(new NoopHostnameVerifier())
+    				   .build();
+    		HttpDelete delete = new HttpDelete(uri);
+    		response = client.execute(delete);
+    		int statusCode = response.getStatusLine().getStatusCode();
+    		if(statusCode != 200 && statusCode != 404) {
+    			// even though we check for the property's existance above, still guard against 404
+    			throw new IOException(String.format("Invalid response (%d) when DELETINGing %s", statusCode, uri.toString())); 
+    		}
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    		throw new IOException(e.getMessage());
+    	} finally {
+    		response.close();
+    		client.close();
+    	}
     }
-
-    public static void updateFastProperty(String key, String value, String appId,
-            EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) throws IOException {
-
-        // First construct the fast propertyId and from that derive the post data which will be sent to the server
-        String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
-        String postDataXml = constructUpdatePropertyXml(fastPropertyId, value);
-
-        String myRegion = NetflixConfiguration.getRegion();
-        if(myRegion == null)
-            myRegion = RegionEnum.US_EAST_1.toString();
-        String host = null;
-        if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
-        else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
-        else throw new IllegalArgumentException(env + " is not a valid environment. Valid environments are: [test | prod]");
-
-        // Build the post uri
-        URI uri = null;
-        try {
-            uri = new URIBuilder()
-            .setScheme("http")
-            .setHost(host)
-            .setPort(PORT)
-            .setPath(ENDPOINT_PATH)
-            .build();
-        } catch(URISyntaxException e) {
-            throw new IOException("Error building POST uri to create fast property.", e);
-        }
-
-        System.out.println("POSTing to: " + uri.toString());
-        System.out.println("POST data:\n" + postDataXml);
-
-        // Do a POST request to create the fast property
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost post = new HttpPost(uri);
-        post.setHeader("Content-Type", "application/xml");
-        HttpEntity entity = new ByteArrayEntity(postDataXml.getBytes());
-        post.setEntity(entity);
-
-        try {
-            CloseableHttpResponse response = httpClient.execute(post);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if(statusCode == 200)
-                System.out.println("Property updated successfully");
-            else {
-                String resp = EntityUtils.toString(response.getEntity());
-                throw new IOException("Server responded with status code: " + statusCode +
-                        ".\n And sent the following response\n" + resp);
-            }
-        } catch(ClientProtocolException e) {
-            throw new IOException("Error creating fast property: " + fastPropertyId, e);
-        } catch (IOException e) {
-            throw new IOException("Error creating fast property: " + fastPropertyId, e);
-        } finally {
-            try {
-                httpClient.close();
-            } catch(IOException e) {
-                // ignore
-            }
-        }
-
-    }
-
-    public static void deleteFastProperty(String key, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries)
-            throws IOException {
-        // Create the fast propertyID
-        String fastPropertyId = getFastPropertyId(key, appId, env, region, serverId, stack, countries);
-
-        // First check if the property already exists
-        // If the property does not exists, do not do anything
-        if(!fastPropertyExists(key, appId, env, region, serverId, stack, countries)) {
-            System.out.println("Nothing to delete as property does not exist: " + fastPropertyId);
-            return;
-        }
-        System.out.println("Property Exists -- Deleting ...");
-
-        String myRegion = NetflixConfiguration.getRegion();
-        if(myRegion == null)
-            myRegion = RegionEnum.US_EAST_1.toString();
-        String host = null;
-        if(env == EnvironmentEnum.test) host = String.format(ENDPOINT_HOSTNAME_TEST, myRegion);
-        else if(env == EnvironmentEnum.prod) host = String.format(ENDPOINT_HOSTNAME_PROD, myRegion);
-        else throw new IllegalArgumentException(env + " is not a valid environment. Valid environments are: [test | prod]");
-
-        URI uri = null;
-        try {
-            uri = new URIBuilder()
-            .setScheme("http")
-            .setHost(host)
-            .setPort(PORT)
-            .setPath(DELETE_PATH)
-            .setParameter("id", fastPropertyId)
-            .setParameter("source", DEFAULT_SOURCE)
-            .setParameter("updatedBy", DEFAULT_UPDATED_BY)
-            .setParameter("cmcTicket", DEFAULT_CMC)
-            .build();
-        } catch(URISyntaxException e) {
-            throw new IllegalArgumentException("Error building valid uri to delete fast property.");
-        }
-
-        // Do a get request to delete the property
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet get = new HttpGet(uri);
-        try {
-            CloseableHttpResponse response = httpClient.execute(get);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if(statusCode == 200)
-                System.out.println("Successfully deleted property: " + fastPropertyId);
-            else
-                throw new IOException("Server returned with unexpected status code: " + statusCode);
-        } catch(ClientProtocolException e) {
-            throw new IOException("Failed to delete the property: " + fastPropertyId, e);
-        } catch(IOException e) {
-            throw new IOException("Failed to delete the property: " + fastPropertyId, e);
-        } finally {
-            try {
-                httpClient.close();
-            } catch(IOException e) {
-                // ignore
-            }
-        }
+    
 
 
-
-    }
-
-    private static String getFastPropertyId(String key, String appId, EnvironmentEnum env, RegionEnum region, String serverId, String stack, String countries) {
-        // Key is mandatory, if not provided throw IllegalArgument exception
-        if(Strings.isNullOrEmpty(key)) throw new IllegalArgumentException("FastProperty key is mandatory");
-
+    
+    private static String getPropertyId(String key, String appId, EnvironmentEnum env, RegionEnum region, 
+    		String serverId, String stack, String asg, String cluster, String zone) {
+    	// Key is mandatory
+    	if(Strings.isNullOrEmpty(key)) throw new IllegalArgumentException("key is mandatory");
+    	
         // Valid environments are test and prod. Other env enums (dev and tools) are invalid
         if(env == null) throw new IllegalArgumentException("fastProperty env is mandatory");
         if((env != EnvironmentEnum.test) && (env != EnvironmentEnum.prod))
             throw new IllegalArgumentException(env.toString() + " is not a valid environment. Only [test, prod] are valid");
-
-        // Following arguments if null are treated as empty strings
-        // appId, serverId, stack, countries
+        
+        // The following arguments if null area treated as empty strings
+        // app, region, serverId, stack
         if(appId == null) appId = "";
         if(serverId == null) serverId = "";
         if(stack == null) stack = "";
-        if(countries == null) countries = "";
 
         String regionStr = (region == null) ? "" : region.toString();
-
-
-        return (key + "|" + appId + "|" + env.toString() + "|" + regionStr + "|" + serverId + "|" + stack + "|" + countries);
+        
+        // Build the property id using key, appId, env, region, serverId, stack and countries
+        String propertyId = key + "|" + appId + "|" + env.toString() + "|" + regionStr + "|" + serverId + "|" + stack + "|";
+        
+        // Append asg, cluster and zone if they are there
+        if(!Strings.isNullOrEmpty(asg))
+        	propertyId += "|asg=" + asg;
+        
+        if(!Strings.isNullOrEmpty(cluster))
+        	propertyId += "|cluster=" + cluster;
+        
+        if(!Strings.isNullOrEmpty(zone))
+        	propertyId += "|zone=" + zone;
+        
+    	return propertyId;
     }
 
-    private static String constructCreatePropertyXml(String key, String value, String appId, EnvironmentEnum env,
-            RegionEnum region, String serverId, String stack, String countries) {
-
-        // Key must be provided
-        if(Strings.isNullOrEmpty(key)) throw new IllegalArgumentException("Key must be provided while creating fast property");
-
-        // Env must be provided and must be either test or prod
-        if(env == null) throw new IllegalArgumentException("env must be provided while creating fast property");
-        if((env != EnvironmentEnum.test) && (env != EnvironmentEnum.prod))
-            throw new IllegalArgumentException(env.toString() + " is not a valid environment. Only [test, prod] are valid");
-
-        // Value must be provided as well
-        if(Strings.isNullOrEmpty(value)) throw new IllegalArgumentException("Value must be provided while creating fast property");
-
-        // Construct the timestamp
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String timestamp = dateFormat.format(new Date()).replace(" ","T") + "Z";
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("<property>");
-        buffer.append("<key>" + key + "</key>");
-        buffer.append("<value>" + value + "</value>");
-        if(!Strings.isNullOrEmpty(appId))
-            buffer.append("<appId>" + appId + "</appId>");
-        buffer.append("<env>" + env.toString() + "</env>");
-        if(region != null)
-            buffer.append("<region>" + region.toString() + "</region>");
-        if(!Strings.isNullOrEmpty(serverId))
-            buffer.append("<serverId>" + serverId + "</serverId>");
-        if(!Strings.isNullOrEmpty(stack))
-            buffer.append("<stack>" + stack + "</stack>");
-        if(!Strings.isNullOrEmpty(countries))
-            buffer.append("<countries>" + countries +  "</countries>");
-        buffer.append("<updatedBy>" + DEFAULT_UPDATED_BY + "</updatedBy>");
-        buffer.append("<sourceOfUpdate>" + DEFAULT_SOURCE + "</sourceOfUpdate>");
-        buffer.append("<ts>" + timestamp + "</ts>");
-        buffer.append("<cmcTicket>" + DEFAULT_CMC + "</cmcTicket>");
-        buffer.append("</property>");
-        return buffer.toString();
-    }
-
-    private static String constructUpdatePropertyXml(String fastPropertyId, String value) {
-        // We validate that both the arguments are non null
-        if(Strings.isNullOrEmpty(fastPropertyId)) throw new IllegalArgumentException("fastPropertyId is mandatory.");
-        if(Strings.isNullOrEmpty(value)) throw new IllegalArgumentException("value is mandatory");
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("<property>");
-        buffer.append("<propertyId>" + fastPropertyId + "</propertyId>");
-        buffer.append("<value>" + value + "</value>");
-        buffer.append("<updatedBy>" + DEFAULT_UPDATED_BY + "</updatedBy>");
-        buffer.append("<sourceOfUpdate>" + DEFAULT_SOURCE + "</sourceOfUpdate>");
-        buffer.append("<cmcTicket>" + DEFAULT_CMC + "</cmcTicket>");
-        buffer.append("</property>");
-        return buffer.toString();
-    }
 
     private static String extractValueFromResponseJson(String responseJson) throws JsonParseException, JsonMappingException, IOException {
 
