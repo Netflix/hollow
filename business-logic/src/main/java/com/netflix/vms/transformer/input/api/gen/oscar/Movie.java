@@ -354,6 +354,45 @@ public class Movie extends HollowObject {
         return delegate().getVisibleBoxed(ordinal);
     }
 
+    public boolean getInteractive() {
+        return delegate().getInteractive(ordinal);
+    }
+
+    public Boolean getInteractiveBoxed() {
+        return delegate().getInteractiveBoxed(ordinal);
+    }
+
+    public String getInteractiveType() {
+        return delegate().getInteractiveType(ordinal);
+    }
+
+    public boolean isInteractiveTypeEqual(String testValue) {
+        return delegate().isInteractiveTypeEqual(ordinal, testValue);
+    }
+
+    public InteractiveType getInteractiveTypeHollowReference() {
+        int refOrdinal = delegate().getInteractiveTypeOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getInteractiveType(refOrdinal);
+    }
+
+    public int getDisplayRunLength() {
+        return delegate().getDisplayRunLength(ordinal);
+    }
+
+    public Integer getDisplayRunLengthBoxed() {
+        return delegate().getDisplayRunLengthBoxed(ordinal);
+    }
+
+    public int getInteractiveShortestRunLength() {
+        return delegate().getInteractiveShortestRunLength(ordinal);
+    }
+
+    public Integer getInteractiveShortestRunLengthBoxed() {
+        return delegate().getInteractiveShortestRunLengthBoxed(ordinal);
+    }
+
     public String getCreatedByTeam() {
         return delegate().getCreatedByTeam(ordinal);
     }

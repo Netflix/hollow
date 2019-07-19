@@ -47,8 +47,26 @@ public class OscarTestData extends HollowTestDataset {
         return rec;
     }
 
+    public ISOCountryTestData ISOCountry(ISOCountryTestData.ISOCountryField... fields) {
+        ISOCountryTestData rec = ISOCountryTestData.ISOCountry(fields);
+        add(rec);
+        return rec;
+    }
+
+    public ISOCountryListTestData ISOCountryList(ISOCountryTestData... elements) {
+        ISOCountryListTestData rec = ISOCountryListTestData.ISOCountryList(elements);
+        add(rec);
+        return rec;
+    }
+
     public ImageTypeTestData ImageType(ImageTypeTestData.ImageTypeField... fields) {
         ImageTypeTestData rec = ImageTypeTestData.ImageType(fields);
+        add(rec);
+        return rec;
+    }
+
+    public InteractiveTypeTestData InteractiveType(InteractiveTypeTestData.InteractiveTypeField... fields) {
+        InteractiveTypeTestData rec = InteractiveTypeTestData.InteractiveType(fields);
         add(rec);
         return rec;
     }
@@ -109,12 +127,6 @@ public class OscarTestData extends HollowTestDataset {
 
     public MovieSetContentLabelTestData MovieSetContentLabel(MovieSetContentLabelTestData.MovieSetContentLabelField... fields) {
         MovieSetContentLabelTestData rec = MovieSetContentLabelTestData.MovieSetContentLabel(fields);
-        add(rec);
-        return rec;
-    }
-
-    public MovieTitleTestData MovieTitle(MovieTitleTestData.MovieTitleField... fields) {
-        MovieTitleTestData rec = MovieTitleTestData.MovieTitle(fields);
         add(rec);
         return rec;
     }
@@ -317,8 +329,26 @@ public class OscarTestData extends HollowTestDataset {
         return rec;
     }
 
+    public ShowCountryLabelTestData ShowCountryLabel(ShowCountryLabelTestData.ShowCountryLabelField... fields) {
+        ShowCountryLabelTestData rec = ShowCountryLabelTestData.ShowCountryLabel(fields);
+        add(rec);
+        return rec;
+    }
+
     public ShowCountryLabelOverrideTestData ShowCountryLabelOverride(ShowCountryLabelOverrideTestData.ShowCountryLabelOverrideField... fields) {
         ShowCountryLabelOverrideTestData rec = ShowCountryLabelOverrideTestData.ShowCountryLabelOverride(fields);
+        add(rec);
+        return rec;
+    }
+
+    public ShowMemberTypeTestData ShowMemberType(ShowMemberTypeTestData.ShowMemberTypeField... fields) {
+        ShowMemberTypeTestData rec = ShowMemberTypeTestData.ShowMemberType(fields);
+        add(rec);
+        return rec;
+    }
+
+    public ShowMemberTypeListTestData ShowMemberTypeList(ShowMemberTypeTestData... elements) {
+        ShowMemberTypeListTestData rec = ShowMemberTypeListTestData.ShowMemberTypeList(elements);
         add(rec);
         return rec;
     }
@@ -379,6 +409,12 @@ public class OscarTestData extends HollowTestDataset {
 
     public WindowTypeTestData WindowType(WindowTypeTestData.WindowTypeField... fields) {
         WindowTypeTestData rec = WindowTypeTestData.WindowType(fields);
+        add(rec);
+        return rec;
+    }
+
+    public isOriginalTitleTestData isOriginalTitle(isOriginalTitleTestData.isOriginalTitleField... fields) {
+        isOriginalTitleTestData rec = isOriginalTitleTestData.isOriginalTitle(fields);
         add(rec);
         return rec;
     }

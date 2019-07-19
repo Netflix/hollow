@@ -21,6 +21,8 @@ public class MovieTitleNLSDelegateCachedImpl extends HollowObjectAbstractDelegat
     private final int titleBcpCodeOrdinal;
     private final String sourceType;
     private final int sourceTypeOrdinal;
+    private final Boolean isOriginalTitle;
+    private final int isOriginalTitleOrdinal;
     private final Long dateCreated;
     private final int dateCreatedOrdinal;
     private final Long lastUpdated;
@@ -50,6 +52,9 @@ public class MovieTitleNLSDelegateCachedImpl extends HollowObjectAbstractDelegat
         this.sourceTypeOrdinal = typeAPI.getSourceTypeOrdinal(ordinal);
         int sourceTypeTempOrdinal = sourceTypeOrdinal;
         this.sourceType = sourceTypeTempOrdinal == -1 ? null : typeAPI.getAPI().getTitleSourceTypeTypeAPI().get_name(sourceTypeTempOrdinal);
+        this.isOriginalTitleOrdinal = typeAPI.getIsOriginalTitleOrdinal(ordinal);
+        int isOriginalTitleTempOrdinal = isOriginalTitleOrdinal;
+        this.isOriginalTitle = isOriginalTitleTempOrdinal == -1 ? null : typeAPI.getAPI().getIsOriginalTitleTypeAPI().getValue(isOriginalTitleTempOrdinal);
         this.dateCreatedOrdinal = typeAPI.getDateCreatedOrdinal(ordinal);
         int dateCreatedTempOrdinal = dateCreatedOrdinal;
         this.dateCreated = dateCreatedTempOrdinal == -1 ? null : typeAPI.getAPI().getDateTypeAPI().getValue(dateCreatedTempOrdinal);
@@ -147,6 +152,20 @@ public class MovieTitleNLSDelegateCachedImpl extends HollowObjectAbstractDelegat
 
     public int getSourceTypeOrdinal(int ordinal) {
         return sourceTypeOrdinal;
+    }
+
+    public boolean getIsOriginalTitle(int ordinal) {
+        if(isOriginalTitle == null)
+            return false;
+        return isOriginalTitle.booleanValue();
+    }
+
+    public Boolean getIsOriginalTitleBoxed(int ordinal) {
+        return isOriginalTitle;
+    }
+
+    public int getIsOriginalTitleOrdinal(int ordinal) {
+        return isOriginalTitleOrdinal;
     }
 
     public long getDateCreated(int ordinal) {

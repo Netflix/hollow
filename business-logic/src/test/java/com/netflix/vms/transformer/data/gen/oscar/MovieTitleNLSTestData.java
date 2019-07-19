@@ -12,6 +12,7 @@ import com.netflix.vms.transformer.data.gen.oscar.MovieTitleStringTestData.Movie
 import com.netflix.vms.transformer.data.gen.oscar.MovieTitleTypeTestData.MovieTitleTypeField;
 import com.netflix.vms.transformer.data.gen.oscar.StringTestData.StringField;
 import com.netflix.vms.transformer.data.gen.oscar.TitleSourceTypeTestData.TitleSourceTypeField;
+import com.netflix.vms.transformer.data.gen.oscar.isOriginalTitleTestData.isOriginalTitleField;
 
 public class MovieTitleNLSTestData extends HollowTestObjectRecord {
 
@@ -98,6 +99,18 @@ public class MovieTitleNLSTestData extends HollowTestObjectRecord {
         if(f == null) return null;
         TitleSourceTypeTestData ref = (TitleSourceTypeTestData)f.value;
         return ref._name();
+    }
+
+    public isOriginalTitleTestData isOriginalTitleRef() {
+        Field f = super.getField("isOriginalTitle");
+        return f == null ? null : (isOriginalTitleTestData)f.value;
+    }
+
+    public Boolean isOriginalTitle() {
+        Field f = super.getField("isOriginalTitle");
+        if(f == null) return null;
+        isOriginalTitleTestData ref = (isOriginalTitleTestData)f.value;
+        return ref.value();
     }
 
     public DateTestData dateCreatedRef() {
@@ -224,6 +237,18 @@ public class MovieTitleNLSTestData extends HollowTestObjectRecord {
             return sourceType(TitleSourceTypeField._name(val));
         }
 
+        public static MovieTitleNLSField isOriginalTitle(isOriginalTitleTestData val) {
+            return new MovieTitleNLSField("isOriginalTitle", val);
+        }
+
+        public static MovieTitleNLSField isOriginalTitle(isOriginalTitleField... fields) {
+            return isOriginalTitle(new isOriginalTitleTestData(fields));
+        }
+
+        public static MovieTitleNLSField isOriginalTitle(boolean val) {
+            return isOriginalTitle(isOriginalTitleField.value(val));
+        }
+
         public static MovieTitleNLSField dateCreated(DateTestData val) {
             return new MovieTitleNLSField("dateCreated", val);
         }
@@ -274,7 +299,7 @@ public class MovieTitleNLSTestData extends HollowTestObjectRecord {
 
     }
 
-    public static final HollowObjectSchema SCHEMA = new HollowObjectSchema("MovieTitleNLS", 10, new PrimaryKey("MovieTitleNLS", "movieId", "type", "merchBcpCode"));
+    public static final HollowObjectSchema SCHEMA = new HollowObjectSchema("MovieTitleNLS", 11, new PrimaryKey("MovieTitleNLS", "movieId", "type", "merchBcpCode"));
 
     static {
         SCHEMA.addField("movieId", FieldType.REFERENCE, "MovieId");
@@ -283,6 +308,7 @@ public class MovieTitleNLSTestData extends HollowTestObjectRecord {
         SCHEMA.addField("merchBcpCode", FieldType.REFERENCE, "BcpCode");
         SCHEMA.addField("titleBcpCode", FieldType.REFERENCE, "BcpCode");
         SCHEMA.addField("sourceType", FieldType.REFERENCE, "TitleSourceType");
+        SCHEMA.addField("isOriginalTitle", FieldType.REFERENCE, "isOriginalTitle");
         SCHEMA.addField("dateCreated", FieldType.REFERENCE, "Date");
         SCHEMA.addField("lastUpdated", FieldType.REFERENCE, "Date");
         SCHEMA.addField("createdBy", FieldType.REFERENCE, "String");

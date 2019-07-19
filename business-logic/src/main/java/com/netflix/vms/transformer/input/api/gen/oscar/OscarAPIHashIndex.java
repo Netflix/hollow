@@ -108,6 +108,28 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         };
     }
 
+    public Iterable<ISOCountry> findISOCountryMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ISOCountry>(matches.iterator()) {
+            public ISOCountry getData(int ordinal) {
+                return api.getISOCountry(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ISOCountryList> findISOCountryListMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ISOCountryList>(matches.iterator()) {
+            public ISOCountryList getData(int ordinal) {
+                return api.getISOCountryList(ordinal);
+            }
+        };
+    }
+
     public Iterable<ImageType> findImageTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -115,6 +137,17 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         return new AbstractHollowOrdinalIterable<ImageType>(matches.iterator()) {
             public ImageType getData(int ordinal) {
                 return api.getImageType(ordinal);
+            }
+        };
+    }
+
+    public Iterable<InteractiveType> findInteractiveTypeMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<InteractiveType>(matches.iterator()) {
+            public InteractiveType getData(int ordinal) {
+                return api.getInteractiveType(ordinal);
             }
         };
     }
@@ -170,17 +203,6 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         return new AbstractHollowOrdinalIterable<MovieTitleType>(matches.iterator()) {
             public MovieTitleType getData(int ordinal) {
                 return api.getMovieTitleType(ordinal);
-            }
-        };
-    }
-
-    public Iterable<MovieTitle> findMovieTitleMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<MovieTitle>(matches.iterator()) {
-            public MovieTitle getData(int ordinal) {
-                return api.getMovieTitle(ordinal);
             }
         };
     }
@@ -313,6 +335,39 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         return new AbstractHollowOrdinalIterable<RolloutType>(matches.iterator()) {
             public RolloutType getData(int ordinal) {
                 return api.getRolloutType(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ShowMemberType> findShowMemberTypeMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ShowMemberType>(matches.iterator()) {
+            public ShowMemberType getData(int ordinal) {
+                return api.getShowMemberType(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ShowMemberTypeList> findShowMemberTypeListMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ShowMemberTypeList>(matches.iterator()) {
+            public ShowMemberTypeList getData(int ordinal) {
+                return api.getShowMemberTypeList(ordinal);
+            }
+        };
+    }
+
+    public Iterable<ShowCountryLabel> findShowCountryLabelMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<ShowCountryLabel>(matches.iterator()) {
+            public ShowCountryLabel getData(int ordinal) {
+                return api.getShowCountryLabel(ordinal);
             }
         };
     }
@@ -669,17 +724,6 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         };
     }
 
-    public Iterable<MovieTitleNLS> findMovieTitleNLSMatches(Object... keys) {
-        HollowHashIndexResult matches = idx.findMatches(keys);
-        if(matches == null) return Collections.emptySet();
-
-        return new AbstractHollowOrdinalIterable<MovieTitleNLS>(matches.iterator()) {
-            public MovieTitleNLS getData(int ordinal) {
-                return api.getMovieTitleNLS(ordinal);
-            }
-        };
-    }
-
     public Iterable<WindowType> findWindowTypeMatches(Object... keys) {
         HollowHashIndexResult matches = idx.findMatches(keys);
         if(matches == null) return Collections.emptySet();
@@ -720,6 +764,28 @@ public class OscarAPIHashIndex extends AbstractHollowHashIndex<OscarAPI> {
         return new AbstractHollowOrdinalIterable<Rollout>(matches.iterator()) {
             public Rollout getData(int ordinal) {
                 return api.getRollout(ordinal);
+            }
+        };
+    }
+
+    public Iterable<IsOriginalTitle> findisOriginalTitleMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<IsOriginalTitle>(matches.iterator()) {
+            public IsOriginalTitle getData(int ordinal) {
+                return api.getIsOriginalTitle(ordinal);
+            }
+        };
+    }
+
+    public Iterable<MovieTitleNLS> findMovieTitleNLSMatches(Object... keys) {
+        HollowHashIndexResult matches = idx.findMatches(keys);
+        if(matches == null) return Collections.emptySet();
+
+        return new AbstractHollowOrdinalIterable<MovieTitleNLS>(matches.iterator()) {
+            public MovieTitleNLS getData(int ordinal) {
+                return api.getMovieTitleNLS(ordinal);
             }
         };
     }

@@ -335,6 +335,44 @@ public class MovieDelegateLookupImpl extends HollowObjectAbstractDelegate implem
         return typeAPI.getVisibleBoxed(ordinal);
     }
 
+    public boolean getInteractive(int ordinal) {
+        return typeAPI.getInteractive(ordinal);
+    }
+
+    public Boolean getInteractiveBoxed(int ordinal) {
+        return typeAPI.getInteractiveBoxed(ordinal);
+    }
+
+    public String getInteractiveType(int ordinal) {
+        ordinal = typeAPI.getInteractiveTypeOrdinal(ordinal);
+        return ordinal == -1 ? null : typeAPI.getAPI().getInteractiveTypeTypeAPI().getValue(ordinal);
+    }
+
+    public boolean isInteractiveTypeEqual(int ordinal, String testValue) {
+        ordinal = typeAPI.getInteractiveTypeOrdinal(ordinal);
+        return ordinal == -1 ? testValue == null : typeAPI.getAPI().getInteractiveTypeTypeAPI().isValueEqual(ordinal, testValue);
+    }
+
+    public int getInteractiveTypeOrdinal(int ordinal) {
+        return typeAPI.getInteractiveTypeOrdinal(ordinal);
+    }
+
+    public int getDisplayRunLength(int ordinal) {
+        return typeAPI.getDisplayRunLength(ordinal);
+    }
+
+    public Integer getDisplayRunLengthBoxed(int ordinal) {
+        return typeAPI.getDisplayRunLengthBoxed(ordinal);
+    }
+
+    public int getInteractiveShortestRunLength(int ordinal) {
+        return typeAPI.getInteractiveShortestRunLength(ordinal);
+    }
+
+    public Integer getInteractiveShortestRunLengthBoxed(int ordinal) {
+        return typeAPI.getInteractiveShortestRunLengthBoxed(ordinal);
+    }
+
     public String getCreatedByTeam(int ordinal) {
         ordinal = typeAPI.getCreatedByTeamOrdinal(ordinal);
         return ordinal == -1 ? null : typeAPI.getAPI().getStringTypeAPI().getValue(ordinal);

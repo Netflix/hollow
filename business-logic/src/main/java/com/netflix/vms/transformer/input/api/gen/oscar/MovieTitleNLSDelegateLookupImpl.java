@@ -97,6 +97,20 @@ public class MovieTitleNLSDelegateLookupImpl extends HollowObjectAbstractDelegat
         return typeAPI.getSourceTypeOrdinal(ordinal);
     }
 
+    public boolean getIsOriginalTitle(int ordinal) {
+        ordinal = typeAPI.getIsOriginalTitleOrdinal(ordinal);
+        return ordinal == -1 ? false : typeAPI.getAPI().getIsOriginalTitleTypeAPI().getValue(ordinal);
+    }
+
+    public Boolean getIsOriginalTitleBoxed(int ordinal) {
+        ordinal = typeAPI.getIsOriginalTitleOrdinal(ordinal);
+        return ordinal == -1 ? null : typeAPI.getAPI().getIsOriginalTitleTypeAPI().getValueBoxed(ordinal);
+    }
+
+    public int getIsOriginalTitleOrdinal(int ordinal) {
+        return typeAPI.getIsOriginalTitleOrdinal(ordinal);
+    }
+
     public long getDateCreated(int ordinal) {
         ordinal = typeAPI.getDateCreatedOrdinal(ordinal);
         return ordinal == -1 ? Long.MIN_VALUE : typeAPI.getAPI().getDateTypeAPI().getValue(ordinal);

@@ -9,6 +9,7 @@ import com.netflix.vms.transformer.data.gen.oscar.BcpCodeTestData.BcpCodeField;
 import com.netflix.vms.transformer.data.gen.oscar.CountryStringTestData.CountryStringField;
 import com.netflix.vms.transformer.data.gen.oscar.DateTestData.DateField;
 import com.netflix.vms.transformer.data.gen.oscar.ForceReasonTestData.ForceReasonField;
+import com.netflix.vms.transformer.data.gen.oscar.InteractiveTypeTestData.InteractiveTypeField;
 import com.netflix.vms.transformer.data.gen.oscar.MovieIdTestData.MovieIdField;
 import com.netflix.vms.transformer.data.gen.oscar.MovieTitleStringTestData.MovieTitleStringField;
 import com.netflix.vms.transformer.data.gen.oscar.MovieTypeTestData.MovieTypeField;
@@ -288,6 +289,33 @@ public class MovieTestData extends HollowTestObjectRecord {
     public Boolean visible() {
         Field f = super.getField("visible");
         return f == null ? null : (Boolean)f.value;
+    }
+
+    public Boolean interactive() {
+        Field f = super.getField("interactive");
+        return f == null ? null : (Boolean)f.value;
+    }
+
+    public InteractiveTypeTestData interactiveTypeRef() {
+        Field f = super.getField("interactiveType");
+        return f == null ? null : (InteractiveTypeTestData)f.value;
+    }
+
+    public String interactiveType() {
+        Field f = super.getField("interactiveType");
+        if(f == null) return null;
+        InteractiveTypeTestData ref = (InteractiveTypeTestData)f.value;
+        return ref.value();
+    }
+
+    public int displayRunLength() {
+        Field f = super.getField("displayRunLength");
+        return f == null ? Integer.MIN_VALUE : (Integer)f.value;
+    }
+
+    public int interactiveShortestRunLength() {
+        Field f = super.getField("interactiveShortestRunLength");
+        return f == null ? Integer.MIN_VALUE : (Integer)f.value;
     }
 
     public StringTestData createdByTeamRef() {
@@ -618,6 +646,30 @@ public class MovieTestData extends HollowTestObjectRecord {
             return new MovieField("visible", val);
         }
 
+        public static MovieField interactive(boolean val) {
+            return new MovieField("interactive", val);
+        }
+
+        public static MovieField interactiveType(InteractiveTypeTestData val) {
+            return new MovieField("interactiveType", val);
+        }
+
+        public static MovieField interactiveType(InteractiveTypeField... fields) {
+            return interactiveType(new InteractiveTypeTestData(fields));
+        }
+
+        public static MovieField interactiveType(String val) {
+            return interactiveType(InteractiveTypeField.value(val));
+        }
+
+        public static MovieField displayRunLength(int val) {
+            return new MovieField("displayRunLength", val);
+        }
+
+        public static MovieField interactiveShortestRunLength(int val) {
+            return new MovieField("interactiveShortestRunLength", val);
+        }
+
         public static MovieField createdByTeam(StringTestData val) {
             return new MovieField("createdByTeam", val);
         }
@@ -692,7 +744,7 @@ public class MovieTestData extends HollowTestObjectRecord {
 
     }
 
-    public static final HollowObjectSchema SCHEMA = new HollowObjectSchema("Movie", 34, new PrimaryKey("Movie", "movieId"));
+    public static final HollowObjectSchema SCHEMA = new HollowObjectSchema("Movie", 38, new PrimaryKey("Movie", "movieId"));
 
     static {
         SCHEMA.addField("movieId", FieldType.REFERENCE, "MovieId");
@@ -723,6 +775,10 @@ public class MovieTestData extends HollowTestObjectRecord {
         SCHEMA.addField("creator", FieldType.REFERENCE, "PersonName");
         SCHEMA.addField("forceReason", FieldType.REFERENCE, "ForceReason");
         SCHEMA.addField("visible", FieldType.BOOLEAN);
+        SCHEMA.addField("interactive", FieldType.BOOLEAN);
+        SCHEMA.addField("interactiveType", FieldType.REFERENCE, "InteractiveType");
+        SCHEMA.addField("displayRunLength", FieldType.INT);
+        SCHEMA.addField("interactiveShortestRunLength", FieldType.INT);
         SCHEMA.addField("createdByTeam", FieldType.REFERENCE, "String");
         SCHEMA.addField("updatedByTeam", FieldType.REFERENCE, "String");
         SCHEMA.addField("dateCreated", FieldType.REFERENCE, "Date");

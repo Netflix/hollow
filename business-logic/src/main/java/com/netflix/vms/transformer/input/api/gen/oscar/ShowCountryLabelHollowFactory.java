@@ -5,16 +5,16 @@ import com.netflix.hollow.core.read.dataaccess.HollowTypeDataAccess;
 import com.netflix.hollow.api.custom.HollowTypeAPI;
 
 @SuppressWarnings("all")
-public class MovieTitleHollowFactory<T extends MovieTitle> extends HollowFactory<T> {
+public class ShowCountryLabelHollowFactory<T extends ShowCountryLabel> extends HollowFactory<T> {
 
     @Override
     public T newHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new MovieTitle(((MovieTitleTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
+        return (T)new ShowCountryLabel(((ShowCountryLabelTypeAPI)typeAPI).getDelegateLookupImpl(), ordinal);
     }
 
     @Override
     public T newCachedHollowObject(HollowTypeDataAccess dataAccess, HollowTypeAPI typeAPI, int ordinal) {
-        return (T)new MovieTitle(new MovieTitleDelegateCachedImpl((MovieTitleTypeAPI)typeAPI, ordinal), ordinal);
+        return (T)new ShowCountryLabel(new ShowCountryLabelDelegateCachedImpl((ShowCountryLabelTypeAPI)typeAPI, ordinal), ordinal);
     }
 
 }

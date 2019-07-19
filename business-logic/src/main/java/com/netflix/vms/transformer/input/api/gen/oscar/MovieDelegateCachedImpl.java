@@ -54,6 +54,11 @@ public class MovieDelegateCachedImpl extends HollowObjectAbstractDelegate implem
     private final String forceReason;
     private final int forceReasonOrdinal;
     private final Boolean visible;
+    private final Boolean interactive;
+    private final String interactiveType;
+    private final int interactiveTypeOrdinal;
+    private final Integer displayRunLength;
+    private final Integer interactiveShortestRunLength;
     private final String createdByTeam;
     private final int createdByTeamOrdinal;
     private final String updatedByTeam;
@@ -131,6 +136,12 @@ public class MovieDelegateCachedImpl extends HollowObjectAbstractDelegate implem
         int forceReasonTempOrdinal = forceReasonOrdinal;
         this.forceReason = forceReasonTempOrdinal == -1 ? null : typeAPI.getAPI().getForceReasonTypeAPI().getValue(forceReasonTempOrdinal);
         this.visible = typeAPI.getVisibleBoxed(ordinal);
+        this.interactive = typeAPI.getInteractiveBoxed(ordinal);
+        this.interactiveTypeOrdinal = typeAPI.getInteractiveTypeOrdinal(ordinal);
+        int interactiveTypeTempOrdinal = interactiveTypeOrdinal;
+        this.interactiveType = interactiveTypeTempOrdinal == -1 ? null : typeAPI.getAPI().getInteractiveTypeTypeAPI().getValue(interactiveTypeTempOrdinal);
+        this.displayRunLength = typeAPI.getDisplayRunLengthBoxed(ordinal);
+        this.interactiveShortestRunLength = typeAPI.getInteractiveShortestRunLengthBoxed(ordinal);
         this.createdByTeamOrdinal = typeAPI.getCreatedByTeamOrdinal(ordinal);
         int createdByTeamTempOrdinal = createdByTeamOrdinal;
         this.createdByTeam = createdByTeamTempOrdinal == -1 ? null : typeAPI.getAPI().getStringTypeAPI().getValue(createdByTeamTempOrdinal);
@@ -492,6 +503,50 @@ public class MovieDelegateCachedImpl extends HollowObjectAbstractDelegate implem
 
     public Boolean getVisibleBoxed(int ordinal) {
         return visible;
+    }
+
+    public boolean getInteractive(int ordinal) {
+        if(interactive == null)
+            return false;
+        return interactive.booleanValue();
+    }
+
+    public Boolean getInteractiveBoxed(int ordinal) {
+        return interactive;
+    }
+
+    public String getInteractiveType(int ordinal) {
+        return interactiveType;
+    }
+
+    public boolean isInteractiveTypeEqual(int ordinal, String testValue) {
+        if(testValue == null)
+            return interactiveType == null;
+        return testValue.equals(interactiveType);
+    }
+
+    public int getInteractiveTypeOrdinal(int ordinal) {
+        return interactiveTypeOrdinal;
+    }
+
+    public int getDisplayRunLength(int ordinal) {
+        if(displayRunLength == null)
+            return Integer.MIN_VALUE;
+        return displayRunLength.intValue();
+    }
+
+    public Integer getDisplayRunLengthBoxed(int ordinal) {
+        return displayRunLength;
+    }
+
+    public int getInteractiveShortestRunLength(int ordinal) {
+        if(interactiveShortestRunLength == null)
+            return Integer.MIN_VALUE;
+        return interactiveShortestRunLength.intValue();
+    }
+
+    public Integer getInteractiveShortestRunLengthBoxed(int ordinal) {
+        return interactiveShortestRunLength;
     }
 
     public String getCreatedByTeam(int ordinal) {

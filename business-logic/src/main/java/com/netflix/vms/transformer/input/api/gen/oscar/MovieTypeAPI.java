@@ -38,6 +38,10 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
             "creator",
             "forceReason",
             "visible",
+            "interactive",
+            "interactiveType",
+            "displayRunLength",
+            "interactiveShortestRunLength",
             "createdByTeam",
             "updatedByTeam",
             "dateCreated",
@@ -389,10 +393,76 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
 
 
 
-    public int getCreatedByTeamOrdinal(int ordinal) {
+    public boolean getInteractive(int ordinal) {
         if(fieldIndex[28] == -1)
+            return Boolean.TRUE.equals(missingDataHandler().handleBoolean("Movie", ordinal, "interactive"));
+        return Boolean.TRUE.equals(getTypeDataAccess().readBoolean(ordinal, fieldIndex[28]));
+    }
+
+    public Boolean getInteractiveBoxed(int ordinal) {
+        if(fieldIndex[28] == -1)
+            return missingDataHandler().handleBoolean("Movie", ordinal, "interactive");
+        return getTypeDataAccess().readBoolean(ordinal, fieldIndex[28]);
+    }
+
+
+
+    public int getInteractiveTypeOrdinal(int ordinal) {
+        if(fieldIndex[29] == -1)
+            return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "interactiveType");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[29]);
+    }
+
+    public InteractiveTypeTypeAPI getInteractiveTypeTypeAPI() {
+        return getAPI().getInteractiveTypeTypeAPI();
+    }
+
+    public int getDisplayRunLength(int ordinal) {
+        if(fieldIndex[30] == -1)
+            return missingDataHandler().handleInt("Movie", ordinal, "displayRunLength");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[30]);
+    }
+
+    public Integer getDisplayRunLengthBoxed(int ordinal) {
+        int i;
+        if(fieldIndex[30] == -1) {
+            i = missingDataHandler().handleInt("Movie", ordinal, "displayRunLength");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[30]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[30]);
+        }
+        if(i == Integer.MIN_VALUE)
+            return null;
+        return Integer.valueOf(i);
+    }
+
+
+
+    public int getInteractiveShortestRunLength(int ordinal) {
+        if(fieldIndex[31] == -1)
+            return missingDataHandler().handleInt("Movie", ordinal, "interactiveShortestRunLength");
+        return getTypeDataAccess().readInt(ordinal, fieldIndex[31]);
+    }
+
+    public Integer getInteractiveShortestRunLengthBoxed(int ordinal) {
+        int i;
+        if(fieldIndex[31] == -1) {
+            i = missingDataHandler().handleInt("Movie", ordinal, "interactiveShortestRunLength");
+        } else {
+            boxedFieldAccessSampler.recordFieldAccess(fieldIndex[31]);
+            i = getTypeDataAccess().readInt(ordinal, fieldIndex[31]);
+        }
+        if(i == Integer.MIN_VALUE)
+            return null;
+        return Integer.valueOf(i);
+    }
+
+
+
+    public int getCreatedByTeamOrdinal(int ordinal) {
+        if(fieldIndex[32] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "createdByTeam");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[28]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[32]);
     }
 
     public StringTypeAPI getCreatedByTeamTypeAPI() {
@@ -400,9 +470,9 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getUpdatedByTeamOrdinal(int ordinal) {
-        if(fieldIndex[29] == -1)
+        if(fieldIndex[33] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "updatedByTeam");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[29]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[33]);
     }
 
     public StringTypeAPI getUpdatedByTeamTypeAPI() {
@@ -410,9 +480,9 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getDateCreatedOrdinal(int ordinal) {
-        if(fieldIndex[30] == -1)
+        if(fieldIndex[34] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "dateCreated");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[30]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[34]);
     }
 
     public DateTypeAPI getDateCreatedTypeAPI() {
@@ -420,9 +490,9 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getLastUpdatedOrdinal(int ordinal) {
-        if(fieldIndex[31] == -1)
+        if(fieldIndex[35] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "lastUpdated");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[31]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[35]);
     }
 
     public DateTypeAPI getLastUpdatedTypeAPI() {
@@ -430,9 +500,9 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getCreatedByOrdinal(int ordinal) {
-        if(fieldIndex[32] == -1)
+        if(fieldIndex[36] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "createdBy");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[32]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[36]);
     }
 
     public StringTypeAPI getCreatedByTypeAPI() {
@@ -440,9 +510,9 @@ public class MovieTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getUpdatedByOrdinal(int ordinal) {
-        if(fieldIndex[33] == -1)
+        if(fieldIndex[37] == -1)
             return missingDataHandler().handleReferencedOrdinal("Movie", ordinal, "updatedBy");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[33]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[37]);
     }
 
     public StringTypeAPI getUpdatedByTypeAPI() {

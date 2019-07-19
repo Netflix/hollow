@@ -22,9 +22,9 @@ public class GenerateCinderInputArtifacts {
     private static final String GENERATED_TEST_DATA_DEST = "/business-logic/src/test/java/com/netflix/vms/transformer/data/gen";
 
     private static List<ArtifactsSpec> ARTIFACT_SPECS = ImmutableList.<ArtifactsSpec>builder()
-            .add(new ArtifactsSpec("gatekeeper2_status_test","gatekeeper2","Gk2Status"))  // GK2
+            //.add(new ArtifactsSpec("gatekeeper2_status_test","gatekeeper2","Gk2Status"))  // GK2
             .add(new ArtifactsSpec("oscar_entityfeed_testintg","oscar","Oscar"))          // Oscar
-            .add(new ArtifactsSpec("flexds_testintg","flexds","FlexDS"))                  // FlexDS
+            //.add(new ArtifactsSpec("flexds_testintg","flexds","FlexDS"))                  // FlexDS
             .build();
 
     public static class ArtifactsSpec {

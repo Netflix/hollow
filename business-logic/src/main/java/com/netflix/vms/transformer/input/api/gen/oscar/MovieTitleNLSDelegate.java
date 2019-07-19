@@ -42,6 +42,12 @@ public interface MovieTitleNLSDelegate extends HollowObjectDelegate {
 
     public int getSourceTypeOrdinal(int ordinal);
 
+    public boolean getIsOriginalTitle(int ordinal);
+
+    public Boolean getIsOriginalTitleBoxed(int ordinal);
+
+    public int getIsOriginalTitleOrdinal(int ordinal);
+
     public long getDateCreated(int ordinal);
 
     public Long getDateCreatedBoxed(int ordinal);

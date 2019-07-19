@@ -53,6 +53,7 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Flags;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.ListOfRightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.RightsWindow;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Status;
+import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.input.datasets.OscarDataset;
@@ -67,6 +68,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class VideoMetaDataModule {
@@ -90,7 +92,7 @@ public class VideoMetaDataModule {
     private final Gatekeeper2Dataset gk2Dataset;
     private final HollowPrimaryKeyIndex storiesSynopsesIdx;
 
-    //private final OscarDataset oscarDataset;
+//    private final OscarDataset oscarDataset;
 
     private final int newContentFlagDuration;
 
@@ -519,6 +521,7 @@ public class VideoMetaDataModule {
 //                vmd.originalLanguageBcp47code = new Strings(origLang);
 //            }
 //
+//            // TODO: remove this or wrap with FP check if alias is deprecated, depending on whether/when that PR is merged and acted upon
 //            vmd.aliases = oscarDataset.getMovieTitleAkas(videoId)
 //                    .map(mta->new Strings(mta.getAlias()))
 //                    .collect(Collectors.toSet());
@@ -529,14 +532,13 @@ public class VideoMetaDataModule {
 //            vmd.isTestTitle = movie.getTestTitle();
 //            vmd.metadataReleaseDays = OutputUtil.getNullableInteger(movie.getMetadataReleaseDays());
 //
-//            // TODO:  this field is not yet exposed in incremental hollow
-////            vmd.displayRuntimeInSeconds = OutputUtil.getNullableInteger((int)movie.getDisplayRuntime());
-////            if (movie.getInteractiveData()!=null) {
-////                vmd.interactiveData = new InteractiveData();
-////                if (movie.getInteractiveData().getInteractiveType()!=null) {
-////                    vmd.interactiveData.interactiveType = movie.getInteractiveData().getInteractiveType();
-////                }
-////            }
+//            vmd.displayRuntimeInSeconds = OutputUtil.getNullableInteger(movie.getDisplayRunLengthBoxed());
+//            if (movie.getInteractive()) {
+//                vmd.interactiveData = new InteractiveData();
+//                if (movie.getInteractiveType()!=null) {
+//                    vmd.interactiveData.interactiveType = movie.getInteractiveType();
+//                }
+//            }
 //
 //        }
 //    }

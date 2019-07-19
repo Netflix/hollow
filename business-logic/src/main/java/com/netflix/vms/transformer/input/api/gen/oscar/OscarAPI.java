@@ -37,13 +37,15 @@ public class OscarAPI extends HollowAPI  {
     private final DateTypeAPI dateTypeAPI;
     private final DistributorNameTypeAPI distributorNameTypeAPI;
     private final ForceReasonTypeAPI forceReasonTypeAPI;
+    private final ISOCountryTypeAPI iSOCountryTypeAPI;
+    private final ISOCountryListTypeAPI iSOCountryListTypeAPI;
     private final ImageTypeTypeAPI imageTypeTypeAPI;
+    private final InteractiveTypeTypeAPI interactiveTypeTypeAPI;
     private final LongTypeAPI longTypeAPI;
     private final MovieIdTypeAPI movieIdTypeAPI;
     private final MovieReleaseTypeTypeAPI movieReleaseTypeTypeAPI;
     private final MovieTitleStringTypeAPI movieTitleStringTypeAPI;
     private final MovieTitleTypeTypeAPI movieTitleTypeTypeAPI;
-    private final MovieTitleTypeAPI movieTitleTypeAPI;
     private final MovieTypeTypeAPI movieTypeTypeAPI;
     private final OverrideEntityTypeTypeAPI overrideEntityTypeTypeAPI;
     private final OverrideEntityValueTypeAPI overrideEntityValueTypeAPI;
@@ -56,6 +58,9 @@ public class OscarAPI extends HollowAPI  {
     private final RolloutNameTypeAPI rolloutNameTypeAPI;
     private final RolloutStatusTypeAPI rolloutStatusTypeAPI;
     private final RolloutTypeTypeAPI rolloutTypeTypeAPI;
+    private final ShowMemberTypeTypeAPI showMemberTypeTypeAPI;
+    private final ShowMemberTypeListTypeAPI showMemberTypeListTypeAPI;
+    private final ShowCountryLabelTypeAPI showCountryLabelTypeAPI;
     private final SourceRequestDefaultFulfillmentTypeAPI sourceRequestDefaultFulfillmentTypeAPI;
     private final StringTypeAPI stringTypeAPI;
     private final MovieCountriesNotOriginalTypeAPI movieCountriesNotOriginalTypeAPI;
@@ -88,11 +93,12 @@ public class OscarAPI extends HollowAPI  {
     private final TitleSetupRequirementsTypeAPI titleSetupRequirementsTypeAPI;
     private final TitleSourceTypeTypeAPI titleSourceTypeTypeAPI;
     private final MovieTitleAkaTypeAPI movieTitleAkaTypeAPI;
-    private final MovieTitleNLSTypeAPI movieTitleNLSTypeAPI;
     private final WindowTypeTypeAPI windowTypeTypeAPI;
     private final RolloutPhaseTypeAPI rolloutPhaseTypeAPI;
     private final SetOfRolloutPhaseTypeAPI setOfRolloutPhaseTypeAPI;
     private final RolloutTypeAPI rolloutTypeAPI;
+    private final IsOriginalTitleTypeAPI isOriginalTitleTypeAPI;
+    private final MovieTitleNLSTypeAPI movieTitleNLSTypeAPI;
 
     private final HollowObjectProvider attributeNameProvider;
     private final HollowObjectProvider attributeValueProvider;
@@ -101,13 +107,15 @@ public class OscarAPI extends HollowAPI  {
     private final HollowObjectProvider dateProvider;
     private final HollowObjectProvider distributorNameProvider;
     private final HollowObjectProvider forceReasonProvider;
+    private final HollowObjectProvider iSOCountryProvider;
+    private final HollowObjectProvider iSOCountryListProvider;
     private final HollowObjectProvider imageTypeProvider;
+    private final HollowObjectProvider interactiveTypeProvider;
     private final HollowObjectProvider longProvider;
     private final HollowObjectProvider movieIdProvider;
     private final HollowObjectProvider movieReleaseTypeProvider;
     private final HollowObjectProvider movieTitleStringProvider;
     private final HollowObjectProvider movieTitleTypeProvider;
-    private final HollowObjectProvider movieTitleProvider;
     private final HollowObjectProvider movieTypeProvider;
     private final HollowObjectProvider overrideEntityTypeProvider;
     private final HollowObjectProvider overrideEntityValueProvider;
@@ -120,6 +128,9 @@ public class OscarAPI extends HollowAPI  {
     private final HollowObjectProvider rolloutNameProvider;
     private final HollowObjectProvider rolloutStatusProvider;
     private final HollowObjectProvider rolloutTypeProvider;
+    private final HollowObjectProvider showMemberTypeProvider;
+    private final HollowObjectProvider showMemberTypeListProvider;
+    private final HollowObjectProvider showCountryLabelProvider;
     private final HollowObjectProvider sourceRequestDefaultFulfillmentProvider;
     private final HollowObjectProvider stringProvider;
     private final HollowObjectProvider movieCountriesNotOriginalProvider;
@@ -152,11 +163,12 @@ public class OscarAPI extends HollowAPI  {
     private final HollowObjectProvider titleSetupRequirementsProvider;
     private final HollowObjectProvider titleSourceTypeProvider;
     private final HollowObjectProvider movieTitleAkaProvider;
-    private final HollowObjectProvider movieTitleNLSProvider;
     private final HollowObjectProvider windowTypeProvider;
     private final HollowObjectProvider rolloutPhaseProvider;
     private final HollowObjectProvider setOfRolloutPhaseProvider;
     private final HollowObjectProvider rolloutProvider;
+    private final HollowObjectProvider isOriginalTitleProvider;
+    private final HollowObjectProvider movieTitleNLSProvider;
 
     public OscarAPI(HollowDataAccess dataAccess) {
         this(dataAccess, Collections.<String>emptySet());
@@ -175,7 +187,7 @@ public class OscarAPI extends HollowAPI  {
         HollowTypeDataAccess typeDataAccess;
         HollowFactory factory;
 
-        objectCreationSampler = new HollowObjectCreationSampler("AttributeName","AttributeValue","BcpCode","CountryString","Date","DistributorName","ForceReason","ImageType","Long","MovieId","MovieReleaseType","MovieTitleString","MovieTitleType","MovieTitle","MovieType","OverrideEntityType","OverrideEntityValue","PersonId","PersonName","PhaseName","PhaseType","RatingsRequirements","RecipeGroups","RolloutName","RolloutStatus","RolloutType","SourceRequestDefaultFulfillment","String","MovieCountriesNotOriginal","MovieExtensionOverride","MovieReleaseHistory","MovieSetContentLabel","PhaseArtwork","PhaseCastMember","PhaseMetadataElement","PhaseRequiredImageType","PhaseTrailer","RolloutCountry","SetOfMovieExtensionOverride","MovieExtension","SetOfPhaseArtwork","SetOfPhaseCastMember","SetOfPhaseMetadataElement","SetOfPhaseRequiredImageType","SetOfPhaseTrailer","SetOfRolloutCountry","SetOfString","MovieCountries","ShowCountryLabelOverride","SubsDubs","SubtypeString","Subtype","SupplementalSubtype","Movie","TitleSetupRequirementsTemplate","TitleSetupRequirements","TitleSourceType","MovieTitleAka","MovieTitleNLS","WindowType","RolloutPhase","SetOfRolloutPhase","Rollout");
+        objectCreationSampler = new HollowObjectCreationSampler("AttributeName","AttributeValue","BcpCode","CountryString","Date","DistributorName","ForceReason","ISOCountry","ISOCountryList","ImageType","InteractiveType","Long","MovieId","MovieReleaseType","MovieTitleString","MovieTitleType","MovieType","OverrideEntityType","OverrideEntityValue","PersonId","PersonName","PhaseName","PhaseType","RatingsRequirements","RecipeGroups","RolloutName","RolloutStatus","RolloutType","ShowMemberType","ShowMemberTypeList","ShowCountryLabel","SourceRequestDefaultFulfillment","String","MovieCountriesNotOriginal","MovieExtensionOverride","MovieReleaseHistory","MovieSetContentLabel","PhaseArtwork","PhaseCastMember","PhaseMetadataElement","PhaseRequiredImageType","PhaseTrailer","RolloutCountry","SetOfMovieExtensionOverride","MovieExtension","SetOfPhaseArtwork","SetOfPhaseCastMember","SetOfPhaseMetadataElement","SetOfPhaseRequiredImageType","SetOfPhaseTrailer","SetOfRolloutCountry","SetOfString","MovieCountries","ShowCountryLabelOverride","SubsDubs","SubtypeString","Subtype","SupplementalSubtype","Movie","TitleSetupRequirementsTemplate","TitleSetupRequirements","TitleSourceType","MovieTitleAka","WindowType","RolloutPhase","SetOfRolloutPhase","Rollout","isOriginalTitle","MovieTitleNLS");
 
         typeDataAccess = dataAccess.getTypeDataAccess("AttributeName");
         if(typeDataAccess != null) {
@@ -310,6 +322,44 @@ public class OscarAPI extends HollowAPI  {
             forceReasonProvider = new HollowObjectFactoryProvider(typeDataAccess, forceReasonTypeAPI, factory);
         }
 
+        typeDataAccess = dataAccess.getTypeDataAccess("ISOCountry");
+        if(typeDataAccess != null) {
+            iSOCountryTypeAPI = new ISOCountryTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            iSOCountryTypeAPI = new ISOCountryTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "ISOCountry"));
+        }
+        addTypeAPI(iSOCountryTypeAPI);
+        factory = factoryOverrides.get("ISOCountry");
+        if(factory == null)
+            factory = new ISOCountryHollowFactory();
+        if(cachedTypes.contains("ISOCountry")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.iSOCountryProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.iSOCountryProvider;
+            iSOCountryProvider = new HollowObjectCacheProvider(typeDataAccess, iSOCountryTypeAPI, factory, previousCacheProvider);
+        } else {
+            iSOCountryProvider = new HollowObjectFactoryProvider(typeDataAccess, iSOCountryTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ISOCountryList");
+        if(typeDataAccess != null) {
+            iSOCountryListTypeAPI = new ISOCountryListTypeAPI(this, (HollowListTypeDataAccess)typeDataAccess);
+        } else {
+            iSOCountryListTypeAPI = new ISOCountryListTypeAPI(this, new HollowListMissingDataAccess(dataAccess, "ISOCountryList"));
+        }
+        addTypeAPI(iSOCountryListTypeAPI);
+        factory = factoryOverrides.get("ISOCountryList");
+        if(factory == null)
+            factory = new ISOCountryListHollowFactory();
+        if(cachedTypes.contains("ISOCountryList")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.iSOCountryListProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.iSOCountryListProvider;
+            iSOCountryListProvider = new HollowObjectCacheProvider(typeDataAccess, iSOCountryListTypeAPI, factory, previousCacheProvider);
+        } else {
+            iSOCountryListProvider = new HollowObjectFactoryProvider(typeDataAccess, iSOCountryListTypeAPI, factory);
+        }
+
         typeDataAccess = dataAccess.getTypeDataAccess("ImageType");
         if(typeDataAccess != null) {
             imageTypeTypeAPI = new ImageTypeTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
@@ -327,6 +377,25 @@ public class OscarAPI extends HollowAPI  {
             imageTypeProvider = new HollowObjectCacheProvider(typeDataAccess, imageTypeTypeAPI, factory, previousCacheProvider);
         } else {
             imageTypeProvider = new HollowObjectFactoryProvider(typeDataAccess, imageTypeTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("InteractiveType");
+        if(typeDataAccess != null) {
+            interactiveTypeTypeAPI = new InteractiveTypeTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            interactiveTypeTypeAPI = new InteractiveTypeTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "InteractiveType"));
+        }
+        addTypeAPI(interactiveTypeTypeAPI);
+        factory = factoryOverrides.get("InteractiveType");
+        if(factory == null)
+            factory = new InteractiveTypeHollowFactory();
+        if(cachedTypes.contains("InteractiveType")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.interactiveTypeProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.interactiveTypeProvider;
+            interactiveTypeProvider = new HollowObjectCacheProvider(typeDataAccess, interactiveTypeTypeAPI, factory, previousCacheProvider);
+        } else {
+            interactiveTypeProvider = new HollowObjectFactoryProvider(typeDataAccess, interactiveTypeTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("Long");
@@ -422,25 +491,6 @@ public class OscarAPI extends HollowAPI  {
             movieTitleTypeProvider = new HollowObjectCacheProvider(typeDataAccess, movieTitleTypeTypeAPI, factory, previousCacheProvider);
         } else {
             movieTitleTypeProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTitleTypeTypeAPI, factory);
-        }
-
-        typeDataAccess = dataAccess.getTypeDataAccess("MovieTitle");
-        if(typeDataAccess != null) {
-            movieTitleTypeAPI = new MovieTitleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
-        } else {
-            movieTitleTypeAPI = new MovieTitleTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "MovieTitle"));
-        }
-        addTypeAPI(movieTitleTypeAPI);
-        factory = factoryOverrides.get("MovieTitle");
-        if(factory == null)
-            factory = new MovieTitleHollowFactory();
-        if(cachedTypes.contains("MovieTitle")) {
-            HollowObjectCacheProvider previousCacheProvider = null;
-            if(previousCycleAPI != null && (previousCycleAPI.movieTitleProvider instanceof HollowObjectCacheProvider))
-                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.movieTitleProvider;
-            movieTitleProvider = new HollowObjectCacheProvider(typeDataAccess, movieTitleTypeAPI, factory, previousCacheProvider);
-        } else {
-            movieTitleProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTitleTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("MovieType");
@@ -669,6 +719,63 @@ public class OscarAPI extends HollowAPI  {
             rolloutTypeProvider = new HollowObjectCacheProvider(typeDataAccess, rolloutTypeTypeAPI, factory, previousCacheProvider);
         } else {
             rolloutTypeProvider = new HollowObjectFactoryProvider(typeDataAccess, rolloutTypeTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ShowMemberType");
+        if(typeDataAccess != null) {
+            showMemberTypeTypeAPI = new ShowMemberTypeTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            showMemberTypeTypeAPI = new ShowMemberTypeTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "ShowMemberType"));
+        }
+        addTypeAPI(showMemberTypeTypeAPI);
+        factory = factoryOverrides.get("ShowMemberType");
+        if(factory == null)
+            factory = new ShowMemberTypeHollowFactory();
+        if(cachedTypes.contains("ShowMemberType")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.showMemberTypeProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.showMemberTypeProvider;
+            showMemberTypeProvider = new HollowObjectCacheProvider(typeDataAccess, showMemberTypeTypeAPI, factory, previousCacheProvider);
+        } else {
+            showMemberTypeProvider = new HollowObjectFactoryProvider(typeDataAccess, showMemberTypeTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ShowMemberTypeList");
+        if(typeDataAccess != null) {
+            showMemberTypeListTypeAPI = new ShowMemberTypeListTypeAPI(this, (HollowListTypeDataAccess)typeDataAccess);
+        } else {
+            showMemberTypeListTypeAPI = new ShowMemberTypeListTypeAPI(this, new HollowListMissingDataAccess(dataAccess, "ShowMemberTypeList"));
+        }
+        addTypeAPI(showMemberTypeListTypeAPI);
+        factory = factoryOverrides.get("ShowMemberTypeList");
+        if(factory == null)
+            factory = new ShowMemberTypeListHollowFactory();
+        if(cachedTypes.contains("ShowMemberTypeList")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.showMemberTypeListProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.showMemberTypeListProvider;
+            showMemberTypeListProvider = new HollowObjectCacheProvider(typeDataAccess, showMemberTypeListTypeAPI, factory, previousCacheProvider);
+        } else {
+            showMemberTypeListProvider = new HollowObjectFactoryProvider(typeDataAccess, showMemberTypeListTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("ShowCountryLabel");
+        if(typeDataAccess != null) {
+            showCountryLabelTypeAPI = new ShowCountryLabelTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            showCountryLabelTypeAPI = new ShowCountryLabelTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "ShowCountryLabel"));
+        }
+        addTypeAPI(showCountryLabelTypeAPI);
+        factory = factoryOverrides.get("ShowCountryLabel");
+        if(factory == null)
+            factory = new ShowCountryLabelHollowFactory();
+        if(cachedTypes.contains("ShowCountryLabel")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.showCountryLabelProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.showCountryLabelProvider;
+            showCountryLabelProvider = new HollowObjectCacheProvider(typeDataAccess, showCountryLabelTypeAPI, factory, previousCacheProvider);
+        } else {
+            showCountryLabelProvider = new HollowObjectFactoryProvider(typeDataAccess, showCountryLabelTypeAPI, factory);
         }
 
         typeDataAccess = dataAccess.getTypeDataAccess("SourceRequestDefaultFulfillment");
@@ -1279,25 +1386,6 @@ public class OscarAPI extends HollowAPI  {
             movieTitleAkaProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTitleAkaTypeAPI, factory);
         }
 
-        typeDataAccess = dataAccess.getTypeDataAccess("MovieTitleNLS");
-        if(typeDataAccess != null) {
-            movieTitleNLSTypeAPI = new MovieTitleNLSTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
-        } else {
-            movieTitleNLSTypeAPI = new MovieTitleNLSTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "MovieTitleNLS"));
-        }
-        addTypeAPI(movieTitleNLSTypeAPI);
-        factory = factoryOverrides.get("MovieTitleNLS");
-        if(factory == null)
-            factory = new MovieTitleNLSHollowFactory();
-        if(cachedTypes.contains("MovieTitleNLS")) {
-            HollowObjectCacheProvider previousCacheProvider = null;
-            if(previousCycleAPI != null && (previousCycleAPI.movieTitleNLSProvider instanceof HollowObjectCacheProvider))
-                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.movieTitleNLSProvider;
-            movieTitleNLSProvider = new HollowObjectCacheProvider(typeDataAccess, movieTitleNLSTypeAPI, factory, previousCacheProvider);
-        } else {
-            movieTitleNLSProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTitleNLSTypeAPI, factory);
-        }
-
         typeDataAccess = dataAccess.getTypeDataAccess("WindowType");
         if(typeDataAccess != null) {
             windowTypeTypeAPI = new WindowTypeTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
@@ -1374,6 +1462,44 @@ public class OscarAPI extends HollowAPI  {
             rolloutProvider = new HollowObjectFactoryProvider(typeDataAccess, rolloutTypeAPI, factory);
         }
 
+        typeDataAccess = dataAccess.getTypeDataAccess("isOriginalTitle");
+        if(typeDataAccess != null) {
+            isOriginalTitleTypeAPI = new IsOriginalTitleTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            isOriginalTitleTypeAPI = new IsOriginalTitleTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "isOriginalTitle"));
+        }
+        addTypeAPI(isOriginalTitleTypeAPI);
+        factory = factoryOverrides.get("isOriginalTitle");
+        if(factory == null)
+            factory = new IsOriginalTitleHollowFactory();
+        if(cachedTypes.contains("isOriginalTitle")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.isOriginalTitleProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.isOriginalTitleProvider;
+            isOriginalTitleProvider = new HollowObjectCacheProvider(typeDataAccess, isOriginalTitleTypeAPI, factory, previousCacheProvider);
+        } else {
+            isOriginalTitleProvider = new HollowObjectFactoryProvider(typeDataAccess, isOriginalTitleTypeAPI, factory);
+        }
+
+        typeDataAccess = dataAccess.getTypeDataAccess("MovieTitleNLS");
+        if(typeDataAccess != null) {
+            movieTitleNLSTypeAPI = new MovieTitleNLSTypeAPI(this, (HollowObjectTypeDataAccess)typeDataAccess);
+        } else {
+            movieTitleNLSTypeAPI = new MovieTitleNLSTypeAPI(this, new HollowObjectMissingDataAccess(dataAccess, "MovieTitleNLS"));
+        }
+        addTypeAPI(movieTitleNLSTypeAPI);
+        factory = factoryOverrides.get("MovieTitleNLS");
+        if(factory == null)
+            factory = new MovieTitleNLSHollowFactory();
+        if(cachedTypes.contains("MovieTitleNLS")) {
+            HollowObjectCacheProvider previousCacheProvider = null;
+            if(previousCycleAPI != null && (previousCycleAPI.movieTitleNLSProvider instanceof HollowObjectCacheProvider))
+                previousCacheProvider = (HollowObjectCacheProvider) previousCycleAPI.movieTitleNLSProvider;
+            movieTitleNLSProvider = new HollowObjectCacheProvider(typeDataAccess, movieTitleNLSTypeAPI, factory, previousCacheProvider);
+        } else {
+            movieTitleNLSProvider = new HollowObjectFactoryProvider(typeDataAccess, movieTitleNLSTypeAPI, factory);
+        }
+
     }
 
     public void detachCaches() {
@@ -1391,8 +1517,14 @@ public class OscarAPI extends HollowAPI  {
             ((HollowObjectCacheProvider)distributorNameProvider).detach();
         if(forceReasonProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)forceReasonProvider).detach();
+        if(iSOCountryProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)iSOCountryProvider).detach();
+        if(iSOCountryListProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)iSOCountryListProvider).detach();
         if(imageTypeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)imageTypeProvider).detach();
+        if(interactiveTypeProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)interactiveTypeProvider).detach();
         if(longProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)longProvider).detach();
         if(movieIdProvider instanceof HollowObjectCacheProvider)
@@ -1403,8 +1535,6 @@ public class OscarAPI extends HollowAPI  {
             ((HollowObjectCacheProvider)movieTitleStringProvider).detach();
         if(movieTitleTypeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)movieTitleTypeProvider).detach();
-        if(movieTitleProvider instanceof HollowObjectCacheProvider)
-            ((HollowObjectCacheProvider)movieTitleProvider).detach();
         if(movieTypeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)movieTypeProvider).detach();
         if(overrideEntityTypeProvider instanceof HollowObjectCacheProvider)
@@ -1429,6 +1559,12 @@ public class OscarAPI extends HollowAPI  {
             ((HollowObjectCacheProvider)rolloutStatusProvider).detach();
         if(rolloutTypeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)rolloutTypeProvider).detach();
+        if(showMemberTypeProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)showMemberTypeProvider).detach();
+        if(showMemberTypeListProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)showMemberTypeListProvider).detach();
+        if(showCountryLabelProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)showCountryLabelProvider).detach();
         if(sourceRequestDefaultFulfillmentProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)sourceRequestDefaultFulfillmentProvider).detach();
         if(stringProvider instanceof HollowObjectCacheProvider)
@@ -1493,8 +1629,6 @@ public class OscarAPI extends HollowAPI  {
             ((HollowObjectCacheProvider)titleSourceTypeProvider).detach();
         if(movieTitleAkaProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)movieTitleAkaProvider).detach();
-        if(movieTitleNLSProvider instanceof HollowObjectCacheProvider)
-            ((HollowObjectCacheProvider)movieTitleNLSProvider).detach();
         if(windowTypeProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)windowTypeProvider).detach();
         if(rolloutPhaseProvider instanceof HollowObjectCacheProvider)
@@ -1503,6 +1637,10 @@ public class OscarAPI extends HollowAPI  {
             ((HollowObjectCacheProvider)setOfRolloutPhaseProvider).detach();
         if(rolloutProvider instanceof HollowObjectCacheProvider)
             ((HollowObjectCacheProvider)rolloutProvider).detach();
+        if(isOriginalTitleProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)isOriginalTitleProvider).detach();
+        if(movieTitleNLSProvider instanceof HollowObjectCacheProvider)
+            ((HollowObjectCacheProvider)movieTitleNLSProvider).detach();
     }
 
     public AttributeNameTypeAPI getAttributeNameTypeAPI() {
@@ -1526,8 +1664,17 @@ public class OscarAPI extends HollowAPI  {
     public ForceReasonTypeAPI getForceReasonTypeAPI() {
         return forceReasonTypeAPI;
     }
+    public ISOCountryTypeAPI getISOCountryTypeAPI() {
+        return iSOCountryTypeAPI;
+    }
+    public ISOCountryListTypeAPI getISOCountryListTypeAPI() {
+        return iSOCountryListTypeAPI;
+    }
     public ImageTypeTypeAPI getImageTypeTypeAPI() {
         return imageTypeTypeAPI;
+    }
+    public InteractiveTypeTypeAPI getInteractiveTypeTypeAPI() {
+        return interactiveTypeTypeAPI;
     }
     public LongTypeAPI getLongTypeAPI() {
         return longTypeAPI;
@@ -1543,9 +1690,6 @@ public class OscarAPI extends HollowAPI  {
     }
     public MovieTitleTypeTypeAPI getMovieTitleTypeTypeAPI() {
         return movieTitleTypeTypeAPI;
-    }
-    public MovieTitleTypeAPI getMovieTitleTypeAPI() {
-        return movieTitleTypeAPI;
     }
     public MovieTypeTypeAPI getMovieTypeTypeAPI() {
         return movieTypeTypeAPI;
@@ -1582,6 +1726,15 @@ public class OscarAPI extends HollowAPI  {
     }
     public RolloutTypeTypeAPI getRolloutTypeTypeAPI() {
         return rolloutTypeTypeAPI;
+    }
+    public ShowMemberTypeTypeAPI getShowMemberTypeTypeAPI() {
+        return showMemberTypeTypeAPI;
+    }
+    public ShowMemberTypeListTypeAPI getShowMemberTypeListTypeAPI() {
+        return showMemberTypeListTypeAPI;
+    }
+    public ShowCountryLabelTypeAPI getShowCountryLabelTypeAPI() {
+        return showCountryLabelTypeAPI;
     }
     public SourceRequestDefaultFulfillmentTypeAPI getSourceRequestDefaultFulfillmentTypeAPI() {
         return sourceRequestDefaultFulfillmentTypeAPI;
@@ -1679,9 +1832,6 @@ public class OscarAPI extends HollowAPI  {
     public MovieTitleAkaTypeAPI getMovieTitleAkaTypeAPI() {
         return movieTitleAkaTypeAPI;
     }
-    public MovieTitleNLSTypeAPI getMovieTitleNLSTypeAPI() {
-        return movieTitleNLSTypeAPI;
-    }
     public WindowTypeTypeAPI getWindowTypeTypeAPI() {
         return windowTypeTypeAPI;
     }
@@ -1693,6 +1843,12 @@ public class OscarAPI extends HollowAPI  {
     }
     public RolloutTypeAPI getRolloutTypeAPI() {
         return rolloutTypeAPI;
+    }
+    public IsOriginalTitleTypeAPI getIsOriginalTitleTypeAPI() {
+        return isOriginalTitleTypeAPI;
+    }
+    public MovieTitleNLSTypeAPI getMovieTitleNLSTypeAPI() {
+        return movieTitleNLSTypeAPI;
     }
     public Collection<AttributeName> getAllAttributeName() {
         return new AllHollowRecordCollection<AttributeName>(getDataAccess().getTypeDataAccess("AttributeName").getTypeState()) {
@@ -1771,6 +1927,28 @@ public class OscarAPI extends HollowAPI  {
         objectCreationSampler.recordCreation(6);
         return (ForceReason)forceReasonProvider.getHollowObject(ordinal);
     }
+    public Collection<ISOCountry> getAllISOCountry() {
+        return new AllHollowRecordCollection<ISOCountry>(getDataAccess().getTypeDataAccess("ISOCountry").getTypeState()) {
+            protected ISOCountry getForOrdinal(int ordinal) {
+                return getISOCountry(ordinal);
+            }
+        };
+    }
+    public ISOCountry getISOCountry(int ordinal) {
+        objectCreationSampler.recordCreation(7);
+        return (ISOCountry)iSOCountryProvider.getHollowObject(ordinal);
+    }
+    public Collection<ISOCountryList> getAllISOCountryList() {
+        return new AllHollowRecordCollection<ISOCountryList>(getDataAccess().getTypeDataAccess("ISOCountryList").getTypeState()) {
+            protected ISOCountryList getForOrdinal(int ordinal) {
+                return getISOCountryList(ordinal);
+            }
+        };
+    }
+    public ISOCountryList getISOCountryList(int ordinal) {
+        objectCreationSampler.recordCreation(8);
+        return (ISOCountryList)iSOCountryListProvider.getHollowObject(ordinal);
+    }
     public Collection<ImageType> getAllImageType() {
         return new AllHollowRecordCollection<ImageType>(getDataAccess().getTypeDataAccess("ImageType").getTypeState()) {
             protected ImageType getForOrdinal(int ordinal) {
@@ -1779,8 +1957,19 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public ImageType getImageType(int ordinal) {
-        objectCreationSampler.recordCreation(7);
+        objectCreationSampler.recordCreation(9);
         return (ImageType)imageTypeProvider.getHollowObject(ordinal);
+    }
+    public Collection<InteractiveType> getAllInteractiveType() {
+        return new AllHollowRecordCollection<InteractiveType>(getDataAccess().getTypeDataAccess("InteractiveType").getTypeState()) {
+            protected InteractiveType getForOrdinal(int ordinal) {
+                return getInteractiveType(ordinal);
+            }
+        };
+    }
+    public InteractiveType getInteractiveType(int ordinal) {
+        objectCreationSampler.recordCreation(10);
+        return (InteractiveType)interactiveTypeProvider.getHollowObject(ordinal);
     }
     public Collection<HLong> getAllHLong() {
         return new AllHollowRecordCollection<HLong>(getDataAccess().getTypeDataAccess("Long").getTypeState()) {
@@ -1790,7 +1979,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public HLong getHLong(int ordinal) {
-        objectCreationSampler.recordCreation(8);
+        objectCreationSampler.recordCreation(11);
         return (HLong)longProvider.getHollowObject(ordinal);
     }
     public Collection<MovieId> getAllMovieId() {
@@ -1801,7 +1990,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieId getMovieId(int ordinal) {
-        objectCreationSampler.recordCreation(9);
+        objectCreationSampler.recordCreation(12);
         return (MovieId)movieIdProvider.getHollowObject(ordinal);
     }
     public Collection<MovieReleaseType> getAllMovieReleaseType() {
@@ -1812,7 +2001,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieReleaseType getMovieReleaseType(int ordinal) {
-        objectCreationSampler.recordCreation(10);
+        objectCreationSampler.recordCreation(13);
         return (MovieReleaseType)movieReleaseTypeProvider.getHollowObject(ordinal);
     }
     public Collection<MovieTitleString> getAllMovieTitleString() {
@@ -1823,7 +2012,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieTitleString getMovieTitleString(int ordinal) {
-        objectCreationSampler.recordCreation(11);
+        objectCreationSampler.recordCreation(14);
         return (MovieTitleString)movieTitleStringProvider.getHollowObject(ordinal);
     }
     public Collection<MovieTitleType> getAllMovieTitleType() {
@@ -1834,19 +2023,8 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieTitleType getMovieTitleType(int ordinal) {
-        objectCreationSampler.recordCreation(12);
+        objectCreationSampler.recordCreation(15);
         return (MovieTitleType)movieTitleTypeProvider.getHollowObject(ordinal);
-    }
-    public Collection<MovieTitle> getAllMovieTitle() {
-        return new AllHollowRecordCollection<MovieTitle>(getDataAccess().getTypeDataAccess("MovieTitle").getTypeState()) {
-            protected MovieTitle getForOrdinal(int ordinal) {
-                return getMovieTitle(ordinal);
-            }
-        };
-    }
-    public MovieTitle getMovieTitle(int ordinal) {
-        objectCreationSampler.recordCreation(13);
-        return (MovieTitle)movieTitleProvider.getHollowObject(ordinal);
     }
     public Collection<MovieType> getAllMovieType() {
         return new AllHollowRecordCollection<MovieType>(getDataAccess().getTypeDataAccess("MovieType").getTypeState()) {
@@ -1856,7 +2034,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieType getMovieType(int ordinal) {
-        objectCreationSampler.recordCreation(14);
+        objectCreationSampler.recordCreation(16);
         return (MovieType)movieTypeProvider.getHollowObject(ordinal);
     }
     public Collection<OverrideEntityType> getAllOverrideEntityType() {
@@ -1867,7 +2045,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public OverrideEntityType getOverrideEntityType(int ordinal) {
-        objectCreationSampler.recordCreation(15);
+        objectCreationSampler.recordCreation(17);
         return (OverrideEntityType)overrideEntityTypeProvider.getHollowObject(ordinal);
     }
     public Collection<OverrideEntityValue> getAllOverrideEntityValue() {
@@ -1878,7 +2056,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public OverrideEntityValue getOverrideEntityValue(int ordinal) {
-        objectCreationSampler.recordCreation(16);
+        objectCreationSampler.recordCreation(18);
         return (OverrideEntityValue)overrideEntityValueProvider.getHollowObject(ordinal);
     }
     public Collection<PersonId> getAllPersonId() {
@@ -1889,7 +2067,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PersonId getPersonId(int ordinal) {
-        objectCreationSampler.recordCreation(17);
+        objectCreationSampler.recordCreation(19);
         return (PersonId)personIdProvider.getHollowObject(ordinal);
     }
     public Collection<PersonName> getAllPersonName() {
@@ -1900,7 +2078,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PersonName getPersonName(int ordinal) {
-        objectCreationSampler.recordCreation(18);
+        objectCreationSampler.recordCreation(20);
         return (PersonName)personNameProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseName> getAllPhaseName() {
@@ -1911,7 +2089,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseName getPhaseName(int ordinal) {
-        objectCreationSampler.recordCreation(19);
+        objectCreationSampler.recordCreation(21);
         return (PhaseName)phaseNameProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseType> getAllPhaseType() {
@@ -1922,7 +2100,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseType getPhaseType(int ordinal) {
-        objectCreationSampler.recordCreation(20);
+        objectCreationSampler.recordCreation(22);
         return (PhaseType)phaseTypeProvider.getHollowObject(ordinal);
     }
     public Collection<RatingsRequirements> getAllRatingsRequirements() {
@@ -1933,7 +2111,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RatingsRequirements getRatingsRequirements(int ordinal) {
-        objectCreationSampler.recordCreation(21);
+        objectCreationSampler.recordCreation(23);
         return (RatingsRequirements)ratingsRequirementsProvider.getHollowObject(ordinal);
     }
     public Collection<RecipeGroups> getAllRecipeGroups() {
@@ -1944,7 +2122,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RecipeGroups getRecipeGroups(int ordinal) {
-        objectCreationSampler.recordCreation(22);
+        objectCreationSampler.recordCreation(24);
         return (RecipeGroups)recipeGroupsProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutName> getAllRolloutName() {
@@ -1955,7 +2133,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RolloutName getRolloutName(int ordinal) {
-        objectCreationSampler.recordCreation(23);
+        objectCreationSampler.recordCreation(25);
         return (RolloutName)rolloutNameProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutStatus> getAllRolloutStatus() {
@@ -1966,7 +2144,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RolloutStatus getRolloutStatus(int ordinal) {
-        objectCreationSampler.recordCreation(24);
+        objectCreationSampler.recordCreation(26);
         return (RolloutStatus)rolloutStatusProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutType> getAllRolloutType() {
@@ -1977,8 +2155,41 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RolloutType getRolloutType(int ordinal) {
-        objectCreationSampler.recordCreation(25);
+        objectCreationSampler.recordCreation(27);
         return (RolloutType)rolloutTypeProvider.getHollowObject(ordinal);
+    }
+    public Collection<ShowMemberType> getAllShowMemberType() {
+        return new AllHollowRecordCollection<ShowMemberType>(getDataAccess().getTypeDataAccess("ShowMemberType").getTypeState()) {
+            protected ShowMemberType getForOrdinal(int ordinal) {
+                return getShowMemberType(ordinal);
+            }
+        };
+    }
+    public ShowMemberType getShowMemberType(int ordinal) {
+        objectCreationSampler.recordCreation(28);
+        return (ShowMemberType)showMemberTypeProvider.getHollowObject(ordinal);
+    }
+    public Collection<ShowMemberTypeList> getAllShowMemberTypeList() {
+        return new AllHollowRecordCollection<ShowMemberTypeList>(getDataAccess().getTypeDataAccess("ShowMemberTypeList").getTypeState()) {
+            protected ShowMemberTypeList getForOrdinal(int ordinal) {
+                return getShowMemberTypeList(ordinal);
+            }
+        };
+    }
+    public ShowMemberTypeList getShowMemberTypeList(int ordinal) {
+        objectCreationSampler.recordCreation(29);
+        return (ShowMemberTypeList)showMemberTypeListProvider.getHollowObject(ordinal);
+    }
+    public Collection<ShowCountryLabel> getAllShowCountryLabel() {
+        return new AllHollowRecordCollection<ShowCountryLabel>(getDataAccess().getTypeDataAccess("ShowCountryLabel").getTypeState()) {
+            protected ShowCountryLabel getForOrdinal(int ordinal) {
+                return getShowCountryLabel(ordinal);
+            }
+        };
+    }
+    public ShowCountryLabel getShowCountryLabel(int ordinal) {
+        objectCreationSampler.recordCreation(30);
+        return (ShowCountryLabel)showCountryLabelProvider.getHollowObject(ordinal);
     }
     public Collection<SourceRequestDefaultFulfillment> getAllSourceRequestDefaultFulfillment() {
         return new AllHollowRecordCollection<SourceRequestDefaultFulfillment>(getDataAccess().getTypeDataAccess("SourceRequestDefaultFulfillment").getTypeState()) {
@@ -1988,7 +2199,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SourceRequestDefaultFulfillment getSourceRequestDefaultFulfillment(int ordinal) {
-        objectCreationSampler.recordCreation(26);
+        objectCreationSampler.recordCreation(31);
         return (SourceRequestDefaultFulfillment)sourceRequestDefaultFulfillmentProvider.getHollowObject(ordinal);
     }
     public Collection<HString> getAllHString() {
@@ -1999,7 +2210,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public HString getHString(int ordinal) {
-        objectCreationSampler.recordCreation(27);
+        objectCreationSampler.recordCreation(32);
         return (HString)stringProvider.getHollowObject(ordinal);
     }
     public Collection<MovieCountriesNotOriginal> getAllMovieCountriesNotOriginal() {
@@ -2010,7 +2221,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieCountriesNotOriginal getMovieCountriesNotOriginal(int ordinal) {
-        objectCreationSampler.recordCreation(28);
+        objectCreationSampler.recordCreation(33);
         return (MovieCountriesNotOriginal)movieCountriesNotOriginalProvider.getHollowObject(ordinal);
     }
     public Collection<MovieExtensionOverride> getAllMovieExtensionOverride() {
@@ -2021,7 +2232,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieExtensionOverride getMovieExtensionOverride(int ordinal) {
-        objectCreationSampler.recordCreation(29);
+        objectCreationSampler.recordCreation(34);
         return (MovieExtensionOverride)movieExtensionOverrideProvider.getHollowObject(ordinal);
     }
     public Collection<MovieReleaseHistory> getAllMovieReleaseHistory() {
@@ -2032,7 +2243,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieReleaseHistory getMovieReleaseHistory(int ordinal) {
-        objectCreationSampler.recordCreation(30);
+        objectCreationSampler.recordCreation(35);
         return (MovieReleaseHistory)movieReleaseHistoryProvider.getHollowObject(ordinal);
     }
     public Collection<MovieSetContentLabel> getAllMovieSetContentLabel() {
@@ -2043,7 +2254,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieSetContentLabel getMovieSetContentLabel(int ordinal) {
-        objectCreationSampler.recordCreation(31);
+        objectCreationSampler.recordCreation(36);
         return (MovieSetContentLabel)movieSetContentLabelProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseArtwork> getAllPhaseArtwork() {
@@ -2054,7 +2265,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseArtwork getPhaseArtwork(int ordinal) {
-        objectCreationSampler.recordCreation(32);
+        objectCreationSampler.recordCreation(37);
         return (PhaseArtwork)phaseArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseCastMember> getAllPhaseCastMember() {
@@ -2065,7 +2276,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseCastMember getPhaseCastMember(int ordinal) {
-        objectCreationSampler.recordCreation(33);
+        objectCreationSampler.recordCreation(38);
         return (PhaseCastMember)phaseCastMemberProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseMetadataElement> getAllPhaseMetadataElement() {
@@ -2076,7 +2287,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseMetadataElement getPhaseMetadataElement(int ordinal) {
-        objectCreationSampler.recordCreation(34);
+        objectCreationSampler.recordCreation(39);
         return (PhaseMetadataElement)phaseMetadataElementProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseRequiredImageType> getAllPhaseRequiredImageType() {
@@ -2087,7 +2298,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseRequiredImageType getPhaseRequiredImageType(int ordinal) {
-        objectCreationSampler.recordCreation(35);
+        objectCreationSampler.recordCreation(40);
         return (PhaseRequiredImageType)phaseRequiredImageTypeProvider.getHollowObject(ordinal);
     }
     public Collection<PhaseTrailer> getAllPhaseTrailer() {
@@ -2098,7 +2309,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public PhaseTrailer getPhaseTrailer(int ordinal) {
-        objectCreationSampler.recordCreation(36);
+        objectCreationSampler.recordCreation(41);
         return (PhaseTrailer)phaseTrailerProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutCountry> getAllRolloutCountry() {
@@ -2109,7 +2320,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RolloutCountry getRolloutCountry(int ordinal) {
-        objectCreationSampler.recordCreation(37);
+        objectCreationSampler.recordCreation(42);
         return (RolloutCountry)rolloutCountryProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfMovieExtensionOverride> getAllSetOfMovieExtensionOverride() {
@@ -2120,7 +2331,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfMovieExtensionOverride getSetOfMovieExtensionOverride(int ordinal) {
-        objectCreationSampler.recordCreation(38);
+        objectCreationSampler.recordCreation(43);
         return (SetOfMovieExtensionOverride)setOfMovieExtensionOverrideProvider.getHollowObject(ordinal);
     }
     public Collection<MovieExtension> getAllMovieExtension() {
@@ -2131,7 +2342,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieExtension getMovieExtension(int ordinal) {
-        objectCreationSampler.recordCreation(39);
+        objectCreationSampler.recordCreation(44);
         return (MovieExtension)movieExtensionProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfPhaseArtwork> getAllSetOfPhaseArtwork() {
@@ -2142,7 +2353,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfPhaseArtwork getSetOfPhaseArtwork(int ordinal) {
-        objectCreationSampler.recordCreation(40);
+        objectCreationSampler.recordCreation(45);
         return (SetOfPhaseArtwork)setOfPhaseArtworkProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfPhaseCastMember> getAllSetOfPhaseCastMember() {
@@ -2153,7 +2364,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfPhaseCastMember getSetOfPhaseCastMember(int ordinal) {
-        objectCreationSampler.recordCreation(41);
+        objectCreationSampler.recordCreation(46);
         return (SetOfPhaseCastMember)setOfPhaseCastMemberProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfPhaseMetadataElement> getAllSetOfPhaseMetadataElement() {
@@ -2164,7 +2375,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfPhaseMetadataElement getSetOfPhaseMetadataElement(int ordinal) {
-        objectCreationSampler.recordCreation(42);
+        objectCreationSampler.recordCreation(47);
         return (SetOfPhaseMetadataElement)setOfPhaseMetadataElementProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfPhaseRequiredImageType> getAllSetOfPhaseRequiredImageType() {
@@ -2175,7 +2386,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfPhaseRequiredImageType getSetOfPhaseRequiredImageType(int ordinal) {
-        objectCreationSampler.recordCreation(43);
+        objectCreationSampler.recordCreation(48);
         return (SetOfPhaseRequiredImageType)setOfPhaseRequiredImageTypeProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfPhaseTrailer> getAllSetOfPhaseTrailer() {
@@ -2186,7 +2397,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfPhaseTrailer getSetOfPhaseTrailer(int ordinal) {
-        objectCreationSampler.recordCreation(44);
+        objectCreationSampler.recordCreation(49);
         return (SetOfPhaseTrailer)setOfPhaseTrailerProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfRolloutCountry> getAllSetOfRolloutCountry() {
@@ -2197,7 +2408,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfRolloutCountry getSetOfRolloutCountry(int ordinal) {
-        objectCreationSampler.recordCreation(45);
+        objectCreationSampler.recordCreation(50);
         return (SetOfRolloutCountry)setOfRolloutCountryProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfString> getAllSetOfString() {
@@ -2208,7 +2419,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfString getSetOfString(int ordinal) {
-        objectCreationSampler.recordCreation(46);
+        objectCreationSampler.recordCreation(51);
         return (SetOfString)setOfStringProvider.getHollowObject(ordinal);
     }
     public Collection<MovieCountries> getAllMovieCountries() {
@@ -2219,7 +2430,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieCountries getMovieCountries(int ordinal) {
-        objectCreationSampler.recordCreation(47);
+        objectCreationSampler.recordCreation(52);
         return (MovieCountries)movieCountriesProvider.getHollowObject(ordinal);
     }
     public Collection<ShowCountryLabelOverride> getAllShowCountryLabelOverride() {
@@ -2230,7 +2441,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public ShowCountryLabelOverride getShowCountryLabelOverride(int ordinal) {
-        objectCreationSampler.recordCreation(48);
+        objectCreationSampler.recordCreation(53);
         return (ShowCountryLabelOverride)showCountryLabelOverrideProvider.getHollowObject(ordinal);
     }
     public Collection<SubsDubs> getAllSubsDubs() {
@@ -2241,7 +2452,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SubsDubs getSubsDubs(int ordinal) {
-        objectCreationSampler.recordCreation(49);
+        objectCreationSampler.recordCreation(54);
         return (SubsDubs)subsDubsProvider.getHollowObject(ordinal);
     }
     public Collection<SubtypeString> getAllSubtypeString() {
@@ -2252,7 +2463,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SubtypeString getSubtypeString(int ordinal) {
-        objectCreationSampler.recordCreation(50);
+        objectCreationSampler.recordCreation(55);
         return (SubtypeString)subtypeStringProvider.getHollowObject(ordinal);
     }
     public Collection<Subtype> getAllSubtype() {
@@ -2263,7 +2474,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public Subtype getSubtype(int ordinal) {
-        objectCreationSampler.recordCreation(51);
+        objectCreationSampler.recordCreation(56);
         return (Subtype)subtypeProvider.getHollowObject(ordinal);
     }
     public Collection<SupplementalSubtype> getAllSupplementalSubtype() {
@@ -2274,7 +2485,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SupplementalSubtype getSupplementalSubtype(int ordinal) {
-        objectCreationSampler.recordCreation(52);
+        objectCreationSampler.recordCreation(57);
         return (SupplementalSubtype)supplementalSubtypeProvider.getHollowObject(ordinal);
     }
     public Collection<Movie> getAllMovie() {
@@ -2285,7 +2496,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public Movie getMovie(int ordinal) {
-        objectCreationSampler.recordCreation(53);
+        objectCreationSampler.recordCreation(58);
         return (Movie)movieProvider.getHollowObject(ordinal);
     }
     public Collection<TitleSetupRequirementsTemplate> getAllTitleSetupRequirementsTemplate() {
@@ -2296,7 +2507,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public TitleSetupRequirementsTemplate getTitleSetupRequirementsTemplate(int ordinal) {
-        objectCreationSampler.recordCreation(54);
+        objectCreationSampler.recordCreation(59);
         return (TitleSetupRequirementsTemplate)titleSetupRequirementsTemplateProvider.getHollowObject(ordinal);
     }
     public Collection<TitleSetupRequirements> getAllTitleSetupRequirements() {
@@ -2307,7 +2518,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public TitleSetupRequirements getTitleSetupRequirements(int ordinal) {
-        objectCreationSampler.recordCreation(55);
+        objectCreationSampler.recordCreation(60);
         return (TitleSetupRequirements)titleSetupRequirementsProvider.getHollowObject(ordinal);
     }
     public Collection<TitleSourceType> getAllTitleSourceType() {
@@ -2318,7 +2529,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public TitleSourceType getTitleSourceType(int ordinal) {
-        objectCreationSampler.recordCreation(56);
+        objectCreationSampler.recordCreation(61);
         return (TitleSourceType)titleSourceTypeProvider.getHollowObject(ordinal);
     }
     public Collection<MovieTitleAka> getAllMovieTitleAka() {
@@ -2329,19 +2540,8 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public MovieTitleAka getMovieTitleAka(int ordinal) {
-        objectCreationSampler.recordCreation(57);
+        objectCreationSampler.recordCreation(62);
         return (MovieTitleAka)movieTitleAkaProvider.getHollowObject(ordinal);
-    }
-    public Collection<MovieTitleNLS> getAllMovieTitleNLS() {
-        return new AllHollowRecordCollection<MovieTitleNLS>(getDataAccess().getTypeDataAccess("MovieTitleNLS").getTypeState()) {
-            protected MovieTitleNLS getForOrdinal(int ordinal) {
-                return getMovieTitleNLS(ordinal);
-            }
-        };
-    }
-    public MovieTitleNLS getMovieTitleNLS(int ordinal) {
-        objectCreationSampler.recordCreation(58);
-        return (MovieTitleNLS)movieTitleNLSProvider.getHollowObject(ordinal);
     }
     public Collection<WindowType> getAllWindowType() {
         return new AllHollowRecordCollection<WindowType>(getDataAccess().getTypeDataAccess("WindowType").getTypeState()) {
@@ -2351,7 +2551,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public WindowType getWindowType(int ordinal) {
-        objectCreationSampler.recordCreation(59);
+        objectCreationSampler.recordCreation(63);
         return (WindowType)windowTypeProvider.getHollowObject(ordinal);
     }
     public Collection<RolloutPhase> getAllRolloutPhase() {
@@ -2362,7 +2562,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public RolloutPhase getRolloutPhase(int ordinal) {
-        objectCreationSampler.recordCreation(60);
+        objectCreationSampler.recordCreation(64);
         return (RolloutPhase)rolloutPhaseProvider.getHollowObject(ordinal);
     }
     public Collection<SetOfRolloutPhase> getAllSetOfRolloutPhase() {
@@ -2373,7 +2573,7 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public SetOfRolloutPhase getSetOfRolloutPhase(int ordinal) {
-        objectCreationSampler.recordCreation(61);
+        objectCreationSampler.recordCreation(65);
         return (SetOfRolloutPhase)setOfRolloutPhaseProvider.getHollowObject(ordinal);
     }
     public Collection<Rollout> getAllRollout() {
@@ -2384,8 +2584,30 @@ public class OscarAPI extends HollowAPI  {
         };
     }
     public Rollout getRollout(int ordinal) {
-        objectCreationSampler.recordCreation(62);
+        objectCreationSampler.recordCreation(66);
         return (Rollout)rolloutProvider.getHollowObject(ordinal);
+    }
+    public Collection<IsOriginalTitle> getAllIsOriginalTitle() {
+        return new AllHollowRecordCollection<IsOriginalTitle>(getDataAccess().getTypeDataAccess("isOriginalTitle").getTypeState()) {
+            protected IsOriginalTitle getForOrdinal(int ordinal) {
+                return getIsOriginalTitle(ordinal);
+            }
+        };
+    }
+    public IsOriginalTitle getIsOriginalTitle(int ordinal) {
+        objectCreationSampler.recordCreation(67);
+        return (IsOriginalTitle)isOriginalTitleProvider.getHollowObject(ordinal);
+    }
+    public Collection<MovieTitleNLS> getAllMovieTitleNLS() {
+        return new AllHollowRecordCollection<MovieTitleNLS>(getDataAccess().getTypeDataAccess("MovieTitleNLS").getTypeState()) {
+            protected MovieTitleNLS getForOrdinal(int ordinal) {
+                return getMovieTitleNLS(ordinal);
+            }
+        };
+    }
+    public MovieTitleNLS getMovieTitleNLS(int ordinal) {
+        objectCreationSampler.recordCreation(68);
+        return (MovieTitleNLS)movieTitleNLSProvider.getHollowObject(ordinal);
     }
     public void setSamplingDirector(HollowSamplingDirector director) {
         super.setSamplingDirector(director);

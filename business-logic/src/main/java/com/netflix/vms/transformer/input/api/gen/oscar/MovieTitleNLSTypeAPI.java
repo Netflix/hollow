@@ -16,6 +16,7 @@ public class MovieTitleNLSTypeAPI extends HollowObjectTypeAPI {
             "merchBcpCode",
             "titleBcpCode",
             "sourceType",
+            "isOriginalTitle",
             "dateCreated",
             "lastUpdated",
             "createdBy",
@@ -84,10 +85,20 @@ public class MovieTitleNLSTypeAPI extends HollowObjectTypeAPI {
         return getAPI().getTitleSourceTypeTypeAPI();
     }
 
-    public int getDateCreatedOrdinal(int ordinal) {
+    public int getIsOriginalTitleOrdinal(int ordinal) {
         if(fieldIndex[6] == -1)
-            return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "dateCreated");
+            return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "isOriginalTitle");
         return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[6]);
+    }
+
+    public IsOriginalTitleTypeAPI getIsOriginalTitleTypeAPI() {
+        return getAPI().getIsOriginalTitleTypeAPI();
+    }
+
+    public int getDateCreatedOrdinal(int ordinal) {
+        if(fieldIndex[7] == -1)
+            return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "dateCreated");
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
     }
 
     public DateTypeAPI getDateCreatedTypeAPI() {
@@ -95,9 +106,9 @@ public class MovieTitleNLSTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getLastUpdatedOrdinal(int ordinal) {
-        if(fieldIndex[7] == -1)
+        if(fieldIndex[8] == -1)
             return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "lastUpdated");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[7]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
     }
 
     public DateTypeAPI getLastUpdatedTypeAPI() {
@@ -105,9 +116,9 @@ public class MovieTitleNLSTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getCreatedByOrdinal(int ordinal) {
-        if(fieldIndex[8] == -1)
+        if(fieldIndex[9] == -1)
             return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "createdBy");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[8]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
     }
 
     public StringTypeAPI getCreatedByTypeAPI() {
@@ -115,9 +126,9 @@ public class MovieTitleNLSTypeAPI extends HollowObjectTypeAPI {
     }
 
     public int getUpdatedByOrdinal(int ordinal) {
-        if(fieldIndex[9] == -1)
+        if(fieldIndex[10] == -1)
             return missingDataHandler().handleReferencedOrdinal("MovieTitleNLS", ordinal, "updatedBy");
-        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[9]);
+        return getTypeDataAccess().readOrdinal(ordinal, fieldIndex[10]);
     }
 
     public StringTypeAPI getUpdatedByTypeAPI() {

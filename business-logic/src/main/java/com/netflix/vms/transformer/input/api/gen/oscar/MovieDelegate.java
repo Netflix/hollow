@@ -150,6 +150,24 @@ public interface MovieDelegate extends HollowObjectDelegate {
 
     public Boolean getVisibleBoxed(int ordinal);
 
+    public boolean getInteractive(int ordinal);
+
+    public Boolean getInteractiveBoxed(int ordinal);
+
+    public String getInteractiveType(int ordinal);
+
+    public boolean isInteractiveTypeEqual(int ordinal, String testValue);
+
+    public int getInteractiveTypeOrdinal(int ordinal);
+
+    public int getDisplayRunLength(int ordinal);
+
+    public Integer getDisplayRunLengthBoxed(int ordinal);
+
+    public int getInteractiveShortestRunLength(int ordinal);
+
+    public Integer getInteractiveShortestRunLengthBoxed(int ordinal);
+
     public String getCreatedByTeam(int ordinal);
 
     public boolean isCreatedByTeamEqual(int ordinal, String testValue);

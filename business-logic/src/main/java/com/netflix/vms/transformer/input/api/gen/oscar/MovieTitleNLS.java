@@ -103,6 +103,21 @@ public class MovieTitleNLS extends HollowObject {
         return  api().getTitleSourceType(refOrdinal);
     }
 
+    public Boolean getIsOriginalTitleBoxed() {
+        return delegate().getIsOriginalTitleBoxed(ordinal);
+    }
+
+    public boolean getIsOriginalTitle() {
+        return delegate().getIsOriginalTitle(ordinal);
+    }
+
+    public IsOriginalTitle getIsOriginalTitleHollowReference() {
+        int refOrdinal = delegate().getIsOriginalTitleOrdinal(ordinal);
+        if(refOrdinal == -1)
+            return null;
+        return  api().getIsOriginalTitle(refOrdinal);
+    }
+
     public Long getDateCreatedBoxed() {
         return delegate().getDateCreatedBoxed(ordinal);
     }

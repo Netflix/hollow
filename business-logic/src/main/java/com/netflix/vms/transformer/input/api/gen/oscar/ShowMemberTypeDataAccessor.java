@@ -6,33 +6,33 @@ import com.netflix.hollow.core.index.key.PrimaryKey;
 import com.netflix.hollow.core.read.engine.HollowReadStateEngine;
 
 @SuppressWarnings("all")
-public class MovieTitleDataAccessor extends AbstractHollowDataAccessor<MovieTitle> {
+public class ShowMemberTypeDataAccessor extends AbstractHollowDataAccessor<ShowMemberType> {
 
-    public static final String TYPE = "MovieTitle";
+    public static final String TYPE = "ShowMemberType";
     private OscarAPI api;
 
-    public MovieTitleDataAccessor(HollowConsumer consumer) {
+    public ShowMemberTypeDataAccessor(HollowConsumer consumer) {
         super(consumer, TYPE);
         this.api = (OscarAPI)consumer.getAPI();
     }
 
-    public MovieTitleDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api) {
+    public ShowMemberTypeDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api) {
         super(rStateEngine, TYPE);
         this.api = api;
     }
 
-    public MovieTitleDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api, String ... fieldPaths) {
+    public ShowMemberTypeDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api, String ... fieldPaths) {
         super(rStateEngine, TYPE, fieldPaths);
         this.api = api;
     }
 
-    public MovieTitleDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api, PrimaryKey primaryKey) {
+    public ShowMemberTypeDataAccessor(HollowReadStateEngine rStateEngine, OscarAPI api, PrimaryKey primaryKey) {
         super(rStateEngine, TYPE, primaryKey);
         this.api = api;
     }
 
-    @Override public MovieTitle getRecord(int ordinal){
-        return api.getMovieTitle(ordinal);
+    @Override public ShowMemberType getRecord(int ordinal){
+        return api.getShowMemberType(ordinal);
     }
 
 }
