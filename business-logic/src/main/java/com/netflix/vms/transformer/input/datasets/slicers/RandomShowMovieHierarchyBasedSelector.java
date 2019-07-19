@@ -26,6 +26,12 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+
+//
+// This class can find videoIds belonging to topNodeIds in inputs for input slicing. This is an alternative
+// to the existing implementation using GlobalVideoBasedSelector which uses the output blob to find videoIds that
+// belong to a topNodeId. Depending on what is being tested, one might be more suitable over the other.
+//
 public class RandomShowMovieHierarchyBasedSelector {
     private HollowReadStateEngine stateEngine;
     private VMSHollowInputAPI api;

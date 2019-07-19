@@ -43,8 +43,10 @@ public class TransformerOutputDataSlicer extends DataSlicer implements OutputDat
         VMSRawHollowAPI outputAPI = new VMSRawHollowAPI(stateEngine);
 
         if (videoIdsToInclude.isEmpty()) {
-            RandomGlobalVideoBasedSelector random = new RandomGlobalVideoBasedSelector(stateEngine);
-            videoIdsToInclude.addAll(random.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
+            GlobalVideoBasedSelector videoSelector = new GlobalVideoBasedSelector(stateEngine);
+
+            this.videoIdsToInclude.addAll(
+                    videoSelector.findVideosForTopNodes(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
         }
 
         findIncludedOrdinals(stateEngine, "CompleteVideo", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {

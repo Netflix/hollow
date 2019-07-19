@@ -60,7 +60,7 @@ public class ConverterDiff {
     @Before
     public void setUp() {
         isProd = false;
-        slicer = new ConverterDataSlicerImpl(TARGET_NUMBER_OF_TOPNODES);
+        slicer = new ConverterDataSlicerImpl();
     }
 
     @AfterClass

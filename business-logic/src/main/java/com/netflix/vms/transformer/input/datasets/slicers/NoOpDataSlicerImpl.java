@@ -6,8 +6,8 @@ import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 
 public class NoOpDataSlicerImpl extends DataSlicer implements InputDataSlicer {
 
-    public NoOpDataSlicerImpl(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+    public NoOpDataSlicerImpl(int... specificNodeIdsToInclude) {
+        super(specificNodeIdsToInclude);
     }
 
     @Override

@@ -7,8 +7,8 @@ import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 
 public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlicer {
 
-    public ConverterDataSlicerImpl(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+    public ConverterDataSlicerImpl(int... specificNodeIdsToInclude) {
+        super(specificNodeIdsToInclude);
     }
 
     @Override
@@ -18,10 +18,20 @@ public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlic
 
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
-        if (videoIdsToInclude.isEmpty()) {
-            RandomShowMovieHierarchyBasedSelector selector = new RandomShowMovieHierarchyBasedSelector(stateEngine);
-            videoIdsToInclude.addAll(selector.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
-        }
+        //
+        // Below code snippet can find videoIds belonging to topNodeIds in inputs for input slicing. This is an alternative
+        // to the existing implementation using GlobalVideoBasedSelector which uses the output blob to find videoIds that
+        // belong to a topNodeId. Depending on what is being tested, one might be more suitable over the other.
+        //
+        // Below code snippet worked when all types were coming via the Converter API, but has not been migrated to n-inputs
+        // to Transformer, in favor using output-based GlobalVideoBasedSelector instead if it meets the requirements, or
+        // using other testing options eg. followVIP, staticInputVersions, and remote debugging.
+        //
+        // if (videoIdsToInclude.isEmpty()) {
+        //    RandomShowMovieHierarchyBasedSelector selector = new RandomShowMovieHierarchyBasedSelector(stateEngine);
+        //    videoIdsToInclude.addAll(selector.findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
+        //}
+        //
 
         findIncludedOrdinals(stateEngine, "ShowSeasonEpisode", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
             @Override

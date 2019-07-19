@@ -69,7 +69,7 @@ public class InputSlicePinTitleProcessor extends AbstractPinTitleProcessor {
                 throw new UnsupportedOperationException("Input slicer missing for namespace= " + namespace);
             }
 
-            InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, 0, topNodes);
+            InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, topNodes);
             HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputStateEngine);
 
             String blobID = PinTitleHelper.createBlobID("sliced_input_" + namespace, inputDataVersion, topNodes);

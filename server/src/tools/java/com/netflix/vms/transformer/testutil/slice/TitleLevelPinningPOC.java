@@ -134,7 +134,7 @@ public class TitleLevelPinningPOC {
             File sliceFile = new File(SLICED_INPUT_FILE);
             if (!sliceFile.exists()) {
                 HollowReadStateEngine inputStateEngine = loadStateEngine(SNAPSHOT_FILE);
-                InputDataSlicer slicer = new ConverterDataSlicerImpl(0, fastlaneIds); // TODO: Add all Cinder inputs
+                InputDataSlicer slicer = new ConverterDataSlicerImpl(fastlaneIds); // If this topNode contains several videoIDs then pass all videoIDs
                 HollowWriteStateEngine slicedStateEngine = slicer.sliceInputBlob(inputStateEngine);
                 writeStateEngine(slicedStateEngine, sliceFile);
             }

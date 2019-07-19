@@ -7,6 +7,7 @@ import com.netflix.hollow.core.read.engine.PopulatedOrdinalListener;
 import com.netflix.hollow.core.write.HollowWriteStateEngine;
 import com.netflix.hollow.tools.combine.HollowCombiner;
 import com.netflix.hollow.tools.combine.HollowCombinerIncludeOrdinalsCopyDirector;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,8 +27,16 @@ public abstract class DataSlicer {
     public DataSlicer(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
         this.numberOfRandomTopNodesToInclude = numberOfRandomTopNodesToInclude;
         this.specificTopNodeIdsToInclude = specificTopNodeIdsToInclude;
-        this.ordinalsToInclude = new HashMap<String, BitSet>();
-        this.videoIdsToInclude = new HashSet<Integer>();
+        this.ordinalsToInclude = new HashMap<>();
+        this.videoIdsToInclude = new HashSet<>();
+
+    }
+
+    public DataSlicer(int... specificNodesToInclude) {
+        this(0, specificNodesToInclude);
+
+        if (specificNodesToInclude != null)
+            Arrays.stream(specificNodesToInclude).forEach(this.videoIdsToInclude::add);
     }
 
     public void setExcludedTypes(Set<String> excludedTypes) {

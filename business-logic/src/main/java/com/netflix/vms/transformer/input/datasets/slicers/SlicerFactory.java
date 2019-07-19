@@ -7,12 +7,12 @@ import java.lang.reflect.Constructor;
 
 public class SlicerFactory {
 
-    public InputDataSlicer getInputDataSlicer(UpstreamDatasetHolder.Dataset dataset,
-            int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) throws Exception {
+    public InputDataSlicer getInputDataSlicer(UpstreamDatasetHolder.Dataset dataset, int... specificTopNodeIdsToInclude)
+            throws Exception {
 
         Class slicerClasz =  dataset.getSlicer();
-        Constructor slicerConstructor = slicerClasz.getConstructor(int.class, int[].class);
-        return (InputDataSlicer) slicerConstructor.newInstance(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+        Constructor slicerConstructor = slicerClasz.getConstructor(int[].class);
+        return (InputDataSlicer) slicerConstructor.newInstance(specificTopNodeIdsToInclude);
     }
 
     public OutputDataSlicer getOutputDataSlicer(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {

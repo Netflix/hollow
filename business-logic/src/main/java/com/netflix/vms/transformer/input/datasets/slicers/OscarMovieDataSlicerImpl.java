@@ -7,8 +7,8 @@ import com.netflix.vms.transformer.input.api.gen.oscar.OscarAPI;
 
 public class OscarMovieDataSlicerImpl extends DataSlicer implements InputDataSlicer {
 
-    public OscarMovieDataSlicerImpl(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+    public OscarMovieDataSlicerImpl(int... specificNodeIdsToInclude) {
+        super(specificNodeIdsToInclude);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class FilterToSmallDataSubset {
 
     @Before
     public void setUp() {
-        inputSlicer = new ConverterDataSlicerImpl(TARGET_NUMBER_OF_TOPNODES, 80097047,70305883);
+        inputSlicer = new ConverterDataSlicerImpl(80097047,70305883);
 
         outputSlicer = new TransformerOutputDataSlicer(TARGET_NUMBER_OF_TOPNODES, 80097047,70305883);
     }

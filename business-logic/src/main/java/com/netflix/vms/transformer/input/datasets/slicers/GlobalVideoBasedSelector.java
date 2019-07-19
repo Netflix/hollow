@@ -19,14 +19,14 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class RandomGlobalVideoBasedSelector {
+public class GlobalVideoBasedSelector {
     private HollowReadStateEngine stateEngine;
     private VMSRawHollowAPI api;
     private HollowPrimaryKeyIndex globalVideoIdx;
     private HollowPrimaryKeyIndex completeVideoPrimaryKeyIdx;
     private HollowHashIndex completeVideoHashIdx;
 
-    public RandomGlobalVideoBasedSelector(HollowReadStateEngine stateEngine) {
+    public GlobalVideoBasedSelector(HollowReadStateEngine stateEngine) {
         this.stateEngine = stateEngine;
         api = new VMSRawHollowAPI(stateEngine);
         globalVideoIdx = new HollowPrimaryKeyIndex(stateEngine, "GlobalVideo", "completeVideo.id.value");
@@ -34,10 +34,15 @@ public class RandomGlobalVideoBasedSelector {
         completeVideoPrimaryKeyIdx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
     }
 
+    public Set<Integer> findVideosForTopNodes(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
+
+        return findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+    }
+
     public Set<Integer> findRandomVideoIds(int numberOfRandomTopNodesToInclude, int[] specificTopNodeIdsToInclude) {
         Random rand = new Random(1000);
-        Set<Integer> topNodeVideoIds = new HashSet<Integer>();
-        Set<Integer> allVideoIds = new HashSet<Integer>();
+        Set<Integer> topNodeVideoIds = new HashSet<>();
+        Set<Integer> allVideoIds = new HashSet<>();
 
         int maxGlobalVideoOrdinal = stateEngine.getTypeState("GlobalVideo").maxOrdinal();
         while (topNodeVideoIds.size() < numberOfRandomTopNodesToInclude) {
@@ -80,13 +85,13 @@ public class RandomGlobalVideoBasedSelector {
                 allVideoIds.add(videoId);
 
                 for (VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
-                    Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
+                    int episodeId = episode._getDeliverableVideo()._getValueBoxed();
                     allVideoIds.add(episodeId);
                     addAllSupplementalVideoIds(episodeId, countryCode, allVideoIds);
                 }
 
                 for (VideoHollow season : videoCollectionsData._getShowChildren()) {
-                    Integer seasonId = season._getValueBoxed();
+                    int seasonId = season._getValueBoxed();
                     allVideoIds.add(seasonId);
                     addAllSupplementalVideoIds(seasonId, countryCode, allVideoIds);
                 }
@@ -98,7 +103,7 @@ public class RandomGlobalVideoBasedSelector {
         }
     }
 
-    private void addAllSupplementalVideoIds(Integer videoId, String countryCode, Set<Integer> toSet) {
+    private void addAllSupplementalVideoIds(int videoId, String countryCode, Set<Integer> toSet) {
         int completeVideoOrdinal = completeVideoPrimaryKeyIdx.getMatchingOrdinal(videoId, countryCode);
         CompleteVideoHollow vid = api.getCompleteVideoHollow(completeVideoOrdinal);
 

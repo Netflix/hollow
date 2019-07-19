@@ -28,6 +28,8 @@ import com.netflix.vms.transformer.common.input.InputState;
 import com.netflix.vms.transformer.http.HttpHelper;
 import com.netflix.vms.transformer.input.CycleInputs;
 import com.netflix.vms.transformer.input.UpstreamDatasetHolder;
+import com.netflix.vms.transformer.input.datasets.slicers.GlobalVideoBasedSelector;
+import com.netflix.vms.transformer.input.datasets.slicers.TransformerOutputDataSlicer;
 import com.netflix.vms.transformer.override.InputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.OutputSlicePinTitleProcessor;
 import com.netflix.vms.transformer.override.PinTitleHelper;
@@ -45,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -105,7 +108,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20190703221201051l;
+        long transformerVersion = 20190716000015202l;
         int[] topNodes = { 80133542 };
 
         long start = System.currentTimeMillis();
@@ -116,10 +119,17 @@ public class ShowMeTheFastProgress {
 
         // Load Expected state engines
         HollowReadStateEngine expectedOutputStateEngine = loadTransformerEngine(ctx, OUTPUT_NAMESPACE, transformerVersion, topNodes);
+
+        // Get all videoIds constituting the topNodeIds in the output state engine, for input slicing.
+        GlobalVideoBasedSelector videoSelector = new GlobalVideoBasedSelector(expectedOutputStateEngine);
+        Set<Integer> videoIDs = videoSelector.findVideosForTopNodes(0, topNodes);
+
         String value = expectedOutputStateEngine.getHeaderTag(PUBLISH_CYCLE_DATATS_HEADER);
         long publishCycleDataTS = value != null ? Long.parseLong(value) : System.currentTimeMillis();
         Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = getInputVersionsFromStateEngine(expectedOutputStateEngine);
-        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx,topNodes);
+
+        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx,
+                                                 videoIDs.stream().mapToInt(Integer::intValue).toArray());
 
         // Setup Fastlane context and Output State Engine
         List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
@@ -144,7 +154,8 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneWithSpecificInputVersions() throws Throwable {
         // NOTE: the specified converterVersion must be valid or already in local HD; otherwise, run  getLatestConverterVersion();
-        int[] topNodes = { 80104350 };
+        int[] videoIDs = { 80104350 };  // NOTE: videoIDs corresponding to topNodes below
+        int[] topNodeIDs = { 80104350 };
 
         // NOTE: This map might not be up to date. There should be entries for all Cinder inputs
         Map<UpstreamDatasetHolder.Dataset, Long> inputVersions = new HashMap<>();
@@ -154,10 +165,10 @@ public class ShowMeTheFastProgress {
         // Setup Context
         SimpleTransformerContext ctx = new SimpleTransformerContext();
         //ctx.overrideSupportedCountries("US");
-        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx, topNodes);
+        CycleInputs cycleInputs = getCycleInputs(inputVersions, ctx, videoIDs); // NOTE: Passing videoIDs not topNodes here
 
         // Setup Fastlane context and Output State Engine
-        List<Integer> fastlaneIds = Arrays.stream(topNodes).boxed().collect(Collectors.toList());
+        List<Integer> fastlaneIds = Arrays.stream(topNodeIDs).boxed().collect(Collectors.toList());
         ctx.setFastlaneIds(new HashSet<>(fastlaneIds));
         VMSTransformerWriteStateEngine outputStateEngine = new VMSTransformerWriteStateEngine();
 
@@ -186,7 +197,7 @@ public class ShowMeTheFastProgress {
     }
 
     // Load Transformer inputs based on input versions
-    private CycleInputs getCycleInputs(Map<UpstreamDatasetHolder.Dataset, Long> inputVersions, SimpleTransformerContext ctx, int[] topNodes)
+    private CycleInputs getCycleInputs(Map<UpstreamDatasetHolder.Dataset, Long> inputVersions, SimpleTransformerContext ctx, int... videoIDs)
             throws Throwable{
 
         Map<UpstreamDatasetHolder.Dataset, InputState> inputs = new ConcurrentHashMap<>();
@@ -195,7 +206,7 @@ public class ShowMeTheFastProgress {
             executor.execute(() -> {
                 try {
                     HollowReadStateEngine stateEngine = loadInputState(ctx, getNamespacesforEnv(isProd).get(dataset),
-                            inputVersions.get(dataset), topNodes);
+                            inputVersions.get(dataset), videoIDs);
                     inputs.put(dataset, new InputState(stateEngine, inputVersions.get(dataset)));
                 } catch (Throwable t) {}
             });
@@ -245,30 +256,30 @@ public class ShowMeTheFastProgress {
     }
 
     @SuppressWarnings("unused")
-    private HollowReadStateEngine loadInputState(TransformerContext ctx, String inputNamespace, long inputDataVersion, int... topNodes) throws Throwable {
+    private HollowReadStateEngine loadInputState(TransformerContext ctx, String inputNamespace, long inputDataVersion, int... videoIDs) throws Throwable {
         System.out.println("loadInputState: Loading inputNamespace=" + inputNamespace + " version=" + inputDataVersion);
         long start = System.currentTimeMillis();
         try {
             HollowReadStateEngine stateEngine;
             InputSlicePinTitleProcessor processor = new InputSlicePinTitleProcessor(cinderConsumerBuilder, s3Direct,
                     inputNamespace, WORKING_DIR, isProd, ctx);
-            File slicedFile = processor.getFile(inputNamespace, TYPE.INPUT, inputDataVersion, topNodes);
+            File slicedFile = processor.getFile(inputNamespace, TYPE.INPUT, inputDataVersion, videoIDs);
             if (isUseRemotePinTitleSlicer && !slicedFile.exists()) {
                 try {
-                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, inputNamespace, inputDataVersion, topNodes);
+                    downloadSlice(slicedFile, REMOTE_SLICER_URL, isProd, false, inputNamespace, inputDataVersion, videoIDs);
                 } catch (Exception ex) {
                     System.err.println("ERROR: Remote Slicer failure - " + ex.toString());
                     if (isFallBackToLocalSlicer) System.out.println("Failling back to local slicer."); else throw ex;
                 }
             }
 
-            if (!slicedFile.exists()) slicedFile = processor.process(TYPE.INPUT, inputDataVersion, topNodes);
+            if (!slicedFile.exists()) slicedFile = processor.process(TYPE.INPUT, inputDataVersion, videoIDs);
             stateEngine = processor.readStateEngine(slicedFile);
 
             return stateEngine;
         } finally {
-            trackDuration(start, "loadInputState: inputNamespace=%s, inputDataVersion=%s, topNodes=%s",
-                    inputNamespace, inputDataVersion, toString(topNodes));
+            trackDuration(start, "loadInputState: inputNamespace=%s, inputDataVersion=%s, videoIDs=%s",
+                    inputNamespace, inputDataVersion, toString(videoIDs));
         }
     }
 

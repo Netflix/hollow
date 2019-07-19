@@ -7,8 +7,8 @@ import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
 
 public class Gk2StatusDataSlicerImpl extends DataSlicer implements InputDataSlicer {
 
-    public Gk2StatusDataSlicerImpl(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+    public Gk2StatusDataSlicerImpl(int... specificNodeIdsToInclude) {
+        super(specificNodeIdsToInclude);
     }
 
     @Override

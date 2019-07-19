@@ -164,7 +164,7 @@ public class PinTitleTest {
         inputConsumer.triggerRefreshTo(version);
         HollowWriteStateEngine writeStateEngine = null;
         if (isSlicing) {
-            InputDataSlicer slicer = new SlicerFactory().getInputDataSlicer(dataset, 0, specificTopNodeIdsToInclude);
+            InputDataSlicer slicer = new SlicerFactory().getInputDataSlicer(dataset, specificTopNodeIdsToInclude);
             writeStateEngine = slicer.sliceInputBlob(inputConsumer.getStateEngine());
         } else {
             writeStateEngine = HollowWriteStateCreator.recreateAndPopulateUsingReadEngine(inputConsumer.getStateEngine());

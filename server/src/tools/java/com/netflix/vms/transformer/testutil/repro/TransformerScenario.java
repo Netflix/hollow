@@ -100,7 +100,7 @@ public class TransformerScenario {
             throw new UnsupportedOperationException("Input data slicer missing for dataset= " + dataset);
         }
 
-        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, 0, topNodesToProcess);
+        InputDataSlicer inputDataSlicer = new SlicerFactory().getInputDataSlicer(dataset, topNodesToProcess);
         HollowWriteStateEngine slicedStateEngine = inputDataSlicer.sliceInputBlob(inputConsumer.getStateEngine());
 
         slicedStateEngine.addHeaderTag("publishCycleDataTS", String.valueOf(processTimestamp));
