@@ -71,6 +71,8 @@ import com.netflix.vms.transformer.modules.rollout.RolloutVideoModule;
 import com.netflix.vms.transformer.namedlist.NamedListCompletionModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule;
 import com.netflix.vms.transformer.namedlist.VideoNamedListModule.VideoNamedListPopulator;
+import com.netflix.vms.transformer.util.DeprecationUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -390,8 +392,12 @@ public class SimpleTransformer {
                 if (completeVideo != null) {
                     representativeVideo = preferredCompleteVideo(representativeVideo, completeVideo);
                     availableCountries.add(country);
-                    if (completeVideo.data.facetData.videoMetaData.aliases != null)
-                        aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
+
+                    // marked for removal
+                    if (!DeprecationUtil.disableVideoGeneralAliases()) {
+                        if (completeVideo.data.facetData.videoMetaData.aliases != null)
+                            aliases.addAll(completeVideo.data.facetData.videoMetaData.aliases);
+                    }
                 }
             }
 

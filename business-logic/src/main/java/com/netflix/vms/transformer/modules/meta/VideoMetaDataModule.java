@@ -57,6 +57,7 @@ import com.netflix.vms.transformer.input.api.gen.oscar.Movie;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
 import com.netflix.vms.transformer.input.datasets.OscarDataset;
+import com.netflix.vms.transformer.util.DeprecationUtil;
 import com.netflix.vms.transformer.util.OutputUtil;
 import com.netflix.vms.transformer.util.VideoDateUtil;
 import com.netflix.vms.transformer.util.VideoSetTypeUtil;
@@ -453,14 +454,17 @@ public class VideoMetaDataModule {
             if (origLang != null)
                 vmd.originalLanguageBcp47code = new Strings(origLang._getValue());
 
-            List<VideoGeneralAliasHollow> inputAliases = general._getAliases();
+            // marked for removal
+            if (!DeprecationUtil.disableVideoGeneralAliases()) {
+                List<VideoGeneralAliasHollow> inputAliases = general._getAliases();
 
-            if (inputAliases != null) {
-                Set<Strings> aliasList = new HashSet<>();
-                for (VideoGeneralAliasHollow alias : inputAliases) {
-                    aliasList.add(new Strings(alias._getValue()._getValue()));
+                if (inputAliases != null) {
+                    Set<Strings> aliasList = new HashSet<>();
+                    for (VideoGeneralAliasHollow alias : inputAliases) {
+                        aliasList.add(new Strings(alias._getValue()._getValue()));
+                    }
+                    vmd.aliases = aliasList;
                 }
-                vmd.aliases = aliasList;
             }
 
             List<VideoGeneralTitleTypeHollow> inputTitleTypes = general._getTestTitleTypes();
