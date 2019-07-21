@@ -2701,7 +2701,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -5642,7 +5642,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -8700,7 +8700,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -11951,7 +11951,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -15059,7 +15059,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -18170,7 +18170,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -21123,7 +21123,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -24193,7 +24193,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
@@ -27313,7 +27313,7 @@
             ]
         },
         "netflix:videoresolutiontypelibrary": {
-            "locked": "100.0.791",
+            "locked": "100.0.792",
             "requested": "latest.release"
         },
         "netflix:vmsconverter-hollow-api": {
