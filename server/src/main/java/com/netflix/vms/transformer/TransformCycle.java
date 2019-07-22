@@ -429,7 +429,8 @@ public class TransformCycle {
         HollowReadStateEngine restoreStateEngine = restoreFrom.getStateEngine();
         HollowReadStateEngine restoreNoStreamStateEngine = isNoStreamsBlobEnabled ? nostreamsRestoreFrom.getStateEngine() : null;
 
-        { // @TODO FIX: should restore headers as well
+        {
+            previousStateHeader = new HashMap<>(restoreStateEngine.getHeaderTags());
             outputStateEngine.addHeaderTags(restoreStateEngine.getHeaderTags());
             outputStateEngine.restoreFrom(restoreStateEngine);
         }
@@ -460,6 +461,7 @@ public class TransformCycle {
                     endCycleSuccessfully();
                 }
             } catch (Throwable th) {
+                outputStateEngine.getHeaderTags().clear();
                 outputStateEngine.addHeaderTags(previousStateHeader);
                 ctx.getLogger().error(Arrays.asList(BlobState, RollbackStateEngine),
                         "Transformer failed cycle -- rolling back write state engine to previousState=({})",
@@ -806,7 +808,6 @@ public class TransformCycle {
     private void cinderCycle() {
         producer.runCycle(newState -> {
             HollowWriteStateEngine output = newState.getStateEngine();
-            output.getHeaderTags().clear();
             long previousVersion = newState.getPriorState() == null ? -1 : newState.getPriorState().getVersion();
 
             output.getHeaderTags().clear();
@@ -834,7 +835,7 @@ public class TransformCycle {
                 pinTitleMgr.submitJobsToProcessASync(pinnedTitleSpecs);
 
                 // Process fastlane
-                trasformInputData(cycleInputs, fastlaneOutputStateEngine, ctx);
+                transformInputData(cycleInputs, fastlaneOutputStateEngine, ctx);
 
                 /*
                  * Combine input states
@@ -913,7 +914,7 @@ public class TransformCycle {
                         outputStateEngine.hasChangedSinceLastCycle(), fastlaneOutputStateEngine.hasChangedSinceLastCycle(),
                         isFirstCycle, (System.currentTimeMillis() - startTime));
             } else {
-                trasformInputData(cycleInputs, outputStateEngine, ctx);
+                transformInputData(cycleInputs, outputStateEngine, ctx);
 
                 // Spot to trigger Cycle Monkey if enabled
                 cycleMonkey.doMonkeyBusiness("transformTheData");
@@ -928,7 +929,7 @@ public class TransformCycle {
         return true;
     }
 
-    private static void trasformInputData(CycleInputs cycleInputs, VMSTransformerWriteStateEngine outputStateEngine,
+    private static void transformInputData(CycleInputs cycleInputs, VMSTransformerWriteStateEngine outputStateEngine,
             TransformerContext ctx) throws Throwable {
 
         SimpleTransformer transformer = new SimpleTransformer(cycleInputs, outputStateEngine, ctx);
@@ -943,6 +944,7 @@ public class TransformCycle {
 
         Collection<LogTag> blobStateTags = Arrays.asList(WroteBlob, BlobState);
         try {
+            outputStateEngine.getHeaderTags().clear();
             currentStateHeader = new HashMap<>(headerPopulator.addHeaders(
                     cycleInputs, outputStateEngine,
                     previousCycleNumber, cycleInputs.getCycleNumber()));
@@ -980,6 +982,7 @@ public class TransformCycle {
                 }
 
                 String reverseDeltaFileName = fileNamer.getReverseDeltaFileName(currentCycleNumber, previousCycleNumber);
+                outputStateEngine.getHeaderTags().clear();
                 outputStateEngine.addHeaderTags(previousStateHeader); // Make sure to have reverse delta's header point to prior state
                 try (OutputStream reverseDeltaOutputStream = ctx.files().newBlobOutputStream(new File(reverseDeltaFileName))){
                     writer.writeReverseDelta(reverseDeltaOutputStream);
@@ -1035,6 +1038,7 @@ public class TransformCycle {
     }
 
     private boolean rollbackFastlaneStateEngine() {
+        outputStateEngine.getHeaderTags().clear();
         outputStateEngine.addHeaderTags(previousStateHeader);
         outputStateEngine.resetToLastPrepareForNextCycle();
         fastlaneOutputStateEngine.resetToLastPrepareForNextCycle();
@@ -1068,6 +1072,7 @@ public class TransformCycle {
         previousCycleNumber = currentCycleNumber;
 
         // On success, make sure outputStateEngine has current state header
+        outputStateEngine.getHeaderTags().clear();
         outputStateEngine.addHeaderTags(currentStateHeader);
         ctx.getLogger().info(BlobState,
                 "endCycleSuccessfully write state : before({}), after({}),)",
