@@ -22,14 +22,20 @@ import java.util.Set;
 
 public class TransformerOutputDataSlicer extends DataSlicer implements OutputDataSlicer {
 
+    public final int numberOfRandomTopNodesToInclude;
+    public final int[] specificTopNodeIdsToInclude;
+
     private boolean isIncludeNonVideoL10N = true;
 
     public TransformerOutputDataSlicer(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+        super();
+
+        this.numberOfRandomTopNodesToInclude = numberOfRandomTopNodesToInclude;
+        this.specificTopNodeIdsToInclude = specificTopNodeIdsToInclude;
     }
 
     public TransformerOutputDataSlicer(Set<String> excludedTypes, boolean isIncludeNonVideoL10N, int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-        super(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
+        this(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
 
         setExcludedTypes(excludedTypes);
         this.isIncludeNonVideoL10N = isIncludeNonVideoL10N;
@@ -38,73 +44,30 @@ public class TransformerOutputDataSlicer extends DataSlicer implements OutputDat
     @Override
     public HollowWriteStateEngine sliceOutputBlob(HollowReadStateEngine stateEngine) {
 
-        ordinalsToInclude.clear();
+        clearOrdinalsToInclude();
 
         VMSRawHollowAPI outputAPI = new VMSRawHollowAPI(stateEngine);
 
-        if (videoIdsToInclude.isEmpty()) {
-            GlobalVideoBasedSelector videoSelector = new GlobalVideoBasedSelector(stateEngine);
+        GlobalVideoBasedSelector videoSelector = new GlobalVideoBasedSelector(stateEngine);
+        addVideoIdsToInclude(
+                videoSelector.findVideosForTopNodes(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
 
-            this.videoIdsToInclude.addAll(
-                    videoSelector.findVideosForTopNodes(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude));
-        }
-
-        findIncludedOrdinals(stateEngine, "CompleteVideo", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed();
-            }
-        });
-
-        findIncludedOrdinals(stateEngine, "MulticatalogCountryData", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getMulticatalogCountryDataHollow(ordinal)._getVideoId()._getValueBoxed();
-            }
-        });
-
-        BitSet packagesToInclude = findIncludedOrdinals(stateEngine, "PackageData", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getPackageDataHollow(ordinal)._getVideo()._getValueBoxed();
-            }
-        });
-
-        findIncludedOrdinals(stateEngine, "VideoPackageData", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getVideoPackageDataHollow(ordinal)._getVideoId()._getValueBoxed();
-            }
-
-        });
-
-        findIncludedOrdinals(stateEngine, "RolloutVideo", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getRolloutVideoHollow(ordinal)._getVideo()._getValueBoxed();
-            }
-        });
-
-        findIncludedOrdinals(stateEngine, "GlobalVideo", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getGlobalVideoHollow(ordinal)._getCompleteVideo()._getId()._getValueBoxed();
-            }
-        });
-
-        findIncludedOrdinals(stateEngine, "FallbackUSArtwork", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getFallbackUSArtworkHollow(ordinal)._getId()._getValueBoxed();
-            }
-        });
-
-        findIncludedOrdinals(stateEngine, "LanguageRights", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return outputAPI.getLanguageRightsHollow(ordinal)._getVideoId()._getValueBoxed();
-            }
-        });
+        findIncludedOrdinals(stateEngine, "CompleteVideo", ordinal ->
+                outputAPI.getCompleteVideoHollow(ordinal)._getId()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "MulticatalogCountryData", ordinal ->
+                outputAPI.getMulticatalogCountryDataHollow(ordinal)._getVideoId()._getValueBoxed());
+        BitSet packagesToInclude = findIncludedOrdinals(stateEngine, "PackageData", ordinal ->
+                outputAPI.getPackageDataHollow(ordinal)._getVideo()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "VideoPackageData", ordinal ->
+                outputAPI.getVideoPackageDataHollow(ordinal)._getVideoId()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "RolloutVideo", ordinal ->
+                outputAPI.getRolloutVideoHollow(ordinal)._getVideo()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "GlobalVideo", ordinal ->
+                outputAPI.getGlobalVideoHollow(ordinal)._getCompleteVideo()._getId()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "FallbackUSArtwork", ordinal ->
+                outputAPI.getFallbackUSArtworkHollow(ordinal)._getId()._getValueBoxed());
+        findIncludedOrdinals(stateEngine, "LanguageRights", ordinal ->
+                outputAPI.getLanguageRightsHollow(ordinal)._getVideoId()._getValueBoxed());
 
         includeAll(stateEngine, "EncodingProfile");
         includeAll(stateEngine, "OriginServer");
@@ -120,7 +83,7 @@ public class TransformerOutputDataSlicer extends DataSlicer implements OutputDat
         includeAll(stateEngine, "TopNVideoData");
         includeAll(stateEngine, "GlobalPerson");
 
-        ordinalsToInclude.put("L10NResources", findIncludedL10NOrdinals(stateEngine, videoIdsToInclude));
+        findIncludedL10NOrdinals(stateEngine, "L10NResources", isIncludeNonVideoL10N);
 
         joinIncludedOrdinals(stateEngine, packagesToInclude,
                 "FileEncodingData", "downloadableId.val",
@@ -130,83 +93,8 @@ public class TransformerOutputDataSlicer extends DataSlicer implements OutputDat
                 "DrmInfoData", "packageId",
                 "PackageData", "id");
 
-        HollowWriteStateEngine writeStateEngine = populateFilteredBlob(stateEngine, ordinalsToInclude);
-        addFilteredNamedLists(stateEngine, outputAPI, writeStateEngine, videoIdsToInclude);
+        HollowWriteStateEngine writeStateEngine = populateFilteredBlob(stateEngine);
+        addFilteredNamedLists(outputAPI, writeStateEngine);
         return writeStateEngine;
-    }
-
-    private void addFilteredNamedLists(HollowReadStateEngine readStateEngine, VMSRawHollowAPI api, HollowWriteStateEngine writeStateEngine, Set<Integer> includedVideoIds) {
-        HollowObjectMapper mapper = new HollowObjectMapper(writeStateEngine);
-        mapper.doNotUseDefaultHashKeys();
-
-        for(NamedCollectionHolderHollow holder : api.getAllNamedCollectionHolderHollow()) {
-            NamedCollectionHolder outputHolder = new NamedCollectionHolder();
-
-            outputHolder.country = new ISOCountry(holder._getCountry()._getId());
-
-            outputHolder.videoListMap = new HashMap<Strings, Set<Video>>();
-
-            Set<Integer> validVideoIdsForCountry = new HashSet<Integer>();
-
-            for(Map.Entry<StringsHollow, SetOfVideoHollow> entry : holder._getVideoListMap().entrySet()) {
-                Set<Video> videoSet = new HashSet<Video>();
-
-                for(VideoHollow video : entry.getValue()) {
-                    Integer value = video._getValueBoxed();
-
-                    if(includedVideoIds.contains(value)) {
-                        videoSet.add(new Video(value.intValue()));
-                    }
-                }
-
-                if("VALID_VIDEOS".equals(entry.getKey()._getValue())) {
-                    for(Video video : videoSet)
-                        validVideoIdsForCountry.add(video.value);
-                }
-
-                outputHolder.videoListMap.put(new Strings(entry.getKey()._getValue()), videoSet);
-            }
-
-            mapper.addObject(outputHolder);
-        }
-    }
-
-    private BitSet findIncludedL10NOrdinals(HollowReadStateEngine stateEngine, Set<Integer> includedVideoIds) {
-        VMSRawHollowAPI api = new VMSRawHollowAPI(stateEngine);
-
-        BitSet l10nResourcesPopulatedOrdinals = populatedOrdinals(stateEngine, "L10NResources");
-        BitSet includedL10nResourcesOrdinals = new BitSet(l10nResourcesPopulatedOrdinals.length());
-
-        int l10nOrdinal = l10nResourcesPopulatedOrdinals.nextSetBit(0);
-        while(l10nOrdinal != -1) {
-            L10NResourcesHollow l10nResources = api.getL10NResourcesHollow(l10nOrdinal);
-
-            String idStr = l10nResources._getResourceIdStr();
-            char c = idStr.charAt(0);
-            if (c == 'm' || c == 'e' || (c == 'r' && idStr.startsWith("rv_"))) {
-                // filter video related resourceIds
-                for(int i=0;i<idStr.length();i++) {
-                    if(isNumberCharacter(idStr.charAt(i))) {
-                        int j=i+1;
-                        while(j < idStr.length() && isNumberCharacter(idStr.charAt(j)))
-                            j++;
-
-                        int id = (int)Long.parseLong(idStr.substring(i, j));
-                        if(includedVideoIds.contains(Integer.valueOf(id))) {
-                            includedL10nResourcesOrdinals.set(l10nOrdinal);
-                            break;
-                        }
-
-                        i = j;
-                    }
-                }
-            } else {
-                if (this.isIncludeNonVideoL10N) includedL10nResourcesOrdinals.set(l10nOrdinal);
-            }
-
-            l10nOrdinal = l10nResourcesPopulatedOrdinals.nextSetBit(l10nOrdinal + 1);
-        }
-
-        return includedL10nResourcesOrdinals;
     }
 }

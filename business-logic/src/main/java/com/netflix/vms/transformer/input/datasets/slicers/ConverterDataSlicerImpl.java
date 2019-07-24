@@ -14,7 +14,7 @@ public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlic
     @Override
     public HollowWriteStateEngine sliceInputBlob(HollowReadStateEngine stateEngine) {
 
-        ordinalsToInclude.clear();
+        clearOrdinalsToInclude();
 
         final VMSHollowInputAPI inputAPI = new VMSHollowInputAPI(stateEngine);
 
@@ -33,108 +33,40 @@ public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlic
         //}
         //
 
-        findIncludedOrdinals(stateEngine, "ShowSeasonEpisode", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getShowSeasonEpisodeHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "Package", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "PackageMovieDealCountryGroup", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getPackageMovieDealCountryGroupHollow(ordinal)._getMovieId()._getValue());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "Episodes", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getEpisodesHollow(ordinal)._getEpisodeId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "LocalizedMetadata", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getLocalizedMetadataHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "MovieRatings", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getMovieRatingsHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "Movies", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getMoviesHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "Rollout", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getRolloutHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "StoriesSynopses", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getStoriesSynopsesHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "Supplementals", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getSupplementalsHollow(ordinal)._getMovieId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoAward", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoAwardHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoDate", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoDateHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoGeneral", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoGeneralHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoRating", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoRatingHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoType", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int)inputAPI.getVideoTypeHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "ShowCountryLabel", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int) inputAPI.getShowCountryLabelHollow(ordinal)._getVideoId());
-            }
-        });
-        findIncludedOrdinals(stateEngine, "VideoArtworkSource", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int) inputAPI.getVideoArtworkSourceHollow(ordinal)._getMovieId());
-            }
-        });
+        findIncludedOrdinals(stateEngine, "ShowSeasonEpisode", ordinal ->
+                Integer.valueOf((int)inputAPI.getShowSeasonEpisodeHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "Package", ordinal ->
+                Integer.valueOf((int) inputAPI.getPackageHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "PackageMovieDealCountryGroup", ordinal ->
+                Integer.valueOf((int)inputAPI.getPackageMovieDealCountryGroupHollow(ordinal)._getMovieId()._getValue()));
+        findIncludedOrdinals(stateEngine, "Episodes", ordinal ->
+                Integer.valueOf((int)inputAPI.getEpisodesHollow(ordinal)._getEpisodeId()));
+        findIncludedOrdinals(stateEngine, "LocalizedMetadata", ordinal ->
+                Integer.valueOf((int)inputAPI.getLocalizedMetadataHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "MovieRatings", ordinal ->
+                Integer.valueOf((int)inputAPI.getMovieRatingsHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "Movies", ordinal ->
+                Integer.valueOf((int)inputAPI.getMoviesHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "Rollout", ordinal ->
+                Integer.valueOf((int)inputAPI.getRolloutHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "StoriesSynopses", ordinal ->
+                Integer.valueOf((int)inputAPI.getStoriesSynopsesHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "Supplementals", ordinal ->
+                Integer.valueOf((int)inputAPI.getSupplementalsHollow(ordinal)._getMovieId()));
+        findIncludedOrdinals(stateEngine, "VideoAward", ordinal ->
+                Integer.valueOf((int)inputAPI.getVideoAwardHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "VideoDate", ordinal ->
+                Integer.valueOf((int)inputAPI.getVideoDateHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "VideoGeneral", ordinal ->
+                Integer.valueOf((int)inputAPI.getVideoGeneralHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "VideoRating", ordinal ->
+                Integer.valueOf((int)inputAPI.getVideoRatingHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "VideoType", ordinal ->
+                Integer.valueOf((int)inputAPI.getVideoTypeHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "ShowCountryLabel", ordinal ->
+                Integer.valueOf((int) inputAPI.getShowCountryLabelHollow(ordinal)._getVideoId()));
+        findIncludedOrdinals(stateEngine, "VideoArtworkSource", ordinal ->
+                Integer.valueOf((int) inputAPI.getVideoArtworkSourceHollow(ordinal)._getMovieId()));
 
         includeAll(stateEngine, "DamMerchStills");
         includeAll(stateEngine, "TopN");
@@ -178,7 +110,7 @@ public class ConverterDataSlicerImpl extends DataSlicer implements InputDataSlic
         includeAll(stateEngine, "MasterSchedule");
         includeAll(stateEngine, "OverrideSchedule");
 
-        return populateFilteredBlob(stateEngine, ordinalsToInclude);
+        return populateFilteredBlob(stateEngine);
     }
 
 

@@ -108,7 +108,7 @@ public class ShowMeTheFastProgress {
     @Test
     public void runFastLaneAndDiff() throws Throwable {
         // NOTE: the specified transformerVersion must be valid or already in local HD; otherwise, run  getLatestTransformerVersion();
-        long transformerVersion = 20190716000015202l;
+        long transformerVersion = 20190724182654073l;
         int[] topNodes = { 80133542 };
 
         long start = System.currentTimeMillis();

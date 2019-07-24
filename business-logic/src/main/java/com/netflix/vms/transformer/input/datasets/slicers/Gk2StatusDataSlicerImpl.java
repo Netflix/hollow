@@ -14,17 +14,13 @@ public class Gk2StatusDataSlicerImpl extends DataSlicer implements InputDataSlic
     @Override
     public HollowWriteStateEngine sliceInputBlob(HollowReadStateEngine stateEngine) {
 
-        ordinalsToInclude.clear();
+        clearOrdinalsToInclude();
 
         final Gk2StatusAPI inputAPI = new Gk2StatusAPI(stateEngine);
 
-        findIncludedOrdinals(stateEngine, "Status", videoIdsToInclude, new DataSlicer.VideoIdDeriver() {
-            @Override
-            public Integer deriveId(int ordinal) {
-                return Integer.valueOf((int) inputAPI.getStatus(ordinal).getMovieId());
-            }
-        });
+        findIncludedOrdinals(stateEngine, "Status", ordinal ->
+                Integer.valueOf((int) inputAPI.getStatus(ordinal).getMovieId()));
 
-        return populateFilteredBlob(stateEngine, ordinalsToInclude);
+        return populateFilteredBlob(stateEngine);
     }
 }

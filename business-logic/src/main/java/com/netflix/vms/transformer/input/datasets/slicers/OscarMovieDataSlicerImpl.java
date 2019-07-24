@@ -14,12 +14,13 @@ public class OscarMovieDataSlicerImpl extends DataSlicer implements InputDataSli
     @Override
     public HollowWriteStateEngine sliceInputBlob(HollowReadStateEngine stateEngine) {
 
-        ordinalsToInclude.clear();
+        clearOrdinalsToInclude();
 
         final OscarAPI inputAPI = new OscarAPI(stateEngine);
 
-        findIncludedOrdinals(stateEngine, "Movie", videoIdsToInclude, (ordinal)-> Integer.valueOf((int) inputAPI.getMovie(ordinal).getMovieId()));
+        findIncludedOrdinals(stateEngine, "Movie", (ordinal)->
+                Integer.valueOf((int) inputAPI.getMovie(ordinal).getMovieId()));
 
-        return populateFilteredBlob(stateEngine, ordinalsToInclude);
+        return populateFilteredBlob(stateEngine);
     }
 }
