@@ -34,12 +34,7 @@ public class GlobalVideoBasedSelector {
         completeVideoPrimaryKeyIdx = new HollowPrimaryKeyIndex(stateEngine, "CompleteVideo", "id.value", "country.id");
     }
 
-    public Set<Integer> findVideosForTopNodes(int numberOfRandomTopNodesToInclude, int... specificTopNodeIdsToInclude) {
-
-        return findRandomVideoIds(numberOfRandomTopNodesToInclude, specificTopNodeIdsToInclude);
-    }
-
-    public Set<Integer> findRandomVideoIds(int numberOfRandomTopNodesToInclude, int[] specificTopNodeIdsToInclude) {
+    public Set<Integer> findVideosForTopNodes(int numberOfRandomTopNodesToInclude, int[] specificTopNodeIdsToInclude) {
         Random rand = new Random(1000);
         Set<Integer> topNodeVideoIds = new HashSet<>();
         Set<Integer> allVideoIds = new HashSet<>();
@@ -85,13 +80,13 @@ public class GlobalVideoBasedSelector {
                 allVideoIds.add(videoId);
 
                 for (VideoEpisodeHollow episode : videoCollectionsData._getVideoEpisodes()) {
-                    int episodeId = episode._getDeliverableVideo()._getValueBoxed();
+                    Integer episodeId = episode._getDeliverableVideo()._getValueBoxed();
                     allVideoIds.add(episodeId);
                     addAllSupplementalVideoIds(episodeId, countryCode, allVideoIds);
                 }
 
                 for (VideoHollow season : videoCollectionsData._getShowChildren()) {
-                    int seasonId = season._getValueBoxed();
+                    Integer seasonId = season._getValueBoxed();
                     allVideoIds.add(seasonId);
                     addAllSupplementalVideoIds(seasonId, countryCode, allVideoIds);
                 }
@@ -103,7 +98,7 @@ public class GlobalVideoBasedSelector {
         }
     }
 
-    private void addAllSupplementalVideoIds(int videoId, String countryCode, Set<Integer> toSet) {
+    private void addAllSupplementalVideoIds(Integer videoId, String countryCode, Set<Integer> toSet) {
         int completeVideoOrdinal = completeVideoPrimaryKeyIdx.getMatchingOrdinal(videoId, countryCode);
         CompleteVideoHollow vid = api.getCompleteVideoHollow(completeVideoOrdinal);
 
