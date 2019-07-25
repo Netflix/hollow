@@ -3571,7 +3571,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -3591,7 +3591,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -7403,7 +7403,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.evcache:evcache-core",
@@ -7419,7 +7419,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -11430,7 +11430,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -11450,7 +11450,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -15647,7 +15647,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -15667,7 +15667,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -19721,7 +19721,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -19741,7 +19741,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -23844,7 +23844,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -23864,7 +23864,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -27737,7 +27737,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.evcache:evcache-core",
@@ -27753,7 +27753,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -31825,7 +31825,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -31845,7 +31845,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
@@ -35960,7 +35960,7 @@
             ]
         },
         "org.apache.httpcomponents:httpclient": {
-            "locked": "4.5.6",
+            "locked": "4.5.9",
             "transitive": [
                 "com.amazonaws:aws-java-sdk-core",
                 "com.netflix.eureka:eureka-client",
@@ -35980,7 +35980,7 @@
             ]
         },
         "org.apache.httpcomponents:httpcore": {
-            "locked": "4.4.10",
+            "locked": "4.4.11",
             "transitive": [
                 "net.java.dev.jets3t:jets3t",
                 "netflix:nfsso",
