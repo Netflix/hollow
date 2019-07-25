@@ -7,4 +7,9 @@ public class ModuleDataSourceTransitionUtil {
     public static boolean useOscarFeedVideoGeneral(){
         return USE_OSCAR_INCREMENTAL_VIDEO_GENERAL.get();
     }
+
+    private static final FastProperty.BooleanProperty USE_TOPN_JSON = new FastProperty.BooleanProperty("use.topn.json",false);
+    public static boolean useTopNJson(){
+        return USE_TOPN_JSON.get();
+    }
 }

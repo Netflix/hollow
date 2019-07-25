@@ -146,7 +146,6 @@ public class ConverterDiff {
         diff.addTypeDiff("StreamProfileGroups", "groupName.value");
         diff.addTypeDiff("StreamProfiles", "id");
         diff.addTypeDiff("TerritoryCountries", "territoryCode.value");
-        diff.addTypeDiff("TopN", "videoId");
         diff.addTypeDiff("VideoArtwork", "movieId", "sourceFileId.value");
         diff.addTypeDiff("VideoAward", "videoId");
         diff.addTypeDiff("VideoDate", "videoId");
@@ -291,7 +290,6 @@ public class ConverterDiff {
          *  ShowMemberTypes
          *  ShowSeasonEpisode
          *  SingleValuePassthroughMap
-         *  Status
          *  StorageGroups
          *  StoriesSynopses
          *  StoriesSynopsesHook
@@ -315,9 +313,6 @@ public class ConverterDiff {
          *  SupplementalsList
          *  TerritoryCountries
          *  TextStreamInfo
-         *  TopN
-         *  TopNAttribute
-         *  TopNAttributesSet
          *  TranslatedText
          *  TranslatedTextValue
          *  TurboCollections

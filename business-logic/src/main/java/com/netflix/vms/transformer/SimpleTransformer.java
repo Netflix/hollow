@@ -245,7 +245,7 @@ public class SimpleTransformer {
 
                 new L10NMiscResourcesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
                 new LanguageRightsModule(upstream, converterAPI, ctx, cycleConstants, objectMapper, indexer),
-                new TopNVideoDataModule(converterAPI, ctx, cycleConstants, objectMapper),
+                new TopNVideoDataModule(converterAPI, upstream, ctx, cycleConstants, objectMapper),
                 new RolloutVideoModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
                 new PersonImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),
                 new CharacterImagesModule(converterAPI, ctx, cycleConstants, objectMapper, indexer),

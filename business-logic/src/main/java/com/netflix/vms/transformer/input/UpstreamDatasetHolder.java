@@ -6,18 +6,18 @@ import com.netflix.config.NetflixConfiguration;
 import com.netflix.hollow.api.custom.HollowAPI;
 import com.netflix.hollow.core.util.SimultaneousExecutor;
 import com.netflix.vms.transformer.common.input.InputState;
+import com.netflix.vms.transformer.input.datasets.TopNDataset;
 import com.netflix.vms.transformer.common.input.UpstreamDataset;
 import com.netflix.vms.transformer.common.slice.InputDataSlicer;
 import com.netflix.vms.transformer.hollowinput.VMSHollowInputAPI;
 import com.netflix.vms.transformer.input.api.gen.gatekeeper2.Gk2StatusAPI;
-import com.netflix.vms.transformer.input.api.gen.oscar.OscarAPI;
+import com.netflix.vms.transformer.input.api.gen.topn.TopNAPI;
 import com.netflix.vms.transformer.input.datasets.ConverterDataset;
 import com.netflix.vms.transformer.input.datasets.Gatekeeper2Dataset;
-import com.netflix.vms.transformer.input.datasets.OscarDataset;
 import com.netflix.vms.transformer.input.datasets.slicers.ConverterDataSlicerImpl;
 import com.netflix.vms.transformer.input.datasets.slicers.Gk2StatusDataSlicerImpl;
-import com.netflix.vms.transformer.input.datasets.slicers.OscarMovieDataSlicerImpl;
-
+import com.netflix.vms.transformer.input.datasets.slicers.NoOpDataSlicerImpl;
+import com.netflix.vms.transformer.input.datasets.slicers.TopNDataSlicerImpl;
 import java.lang.reflect.Constructor;
 import java.util.EnumMap;
 import java.util.Map;
@@ -39,7 +39,8 @@ public class UpstreamDatasetHolder {
     public enum Dataset {
 
         CONVERTER(ConverterDataset.class, VMSHollowInputAPI.class, ConverterDataSlicerImpl.class),
-        GATEKEEPER2(Gatekeeper2Dataset.class, Gk2StatusAPI.class, Gk2StatusDataSlicerImpl.class);
+        GATEKEEPER2(Gatekeeper2Dataset.class, Gk2StatusAPI.class, Gk2StatusDataSlicerImpl.class),
+        TOPN(TopNDataset.class, TopNAPI.class, TopNDataSlicerImpl.class);
         //TODO: enable me once we can turn on the new data set including follow vip functionality
 //        OSCAR(OscarDataset.class, OscarAPI.class, OscarMovieDataSlicerImpl.class);
 
@@ -52,9 +53,11 @@ public class UpstreamDatasetHolder {
         static {
             PROD_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
             PROD_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_prod");
+            PROD_INPUT_NAMESPACES.put(TOPN, "vms.popularViewables.topN");
 
             TEST_INPUT_NAMESPACES.put(CONVERTER, "vmsconverter-muon");
             TEST_INPUT_NAMESPACES.put(GATEKEEPER2, "gatekeeper2_status_test");
+            TEST_INPUT_NAMESPACES.put(TOPN, "vms.popularViewables.topN");
 
             //
             // Cinder inputs to Converter that need to be migrated to transformer:
